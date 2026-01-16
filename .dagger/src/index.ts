@@ -8,6 +8,19 @@ import {
   object,
 } from '@dagger.io/dagger'
 
+const CSS_BASE_URL = 'https://auth/'
+const CSS_VAPID_PUBLIC_KEY =
+  'BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY'
+const CSS_VAPID_PRIVATE_KEY = '8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA'
+const CSS_PUSH_SENDER = 'mailto:example@yourdomain.org'
+const CSS_ENCODED_PRIVATE_JWK =
+  'eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ'
+const CSS_HTTPS_KEY = '/sai/packages/css-storage-fixture/test/certs/key.pem'
+const CSS_HTTPS_CERT = '/sai/packages/css-storage-fixture/test/certs/cert.pem'
+const NODE_TLS_REJECT_UNAUTHORIZED = '0'
+const CSS_SPARQL_ENDPOINT = 'http://sparql/sparql'
+const CSS_PORT = '443'
+
 @object()
 export class SaiJs {
   source: Directory
@@ -84,22 +97,16 @@ export class SaiJs {
       .container()
       .from('node:22-slim')
       .withMountedDirectory('/sai', this.source)
-      .withEnvVariable('CSS_BASE_URL', 'https://auth/')
-      .withEnvVariable(
-        'CSS_VAPID_PUBLIC_KEY',
-        'BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY'
-      )
-      .withEnvVariable('CSS_VAPID_PRIVATE_KEY', '8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA')
-      .withEnvVariable('CSS_PUSH_SENDER', 'mailto:example@yourdomain.org')
-      .withEnvVariable(
-        'CSS_ENCODED_PRIVATE_JWK',
-        'eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ'
-      )
+      .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
+      .withEnvVariable('CSS_VAPID_PUBLIC_KEY', CSS_VAPID_PUBLIC_KEY)
+      .withEnvVariable('CSS_VAPID_PRIVATE_KEY', CSS_VAPID_PRIVATE_KEY)
+      .withEnvVariable('CSS_PUSH_SENDER', CSS_PUSH_SENDER)
+      .withEnvVariable('CSS_ENCODED_PRIVATE_JWK', CSS_ENCODED_PRIVATE_JWK)
       .withEnvVariable(
         'CSS_POSTGRES_CONNECTION_STRING',
         'postgres://temporal:temporal@postgresql:5432/auth'
       )
-      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0')
+      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('temporal', this.temporalService())
@@ -113,9 +120,9 @@ export class SaiJs {
       .from('node:24-alpine')
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('DOMAIN', 'id')
-      .withEnvVariable('CSS_SPARQL_ENDPOINT', 'http://sparql/sparql')
-      .withEnvVariable('CSS_HTTPS_KEY', '/sai/packages/css-storage-fixture/test/certs/key.pem')
-      .withEnvVariable('CSS_HTTPS_CERT', '/sai/packages/css-storage-fixture/test/certs/cert.pem')
+      .withEnvVariable('CSS_SPARQL_ENDPOINT', CSS_SPARQL_ENDPOINT)
+      .withEnvVariable('CSS_HTTPS_KEY', CSS_HTTPS_KEY)
+      .withEnvVariable('CSS_HTTPS_CERT', CSS_HTTPS_CERT)
       .withExposedPort(443)
       .withServiceBinding('sparql', this.sparqlService())
       .asService({
@@ -131,27 +138,21 @@ export class SaiJs {
       .from('node:24-alpine')
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_CONFIG', '/sai/packages/css-storage-fixture/test/auth.json')
-      .withEnvVariable('CSS_BASE_URL', 'https://auth/')
+      .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
       .withEnvVariable('CSS_AUTHORIZATION_ENDPOINT', 'https://ui.auth/authorize')
-      .withEnvVariable('CSS_PORT', '443')
-      .withEnvVariable('CSS_HTTPS_KEY', '/sai/packages/css-storage-fixture/test/certs/key.pem')
-      .withEnvVariable('CSS_HTTPS_CERT', '/sai/packages/css-storage-fixture/test/certs/cert.pem')
-      .withEnvVariable(
-        'CSS_VAPID_PUBLIC_KEY',
-        'BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY'
-      )
-      .withEnvVariable('CSS_VAPID_PRIVATE_KEY', '8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA')
-      .withEnvVariable('CSS_PUSH_SENDER', 'mailto:example@yourdomain.org')
-      .withEnvVariable(
-        'CSS_ENCODED_PRIVATE_JWK',
-        'eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ'
-      )
+      .withEnvVariable('CSS_PORT', CSS_PORT)
+      .withEnvVariable('CSS_HTTPS_KEY', CSS_HTTPS_KEY)
+      .withEnvVariable('CSS_HTTPS_CERT', CSS_HTTPS_CERT)
+      .withEnvVariable('CSS_VAPID_PUBLIC_KEY', CSS_VAPID_PUBLIC_KEY)
+      .withEnvVariable('CSS_VAPID_PRIVATE_KEY', CSS_VAPID_PRIVATE_KEY)
+      .withEnvVariable('CSS_PUSH_SENDER', CSS_PUSH_SENDER)
+      .withEnvVariable('CSS_ENCODED_PRIVATE_JWK', CSS_ENCODED_PRIVATE_JWK)
       .withEnvVariable(
         'CSS_POSTGRES_CONNECTION_STRING',
         'postgres://temporal:temporal@postgresql:5432/auth'
       )
       .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
-      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0')
+      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('temporal', this.temporalService())
       .withServiceBinding('id', this.idService())
@@ -177,15 +178,15 @@ export class SaiJs {
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_CONFIG', '/sai/packages/css-storage-fixture/test/registry.json')
       .withEnvVariable('CSS_BASE_URL', 'https://registry/')
-      .withEnvVariable('CSS_PORT', '443')
-      .withEnvVariable('CSS_SPARQL_ENDPOINT', 'http://sparql/sparql')
-      .withEnvVariable('CSS_HTTPS_KEY', '/sai/packages/css-storage-fixture/test/certs/key.pem')
-      .withEnvVariable('CSS_HTTPS_CERT', '/sai/packages/css-storage-fixture/test/certs/cert.pem')
+      .withEnvVariable('CSS_PORT', CSS_PORT)
+      .withEnvVariable('CSS_SPARQL_ENDPOINT', CSS_SPARQL_ENDPOINT)
+      .withEnvVariable('CSS_HTTPS_KEY', CSS_HTTPS_KEY)
+      .withEnvVariable('CSS_HTTPS_CERT', CSS_HTTPS_CERT)
       .withEnvVariable(
         'CSS_POSTGRES_CONNECTION_STRING',
         'postgres://temporal:temporal@postgresql:5432/registry'
       )
-      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0')
+      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withExposedPort(443)
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('sparql', this.sparqlService())
@@ -209,15 +210,15 @@ export class SaiJs {
       .withEnvVariable('CSS_CONFIG', '/sai/packages/css-storage-fixture/test/data.json')
       .withEnvVariable('CSS_ROOT_FILE_PATH', '/sai/packages/css-storage-fixture/test/data')
       .withEnvVariable('CSS_BASE_URL', 'https://data/')
-      .withEnvVariable('CSS_PORT', '443')
-      .withEnvVariable('CSS_HTTPS_KEY', '/sai/packages/css-storage-fixture/test/certs/key.pem')
-      .withEnvVariable('CSS_HTTPS_CERT', '/sai/packages/css-storage-fixture/test/certs/cert.pem')
-      .withEnvVariable('CSS_SPARQL_ENDPOINT', 'http://sparql/sparql')
+      .withEnvVariable('CSS_PORT', CSS_PORT)
+      .withEnvVariable('CSS_HTTPS_KEY', CSS_HTTPS_KEY)
+      .withEnvVariable('CSS_HTTPS_CERT', CSS_HTTPS_CERT)
+      .withEnvVariable('CSS_SPARQL_ENDPOINT', CSS_SPARQL_ENDPOINT)
       .withEnvVariable(
         'CSS_POSTGRES_CONNECTION_STRING',
         'postgres://temporal:temporal@postgresql:5432/auth'
       )
-      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0')
+      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withExposedPort(443)
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('sparql', this.sparqlService())
@@ -237,12 +238,9 @@ export class SaiJs {
       .container()
       .from('node:24-alpine')
       .withMountedDirectory('/sai', this.source)
-      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0')
-      .withEnvVariable('CSS_BASE_URL', 'https://auth/')
-      .withEnvVariable(
-        'CSS_ENCODED_PRIVATE_JWK',
-        'eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ'
-      )
+      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
+      .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
+      .withEnvVariable('CSS_ENCODED_PRIVATE_JWK', CSS_ENCODED_PRIVATE_JWK)
       .withServiceBinding('auth', this.authService())
       .withServiceBinding('registry', this.registryService())
       .withServiceBinding('data', this.dataService())
@@ -326,7 +324,7 @@ export class SaiJs {
     return dag
       .container()
       .from('node:24-alpine')
-      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', '0')
+      .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withServiceBinding('postgresql', this.postgresService())
       .withExec(['ping', '-c', '5', 'postgresql'])
       .stdout()

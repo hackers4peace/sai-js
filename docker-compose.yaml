@@ -1,3 +1,23 @@
+x-postgres-env: &postgres-env
+  CSS_POSTGRES_CONNECTION_STRING: postgres://temporal:temporal@postgresql:5432/auth
+
+x-vapid-env: &vapid-env
+  CSS_VAPID_PUBLIC_KEY: BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY
+  CSS_VAPID_PRIVATE_KEY: 8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA
+  CSS_PUSH_SENDER: mailto:example@yourdomain.org
+
+x-idp-env: &idp-env
+  CSS_ENCODED_PRIVATE_JWK: eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ
+
+x-sparql-env: &sparql-env
+  CSS_SPARQL_ENDPOINT: http://sparql/sparql
+
+x-certs-env: &certs-env
+  NODE_EXTRA_CA_CERTS: /mkcert/rootCA.pem
+
+x-temporal-env: &temporal-env
+  TEMPORAL_ADDRESS: temporal:7233
+
 services:
   auth:
     image: node:22-alpine
@@ -20,20 +40,12 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      - CSS_CONFIG=/sai/packages/css-storage-fixture/auth.json
-      - CSS_LOGGING_LEVEL=debug
-      - CSS_BASE_URL=https://auth.docker/
-
-      - CSS_AUTHORIZATION_ENDPOINT=https://ui.auth.docker/authorize
-      - CSS_PORT=4800
-      - CSS_VAPID_PUBLIC_KEY=BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY
-      - CSS_VAPID_PRIVATE_KEY=8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA
-      - CSS_PUSH_SENDER=mailto:example@yourdomain.org
-      - CSS_ENCODED_PRIVATE_JWK=eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ
-      - CSS_POSTGRES_CONNECTION_STRING=postgres://temporal:temporal@postgresql:5432/auth
-      - CSS_SPARQL_ENDPOINT=http://sparql/sparql
-      - TEMPORAL_ADDRESS=temporal:7233
-      - NODE_EXTRA_CA_CERTS=/mkcert/rootCA.pem
+      <<: [*postgres-env, *vapid-env, *idp-env, *sparql-env, *certs-env, *temporal-env]
+      CSS_CONFIG: /sai/packages/css-storage-fixture/auth.json
+      CSS_LOGGING_LEVEL: debug
+      CSS_BASE_URL: https://auth.docker/
+      CSS_AUTHORIZATION_ENDPOINT: https://ui.auth.docker/authorize
+      CSS_PORT: 4800
     labels:
       - traefik.enable=true
       - traefik.http.routers.auth.rule=Host(`auth.docker`)
@@ -62,13 +74,11 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      - CSS_CONFIG=/sai/packages/css-storage-fixture/registry.json
-      - CSS_LOGGING_LEVEL=info
-      - CSS_BASE_URL=https://reg.docker/
-      - CSS_PORT=4600
-      - CSS_SPARQL_ENDPOINT=http://sparql/sparql
-      - CSS_POSTGRES_CONNECTION_STRING=postgres://temporal:temporal@postgresql:5432/registry
-      - NODE_EXTRA_CA_CERTS=/mkcert/rootCA.pem
+      <<: [*postgres-env, *sparql-env, *certs-env]
+      CSS_CONFIG: /sai/packages/css-storage-fixture/registry.json
+      CSS_LOGGING_LEVEL: info
+      CSS_BASE_URL: https://reg.docker/
+      CSS_PORT: 4600
     labels:
       - traefik.enable=true
       - traefik.http.routers.registry.rule=Host(`reg.docker`)
@@ -97,14 +107,12 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      - CSS_CONFIG=/sai/packages/css-storage-fixture/data.json
-      - CSS_LOGGING_LEVEL=info
-      - CSS_ROOT_FILE_PATH=/sai/packages/css-storage-fixture/dev/data
-      - CSS_BASE_URL=https://data.docker/
-      - CSS_PORT=4700
-      - CSS_SPARQL_ENDPOINT=http://sparql/sparql
-      - CSS_POSTGRES_CONNECTION_STRING=postgres://temporal:temporal@postgresql:5432/auth
-      - NODE_EXTRA_CA_CERTS=/mkcert/rootCA.pem
+      <<: [*postgres-env, *sparql-env, *certs-env]
+      CSS_CONFIG: /sai/packages/css-storage-fixture/data.json
+      CSS_LOGGING_LEVEL: info
+      CSS_ROOT_FILE_PATH: /sai/packages/css-storage-fixture/dev/data
+      CSS_BASE_URL: https://data.docker/
+      CSS_PORT: 4700
     labels:
       - traefik.enable=true
       - traefik.http.routers.data.rule=Host(`data.docker`) || HostRegexp(`^.+\.data\.docker$`)
@@ -131,14 +139,8 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      - CSS_BASE_URL=https://auth.docker/
-      - CSS_ENCODED_PRIVATE_JWK=eyJrdHkiOiJFQyIsIngiOiJDMjlsZmlGbm5OV3RITHplSkxDVXpiQnN3QVJCOVZoSl9fRlBWZFlTY3FRIiwieSI6InIxVFpMQS1zbWxyOUkzSWdfc1dRcTM5R0ZjbUYwOVF6TTU3SUs4d1BxUlkiLCJjcnYiOiJQLTI1NiIsImQiOiJYcHdmRDlkN1gtc1FySWlrRW5rWE9KalVKb1JjZS1zS2ZvLXkxdkxIamVjIiwiYWxnIjoiRVMyNTYifQ
-      - CSS_POSTGRES_CONNECTION_STRING=postgres://temporal:temporal@postgresql:5432/auth
-      - TEMPORAL_ADDRESS=temporal:7233
-      - CSS_VAPID_PUBLIC_KEY=BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY
-      - CSS_VAPID_PRIVATE_KEY=8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA
-      - CSS_PUSH_SENDER=mailto:example@yourdomain.org
-      - NODE_EXTRA_CA_CERTS=/mkcert/rootCA.pem
+      <<: [*postgres-env, *vapid-env, *idp-env, *certs-env, *temporal-env]
+      CSS_BASE_URL: https://auth.docker/
   ui:
     image: node:22-alpine
     container_name: ui
@@ -334,8 +336,8 @@ services:
       - --inspect=0.0.0.0:9236
       - /sai/packages/id/http.ts
     environment:
-      - CSS_SPARQL_ENDPOINT=http://sparql/sparql
-      - DOMAIN=id.docker
+      <<: *sparql-env
+      DOMAIN: id.docker
     labels:
       - traefik.enable=true
       - traefik.http.routers.id.rule=Host(`id.docker`) || HostRegexp(`^.+\.id\.docker$`)
