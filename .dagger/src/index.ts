@@ -132,6 +132,7 @@ export class SaiJs {
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_CONFIG', '/sai/packages/css-storage-fixture/test/auth.json')
       .withEnvVariable('CSS_BASE_URL', 'https://auth/')
+      .withEnvVariable('CSS_AUTHORIZATION_ENDPOINT', 'https://ui.auth/authorize')
       .withEnvVariable('CSS_PORT', '443')
       .withEnvVariable('CSS_HTTPS_KEY', '/sai/packages/css-storage-fixture/test/certs/key.pem')
       .withEnvVariable('CSS_HTTPS_CERT', '/sai/packages/css-storage-fixture/test/certs/cert.pem')

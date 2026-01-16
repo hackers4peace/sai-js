@@ -2,6 +2,7 @@ import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import type { JwkGenerator } from '@solid/community-server'
 import { generateKeyPair } from 'jose'
 import { SelfIssuedSession } from './SelfIssuedSession.js'
+import { agentId } from './util/uriTemplates.js'
 
 export class SessionManager {
   public constructor(
@@ -11,12 +12,6 @@ export class SessionManager {
   ) {}
 
   public async getSession(webid: string): Promise<AuthorizationAgent> {
-    // TODO: make it a variable in configs
-    const pathPrefix = '.sai/agents/'
-
-    const encodedWebId = Buffer.from(webid).toString('base64url')
-    const agentId = `${this.baseUrl}${pathPrefix}${encodedWebId}`
-
     const privateKey = await this.jwkGenerator.getPrivateKey()
     const publicKey = await this.jwkGenerator.getPublicKey()
 
@@ -24,7 +19,7 @@ export class SessionManager {
 
     const oidc = new SelfIssuedSession({
       webid,
-      clientId: agentId,
+      clientId: agentId(webid),
       issuer: this.baseUrl,
       expiresIn: this.expiration * 60 * 1000,
       privateKey,
@@ -33,7 +28,7 @@ export class SessionManager {
     })
     await oidc.login()
 
-    return AuthorizationAgent.build(webid, agentId, {
+    return AuthorizationAgent.build(webid, agentId(webid), {
       fetch: oidc.authFetch.bind(oidc),
       randomUUID: crypto.randomUUID.bind(crypto),
     })

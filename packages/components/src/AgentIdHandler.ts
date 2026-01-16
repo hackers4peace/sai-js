@@ -6,6 +6,7 @@ import {
 } from '@solid/community-server'
 import type {
   CredentialsExtractor,
+  InteractionRoute,
   OperationHttpHandlerInput,
   ResponseDescription,
 } from '@solid/community-server'
@@ -17,7 +18,8 @@ export class AgentIdHandler extends OperationHttpHandler {
   protected readonly logger = getLoggerFor(this)
   public constructor(
     private readonly credentialsExtractor: CredentialsExtractor,
-    private readonly sessionManager: SessionManager
+    private readonly sessionManager: SessionManager,
+    private readonly authorizationEndpoint: InteractionRoute
   ) {
     super()
   }
@@ -36,9 +38,7 @@ export class AgentIdHandler extends OperationHttpHandler {
         },
       ],
       client_id: agentId,
-      client_name: 'Solid Authorization Agent',
-      // FIXME: add to config
-      'interop:hasAuthorizationRedirectEndpoint': 'https://ui.auth.docker/authorize',
+      'interop:hasAuthorizationRedirectEndpoint': this.authorizationEndpoint.getPath(),
     }
 
     const credentials = await this.credentialsExtractor.handleSafe(request)

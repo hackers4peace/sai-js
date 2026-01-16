@@ -13,6 +13,7 @@ import {
   UnregisteredApplication,
 } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
+import { invitationUrl } from '../util/uriTemplates.js'
 
 export const buildSocialAgentProfile = (registration: CRUDSocialAgentRegistration) =>
   // TODO (angel) data validation and how to handle when the social agents profile is missing some components?
@@ -114,9 +115,7 @@ export async function createInvitation(
   saiSession: AuthorizationAgent,
   base: { label: string; note?: string }
 ): Promise<S.Schema.Type<typeof SocialAgentInvitation>> {
-  const encodedWebId = Buffer.from(saiSession.webId).toString('base64url')
-  //FIXME: pass base or path prefix
-  const id = `https://auth.docker/.sai/invitations/${encodedWebId}.${randomUUID()}`
+  const id = invitationUrl(saiSession.webId)
   const socialAgentInvitation =
     await saiSession.registrySet.hasAgentRegistry.addSocialAgentInvitation(
       id,

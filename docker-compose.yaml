@@ -23,6 +23,8 @@ services:
       - CSS_CONFIG=/sai/packages/css-storage-fixture/auth.json
       - CSS_LOGGING_LEVEL=debug
       - CSS_BASE_URL=https://auth.docker/
+
+      - CSS_AUTHORIZATION_ENDPOINT=https://ui.auth.docker/authorize
       - CSS_PORT=4800
       - CSS_VAPID_PUBLIC_KEY=BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY
       - CSS_VAPID_PRIVATE_KEY=8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA

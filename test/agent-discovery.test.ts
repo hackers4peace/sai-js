@@ -1,16 +1,13 @@
 import { getAgentRegistrationIri } from '@janeirodigital/interop-utils'
-import { buildOidcSession } from '@janeirodigital/sai-components'
+import { agentId, buildOidcSession } from '@janeirodigital/sai-components'
 import { describe, expect, test } from 'vitest'
 
 const baseUrl = process.env.CSS_BASE_URL
 
 const aliceId = 'https://id/alice'
-const encodedAliceId = Buffer.from(aliceId).toString('base64url')
 const bobId = 'https://id/bob'
-const encodedBobId = Buffer.from(bobId).toString('base64url')
-const pathPrefix = '.sai/agents/'
-const aliceAgentId = `${baseUrl}${pathPrefix}${encodedAliceId}`
-const bobAgentId = `${baseUrl}${pathPrefix}${encodedBobId}`
+const aliceAgentId = agentId(aliceId)
+const bobAgentId = agentId(bobId)
 
 describe('AgentIdHandler', () => {
   test('id', async () => {
@@ -18,6 +15,7 @@ describe('AgentIdHandler', () => {
     const doc = await response.json()
     expect(response.status).toBe(200)
     expect(doc.client_id).toBe(aliceAgentId)
+    expect(doc['interop:hasAuthorizationRedirectEndpoint']).toBe('https://ui.auth/authorize')
   })
   for (const method of ['HEAD', 'GET']) {
     describe('responds with social agent registry in headers', (): void => {

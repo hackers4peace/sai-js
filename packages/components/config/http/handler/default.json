@@ -55,6 +55,12 @@
       }
     },
     {
+      "@id": "urn:sai:default:AuthorizationEndpointRoute",
+      "@type": "AbsolutePathInteractionRoute",
+      "path": { "@id": "urn:sai:default:variable:authorizationEndpoint" },
+      "ensureSlash": false
+    },
+    {
       "comment": "Handles reading and writing notification subscriptions and channels.",
       "@id": "urn:sai:default:AuthorizationAgentDiscoveryHandler",
       "@type": "OperationRouterHandler",
@@ -70,7 +76,8 @@
           "comment": "Responds with ClientID document and handles agent registration discovery.",
           "@type": "AgentIdHandler",
           "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
-          "sessionManager": { "@id": "urn:sai:default:SessionManager" }
+          "sessionManager": { "@id": "urn:sai:default:SessionManager" },
+          "authorizationEndpoint": { "@id": "urn:sai:default:AuthorizationEndpointRoute" }
         }
       }
     },

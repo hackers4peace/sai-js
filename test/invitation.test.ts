@@ -38,7 +38,7 @@ describe('create invitation', () => {
     const { _tag, value } = body[0]
     expect(_tag).toBe('Success')
     expect(value).toEqual(expect.objectContaining(invitationData))
-    expect(value.capabilityUrl).toMatch('https://auth.docker/.sai/invitations')
+    expect(value.capabilityUrl).toMatch('https://auth/.sai/invitations')
 
     const session = await buildOidcSession(aliceId)
     const check = await session.authFetch(value.id)
