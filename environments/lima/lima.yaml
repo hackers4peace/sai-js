@@ -24,6 +24,8 @@ hostResolver:
 portForwards:
   - guestPort: 443
     hostPort: 443
+  - guestPort: 7878
+    hostPort: 7878
 
 containerd:
   system: false

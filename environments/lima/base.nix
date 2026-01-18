@@ -9,10 +9,7 @@
       nixos-lima.nixosModules.lima
     ];
 
-    networking.hostName = "nixsample";
-    networking.hosts = {
-      "127.0.0.1" = ["server"];
-    };
+    networking.hostName = "sai";
 
     # TODO: Consider setting some/all of the mandatory settings in `nixos-lima.nixosModules.lima`
 

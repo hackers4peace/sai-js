@@ -10,7 +10,8 @@
     "pgcli@latest",
     "github:dagger/nix#packages.x86_64-linux.dagger",
     "bun@latest",
-    "nixos-anywhere@latest"
+    "nixos-anywhere@latest",
+    "nix-prefetch-docker@latest"
   ],
   "shell": {
     "init_hook": [

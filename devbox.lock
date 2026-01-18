@@ -265,6 +265,53 @@
         }
       }
     },
+    "nix-prefetch-docker@latest": {
+      "last_modified": "2026-01-09T13:41:53Z",
+      "resolved": "github:NixOS/nixpkgs/5f02c91314c8ba4afe83b256b023756412218535#nix-prefetch-docker",
+      "source": "devbox-search",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/96zsfqrwvz0wrsnvpxqfx2mggskd817a-nix-prefetch-docker",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/96zsfqrwvz0wrsnvpxqfx2mggskd817a-nix-prefetch-docker"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/q8gskfsml43lqn13f2s3jz3pc0ar09zj-nix-prefetch-docker",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/q8gskfsml43lqn13f2s3jz3pc0ar09zj-nix-prefetch-docker"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/fifqnf9n38dcvd4naba2w4aykrn7w99j-nix-prefetch-docker",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/fifqnf9n38dcvd4naba2w4aykrn7w99j-nix-prefetch-docker"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/pnrd9a6367cf2dbmx3fqdxxdfg8zi47z-nix-prefetch-docker",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/pnrd9a6367cf2dbmx3fqdxxdfg8zi47z-nix-prefetch-docker"
+        }
+      }
+    },
     "nixos-anywhere@latest": {
       "last_modified": "2026-01-09T13:41:53Z",
       "resolved": "github:NixOS/nixpkgs/5f02c91314c8ba4afe83b256b023756412218535#nixos-anywhere",
