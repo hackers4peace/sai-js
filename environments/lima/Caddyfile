@@ -1,0 +1,4 @@
+https://server {
+    tls internal
+    reverse_proxy nginx:80
+}

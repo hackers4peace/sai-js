@@ -9,12 +9,16 @@
     "ducker@latest",
     "pgcli@latest",
     "github:dagger/nix#packages.x86_64-linux.dagger",
-    "bun@latest"
+    "bun@latest",
+    "nixos-anywhere@latest"
   ],
   "shell": {
-    "init_hook": ["export CAROOT=\"$(mkcert -CAROOT)\"", "export SSL_CERT_FILE=$CAROOT/rootCA.pem"],
+    "init_hook": [
+      "export CAROOT=\"$(mkcert -CAROOT)\"",
+      "export SSL_CERT_FILE=$CAROOT/rootCA.pem"
+    ],
     "scripts": {
-      "up": "make up",
+      "up":   "make up",
       "down": "make down",
       "seed": "bun packages/css-storage-fixture/setup.ts"
     }
