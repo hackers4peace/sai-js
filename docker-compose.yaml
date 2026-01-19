@@ -40,7 +40,15 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      <<: [*postgres-env, *vapid-env, *idp-env, *sparql-env, *certs-env, *temporal-env]
+      <<:
+        [
+          *postgres-env,
+          *vapid-env,
+          *idp-env,
+          *sparql-env,
+          *certs-env,
+          *temporal-env,
+        ]
       CSS_CONFIG: /sai/packages/css-storage-fixture/auth.json
       CSS_LOGGING_LEVEL: debug
       CSS_BASE_URL: https://auth.docker/
@@ -294,7 +302,7 @@ services:
       - traefik.http.services.temporal-ui.loadbalancer.server.port=8080
 
   oxigraph:
-    image: ghcr.io/oxigraph/oxigraph:latest
+    image: oxigraph/oxigraph:latest
     container_name: oxigraph
     restart: on-failure
     networks:

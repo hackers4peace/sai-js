@@ -49,7 +49,7 @@ export class SaiJs {
   oxigraphService(): Service {
     return dag
       .container()
-      .from('ghcr.io/oxigraph/oxigraph:latest')
+      .from('oxigraph/oxigraph:latest')
       .withExposedPort(7878)
       .asService({ args: ['oxigraph', 'serve', '--location', '/data', '--bind', '0.0.0.0:7878'] })
       .withHostname('oxigraph')
