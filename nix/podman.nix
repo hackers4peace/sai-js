@@ -35,7 +35,7 @@
         image = "docker.io/library/caddy:latest";
         ports = ["443:443"];
         volumes = [
-          "/home/elf-pavlik/code/solid/sai-js/environments/lima/Caddyfile:/etc/caddy/Caddyfile"
+          "/home/elf-pavlik/code/solid/sai-js/nix/Caddyfile:/etc/caddy/Caddyfile"
         ];
         cmd = ["caddy" "run" "--config" "/etc/caddy/Caddyfile"];
       };

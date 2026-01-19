@@ -12,7 +12,8 @@
     "bun@latest",
     "nixos-anywhere@latest",
     "nix-prefetch-docker@latest",
-    "skopeo@latest"
+    "skopeo@latest",
+    "dive@latest"
   ],
   "shell": {
     "init_hook": [

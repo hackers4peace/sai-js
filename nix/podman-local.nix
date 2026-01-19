@@ -5,8 +5,8 @@
   systemd.services.load-sai-oxigraph = {
     description = "Load sai-oxigraph image into Podman";
     wantedBy = [ "multi-user.target" ];
-    wants = [ "podman-sparql.service" ];
     after = [ "network-online.target" ];
+    before = [ "podman-sparql.service" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ./images/sai-oxigraph.nix { }}";

@@ -18,28 +18,28 @@
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./base.nix
+          ./nix/base.nix
         ];
       };
       nixosConfigurations.sai = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./base.nix
-          ./podman.nix
+          ./nix/base.nix
+          ./nix/podman.nix
         ];
       };
       nixosConfigurations.sai-local = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./base.nix
-          ./podman-local.nix
+          ./nix/base.nix
+          ./nix/podman-local.nix
         ];
       };
 
       packages.${system} = {
-        sai-oxigraph = pkgs.callPackage ./images/sai-oxigraph.nix { };
+        sai-oxigraph = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
         default = self.packages.${system}.sai-oxigraph;
       };
     };    
