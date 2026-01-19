@@ -29,6 +29,14 @@
           ./podman.nix
         ];
       };
+      nixosConfigurations.sai-local = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit nixos-lima; };
+        modules = [
+          ./base.nix
+          ./podman-local.nix
+        ];
+      };
 
       packages.${system} = {
         sai-oxigraph = pkgs.callPackage ./images/sai-oxigraph.nix { };

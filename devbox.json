@@ -11,7 +11,8 @@
     "github:dagger/nix#packages.x86_64-linux.dagger",
     "bun@latest",
     "nixos-anywhere@latest",
-    "nix-prefetch-docker@latest"
+    "nix-prefetch-docker@latest",
+    "skopeo@latest"
   ],
   "shell": {
     "init_hook": [
