@@ -1,0 +1,15 @@
+{
+  "name": "sai-id",
+  "version": "0.1.0",
+  "description": "serves WebID, soon CID",
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "main": "http.ts",
+  "scripts": {},
+  "dependencies": {
+    "@hono/node-server": "^1.19.8",
+    "@jeswr/pretty-turtle": "^1.8.2",
+    "fetch-sparql-endpoint": "^6.2.0"
+  }
+}

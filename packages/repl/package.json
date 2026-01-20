@@ -27,8 +27,7 @@
   },
   "scripts": {
     "repl": "tsx ./repl.ts",
-    "cli": "NODE_OPTIONS='--no-deprecation' tsx ./cli.ts",
-    "test": "vitest run"
+    "cli": "NODE_OPTIONS='--no-deprecation' tsx ./cli.ts"
   },
   "dependencies": {
     "@effect/cli": "^0.47.1",

@@ -342,7 +342,7 @@ services:
     command:
       - node
       - --inspect=0.0.0.0:9236
-      - /sai/packages/id/http.ts
+      - /sai/services/id/http.ts
     environment:
       <<: *sparql-env
       DOMAIN: id.docker

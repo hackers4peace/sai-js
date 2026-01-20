@@ -126,7 +126,7 @@ export class SaiJs {
       .withExposedPort(443)
       .withServiceBinding('sparql', this.sparqlService())
       .asService({
-        args: ['node', '/sai/packages/id/https.ts'],
+        args: ['node', '/sai/services/id/https.ts'],
       })
       .withHostname('id')
   }

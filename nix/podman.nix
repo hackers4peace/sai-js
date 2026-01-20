@@ -19,17 +19,13 @@
         };
       };
       id = {
-        image = "docker.io/library/node:24-alpine";
+        image = "hackers4peace/sai-id:latest";
         ports = ["3000:3000"];
-        volumes = [
-          "/home/elf-pavlik/code/solid/sai-js:/sai"
-        ];
+        dependsOn = ["sparql"];
         environment = {
           DOMAIN = "id";
           CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
         };
-        cmd = ["node" "/sai/packages/id/http.ts"];
-        dependsOn = ["sparql"];
       };
       caddy = {
         image = "docker.io/library/caddy:latest";

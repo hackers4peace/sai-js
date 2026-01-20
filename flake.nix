@@ -40,7 +40,9 @@
 
       packages.${system} = {
         sai-oxigraph = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
-        default = self.packages.${system}.sai-oxigraph;
+        sai-oxigraph-image = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
+        sai-id = pkgs.callPackage ./nix/packages/sai-id.nix { };
+        sai-id-image = pkgs.callPackage ./nix/images/sai-id.nix { };
       };
-    };    
+    };
 }
