@@ -27,6 +27,14 @@
         modules = [
           ./nix/base.nix
           ./nix/podman.nix
+          {
+            services.sai.containers = {
+              id.domain = "id";
+              id.sparqlEndpoint = "http://sparql/sparql";
+              sparql.resolver = "127.0.0.11";
+              caddy.caddyfilePath = "/home/elf-pavlik/code/solid/sai-js/nix/Caddyfile";
+            };
+          }
         ];
       };
       nixosConfigurations.sai-local = nixpkgs.lib.nixosSystem {
@@ -35,6 +43,14 @@
         modules = [
           ./nix/base.nix
           ./nix/podman-local.nix
+          {
+            services.sai.containers = {
+              id.domain = "id";
+              id.sparqlEndpoint = "http://sparql/sparql";
+              sparql.resolver = "127.0.0.11";
+              caddy.caddyfilePath = "/home/elf-pavlik/code/solid/sai-js/nix/Caddyfile";
+            };
+          }
         ];
       };
 
