@@ -25,7 +25,6 @@
               id.domain = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
               sparql.resolver = "127.0.0.11";
-              caddy.caddyfilePath = "/home/elf-pavlik/code/solid/sai-js/nix/Caddyfile";
             };
           }
         ];
@@ -41,7 +40,6 @@
               id.domain = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
               sparql.resolver = "127.0.0.11";
-              caddy.caddyfilePath = "/home/elf-pavlik/code/solid/sai-js/nix/Caddyfile";
             };
           }
         ];

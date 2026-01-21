@@ -3,12 +3,10 @@ let
   cfg = config.services.sai.containers;
 in
 {
+  imports = [ ./caddy.nix ];
+
   options.services.sai.containers = {
     id = {
-      domain = lib.mkOption {
-        type = lib.types.str;
-        default = "id";
-      };
       sparqlEndpoint = lib.mkOption {
         type = lib.types.str;
         default = "http://sparql/sparql";
@@ -18,11 +16,6 @@ in
       resolver = lib.mkOption {
         type = lib.types.str;
         default = "127.0.0.11";
-      };
-    };
-    caddy = {
-      caddyfilePath = lib.mkOption {
-        type = lib.types.path;
       };
     };
   };
@@ -54,14 +47,6 @@ in
             DOMAIN = cfg.id.domain;
             CSS_SPARQL_ENDPOINT = cfg.id.sparqlEndpoint;
           };
-        };
-        caddy = {
-          image = "docker.io/library/caddy:latest";
-          ports = ["443:443"];
-          volumes = [
-            "${cfg.caddy.caddyfilePath}:/etc/caddy/Caddyfile"
-          ];
-          cmd = ["caddy" "run" "--config" "/etc/caddy/Caddyfile"];
         };
       };
     };

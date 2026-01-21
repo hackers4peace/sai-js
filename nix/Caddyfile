@@ -1,6 +1,0 @@
-https://id {
-    tls internal
-    reverse_proxy id:3000 {
-        header_up Host id
-    }
-}
