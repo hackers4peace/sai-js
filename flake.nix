@@ -14,18 +14,11 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      nixosConfigurations.base = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit nixos-lima; };
-        modules = [
-          ./nix/base.nix
-        ];
-      };
       nixosConfigurations.sai = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./nix/base.nix
+          ./nix/lima.nix
           ./nix/podman.nix
           {
             services.sai.containers = {
@@ -41,7 +34,7 @@
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./nix/base.nix
+          ./nix/lima.nix
           ./nix/podman-local.nix
           {
             services.sai.containers = {
