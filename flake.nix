@@ -22,11 +22,12 @@
           ./nix/caddy.nix
           ./nix/podman.nix
           {
-            services.sai.containers = {
-              id.domain = "id.hackers4peace.net";
-              id.sparqlEndpoint = "http://sparql/sparql";
-              sparql.resolver = "127.0.0.11";
-            };
+        services.sai.containers = {
+            id.idOrigin = "id.hackers4peace.net";
+            id.docOrigin = "id.hackers4peace.net";
+            id.sparqlEndpoint = "http://sparql/sparql";
+            sparql.resolver = "127.0.0.11";
+          };
           }
         ];
       };
@@ -39,7 +40,8 @@
           ./nix/podman.nix
           {
             services.sai.containers = {
-              id.domain = "id";
+              id.idOrigin = "id";
+              id.docOrigin = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
               sparql.resolver = "127.0.0.11";
             };
@@ -55,7 +57,8 @@
           ./nix/podman-local.nix
           {
             services.sai.containers = {
-              id.domain = "id";
+              id.idOrigin = "id";
+              id.docOrigin = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
               sparql.resolver = "127.0.0.11";
             };

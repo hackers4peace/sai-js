@@ -7,15 +7,10 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "hackers4peace/sai-id";
-  tag = "latest";
+  tag = "0.2";
 
   config = {
     Cmd = [ "${pkgs.nodejs}/bin/node" "http.ts" ];
-    Env = [
-      "NODE_ENV=production"
-      "DOMAIN=id"
-      "CSS_SPARQL_ENDPOINT=http://sparql/sparql"
-    ];
     WorkingDir = "/app";
   };
 

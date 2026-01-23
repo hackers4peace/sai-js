@@ -6,7 +6,9 @@
   "author": "",
   "type": "module",
   "main": "http.ts",
-  "scripts": {},
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
     "@hono/node-server": "^1.19.8",
     "@jeswr/pretty-turtle": "^1.8.2",

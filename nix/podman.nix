@@ -42,7 +42,8 @@ in
           ports = ["3000:3000"];
           dependsOn = ["sparql"];
           environment = {
-            DOMAIN = cfg.id.domain;
+            ID_ORGIN = cfg.id.idOrigin;
+            DOC_DOMAIN = cfg.id.docOrigin;
             CSS_SPARQL_ENDPOINT = cfg.id.sparqlEndpoint;
           };
         };

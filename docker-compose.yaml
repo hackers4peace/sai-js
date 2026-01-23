@@ -345,7 +345,8 @@ services:
       - /sai/services/id/http.ts
     environment:
       <<: *sparql-env
-      DOMAIN: id.docker
+      ID_ORIGIN: id.docker
+      DOC_ORIGIN: id.docker
     labels:
       - traefik.enable=true
       - traefik.http.routers.id.rule=Host(`id.docker`) || HostRegexp(`^.+\.id\.docker$`)
