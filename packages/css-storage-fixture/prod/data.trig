@@ -1,0 +1,14 @@
+GRAPH <https://id.hackers4peace.net/elf-pavlik> {
+  <https://elf-pavlik.hackers4peace.net>
+      solid:oidcIssuer <https://auth.hackers4peace.net/>;
+      interop:hasRegistrySet <https://reg.hackers4peace.net/elf-pavlik/>;
+      interop:hasAuthorizationAgent <https://auth.hackers4peace.net/.sai/agents/aHR0cHM6Ly9lbGYtcGF2bGlrLmhhY2tlcnM0cGVhY2UubmV0> .
+}
+
+GRAPH <https://id.hackers4peace.net/samurex> {
+  <https://samurex.hackers4peace.net>
+      solid:oidcIssuer <https://auth.hackers4peace.net/>;
+      interop:hasRegistrySet <https://reg.hackers4peace.net/samurex/>;
+      interop:hasAuthorizationAgent <https://auth.hackers4peace.net/.sai/agents/aHR0cHM6Ly9zYW11cmV4LmhhY2tlcnM0cGVhY2UubmV0> .
+}
+

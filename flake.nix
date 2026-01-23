@@ -14,11 +14,28 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      nixosConfigurations.sai = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.h4p = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
           ./nix/lima.nix
+          ./nix/caddy.nix
+          ./nix/podman.nix
+          {
+            services.sai.containers = {
+              id.domain = "id.hackers4peace.net";
+              id.sparqlEndpoint = "http://sparql/sparql";
+              sparql.resolver = "127.0.0.11";
+            };
+          }
+        ];
+      };
+      nixosConfigurations.lima = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit nixos-lima; };
+        modules = [
+          ./nix/lima.nix
+          ./nix/caddy.nix
           ./nix/podman.nix
           {
             services.sai.containers = {
@@ -29,11 +46,12 @@
           }
         ];
       };
-      nixosConfigurations.sai-local = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.lima-local = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
           ./nix/lima.nix
+          ./nix/caddy.nix
           ./nix/podman-local.nix
           {
             services.sai.containers = {

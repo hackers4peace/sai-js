@@ -3,8 +3,6 @@ let
   cfg = config.services.sai.containers;
 in
 {
-  imports = [ ./caddy.nix ];
-
   options.services.sai.containers = {
     id = {
       sparqlEndpoint = lib.mkOption {
