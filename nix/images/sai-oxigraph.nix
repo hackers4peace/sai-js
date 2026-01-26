@@ -53,6 +53,13 @@ nginxConfig = pkgs.writeText "nginx.conf" ''
       }
   }
 '';
+  nginxBase =
+    if pkgs.system == "x86_64-linux" then {
+      sha256 = "sha256-/OjrhHIQuhEZYQ5HtzQ2GqJPg8n0GMtCIgE3JWnO3Do=";
+    } else if pkgs.system == "aarch64-linux" then {
+      sha256 = "sha256-ntykiupgLPEcXxiZO2GGjKNtNYzj+V2qEdGiVuceV7M=";
+    } else
+      throw "Unsupported system: ${pkgs.system}";
 in
 pkgs.dockerTools.buildImage {
   name = "hackers4peace/sai-oxigraph";
@@ -60,13 +67,13 @@ pkgs.dockerTools.buildImage {
 
   fromImage = pkgs.dockerTools.pullImage {
     imageName = "docker.io/library/nginx";
-    imageDigest = "sha256:b0f7830b6bfaa1258f45d94c240ab668ced1b3651c8a222aefe6683447c7bf55";
     finalImageName = "docker.io/library/nginx";
     finalImageTag = "alpine";
-    sha256 = "sha256-/OjrhHIQuhEZYQ5HtzQ2GqJPg8n0GMtCIgE3JWnO3Do=";
+
+    imageDigest = "sha256:b0f7830b6bfaa1258f45d94c240ab668ced1b3651c8a222aefe6683447c7bf55";
+    sha256 = nginxBase.sha256;
   };
 
-  # Preserve base image's CMD and Entrypoint by explicitly specifying them
   config = {
     Cmd = [ "nginx" "-g" "daemon off;" ];
     Entrypoint = [ "/docker-entrypoint-custom.sh" ];

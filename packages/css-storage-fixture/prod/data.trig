@@ -1,3 +1,6 @@
+PREFIX interop: <http://www.w3.org/ns/solid/interop#>
+PREFIX solid: <http://www.w3.org/ns/solid/terms#>
+
 GRAPH <https://id.hackers4peace.net/elf-pavlik> {
   <https://elf-pavlik.hackers4peace.net>
       solid:oidcIssuer <https://auth.hackers4peace.net/>;

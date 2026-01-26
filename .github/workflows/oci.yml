@@ -1,0 +1,101 @@
+name: Build & Publish Multi-Arch Images (Docker Hub)
+
+on:
+  push:
+    branches: [deployment]
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.io
+  NAMESPACE: hackers4peace
+  TAG: ${{ github.sha }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  # Space-separated list of flake image attributes
+  IMAGE_ATTRS: |
+    sai-oxigraph-image
+    sai-id-image
+
+jobs:
+  build-and-publish:
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: x86_64-linux
+            arch: amd64
+            runner: ubuntu-latest
+          - system: aarch64-linux
+            arch: arm64
+            runner: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Dagger
+        uses: dagger/dagger-for-github@v7
+        with:
+          version: latest
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+
+      - name: Build & publish images (${{ matrix.arch }})
+        run: |
+          for image in $IMAGE_ATTRS; do
+            dagger call publish-images \
+              --system ${{ matrix.system }} \
+              --images "$image" \
+              --tag $TAG \
+              --registry $REGISTRY/$NAMESPACE \
+              --username=env://DOCKERHUB_USERNAME \
+              --password=env://DOCKERHUB_TOKEN
+          done
+
+  publish-manifests:
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Publish multi-arch manifests (Podman)
+        run: |
+          AUTHFILE="$RUNNER_TEMP/podman-auth.json"
+
+          podman login docker.io \
+            --authfile "$AUTHFILE" \
+            -u "$DOCKERHUB_USERNAME" \
+            -p "$DOCKERHUB_TOKEN"
+
+          for image in $IMAGE_ATTRS; do
+            name="${image%-image}"
+            target="${NAMESPACE}/${name}:${TAG}"
+
+            podman manifest create "$target"
+
+            podman manifest add \
+              --authfile "$AUTHFILE" \
+              "$target" \
+              "docker://$target-amd64" \
+              "docker://$target-arm64"
+
+            podman manifest push \
+              --all \
+              --authfile "$AUTHFILE" \
+              "$target" \
+              "docker://$target"
+          done

@@ -1,42 +1,24 @@
-{
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
+
 pkgs.buildNpmPackage {
   pname = "sai-id";
-  version = "0.1.0";
-  src = pkgs.lib.cleanSourceWith {
-    filter = name: type:
-      let baseName = builtins.baseNameOf (builtins.toString name); in
-      ! (pkgs.lib.hasPrefix ".devbox" baseName ||
-         pkgs.lib.hasPrefix "node_modules" baseName ||
-         pkgs.lib.hasPrefix ".git" baseName ||
-         baseName == "flake.lock" ||
-         baseName == "result");
-    src = ../../services/id;
-  };
+  version = "0.3.0";
+
+  src = pkgs.lib.cleanSource ../../services/id;
+
   npmDepsHash = "sha256-5GPdkah7ATlmqtrwtIQN6bkpKK9raJYbx+hOFb3KGrg=";
 
-  buildPhase = ''
-    runHook preBuild
-    runHook postBuild
-  '';
+  dontNpmBuild = true;
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
 
   installPhase = ''
-    runHook preInstall
-
-    mkdir -p $out/bin $out/share/sai-id
-    cp -r node_modules $out/share/sai-id/
-    cp ./*.ts $out/share/sai-id/
-    cp package.json $out/share/sai-id/
+    mkdir -p $out/app
+    cp -r node_modules *.ts package.json $out/app/
 
     makeWrapper ${pkgs.nodejs}/bin/node $out/bin/sai-id \
       --add-flags "http.ts" \
-      --chdir "$out/share/sai-id" 
-
-    runHook postInstall
+      --chdir "$out/app"
   '';
 
   meta = with pkgs.lib; {

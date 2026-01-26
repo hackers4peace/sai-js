@@ -1,6 +1,8 @@
 import {
   type Container,
   type Directory,
+  type File,
+  type Secret,
   type Service,
   argument,
   dag,
@@ -20,6 +22,31 @@ const CSS_HTTPS_CERT = '/sai/packages/css-storage-fixture/test/certs/cert.pem'
 const NODE_TLS_REJECT_UNAUTHORIZED = '0'
 const CSS_SPARQL_ENDPOINT = 'http://sparql/sparql'
 const CSS_PORT = '443'
+
+const NIX_IMAGE = 'nixos/nix'
+const SKOPEO_IMAGE = 'quay.io/skopeo/stable:latest'
+const IMAGE_SUFFIX = '-image'
+
+type Arch = 'amd64' | 'arm64'
+
+function systemToArch(system: string): Arch {
+  switch (system) {
+    case 'x86_64-linux':
+      return 'amd64'
+    case 'aarch64-linux':
+      return 'arm64'
+    default:
+      throw new Error(`Unsupported system: ${system}`)
+  }
+}
+
+function tarballName(image: string): string {
+  return `docker-image-${image}.tar.gz`
+}
+
+function imageBaseName(image: string): string {
+  return image.endsWith(IMAGE_SUFFIX) ? image.slice(0, -IMAGE_SUFFIX.length) : image
+}
 
 @object()
 export class SaiJs {
@@ -329,5 +356,77 @@ export class SaiJs {
       .withServiceBinding('postgresql', this.postgresService())
       .withExec(['ping', '-c', '5', 'postgresql'])
       .stdout()
+  }
+
+  @func()
+  buildImage(system: string, image: string): File {
+    return dag
+      .container()
+      .from(NIX_IMAGE)
+      .withMountedDirectory('/sai', this.source)
+      .withWorkdir('/sai')
+      .withEnvVariable('NIX_CONFIG', 'experimental-features = nix-command flakes')
+      .withExec([
+        'sh',
+        '-c',
+        `
+          set -eu
+          OUT=$(nix build --no-link --print-out-paths .#packages.${system}.${image})
+          cp -v "$OUT" result.tar.gz
+        `,
+      ])
+      .file('/sai/result.tar.gz')
+  }
+
+  @func()
+  publishImage(
+    imageFile: File,
+    imageName: string,
+    tag: string,
+    registry: string,
+    username: Secret,
+    password: Secret
+  ): Promise<string> {
+    return dag
+      .container()
+      .from(SKOPEO_IMAGE)
+      .withMountedFile('/img/image.tar.gz', imageFile)
+      .withSecretVariable('REGISTRY_USER', username)
+      .withSecretVariable('REGISTRY_PASS', password)
+      .withExec(['sh', '-c', 'skopeo login docker.io -u $REGISTRY_USER -p $REGISTRY_PASS'])
+      .withExec([
+        'skopeo',
+        'copy',
+        '--retry-times',
+        '3',
+        'docker-archive:/img/image.tar.gz',
+        `docker://${registry}/${imageName}:${tag}`,
+      ])
+      .stdout()
+  }
+
+  @func()
+  async publishImages(
+    system: string,
+    images: string[],
+    registry: string,
+    tag: string,
+    username: Secret,
+    password: Secret
+  ): Promise<string[]> {
+    const arch = systemToArch(system)
+    const refs: string[] = []
+
+    for (const image of images) {
+      const baseName = imageBaseName(image)
+      const archTag = `${tag}-${arch}`
+
+      const file = this.buildImage(system, image)
+      const ref = await this.publishImage(file, baseName, archTag, registry, username, password)
+
+      refs.push(ref)
+    }
+
+    return refs
   }
 }

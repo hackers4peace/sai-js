@@ -3,7 +3,7 @@
   "private": true,
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@dagger.io/dagger": "^0.19.8",
+    "@dagger.io/dagger": "^0.19.10",
     "@inrupt/base-rollup-config": "^3.2.4",
     "@types/node": "^22.10.10",
     "husky": "^9.1.7",
