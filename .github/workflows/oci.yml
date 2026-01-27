@@ -1,8 +1,8 @@
 name: Build & Publish Multi-Arch Images (Docker Hub)
 
 on:
-  push:
-    branches: [deployment]
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
