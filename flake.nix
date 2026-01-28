@@ -19,6 +19,7 @@
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+      latestRelease = "89ec9964bb2d6c60273f68d01a298ff60473be07";
     in
     {
       nixosConfigurations.hetzner-cloud-aarch64 = nixpkgs.lib.nixosSystem {
@@ -41,11 +42,11 @@
           {
             services.sai.containers = {
               sparql.resolver = "127.0.0.11";
-              sparql.tag = "dc60ef729bc4293f86501e678a4699248c97ec3e";
+              sparql.tag = latestRelease;
               id.idOrigin = "hackers4peace.net";
               id.docOrigin = "id.hackers4peace.net";
               id.sparqlEndpoint = "http://sparql/sparql";
-              id.tag = "dc60ef729bc4293f86501e678a4699248c97ec3e";
+              id.tag = latestRelease;
               id.caddyConfig = ''
                 tls {
                   dns gandi {env.GANDI_BEARER_TOKEN}
@@ -69,11 +70,11 @@
           {
             services.sai.containers = {
               sparql.resolver = "127.0.0.11";
-              sparql.tag = "dc60ef729bc4293f86501e678a4699248c97ec3e";
+              sparql.tag = latestRelease;
               id.idOrigin = "id";
               id.docOrigin = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
-              id.tag = "dc60ef729bc4293f86501e678a4699248c97ec3e";
+              id.tag = latestRelease;
             };
           }
         ];
