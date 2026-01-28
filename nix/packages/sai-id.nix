@@ -2,7 +2,7 @@
 
 pkgs.buildNpmPackage {
   pname = "sai-id";
-  version = "0.3.0";
+  version = "0.3.1";
 
   src = pkgs.lib.cleanSource ../../services/id;
 
