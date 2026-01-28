@@ -677,6 +677,54 @@
         }
       }
     },
+    "ragenix@latest": {
+      "last_modified": "2026-01-19T00:39:23Z",
+      "resolved": "github:NixOS/nixpkgs/bde09022887110deb780067364a0818e89258968#ragenix",
+      "source": "devbox-search",
+      "version": "2025.03.09",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/52pcw2sxc44w7pmlva3kygbi7z9n6q7i-ragenix-2025.03.09",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/52pcw2sxc44w7pmlva3kygbi7z9n6q7i-ragenix-2025.03.09"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/zhixqh6vwx4582nagxcprwsidkijffg7-ragenix-2025.03.09",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/zhixqh6vwx4582nagxcprwsidkijffg7-ragenix-2025.03.09"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/4gr8py6r4bai3xsadm9ddc7ynbp4zhjv-ragenix-2025.03.09",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/4gr8py6r4bai3xsadm9ddc7ynbp4zhjv-ragenix-2025.03.09"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/b2l355s1bi8xjzc5r205iv07ldy6660w-ragenix-2025.03.09",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/b2l355s1bi8xjzc5r205iv07ldy6660w-ragenix-2025.03.09"
+        }
+      }
+    },
     "skopeo@latest": {
       "last_modified": "2025-12-31T03:27:36Z",
       "resolved": "github:NixOS/nixpkgs/f665af0cdb70ed27e1bd8f9fdfecaf451260fc55#skopeo",
