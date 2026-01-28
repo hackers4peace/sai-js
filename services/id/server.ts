@@ -32,7 +32,7 @@ app.get('/', (c) => {
     return c.text('invalid subdomain count', 400)
   if (hostParts.slice(1).join('.') !== idOrigin) return c.text('invalid domain', 400)
   const subdomain = hostParts[0]
-  return c.redirect(`https://${idOrigin}/${subdomain}`, 303)
+  return c.redirect(`https://${docOrigin}/${subdomain}`, 303)
 })
 
 app.get('/:handle', async (c) => {

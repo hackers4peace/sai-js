@@ -63,7 +63,7 @@ describe('id', () => {
       },
     })
     expect(res.status).toBe(303)
-    expect(res.headers.get('Location')).toBe(`https://${idOrigin}/sub`)
+    expect(res.headers.get('Location')).toBe(`https://${docOrigin}/sub`)
   })
   test('request id with invalid domain', async () => {
     const res = await app.request('/', {
