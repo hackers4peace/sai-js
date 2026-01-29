@@ -23,6 +23,22 @@ in
         '';
       };
     };
+    data = {
+      origin = lib.mkOption {
+        type = lib.types.str;
+        default = "data";
+      };
+      caddyConfig = lib.mkOption {
+        type = lib.types.str;
+        default = ''
+          tls internal
+          reverse_proxy localhost:4700 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto https
+          }
+        '';
+      };
+    };
   };
 
   config = {
@@ -38,6 +54,8 @@ in
       virtualHosts = {
         "*.${cfg.id.idOrigin}".extraConfig = cfg.id.caddyConfig;
         ${cfg.id.docOrigin}.extraConfig = cfg.id.caddyConfig;
+        "*.${cfg.data.origin}".extraConfig = cfg.data.caddyConfig;
+        ${cfg.data.origin}.extraConfig = cfg.data.caddyConfig;
       };
     };
 

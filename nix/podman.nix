@@ -1,6 +1,8 @@
 { config, pkgs, lib, ... }:
 let
   cfg = config.services.sai.containers;
+  sai-id = pkgs.callPackage ./packages/sai-id.nix { };
+  sai-css = pkgs.callPackage ./packages/sai-css.nix { };
 in
 {
   options.services.sai.containers = {
@@ -47,7 +49,7 @@ in
     id = {
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "latest";
+        default = sai-id.version;
         description = "sai-id image tag";
       };
       sparqlEndpoint = lib.mkOption {
@@ -64,6 +66,21 @@ in
       resolver = lib.mkOption {
         type = lib.types.str;
         default = "127.0.0.11";
+      };
+    };
+    data = {
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = sai-css.version;
+        description = "sai-css image tag";
+      };
+      baseUrl = lib.mkOption {
+        type = lib.types.str;
+      };
+      config = lib.mkOption {
+        type = lib.types.path;
+        default = ../services/css/data.json;
+        description = "data service config";
       };
     };
   };
@@ -206,6 +223,25 @@ in
             TEMPORAL_ADDRESS = "temporal:7233";
             TEMPORAL_CORS_ORIGINS = "http://localhost:3000";
           };
+        };
+
+        data = {
+          image = "hackers4peace/sai-css:${cfg.data.tag}";
+          ports = ["4700:4700"];
+          dependsOn = ["postgresql"];
+          environment = {
+
+            CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
+            CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
+            CSS_CONFIG = "/config/data.json";
+            CSS_ROOT_FILE_PATH = "/data";
+            CSS_BASE_URL = cfg.data.baseUrl;
+            CSS_PORT = "4700";
+          };
+          volumes = [
+            "${cfg.data.config}:/config/data.json:ro"
+            "css-data:/data"
+          ];
         };
       };
     };

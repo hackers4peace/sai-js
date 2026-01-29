@@ -56,6 +56,8 @@
                   header_up Host {host}
                 }
               '';
+              data.baseUrl = "https://data.hackers4peace.net/";
+              data.tag = latestRelease;
             };
           }
         ];
@@ -75,6 +77,8 @@
               id.docOrigin = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
               id.tag = latestRelease;
+              data.baseUrl = "https://data/";
+              data.tag = latestRelease;
             };
           }
         ];
@@ -92,6 +96,7 @@
               id.idOrigin = "id";
               id.docOrigin = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
+              data.baseUrl = "https://data/";
             };
           }
         ];
@@ -106,6 +111,8 @@
 
           sai-id = pkgs.callPackage ./nix/packages/sai-id.nix { };
           sai-id-image = pkgs.callPackage ./nix/images/sai-id.nix { };
+          sai-css = pkgs.callPackage ./nix/packages/sai-css.nix { };
+          sai-css-image = pkgs.callPackage ./nix/images/sai-css.nix { };
         }
       );
     };

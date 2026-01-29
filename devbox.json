@@ -17,12 +17,9 @@
     "ragenix@latest"
   ],
   "shell": {
-    "init_hook": [
-      "export CAROOT=\"$(mkcert -CAROOT)\"",
-      "export SSL_CERT_FILE=$CAROOT/rootCA.pem"
-    ],
+    "init_hook": ["export CAROOT=\"$(mkcert -CAROOT)\"", "export SSL_CERT_FILE=$CAROOT/rootCA.pem"],
     "scripts": {
-      "up":   "make up",
+      "up": "make up",
       "down": "make down",
       "seed": "bun packages/css-storage-fixture/setup.ts"
     }

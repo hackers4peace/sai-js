@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "sai-id",
   "version": "0.1.0",
   "description": "serves WebID, soon CID",
