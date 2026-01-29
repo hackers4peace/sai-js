@@ -1,5 +1,5 @@
+import { agentId, buildOidcSession } from '@elfpavlik/sai-components'
 import { getAgentRegistrationIri } from '@janeirodigital/interop-utils'
-import { agentId, buildOidcSession } from '@janeirodigital/sai-components'
 import { describe, expect, test } from 'vitest'
 
 const baseUrl = process.env.CSS_BASE_URL

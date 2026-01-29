@@ -1,10 +1,10 @@
+import { buildOidcSession } from '@elfpavlik/sai-components'
 import {
   AS,
   discoverAgentRegistration,
   discoverAuthorizationAgent,
   fetchWrapper,
 } from '@janeirodigital/interop-utils'
-import { buildOidcSession } from '@janeirodigital/sai-components'
 import { describe, expect, test } from 'vitest'
 import { receivesNotification } from './util'
 

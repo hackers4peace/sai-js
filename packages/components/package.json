@@ -1,16 +1,16 @@
 {
-  "name": "@janeirodigital/sai-components",
+  "name": "@elfpavlik/sai-components",
   "version": "1.0.0-rc.25",
   "description": "",
-  "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-components",
+  "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components",
   "lsd:components": "dist/components/components.jsonld",
   "lsd:contexts": {
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-components/^1.0.0/components/context.jsonld": "dist/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld": "dist/components/context.jsonld"
   },
   "lsd:importPaths": {
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-components/^1.0.0/components/": "dist/components/",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-components/^1.0.0/config/": "config/",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-components/^1.0.0/dist/": "dist/"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/": "dist/components/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/config/": "config/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/dist/": "dist/"
   },
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,6 +20,7 @@
     "build:ts": "tsc",
     "clean": "rm -rf dist/"
   },
+  "files": ["dist/", "src/"],
   "keywords": [],
   "author": "",
   "license": "MIT",
