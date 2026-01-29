@@ -19,6 +19,6 @@
   "license": "MIT",
   "dependencies": {
     "@solid/community-server": "8.0.0-alpha.1",
-    "@janeirodigital/sai-components": "1.0.0-rc.24"
+    "@janeirodigital/sai-components": "1.0.0-rc.25"
   }
 }

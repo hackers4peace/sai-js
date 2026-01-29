@@ -1,7 +1,7 @@
 {
   "name": "@janeirodigital/interop-repl",
   "private": true,
-  "version": "1.0.0-rc.24",
+  "version": "1.0.0-rc.25",
   "description": "",
   "contributors": [
     {
@@ -32,14 +32,14 @@
   "dependencies": {
     "@effect/cli": "^0.47.1",
     "@effect/platform-node": "^0.63.1",
-    "@janeirodigital/interop-utils": "^1.0.0-rc.24",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.25",
     "effect": "^3.9.1"
   },
   "devDependencies": {
     "@effect/platform": "^0.68.1",
-    "@janeirodigital/css-test-utils": "^1.0.0-rc.24",
-    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.24",
-    "@janeirodigital/interop-data-model": "^1.0.0-rc.24",
+    "@janeirodigital/css-test-utils": "^1.0.0-rc.25",
+    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.25",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.25",
     "@paralleldrive/cuid2": "^2.2.2",
     "tsx": "^4.17.0"
   }

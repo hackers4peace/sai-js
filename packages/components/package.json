@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/sai-components",
-  "version": "1.0.0-rc.24",
+  "version": "1.0.0-rc.25",
   "description": "",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-components",
   "lsd:components": "dist/components/components.jsonld",
@@ -26,9 +26,9 @@
   "dependencies": {
     "@comunica/query-sparql-rdfjs": "^4.5.0",
     "@effect/rpc": "^0.44.13",
-    "@janeirodigital/interop-data-model": "^1.0.0-rc.24",
-    "@janeirodigital/interop-utils": "^1.0.0-rc.24",
-    "@janeirodigital/sai-api-messages": "1.0.0-rc.24",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.25",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.25",
+    "@janeirodigital/sai-api-messages": "1.0.0-rc.25",
     "@solid-notifications/discovery": "^0.1.2",
     "@solid-notifications/subscription": "^0.1.2",
     "@solid/community-server": "8.0.0-alpha.1",

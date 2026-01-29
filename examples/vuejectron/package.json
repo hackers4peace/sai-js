@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@inrupt/solid-client-authn-browser": "^2.0.0",
-    "@janeirodigital/interop-application": "^1.0.0-rc.24",
-    "@janeirodigital/interop-data-model": "^1.0.0-rc.24",
-    "@janeirodigital/interop-utils": "^1.0.0-rc.24",
+    "@janeirodigital/interop-application": "^1.0.0-rc.25",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.25",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.25",
     "@ldo/ldo": "1.0.0-alpha.32",
     "@ldo/connected": "1.0.0-alpha.32",
     "@ldo/connected-solid": "1.0.0-alpha.32",

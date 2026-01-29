@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/interop-utils",
-  "version": "1.0.0-rc.24",
+  "version": "1.0.0-rc.25",
   "description": "Internal utilities intended to be used by other modules implementing Solid Application Interoperability specification",
   "contributors": [
     {
@@ -50,7 +50,7 @@
     "postgres": "^3.4.7"
   },
   "devDependencies": {
-    "@janeirodigital/css-test-utils": "^1.0.0-rc.24",
+    "@janeirodigital/css-test-utils": "^1.0.0-rc.25",
     "@rdfjs/types": "^1.1.0",
     "@types/http-link-header": "^1.0.3",
     "@types/n3": "^1.21.1"

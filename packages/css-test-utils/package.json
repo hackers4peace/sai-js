@@ -1,7 +1,7 @@
 {
   "name": "@janeirodigital/css-test-utils",
   "private": true,
-  "version": "1.0.0-rc.24",
+  "version": "1.0.0-rc.25",
   "description": "Internal testing utilities intended to be used by other modules implementing Solid Application Interoperability specification. Intended to be only used as a development dependency.",
   "contributors": [
     {

@@ -12,8 +12,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@janeirodigital/sai-components": "1.0.0-rc.24",
-    "@janeirodigital/interop-test-utils": "1.0.0-rc.24",
-    "@janeirodigital/interop-utils": "1.0.0-rc.24"
+    "@janeirodigital/sai-components": "1.0.0-rc.25",
+    "@janeirodigital/interop-test-utils": "1.0.0-rc.25",
+    "@janeirodigital/interop-utils": "1.0.0-rc.25"
   }
 }

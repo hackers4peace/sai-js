@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/sai-api-messages",
-  "version": "1.0.0-rc.24",
+  "version": "1.0.0-rc.25",
   "description": "",
   "license": "MIT",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@effect/rpc": "^0.44.13",
-    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.24",
+    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.25",
     "effect": "^3.10.8"
   },
   "devDependencies": {
