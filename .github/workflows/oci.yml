@@ -16,6 +16,7 @@ env:
   IMAGE_ATTRS: |
     sai-oxigraph-image
     sai-id-image
+    sai-css-image
 
 jobs:
   build-and-publish:
