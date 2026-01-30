@@ -9,8 +9,21 @@
     group = "caddy";
     mode = "0400";
   };
-  systemd.services.caddy.serviceConfig.EnvironmentFile =
-    [ config.age.secrets.gandi.path ];
+
+  age.secrets.auth = {
+    file = ./secrets/auth.age;
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
+  services.sai.containers = {
+    auth.env = config.age.secrets.auth.path;
+  };
+
+  systemd.services.caddy.serviceConfig.EnvironmentFile = [
+    config.age.secrets.gandi.path
+  ];
 
   networking.firewall = {
     enable = true;

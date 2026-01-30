@@ -56,8 +56,42 @@
                   header_up Host {host}
                 }
               '';
+              data.caddyConfig = ''
+                tls {
+                  dns gandi {env.GANDI_BEARER_TOKEN}
+                  propagation_delay 300s
+                }
+                reverse_proxy localhost:4700 {
+                  header_up Host {host}
+                  header_up X-Forwarded-Proto https
+                }
+              '';
+              auth.caddyConfig = ''
+                tls {
+                  dns gandi {env.GANDI_BEARER_TOKEN}
+                  propagation_delay 300s
+                }
+                reverse_proxy localhost:4800 {
+                  header_up Host {host}
+                  header_up X-Forwarded-Proto https
+                }
+              '';
+              registry.caddyConfig = ''
+                tls {
+                  dns gandi {env.GANDI_BEARER_TOKEN}
+                  propagation_delay 300s
+                }
+                reverse_proxy localhost:4600 {
+                  header_up Host {host}
+                  header_up X-Forwarded-Proto https
+                }
+              '';
               data.baseUrl = "https://data.hackers4peace.net/";
               data.tag = latestRelease;
+              auth.vapidPublicKey = "BJ5cuKc1taNAQ87rXz9mO9g8kE7198r_yc2iCSexaqDlax4nUpnj9T1sxAyBH8l--1qiZCeSwCsDi6KYUkx2vBA";
+              auth.baseUrl = "https://auth.hackers4peace.net/";
+              auth.authEndpoint = "https://app.auth.hackers4peace.net/authorize";
+              registry.baseUrl = "https://reg.hackers4peace.net/";
             };
           }
         ];
@@ -97,6 +131,11 @@
               id.docOrigin = "id";
               id.sparqlEndpoint = "http://sparql/sparql";
               data.baseUrl = "https://data/";
+              auth.vapidPublicKey = "BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY";
+              auth.baseUrl = "https://auth/";
+              auth.authEndpoint = "https://app.auth/authorize";
+              auth.env = ./packages/css-storage-fixture/dev/env;
+              registry.baseUrl = "https://registry/";
             };
           }
         ];

@@ -23,6 +23,38 @@ in
         '';
       };
     };
+    auth = {
+      origin = lib.mkOption {
+        type = lib.types.str;
+        default = "auth";
+      };
+      caddyConfig = lib.mkOption {
+        type = lib.types.str;
+        default = ''
+          tls internal
+          reverse_proxy localhost:4800 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto https
+          }
+        '';
+      };
+    };
+    registry = {
+      origin = lib.mkOption {
+        type = lib.types.str;
+        default = "registry";
+      };
+      caddyConfig = lib.mkOption {
+        type = lib.types.str;
+        default = ''
+          tls internal
+          reverse_proxy localhost:4600 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto https
+          }
+        '';
+      };
+    };
     data = {
       origin = lib.mkOption {
         type = lib.types.str;
@@ -56,9 +88,9 @@ in
         ${cfg.id.docOrigin}.extraConfig = cfg.id.caddyConfig;
         "*.${cfg.data.origin}".extraConfig = cfg.data.caddyConfig;
         ${cfg.data.origin}.extraConfig = cfg.data.caddyConfig;
+        ${cfg.registry.origin}.extraConfig = cfg.registry.caddyConfig;
+        ${cfg.auth.origin}.extraConfig = cfg.auth.caddyConfig;
       };
     };
-
-    networking.firewall.allowedTCPPorts = [ 80 443 ];
   };
 }

@@ -3,4 +3,5 @@ let
 in
 {
   "secrets/gandi.age".publicKeys = [ h4p ];
+  "secrets/auth.age".publicKeys = [ h4p ];
 }

@@ -68,6 +68,46 @@ in
         default = "127.0.0.11";
       };
     };
+    auth = {
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = sai-css.version;
+        description = "sai-css image tag";
+      };
+      baseUrl = lib.mkOption {
+        type = lib.types.str;
+      };
+      authEndpoint = lib.mkOption {
+        type = lib.types.str;
+      };
+      vapidPublicKey = lib.mkOption {
+        type = lib.types.str;
+      };
+      env = lib.mkOption {
+        type = lib.types.path;
+        description = "auth service env";
+      };
+      config = lib.mkOption {
+        type = lib.types.path;
+        default = ../services/css/auth.json;
+        description = "auth service config";
+      };
+    };
+    registry = {
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = sai-css.version;
+        description = "sai-css image tag";
+      };
+      baseUrl = lib.mkOption {
+        type = lib.types.str;
+      };
+      config = lib.mkOption {
+        type = lib.types.path;
+        default = ../services/css/registry.json;
+        description = "registry service config";
+      };
+    };
     data = {
       tag = lib.mkOption {
         type = lib.types.str;
@@ -223,6 +263,45 @@ in
             TEMPORAL_ADDRESS = "temporal:7233";
             TEMPORAL_CORS_ORIGINS = "http://localhost:3000";
           };
+        };
+
+        auth = {
+          image = "hackers4peace/sai-css:${cfg.auth.tag}";
+          ports = ["4800:4800"];
+          dependsOn = ["postgresql"];
+          environment = {
+            CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
+            CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
+            CSS_CONFIG = "/config/auth.json";
+            CSS_BASE_URL = cfg.auth.baseUrl;
+            CSS_AUTHORIZATION_ENDPOINT = cfg.auth.authEndpoint;
+            CSS_PORT = "4800";
+            TEMPORAL_ADDRESS = "temporal:7233";
+            CSS_VAPID_PUBLIC_KEY = cfg.auth.vapidPublicKey;
+          };
+          environmentFiles = [
+            cfg.auth.env
+          ];
+          volumes = [
+            "${cfg.auth.config}:/config/auth.json:ro"
+          ];
+        };
+
+        registry = {
+          image = "hackers4peace/sai-css:${cfg.registry.tag}";
+          ports = ["4600:4600"];
+          dependsOn = ["postgresql"];
+          environment = {
+
+            CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
+            CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
+            CSS_CONFIG = "/config/registry.json";
+            CSS_BASE_URL = cfg.registry.baseUrl;
+            CSS_PORT = "4600";
+          };
+          volumes = [
+            "${cfg.registry.config}:/config/registry.json:ro"
+          ];
         };
 
         data = {
