@@ -19,7 +19,7 @@
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      latestRelease = "89ec9964bb2d6c60273f68d01a298ff60473be07";
+      latestRelease = "01e4127b5bfe5d9a4c82b1acef3f8b3593ce3910";
     in
     {
       nixosConfigurations.hetzner-cloud-aarch64 = nixpkgs.lib.nixosSystem {
@@ -45,8 +45,14 @@
               sparql.tag = latestRelease;
               id.idOrigin = "hackers4peace.net";
               id.docOrigin = "id.hackers4peace.net";
+              data.origin = "data.hackers4peace.net";
+              registry.origin = "reg.hackers4peace.net";
+              auth.origin = "auth.hackers4peace.net";
               id.sparqlEndpoint = "http://sparql/sparql";
               id.tag = latestRelease;
+              data.tag = latestRelease;
+              registry.tag = latestRelease;
+              auth.tag = latestRelease;
               id.caddyConfig = ''
                 tls {
                   dns gandi {env.GANDI_BEARER_TOKEN}
@@ -87,7 +93,6 @@
                 }
               '';
               data.baseUrl = "https://data.hackers4peace.net/";
-              data.tag = latestRelease;
               auth.vapidPublicKey = "BJ5cuKc1taNAQ87rXz9mO9g8kE7198r_yc2iCSexaqDlax4nUpnj9T1sxAyBH8l--1qiZCeSwCsDi6KYUkx2vBA";
               auth.baseUrl = "https://auth.hackers4peace.net/";
               auth.authEndpoint = "https://app.auth.hackers4peace.net/authorize";
