@@ -7,7 +7,6 @@ import type {
   AuthorizationData,
   DataInstanceList,
   DataRegistryList,
-  IRI,
   Resource,
   ShareAuthorization,
   ShareAuthorizationConfirmation,
@@ -17,6 +16,7 @@ import type {
   SocialAgentList,
   UnregisteredApplication,
 } from '@janeirodigital/sai-api-messages'
+import { IRI } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
@@ -53,11 +53,11 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // TODO rename list with load
-  async function listDataInstances(
-    agentId: S.Schema.Type<typeof IRI>,
-    registrationId: S.Schema.Type<typeof IRI>
-  ) {
-    const dataInstances = await effect.listDataInstances(agentId, registrationId)
+  async function listDataInstances(agentId: string, registrationId: string) {
+    const dataInstances = await effect.listDataInstances(
+      IRI.make(agentId),
+      IRI.make(registrationId)
+    )
     loadedDataInstances[registrationId] = [...dataInstances]
   }
 

@@ -48,6 +48,7 @@
               data.origin = "data.hackers4peace.net";
               registry.origin = "reg.hackers4peace.net";
               auth.origin = "auth.hackers4peace.net";
+              ui.origin = "app.auth.hackers4peace.net";
               id.sparqlEndpoint = "http://sparql/sparql";
               id.tag = latestRelease;
               data.tag = latestRelease;
@@ -158,6 +159,8 @@
 
           sai-css = pkgs.callPackage ./nix/packages/sai-css.nix { };
           sai-css-image = pkgs.callPackage ./nix/images/sai-css.nix { };
+
+          sai-ui = pkgs.callPackage ./nix/packages/sai-ui.nix {};
         }
       );
     };

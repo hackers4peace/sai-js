@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 let
   cfg = config.services.sai.containers;
+  sai-ui = pkgs.callPackage ./packages/sai-ui.nix {};
 in
 {
   options.services.sai.containers = {
@@ -39,6 +40,23 @@ in
         '';
       };
     };
+    ui = {
+      origin = lib.mkOption {
+        type = lib.types.str;
+        default = "app.auth";
+      };
+      caddyConfig = lib.mkOption {
+        type = lib.types.str;
+        default = ''
+          tls internal
+          root * ${sai-ui}
+          encode zstd gzip
+          # history fallback
+          try_files {path} {path}/ /index.html
+          file_server
+        '';
+      };
+    };
     registry = {
       origin = lib.mkOption {
         type = lib.types.str;
@@ -74,6 +92,10 @@ in
   };
 
   config = {
+    environment.systemPackages = [
+      sai-ui
+    ];
+
     services.caddy = {
       enable = true;
       package = pkgs.caddy.withPlugins {
@@ -90,6 +112,7 @@ in
         ${cfg.data.origin}.extraConfig = cfg.data.caddyConfig;
         ${cfg.registry.origin}.extraConfig = cfg.registry.caddyConfig;
         ${cfg.auth.origin}.extraConfig = cfg.auth.caddyConfig;
+        ${cfg.ui.origin}.extraConfig = cfg.ui.caddyConfig;
       };
     };
   };

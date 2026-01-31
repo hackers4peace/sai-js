@@ -1,7 +1,11 @@
 {
+  pkgs,
   config,
   ...
 }:
+let
+  sai-ui = pkgs.callPackage ./packages/sai-ui.nix {};
+in
 {
   age.secrets.gandi = {
     file = ./secrets/gandi.age;
@@ -19,6 +23,21 @@
 
   services.sai.containers = {
     auth.env = config.age.secrets.auth.path;
+    ui.caddyConfig = ''
+      tls {
+        dns gandi {env.GANDI_BEARER_TOKEN}
+        propagation_delay 300s
+      }
+      root * ${sai-ui}
+      encode zstd gzip
+      try_files {path} {path}/ /index.html
+      file_server
+      header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+      }
+    '';
   };
 
   systemd.services.caddy.serviceConfig.EnvironmentFile = [

@@ -14,7 +14,8 @@
     "nix-prefetch-docker@latest",
     "skopeo@latest",
     "prefetch-npm-deps@latest",
-    "ragenix@latest"
+    "ragenix@latest",
+    "cacert@latest"
   ],
   "shell": {
     "init_hook": ["export CAROOT=\"$(mkcert -CAROOT)\"", "export SSL_CERT_FILE=$CAROOT/rootCA.pem"],

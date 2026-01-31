@@ -8,13 +8,13 @@
     >
       <v-card-actions>
         <v-spacer />
-        <v-btn 
+        <v-btn
           prepend-icon="mdi-hexagon-multiple-outline"
           :to="{name: 'data-registry-list', query: {agent: agent.id}}"
         >
           {{ $t('data') }}
         </v-btn>
-        <v-btn 
+        <v-btn
           :disabled="!agent.accessNeedGroup"
           prepend-icon="mdi-security"
           :to="{name: 'authorization', query: {webid: agent.id, redirect: 'false'}}"
@@ -41,7 +41,7 @@
     >
       <v-card-actions>
         <v-spacer />
-        <v-btn 
+        <v-btn
           prepend-icon="mdi-content-copy"
           @click="copyCapabilityUrl(invitation)"
         >
@@ -81,7 +81,8 @@
 </template>
 <script lang="ts" setup>
 import { useAppStore } from '@/store/app'
-import type { Invitation } from '@janeirodigital/sai-api-messages'
+import type { SocialAgentInvitation } from '@janeirodigital/sai-api-messages'
+import type * as S from 'effect/Schema'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -91,11 +92,11 @@ appStore.listSocialAgents()
 appStore.listSocialAgentInvitations()
 const showAdd = ref(false)
 
-function copyCapabilityUrl(invitation: Invitation) {
+function copyCapabilityUrl(invitation: S.Schema.Type<typeof SocialAgentInvitation>) {
   navigator.clipboard.writeText(invitation.capabilityUrl)
 }
 
-function webShareUrl(invitation: Invitation) {
+function webShareUrl(invitation: S.Schema.Type<typeof SocialAgentInvitation>) {
   navigator.share({
     title: invitation.label,
     text: invitation.note,

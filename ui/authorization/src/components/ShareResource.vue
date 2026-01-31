@@ -97,8 +97,9 @@ import AccessModeSelector from '@/components/AccessModeSelector.vue'
 import { useAppStore } from '@/store/app'
 import {
   AccessModes,
+  IRI,
   type Resource,
-  type ShareAuthorizationModes,
+  ShapeTree,
   type SocialAgentList,
 } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
@@ -114,6 +115,10 @@ const props = defineProps<{
   socialAgents: S.Schema.Type<typeof SocialAgentList>
 }>()
 
+type ShareAuthorizationModes = {
+  accessMode: string[]
+  children: { shapeTree: string; accessMode: string[] }[]
+}
 const shareData: ShareAuthorizationModes = reactive({
   accessMode: [],
   children: [],
@@ -170,11 +175,14 @@ function modeSelected(shapeTree: string, mode: string) {
 function share() {
   loading.value = true
   appStore.shareResource({
-    applicationId: props.applicationId,
+    applicationId: IRI.make(props.applicationId),
     resource: props.resource.id,
-    accessMode: shareData.accessMode,
-    children: shareData.children,
-    agents: [...selectedAgents],
+    accessMode: shareData.accessMode.map((m) => IRI.make(m)),
+    children: shareData.children.map((c) => ({
+      shapeTree: IRI.make(c.shapeTree),
+      accessMode: c.accessMode.map((m) => IRI.make(m)),
+    })),
+    agents: [...selectedAgents].map((a) => IRI.make(a)),
   })
 }
 

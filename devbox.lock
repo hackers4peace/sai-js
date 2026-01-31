@@ -49,6 +49,102 @@
         }
       }
     },
+    "cacert@latest": {
+      "last_modified": "2026-01-24T23:43:55Z",
+      "resolved": "github:NixOS/nixpkgs/26b0093bc977081dc7653175a3fadab11e07bed7#cacert",
+      "source": "devbox-search",
+      "version": "3.119.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hdlzbkfhsvpihhwpwxskgv43pqp2x94y-nss-cacert-3.119.1",
+              "default": true
+            },
+            {
+              "name": "unbundled",
+              "path": "/nix/store/cxbv7r17cdfiqvv82y8b5387ln5sbxvr-nss-cacert-3.119.1-unbundled"
+            },
+            {
+              "name": "hashed",
+              "path": "/nix/store/df0r4h0m7w6hf2hmkblih37k3cs8w2jf-nss-cacert-3.119.1-hashed"
+            },
+            {
+              "name": "p11kit",
+              "path": "/nix/store/cvw1wfmy1ipf98qvdpalaidqllj6z87b-nss-cacert-3.119.1-p11kit"
+            }
+          ],
+          "store_path": "/nix/store/hdlzbkfhsvpihhwpwxskgv43pqp2x94y-nss-cacert-3.119.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xrnx7qfbwz5yhh6n5q0fhgsmb0hg9fx1-nss-cacert-3.119.1",
+              "default": true
+            },
+            {
+              "name": "hashed",
+              "path": "/nix/store/xxbydzyqda6ydqjj94rpsdx002rlxy8c-nss-cacert-3.119.1-hashed"
+            },
+            {
+              "name": "p11kit",
+              "path": "/nix/store/ydi57g15k7s6vrgyw3cgr34n7bdg3yyy-nss-cacert-3.119.1-p11kit"
+            },
+            {
+              "name": "unbundled",
+              "path": "/nix/store/j3bmb1s2mqbdks20wz73mh81zz7vv22i-nss-cacert-3.119.1-unbundled"
+            }
+          ],
+          "store_path": "/nix/store/xrnx7qfbwz5yhh6n5q0fhgsmb0hg9fx1-nss-cacert-3.119.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xw30vcfda5qmxcaqgvmra1pj789x9l6a-nss-cacert-3.119.1",
+              "default": true
+            },
+            {
+              "name": "p11kit",
+              "path": "/nix/store/whbdma670k3pqmrp90zj3pndxmrgdsf6-nss-cacert-3.119.1-p11kit"
+            },
+            {
+              "name": "unbundled",
+              "path": "/nix/store/i798k7rlws6yysxrm2kjb0gybinjs6i9-nss-cacert-3.119.1-unbundled"
+            },
+            {
+              "name": "hashed",
+              "path": "/nix/store/sxh9ircy4rgvwals9pfiydsi32g25b4g-nss-cacert-3.119.1-hashed"
+            }
+          ],
+          "store_path": "/nix/store/xw30vcfda5qmxcaqgvmra1pj789x9l6a-nss-cacert-3.119.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/0fcmv6kr1qw5h2ahd95yjfcal427676j-nss-cacert-3.119.1",
+              "default": true
+            },
+            {
+              "name": "hashed",
+              "path": "/nix/store/rwh9a3rjycipp2yg2g3iw2ns9367ywra-nss-cacert-3.119.1-hashed"
+            },
+            {
+              "name": "p11kit",
+              "path": "/nix/store/a2lr219dfyn771a1rsdygikfk1x156cp-nss-cacert-3.119.1-p11kit"
+            },
+            {
+              "name": "unbundled",
+              "path": "/nix/store/97gd3rfaxviv06acrxqqjkkn5pf6ja3b-nss-cacert-3.119.1-unbundled"
+            }
+          ],
+          "store_path": "/nix/store/0fcmv6kr1qw5h2ahd95yjfcal427676j-nss-cacert-3.119.1"
+        }
+      }
+    },
     "ducker@latest": {
       "last_modified": "2025-12-31T03:27:36Z",
       "resolved": "github:NixOS/nixpkgs/f665af0cdb70ed27e1bd8f9fdfecaf451260fc55#ducker",
