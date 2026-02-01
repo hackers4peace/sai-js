@@ -1,4 +1,5 @@
 // Plugins
+import fs from 'node:fs'
 import vue from '@vitejs/plugin-vue'
 import { ExternalFluentPlugin, SFCFluentPlugin } from 'unplugin-fluent-vue/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -70,6 +71,17 @@ export default defineConfig({
       baseDir: path.resolve('src'), // base directory for Vue files
       ftlDir: path.resolve('src/locales'), // directory with ftl files
     }),
+    {
+      name: 'exclude-config',
+      apply: 'build',
+      closeBundle() {
+        const configPath = path.resolve(__dirname, 'dist/config.json')
+        if (fs.existsSync(configPath)) {
+          fs.unlinkSync(configPath)
+          console.log('✓ Removed config.json from dist')
+        }
+      },
+    },
   ],
   define: { 'process.env': {} },
   resolve: {

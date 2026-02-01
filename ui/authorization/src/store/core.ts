@@ -1,11 +1,12 @@
 import * as effect from '@/effect'
 import { fluent } from '@/plugins/fluent'
+import { getRuntimeConfig } from '@/runtime-config'
 import { FluentBundle } from '@fluent/bundle'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import type { PushSubscription } from 'web-push'
 
-const endpoint = `${import.meta.env.VITE_BACKEND_BASE_URL}/.account/`
+let endpoint: string
 
 function defaultLang(availableLanguages: string[]): string {
   const lang = navigator.language.split('-')[0]
@@ -13,8 +14,9 @@ function defaultLang(availableLanguages: string[]): string {
 }
 
 export const useCoreStore = defineStore('core', () => {
+  endpoint = `${getRuntimeConfig().backendBaseUrl}/.account/`
   const userId = ref<string | null>(null)
-  const availableLanguages = ref<string[]>(import.meta.env.VITE_LANGUAGES.split(','))
+  const availableLanguages = ref<string[]>(getRuntimeConfig().languages)
   const lang = ref(localStorage.getItem('lang') ?? defaultLang(availableLanguages.value))
   const pushSubscription = ref<PushSubscription | null>(null)
 
@@ -31,7 +33,7 @@ export const useCoreStore = defineStore('core', () => {
   )
 
   function navigateHome() {
-    window.location.href = import.meta.env.VITE_BASE_URL
+    window.location.href = import.meta.env.BASE_URL
   }
 
   async function signIn(email: string, password: string): Promise<boolean> {
@@ -143,7 +145,7 @@ export const useCoreStore = defineStore('core', () => {
       if (!subscription) {
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: import.meta.env.VITE_VAPID_PUBLIC_KEY,
+          applicationServerKey: getRuntimeConfig().vapidPublicKey,
         })
       }
       pushSubscription.value = subscription.toJSON() as PushSubscription

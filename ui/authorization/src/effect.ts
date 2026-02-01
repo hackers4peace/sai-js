@@ -28,8 +28,7 @@ import {
 import { Effect, Layer } from 'effect'
 import type * as S from 'effect/Schema'
 import type { PushSubscription } from 'web-push'
-
-const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL
+import { getRuntimeConfig } from './runtime-config'
 
 // Create the client
 const makeClient = Effect.gen(function* () {
@@ -37,7 +36,9 @@ const makeClient = Effect.gen(function* () {
 
   return HttpRpcResolverNoStream.make<UiRpcRouter>(
     client.pipe(
-      HttpClient.mapRequest(HttpClientRequest.prependUrl(`${backendBaseUrl}/.sai/api`))
+      HttpClient.mapRequest(
+        HttpClientRequest.prependUrl(`${getRuntimeConfig().backendBaseUrl}/.sai/api`)
+      )
       // HttpClient.tapRequest(Console.log)
     )
   ).pipe(RpcResolver.toClient)

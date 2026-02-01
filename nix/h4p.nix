@@ -5,6 +5,20 @@
 }:
 let
   sai-ui = pkgs.callPackage ./packages/sai-ui.nix {};
+  uiConfig = {
+    backendBaseUrl = "https://auth.hackers4peace.net";
+    vapidPublicKey = "BJ5cuKc1taNAQ87rXz9mO9g8kE7198r_yc2iCSexaqDlax4nUpnj9T1sxAyBH8l--1qiZCeSwCsDi6KYUkx2vBA";
+    languages = ["en" "pl"];
+  };
+  jsonFormat = pkgs.formats.json {};
+  configFile = jsonFormat.generate "config.json" uiConfig;
+
+  sai-ui-h4p = pkgs.runCommand "sai-ui-configured" {} ''
+    mkdir -p $out
+    cp -r ${sai-ui}/* $out/
+    chmod +w $out
+    cp ${configFile} $out/config.json
+  '';
 in
 {
   age.secrets.gandi = {
@@ -28,7 +42,7 @@ in
         dns gandi {env.GANDI_BEARER_TOKEN}
         propagation_delay 300s
       }
-      root * ${sai-ui}
+      root * ${sai-ui-h4p}
       encode zstd gzip
       try_files {path} {path}/ /index.html
       file_server
