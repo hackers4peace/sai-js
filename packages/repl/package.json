@@ -27,20 +27,22 @@
   },
   "scripts": {
     "repl": "tsx ./repl.ts",
-    "cli": "NODE_OPTIONS='--no-deprecation' tsx ./cli.ts"
+    "cli": "NODE_OPTIONS='--no-deprecation' tsx ./cli.ts",
+    "cmd": "NODE_OPTIONS='--no-deprecation' tsx ./cmd.ts"
   },
   "dependencies": {
-    "@effect/cli": "^0.47.1",
-    "@effect/platform-node": "^0.63.1",
+    "@effect/cli": "^0.73.2",
+    "@effect/platform": "^0.94.3",
+    "@effect/platform-node": "^0.104.1",
     "@janeirodigital/interop-utils": "^1.0.0-rc.26",
-    "effect": "^3.9.1"
-  },
-  "devDependencies": {
-    "@effect/platform": "^0.68.1",
-    "@janeirodigital/css-test-utils": "^1.0.0-rc.26",
     "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.26",
     "@janeirodigital/interop-data-model": "^1.0.0-rc.26",
-    "@paralleldrive/cuid2": "^2.2.2",
+    "@paralleldrive/cuid2": "^3.3.0",
+    "effect": "^3.19.16",
+    "jose": "^6.1.3"
+  },
+  "devDependencies": {
+    "@janeirodigital/css-test-utils": "^1.0.0-rc.26",
     "tsx": "^4.17.0"
   }
 }
