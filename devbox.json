@@ -9,6 +9,7 @@
     "ducker@latest",
     "pgcli@latest",
     "github:dagger/nix#packages.x86_64-linux.dagger",
+    "github:dagger/nix#packages.x86_64-linux.container-use",
     "bun@latest",
     "nixos-anywhere@latest",
     "nix-prefetch-docker@latest",
