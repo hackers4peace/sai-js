@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/interop-data-model",
-  "version": "1.0.0-rc.25",
+  "version": "1.0.0-rc.26",
   "description": "Internal data model intended to be used by other modules implementing Solid Application Interoperability specification",
   "contributors": [
     {
@@ -43,13 +43,13 @@
     "publish": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@janeirodigital/interop-utils": "^1.0.0-rc.25",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.26",
     "n3": "^1.23.1",
     "ts-mixer": "^6.0.3",
     "typescript-memoize": "^1.1.1"
   },
   "devDependencies": {
-    "@janeirodigital/interop-test-utils": "^1.0.0-rc.25",
+    "@janeirodigital/interop-test-utils": "^1.0.0-rc.26",
     "@rdfjs/types": "^1.1.0",
     "@types/n3": "^1.21.1"
   }

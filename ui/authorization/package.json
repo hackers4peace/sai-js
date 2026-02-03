@@ -12,7 +12,7 @@
     "@effect/rpc": "^0.44.13",
     "@effect/rpc-http": "^0.42.13",
     "@fluent/bundle": "^0.18.0",
-    "@janeirodigital/sai-api-messages": "^1.0.0-rc.25",
+    "@janeirodigital/sai-api-messages": "^1.0.0-rc.26",
     "@mdi/font": "7.3.67",
     "@vueuse/core": "14.1.0",
     "effect": "^3.10.8",
