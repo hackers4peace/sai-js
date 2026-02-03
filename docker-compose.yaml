@@ -18,6 +18,12 @@ x-certs-env: &certs-env
 x-temporal-env: &temporal-env
   TEMPORAL_ADDRESS: temporal:7233
 
+x-origin-env: &origin-env
+  CSS_ID_ORIGIN: id.docker
+  CSS_DOC_ORIGIN: id.docker
+  CSS_DATA_ORIGIN: data.docker
+  CSS_REG_ORIGIN: reg.docker
+
 services:
   auth:
     image: node:22-alpine
@@ -48,6 +54,7 @@ services:
           *sparql-env,
           *certs-env,
           *temporal-env,
+          *origin-env,
         ]
       CSS_CONFIG: /sai/packages/css-storage-fixture/auth.json
       CSS_LOGGING_LEVEL: debug
@@ -385,6 +392,7 @@ services:
       <<: *sparql-env
       ID_ORIGIN: id.docker
       DOC_ORIGIN: id.docker
+      # TODO: reuse CSS_ in origin-env
     labels:
       - traefik.enable=true
       - traefik.http.routers.id.rule=Host(`id.docker`) || HostRegexp(`^.+\.id\.docker$`)

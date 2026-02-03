@@ -126,7 +126,8 @@
         "cookieStore": { "@id": "urn:solid-server:default:CookieStore" },
         "webIdStore": { "@id": "urn:solid-server:default:WebIdStore" },
         "uiPushSubscriptionStore": { "@id": "urn:sai:default:UiPushSubscriptionStore" },
-        "sessionManager": { "@id": "urn:sai:default:SessionManager" }
+        "sessionManager": { "@id": "urn:sai:default:SessionManager" },
+        "accountService": { "@id": "urn:sai:default:AccountService" }
       }
     },
     {

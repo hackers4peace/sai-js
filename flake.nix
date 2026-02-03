@@ -49,7 +49,6 @@
               registry.origin = "reg.hackers4peace.net";
               auth.origin = "auth.hackers4peace.net";
               ui.origin = "app.auth.hackers4peace.net";
-              id.sparqlEndpoint = "http://sparql/sparql";
               id.tag = latestRelease;
               data.tag = latestRelease;
               registry.tag = latestRelease;
@@ -97,6 +96,10 @@
               auth.vapidPublicKey = "BJ5cuKc1taNAQ87rXz9mO9g8kE7198r_yc2iCSexaqDlax4nUpnj9T1sxAyBH8l--1qiZCeSwCsDi6KYUkx2vBA";
               auth.baseUrl = "https://auth.hackers4peace.net/";
               auth.authEndpoint = "https://app.auth.hackers4peace.net/authorize";
+              auth.idOrigin = "hackers4peace.net";
+              auth.docOrigin = "id.hackers4peace.net";
+              auth.dataOrigin = "data.hackers4peace.net";
+              auth.regOrigin = "reg.hackers4peace.net";
               registry.baseUrl = "https://reg.hackers4peace.net/";
             };
           }
@@ -115,7 +118,6 @@
               sparql.tag = latestRelease;
               id.idOrigin = "id";
               id.docOrigin = "id";
-              id.sparqlEndpoint = "http://sparql/sparql";
               id.tag = latestRelease;
               data.baseUrl = "https://data/";
               data.tag = latestRelease;
@@ -135,7 +137,6 @@
               sparql.resolver = "127.0.0.11";
               id.idOrigin = "id";
               id.docOrigin = "id";
-              id.sparqlEndpoint = "http://sparql/sparql";
               data.baseUrl = "https://data/";
               auth.vapidPublicKey = "BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY";
               auth.baseUrl = "https://auth/";

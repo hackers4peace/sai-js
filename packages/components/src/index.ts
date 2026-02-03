@@ -15,3 +15,5 @@ export * from './AdminPermissionReader.js'
 export * from './SparqlStoreEntry.js'
 
 export * from './util/uriTemplates.js'
+
+export * from './services/Account.js'

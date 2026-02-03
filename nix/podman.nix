@@ -52,10 +52,6 @@ in
         default = sai-id.version;
         description = "sai-id image tag";
       };
-      sparqlEndpoint = lib.mkOption {
-        type = lib.types.str;
-        default = "http://sparql/sparql";
-      };
     };
     sparql = {
       tag = lib.mkOption {
@@ -78,6 +74,18 @@ in
         type = lib.types.str;
       };
       authEndpoint = lib.mkOption {
+        type = lib.types.str;
+      };
+      idOrigin = lib.mkOption {
+        type = lib.types.str;
+      };
+      docOrigin = lib.mkOption {
+        type = lib.types.str;
+      };
+      dataOrigin = lib.mkOption {
+        type = lib.types.str;
+      };
+      regOrigin = lib.mkOption {
         type = lib.types.str;
       };
       vapidPublicKey = lib.mkOption {
@@ -154,7 +162,7 @@ in
           environment = {
             ID_ORIGIN = cfg.id.idOrigin;
             DOC_ORIGIN = cfg.id.docOrigin;
-            CSS_SPARQL_ENDPOINT = cfg.id.sparqlEndpoint;
+            CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
           };
         };
 
@@ -278,6 +286,10 @@ in
             CSS_PORT = "4800";
             TEMPORAL_ADDRESS = "temporal:7233";
             CSS_VAPID_PUBLIC_KEY = cfg.auth.vapidPublicKey;
+            CSS_ID_ORIGIN = cfg.auth.idOrigin;
+            CSS_DOC_ORIGIN = cfg.auth.docOrigin;
+            CSS_DATA_ORIGIN = cfg.auth.dataOrigin;
+            CSS_REG_ORIGIN = cfg.auth.regOrigin;
           };
           environmentFiles = [
             cfg.auth.env

@@ -1,0 +1,21 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "@id": "urn:sai:default:AccountService",
+      "@type": "AccountService",
+      "sparqlEndpoint": { "@id": "urn:solid-server:default:variable:sparqlEndpoint" },
+      "postgresConnectionString": { "@id": "urn:sai:default:variable:postgresConnectionString" },
+      "tableName": "key_value",
+      "issuer": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "idOrigin": { "@id": "urn:sai:default:variable:idOrigin" },
+      "docOrigin": { "@id": "urn:sai:default:variable:docOrigin" },
+      "dataOrigin": { "@id": "urn:sai:default:variable:dataOrigin" },
+      "regOrigin": { "@id": "urn:sai:default:variable:regOrigin" }
+    }
+  ]
+}

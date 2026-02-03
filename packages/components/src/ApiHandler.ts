@@ -17,7 +17,7 @@ import { getLoggerFor } from 'global-logger-factory'
 import type { PushSubscription } from 'web-push'
 import type { SessionManager } from './SessionManager'
 import type { UiPushSubscriptionStore } from './UiPushSubscriptionStore.js'
-import { bootstrapAccount, checkHandle } from './services/Account.js'
+import type { AccountService } from './services/Account.js'
 import {
   acceptInvitation,
   createInvitation,
@@ -40,7 +40,8 @@ export class ApiHandler extends OperationHttpHandler {
     private readonly cookieStore: CookieStore,
     private readonly webIdStore: WebIdStore,
     private readonly uiPushSubscriptionStore: UiPushSubscriptionStore,
-    private readonly sessionManager: SessionManager
+    private readonly sessionManager: SessionManager,
+    private readonly accountService: AccountService
   ) {
     super()
   }
@@ -66,14 +67,16 @@ export class ApiHandler extends OperationHttpHandler {
         throw err
       }
     }
+
     const SaiServiceLive = Layer.succeed(
       SaiService,
       // @ts-ignore
       SaiService.of({
         getWebId: () => Effect.succeed(session.webId),
-        checkHandle: (handle: string) => Effect.promise(() => checkHandle(handle)),
+        checkHandle: (handle: string) =>
+          Effect.promise(() => this.accountService.checkHandle(handle)),
         bootstrapAccount: (handle: string) =>
-          Effect.promise(() => bootstrapAccount(accountId, handle)),
+          Effect.promise(() => this.accountService.bootstrapAccount(accountId, handle)),
         getDataRegistries: (agentId, lang) =>
           Effect.promise(() => getDataRegistries(session, agentId, lang)),
         listDataInstances: (agentId, registrationId) =>

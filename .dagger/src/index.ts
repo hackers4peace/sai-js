@@ -181,6 +181,11 @@ export class SaiJs {
       )
       .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
+      .withEnvVariable('CSS_SPARQL_ENDPOINT', CSS_SPARQL_ENDPOINT)
+      .withEnvVariable('CSS_ID_ORIGIN', 'id')
+      .withEnvVariable('CSS_DOC_ORIGIN', 'id')
+      .withEnvVariable('CSS_DATA_ORIGIN', 'data')
+      .withEnvVariable('CSS_REG_ORIGIN', 'reg')
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('temporal', this.temporalService())
       .withServiceBinding('id', this.idService())
@@ -212,7 +217,7 @@ export class SaiJs {
       .withEnvVariable('CSS_HTTPS_CERT', CSS_HTTPS_CERT)
       .withEnvVariable(
         'CSS_POSTGRES_CONNECTION_STRING',
-        'postgres://temporal:temporal@postgresql:5432/registry'
+        'postgres://temporal:temporal@postgresql:5432/auth'
       )
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withExposedPort(443)
