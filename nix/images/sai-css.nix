@@ -1,4 +1,3 @@
-
 { pkgs, ... }:
 
 let
@@ -12,6 +11,8 @@ pkgs.dockerTools.buildImage {
   copyToRoot = pkgs.buildEnv {
     name = "root";
     paths = [
+      pkgs.busybox
+      pkgs.cacert
       pkgs.nodejs
       sai-css
       (pkgs.runCommand "data-dirs" {} ''

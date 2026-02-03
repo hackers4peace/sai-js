@@ -19,7 +19,7 @@
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      latestRelease = "01e4127b5bfe5d9a4c82b1acef3f8b3593ce3910";
+      latestRelease = "16ded8b5ef977a50eb5c9ee673db91d32d36f8ac";
     in
     {
       nixosConfigurations.hetzner-cloud-aarch64 = nixpkgs.lib.nixosSystem {
