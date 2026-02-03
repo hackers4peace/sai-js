@@ -9,6 +9,8 @@ let
     backendBaseUrl = "https://auth.hackers4peace.net";
     vapidPublicKey = "BJ5cuKc1taNAQ87rXz9mO9g8kE7198r_yc2iCSexaqDlax4nUpnj9T1sxAyBH8l--1qiZCeSwCsDi6KYUkx2vBA";
     languages = ["en" "pl"];
+    idOrigin = "hackers4peace.net";
+    dataOrigin = "data.hackers4peace.net";
   };
   jsonFormat = pkgs.formats.json {};
   configFile = jsonFormat.generate "config.json" uiConfig;

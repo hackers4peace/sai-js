@@ -36,9 +36,9 @@
           </v-form>
           <dl>
             <dt>ID</dt>
-            <dd><v-chip :color="handleAvailable ? 'green' : 'red'" variant="flat">https://<span class="handle">{{handle}}</span>.id.docker</v-chip></dd>
+            <dd><v-chip :color="handleAvailable ? 'green' : 'red'" variant="flat">https://<span class="handle">{{handle}}</span>.{{config.idOrigin}}</v-chip></dd>
             <dt>Pod</dt>
-            <dd><v-chip  :color="handleAvailable ? 'green' : 'red'" variant="flat">https://<span class="handle">{{handle}}</span>.data.docker</v-chip></dd>
+            <dd><v-chip  :color="handleAvailable ? 'green' : 'red'" variant="flat">https://<span class="handle">{{handle}}</span>.{{config.dataOrigin}}</v-chip></dd>
           </dl>
         </v-card-text>
       </v-card-item>
@@ -66,10 +66,12 @@ dd {
 
 <script lang="ts" setup>
 import { bootstrapAccount, checkHandle } from '@/effect'
+import { getRuntimeConfig } from '@/runtime-config'
 import { useCoreStore } from '@/store/core'
 import { computedAsync } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
+const config = getRuntimeConfig()
 const coreStore = useCoreStore()
 const email = ref('')
 const password = ref('')

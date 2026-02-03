@@ -2,6 +2,8 @@ export interface RuntimeConfig {
   backendBaseUrl: string
   vapidPublicKey: string
   languages: string[]
+  idOrigin: string
+  dataOrigin: string
 }
 
 // Cache the config after first load to avoid repeated fetches
