@@ -290,6 +290,7 @@ in
             CSS_DOC_ORIGIN = cfg.auth.docOrigin;
             CSS_DATA_ORIGIN = cfg.auth.dataOrigin;
             CSS_REG_ORIGIN = cfg.auth.regOrigin;
+            SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
           };
           environmentFiles = [
             cfg.auth.env
@@ -304,12 +305,12 @@ in
           ports = ["4600:4600"];
           dependsOn = ["postgresql"];
           environment = {
-
             CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
             CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
             CSS_CONFIG = "/config/registry.json";
             CSS_BASE_URL = cfg.registry.baseUrl;
             CSS_PORT = "4600";
+            SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
           };
           volumes = [
             "${cfg.registry.config}:/config/registry.json:ro"
@@ -321,13 +322,13 @@ in
           ports = ["4700:4700"];
           dependsOn = ["postgresql"];
           environment = {
-
             CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
             CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
             CSS_CONFIG = "/config/data.json";
             CSS_ROOT_FILE_PATH = "/data";
             CSS_BASE_URL = cfg.data.baseUrl;
             CSS_PORT = "4700";
+            SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
           };
           volumes = [
             "${cfg.data.config}:/config/data.json:ro"
