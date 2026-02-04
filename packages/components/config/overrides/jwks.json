@@ -1,0 +1,20 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "@id": "urn:sai:default:OverrideJwkGenerator",
+      "@type": "Override",
+      "overrideInstance": {
+        "@id": "urn:solid-server:default:JwkGenerator"
+      },
+      "overrideParameters": {
+        "@type": "EnvJwkGenerator",
+        "encodedPrivateJwk": { "@id": "urn:sai:default:variable:encodedPrivateJwk" }
+      }
+    }
+  ]
+}
