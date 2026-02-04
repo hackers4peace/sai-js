@@ -1,0 +1,56 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "@id": "urn:solid-server:default:ResourceStore_Backend",
+      "@type": "RoutingResourceStore",
+      "rule": { "@id": "urn:solid-server:default:RouterRule" }
+    },
+    {
+      "comment": "Configure routing to send RDF sparql store and all other data to file system.",
+      "@id": "urn:solid-server:default:RouterRule",
+      "@type": "ConvertingRouterRule",
+      "typedStores": [
+        {
+          "@id": "urn:sai:default:SparqlStoreEntry",
+          "@type": "SparqlStoreEntry",
+          "store": { "@id": "urn:solid-server:default:SparqlResourceStore" },
+          "converter": { "@id": "urn:solid-server:default:RdfToQuadConverter" }
+        }
+      ],
+      "defaultStore": {
+        "@id": "urn:solid-server:default:FileResourceStore"
+      }
+    },
+
+    {
+      "@id": "urn:solid-server:default:FileResourceStore",
+      "@type": "DataAccessorBasedStore",
+      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+      "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
+      "accessor": { "@id": "urn:solid-server:default:FileDataAccessor" },
+      "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" }
+    },
+    {
+      "@id": "urn:solid-server:default:SparqlResourceStore",
+      "@type": "RepresentationConvertingStore",
+      "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" },
+      "options_inConverter": { "@id": "urn:solid-server:default:RepresentationConverter" },
+      "options_inPreferences_type": {
+        "RepresentationConvertingStore:_options_inPreferences_type_key": "internal/quads",
+        "RepresentationConvertingStore:_options_inPreferences_type_value": 1
+      },
+      "source": {
+        "@type": "DataAccessorBasedStore",
+        "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+        "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
+        "accessor": { "@id": "urn:solid-server:default:SparqlDataAccessor" },
+        "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" }
+      }
+    }
+  ]
+}
