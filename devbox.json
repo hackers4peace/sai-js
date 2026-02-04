@@ -19,7 +19,11 @@
     "cacert@latest"
   ],
   "shell": {
-    "init_hook": ["export CAROOT=\"$(mkcert -CAROOT)\"", "export SSL_CERT_FILE=$CAROOT/rootCA.pem"],
+    "init_hook": [
+      "export CAROOT=\"$(mkcert -CAROOT)\"",
+      "export SSL_CERT_FILE=$CAROOT/rootCA.pem",
+      "alias cu='container-use'"
+    ],
     "scripts": {
       "up": "make up",
       "down": "make down",

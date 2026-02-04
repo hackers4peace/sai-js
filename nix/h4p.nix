@@ -62,7 +62,7 @@ in
 
   networking.firewall = {
     enable = true;
-
+    trustedInterfaces = [ "podman0" ];
     interfaces.enp1s0.allowedTCPPorts = [ 22 80 443 ]; # SSH HTTP HTTPS
     logRefusedConnections = false; # avoid log spam
     checkReversePath = "loose";    # avoids Hetzner asymmetric routing issues
