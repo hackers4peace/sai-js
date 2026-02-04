@@ -54,12 +54,17 @@ export class PostgresKeyValueStorage<T> extends Initializer implements KeyValueS
 
   /** Ensures the storage table exists. Idempotent. */
   async ensureTable() {
-    await this.sql`
+    await this.sql`SELECT pg_advisory_lock(hashtext(${this.tableName}))`
+    try {
+      await this.sql`
       CREATE TABLE IF NOT EXISTS ${this.sql(this.tableName)} (
         key TEXT PRIMARY KEY,
         value JSONB NOT NULL
       )
     `
+    } finally {
+      await this.sql`SELECT pg_advisory_unlock(hashtext(${this.tableName}))`
+    }
   }
 
   async get(key: string): Promise<T | undefined> {
