@@ -1,0 +1,47 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "@id": "urn:sai:default:UiPushSubscriptionStore",
+      "@type": "UiPushSubscriptionStore",
+      "storage": { "@id": "urn:solid-server:default:AccountStorage" }
+    },
+    {
+      "@id": "urn:sai:default:ReciprocalWebhookStore",
+      "@type": "ReciprocalWebhookStore",
+      "storage": { "@id": "urn:solid-server:default:AccountStorage" }
+    },
+    {
+      "@id": "urn:solid-server:default:PrimaryParallelInitializer",
+      "@type": "ParallelHandler",
+      "handlers": [
+        { "@id": "urn:sai:default:UiPushSubscriptionStore" },
+        { "@id": "urn:sai:default:ReciprocalWebhookStore" }
+      ]
+    },
+    {
+      "@id": "urn:solid-server:default:EarlyProcessParallelInitializer",
+      "@type": "ParallelHandler",
+      "handlers": [
+        { "@id": "urn:sai:default:UiPushSubscriptionStore" },
+        { "@id": "urn:sai:default:ReciprocalWebhookStore" }
+      ]
+    },
+    {
+      "@id": "urn:sai:default:OverrideWebIdStore",
+      "@type": "Override",
+      "overrideInstance": {
+        "@id": "urn:solid-server:default:WebIdStore"
+      },
+      "overrideParameters": {
+        "@type": "CustomWebIdStore",
+        "storage": { "@id": "urn:solid-server:default:AccountStorage" }
+      }
+    }
+  ]
+}
