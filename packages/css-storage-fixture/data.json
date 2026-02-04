@@ -109,40 +109,7 @@
         "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" }
       }
     },
-    {
-      "comment": "PostgreSQL connection string.",
-      "@id": "urn:sai:default:variable:postgresConnectionString",
-      "@type": "Variable"
-    },
-    {
-      "@id": "urn:solid-server-app-setup:default:CliExtractor",
-      "@type": "YargsCliExtractor",
-      "parameters": [
-        {
-          "@type": "YargsParameter",
-          "name": "postgresConnectionString",
-          "options": {
-            "demandOption": true,
-            "requiresArg": true,
-            "type": "string",
-            "describe": "PostgreSQL connection string."
-          }
-        }
-      ]
-    },
-    {
-      "@id": "urn:solid-server-app-setup:default:ShorthandResolver",
-      "@type": "CombinedShorthandResolver",
-      "resolvers": [
-        {
-          "CombinedShorthandResolver:_resolvers_key": "urn:sai:default:variable:postgresConnectionString",
-          "CombinedShorthandResolver:_resolvers_value": {
-            "@type": "KeyExtractor",
-            "key": "postgresConnectionString"
-          }
-        }
-      ]
-    },
+
     {
       "@id": "urn:solid-server:default:PrimaryParallelInitializer",
       "@type": "ParallelHandler",
