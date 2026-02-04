@@ -2,7 +2,7 @@
 
 pkgs.buildNpmPackage {
   pname = "sai-css";
-  version = "0.1.2";
+  version = "0.1.3";
 
   src = pkgs.lib.cleanSource ../../services/css;
 

@@ -20,7 +20,7 @@ pkgs.dockerTools.buildImage {
         chmod 0775 $out/data $out/config
       '')
       ];
-    pathsToLink = [ "/bin" "/app" ];
+    pathsToLink = [ "/bin" "/app" "/etc" ];
   };
 
   config = {

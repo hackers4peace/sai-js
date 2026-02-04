@@ -16,7 +16,7 @@ pkgs.dockerTools.buildImage {
       pkgs.nodejs
       sai-id
     ];
-    pathsToLink = [ "/bin" "/app" ];
+    pathsToLink = [ "/bin" "/app" "/etc" ];
   };
 
   config = {
