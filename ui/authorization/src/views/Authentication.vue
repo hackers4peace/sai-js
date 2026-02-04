@@ -11,7 +11,14 @@
         <v-card-text>
           <v-form @submit.prevent="signIn">
             <v-text-field v-bind="$ta('email-input')" v-model="email" required />
-            <v-text-field v-bind="$ta('password-input')" v-model="password" required />
+            <v-text-field
+              v-bind="$ta('password-input')"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+              @click:append-inner="showPassword = !showPassword"
+              required
+            />
             <v-btn type="submit" block class="mt-2" :disabled="!email || !password">
               {{ $t('sign-in') }}
             </v-btn>
@@ -75,6 +82,7 @@ const config = getRuntimeConfig()
 const coreStore = useCoreStore()
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const handle = ref('')
 const step = ref('signIn')
 const checking = ref(false)
