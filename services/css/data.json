@@ -40,28 +40,8 @@
     "css:config/util/variables/default.json",
 
     "css:config/storage/backend/data-accessors/file.json",
-    "css:config/storage/backend/data-accessors/sparql-endpoint.json"
+    "css:config/storage/backend/data-accessors/sparql-endpoint.json",
+    "sai:config/policy/engine.json"
   ],
-  "@graph": [
-    {
-      "comment": "Necessary for the policy-engine.",
-      "@id": "urn:sai:policy-engine:AuthorizationManager",
-      "@type": "SaiAuthorizationManager",
-      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
-      "sparqlEndpoint": { "@id": "urn:solid-server:default:variable:sparqlEndpoint" },
-      "storageStrategy": { "@id": "urn:solid-server:default:StorageLocationStrategy" }
-    },
-    {
-      "@id": "urn:sai:default:OverrideBaseHttpHandler",
-      "@type": "Override",
-      "overrideInstance": { "@id": "urn:solid-server:default:BaseHttpHandler" },
-      "overrideSteps": [
-        {
-          "@type": "OverrideListRemove",
-          "overrideParameter": { "@id": "StatusWaterfallHandler:_handlers" },
-          "overrideTarget": { "@id": "urn:solid-server:default:AuthResourceHttpHandler" }
-        }
-      ]
-    }
-  ]
+  "@graph": []
 }

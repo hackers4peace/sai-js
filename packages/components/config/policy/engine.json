@@ -1,0 +1,30 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "Necessary for the policy-engine.",
+      "@id": "urn:sai:policy-engine:AuthorizationManager",
+      "@type": "SaiAuthorizationManager",
+      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+      "sparqlEndpoint": { "@id": "urn:solid-server:default:variable:sparqlEndpoint" },
+      "storageStrategy": { "@id": "urn:solid-server:default:StorageLocationStrategy" }
+    },
+    {
+      "@id": "urn:sai:default:OverrideBaseHttpHandler",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:BaseHttpHandler" },
+      "overrideSteps": [
+        {
+          "@type": "OverrideListRemove",
+          "overrideParameter": { "@id": "StatusWaterfallHandler:_handlers" },
+          "overrideTarget": { "@id": "urn:solid-server:default:AuthResourceHttpHandler" }
+        }
+      ]
+    }
+  ]
+}
