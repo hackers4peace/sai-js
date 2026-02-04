@@ -38,17 +38,5 @@
     "css:config/util/resource-locker/memory.json",
     "css:config/util/variables/default.json"
   ],
-  "@graph": [
-
-    {
-      "@id": "urn:solid-server:default:PrimaryParallelInitializer",
-      "@type": "ParallelHandler",
-      "handlers": [{ "@id": "urn:solid-server:default:KeyValueStorage" }]
-    },
-    {
-      "@id": "urn:solid-server:default:EarlyProcessParallelInitializer",
-      "@type": "ParallelHandler",
-      "handlers": [{ "@id": "urn:solid-server:default:KeyValueStorage" }]
-    }
-  ]
+  "@graph": []
 }
