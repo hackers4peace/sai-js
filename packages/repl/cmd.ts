@@ -121,6 +121,8 @@ const generateRegistry = (inputPath: string, outputPath: string): Effect.Effect<
       let result = content
       for (const [oldUrl, newUrl] of sortedUrlMap) {
         result = result.split(oldUrl).join(newUrl)
+        // for segments in indexes in kv.json
+        result = result.split(encodeURIComponent(oldUrl)).join(encodeURIComponent(newUrl))
       }
 
       writeFileSync(outputPath, result, 'utf-8')

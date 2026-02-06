@@ -5,23 +5,20 @@
   "idp/keys/cookie-secret": [
     "1d3e45c34d0eeba2ce40c9a3e22916eabfe572207e02b69cf8f7ebc95cb134e3e3107236148bc4feecff7f9b3932c1473b5707af4d5353e8a13a35df9b8c0005"
   ],
-  "accounts/index/password/fe116276-ed94-4e87-8917-70b7985244b4": [
-    "9f942f30-2631-4403-9a1a-300f8faae267"
-  ],
-  "accounts/index/password/d7c9cb32-9e18-4c9d-8998-491a22edd3f7": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
-  ],
-  "accounts/index/password/email/alice%40acme.example": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
-  ],
-  "accounts/index/password/email/kim%40encom.example": [
-    "9f942f30-2631-4403-9a1a-300f8faae267"
-  ],
   "accounts/data/e4fcefdc-5251-4e7c-9374-93ae71f188e3": {
     "linkedLoginsCount": 1,
     "id": "e4fcefdc-5251-4e7c-9374-93ae71f188e3",
     "**uiPushSubscription**": {},
-    "**reciprocalWebhook**": {},
+    "**reciprocalWebhook**": {
+      "cb950007-7b6b-427f-8d8b-f96458bfbba3": {
+        "webId": "https://alice.id.docker",
+        "peerId": "https://bob.id.docker",
+        "accountId": "e4fcefdc-5251-4e7c-9374-93ae71f188e3",
+        "sendTo": "https://auth.docker/.sai/reciprocal-webhook/26bf5f67-7858-4c18-ab1a-7404ed530c1b",
+        "channel": "{\"id\":\"https://reg.docker/.notifications/WebhookChannel2023/a5d8f331-700d-4178-919e-51d75fa9898c\",\"type\":\"http://www.w3.org/ns/solid/notifications#WebhookChannel2023\",\"topic\":\"https://reg.docker/bob/agent/jc5gt6/\",\"sendTo\":\"https://auth.docker/.sai/reciprocal-webhook/26bf5f67-7858-4c18-ab1a-7404ed530c1b\"}",
+        "id": "cb950007-7b6b-427f-8d8b-f96458bfbba3"
+      }
+    },
     "**password**": {
       "d7c9cb32-9e18-4c9d-8998-491a22edd3f7": {
         "accountId": "e4fcefdc-5251-4e7c-9374-93ae71f188e3",
@@ -68,45 +65,52 @@
       }
     }
   },
+  "accounts/index/password/d7c9cb32-9e18-4c9d-8998-491a22edd3f7": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/password/email/alice%40acme.example": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/reciprocalWebhook/cb950007-7b6b-427f-8d8b-f96458bfbba3": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/reciprocalWebhook/peerId/https%3A%2F%2Fbob.id.docker": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/reciprocalWebhook/sendTo/https%3A%2F%2Fauth%2F.sai%2Freciprocal-webhook%2F26bf5f67-7858-4c18-ab1a-7404ed530c1b": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/reciprocalWebhook/webId/https%3A%2F%2Falice.id.docker": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
   "accounts/index/webIdLink/823e97fa-7436-4cf7-8e84-72aa2ba56f68": [
     "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
   ],
   "accounts/index/webIdLink/webId/https%3A%2F%2Falice.id.docker": [
     "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
   ],
-  "accounts/data/9f942f30-2631-4403-9a1a-300f8faae267": {
-    "linkedLoginsCount": 1,
-    "id": "9f942f30-2631-4403-9a1a-300f8faae267",
-    "**uiPushSubscription**": {},
-    "**reciprocalWebhook**": {},
-    "**password**": {
-      "fe116276-ed94-4e87-8917-70b7985244b4": {
-        "accountId": "9f942f30-2631-4403-9a1a-300f8faae267",
-        "email": "kim@encom.example",
-        "password": "$2b$10$F.yfLO/WTd31fD.GuswWbui/./pXpOPH1VtMTYcTdt0dPdYkEim.y",
-        "verified": true,
-        "id": "fe116276-ed94-4e87-8917-70b7985244b4"
-      }
-    },
-    "**clientCredentials**": {},
-    "**pod**": {},
-    "**webIdLink**": {
-      "678b68db-3d29-428a-b339-6e3f8b285de9": {
-        "webId": "https://kim.id.docker",
-        "accountId": "9f942f30-2631-4403-9a1a-300f8faae267",
-        "id": "678b68db-3d29-428a-b339-6e3f8b285de9"
-      }
-    }
+  "accounts/index/owner/b576d155-3a70-44ef-9d5f-ebe42fdfd43c": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/owner/db2943c6-ee70-4009-b980-3a0ecaa6453a": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/pod/7971013a-eec7-405a-a829-72c4f75f2393": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Falice-work.data.docker%2F": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/pod/c9c6608d-fa19-4a54-8e6a-47051ba6b0ce": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Falice-home.data.docker%2F": [
+    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  ],
+  "accounts/cookies/8187358a-2072-4dce-9c76-24caffcc84a4": {
+    "expires": "3026-01-08T18:05:16.680Z",
+    "payload": "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
   },
-  "accounts/index/password/958d5f04-57df-4cff-a848-06efab13a2b0": [
-    "281efdff-8a0a-4f57-b058-250717899fae"
-  ],
-  "accounts/index/password/email/bob%40yoyodyne.example": [
-    "281efdff-8a0a-4f57-b058-250717899fae"
-  ],
-  "accounts/index/webIdLink/678b68db-3d29-428a-b339-6e3f8b285de9": [
-    "9f942f30-2631-4403-9a1a-300f8faae267"
-  ],
   "accounts/data/281efdff-8a0a-4f57-b058-250717899fae": {
     "linkedLoginsCount": 1,
     "id": "281efdff-8a0a-4f57-b058-250717899fae",
@@ -145,14 +149,17 @@
       }
     }
   },
+  "accounts/index/password/958d5f04-57df-4cff-a848-06efab13a2b0": [
+    "281efdff-8a0a-4f57-b058-250717899fae"
+  ],
+  "accounts/index/password/email/bob%40yoyodyne.example": [
+    "281efdff-8a0a-4f57-b058-250717899fae"
+  ],
   "accounts/index/webIdLink/fcc56d5b-599f-495a-ba09-d23db6c711d2": [
     "281efdff-8a0a-4f57-b058-250717899fae"
   ],
   "accounts/index/webIdLink/webId/https%3A%2F%2Fbob.id.docker": [
     "281efdff-8a0a-4f57-b058-250717899fae"
-  ],
-  "accounts/index/webIdLink/webId/https%3A%2F%2Fkim.id.docker": [
-    "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
   "accounts/index/owner/2897ea7d-ede2-4cd2-ac98-a3f1467c09a1": [
     "281efdff-8a0a-4f57-b058-250717899fae"
@@ -163,22 +170,44 @@
   "accounts/index/pod/baseUrl/https%3A%2F%2Fbob.data.docker%2F": [
     "281efdff-8a0a-4f57-b058-250717899fae"
   ],
-  "accounts/index/owner/db2943c6-ee70-4009-b980-3a0ecaa6453a": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  "accounts/cookies/339642f3-f3ee-42e5-85b9-4b1ab6b27ddc": {
+    "expires": "3026-01-08T18:05:16.680Z",
+    "payload": "281efdff-8a0a-4f57-b058-250717899fae"
+  },
+  "accounts/data/9f942f30-2631-4403-9a1a-300f8faae267": {
+    "linkedLoginsCount": 1,
+    "id": "9f942f30-2631-4403-9a1a-300f8faae267",
+    "**uiPushSubscription**": {},
+    "**reciprocalWebhook**": {},
+    "**password**": {
+      "fe116276-ed94-4e87-8917-70b7985244b4": {
+        "accountId": "9f942f30-2631-4403-9a1a-300f8faae267",
+        "email": "kim@encom.example",
+        "password": "$2b$10$F.yfLO/WTd31fD.GuswWbui/./pXpOPH1VtMTYcTdt0dPdYkEim.y",
+        "verified": true,
+        "id": "fe116276-ed94-4e87-8917-70b7985244b4"
+      }
+    },
+    "**clientCredentials**": {},
+    "**pod**": {},
+    "**webIdLink**": {
+      "678b68db-3d29-428a-b339-6e3f8b285de9": {
+        "webId": "https://kim.id.docker",
+        "accountId": "9f942f30-2631-4403-9a1a-300f8faae267",
+        "id": "678b68db-3d29-428a-b339-6e3f8b285de9"
+      }
+    }
+  },
+  "accounts/index/password/fe116276-ed94-4e87-8917-70b7985244b4": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
-  "accounts/index/pod/7971013a-eec7-405a-a829-72c4f75f2393": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  "accounts/index/password/email/kim%40encom.example": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
-  "accounts/index/pod/baseUrl/https%3A%2F%2Falice-work.data.docker%2F": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  "accounts/index/webIdLink/678b68db-3d29-428a-b339-6e3f8b285de9": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
-  "accounts/index/owner/b576d155-3a70-44ef-9d5f-ebe42fdfd43c": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
-  ],
-  "accounts/index/pod/c9c6608d-fa19-4a54-8e6a-47051ba6b0ce": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
-  ],
-  "accounts/index/pod/baseUrl/https%3A%2F%2Falice-home.data.docker%2F": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
+  "accounts/index/webIdLink/webId/https%3A%2F%2Fkim.id.docker": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
   ]
 }
