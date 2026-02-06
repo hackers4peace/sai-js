@@ -5,11 +5,13 @@ PREFIX acp: <http://www.w3.org/ns/solid/acp#>
 PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 PREFIX ldp: <http://www.w3.org/ns/ldp#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX solid: <http://www.w3.org/ns/solid/terms#>
 PREFIX oidc: <http://www.w3.org/ns/solid/oidc#>
 PREFIX space: <http://www.w3.org/ns/pim/space#>
 PREFIX shapetrees: <https://data/shapetrees/trees/>
 PREFIX pm: <https://vocab.example/project-management/>
+
 
 GRAPH <https://registry/> {
   <https://registry/>
@@ -103,6 +105,7 @@ GRAPH <https://registry/acme/agent/je0s7n/gmaqjb> {
     a interop:AccessGrant;
     interop:granted true;
     interop:grantee <https://id/alice>;
+    interop:grantedBy <https://id/acme>;
     interop:hasDataGrant
       <https://registry/acme/agent/je0s7n/g4yhtm>.
 }
@@ -119,13 +122,33 @@ GRAPH <https://registry/acme/agent/je0s7n/g4yhtm> {
     interop:dataOwner <https://id/acme>;
     interop:registeredShapeTree shapetrees:Project;
     interop:hasStorage <https://data/acme-rnd/>;
+    interop:scopeOfGrant interop:SelectedFromRegistry;
     interop:hasDataRegistration <https://data/acme-rnd/reb39k/>;
-    interop:scopeOfGrant interop:AllFromRegistry;
+    interop:hasDataInstance <https://data/acme-rnd/reb39k/pbh2yw>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
 GRAPH <meta:https://registry/acme/agent/je0s7n/g4yhtm> {
         <https://registry/acme/agent/je0s7n/g4yhtm> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/agent/je0s7n/wwp4j6> {
+  <https://registry/acme/agent/je0s7n/wwp4j6>
+    a interop:DelegatedDataGrant;
+    interop:delegationOfGrant <https://registry/acme/agent/je0s7n/g4yhtm>;
+    interop:grantee <https://data/test-client/public/id>;
+    interop:grantedBy <https://id/alice>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:hasStorage <https://data/acme-rnd/>;
+    interop:scopeOfGrant interop:SelectedFromRegistry;
+    interop:hasDataRegistration <https://data/acme-rnd/reb39k/>;
+    interop:hasDataInstance <https://data/acme-rnd/reb39k/pbh2yw>;
+    interop:accessMode acl:Read.
+}
+
+GRAPH <meta:https://registry/acme/agent/je0s7n/wwp4j6> {
+        <https://registry/acme/agent/je0s7n/wwp4j6> a ldp:Resource .
 }
 
 GRAPH <https://registry/acme/agent/fqvaym/cshspf> {
@@ -162,6 +185,10 @@ GRAPH <meta:https://registry/acme/agent/fqvaym/vled83> {
         <https://registry/acme/agent/fqvaym/vled83> a ldp:Resource .
 }
 
+GRAPH <meta:https://registry/acme/.acr> {
+        <https://registry/acme/.acr> a ldp:Resource .
+}
+
 GRAPH <https://registry/acme/agent/fqvaym/wegvwe> {
   <https://registry/acme/agent/fqvaym/wegvwe>
     a interop:DataGrant;
@@ -177,10 +204,6 @@ GRAPH <https://registry/acme/agent/fqvaym/wegvwe> {
 
 GRAPH <meta:https://registry/acme/agent/fqvaym/wegvwe> {
         <https://registry/acme/agent/fqvaym/wegvwe> a ldp:Resource .
-}
-
-GRAPH <meta:https://registry/acme/.acr> {
-        <https://registry/acme/.acr> a ldp:Resource .
 }
 
 GRAPH <https://registry/acme/.acr> {
@@ -226,6 +249,7 @@ GRAPH <meta:https://registry/alice/authorization/hsyzmp/> {
     a interop:AccessAuthorization, ldp:Resource;
     interop:granted true;
     interop:grantee <https://data/test-client/public/id>;
+    interop:grantedBy <https://id/alice>;
     interop:hasDataAuthorization
       <https://registry/alice/authorization/hsyzmp/w329t6>.
 }
@@ -233,8 +257,8 @@ GRAPH <meta:https://registry/alice/authorization/hsyzmp/> {
 GRAPH <https://registry/alice/authorization/hsyzmp/w329t6> {
   <https://registry/alice/authorization/hsyzmp/w329t6>
     a interop:DataAuthorization;
-    interop:grantedBy <https://id/alice>;
     interop:grantee <https://data/test-client/public/id>;
+    interop:grantedBy <https://id/alice>;
     interop:registeredShapeTree shapetrees:Project;
     interop:scopeOfAuthorization interop:All;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
@@ -358,7 +382,6 @@ GRAPH <meta:https://registry/alice/agent/cvmsa4/> {
     interop:registeredAgent <https://data/test-client/public/id>;
     interop:hasAccessGrant <https://registry/alice/agent/cvmsa4/y1pp6y>.
   <https://data/test-client/public/id> oidc:client_name "Test client";
-      oidc:logo_uri <https://robohash.org/aHR0cHM6Ly92dWVqZWN0cm9uLmRvY2tlcg?set=set3>;
       interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm>.
 }
 
@@ -415,6 +438,7 @@ GRAPH <https://registry/alice/agent/cvmsa4/y1pp6y> {
     a interop:AccessGrant;
     interop:granted true;
     interop:grantee <https://data/test-client/public/id>;
+    interop:grantedBy <https://id/alice>;
     interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm>;
     interop:hasDataGrant
       <https://registry/alice/agent/cvmsa4/afiooi>,
@@ -459,7 +483,6 @@ GRAPH <https://registry/alice/agent/cvmsa4/azgyc5> {
 GRAPH <meta:https://registry/alice/agent/cvmsa4/azgyc5> {
         <https://registry/alice/agent/cvmsa4/azgyc5> a ldp:Resource .
 }
-
 
 GRAPH <meta:https://registry/alice/.acr> {
         <https://registry/alice/.acr> a ldp:Resource .
@@ -668,8 +691,20 @@ GRAPH <meta:https://data/alice-work/sx86hi/k3pqsb> {
 GRAPH <https://data/alice-work/sx86hi/k3pqsb> {
   <https://data/alice-work/sx86hi/k3pqsb>
     rdfs:label "Project A" ;
-    pm:hasTask
+    pm:hasTask 
       <https://data/alice-work/btze4a/y48odn> .
+}
+
+GRAPH <meta:https://data/alice-work/sx86hi/doznys> {
+  <https://data/alice-work/sx86hi/doznys>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-work/sx86hi/doznys> {
+  <https://data/alice-work/sx86hi/doznys>
+    rdfs:label "Project B" ;
+    pm:hasTask 
+      <https://data/alice-work/btze4a/n5sz83> . # new not created yet
 }
 
 GRAPH <meta:https://data/alice-work/btze4a/> {
@@ -766,9 +801,9 @@ GRAPH <meta:https://data/acme-rnd/x0md9s/> {
     interop:registeredShapeTree shapetrees:Task .
 }
 
-
 GRAPH <https://id/acme> {
   <https://id/acme>
+      rdfs:label "ACME";
       solid:oidcIssuer <https://auth/>;
       interop:hasRegistrySet <https://registry/acme/>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l> .
@@ -776,21 +811,24 @@ GRAPH <https://id/acme> {
 
 GRAPH <https://id/alice> {
   <https://id/alice>
-    solid:oidcIssuer <https://auth/>;
-    interop:hasRegistrySet <https://registry/alice/>;
-    interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ> .
+      rdfs:label "Alice";
+      solid:oidcIssuer <https://auth/>;
+      interop:hasRegistrySet <https://registry/alice/>;
+      interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ> .
 }
 
 GRAPH <https://id/bob> {
   <https://id/bob>
-    solid:oidcIssuer <https://auth/>;
-    interop:hasRegistrySet <https://registry/bob/>;
-    interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I> .
+      rdfs:label "Bob";
+      solid:oidcIssuer <https://auth/>;
+      interop:hasRegistrySet <https://registry/bob/>;
+      interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I> .
 }
 
 GRAPH <https://id/kim> {
   <https://id/kim>
-    solid:oidcIssuer <https://auth/>;
-    interop:hasRegistrySet <https://registry/kim/>;
-    interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0> .
+      rdfs:label "Kim";
+      solid:oidcIssuer <https://auth/>;
+      interop:hasRegistrySet <https://registry/kim/>;
+      interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0> .
 }

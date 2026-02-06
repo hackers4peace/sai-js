@@ -136,7 +136,7 @@ GRAPH <https://reg.docker/acme/agent/je0s7n/wwp4j6> {
   <https://reg.docker/acme/agent/je0s7n/wwp4j6>
     a interop:DelegatedDataGrant;
     interop:delegationOfGrant <https://reg.docker/acme/agent/je0s7n/g4yhtm>;
-    interop:grantee <https://vuejectron.docker/id>;
+    interop:grantee <https://test-client.data.docker/public/id>;
     interop:grantedBy <https://alice.id.docker>;
     interop:dataOwner <https://acme.id.docker>;
     interop:registeredShapeTree shapetrees:Project;
@@ -189,6 +189,23 @@ GRAPH <meta:https://reg.docker/acme/.acr> {
         <https://reg.docker/acme/.acr> a ldp:Resource .
 }
 
+GRAPH <https://reg.docker/acme/agent/fqvaym/wegvwe> {
+  <https://reg.docker/acme/agent/fqvaym/wegvwe>
+    a interop:DataGrant;
+    interop:grantee acp:PublicClient;
+    interop:grantedBy acp:PublicAgent;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:TODO;
+    interop:hasStorage <https://test-client.data.docker/>;
+    interop:scopeOfGrant interop:AllFromRegistry;
+    interop:hasDataRegistration <https://test-client.data.docker/public/>;
+    interop:accessMode acl:Read.
+}
+
+GRAPH <meta:https://reg.docker/acme/agent/fqvaym/wegvwe> {
+        <https://reg.docker/acme/agent/fqvaym/wegvwe> a ldp:Resource .
+}
+
 GRAPH <https://reg.docker/acme/.acr> {
   <https://reg.docker/acme/.acr#root>
     a acp:AccessControlResource;
@@ -231,7 +248,7 @@ GRAPH <meta:https://reg.docker/alice/authorization/hsyzmp/> {
   <https://reg.docker/alice/authorization/hsyzmp/>
     a interop:AccessAuthorization, ldp:Resource;
     interop:granted true;
-    interop:grantee <https://vuejectron.docker/id>;
+    interop:grantee <https://test-client.data.docker/public/id>;
     interop:grantedBy <https://alice.id.docker>;
     interop:hasDataAuthorization
       <https://reg.docker/alice/authorization/hsyzmp/w329t6>.
@@ -240,7 +257,7 @@ GRAPH <meta:https://reg.docker/alice/authorization/hsyzmp/> {
 GRAPH <https://reg.docker/alice/authorization/hsyzmp/w329t6> {
   <https://reg.docker/alice/authorization/hsyzmp/w329t6>
     a interop:DataAuthorization;
-    interop:grantee <https://vuejectron.docker/id>;
+    interop:grantee <https://test-client.data.docker/public/id>;
     interop:grantedBy <https://alice.id.docker>;
     interop:registeredShapeTree shapetrees:Project;
     interop:scopeOfAuthorization interop:All;
@@ -362,12 +379,10 @@ GRAPH <https://reg.docker/alice/agent/vzp6ky/.acr> {
 GRAPH <meta:https://reg.docker/alice/agent/cvmsa4/> {
   <https://reg.docker/alice/agent/cvmsa4/>
     a interop:ApplicationRegistration, ldp:Resource;
-    interop:registeredAgent <https://vuejectron.docker/id>;
+    interop:registeredAgent <https://test-client.data.docker/public/id>;
     interop:hasAccessGrant <https://reg.docker/alice/agent/cvmsa4/y1pp6y>.
-  <https://vuejectron.docker/id> oidc:client_name "Vuejectron";
-      oidc:logo_uri <https://robohash.org/aHR0cHM6Ly92dWVqZWN0cm9uLmRvY2tlcg?set=set3>;
-      interop:hasAccessNeedGroup <https://vuejectron.docker/access-needs#need-group-pm>;
-      interop:hasAuthorizationCallbackEndpoint <https://vuejectron.docker>.
+  <https://test-client.data.docker/public/id> oidc:client_name "Test client";
+      interop:hasAccessNeedGroup <https://test-client.data.docker/public/access-needs#need-group-pm>.
 }
 
 GRAPH <meta:https://reg.docker/alice/agent/cvmsa4/.acr> {
@@ -405,7 +420,7 @@ GRAPH <https://reg.docker/alice/agent/cvmsa4/.acr> {
       acp:anyOf [
         a acp:Matcher;
         acp:agent <https://alice.id.docker>;
-        acp:client <https://vuejectron.docker/id>
+        acp:client <https://test-client.data.docker/public/id>
       ]
     ].
 }
@@ -422,9 +437,9 @@ GRAPH <https://reg.docker/alice/agent/cvmsa4/y1pp6y> {
   <https://reg.docker/alice/agent/cvmsa4/y1pp6y>
     a interop:AccessGrant;
     interop:granted true;
-    interop:grantee <https://vuejectron.docker/id>;
+    interop:grantee <https://test-client.data.docker/public/id>;
     interop:grantedBy <https://alice.id.docker>;
-    interop:hasAccessNeedGroup <https://vuejectron.docker/access-needs#need-group-pm>;
+    interop:hasAccessNeedGroup <https://test-client.data.docker/public/access-needs#need-group-pm>;
     interop:hasDataGrant
       <https://reg.docker/alice/agent/cvmsa4/afiooi>,
       <https://reg.docker/alice/agent/cvmsa4/azgyc5>.
@@ -437,7 +452,7 @@ GRAPH <meta:https://reg.docker/alice/agent/cvmsa4/y1pp6y> {
 GRAPH <https://reg.docker/alice/agent/cvmsa4/afiooi> {
   <https://reg.docker/alice/agent/cvmsa4/afiooi>
     a interop:DataGrant;
-    interop:grantee <https://vuejectron.docker/id>;
+    interop:grantee <https://test-client.data.docker/public/id>;
     interop:grantedBy <https://alice.id.docker>;
     interop:dataOwner <https://alice.id.docker>;
     interop:registeredShapeTree shapetrees:Project;
@@ -454,7 +469,7 @@ GRAPH <meta:https://reg.docker/alice/agent/cvmsa4/afiooi> {
 GRAPH <https://reg.docker/alice/agent/cvmsa4/azgyc5> {
   <https://reg.docker/alice/agent/cvmsa4/azgyc5>
     a interop:DataGrant;
-    interop:grantee <https://vuejectron.docker/id>;
+    interop:grantee <https://test-client.data.docker/public/id>;
     interop:grantedBy <https://alice.id.docker>;
     interop:dataOwner <https://alice.id.docker>;
     interop:registeredShapeTree shapetrees:Task;
@@ -605,7 +620,21 @@ GRAPH <meta:https://reg.docker/kim/authorization/> {
 
 GRAPH <meta:https://reg.docker/kim/agent/> {
   <https://reg.docker/kim/agent/>
-    a interop:AgentRegistry, ldp:Resource.
+    a interop:AgentRegistry, ldp:Resource;
+    interop:hasSocialAgentInvitation
+      <https://reg.docker/kim/agent/zi1nic>.
+}
+
+GRAPH <meta:https://reg.docker/kim/agent/zi1nic> {
+        <https://reg.docker/kim/agent/zi1nic> a ldp:Resource .
+}
+
+GRAPH <https://reg.docker/kim/agent/zi1nic> {
+  <https://reg.docker/kim/agent/zi1nic>
+    a interop:SocialAgentInvitation;
+    interop:hasCapabilityUrl <https://auth/.sai/invitations/aHR0cHM6Ly9pZC9raW0.8f19934d-b6a6-4a73-9d27-8cd20ed0657f> ;
+    skos:prefLabel "Bob" ;
+    skos:note "What about Bob?" .
 }
 
 GRAPH <meta:https://reg.docker/kim/.acr> {
