@@ -1,8 +1,5 @@
-import { readFile, writeFile } from 'node:fs/promises'
-
-export async function seedQuadstore(sparqlEndpoint: string, filePath: string): Promise<void> {
+export async function seedQuadstore(sparqlEndpoint: string, data: string): Promise<void> {
   await dropQuadstore(sparqlEndpoint)
-  const data = await readFile(filePath, 'utf8')
   const response = await fetch(sparqlEndpoint, {
     method: 'POST',
     headers: {
@@ -13,13 +10,13 @@ export async function seedQuadstore(sparqlEndpoint: string, filePath: string): P
   if (!response.ok) throw new Error('seeding quadstore failed')
 }
 
-export async function dumpQuadstore(sparqlEndpoint: string, filePath: string): Promise<void> {
+export async function fetchQuadstore(sparqlEndpoint: string): Promise<string> {
   const response = await fetch(sparqlEndpoint, {
     headers: {
       Accept: 'application/trig',
     },
   })
-  await writeFile(filePath, await response.text())
+  return response.text()
 }
 
 export async function dropQuadstore(sparqlEndpoint: string): Promise<void> {

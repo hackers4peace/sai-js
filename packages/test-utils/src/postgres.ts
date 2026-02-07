@@ -1,9 +1,8 @@
-import { readFile, writeFile } from 'node:fs/promises'
 import postgres from 'postgres'
 import type { Sql } from 'postgres'
 
 export class Postgres {
-  private sql: Sql
+  public sql: Sql
 
   constructor(
     private readonly connectionString: string,
@@ -76,14 +75,8 @@ export class Postgres {
     return Object.fromEntries(rows.map((row) => [row.key, JSON.parse(row.value)]))
   }
 
-  async seedKeyValue(filePath: string): Promise<void> {
-    const data = JSON.parse(await readFile(filePath, 'utf8'))
+  async seedKeyValue(data: Record<string, string | object>): Promise<void> {
     await this.ensureDatabase()
     await this.importFromJson(data)
-  }
-
-  async dumpKeyValue(filePath: string): Promise<void> {
-    const data = await this.exportToJson()
-    await writeFile(filePath, JSON.stringify(data, null, 2))
   }
 }

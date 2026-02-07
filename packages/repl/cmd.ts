@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { Args, Command, Options } from '@effect/cli'
 import * as NodeContext from '@effect/platform-node/NodeContext'
 import * as Runtime from '@effect/platform-node/NodeRuntime'
+import { Postgres, seedQuadstore } from '@janeirodigital/interop-test-utils'
 import { Console, Effect, Option } from 'effect'
 import { exportJWK, generateKeyPair } from 'jose'
 
@@ -182,9 +183,38 @@ const generateRegistryCommand = Command.make(
   Command.withDescription('Generate test registry.trig by replacing URLs from dev registry.trig')
 )
 
+const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
+  Effect.gen(function* () {
+    yield* Console.log(`Seeding data for ${env}`)
+
+    const connectionString = 'postgres://temporal:temporal@localhost:5432/auth'
+    const sparqlEndpoint = 'http://localhost:7878/store'
+    const pg = new Postgres(connectionString, 'key_value')
+
+    const kv = yield* generateRegistry(kvSourcePath, env)
+    const dataset = yield* generateRegistry(datasetSourcePath, env)
+
+    yield* Effect.promise(() => pg.seedKeyValue(JSON.parse(kv)))
+    yield* Effect.promise(() => seedQuadstore(sparqlEndpoint, dataset))
+    pg.sql.end()
+
+    yield* Console.log('Data seeded successfully')
+    return 0
+  }).pipe(
+    Effect.catchAll((error: Error) =>
+      Effect.gen(function* () {
+        yield* Console.error(`Error generating registry: ${error.message}`)
+        return 1
+      })
+    )
+  )
+).pipe(
+  Command.withDescription('Generate test registry.trig by replacing URLs from dev registry.trig')
+)
+
 const cliCommand = Command.make('interop').pipe(
   Command.withDescription('SAI Interop CLI tool'),
-  Command.withSubcommands([genJwkCommand, generateRegistryCommand])
+  Command.withSubcommands([genJwkCommand, generateRegistryCommand, seedEnvCommand])
 )
 
 const cli = Command.run(cliCommand, {

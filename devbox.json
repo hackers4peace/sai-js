@@ -22,12 +22,13 @@
     "init_hook": [
       "export CAROOT=\"$(mkcert -CAROOT)\"",
       "export SSL_CERT_FILE=$CAROOT/rootCA.pem",
-      "alias cu='container-use'"
+      "alias cu='container-use'",
+      "alias jq='jaq'"
     ],
     "scripts": {
       "up": "make up",
       "down": "make down",
-      "seed": "bun packages/css-storage-fixture/setup.ts"
+      "seed": "bun packages/repl/cmd.ts -- seed-env"
     }
   }
 }
