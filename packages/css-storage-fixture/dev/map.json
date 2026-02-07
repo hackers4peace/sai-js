@@ -1,0 +1,26 @@
+{
+  "agents": {
+    "https://id/acme": "https://acme.id.docker",
+    "https://id/alice": "https://alice.id.docker",
+    "https://id/bob": "https://bob.id.docker",
+    "https://id/kim": "https://kim.id.docker"
+  },
+  "prefixes": {
+    "https://auth/": "https://auth.docker/",
+    "https://data/shapetrees/trees/": "https://shapetrees.data.docker/trees/",
+    "https://registry/": "https://reg.docker/",
+    "meta:https://registry/": "meta:https://reg.docker/",
+    "https://id/": "https://id.docker/",
+    "https://data/acme-rnd/": "https://acme-rnd.data.docker/",
+    "meta:https://data/acme-rnd/": "meta:https://acme-rnd.data.docker/",
+    "https://data/alice-home/": "https://alice-home.data.docker/",
+    "meta:https://data/alice-home/": "meta:https://alice-home.data.docker/",
+    "https://data/alice-work/": "https://alice-work.data.docker/",
+    "meta:https://data/alice-work/": "meta:https://alice-work.data.docker/",
+    "https://data/bob/": "https://bob.data.docker/",
+    "meta:https://data/bob/": "meta:https://bob.data.docker/",
+    "https://data/shapetrees/": "https://shapetrees.data.docker/",
+    "meta:https://data/shapetrees/": "meta:https://shapetrees.data.docker/",
+    "https://data/test-client/": "https://test-client.data.docker/"
+  }
+}

@@ -1,36 +1,22 @@
 import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { Args, Command, Options } from '@effect/cli'
 import * as NodeContext from '@effect/platform-node/NodeContext'
 import * as Runtime from '@effect/platform-node/NodeRuntime'
 import { Console, Effect, Option } from 'effect'
 import { exportJWK, generateKeyPair } from 'jose'
 
-const urlMap = {
-  'https://auth.docker/': 'https://auth/',
-  'https://shapetrees.data.docker/trees/': 'https://data/shapetrees/trees/',
-  'https://reg.docker/': 'https://registry/',
-  'meta:https://reg.docker/': 'meta:https://registry/',
-  'https://id.docker/': 'https://id/',
-  'https://acme.id.docker': 'https://id/acme',
-  'https://alice.id.docker': 'https://id/alice',
-  'https://bob.id.docker': 'https://id/bob',
-  'https://kim.id.docker': 'https://id/kim',
-  'https://acme-rnd.data.docker/': 'https://data/acme-rnd/',
-  'meta:https://acme-rnd.data.docker/': 'meta:https://data/acme-rnd/',
-  'https://alice-home.data.docker/': 'https://data/alice-home/',
-  'meta:https://alice-home.data.docker/': 'meta:https://data/alice-home/',
-  'https://alice-work.data.docker/': 'https://data/alice-work/',
-  'meta:https://alice-work.data.docker/': 'meta:https://data/alice-work/',
-  'https://bob.data.docker/': 'https://data/bob/',
-  'meta:https://bob.data.docker/': 'meta:https://data/bob/',
-  'https://shapetrees.data.docker/': 'https://data/shapetrees/',
-  'meta:https://shapetrees.data.docker/': 'meta:https://data/shapetrees/',
-  'https://test-client.data.docker/': 'https://data/test-client/',
-  aHR0cHM6Ly9hY21lLmlkLmRvY2tlcg: 'aHR0cHM6Ly9pZC9hY21l',
-  aHR0cHM6Ly9hbGljZS5pZC5kb2NrZXI: 'aHR0cHM6Ly9pZC9hbGljZQ',
-  aHR0cHM6Ly9ib2IuaWQuZG9ja2Vy: 'aHR0cHM6Ly9pZC9ib2I',
-  aHR0cHM6Ly9raW0uaWQuZG9ja2Vy: 'aHR0cHM6Ly9pZC9raW0',
+const datasetSourcePath = fileURLToPath(
+  new URL('../css-storage-fixture/test/registry.trig', import.meta.url)
+)
+const kvSourcePath = fileURLToPath(new URL('../css-storage-fixture/test/kv.json', import.meta.url))
+const mapPaths = {
+  dev: fileURLToPath(new URL('../css-storage-fixture/dev/map.json', import.meta.url)),
+  demo: fileURLToPath(new URL('../css-storage-fixture/demo/map.json', import.meta.url)),
 }
+
+const encode = (str: string): string => Buffer.from(str).toString('base64url')
+const graphRegExp = /GRAPH <(https?:\/\/[^>]+)> \{/
 
 const algorithmArg = Args.text({ name: 'algorithm' }).pipe(
   Args.withDescription(
@@ -99,47 +85,89 @@ const genJwkCommand = Command.make(
     )
 ).pipe(Command.withDescription('Generate a JSON Web Key (JWK)'))
 
-const registryInputOption = Options.file('input').pipe(
-  Options.withAlias('i'),
-  Options.withDescription('Input file path for the registry.trig file'),
-  Options.withDefault('../css-storage-fixture/dev/registry.trig')
+const envOption = Options.text('env').pipe(
+  Options.withAlias('e'),
+  Options.withDescription('Target environment'),
+  Options.withDefault('dev')
 )
 
-const registryOutputOption = Options.file('output').pipe(
-  Options.withAlias('o'),
-  Options.withDescription('Output file path for the generated registry.trig file'),
-  Options.withDefault('../css-storage-fixture/test/registry.trig')
+const datasetPathOption = Options.file('dataset').pipe(
+  Options.withAlias('d'),
+  Options.withDescription('Dataset output file path for the generated file'),
+  Options.optional
 )
 
-const generateRegistry = (inputPath: string, outputPath: string): Effect.Effect<void, Error> =>
+const kvPathOption = Options.file('key-value').pipe(
+  Options.withAlias('k'),
+  Options.withDescription('Key-value output file path for the generated file'),
+  Options.optional
+)
+
+const generateRegistry = (path: string, env: string): Effect.Effect<string, Error> =>
   Effect.try({
     try: () => {
-      const content = readFileSync(inputPath, 'utf-8')
-
-      const sortedUrlMap = Object.entries(urlMap).sort((a, b) => b[0].length - a[0].length)
-
-      let result = content
-      for (const [oldUrl, newUrl] of sortedUrlMap) {
-        result = result.split(oldUrl).join(newUrl)
-        // for segments in indexes in kv.json
-        result = result.split(encodeURIComponent(oldUrl)).join(encodeURIComponent(newUrl))
+      const content = readFileSync(path, 'utf-8')
+      const map = JSON.parse(readFileSync(mapPaths[env], 'utf-8')) as {
+        agents: Record<string, string>
+        prefixes: Record<string, string>
       }
 
-      writeFileSync(outputPath, result, 'utf-8')
+      const urlMap = {
+        ...Object.fromEntries(Object.entries(map.agents).map(([k, v]) => [encode(k), encode(v)])),
+        ...map.agents,
+        ...map.prefixes,
+      }
+
+      const lines = content.split(/\r?\n/)
+      const result = lines
+        .map((line) => {
+          let updated = line
+          if (line.match(graphRegExp)) {
+            for (const [oldUrl, newUrl] of Object.entries(map.prefixes)) {
+              updated = updated.split(oldUrl).join(newUrl)
+            }
+          } else {
+            for (const [oldUrl, newUrl] of Object.entries(urlMap)) {
+              updated = updated.split(oldUrl).join(newUrl)
+              // for segments in indexes in kv.json
+              updated = updated.split(encodeURIComponent(oldUrl)).join(encodeURIComponent(newUrl))
+            }
+          }
+          return updated
+        })
+        .join('\n')
+
+      return result
     },
-    catch: (error) => new Error(`Failed to generate registry: ${error}`),
+    catch: (error) => new Error(`Failed to generate data: ${error}`),
   })
 
 const generateRegistryCommand = Command.make(
   'generate-registry',
-  { input: registryInputOption, output: registryOutputOption },
-  ({ input, output }) =>
+  { datasetPath: datasetPathOption, kvPath: kvPathOption, env: envOption },
+  ({ datasetPath, kvPath, env }) =>
     Effect.gen(function* () {
-      yield* Console.log(`Generating registry from ${input} to ${output}`)
+      yield* Console.log(`Generating data for ${env}`)
 
-      yield* generateRegistry(input, output)
+      yield* Option.match(datasetPath, {
+        onNone: () => Console.log('no dataset path'),
+        onSome: (filePath) =>
+          Effect.gen(function* () {
+            const result = yield* generateRegistry(datasetSourcePath, env)
+            writeFileSync(filePath, result, 'utf-8')
+          }).pipe(Effect.andThen(() => Console.log(`dataset saved to: ${filePath}`))),
+      })
 
-      yield* Console.log(`Registry generated successfully: ${output}`)
+      yield* Option.match(kvPath, {
+        onNone: () => Console.log('no key-value path'),
+        onSome: (filePath) =>
+          Effect.gen(function* () {
+            const result = yield* generateRegistry(kvSourcePath, env)
+            writeFileSync(filePath, result, 'utf-8')
+          }).pipe(Effect.andThen(() => Console.log(`key-value saved to: ${filePath}`))),
+      })
+
+      yield* Console.log('Data generated successfully')
 
       return 0
     }).pipe(

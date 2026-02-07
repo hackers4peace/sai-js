@@ -1,0 +1,26 @@
+{
+  "agents": {
+    "https://id/acme": "https://acme.hackers4peace.net",
+    "https://id/alice": "https://alice.hackers4peace.net",
+    "https://id/bob": "https://bob.hackers4peace.net",
+    "https://id/kim": "https://kim.hackers4peace.net"
+  },
+  "prefixes": {
+    "https://auth/": "https://auth.hackers4peace.net/",
+    "https://data/shapetrees/trees/": "https://shapetrees.data.hackers4peace.net/trees/",
+    "https://registry/": "https://reg.hackers4peace.net/",
+    "meta:https://registry/": "meta:https://reg.hackers4peace.net/",
+    "https://id/": "https://id.hackers4peace.net/",
+    "https://data/acme-rnd/": "https://acme-rnd.data.hackers4peace.net/",
+    "meta:https://data/acme-rnd/": "meta:https://acme-rnd.data.hackers4peace.net/",
+    "https://data/alice-home/": "https://alice-home.data.hackers4peace.net/",
+    "meta:https://data/alice-home/": "meta:https://alice-home.data.hackers4peace.net/",
+    "https://data/alice-work/": "https://alice-work.data.hackers4peace.net/",
+    "meta:https://data/alice-work/": "meta:https://alice-work.data.hackers4peace.net/",
+    "https://data/bob/": "https://bob.data.hackers4peace.net/",
+    "meta:https://data/bob/": "meta:https://bob.data.hackers4peace.net/",
+    "https://data/shapetrees/": "https://shapetrees.data.hackers4peace.net/",
+    "meta:https://data/shapetrees/": "meta:https://shapetrees.data.hackers4peace.net/",
+    "https://data/test-client/": "https://test-client.data.hackers4peace.net/"
+  }
+}
