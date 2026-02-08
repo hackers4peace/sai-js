@@ -801,6 +801,162 @@ GRAPH <meta:https://data/acme-rnd/x0md9s/> {
     interop:registeredShapeTree shapetrees:Task .
 }
 
+GRAPH <meta:https://data/test-client/> {
+  <https://data/test-client/>
+    a interop:DataRegistry, ldp:Resource, space:Storage ;
+    interop:hasDataRegistration
+    <https://data/test-client/public/> .
+}
+
+GRAPH <meta:https://data/test-client/public/> {
+  <https://data/test-client/public/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:TODO .
+}
+
+GRAPH <https://data/test-client/public/> {
+  <https://data/test-client/public/>
+    ldp:contains
+      <https://data/test-client/public/access-needs> ,
+      <https://data/test-client/public/descriptions-en> ,
+      <https://data/test-client/public/descriptions-es> .
+}
+
+GRAPH <meta:https://data/test-client/public/access-needs> {
+  <https://data/test-client/public/access-needs>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/test-client/public/access-needs> {
+  <https://data/test-client/public/access-needs#need-group-pm>
+    a interop:AccessNeedGroup ;
+    interop:accessNecessity interop:accessRequired ;
+    interop:accessScenario interop:PersonalAccess ;
+    interop:authenticatesAs interop:SocialAgent ;
+    interop:hasAccessDescriptionSet
+      <https://data/test-client/public/descriptions-en> ,
+      <https://data/test-client/public/descriptions-es> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-project> .
+
+  <https://data/test-client/public/access-needs#need-project>
+    a interop:AccessNeed ;
+    interop:registeredShapeTree shapetrees:Project ;
+    interop:accessNecessity interop:AccessRequired ;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete .
+
+  <https://data/test-client/public/access-needs#need-task>
+    a interop:AccessNeed ;
+    interop:registeredShapeTree shapetrees:Task ;
+    interop:accessNecessity interop:AccessRequired ;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete ;
+    interop:inheritsFromNeed <https://data/test-client/public/access-needs#need-project> .
+
+  <https://data/test-client/public/access-needs#need-image>
+    a interop:AccessNeed ;
+    interop:registeredShapeTree shapetrees:Image ;
+    interop:accessNecessity interop:AccessOptional ;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete ;
+    interop:inheritsFromNeed <https://data/test-client/public/access-needs#need-project> .
+
+  <https://data/test-client/public/access-needs#need-file>
+    a interop:AccessNeed ;
+    interop:registeredShapeTree shapetrees:File ;
+    interop:accessNecessity interop:AccessOptional ;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete ;
+    interop:inheritsFromNeed <https://data/test-client/public/access-needs#need-project> .
+
+  <https://data/test-client/public/descriptions-en>
+    interop:usesLanguage "en"^^xsd:language .
+
+  <https://data/test-client/public/descriptions-es>
+    interop:usesLanguage "es"^^xsd:language .
+}
+
+GRAPH <meta:https://data/test-client/public/descriptions-en> {
+  <https://data/test-client/public/descriptions-en>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/test-client/public/descriptions-en> {
+
+  <https://data/test-client/public/descriptions-en>
+    a interop:AccessDescriptionSet ;
+    interop:usesLanguage "en"^^xsd:language .
+
+  <https://data/test-client/public/descriptions-en#en-need-group-pm>
+    a interop:AccessNeedGroupDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-en> ;
+    interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm> ;
+    skos:prefLabel "Manage Projects"@en ;
+    skos:definition "Allow Projectron to read the Projects you select, and Task in those projects."@en .
+
+  <https://data/test-client/public/descriptions-en#en-need-project>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-en> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-project> ;
+    skos:prefLabel "Access to Projects is essential for Projectron to perform its core function of Project Management."@en .
+
+  <https://data/test-client/public/descriptions-en#en-need-task>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-en> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-task> ;
+    skos:prefLabel "Access to Tasks allows Projectron to identify and manage the work to be done in a given Project."@en .
+
+  <https://data/test-client/public/descriptions-en#en-need-image>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-en> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-image> ;
+    skos:prefLabel "Access to Images allows Projectron to identify and manage the work to be done in a given Project."@en .
+
+  <https://data/test-client/public/descriptions-en#en-need-file>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-en> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-file> ;
+    skos:prefLabel "Access to Files allows Projectron to identify and manage the work to be done in a given Project."@en .
+}
+
+GRAPH <meta:https://data/test-client/public/descriptions-es> {
+  <https://data/test-client/public/descriptions-es>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/test-client/public/descriptions-es> {
+  <https://data/test-client/public/descriptions-es>
+    a interop:AccessDescriptionSet ;
+    interop:usesLanguage "es"^^xsd:language .
+
+  <https://data/test-client/public/descriptions-es#es-need-group-pm>
+    a interop:AccessNeedGroupDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-es> ;
+    interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm> ;
+    skos:prefLabel "Gestionar proyectos"@es ;
+    skos:definition "Permita que Projectron lea los proyectos que seleccione y la tarea en esos proyectos."@es .
+
+  <https://data/test-client/public/descriptions-es#es-need-project>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-es> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-project> ;
+    skos:prefLabel "El acceso a los proyectos es esencial para que Projectron realice su función principal de gestión de proyectos."@es .
+
+  <https://data/test-client/public/descriptions-es#es-need-task>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-es> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-task> ;
+    skos:prefLabel "El acceso a Tareas permite a Projectron identificar y administrar el trabajo a realizar en un proyecto determinado."@es .
+
+  <https://data/test-client/public/descriptions-es#es-need-image>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-es> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-image> ;
+    skos:prefLabel "El acceso a Imágenes permite a Projectron identificar y gestionar el trabajo a realizar en un Proyecto determinado."@es .
+
+  <https://data/test-client/public/descriptions-es#es-need-file>
+    a interop:AccessNeedDescription ;
+    interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-es> ;
+    interop:hasAccessNeed <https://data/test-client/public/access-needs#need-file> ;
+    skos:prefLabel "El acceso a Archivos permite a Projectron identificar y administrar el trabajo a realizar en un Proyecto determinado."@es .
+}
+
 GRAPH <https://id/acme> {
   <https://id/acme>
       rdfs:label "ACME";

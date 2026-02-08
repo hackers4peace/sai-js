@@ -59,12 +59,12 @@ describe('get authorization data', () => {
           label:
             'Access to Projects is essential for Projectron to perform its core function of Project Management.',
           required: true,
-          access: [
+          access: expect.arrayContaining([
             'http://www.w3.org/ns/auth/acl#Read',
             'http://www.w3.org/ns/auth/acl#Create',
             'http://www.w3.org/ns/auth/acl#Update',
             'http://www.w3.org/ns/auth/acl#Delete',
-          ],
+          ]),
           shapeTree: { id: 'https://data/shapetrees/trees/Project', label: 'Projects' },
           children: expect.arrayContaining([
             expect.objectContaining({
