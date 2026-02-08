@@ -21,6 +21,9 @@
     "meta:https://data/bob/": "meta:https://bob.data.hackers4peace.net/",
     "https://data/shapetrees/": "https://shapetrees.data.hackers4peace.net/",
     "meta:https://data/shapetrees/": "meta:https://shapetrees.data.hackers4peace.net/",
-    "https://data/test-client/": "https://test-client.data.hackers4peace.net/"
+    "https://test-client": "https://vuejectron.hackers4peace.net",
+    "https://data/test-client/public/id": "https://vuejectron.hackers4peace.net/id",
+    "https://data/test-client/": "https://vuejectron.data.hackers4peace.net/",
+    "meta:https://data/test-client/": "meta:https://vuejectron.data.hackers4peace.net/"
   }
 }

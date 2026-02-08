@@ -382,7 +382,8 @@ GRAPH <meta:https://registry/alice/agent/cvmsa4/> {
     interop:registeredAgent <https://data/test-client/public/id>;
     interop:hasAccessGrant <https://registry/alice/agent/cvmsa4/y1pp6y>.
   <https://data/test-client/public/id> oidc:client_name "Test client";
-      interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm>.
+      interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm> ;
+      interop:hasAuthorizationCallbackEndpoint <https://test-client> .
 }
 
 GRAPH <meta:https://registry/alice/agent/cvmsa4/.acr> {

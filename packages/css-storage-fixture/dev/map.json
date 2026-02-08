@@ -21,6 +21,9 @@
     "meta:https://data/bob/": "meta:https://bob.data.docker/",
     "https://data/shapetrees/": "https://shapetrees.data.docker/",
     "meta:https://data/shapetrees/": "meta:https://shapetrees.data.docker/",
-    "https://data/test-client/": "https://test-client.data.docker/"
+    "https://test-client": "https://vuejectron.docker",
+    "https://data/test-client/public/id": "https://vuejectron.docker/id",
+    "https://data/test-client/": "https://vuejectron.data.docker/",
+    "meta:https://data/test-client/": "meta:https://vuejectron.data.docker/"
   }
 }

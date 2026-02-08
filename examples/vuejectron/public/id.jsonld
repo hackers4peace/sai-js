@@ -10,6 +10,6 @@
   "logo_uri": "https://robohash.org/aHR0cHM6Ly92dWVqZWN0cm9uLmRvY2tlcg?set=set3",
   "redirect_uris": ["https://vuejectron.docker/redirect"],
   "grant_types": ["refresh_token", "authorization_code"],
-  "interop:hasAccessNeedGroup": "https://vuejectron.docker/access-needs#need-group-pm",
+  "interop:hasAccessNeedGroup": "https://vuejectron.data.docker/public/access-needs#need-group-pm",
   "interop:hasAuthorizationCallbackEndpoint": "https://vuejectron.docker"
 }

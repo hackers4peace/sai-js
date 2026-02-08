@@ -11,5 +11,5 @@
   "redirect_uris": ["https://data/test-client/public/id"],
   "grant_types": ["refresh_token", "authorization_code"],
   "interop:hasAccessNeedGroup": "https://data/test-client/public/access-needs#need-group-pm",
-  "interop:hasAuthorizationCallbackEndpoint": "https://data/test-client/public/id"
+  "interop:hasAuthorizationCallbackEndpoint": "https://test-client"
 }
