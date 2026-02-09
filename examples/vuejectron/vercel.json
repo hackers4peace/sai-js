@@ -1,11 +1,17 @@
 {
   "buildCommand": "vite build && node scripts/vercel.js",
+
   "rewrites": [
     {
       "source": "/id",
       "destination": "/id.jsonld"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
+
   "headers": [
     {
       "source": "/id.jsonld",
