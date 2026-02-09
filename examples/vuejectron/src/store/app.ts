@@ -8,19 +8,19 @@ import type { LdoBase } from '@ldo/ldo'
 import { useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { ref, shallowRef, triggerRef } from 'vue'
-import { FileShapeType } from '../../ldo/File$.shapeTypes'
-import type { File as FileObject } from '../../ldo/File$.typings'
-import { ProjectShapeType } from '../../ldo/Project$.shapeTypes'
-import type { Project } from '../../ldo/Project$.typings'
-import { TaskShapeType } from '../../ldo/Task$.shapeTypes'
-import type { Task } from '../../ldo/Task$.typings'
+import { FileShapeType } from '../../ldo/File.shapeTypes'
+import type { File as FileObject } from '../../ldo/File.typings'
+import { ProjectShapeType } from '../../ldo/Project.shapeTypes'
+import type { Project } from '../../ldo/Project.typings'
+import { TaskShapeType } from '../../ldo/Task.shapeTypes'
+import type { Task } from '../../ldo/Task.typings'
 import { useCoreStore } from './core'
 
 const scopes = {
-  project: 'https://shapetrees.data.docker/trees/Project',
-  task: 'https://shapetrees.data.docker/trees/Task',
-  image: 'https://shapetrees.data.docker/trees/Image',
-  file: 'https://shapetrees.data.docker/trees/File',
+  project: 'https://shapetrees.hackers4peace.net/trees/Project',
+  task: 'https://shapetrees.hackers4peace.net/trees/Task',
+  image: 'https://shapetrees.hackers4peace.net/trees/Image',
+  file: 'https://shapetrees.hackers4peace.net/trees/File',
 }
 
 type AgentId = string

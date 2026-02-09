@@ -1,0 +1,32 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <https://shapetrees.hackers4peace.net/shapes/>
+PREFIX solidtrees: <https://shapetrees.hackers4peace.net/trees/>
+
+solidtrees:Task
+  a shapetrees:ShapeTree ;
+  shapetrees:expectsType shapetrees:Resource ;
+  shapetrees:shape solidshapes:Task ;
+  shapetrees:describesInstance rdfs:label .
+
+solidtrees:desc-en\#Task
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidtrees:Task .
+
+solidtrees:desc-en
+  shapetrees:usesLanguage "en"^^xsd:language .
+
+solidtrees:desc-es\#Task
+  shapetrees:inDescriptionSet solidtrees:desc-es ;
+  shapetrees:describes solidtrees:Task .
+
+solidtrees:desc-es
+  shapetrees:usesLanguage "es"^^xsd:language .
+
+solidtrees:desc-pl\#Task
+  shapetrees:inDescriptionSet solidtrees:desc-pl ;
+  shapetrees:describes solidtrees:Task .
+
+solidtrees:desc-pl
+  shapetrees:usesLanguage "pl"^^xsd:language .

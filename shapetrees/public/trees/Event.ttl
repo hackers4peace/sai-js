@@ -1,0 +1,25 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX uuid: <urn:uuid>
+PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <https://shapetrees.hackers4peace.net/shapes/>
+PREFIX solidtrees: <https://shapetrees.hackers4peace.net/trees/>
+PREFIX schema: <https://schema.org/>
+
+solidtrees:Event
+  a shapetrees:ShapeTree ;
+  shapetrees:expectsType shapetrees:Resource ;
+  shapetrees:shape solidshapes:Event ;
+  shapetrees:describesInstance schema:name ;
+  shapetrees:references
+    uuid:6feabd5e-d595-5996-ae90-cdc700076d50 .
+
+uuid:6feabd5e-d595-5996-ae90-cdc700076d50
+  shapetrees:hasShapeTree solidtrees:Role ;
+  shapetrees:viaPredicate schema:attendee .
+
+solidtrees:desc-en\#Event
+  shapetrees:inDescriptionSet solidtrees:cg-en ;
+  shapetrees:describes solidtrees:Event .
+
+solidtrees:cg-en
+  shapetrees:usesLanguage "en"^^xsd:language .

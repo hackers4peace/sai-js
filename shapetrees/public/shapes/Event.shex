@@ -1,0 +1,41 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX shex: <http://www.w3.org/ns/shex>
+PREFIX schema: <https://schema.org/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX solidshapes: <https://shapetrees.hackers4peace.net/shapes/>
+PREFIX ex: <https://vocab.example/events/>
+
+#solidshapes:Event IRI {
+solidshapes:Event {
+  a [ schema:Event ] ;
+  schema:name xsd:string ;
+  schema:startDate xsd:dateTime ;
+  ex:chair @solidshapes:Role ;
+  ex:scribe @solidshapes:Role ? ;
+  ex:attendee @solidshapes:Role * ;
+  ex:absentee @solidshapes:Role * ;
+  #ex:chair IRI // shex:reference solidshapes:Role ;
+  #ex:scribe IRI ? // shex:reference solidshapes:Role ;
+  #ex:attendee IRI * // shex:reference solidshapes:Role ;
+  #ex:absentee IRI * // shex:reference solidshapes:Role
+}
+
+#solidshapes:Role IRI {
+solidshapes:Role {
+  a [ schema:Role ] ;
+  ex:agent @solidshapes:Person 
+}
+
+#solidshapes:Person IRI {
+solidshapes:Person {
+  a [ foaf:Person ] ;
+  rdfs:label xsd:string
+}
+
+#solidshapes:Organization IRI {
+solidshapes:Organization {
+  a [ foaf:Organization ] ;
+  rdfs:label xsd:string ;
+  schema:member @solidshapes:Person *
+}

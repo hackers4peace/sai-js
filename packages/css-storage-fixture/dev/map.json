@@ -7,7 +7,6 @@
   },
   "prefixes": {
     "https://auth/": "https://auth.docker/",
-    "https://data/shapetrees/trees/": "https://shapetrees.data.docker/trees/",
     "https://registry/": "https://reg.docker/",
     "meta:https://registry/": "meta:https://reg.docker/",
     "https://id/": "https://id.docker/",
@@ -19,8 +18,8 @@
     "meta:https://data/alice-work/": "meta:https://alice-work.data.docker/",
     "https://data/bob/": "https://bob.data.docker/",
     "meta:https://data/bob/": "meta:https://bob.data.docker/",
-    "https://data/shapetrees/": "https://shapetrees.data.docker/",
-    "meta:https://data/shapetrees/": "meta:https://shapetrees.data.docker/",
+    "https://data/shapetrees/": "https://shapetrees.hackers4peace.net/",
+    "meta:https://data/shapetrees/": "meta:https://shapetrees.hackers4peace.net/",
     "https://test-client": "https://vuejectron.docker",
     "https://data/test-client/public/id": "https://vuejectron.docker/id",
     "https://data/test-client/": "https://vuejectron.data.docker/",

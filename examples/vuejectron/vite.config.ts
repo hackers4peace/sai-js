@@ -1,5 +1,5 @@
-import { existsSync } from 'node:fs'
-import { extname, join } from 'node:path'
+import { existsSync, unlinkSync } from 'node:fs'
+import { extname, join, resolve } from 'node:path'
 import { URL, fileURLToPath } from 'node:url'
 // Plugins
 import vue from '@vitejs/plugin-vue'
@@ -35,6 +35,22 @@ export default defineConfig({
         enabled: true,
       },
     }),
+    {
+      name: 'exclude-config',
+      apply: 'build',
+      closeBundle() {
+        const configPath = resolve(__dirname, 'dist/config.json')
+        if (existsSync(configPath)) {
+          unlinkSync(configPath)
+          console.log('✓ Removed config.json from dist')
+        }
+        const idPath = resolve(__dirname, 'dist/id.jsonld')
+        if (existsSync(idPath)) {
+          unlinkSync(idPath)
+          console.log('✓ Removed id.jsonld from dist')
+        }
+      },
+    },
     {
       name: 'clean-urls',
       configureServer(server) {

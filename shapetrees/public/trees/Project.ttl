@@ -1,0 +1,51 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX uuid: <urn:uuid>
+PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <https://shapetrees.hackers4peace.net/shapes/>
+PREFIX solidtrees: <https://shapetrees.hackers4peace.net/trees/>
+PREFIX pm: <https://vocab.example/project-management/>
+
+solidtrees:Project
+  a shapetrees:ShapeTree ;
+  shapetrees:expectsType shapetrees:Resource ;
+  shapetrees:shape solidshapes:Project ;
+  shapetrees:describesInstance rdfs:label ;
+  shapetrees:references
+    uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d ,
+    uuid:86d54925-eeb5-4360-bca4-d53009bae8c7 ,
+    uuid:85a1d32b-5c91-4900-9bc8-f271117675ed .
+
+
+uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d
+  shapetrees:hasShapeTree solidtrees:Task ;
+  shapetrees:viaPredicate pm:hasTask .
+
+uuid:86d54925-eeb5-4360-bca4-d53009bae8c7
+  shapetrees:hasShapeTree solidtrees:Image ;
+  shapetrees:viaPredicate pm:hasImage .
+
+uuid:85a1d32b-5c91-4900-9bc8-f271117675ed
+  shapetrees:hasShapeTree solidtrees:File ;
+  shapetrees:viaPredicate pm:hasFile .
+
+solidtrees:desc-en\#Project
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidtrees:Project .
+
+solidtrees:desc-en
+  shapetrees:usesLanguage "en"^^xsd:language .
+
+solidtrees:desc-es\#Project
+  shapetrees:inDescriptionSet solidtrees:desc-es ;
+  shapetrees:describes solidtrees:Project .
+
+solidtrees:desc-es
+  shapetrees:usesLanguage "es"^^xsd:language .
+
+solidtrees:desc-pl\#Project
+  shapetrees:inDescriptionSet solidtrees:desc-pl ;
+  shapetrees:describes solidtrees:Project .
+
+solidtrees:desc-pl
+  shapetrees:usesLanguage "pl"^^xsd:language .

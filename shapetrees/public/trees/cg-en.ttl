@@ -1,0 +1,21 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <https://shapetrees.hackers4peace.net/shapes/>
+PREFIX solidtrees: <https://shapetrees.hackers4peace.net/trees/>
+
+solidtrees:cg-en
+  a shapetrees:DescriptionSet ;
+  shapetrees:usesLanguage "en"^^xsd:language .
+
+solidtrees:cg-en\#Event
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:cg-en ;
+  shapetrees:describes solidshapes:Event ;
+  skos:prefLabel "Events"@en .
+
+solidtrees:cg-en\#Role
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:cg-en ;
+  shapetrees:describes solidshapes:Role ;
+  skos:prefLabel "Roles"@en .

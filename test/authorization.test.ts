@@ -121,7 +121,7 @@ describe('denied', () => {
     expect(_tag).toBe('Success')
     expect(value.granted).toBeFalsy()
     expect(value.id).toMatch('https://registry/bob/authorization/')
-    expect(value.callbackEndpoint).toBe('https://data/test-client/public/id')
+    expect(value.callbackEndpoint).toBe('https://test-client')
 
     const manager = buildSessionManager()
     const session = await manager.getSession(bobId)

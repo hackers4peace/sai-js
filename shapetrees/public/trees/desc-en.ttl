@@ -1,0 +1,33 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <https://shapetrees.hackers4peace.net/shapes/>
+PREFIX solidtrees: <https://shapetrees.hackers4peace.net/trees/>
+
+solidtrees:desc-en
+  a shapetrees:DescriptionSet ;
+  shapetrees:usesLanguage "en"^^xsd:language .
+
+solidtrees:desc-en\#Project
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidshapes:Project ;
+  skos:prefLabel "Projects"@en .
+
+solidtrees:desc-en\#Task
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidshapes:Task ;
+  skos:prefLabel "Tasks"@en .
+
+solidtrees:desc-en\#Image
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidshapes:Image ;
+  skos:prefLabel "Images"@en .
+
+solidtrees:desc-en\#File
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidshapes:File ;
+  skos:prefLabel "Files"@en .
