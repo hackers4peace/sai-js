@@ -36,7 +36,4 @@ packages/css-storage-fixture/test/.internal/accounts/index/clientCredentials
 
 .turbo
 
-# ldo
-examples/*/ldo/
-
 traefik/certs/*
