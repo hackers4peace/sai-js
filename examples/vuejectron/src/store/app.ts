@@ -4,6 +4,7 @@ import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
 import { Application, NotificationManager } from '@janeirodigital/interop-application'
 import { AS, RequestError } from '@janeirodigital/interop-utils'
 import { commitData, changeData as ldoChangeData } from '@ldo/connected'
+//@ts-ignore
 import { type SolidLdoDataset, createSolidLdoDataset } from '@ldo/connected-solid'
 import type { LdoBase } from '@ldo/ldo'
 import { useStorage } from '@vueuse/core'
@@ -224,12 +225,13 @@ export const useAppStore = defineStore('app', () => {
     if (!task['@id']) throw task
     const projectId = session.findParent(task['@id']!)
     const ldoProject = findProject(projectId)
-    const isDraft = !ldoProject.hasTask?.find((t) => t['@id'] === task['@id'])
+    const isDraft = ![...ldoProject.hasTask!].find(
+      (t: { '@id': string }) => t['@id'] === task['@id']
+    )
     if (isDraft) {
       // add reference to new task
       const cProject = changeData(ldoProject)
-      // @ts-expect-error
-      cProject.hasTask.push({ '@id': task['@id'] })
+      cProject.hasTask!.add({ '@id': task['@id'] })
       const result = await commitData(cProject)
       if (result.isError) throw result
     }

@@ -1,6 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
 
-mkdirSync('public', { recursive: true })
-
-writeFileSync('public/id.jsonld', process.env.CLIENT_ID)
-writeFileSync('public/config.json', process.env.CONFIG)
+writeFileSync('dist/id.jsonld', process.env.CLIENT_ID)
+writeFileSync('dist/config.json', process.env.CONFIG)

@@ -14,7 +14,7 @@
       </h3>
       <v-list>
         <v-list-item
-          v-for="task of (appStore.currentProject.hasTask as Task[])"
+          v-for="task of (appStore.currentProject.hasTask as LdSet<Task>)"
           :key="task['@id']"
         >
           <v-card v-if="task.label">
@@ -113,6 +113,7 @@
 </template>
 
 <script lang="ts" setup>
+import { LdSet } from '@ldo/ldo'
 import { computedAsync } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -120,8 +121,8 @@ import { useRoute } from 'vue-router'
 import { useAppStore } from '@/store/app'
 
 import InputDialog from '@/components/InputDialog.vue'
-import type { File as FileObject } from '../../ldo/File$.typings'
-import type { Task } from '../../ldo/Task$.typings'
+import type { File as FileObject } from '../../ldo/File.typings'
+import type { Task } from '../../ldo/Task.typings'
 
 const download = ref<HTMLAnchorElement>()
 const fileUpload = ref<HTMLInputElement>()

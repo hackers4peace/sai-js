@@ -18,7 +18,7 @@
     "vitest": "^3.0.4"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "if [ \"$CI\" != \"true\" ]; then husky install; fi",
     "build": "turbo run build",
     "test": "turbo run test --concurrency=1",
     "clean": "turbo run clean",
