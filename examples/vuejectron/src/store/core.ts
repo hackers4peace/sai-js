@@ -1,3 +1,4 @@
+import { getRuntimeConfig } from '@/runtime-config'
 import {
   type ISessionInfo,
   getDefaultSession,
@@ -15,13 +16,14 @@ class OidcError extends Error {
 }
 
 export const useCoreStore = defineStore('core', () => {
+  const config = getRuntimeConfig()
   const userId = ref<string | null>(null)
 
   async function login(oidcIssuer: string) {
     const options = {
-      clientId: import.meta.env.VITE_APPLICATION_ID,
+      clientId: config.clientId,
       oidcIssuer,
-      redirectUrl: `${import.meta.env.VITE_BASE_URL}/redirect`,
+      redirectUrl: `${config.baseUrl}/redirect`,
     }
     await oidcLogin(options)
   }

@@ -4,12 +4,9 @@
  * Bootstraps Vuetify and other plugins then mounts the App`
  */
 
-// Components
 import { createApp } from 'vue'
 import App from './App.vue'
 import { loadRuntimeConfig } from './runtime-config'
-
-// Composables
 
 // Plugins
 import { registerPlugins } from '@/plugins'

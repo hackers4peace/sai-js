@@ -1,0 +1,20 @@
+{
+  "buildCommand": "vite build && node scripts/vercel.js",
+  "rewrites": [
+    {
+      "source": "/id",
+      "destination": "/id.jsonld"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/id.jsonld",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/ld+json"
+        }
+      ]
+    }
+  ]
+}

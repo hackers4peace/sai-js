@@ -1,4 +1,5 @@
 import type { Agent, ResourceServer } from '@/models'
+import { getRuntimeConfig } from '@/runtime-config'
 import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
 import { Application, NotificationManager } from '@janeirodigital/interop-application'
 import { AS, RequestError } from '@janeirodigital/interop-utils'
@@ -50,7 +51,7 @@ export const useAppStore = defineStore('app', () => {
     if (session) return session
     const deps = { fetch: authnFetch, randomUUID: crypto.randomUUID.bind(crypto) }
     try {
-      session = await Application.build(coreStore.userId, import.meta.env.VITE_APPLICATION_ID, deps)
+      session = await Application.build(coreStore.userId, getRuntimeConfig().clientId, deps)
     } catch (err) {
       if (err instanceof RequestError) {
         saiError.value = err.message

@@ -35,6 +35,7 @@
 </template>
 
 <script lang="ts" setup>
+import { getRuntimeConfig } from '@/runtime-config'
 import { useAppStore } from '@/store/app'
 import { useCoreStore } from '@/store/core'
 import { computed, ref } from 'vue'
@@ -43,7 +44,7 @@ const store = useCoreStore()
 const appStore = useAppStore()
 const hasError = computed(() => !!appStore.saiError)
 
-const defaultOidcIssuer = import.meta.env.VITE_DEFAULT_OIDC_ISSUER
+const defaultOidcIssuer = getRuntimeConfig().defaultOidcIssuer
 const oidcIssuer = ref('')
 
 // will redirect to OIDC issuer
