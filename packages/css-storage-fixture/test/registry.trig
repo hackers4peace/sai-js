@@ -28,7 +28,8 @@ GRAPH <meta:https://registry/acme/> {
     interop:hasAgentRegistry <https://registry/acme/agent/>;
     interop:hasAuthorizationRegistry <https://registry/acme/authorization/>;
     interop:hasDataRegistry
-      <https://data/acme-rnd/>.
+      <https://data/acme-rnd/>,
+      <https://data/acme-hr/>.
 }
 
 GRAPH <meta:https://registry/acme/authorization/> {
@@ -40,7 +41,8 @@ GRAPH <meta:https://registry/acme/agent/> {
   <https://registry/acme/agent/>
     a interop:AgentRegistry, ldp:Resource;
     interop:hasSocialAgentRegistration
-      <https://registry/acme/agent/je0s7n/>.
+      <https://registry/acme/agent/je0s7n/>,
+      <https://registry/acme/agent/m4k9wp/>.
 }
 
 GRAPH <meta:https://registry/acme/agent/je0s7n/> {
@@ -98,6 +100,153 @@ GRAPH <https://registry/acme/agent/je0s7n/.acr> {
         acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
       ]
     ].
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/> {
+  <https://registry/acme/agent/m4k9wp/>
+    a interop:SocialAgentRegistration, ldp:Resource;
+    interop:registeredAgent <https://id/bob> ;
+    interop:reciprocalRegistration <https://registry/bob/agent/x7n2qv/> ;
+    interop:hasAccessGrant <https://registry/acme/agent/m4k9wp/b8n3kx> ;
+    skos:prefLabel "Bob" ;
+    skos:note "A colleague working on projects." .
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/.acr> {
+        <https://registry/acme/agent/m4k9wp/.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/.acr> {
+  <https://registry/acme/agent/m4k9wp/.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/agent/m4k9wp/>;
+    acp:accessControl
+      <https://registry/acme/agent/m4k9wp/.acr#fullOwnerAccess>,
+      <https://registry/acme/agent/m4k9wp/.acr#peerReadAccess>;
+    acp:memberAccessControl
+      <https://registry/acme/agent/m4k9wp/.acr#fullOwnerAccess>,
+      <https://registry/acme/agent/m4k9wp/.acr#peerReadAccess>.
+
+  <https://registry/acme/agent/m4k9wp/.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/agent/m4k9wp/.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/> {
+  <https://registry/acme/agent/m4k9wp/>
+    ldp:contains
+      <https://registry/acme/agent/m4k9wp/b8n3kx> .
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/b8n3kx> {
+  <https://registry/acme/agent/m4k9wp/b8n3kx>
+    a interop:AccessGrant;
+    interop:granted true;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:hasDataGrant
+      <https://registry/acme/agent/m4k9wp/p9m2vr>,
+      <https://registry/acme/agent/m4k9wp/t7k5nw>,
+      <https://registry/acme/agent/m4k9wp/x4j8lm>,
+      <https://registry/acme/agent/m4k9wp/q2v9pt> .
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/b8n3kx> {
+        <https://registry/acme/agent/m4k9wp/b8n3kx> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/p9m2vr> {
+  <https://registry/acme/agent/m4k9wp/p9m2vr>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:hasStorage <https://data/acme-rnd/>;
+    interop:hasDataRegistration <https://data/acme-rnd/reb39k/>;
+    interop:scopeOfGrant interop:AllFromRegistry;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/acme/agent/m4k9wp/t7k5nw>
+    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/p9m2vr>.
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/p9m2vr> {
+        <https://registry/acme/agent/m4k9wp/p9m2vr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/t7k5nw> {
+  <https://registry/acme/agent/m4k9wp/t7k5nw>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:hasStorage <https://data/acme-rnd/>;
+    interop:hasDataRegistration <https://data/acme-rnd/x0md9s/>;
+    interop:scopeOfGrant interop:Inherited;
+    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/p9m2vr>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/t7k5nw> {
+        <https://registry/acme/agent/m4k9wp/t7k5nw> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/x4j8lm> {
+  <https://registry/acme/agent/m4k9wp/x4j8lm>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:hasStorage <https://data/acme-hr/>;
+    interop:hasDataRegistration <https://data/acme-hr/p7t9km/>;
+    interop:scopeOfGrant interop:AllFromRegistry;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/acme/agent/m4k9wp/q2v9pt>
+    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/x4j8lm>.
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/x4j8lm> {
+        <https://registry/acme/agent/m4k9wp/x4j8lm> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/agent/m4k9wp/q2v9pt> {
+  <https://registry/acme/agent/m4k9wp/q2v9pt>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:hasStorage <https://data/acme-hr/>;
+    interop:hasDataRegistration <https://data/acme-hr/v4n2qx/>;
+    interop:scopeOfGrant interop:Inherited;
+    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/x4j8lm>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/acme/agent/m4k9wp/q2v9pt> {
+        <https://registry/acme/agent/m4k9wp/q2v9pt> a ldp:Resource .
 }
 
 GRAPH <https://registry/acme/agent/je0s7n/gmaqjb> {
@@ -332,6 +481,7 @@ GRAPH <meta:https://registry/alice/agent/vzp6ky/> {
     a interop:SocialAgentRegistration, ldp:Resource;
     interop:registeredAgent <https://id/bob> ;
     interop:reciprocalRegistration <https://registry/bob/agent/jc5gt6/> ;
+    interop:hasAccessGrant <https://registry/alice/agent/vzp6ky/w9n2qx> ;
     skos:prefLabel "Bob" ;
     skos:note "A colleague at ACME" .
 }
@@ -374,6 +524,64 @@ GRAPH <https://registry/alice/agent/vzp6ky/.acr> {
         acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
       ]
     ].
+}
+
+GRAPH <https://registry/alice/agent/vzp6ky/> {
+  <https://registry/alice/agent/vzp6ky/>
+    ldp:contains
+      <https://registry/alice/agent/vzp6ky/w9n2qx> .
+}
+
+GRAPH <https://registry/alice/agent/vzp6ky/w9n2qx> {
+  <https://registry/alice/agent/vzp6ky/w9n2qx>
+    a interop:AccessGrant;
+    interop:granted true;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/alice>;
+    interop:hasDataGrant
+      <https://registry/alice/agent/vzp6ky/p3m8kr>,
+      <https://registry/alice/agent/vzp6ky/t7k5nw> .
+}
+
+GRAPH <meta:https://registry/alice/agent/vzp6ky/w9n2qx> {
+        <https://registry/alice/agent/vzp6ky/w9n2qx> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/agent/vzp6ky/p3m8kr> {
+  <https://registry/alice/agent/vzp6ky/p3m8kr>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/alice>;
+    interop:dataOwner <https://id/alice>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:hasStorage <https://data/alice-home/>;
+    interop:hasDataRegistration <https://data/alice-home/x1n3cm/>;
+    interop:scopeOfGrant interop:AllFromRegistry;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/alice/agent/vzp6ky/t7k5nw>
+    interop:inheritsFromGrant <https://registry/alice/agent/vzp6ky/p3m8kr>.
+}
+
+GRAPH <meta:https://registry/alice/agent/vzp6ky/p3m8kr> {
+        <https://registry/alice/agent/vzp6ky/p3m8kr> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/agent/vzp6ky/t7k5nw> {
+  <https://registry/alice/agent/vzp6ky/t7k5nw>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/alice>;
+    interop:dataOwner <https://id/alice>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:hasStorage <https://data/alice-home/>;
+    interop:hasDataRegistration <https://data/alice-home/pm1oxz/>;
+    interop:scopeOfGrant interop:Inherited;
+    interop:inheritsFromGrant <https://registry/alice/agent/vzp6ky/p3m8kr>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/alice/agent/vzp6ky/t7k5nw> {
+        <https://registry/alice/agent/vzp6ky/t7k5nw> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/alice/agent/cvmsa4/> {
@@ -461,6 +669,8 @@ GRAPH <https://registry/alice/agent/cvmsa4/afiooi> {
     interop:hasDataRegistration <https://data/alice-work/sx86hi/>;
     interop:scopeOfGrant interop:AllFromRegistry;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/alice/agent/cvmsa4/azgyc5>
+    interop:inheritsFromGrant <https://registry/alice/agent/cvmsa4/afiooi>.
 }
 
 GRAPH <meta:https://registry/alice/agent/cvmsa4/afiooi> {
@@ -529,7 +739,9 @@ GRAPH <meta:https://registry/bob/agent/> {
   <https://registry/bob/agent/>
     a interop:AgentRegistry, ldp:Resource;
     interop:hasSocialAgentRegistration
-      <https://registry/bob/agent/jc5gt6/>.
+      <https://registry/bob/agent/jc5gt6/>,
+      <https://registry/bob/agent/x7n2qv/>,
+      <https://registry/bob/agent/n4m8qx/>.
 }
 
 GRAPH <meta:https://registry/bob/agent/jc5gt6/> {
@@ -581,6 +793,104 @@ GRAPH <https://registry/bob/agent/jc5gt6/.acr> {
     ].
 }
 
+GRAPH <meta:https://registry/bob/agent/x7n2qv/> {
+  <https://registry/bob/agent/x7n2qv/>
+    a interop:SocialAgentRegistration, ldp:Resource;
+    interop:registeredAgent <https://id/acme> ;
+    interop:reciprocalRegistration <https://registry/acme/agent/m4k9wp/> ;
+    skos:prefLabel "ACME" ;
+    skos:note "A producer of open source gadgets." .
+}
+
+GRAPH <meta:https://registry/bob/agent/x7n2qv/.acr> {
+        <https://registry/bob/agent/x7n2qv/.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/bob/agent/x7n2qv/.acr> {
+  <https://registry/bob/agent/x7n2qv/.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/bob/agent/x7n2qv/>;
+    acp:accessControl
+      <https://registry/bob/agent/x7n2qv/.acr#fullOwnerAccess>,
+      <https://registry/bob/agent/x7n2qv/.acr#peerReadAccess>;
+    acp:memberAccessControl
+      <https://registry/bob/agent/x7n2qv/.acr#fullOwnerAccess>,
+      <https://registry/bob/agent/x7n2qv/.acr#peerReadAccess>.
+
+  <https://registry/bob/agent/x7n2qv/.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+
+  <https://registry/bob/agent/x7n2qv/.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/bob/agent/n4m8qx/> {
+  <https://registry/bob/agent/n4m8qx/>
+    a interop:SocialAgentRegistration, ldp:Resource;
+    interop:registeredAgent <https://id/yoyo> ;
+    interop:reciprocalRegistration <https://registry/yoyo/agent/z3k7wm/> ;
+    skos:prefLabel "Yoyo" ;
+    skos:note "A colleague working on projects." .
+}
+
+GRAPH <meta:https://registry/bob/agent/n4m8qx/.acr> {
+        <https://registry/bob/agent/n4m8qx/.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/bob/agent/n4m8qx/.acr> {
+  <https://registry/bob/agent/n4m8qx/.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/bob/agent/n4m8qx/>;
+    acp:accessControl
+      <https://registry/bob/agent/n4m8qx/.acr#fullOwnerAccess>,
+      <https://registry/bob/agent/n4m8qx/.acr#peerReadAccess>;
+    acp:memberAccessControl
+      <https://registry/bob/agent/n4m8qx/.acr#fullOwnerAccess>,
+      <https://registry/bob/agent/n4m8qx/.acr#peerReadAccess>.
+
+  <https://registry/bob/agent/n4m8qx/.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+
+  <https://registry/bob/agent/n4m8qx/.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/yoyo>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv>
+      ]
+    ].
+}
+
 GRAPH <meta:https://registry/bob/.acr> {
         <https://registry/bob/.acr> a ldp:Resource .
 }
@@ -611,7 +921,166 @@ GRAPH <meta:https://registry/kim/> {
   <https://registry/kim/>
     a interop:RegistrySet, ldp:Resource, space:Storage;
     interop:hasAgentRegistry <https://registry/kim/agent/>;
-    interop:hasAuthorizationRegistry <https://registry/kim/authorization/>.
+    interop:hasAuthorizationRegistry <https://registry/kim/authorization/>;
+    interop:hasDataRegistry
+      <https://data/kim-red/>,
+      <https://data/kim-blue/>.
+}
+
+GRAPH <meta:https://registry/yoyo/> {
+  <https://registry/yoyo/>
+    a interop:RegistrySet, ldp:Resource, space:Storage;
+    interop:hasAgentRegistry <https://registry/yoyo/agent/>;
+    interop:hasAuthorizationRegistry <https://registry/yoyo/authorization/>;
+    interop:hasDataRegistry
+      <https://data/yoyo-eu/>,
+      <https://data/yoyo-na/>.
+}
+
+GRAPH <meta:https://registry/yoyo/authorization/> {
+  <https://registry/yoyo/authorization/>
+    a interop:AuthorizationRegistry, ldp:Resource.
+}
+
+GRAPH <meta:https://registry/yoyo/agent/> {
+  <https://registry/yoyo/agent/>
+    a interop:AgentRegistry, ldp:Resource;
+    interop:hasSocialAgentRegistration
+      <https://registry/yoyo/agent/z3k7wm/>.
+}
+
+GRAPH <meta:https://registry/yoyo/.acr> {
+        <https://registry/yoyo/.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/.acr> {
+  <https://registry/yoyo/.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/yoyo/>;
+    acp:accessControl
+      <https://registry/yoyo/.acr#fullOwnerAccess>;
+    acp:memberAccessControl
+      <https://registry/yoyo/.acr#fullOwnerAccess>.
+
+  <https://registry/yoyo/.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/yoyo>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/yoyo/agent/z3k7wm/> {
+  <https://registry/yoyo/agent/z3k7wm/>
+    a interop:SocialAgentRegistration, ldp:Resource;
+    interop:registeredAgent <https://id/bob> ;
+    interop:reciprocalRegistration <https://registry/bob/agent/n4m8qx/> ;
+    interop:hasAccessGrant <https://registry/yoyo/agent/z3k7wm/k9m4wp> ;
+    skos:prefLabel "Bob" ;
+    skos:note "A colleague working on projects." .
+}
+
+GRAPH <meta:https://registry/yoyo/agent/z3k7wm/.acr> {
+        <https://registry/yoyo/agent/z3k7wm/.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/agent/z3k7wm/.acr> {
+  <https://registry/yoyo/agent/z3k7wm/.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/yoyo/agent/z3k7wm/>;
+    acp:accessControl
+      <https://registry/yoyo/agent/z3k7wm/.acr#fullOwnerAccess>,
+      <https://registry/yoyo/agent/z3k7wm/.acr#peerReadAccess>;
+    acp:memberAccessControl
+      <https://registry/yoyo/agent/z3k7wm/.acr#fullOwnerAccess>,
+      <https://registry/yoyo/agent/z3k7wm/.acr#peerReadAccess>.
+
+  <https://registry/yoyo/agent/z3k7wm/.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/yoyo>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv>
+      ]
+    ].
+
+  <https://registry/yoyo/agent/z3k7wm/.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <https://registry/yoyo/agent/z3k7wm/> {
+  <https://registry/yoyo/agent/z3k7wm/>
+    ldp:contains
+      <https://registry/yoyo/agent/z3k7wm/k9m4wp> .
+}
+
+GRAPH <https://registry/yoyo/agent/z3k7wm/k9m4wp> {
+  <https://registry/yoyo/agent/z3k7wm/k9m4wp>
+    a interop:AccessGrant;
+    interop:granted true;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/yoyo>;
+    interop:hasDataGrant
+      <https://registry/yoyo/agent/z3k7wm/p7n2vx>,
+      <https://registry/yoyo/agent/z3k7wm/t5m8qr> .
+}
+
+GRAPH <meta:https://registry/yoyo/agent/z3k7wm/k9m4wp> {
+        <https://registry/yoyo/agent/z3k7wm/k9m4wp> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/agent/z3k7wm/p7n2vx> {
+  <https://registry/yoyo/agent/z3k7wm/p7n2vx>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/yoyo>;
+    interop:dataOwner <https://id/yoyo>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:hasStorage <https://data/yoyo-eu/>;
+    interop:hasDataRegistration <https://data/yoyo-eu/w4n9kx/>;
+    interop:scopeOfGrant interop:AllFromRegistry;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/yoyo/agent/z3k7wm/t5m8qr>
+    interop:inheritsFromGrant <https://registry/yoyo/agent/z3k7wm/p7n2vx>.
+}
+
+GRAPH <meta:https://registry/yoyo/agent/z3k7wm/p7n2vx> {
+        <https://registry/yoyo/agent/z3k7wm/p7n2vx> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/agent/z3k7wm/t5m8qr> {
+  <https://registry/yoyo/agent/z3k7wm/t5m8qr>
+    a interop:DataGrant;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/yoyo>;
+    interop:dataOwner <https://id/yoyo>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:hasStorage <https://data/yoyo-eu/>;
+    interop:hasDataRegistration <https://data/yoyo-eu/m7p3qt/>;
+    interop:scopeOfGrant interop:Inherited;
+    interop:inheritsFromGrant <https://registry/yoyo/agent/z3k7wm/p7n2vx>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/yoyo/agent/z3k7wm/t5m8qr> {
+        <https://registry/yoyo/agent/z3k7wm/t5m8qr> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/kim/authorization/> {
@@ -691,9 +1160,12 @@ GRAPH <meta:https://data/alice-work/sx86hi/k3pqsb> {
 
 GRAPH <https://data/alice-work/sx86hi/k3pqsb> {
   <https://data/alice-work/sx86hi/k3pqsb>
+    a pm:Project ;
     rdfs:label "Project A" ;
     pm:hasTask 
-      <https://data/alice-work/btze4a/y48odn> .
+      <https://data/alice-work/btze4a/y48odn>,
+      <https://data/alice-work/btze4a/jvdl8x>,
+      <https://data/alice-work/btze4a/m2k7wp> .
 }
 
 GRAPH <meta:https://data/alice-work/sx86hi/doznys> {
@@ -703,6 +1175,7 @@ GRAPH <meta:https://data/alice-work/sx86hi/doznys> {
 
 GRAPH <https://data/alice-work/sx86hi/doznys> {
   <https://data/alice-work/sx86hi/doznys>
+    a pm:Project ;
     rdfs:label "Project B" ;
     pm:hasTask 
       <https://data/alice-work/btze4a/n5sz83> . # new not created yet
@@ -721,7 +1194,30 @@ GRAPH <meta:https://data/alice-work/btze4a/y48odn> {
 
 GRAPH <https://data/alice-work/btze4a/y48odn> {
   <https://data/alice-work/btze4a/y48odn>
+    a pm:Task ;
     rdfs:label "Task 1" .
+}
+
+GRAPH <meta:https://data/alice-work/btze4a/jvdl8x> {
+  <https://data/alice-work/btze4a/jvdl8x>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-work/btze4a/jvdl8x> {
+  <https://data/alice-work/btze4a/jvdl8x>
+    a pm:Task ;
+    rdfs:label "Task 2" .
+}
+
+GRAPH <meta:https://data/alice-work/btze4a/m2k7wp> {
+  <https://data/alice-work/btze4a/m2k7wp>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-work/btze4a/m2k7wp> {
+  <https://data/alice-work/btze4a/m2k7wp>
+    a pm:Task ;
+    rdfs:label "Task 3" .
 }
 
 GRAPH <meta:https://data/alice-home/> {
@@ -744,6 +1240,146 @@ GRAPH <meta:https://data/alice-home/pm1oxz/> {
     interop:registeredShapeTree shapetrees:Task .
 }
 
+GRAPH <https://data/alice-home/x1n3cm/> {
+  <https://data/alice-home/x1n3cm/>
+    ldp:contains
+      <https://data/alice-home/x1n3cm/n8k3wp>,
+      <https://data/alice-home/x1n3cm/q5m9vx>,
+      <https://data/alice-home/x1n3cm/j4t7lm> .
+}
+
+GRAPH <meta:https://data/alice-home/x1n3cm/n8k3wp> {
+  <https://data/alice-home/x1n3cm/n8k3wp>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/x1n3cm/n8k3wp> {
+  <https://data/alice-home/x1n3cm/n8k3wp>
+    a pm:Project ;
+    rdfs:label "Neon" ;
+    pm:hasTask 
+      <https://data/alice-home/pm1oxz/r2v5nq>,
+      <https://data/alice-home/pm1oxz/w8x3kp> .
+}
+
+GRAPH <meta:https://data/alice-home/x1n3cm/q5m9vx> {
+  <https://data/alice-home/x1n3cm/q5m9vx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/x1n3cm/q5m9vx> {
+  <https://data/alice-home/x1n3cm/q5m9vx>
+    a pm:Project ;
+    rdfs:label "Glitch" ;
+    pm:hasTask 
+      <https://data/alice-home/pm1oxz/t6k2jr>,
+      <https://data/alice-home/pm1oxz/b9n4wl>,
+      <https://data/alice-home/pm1oxz/m3p7xz> .
+}
+
+GRAPH <meta:https://data/alice-home/x1n3cm/j4t7lm> {
+  <https://data/alice-home/x1n3cm/j4t7lm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/x1n3cm/j4t7lm> {
+  <https://data/alice-home/x1n3cm/j4t7lm>
+    a pm:Project ;
+    rdfs:label "Pulse" ;
+    pm:hasTask 
+      <https://data/alice-home/pm1oxz/h5w8vn>,
+      <https://data/alice-home/pm1oxz/d2k6qt> .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/> {
+  <https://data/alice-home/pm1oxz/>
+    ldp:contains
+      <https://data/alice-home/pm1oxz/r2v5nq>,
+      <https://data/alice-home/pm1oxz/w8x3kp>,
+      <https://data/alice-home/pm1oxz/t6k2jr>,
+      <https://data/alice-home/pm1oxz/b9n4wl>,
+      <https://data/alice-home/pm1oxz/m3p7xz>,
+      <https://data/alice-home/pm1oxz/h5w8vn>,
+      <https://data/alice-home/pm1oxz/d2k6qt> .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/r2v5nq> {
+  <https://data/alice-home/pm1oxz/r2v5nq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/r2v5nq> {
+  <https://data/alice-home/pm1oxz/r2v5nq>
+    a pm:Task ;
+    rdfs:label "R1" .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/w8x3kp> {
+  <https://data/alice-home/pm1oxz/w8x3kp>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/w8x3kp> {
+  <https://data/alice-home/pm1oxz/w8x3kp>
+    a pm:Task ;
+    rdfs:label "W2" .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/t6k2jr> {
+  <https://data/alice-home/pm1oxz/t6k2jr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/t6k2jr> {
+  <https://data/alice-home/pm1oxz/t6k2jr>
+    a pm:Task ;
+    rdfs:label "T3" .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/b9n4wl> {
+  <https://data/alice-home/pm1oxz/b9n4wl>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/b9n4wl> {
+  <https://data/alice-home/pm1oxz/b9n4wl>
+    a pm:Task ;
+    rdfs:label "B4" .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/m3p7xz> {
+  <https://data/alice-home/pm1oxz/m3p7xz>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/m3p7xz> {
+  <https://data/alice-home/pm1oxz/m3p7xz>
+    a pm:Task ;
+    rdfs:label "M5" .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/h5w8vn> {
+  <https://data/alice-home/pm1oxz/h5w8vn>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/h5w8vn> {
+  <https://data/alice-home/pm1oxz/h5w8vn>
+    a pm:Task ;
+    rdfs:label "H6" .
+}
+
+GRAPH <meta:https://data/alice-home/pm1oxz/d2k6qt> {
+  <https://data/alice-home/pm1oxz/d2k6qt>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/alice-home/pm1oxz/d2k6qt> {
+  <https://data/alice-home/pm1oxz/d2k6qt>
+    a pm:Task ;
+    rdfs:label "D7" .
+}
+
 GRAPH <meta:https://data/bob/> {
 <https://data/bob/>
   a interop:DataRegistry, ldp:Resource, space:Storage ;
@@ -763,6 +1399,94 @@ GRAPH <meta:https://data/bob/x6hx8e/> {
   <https://data/bob/x6hx8e/>
     a interop:DataRegistration, ldp:Resource ;
     interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/bob/avn9hv/> {
+  <https://data/bob/avn9hv/>
+    ldp:contains
+      <https://data/bob/avn9hv/n3onkx>,
+      <https://data/bob/avn9hv/gl1tch> .
+}
+
+GRAPH <meta:https://data/bob/avn9hv/n3onkx> {
+  <https://data/bob/avn9hv/n3onkx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/bob/avn9hv/n3onkx> {
+  <https://data/bob/avn9hv/n3onkx>
+    a pm:Project ;
+    rdfs:label "Neon" ;
+    pm:hasTask 
+      <https://data/bob/x6hx8e/k9m2np>,
+      <https://data/bob/x6hx8e/v7x4qz> .
+}
+
+GRAPH <meta:https://data/bob/avn9hv/gl1tch> {
+  <https://data/bob/avn9hv/gl1tch>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/bob/avn9hv/gl1tch> {
+  <https://data/bob/avn9hv/gl1tch>
+    a pm:Project ;
+    rdfs:label "Glitch" ;
+    pm:hasTask 
+      <https://data/bob/x6hx8e/j3w8rt>,
+      <https://data/bob/x6hx8e/f5p1ly> .
+}
+
+GRAPH <https://data/bob/x6hx8e/> {
+  <https://data/bob/x6hx8e/>
+    ldp:contains
+      <https://data/bob/x6hx8e/k9m2np>,
+      <https://data/bob/x6hx8e/v7x4qz>,
+      <https://data/bob/x6hx8e/j3w8rt>,
+      <https://data/bob/x6hx8e/f5p1ly> .
+}
+
+GRAPH <meta:https://data/bob/x6hx8e/k9m2np> {
+  <https://data/bob/x6hx8e/k9m2np>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/bob/x6hx8e/k9m2np> {
+  <https://data/bob/x6hx8e/k9m2np>
+    a pm:Task ;
+    rdfs:label "A1" .
+}
+
+GRAPH <meta:https://data/bob/x6hx8e/v7x4qz> {
+  <https://data/bob/x6hx8e/v7x4qz>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/bob/x6hx8e/v7x4qz> {
+  <https://data/bob/x6hx8e/v7x4qz>
+    a pm:Task ;
+    rdfs:label "B2" .
+}
+
+GRAPH <meta:https://data/bob/x6hx8e/j3w8rt> {
+  <https://data/bob/x6hx8e/j3w8rt>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/bob/x6hx8e/j3w8rt> {
+  <https://data/bob/x6hx8e/j3w8rt>
+    a pm:Task ;
+    rdfs:label "C3" .
+}
+
+GRAPH <meta:https://data/bob/x6hx8e/f5p1ly> {
+  <https://data/bob/x6hx8e/f5p1ly>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/bob/x6hx8e/f5p1ly> {
+  <https://data/bob/x6hx8e/f5p1ly>
+    a pm:Task ;
+    rdfs:label "D4" .
 }
 
 GRAPH <meta:https://data/acme-rnd/> {
@@ -792,14 +1516,761 @@ GRAPH <meta:https://data/acme-rnd/reb39k/pbh2yw> {
 
 GRAPH <https://data/acme-rnd/reb39k/pbh2yw> {
   <https://data/acme-rnd/reb39k/pbh2yw>
-    a shapetrees:Project ;
-    rdfs:label "Project X" .
+    a pm:Project ;
+    rdfs:label "Project X" ;
+    pm:hasTask 
+      <https://data/acme-rnd/x0md9s/n7k3zm>,
+      <https://data/acme-rnd/x0md9s/q9r4vx> .
+}
+
+GRAPH <meta:https://data/acme-rnd/reb39k/z8w2pl> {
+  <https://data/acme-rnd/reb39k/z8w2pl>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-rnd/reb39k/z8w2pl> {
+  <https://data/acme-rnd/reb39k/z8w2pl>
+    a pm:Project ;
+    rdfs:label "Matrix" ;
+    pm:hasTask 
+      <https://data/acme-rnd/x0md9s/m5t7jy>,
+      <https://data/acme-rnd/x0md9s/b3x9kq> .
+}
+
+GRAPH <https://data/acme-rnd/reb39k/> {
+  <https://data/acme-rnd/reb39k/>
+    ldp:contains
+      <https://data/acme-rnd/reb39k/pbh2yw>,
+      <https://data/acme-rnd/reb39k/z8w2pl> .
 }
 
 GRAPH <meta:https://data/acme-rnd/x0md9s/> {
   <https://data/acme-rnd/x0md9s/>
     a interop:DataRegistration, ldp:Resource ;
     interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/acme-rnd/x0md9s/> {
+  <https://data/acme-rnd/x0md9s/>
+    ldp:contains
+      <https://data/acme-rnd/x0md9s/n7k3zm>,
+      <https://data/acme-rnd/x0md9s/q9r4vx>,
+      <https://data/acme-rnd/x0md9s/m5t7jy>,
+      <https://data/acme-rnd/x0md9s/b3x9kq> .
+}
+
+GRAPH <meta:https://data/acme-rnd/x0md9s/n7k3zm> {
+  <https://data/acme-rnd/x0md9s/n7k3zm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-rnd/x0md9s/n7k3zm> {
+  <https://data/acme-rnd/x0md9s/n7k3zm>
+    a pm:Task ;
+    rdfs:label "Z1" .
+}
+
+GRAPH <meta:https://data/acme-rnd/x0md9s/q9r4vx> {
+  <https://data/acme-rnd/x0md9s/q9r4vx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-rnd/x0md9s/q9r4vx> {
+  <https://data/acme-rnd/x0md9s/q9r4vx>
+    a pm:Task ;
+    rdfs:label "Z2" .
+}
+
+GRAPH <meta:https://data/acme-rnd/x0md9s/m5t7jy> {
+  <https://data/acme-rnd/x0md9s/m5t7jy>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-rnd/x0md9s/m5t7jy> {
+  <https://data/acme-rnd/x0md9s/m5t7jy>
+    a pm:Task ;
+    rdfs:label "M1" .
+}
+
+GRAPH <meta:https://data/acme-rnd/x0md9s/b3x9kq> {
+  <https://data/acme-rnd/x0md9s/b3x9kq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-rnd/x0md9s/b3x9kq> {
+  <https://data/acme-rnd/x0md9s/b3x9kq>
+    a pm:Task ;
+    rdfs:label "M2" .
+}
+
+GRAPH <meta:https://data/acme-hr/> {
+  <https://data/acme-hr/>
+    a interop:DataRegistry, ldp:Resource, space:Storage ;
+    interop:hasDataRegistration
+    <https://data/acme-hr/p7t9km/> ,
+    <https://data/acme-hr/v4n2qx/> .
+}
+
+GRAPH <meta:https://data/acme-hr/p7t9km/> {
+  <https://data/acme-hr/p7t9km/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Project .
+}
+
+GRAPH <https://data/acme-hr/p7t9km/> {
+  <https://data/acme-hr/p7t9km/>
+    ldp:contains
+      <https://data/acme-hr/p7t9km/w8z5jl>,
+      <https://data/acme-hr/p7t9km/x2y7vr> .
+}
+
+GRAPH <meta:https://data/acme-hr/p7t9km/w8z5jl> {
+  <https://data/acme-hr/p7t9km/w8z5jl>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-hr/p7t9km/w8z5jl> {
+  <https://data/acme-hr/p7t9km/w8z5jl>
+    a pm:Project ;
+    rdfs:label "Cypher" ;
+    pm:hasTask 
+      <https://data/acme-hr/v4n2qx/h3k9mn>,
+      <https://data/acme-hr/v4n2qx/t5p7wq> .
+}
+
+GRAPH <meta:https://data/acme-hr/p7t9km/x2y7vr> {
+  <https://data/acme-hr/p7t9km/x2y7vr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-hr/p7t9km/x2y7vr> {
+  <https://data/acme-hr/p7t9km/x2y7vr>
+    a pm:Project ;
+    rdfs:label "Phantom" ;
+    pm:hasTask 
+      <https://data/acme-hr/v4n2qx/j6m8rt>,
+      <https://data/acme-hr/v4n2qx/b4n1kx> .
+}
+
+GRAPH <meta:https://data/acme-hr/v4n2qx/> {
+  <https://data/acme-hr/v4n2qx/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/acme-hr/v4n2qx/> {
+  <https://data/acme-hr/v4n2qx/>
+    ldp:contains
+      <https://data/acme-hr/v4n2qx/h3k9mn>,
+      <https://data/acme-hr/v4n2qx/t5p7wq>,
+      <https://data/acme-hr/v4n2qx/j6m8rt>,
+      <https://data/acme-hr/v4n2qx/b4n1kx> .
+}
+
+GRAPH <meta:https://data/acme-hr/v4n2qx/h3k9mn> {
+  <https://data/acme-hr/v4n2qx/h3k9mn>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-hr/v4n2qx/h3k9mn> {
+  <https://data/acme-hr/v4n2qx/h3k9mn>
+    a pm:Task ;
+    rdfs:label "H1" .
+}
+
+GRAPH <meta:https://data/acme-hr/v4n2qx/t5p7wq> {
+  <https://data/acme-hr/v4n2qx/t5p7wq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-hr/v4n2qx/t5p7wq> {
+  <https://data/acme-hr/v4n2qx/t5p7wq>
+    a pm:Task ;
+    rdfs:label "T2" .
+}
+
+GRAPH <meta:https://data/acme-hr/v4n2qx/j6m8rt> {
+  <https://data/acme-hr/v4n2qx/j6m8rt>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-hr/v4n2qx/j6m8rt> {
+  <https://data/acme-hr/v4n2qx/j6m8rt>
+    a pm:Task ;
+    rdfs:label "J3" .
+}
+
+GRAPH <meta:https://data/acme-hr/v4n2qx/b4n1kx> {
+  <https://data/acme-hr/v4n2qx/b4n1kx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/acme-hr/v4n2qx/b4n1kx> {
+  <https://data/acme-hr/v4n2qx/b4n1kx>
+    a pm:Task ;
+    rdfs:label "B4" .
+}
+
+GRAPH <meta:https://data/kim-red/> {
+  <https://data/kim-red/>
+    a interop:DataRegistry, ldp:Resource, space:Storage ;
+    interop:hasDataRegistration
+    <https://data/kim-red/n8w3qp/> ,
+    <https://data/kim-red/t6k9mx/> .
+}
+
+GRAPH <meta:https://data/kim-red/n8w3qp/> {
+  <https://data/kim-red/n8w3qp/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Project .
+}
+
+GRAPH <https://data/kim-red/n8w3qp/> {
+  <https://data/kim-red/n8w3qp/>
+    ldp:contains
+      <https://data/kim-red/n8w3qp/x9z7bl>,
+      <https://data/kim-red/n8w3qp/y4m2vn>,
+      <https://data/kim-red/n8w3qp/k1p5jr> .
+}
+
+GRAPH <meta:https://data/kim-red/n8w3qp/x9z7bl> {
+  <https://data/kim-red/n8w3qp/x9z7bl>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/n8w3qp/x9z7bl> {
+  <https://data/kim-red/n8w3qp/x9z7bl>
+    a pm:Project ;
+    rdfs:label "Pulse" ;
+    pm:hasTask 
+      <https://data/kim-red/t6k9mx/r3v8nm>,
+      <https://data/kim-red/t6k9mx/w5x2kq> .
+}
+
+GRAPH <meta:https://data/kim-red/n8w3qp/y4m2vn> {
+  <https://data/kim-red/n8w3qp/y4m2vn>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/n8w3qp/y4m2vn> {
+  <https://data/kim-red/n8w3qp/y4m2vn>
+    a pm:Project ;
+    rdfs:label "Viper" ;
+    pm:hasTask 
+      <https://data/kim-red/t6k9mx/j7m3pt>,
+      <https://data/kim-red/t6k9mx/b9n5lx>,
+      <https://data/kim-red/t6k9mx/f2k8wr> .
+}
+
+GRAPH <meta:https://data/kim-red/n8w3qp/k1p5jr> {
+  <https://data/kim-red/n8w3qp/k1p5jr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/n8w3qp/k1p5jr> {
+  <https://data/kim-red/n8w3qp/k1p5jr>
+    a pm:Project ;
+    rdfs:label "Raven" ;
+    pm:hasTask 
+      <https://data/kim-red/t6k9mx/h4p7vz>,
+      <https://data/kim-red/t6k9mx/d6t3jm> .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/> {
+  <https://data/kim-red/t6k9mx/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/> {
+  <https://data/kim-red/t6k9mx/>
+    ldp:contains
+      <https://data/kim-red/t6k9mx/r3v8nm>,
+      <https://data/kim-red/t6k9mx/w5x2kq>,
+      <https://data/kim-red/t6k9mx/j7m3pt>,
+      <https://data/kim-red/t6k9mx/b9n5lx>,
+      <https://data/kim-red/t6k9mx/f2k8wr>,
+      <https://data/kim-red/t6k9mx/h4p7vz>,
+      <https://data/kim-red/t6k9mx/d6t3jm> .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/r3v8nm> {
+  <https://data/kim-red/t6k9mx/r3v8nm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/r3v8nm> {
+  <https://data/kim-red/t6k9mx/r3v8nm>
+    a pm:Task ;
+    rdfs:label "R1" .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/w5x2kq> {
+  <https://data/kim-red/t6k9mx/w5x2kq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/w5x2kq> {
+  <https://data/kim-red/t6k9mx/w5x2kq>
+    a pm:Task ;
+    rdfs:label "W2" .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/j7m3pt> {
+  <https://data/kim-red/t6k9mx/j7m3pt>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/j7m3pt> {
+  <https://data/kim-red/t6k9mx/j7m3pt>
+    a pm:Task ;
+    rdfs:label "J3" .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/b9n5lx> {
+  <https://data/kim-red/t6k9mx/b9n5lx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/b9n5lx> {
+  <https://data/kim-red/t6k9mx/b9n5lx>
+    a pm:Task ;
+    rdfs:label "B4" .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/f2k8wr> {
+  <https://data/kim-red/t6k9mx/f2k8wr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/f2k8wr> {
+  <https://data/kim-red/t6k9mx/f2k8wr>
+    a pm:Task ;
+    rdfs:label "F5" .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/h4p7vz> {
+  <https://data/kim-red/t6k9mx/h4p7vz>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/h4p7vz> {
+  <https://data/kim-red/t6k9mx/h4p7vz>
+    a pm:Task ;
+    rdfs:label "H6" .
+}
+
+GRAPH <meta:https://data/kim-red/t6k9mx/d6t3jm> {
+  <https://data/kim-red/t6k9mx/d6t3jm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-red/t6k9mx/d6t3jm> {
+  <https://data/kim-red/t6k9mx/d6t3jm>
+    a pm:Task ;
+    rdfs:label "D7" .
+}
+
+GRAPH <meta:https://data/kim-blue/> {
+  <https://data/kim-blue/>
+    a interop:DataRegistry, ldp:Resource, space:Storage ;
+    interop:hasDataRegistration
+    <https://data/kim-blue/p3m8kz/> ,
+    <https://data/kim-blue/r7v2nw/> .
+}
+
+GRAPH <meta:https://data/kim-blue/p3m8kz/> {
+  <https://data/kim-blue/p3m8kz/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Project .
+}
+
+GRAPH <https://data/kim-blue/p3m8kz/> {
+  <https://data/kim-blue/p3m8kz/>
+    ldp:contains
+      <https://data/kim-blue/p3m8kz/w9n4qx>,
+      <https://data/kim-blue/p3m8kz/t2k6lm> .
+}
+
+GRAPH <meta:https://data/kim-blue/p3m8kz/w9n4qx> {
+  <https://data/kim-blue/p3m8kz/w9n4qx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/p3m8kz/w9n4qx> {
+  <https://data/kim-blue/p3m8kz/w9n4qx>
+    a pm:Project ;
+    rdfs:label "Cipher" ;
+    pm:hasTask 
+      <https://data/kim-blue/r7v2nw/m3p9jt>,
+      <https://data/kim-blue/r7v2nw/x5l7kr>,
+      <https://data/kim-blue/r7v2nw/b8v2nm> .
+}
+
+GRAPH <meta:https://data/kim-blue/p3m8kz/t2k6lm> {
+  <https://data/kim-blue/p3m8kz/t2k6lm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/p3m8kz/t2k6lm> {
+  <https://data/kim-blue/p3m8kz/t2k6lm>
+    a pm:Project ;
+    rdfs:label "Drift" ;
+    pm:hasTask 
+      <https://data/kim-blue/r7v2nw/h4w9px>,
+      <https://data/kim-blue/r7v2nw/k1n6vq> .
+}
+
+GRAPH <meta:https://data/kim-blue/r7v2nw/> {
+  <https://data/kim-blue/r7v2nw/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/kim-blue/r7v2nw/> {
+  <https://data/kim-blue/r7v2nw/>
+    ldp:contains
+      <https://data/kim-blue/r7v2nw/m3p9jt>,
+      <https://data/kim-blue/r7v2nw/x5l7kr>,
+      <https://data/kim-blue/r7v2nw/b8v2nm>,
+      <https://data/kim-blue/r7v2nw/h4w9px>,
+      <https://data/kim-blue/r7v2nw/k1n6vq> .
+}
+
+GRAPH <meta:https://data/kim-blue/r7v2nw/m3p9jt> {
+  <https://data/kim-blue/r7v2nw/m3p9jt>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/r7v2nw/m3p9jt> {
+  <https://data/kim-blue/r7v2nw/m3p9jt>
+    a pm:Task ;
+    rdfs:label "M1" .
+}
+
+GRAPH <meta:https://data/kim-blue/r7v2nw/x5l7kr> {
+  <https://data/kim-blue/r7v2nw/x5l7kr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/r7v2nw/x5l7kr> {
+  <https://data/kim-blue/r7v2nw/x5l7kr>
+    a pm:Task ;
+    rdfs:label "X2" .
+}
+
+GRAPH <meta:https://data/kim-blue/r7v2nw/b8v2nm> {
+  <https://data/kim-blue/r7v2nw/b8v2nm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/r7v2nw/b8v2nm> {
+  <https://data/kim-blue/r7v2nw/b8v2nm>
+    a pm:Task ;
+    rdfs:label "B3" .
+}
+
+GRAPH <meta:https://data/kim-blue/r7v2nw/h4w9px> {
+  <https://data/kim-blue/r7v2nw/h4w9px>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/r7v2nw/h4w9px> {
+  <https://data/kim-blue/r7v2nw/h4w9px>
+    a pm:Task ;
+    rdfs:label "H4" .
+}
+
+GRAPH <meta:https://data/kim-blue/r7v2nw/k1n6vq> {
+  <https://data/kim-blue/r7v2nw/k1n6vq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/kim-blue/r7v2nw/k1n6vq> {
+  <https://data/kim-blue/r7v2nw/k1n6vq>
+    a pm:Task ;
+    rdfs:label "K5" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/> {
+  <https://data/yoyo-eu/>
+    a interop:DataRegistry, ldp:Resource, space:Storage ;
+    interop:hasDataRegistration
+    <https://data/yoyo-eu/w4n9kx/> ,
+    <https://data/yoyo-eu/m7p3qt/> .
+}
+
+GRAPH <meta:https://data/yoyo-eu/w4n9kx/> {
+  <https://data/yoyo-eu/w4n9kx/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Project .
+}
+
+GRAPH <https://data/yoyo-eu/w4n9kx/> {
+  <https://data/yoyo-eu/w4n9kx/>
+    ldp:contains
+      <https://data/yoyo-eu/w4n9kx/x8v2lm>,
+      <https://data/yoyo-eu/w4n9kx/j5k7wr>,
+      <https://data/yoyo-eu/w4n9kx/b3p9nz> .
+}
+
+GRAPH <meta:https://data/yoyo-eu/w4n9kx/x8v2lm> {
+  <https://data/yoyo-eu/w4n9kx/x8v2lm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/w4n9kx/x8v2lm> {
+  <https://data/yoyo-eu/w4n9kx/x8v2lm>
+    a pm:Project ;
+    rdfs:label "Vortex" ;
+    pm:hasTask 
+      <https://data/yoyo-eu/m7p3qt/r9w5vx>,
+      <https://data/yoyo-eu/m7p3qt/n2k8jq> .
+}
+
+GRAPH <meta:https://data/yoyo-eu/w4n9kx/j5k7wr> {
+  <https://data/yoyo-eu/w4n9kx/j5k7wr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/w4n9kx/j5k7wr> {
+  <https://data/yoyo-eu/w4n9kx/j5k7wr>
+    a pm:Project ;
+    rdfs:label "Blade" ;
+    pm:hasTask 
+      <https://data/yoyo-eu/m7p3qt/h6p3lm>,
+      <https://data/yoyo-eu/m7p3qt/x4v9kr>,
+      <https://data/yoyo-eu/m7p3qt/w2n5bx> .
+}
+
+GRAPH <meta:https://data/yoyo-eu/w4n9kx/b3p9nz> {
+  <https://data/yoyo-eu/w4n9kx/b3p9nz>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/w4n9kx/b3p9nz> {
+  <https://data/yoyo-eu/w4n9kx/b3p9nz>
+    a pm:Project ;
+    rdfs:label "Neon" ;
+    pm:hasTask 
+      <https://data/yoyo-eu/m7p3qt/j8m4vx>,
+      <https://data/yoyo-eu/m7p3qt/t5w2nz> .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/> {
+  <https://data/yoyo-eu/m7p3qt/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/> {
+  <https://data/yoyo-eu/m7p3qt/>
+    ldp:contains
+      <https://data/yoyo-eu/m7p3qt/r9w5vx>,
+      <https://data/yoyo-eu/m7p3qt/n2k8jq>,
+      <https://data/yoyo-eu/m7p3qt/h6p3lm>,
+      <https://data/yoyo-eu/m7p3qt/x4v9kr>,
+      <https://data/yoyo-eu/m7p3qt/w2n5bx>,
+      <https://data/yoyo-eu/m7p3qt/j8m4vx>,
+      <https://data/yoyo-eu/m7p3qt/t5w2nz> .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/r9w5vx> {
+  <https://data/yoyo-eu/m7p3qt/r9w5vx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/r9w5vx> {
+  <https://data/yoyo-eu/m7p3qt/r9w5vx>
+    a pm:Task ;
+    rdfs:label "R1" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/n2k8jq> {
+  <https://data/yoyo-eu/m7p3qt/n2k8jq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/n2k8jq> {
+  <https://data/yoyo-eu/m7p3qt/n2k8jq>
+    a pm:Task ;
+    rdfs:label "N2" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/h6p3lm> {
+  <https://data/yoyo-eu/m7p3qt/h6p3lm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/h6p3lm> {
+  <https://data/yoyo-eu/m7p3qt/h6p3lm>
+    a pm:Task ;
+    rdfs:label "H3" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/x4v9kr> {
+  <https://data/yoyo-eu/m7p3qt/x4v9kr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/x4v9kr> {
+  <https://data/yoyo-eu/m7p3qt/x4v9kr>
+    a pm:Task ;
+    rdfs:label "X4" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/w2n5bx> {
+  <https://data/yoyo-eu/m7p3qt/w2n5bx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/w2n5bx> {
+  <https://data/yoyo-eu/m7p3qt/w2n5bx>
+    a pm:Task ;
+    rdfs:label "W5" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/j8m4vx> {
+  <https://data/yoyo-eu/m7p3qt/j8m4vx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/j8m4vx> {
+  <https://data/yoyo-eu/m7p3qt/j8m4vx>
+    a pm:Task ;
+    rdfs:label "J6" .
+}
+
+GRAPH <meta:https://data/yoyo-eu/m7p3qt/t5w2nz> {
+  <https://data/yoyo-eu/m7p3qt/t5w2nz>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-eu/m7p3qt/t5w2nz> {
+  <https://data/yoyo-eu/m7p3qt/t5w2nz>
+    a pm:Task ;
+    rdfs:label "T7" .
+}
+
+GRAPH <meta:https://data/yoyo-na/> {
+  <https://data/yoyo-na/>
+    a interop:DataRegistry, ldp:Resource, space:Storage ;
+    interop:hasDataRegistration
+    <https://data/yoyo-na/k9m4wx/> ,
+    <https://data/yoyo-na/p3n7vz/> .
+}
+
+GRAPH <meta:https://data/yoyo-na/k9m4wx/> {
+  <https://data/yoyo-na/k9m4wx/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Project .
+}
+
+GRAPH <https://data/yoyo-na/k9m4wx/> {
+  <https://data/yoyo-na/k9m4wx/>
+    ldp:contains
+      <https://data/yoyo-na/k9m4wx/q7p2lm>,
+      <https://data/yoyo-na/k9m4wx/w5x8kr> .
+}
+
+GRAPH <meta:https://data/yoyo-na/k9m4wx/q7p2lm> {
+  <https://data/yoyo-na/k9m4wx/q7p2lm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/k9m4wx/q7p2lm> {
+  <https://data/yoyo-na/k9m4wx/q7p2lm>
+    a pm:Project ;
+    rdfs:label "Ghost" ;
+    pm:hasTask 
+      <https://data/yoyo-na/p3n7vz/m8w5jq>,
+      <https://data/yoyo-na/p3n7vz/r4k9vx>,
+      <https://data/yoyo-na/p3n7vz/h2n6lm> .
+}
+
+GRAPH <meta:https://data/yoyo-na/k9m4wx/w5x8kr> {
+  <https://data/yoyo-na/k9m4wx/w5x8kr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/k9m4wx/w5x8kr> {
+  <https://data/yoyo-na/k9m4wx/w5x8kr>
+    a pm:Project ;
+    rdfs:label "Cipher" ;
+    pm:hasTask 
+      <https://data/yoyo-na/p3n7vz/j9m3bx>,
+      <https://data/yoyo-na/p3n7vz/n5w2kr> .
+}
+
+GRAPH <meta:https://data/yoyo-na/p3n7vz/> {
+  <https://data/yoyo-na/p3n7vz/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <https://data/yoyo-na/p3n7vz/> {
+  <https://data/yoyo-na/p3n7vz/>
+    ldp:contains
+      <https://data/yoyo-na/p3n7vz/m8w5jq>,
+      <https://data/yoyo-na/p3n7vz/r4k9vx>,
+      <https://data/yoyo-na/p3n7vz/h2n6lm>,
+      <https://data/yoyo-na/p3n7vz/j9m3bx>,
+      <https://data/yoyo-na/p3n7vz/n5w2kr> .
+}
+
+GRAPH <meta:https://data/yoyo-na/p3n7vz/m8w5jq> {
+  <https://data/yoyo-na/p3n7vz/m8w5jq>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/p3n7vz/m8w5jq> {
+  <https://data/yoyo-na/p3n7vz/m8w5jq>
+    a pm:Task ;
+    rdfs:label "M1" .
+}
+
+GRAPH <meta:https://data/yoyo-na/p3n7vz/r4k9vx> {
+  <https://data/yoyo-na/p3n7vz/r4k9vx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/p3n7vz/r4k9vx> {
+  <https://data/yoyo-na/p3n7vz/r4k9vx>
+    a pm:Task ;
+    rdfs:label "R2" .
+}
+
+GRAPH <meta:https://data/yoyo-na/p3n7vz/h2n6lm> {
+  <https://data/yoyo-na/p3n7vz/h2n6lm>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/p3n7vz/h2n6lm> {
+  <https://data/yoyo-na/p3n7vz/h2n6lm>
+    a pm:Task ;
+    rdfs:label "H3" .
+}
+
+GRAPH <meta:https://data/yoyo-na/p3n7vz/j9m3bx> {
+  <https://data/yoyo-na/p3n7vz/j9m3bx>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/p3n7vz/j9m3bx> {
+  <https://data/yoyo-na/p3n7vz/j9m3bx>
+    a pm:Task ;
+    rdfs:label "J4" .
+}
+
+GRAPH <meta:https://data/yoyo-na/p3n7vz/n5w2kr> {
+  <https://data/yoyo-na/p3n7vz/n5w2kr>
+    a ldp:Resource .
+}
+
+GRAPH <https://data/yoyo-na/p3n7vz/n5w2kr> {
+  <https://data/yoyo-na/p3n7vz/n5w2kr>
+    a pm:Task ;
+    rdfs:label "N5" .
 }
 
 GRAPH <meta:https://data/test-client/> {
@@ -988,4 +2459,12 @@ GRAPH <https://id/kim> {
       solid:oidcIssuer <https://auth/>;
       interop:hasRegistrySet <https://registry/kim/>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0> .
+}
+
+GRAPH <https://id/yoyo> {
+  <https://id/yoyo>
+      rdfs:label "Yoyo";
+      solid:oidcIssuer <https://auth/>;
+      interop:hasRegistrySet <https://registry/yoyo/>;
+      interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv> .
 }
