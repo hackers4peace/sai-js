@@ -189,7 +189,34 @@
       }
     },
     "**clientCredentials**": {},
-    "**pod**": {},
+    "**pod**": {
+      "989f5881-7257-4095-a178-5ed376821641": {
+        "baseUrl": "https://data/kim-red/",
+        "accountId": "9f942f30-2631-4403-9a1a-300f8faae267",
+        "id": "989f5881-7257-4095-a178-5ed376821641",
+        "**owner**": {
+          "bec41854-497d-4b12-a7fb-1904c8831f32": {
+            "webId": "https://id/kim",
+            "visible": true,
+            "podId": "989f5881-7257-4095-a178-5ed376821641",
+            "id": "bec41854-497d-4b12-a7fb-1904c8831f32"
+          }
+        }
+      },
+      "d67f81ad-a43f-446e-b43b-9e3d0a909597": {
+        "baseUrl": "https://data/kim-blue/",
+        "accountId": "9f942f30-2631-4403-9a1a-300f8faae267",
+        "id": "d67f81ad-a43f-446e-b43b-9e3d0a909597",
+        "**owner**": {
+          "87a468a2-721b-49a1-9bb4-75d9e97b9505": {
+            "webId": "https://id/kim",
+            "visible": true,
+            "podId": "d67f81ad-a43f-446e-b43b-9e3d0a909597",
+            "id": "87a468a2-721b-49a1-9bb4-75d9e97b9505"
+          }
+        }
+      }
+    },
     "**webIdLink**": {
       "678b68db-3d29-428a-b339-6e3f8b285de9": {
         "webId": "https://id/kim",
@@ -208,6 +235,24 @@
     "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
   "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fkim": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/index/owner/bec41854-497d-4b12-a7fb-1904c8831f32": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/index/owner/87a468a2-721b-49a1-9bb4-75d9e97b9505": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/index/pod/989f5881-7257-4095-a178-5ed376821641": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/index/pod/d67f81ad-a43f-446e-b43b-9e3d0a909597": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Fkim-red%2F": [
+    "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Fkim-blue%2F": [
     "9f942f30-2631-4403-9a1a-300f8faae267"
   ]
 }
