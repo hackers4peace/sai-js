@@ -41,7 +41,8 @@
 
     "css:config/storage/backend/data-accessors/file.json",
     "css:config/storage/backend/data-accessors/sparql-endpoint.json",
-    "sai:config/policy/engine.json"
+    "sai:config/policy/engine.json",
+    "sai:config/overrides/disable-ui.json"
   ],
   "@graph": []
 }
