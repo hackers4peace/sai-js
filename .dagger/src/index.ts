@@ -389,24 +389,28 @@ export class SaiJs {
     imageName: string,
     tag: string,
     registry: string,
+    namespace: string,
     username: Secret,
     password: Secret
   ): Promise<string> {
+    const ref = `${registry}/${namespace}/${imageName}:${tag}`
+
     return dag
       .container()
       .from(SKOPEO_IMAGE)
       .withMountedFile('/img/image.tar.gz', imageFile)
       .withSecretVariable('REGISTRY_USER', username)
       .withSecretVariable('REGISTRY_PASS', password)
-      .withSecretVariable('REGISTRY_HOST', dag.setSecret('REGISTRY_HOST', registry.split('/')[0]))
-      .withExec(['sh', '-c', 'skopeo login $REGISTRY_HOST -u $REGISTRY_USER -p $REGISTRY_PASS'])
       .withExec([
-        'skopeo',
-        'copy',
-        '--retry-times',
-        '3',
-        'docker-archive:/img/image.tar.gz',
-        `docker://${registry}/${imageName}:${tag}`,
+        'sh',
+        '-c',
+        `
+        skopeo copy \
+          --retry-times 3 \
+          --dest-creds "$REGISTRY_USER:$REGISTRY_PASS" \
+          docker-archive:/img/image.tar.gz \
+          docker://${ref}
+        `,
       ])
       .stdout()
   }
@@ -416,21 +420,26 @@ export class SaiJs {
     system: string,
     images: string[],
     registry: string,
+    namespace: string,
     tag: string,
     username: Secret,
     password: Secret
   ): Promise<string[]> {
     const arch = systemToArch(system)
+    const archTag = `${tag}-${arch}`
+
     const refs: string[] = []
 
     for (const image of images) {
       const baseName = imageBaseName(image)
-      const archTag = `${tag}-${arch}`
 
+      // Build image archive for this system + image
       const file = this.buildImage(system, image)
-      const ref = await this.publishImage(file, baseName, archTag, registry, username, password)
 
-      refs.push(ref)
+      // Publish using secure skopeo copy with --dest-creds
+      await this.publishImage(file, baseName, archTag, registry, namespace, username, password)
+
+      refs.push(`${registry}/${namespace}/${baseName}:${archTag}`)
     }
 
     return refs

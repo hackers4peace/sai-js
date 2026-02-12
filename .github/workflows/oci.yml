@@ -50,16 +50,14 @@ jobs:
 
       - name: Build & publish images (${{ matrix.arch }})
         run: |
-          for image in $IMAGE_ATTRS; do
-            dagger call publish-images \
-              --system ${{ matrix.system }} \
-              --images "$image" \
-              --tag $TAG \
-              --registry $REGISTRY/$NAMESPACE \
-              --username=env://QUAY_USERNAME \
-              --password=env://QUAY_TOKEN
-          done
-
+          dagger call publish-images \
+            --system "${{ matrix.system }}" \
+            $(for image in $IMAGE_ATTRS; do printf -- "--images %s " "$image"; done) \
+            --registry "$REGISTRY" \
+            --namespace "$NAMESPACE" \
+            --tag "$TAG" \
+            --username=env://QUAY_USERNAME \
+            --password=env://QUAY_TOKEN
   publish-manifests:
     runs-on: ubuntu-latest
     needs: build-and-publish
