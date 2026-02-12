@@ -1,16 +1,19 @@
-name: Build & Publish Multi-Arch Images (Docker Hub)
+name: Build & Publish Multi-Arch Images (Quay.io)
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - quay
+  # release:
+  #   types: [published]
   workflow_dispatch:
 
 env:
-  REGISTRY: docker.io
+  REGISTRY: quay.io
   NAMESPACE: hackers4peace
   TAG: ${{ github.sha }}
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+  QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
 
   # Space-separated list of flake image attributes
   IMAGE_ATTRS: |
@@ -53,8 +56,8 @@ jobs:
               --images "$image" \
               --tag $TAG \
               --registry $REGISTRY/$NAMESPACE \
-              --username=env://DOCKERHUB_USERNAME \
-              --password=env://DOCKERHUB_TOKEN
+              --username=env://QUAY_USERNAME \
+              --password=env://QUAY_TOKEN
           done
 
   publish-manifests:
@@ -77,10 +80,10 @@ jobs:
         run: |
           AUTHFILE="$RUNNER_TEMP/podman-auth.json"
 
-          podman login docker.io \
+          podman login quay.io \
             --authfile "$AUTHFILE" \
-            -u "$DOCKERHUB_USERNAME" \
-            -p "$DOCKERHUB_TOKEN"
+            -u "$QUAY_USERNAME" \
+            -p "$QUAY_TOKEN"
 
           for image in $IMAGE_ATTRS; do
             name="${image%-image}"
@@ -91,12 +94,12 @@ jobs:
             podman manifest add \
               --authfile "$AUTHFILE" \
               "$target" \
-              "docker://$target-amd64" \
-              "docker://$target-arm64"
+              "docker://${REGISTRY}/${NAMESPACE}/${name}:${TAG}-amd64" \
+              "docker://${REGISTRY}/${NAMESPACE}/${name}:${TAG}-arm64"
 
             podman manifest push \
               --all \
               --authfile "$AUTHFILE" \
               "$target" \
-              "docker://$target"
+              "docker://${REGISTRY}/${NAMESPACE}/${name}:${TAG}"
           done

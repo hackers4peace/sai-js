@@ -398,7 +398,8 @@ export class SaiJs {
       .withMountedFile('/img/image.tar.gz', imageFile)
       .withSecretVariable('REGISTRY_USER', username)
       .withSecretVariable('REGISTRY_PASS', password)
-      .withExec(['sh', '-c', 'skopeo login docker.io -u $REGISTRY_USER -p $REGISTRY_PASS'])
+      .withSecretVariable('REGISTRY_HOST', dag.setSecret('REGISTRY_HOST', registry.split('/')[0]))
+      .withExec(['sh', '-c', 'skopeo login $REGISTRY_HOST -u $REGISTRY_USER -p $REGISTRY_PASS'])
       .withExec([
         'skopeo',
         'copy',
