@@ -1,8 +1,6 @@
 { config, pkgs, lib, ... }:
 let
   cfg = config.services.sai.containers;
-  sai-id = pkgs.callPackage ./packages/sai-id.nix { };
-  sai-css = pkgs.callPackage ./packages/sai-css.nix { };
 in
 {
   options.services.sai.containers = {
@@ -49,14 +47,12 @@ in
     id = {
       tag = lib.mkOption {
         type = lib.types.str;
-        default = sai-id.version;
         description = "sai-id image tag";
       };
     };
     sparql = {
       tag = lib.mkOption {
         type = lib.types.str;
-        default = "latest";
         description = "sai-oxigraph image tag";
       };
       resolver = lib.mkOption {
@@ -67,7 +63,6 @@ in
     auth = {
       tag = lib.mkOption {
         type = lib.types.str;
-        default = sai-css.version;
         description = "sai-css image tag";
       };
       baseUrl = lib.mkOption {
@@ -104,7 +99,6 @@ in
     registry = {
       tag = lib.mkOption {
         type = lib.types.str;
-        default = sai-css.version;
         description = "sai-css image tag";
       };
       baseUrl = lib.mkOption {
@@ -119,7 +113,6 @@ in
     data = {
       tag = lib.mkOption {
         type = lib.types.str;
-        default = sai-css.version;
         description = "sai-css image tag";
       };
       baseUrl = lib.mkOption {
@@ -148,7 +141,7 @@ in
           cmd = ["serve" "--location" "/data" "--bind" "0.0.0.0:7878"];
         };
         sparql = {
-          image = "hackers4peace/sai-oxigraph:${cfg.sparql.tag}";
+          image = "quay.io/hackers4peace/sai-oxigraph:${cfg.sparql.tag}";
           ports = ["7878:80"];
           dependsOn = ["oxigraph"];
           environment = {
@@ -156,7 +149,7 @@ in
           };
         };
         id = {
-          image = "hackers4peace/sai-id:${cfg.id.tag}";
+          image = "quay.io/hackers4peace/sai-id:${cfg.id.tag}";
           ports = ["3000:3000"];
           dependsOn = ["sparql"];
           environment = {
@@ -186,15 +179,18 @@ in
           image = "docker.io/temporalio/admin-tools:${cfg.temporal.adminToolsVersion}";
           autoStart = true;
 
-          dependsOn = [ "postgresql" ];
+          extraOptions = [
+            "--entrypoint=/bin/sh"
+          ];
 
           cmd = [
-            "sh" "-c"
+            "-c"
             ''
-            until pg_isready -h postgresql -U temporal; do
-              sleep 2
-            done
-            sh /etc/temporal/setup-postgres.sh
+              set -e
+              until pg_isready -h postgresql -U temporal; do
+                sleep 2
+              done
+              sh /etc/temporal/setup-postgres.sh
             ''
           ];
 
@@ -216,7 +212,6 @@ in
           image = "docker.io/temporalio/server:${cfg.temporal.version}";
           autoStart = true;
 
-          dependsOn = [ "temporal-admin-tools" ];
           ports = [ "7233:7233" ];
 
           environment = {
@@ -238,10 +233,12 @@ in
           image = "docker.io/temporalio/admin-tools:${cfg.temporal.adminToolsVersion}";
           autoStart = true;
 
-          dependsOn = [ "temporal" ];
+          extraOptions = [
+            "--entrypoint=/bin/sh"
+          ];
 
           cmd = [
-            "sh" "-c"
+            "-c"
             ''
             until nc -z temporal 7233; do
               sleep 2
@@ -264,7 +261,6 @@ in
           image = "docker.io/temporalio/ui:${cfg.temporal.uiVersion}";
           autoStart = true;
 
-          dependsOn = [ "temporal" ];
           ports = [ "8080:8080" ];
 
           environment = {
@@ -274,7 +270,7 @@ in
         };
 
         auth = {
-          image = "hackers4peace/sai-css:${cfg.auth.tag}";
+          image = "quay.io/hackers4peace/sai-css:${cfg.auth.tag}";
           ports = ["4800:4800"];
           dependsOn = ["postgresql"];
           environment = {
@@ -301,7 +297,7 @@ in
         };
 
         registry = {
-          image = "hackers4peace/sai-css:${cfg.registry.tag}";
+          image = "quay.io/hackers4peace/sai-css:${cfg.registry.tag}";
           ports = ["4600:4600"];
           dependsOn = ["postgresql"];
           environment = {
@@ -318,7 +314,7 @@ in
         };
 
         data = {
-          image = "hackers4peace/sai-css:${cfg.data.tag}";
+          image = "quay.io/hackers4peace/sai-css:${cfg.data.tag}";
           ports = ["4700:4700"];
           dependsOn = ["postgresql"];
           environment = {

@@ -5,7 +5,7 @@ let
 in
 
 pkgs.dockerTools.buildImage {
-  name = "hackers4peace/sai-css";
+  name = "quay.io/hackers4peace/sai-css";
   tag = sai-css.version;
 
   copyToRoot = pkgs.buildEnv {

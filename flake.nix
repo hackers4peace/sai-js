@@ -19,7 +19,7 @@
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      latestRelease = "ad1a4e80f73c9e6c517f17877d5ee0c9fc0f5ab9";
+      latestRelease = "0b2f5613fe4632537c8e3597ea44ec01775d5496";
     in
     {
       nixosConfigurations.hetzner-cloud-aarch64 = nixpkgs.lib.nixosSystem {
@@ -42,13 +42,13 @@
           {
             services.sai.containers = {
               sparql.resolver = "127.0.0.11";
-              sparql.tag = latestRelease;
               id.idOrigin = "hackers4peace.net";
               id.docOrigin = "id.hackers4peace.net";
               data.origin = "data.hackers4peace.net";
               registry.origin = "reg.hackers4peace.net";
               auth.origin = "auth.hackers4peace.net";
               ui.origin = "app.auth.hackers4peace.net";
+              sparql.tag = latestRelease;
               id.tag = latestRelease;
               data.tag = latestRelease;
               registry.tag = latestRelease;
@@ -105,6 +105,13 @@
           }
         ];
       };
+      nixosConfigurations.lima-min = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit nixos-lima; };
+        modules = [
+          ./nix/lima.nix
+        ];
+      };
       nixosConfigurations.lima = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
@@ -115,12 +122,23 @@
           {
             services.sai.containers = {
               sparql.resolver = "127.0.0.11";
-              sparql.tag = latestRelease;
               id.idOrigin = "id";
               id.docOrigin = "id";
-              id.tag = latestRelease;
               data.baseUrl = "https://data/";
+              auth.vapidPublicKey = "BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY";
+              auth.baseUrl = "https://auth/";
+              auth.authEndpoint = "https://app.auth/authorize";
+              auth.env = ./packages/css-storage-fixture/dev/env;
+              auth.idOrigin = "id";
+              auth.docOrigin = "id";
+              auth.dataOrigin = "data";
+              auth.regOrigin = "registry";
+              registry.baseUrl = "https://registry/";
+              sparql.tag = latestRelease;
+              id.tag = latestRelease;
               data.tag = latestRelease;
+              registry.tag = latestRelease;
+              auth.tag = latestRelease;
             };
           }
         ];
@@ -142,6 +160,10 @@
               auth.baseUrl = "https://auth/";
               auth.authEndpoint = "https://app.auth/authorize";
               auth.env = ./packages/css-storage-fixture/dev/env;
+              auth.idOrigin = "id";
+              auth.docOrigin = "id";
+              auth.dataOrigin = "data";
+              auth.regOrigin = "registry";
               registry.baseUrl = "https://registry/";
             };
           }

@@ -2,11 +2,11 @@
 
 pkgs.buildNpmPackage {
   pname = "sai-css";
-  version = "0.1.3";
+  version = "0.2.0";
 
   src = pkgs.lib.cleanSource ../../services/css;
 
-  npmDepsHash = "sha256-v+oUSyo5LYhG2cO8ul7ZK4ugJowfj13YddPP78v9cOs=";
+  npmDepsHash = "sha256-y1ybIVUswoNr4Kgnp1XNe2O9gMq9DHDx+coVoASSHms=";
 
   dontNpmBuild = true;
 

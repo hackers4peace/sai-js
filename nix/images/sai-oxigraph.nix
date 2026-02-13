@@ -62,7 +62,7 @@ nginxConfig = pkgs.writeText "nginx.conf" ''
       throw "Unsupported system: ${pkgs.system}";
 in
 pkgs.dockerTools.buildImage {
-  name = "hackers4peace/sai-oxigraph";
+  name = "quay.io/hackers4peace/sai-oxigraph";
   tag = "latest";
 
   fromImage = pkgs.dockerTools.pullImage {

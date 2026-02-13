@@ -6,7 +6,7 @@ pkgs.buildNpmPackage {
 
   src = pkgs.lib.cleanSource ../../ui/authorization;
 
-  npmDepsHash = "sha256-nz4OojILhqzaa8Cxf3tGlvvm+h+eMDo++Dtm75CKyeo";
+  npmDepsHash = "sha256-piCukmOTNt90XZK7/ksunzQG8x7YTwu0Y/PlHoSyK3w=";
   makeCacheWritable = true;
 
   npmBuildScript = "build";

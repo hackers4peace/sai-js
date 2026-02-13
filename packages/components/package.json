@@ -1,6 +1,6 @@
 {
   "name": "@elfpavlik/sai-components",
-  "version": "1.0.0-rc.26",
+  "version": "1.0.0-rc.27",
   "description": "",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components",
   "lsd:components": "dist/components/components.jsonld",
