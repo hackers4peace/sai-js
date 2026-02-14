@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [ ./podman.nix ];
+  imports = [ ../../podman.nix ];
 
   systemd.services.load-sai-oxigraph = {
     description = "Load sai-oxigraph image into Podman";
@@ -9,7 +9,7 @@
     before = [ "podman-sparql.service" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ./images/sai-oxigraph.nix { }}";
+      ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ../../images/sai-oxigraph.nix { }}";
       RemainAfterExit = true;
     };
   };
@@ -21,7 +21,7 @@
     before = [ "podman-id.service" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ./images/sai-id.nix { }}";
+      ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ../../images/sai-id.nix { }}";
       RemainAfterExit = true;
     };
   };
@@ -32,7 +32,7 @@
     after = [ "network-online.target" "podman-postgresql.service" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ./images/sai-css.nix { }}";
+      ExecStart = "${pkgs.podman}/bin/podman load -i ${pkgs.callPackage ../../images/sai-css.nix { }}";
       RemainAfterExit = true;
     };
   };

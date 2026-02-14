@@ -109,31 +109,19 @@
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./nix/lima.nix
+          ./nix/hosts/lima/lima.nix
         ];
       };
       nixosConfigurations.lima = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./nix/lima.nix
+          ./nix/hosts/lima/lima.nix
+          ./nix/hosts/lima/config.nix
           ./nix/caddy.nix
           ./nix/podman.nix
           {
             services.sai.containers = {
-              sparql.resolver = "127.0.0.11";
-              id.idOrigin = "id";
-              id.docOrigin = "id";
-              data.baseUrl = "https://data/";
-              auth.vapidPublicKey = "BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY";
-              auth.baseUrl = "https://auth/";
-              auth.authEndpoint = "https://app.auth/authorize";
-              auth.env = ./packages/css-storage-fixture/dev/env;
-              auth.idOrigin = "id";
-              auth.docOrigin = "id";
-              auth.dataOrigin = "data";
-              auth.regOrigin = "registry";
-              registry.baseUrl = "https://registry/";
               sparql.tag = latestRelease;
               id.tag = latestRelease;
               data.tag = latestRelease;
@@ -147,26 +135,10 @@
         system = "x86_64-linux";
         specialArgs = { inherit nixos-lima; };
         modules = [
-          ./nix/lima.nix
+          ./nix/hosts/lima/lima.nix
+          ./nix/hosts/lima/config.nix
           ./nix/caddy.nix
-          ./nix/podman-local.nix
-          {
-            services.sai.containers = {
-              sparql.resolver = "127.0.0.11";
-              id.idOrigin = "id";
-              id.docOrigin = "id";
-              data.baseUrl = "https://data/";
-              auth.vapidPublicKey = "BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY";
-              auth.baseUrl = "https://auth/";
-              auth.authEndpoint = "https://app.auth/authorize";
-              auth.env = ./packages/css-storage-fixture/dev/env;
-              auth.idOrigin = "id";
-              auth.docOrigin = "id";
-              auth.dataOrigin = "data";
-              auth.regOrigin = "registry";
-              registry.baseUrl = "https://registry/";
-            };
-          }
+          ./nix/hosts/lima/podman-local.nix
         ];
       };
 
