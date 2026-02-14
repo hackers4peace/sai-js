@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 let
   cfg = config.services.sai.containers;
+  sai-id = pkgs.callPackage ./packages/sai-id.nix { };
+  sai-css = pkgs.callPackage ./packages/sai-css.nix { };
+  sai-oxigraph-image = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
 in
 {
   options.services.sai.containers = {
@@ -47,12 +50,14 @@ in
     id = {
       tag = lib.mkOption {
         type = lib.types.str;
+        default = sai-id.version;
         description = "sai-id image tag";
       };
     };
     sparql = {
       tag = lib.mkOption {
         type = lib.types.str;
+        default = "latest";
         description = "sai-oxigraph image tag";
       };
       resolver = lib.mkOption {
@@ -63,6 +68,7 @@ in
     auth = {
       tag = lib.mkOption {
         type = lib.types.str;
+        default = sai-css.version;
         description = "sai-css image tag";
       };
       baseUrl = lib.mkOption {
@@ -99,6 +105,7 @@ in
     registry = {
       tag = lib.mkOption {
         type = lib.types.str;
+        default = sai-css.version;
         description = "sai-css image tag";
       };
       baseUrl = lib.mkOption {
@@ -113,6 +120,7 @@ in
     data = {
       tag = lib.mkOption {
         type = lib.types.str;
+        default = sai-css.version;
         description = "sai-css image tag";
       };
       baseUrl = lib.mkOption {
@@ -138,20 +146,21 @@ in
       containers = {
         oxigraph = {
           image = "docker.io/oxigraph/oxigraph:latest";
+          autoStart = true;
           cmd = ["serve" "--location" "/data" "--bind" "0.0.0.0:7878"];
         };
         sparql = {
           image = "quay.io/hackers4peace/sai-oxigraph:${cfg.sparql.tag}";
+          autoStart = true;
           ports = ["7878:80"];
-          dependsOn = ["oxigraph"];
           environment = {
             NGINX_RESOLVER = cfg.sparql.resolver;
           };
         };
         id = {
           image = "quay.io/hackers4peace/sai-id:${cfg.id.tag}";
+          autoStart = true;
           ports = ["3000:3000"];
-          dependsOn = ["sparql"];
           environment = {
             ID_ORIGIN = cfg.id.idOrigin;
             DOC_ORIGIN = cfg.id.docOrigin;
@@ -271,8 +280,8 @@ in
 
         auth = {
           image = "quay.io/hackers4peace/sai-css:${cfg.auth.tag}";
+          autoStart = true;
           ports = ["4800:4800"];
-          dependsOn = ["postgresql"];
           environment = {
             CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
             CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
@@ -298,8 +307,8 @@ in
 
         registry = {
           image = "quay.io/hackers4peace/sai-css:${cfg.registry.tag}";
+          autoStart = true;
           ports = ["4600:4600"];
-          dependsOn = ["postgresql"];
           environment = {
             CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
             CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
@@ -315,8 +324,8 @@ in
 
         data = {
           image = "quay.io/hackers4peace/sai-css:${cfg.data.tag}";
+          autoStart = true;
           ports = ["4700:4700"];
-          dependsOn = ["postgresql"];
           environment = {
             CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
             CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
@@ -331,6 +340,26 @@ in
             "css-data:/data"
           ];
         };
+      };
+    };
+
+    systemd.services."podman-temporal" = {
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = 20;   # wait 20 seconds before restart
+        StartLimitIntervalSec = 120;  # 2 minute window
+        StartLimitBurst = 4;          # max 3 restarts in window
+      };
+    };
+    systemd.services."podman-temporal-admin-tools" = {
+      serviceConfig = {
+        Restart = lib.mkForce "no";
+      };
+    };
+
+    systemd.services."podman-temporal-create-namespace" = {
+      serviceConfig = {
+        Restart = lib.mkForce "no";
       };
     };
   };

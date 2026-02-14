@@ -174,7 +174,6 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in {
-          sai-oxigraph = pkgs.callPackage ./nix/packages/sai-oxigraph.nix { };
           sai-oxigraph-image = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
 
           sai-id = pkgs.callPackage ./nix/packages/sai-id.nix { };
