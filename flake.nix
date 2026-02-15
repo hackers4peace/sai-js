@@ -27,6 +27,7 @@
         modules = [
           disko.nixosModules.disko
           ./nix/base.nix
+          ./nix/keys/elf.nix
         ];
       };
 
@@ -36,6 +37,7 @@
           disko.nixosModules.disko
           ragenix.nixosModules.default
           ./nix/base.nix
+          ./nix/keys/elf.nix
           ./nix/h4p.nix
           ./nix/caddy.nix
           ./nix/podman.nix
@@ -103,6 +105,20 @@
               registry.baseUrl = "https://reg.hackers4peace.net/";
             };
           }
+        ];
+      };
+
+      nixosConfigurations.demo = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          disko.nixosModules.disko
+          ragenix.nixosModules.default
+          ./nix/base.nix
+          ./nix/keys/elf.nix
+          ./nix/hosts/demo/demo.nix
+          ./nix/hosts/demo/config.nix
+          ./nix/caddy.nix
+          ./nix/podman.nix
         ];
       };
       nixosConfigurations.lima-min = nixpkgs.lib.nixosSystem {
