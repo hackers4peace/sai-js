@@ -17,7 +17,8 @@
     "prefetch-npm-deps@latest",
     "ragenix@latest",
     "cacert@latest",
-    "nixfmt@latest"
+    "nixfmt@latest",
+    "nixd@latest"
   ],
   "shell": {
     "init_hook": [

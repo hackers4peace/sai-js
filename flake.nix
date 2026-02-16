@@ -15,9 +15,21 @@
     };
   };
 
-  outputs = { self, nixpkgs, ragenix, disko, nixos-lima, home-manager, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      ragenix,
+      disko,
+      nixos-lima,
+      home-manager,
+      ...
+    }@inputs:
     let
-      systems = [ "x86_64-linux" "aarch64-linux" ];
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
       latestRelease = "0b2f5613fe4632537c8e3597ea44ec01775d5496";
     in
@@ -116,7 +128,6 @@
           ./nix/base.nix
           ./nix/keys/elf.nix
           ./nix/hosts/demo/demo.nix
-          ./nix/hosts/demo/config.nix
           ./nix/caddy.nix
           ./nix/podman.nix
         ];
@@ -158,10 +169,12 @@
         ];
       };
 
-      packages = forAllSystems (system:
+      packages = forAllSystems (
+        system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-        in {
+        in
+        {
           sai-oxigraph-image = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
 
           sai-id = pkgs.callPackage ./nix/packages/sai-id.nix { };
@@ -170,7 +183,7 @@
           sai-css = pkgs.callPackage ./nix/packages/sai-css.nix { };
           sai-css-image = pkgs.callPackage ./nix/images/sai-css.nix { };
 
-          sai-ui = pkgs.callPackage ./nix/packages/sai-ui.nix {};
+          sai-ui = pkgs.callPackage ./nix/packages/sai-ui.nix { };
         }
       );
     };
