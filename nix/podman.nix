@@ -3,6 +3,84 @@ let
   cfg = config.services.sai.containers;
   sai-id = pkgs.callPackage ./packages/sai-id.nix { };
   sai-css = pkgs.callPackage ./packages/sai-css.nix { };
+  jsonFormat = pkgs.formats.json { };
+
+  # Generate auth.json with configurable cookie domain
+  authConfig = {
+    "@context" = [
+      "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld"
+      "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld"
+      "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+    ];
+    import = [ "sai:config/auth.json" "css:config/http/server-factory/http.json" ];
+    "@graph" = [
+      {
+        comment = "The updated OIDC configuration.";
+        "@id" = "urn:sai:default:OverrideIdentityProviderFactory";
+        "@type" = "Override";
+        overrideInstance = {
+          "@id" = "urn:solid-server:default:IdentityProviderFactory";
+        };
+        overrideParameters = {
+          "@type" = "IdentityProviderFactory";
+          interactionRoute = {
+            "@id" = "urn:sai:default:AuthorizationEndpointRoute";
+          };
+          config = {
+            claims = {
+              openid = [ "azp" ];
+              webid = [ "webid" ];
+            };
+            clockTolerance = 120;
+            cookies = {
+              long = { signed = true; maxAge = 86400000; };
+              short = { signed = true; domain = cfg.auth.cookieDomain; path = "/.account/"; };
+            };
+            enabledJWA = {
+              dPoPSigningAlgValues = [
+                "RS256"
+                "RS384"
+                "RS512"
+                "PS256"
+                "PS384"
+                "PS512"
+                "ES256"
+                "ES384"
+                "ES512"
+                "Ed25519"
+                "EdDSA"
+              ];
+            };
+            features = {
+              claimsParameter = { enabled = true; };
+              clientCredentials = { enabled = true; };
+              devInteractions = { enabled = false; };
+              dPoP = { enabled = true; };
+              introspection = { enabled = true; };
+              registration = { enabled = true; };
+              revocation = { enabled = true; };
+              userinfo = { enabled = false; };
+            };
+            scopes = [ "openid" "profile" "offline_access" "webid" ];
+            subjectTypes = [ "public" ];
+            ttl = {
+              AccessToken = 3600;
+              AuthorizationCode = 600;
+              BackchannelAuthenticationRequest = 600;
+              ClientCredentials = 600;
+              DeviceCode = 600;
+              Grant = 1209600;
+              IdToken = 3600;
+              Interaction = 3600;
+              RefreshToken = 86400;
+              Session = 1209600;
+            };
+          };
+        };
+      }
+    ];
+  };
+  authConfigFile = jsonFormat.generate "auth.json" authConfig;
 
   containers = {
     oxigraph = {
@@ -162,7 +240,7 @@ let
         cfg.auth.env
       ];
       volumes = [
-        "${cfg.auth.config}:/config/auth.json:ro"
+        "${authConfigFile}:/config/auth.json:ro"
       ];
     };
 
@@ -297,10 +375,9 @@ in
         type = lib.types.path;
         description = "auth service env";
       };
-      config = lib.mkOption {
-        type = lib.types.path;
-        default = ../services/css/auth.json;
-        description = "auth service config";
+      cookieDomain = lib.mkOption {
+        type = lib.types.str;
+        description = "Cookie domain for auth service (e.g., .auth.fed.quest)";
       };
     };
     registry = {
@@ -368,4 +445,3 @@ in
     };
   };
 }
-

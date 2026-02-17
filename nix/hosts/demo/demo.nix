@@ -110,6 +110,7 @@ in
     auth.regOrigin = "reg.${domain}";
     registry.baseUrl = "https://reg.${domain}/";
     auth.env = config.age.secrets.auth.path;
+    auth.cookieDomain = ".auth.${domain}";
     ui.caddyConfig = ''
       ${tls}
       root * ${sai-ui-demo}
