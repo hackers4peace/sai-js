@@ -67,6 +67,7 @@
               data.tag = latestRelease;
               registry.tag = latestRelease;
               auth.tag = latestRelease;
+              worker.tag = latestRelease;
               id.caddyConfig = ''
                 tls {
                   dns gandi {env.GANDI_BEARER_TOKEN}
@@ -182,6 +183,9 @@
 
           sai-css = pkgs.callPackage ./nix/packages/sai-css.nix { };
           sai-css-image = pkgs.callPackage ./nix/images/sai-css.nix { };
+
+          sai-worker = pkgs.callPackage ./nix/packages/sai-worker.nix { };
+          sai-worker-image = pkgs.callPackage ./nix/images/sai-worker.nix { };
 
           sai-ui = pkgs.callPackage ./nix/packages/sai-ui.nix { };
         }

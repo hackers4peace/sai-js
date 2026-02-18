@@ -1,14 +1,12 @@
 {
-  "name": "sai-css",
+  "name": "sai-worker",
   "private": true,
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
   "scripts": {},
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@solid/community-server": "8.0.0-alpha.1",
-    "@elfpavlik/sai-components": "1.0.0-rc.27"
+    "@elfpavlik/sai-components": "1.0.0-rc.28"
   }
 }
