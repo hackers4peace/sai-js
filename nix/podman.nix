@@ -3,6 +3,7 @@ let
   cfg = config.services.sai.containers;
   sai-id = pkgs.callPackage ./packages/sai-id.nix { };
   sai-css = pkgs.callPackage ./packages/sai-css.nix { };
+  sai-worker = pkgs.callPackage ./packages/sai-worker.nix { };
   jsonFormat = pkgs.formats.json { };
 
   # Generate auth.json with configurable cookie domain
@@ -244,6 +245,21 @@ let
       ];
     };
 
+    worker = {
+      image = "quay.io/hackers4peace/sai-worker:${cfg.worker.tag}";
+      autoStart = true;
+      environment = {
+        CSS_BASE_URL = cfg.auth.baseUrl;
+        CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
+        TEMPORAL_ADDRESS = "temporal:7233";
+        CSS_VAPID_PUBLIC_KEY = cfg.auth.vapidPublicKey;
+        SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
+      };
+      environmentFiles = [
+        cfg.auth.env
+      ];
+    };
+
     registry = {
       image = "quay.io/hackers4peace/sai-css:${cfg.registry.tag}";
       autoStart = true;
@@ -378,6 +394,14 @@ in
       cookieDomain = lib.mkOption {
         type = lib.types.str;
         description = "Cookie domain for auth service (e.g., .auth.fed.quest)";
+      };
+    };
+
+    worker = {
+      tag = lib.mkOption {
+        type = lib.types.str;
+        default = sai-worker.version;
+        description = "sai-worker image tag";
       };
     };
     registry = {

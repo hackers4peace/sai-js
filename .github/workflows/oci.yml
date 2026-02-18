@@ -17,6 +17,7 @@ env:
     sai-oxigraph-image
     sai-id-image
     sai-css-image
+    sai-worker-image
 
 jobs:
   build-and-publish:

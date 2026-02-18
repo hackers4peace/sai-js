@@ -73,6 +73,7 @@ in
     data.tag = tag;
     registry.tag = tag;
     auth.tag = tag;
+    worker.tag = tag;
     id.caddyConfig = ''
       ${tls}
       reverse_proxy localhost:3000 {

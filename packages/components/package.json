@@ -1,6 +1,6 @@
 {
   "name": "@elfpavlik/sai-components",
-  "version": "1.0.0-rc.27",
+  "version": "1.0.0-rc.28",
   "description": "",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components",
   "lsd:components": "dist/components/components.jsonld",
@@ -32,6 +32,7 @@
     "@janeirodigital/sai-api-messages": "1.0.0-rc.26",
     "@solid-notifications/discovery": "^0.1.2",
     "@solid-notifications/subscription": "^0.1.2",
+    "@solid-notifications/types": "^0.1.2",
     "@solid/community-server": "8.0.0-alpha.1",
     "@solidlab/policy-engine": "^0.0.2",
     "@temporalio/client": "^1.13.0",
@@ -51,7 +52,6 @@
   },
   "devDependencies": {
     "@inrupt/solid-client-authn-core": "^2.5.0",
-    "@solid-notifications/types": "^0.1.2",
     "@types/web-push": "^3.6.1",
     "componentsjs-generator": "^4.3.0",
     "fs-extra": "^10.1.0",

@@ -1,0 +1,12 @@
+{
+  "name": "sai-worker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {},
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@elfpavlik/sai-components": "1.0.0-rc.28"
+  }
+}
