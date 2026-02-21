@@ -4,7 +4,7 @@
   ...
 }:
 let
-  tag = "0b2f5613fe4632537c8e3597ea44ec01775d5496";
+  tag = "0fbde45c230c416c8619086098650e663c022e7c";
   vapidPublicKey = "BEuveySWp1pRLWZ-Jn9j_46lAY69hmonzX8RS9O84TPzRT65pUDr3k4YA5Xyr6Zqw86o-bsDihoUWJWw8_yswG4";
   domain = "fed.quest";
   tls = ''

@@ -31,7 +31,7 @@
         "aarch64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      latestRelease = "0b2f5613fe4632537c8e3597ea44ec01775d5496";
+      latestRelease = "0fbde45c230c416c8619086098650e663c022e7c";
     in
     {
       nixosConfigurations.hetzner-cloud-aarch64 = nixpkgs.lib.nixosSystem {
