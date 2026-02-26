@@ -13,6 +13,7 @@ export * from './SaiAuthorizationManager.js'
 export * from './SaiPermissionsEngine.js'
 export * from './AdminPermissionReader.js'
 export * from './SparqlStoreEntry.js'
+export * from './HybridDataAccessor.js'
 
 export * from './util/uriTemplates.js'
 

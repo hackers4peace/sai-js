@@ -1386,7 +1386,9 @@ GRAPH <meta:https://data/bob/> {
   interop:registeredBy <https://id/bob> ;
   interop:hasDataRegistration
    <https://data/bob/avn9hv/> ,
-   <https://data/bob/x6hx8e/> .
+   <https://data/bob/x6hx8e/> ,
+   <https://data/bob/a0z5br/> ,
+   <https://data/bob/oapdnp/> .
 }
 
 GRAPH <meta:https://data/bob/avn9hv/> {
@@ -1399,6 +1401,18 @@ GRAPH <meta:https://data/bob/x6hx8e/> {
   <https://data/bob/x6hx8e/>
     a interop:DataRegistration, ldp:Resource ;
     interop:registeredShapeTree shapetrees:Task .
+}
+
+GRAPH <meta:https://data/bob/a0z5br/> {
+  <https://data/bob/a0z5br/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:Image .
+}
+
+GRAPH <meta:https://data/bob/oapdnp/> {
+  <https://data/bob/oapdnp/>
+    a interop:DataRegistration, ldp:Resource ;
+    interop:registeredShapeTree shapetrees:File .
 }
 
 GRAPH <https://data/bob/avn9hv/> {

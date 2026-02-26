@@ -11,7 +11,7 @@
       "rule": { "@id": "urn:solid-server:default:RouterRule" }
     },
     {
-      "comment": "Configure routing to send RDF sparql store and all other data to file system.",
+      "comment": "Configure routing to send RDF to sparql store and all other data to hybrid store.",
       "@id": "urn:solid-server:default:RouterRule",
       "@type": "ConvertingRouterRule",
       "typedStores": [
@@ -23,17 +23,22 @@
         }
       ],
       "defaultStore": {
-        "@id": "urn:solid-server:default:FileResourceStore"
+        "@id": "urn:solid-server:default:HybridResourceStore"
       }
     },
-
     {
-      "@id": "urn:solid-server:default:FileResourceStore",
+      "@id": "urn:solid-server:default:HybridResourceStore",
       "@type": "DataAccessorBasedStore",
       "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
       "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
-      "accessor": { "@id": "urn:solid-server:default:FileDataAccessor" },
+      "accessor": { "@id": "urn:sai:default:HybridDataAccessor" },
       "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" }
+    },
+    {
+      "@id": "urn:sai:default:HybridDataAccessor",
+      "@type": "HybridDataAccessor",
+      "binaryAccessor": { "@id": "urn:solid-server:default:FileDataAccessor" },
+      "sparqlAccessor": { "@id": "urn:solid-server:default:SparqlDataAccessor" }
     },
     {
       "@id": "urn:solid-server:default:SparqlResourceStore",

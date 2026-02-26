@@ -271,7 +271,7 @@ export const useAppStore = defineStore('app', () => {
     // add reference from project to new file
     const cProject = changeData(ldoProject)
     // @ts-expect-error
-    cProject[propForScope[scope]].push({ '@id': fileId })
+    cProject[propForScope[scope]].add({ '@id': fileId })
     const projectResult = await commitData(cProject)
     if (projectResult.isError) throw projectResult
 
@@ -295,7 +295,8 @@ export const useAppStore = defineStore('app', () => {
     const resource = solidLdoDataset.getResource(descriptionIri)
     const cFile = ldoChangeData(newFile, resource)
     cFile.fileName = blob.name
-    cFile.format = blob.type
+    // CSS responds with 409 since it already stores it in metadata
+    //cFile.format = blob.type
 
     const fileResult = await commitData(cFile)
     if (fileResult.isError) throw fileResult
