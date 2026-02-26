@@ -134,7 +134,7 @@ export const useAppStore = defineStore('app', () => {
         const ldoSolidProject = solidLdoDataset.usingType(ProjectShapeType).fromSubject(projectId)
         serverProjects.push(ldoSolidProject)
         // subscribe to changes
-        await notificationsManager.subscribeToResource(projectId)
+        //await notificationsManager.subscribeToResource(projectId)
       }
       projects.value = [...projects.value, ...serverProjects]
     }
@@ -193,7 +193,7 @@ export const useAppStore = defineStore('app', () => {
       session.setChildInfo(childId, scope, ldoProject['@id']!)
       if (scope === scopes.task) {
         // subscribe to changes
-        await notificationsManager.subscribeToResource(childId)
+        //await notificationsManager.subscribeToResource(childId)
       }
     }
   }
