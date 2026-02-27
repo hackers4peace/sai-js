@@ -16,9 +16,17 @@
     {
       "@id": "urn:sai:default:HybridDataAccessor",
       "@type": "HybridDataAccessor",
-      "binaryAccessor": { "@id": "urn:solid-server:default:FileDataAccessor" },
+      "binaryAccessor": { "@id": "urn:sai:default:S3DataAccessor" },
       "sparqlAccessor": { "@id": "urn:solid-server:default:SparqlDataAccessor" },
       "converter": { "@id": "urn:solid-server:default:RepresentationConverter" }
+    },
+    {
+      "@id": "urn:sai:default:S3DataAccessor",
+      "@type": "S3DataAccessor",
+      "endpoint": { "@id": "urn:sai:default:variable:s3Endpoint" },
+      "accessKeyId": { "@id": "urn:sai:default:variable:s3AccessKeyId" },
+      "secretAccessKey": { "@id": "urn:sai:default:variable:s3SecretAccessKey" },
+      "region": { "@id": "urn:sai:default:variable:s3Region" }
     }
   ]
 }

@@ -2,9 +2,10 @@ x-postgres-env: &postgres-env
   CSS_POSTGRES_CONNECTION_STRING: postgres://temporal:temporal@postgresql:5432/auth
 
 x-garage-env: &garage-env
-  CSS_S3_ENDPOINT:
-  CSS_S3_ACCESS_KEY_ID:
-  CSS_S3_SECRET_ACCESS_KEY:
+  CSS_S3_ENDPOINT: http://garage:3900/sai-dev
+  CSS_S3_ACCESS_KEY_ID: GKd0656430cbd2bba62e2cc12b
+  CSS_S3_SECRET_ACCESS_KEY: aa3594ca915bf7b310c7672d436f2a937f20d2ad022eec90345dfc364e1bdd4c
+  CSS_S3_REGION: garage
 
 x-vapid-env: &vapid-env
   CSS_VAPID_PUBLIC_KEY: BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY
@@ -127,7 +128,7 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      <<: [*postgres-env, *sparql-env, *certs-env]
+      <<: [*postgres-env, *garage-env, *sparql-env, *certs-env]
       CSS_CONFIG: /sai/packages/css-storage-fixture/data.json
       CSS_LOGGING_LEVEL: info
       CSS_ROOT_FILE_PATH: /sai/packages/css-storage-fixture/dev/data

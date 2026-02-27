@@ -20,11 +20,7 @@
     "build:ts": "tsc",
     "clean": "rm -rf dist/"
   },
-  "files": [
-    "dist/",
-    "src/",
-    "config/"
-  ],
+  "files": ["dist/", "src/", "config/"],
   "keywords": [],
   "author": "",
   "license": "MIT",

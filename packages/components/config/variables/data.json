@@ -1,0 +1,109 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "S3 endpoint.",
+      "@id": "urn:sai:default:variable:s3Endpoint",
+      "@type": "Variable"
+    },
+    {
+      "comment": "S3 access key ID.",
+      "@id": "urn:sai:default:variable:s3AccessKeyId",
+      "@type": "Variable"
+    },
+    {
+      "comment": "S3 secret access key.",
+      "@id": "urn:sai:default:variable:s3SecretAccessKey",
+      "@type": "Variable"
+    },
+    {
+      "comment": "S3 region.",
+      "@id": "urn:sai:default:variable:s3Region",
+      "@type": "Variable"
+    },
+    {
+      "@id": "urn:solid-server-app-setup:default:CliExtractor",
+      "@type": "YargsCliExtractor",
+      "parameters": [
+        {
+          "@type": "YargsParameter",
+          "name": "s3Endpoint",
+          "options": {
+            "demandOption": true,
+            "requiresArg": true,
+            "type": "string",
+            "describe": "S3 endpoint URL"
+          }
+        },
+        {
+          "@type": "YargsParameter",
+          "name": "s3AccessKeyId",
+          "options": {
+            "demandOption": true,
+            "requiresArg": true,
+            "type": "string",
+            "describe": "S3 access key ID"
+          }
+        },
+        {
+          "@type": "YargsParameter",
+          "name": "s3SecretAccessKey",
+          "options": {
+            "demandOption": true,
+            "requiresArg": true,
+            "type": "string",
+            "describe": "S3 secret access key"
+          }
+        },
+        {
+          "@type": "YargsParameter",
+          "name": "s3Region",
+          "options": {
+            "demandOption": true,
+            "requiresArg": true,
+            "type": "string",
+            "describe": "S3 region"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "urn:solid-server-app-setup:default:ShorthandResolver",
+      "@type": "CombinedShorthandResolver",
+      "resolvers": [
+        {
+          "CombinedShorthandResolver:_resolvers_key": "urn:sai:default:variable:s3Endpoint",
+          "CombinedShorthandResolver:_resolvers_value": {
+            "@type": "KeyExtractor",
+            "key": "s3Endpoint"
+          }
+        },
+        {
+          "CombinedShorthandResolver:_resolvers_key": "urn:sai:default:variable:s3AccessKeyId",
+          "CombinedShorthandResolver:_resolvers_value": {
+            "@type": "KeyExtractor",
+            "key": "s3AccessKeyId"
+          }
+        },
+        {
+          "CombinedShorthandResolver:_resolvers_key": "urn:sai:default:variable:s3SecretAccessKey",
+          "CombinedShorthandResolver:_resolvers_value": {
+            "@type": "KeyExtractor",
+            "key": "s3SecretAccessKey"
+          }
+        },
+        {
+          "CombinedShorthandResolver:_resolvers_key": "urn:sai:default:variable:s3Region",
+          "CombinedShorthandResolver:_resolvers_value": {
+            "@type": "KeyExtractor",
+            "key": "s3Region"
+          }
+        }
+      ]
+    }
+  ]
+}

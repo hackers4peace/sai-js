@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import type { ReadableStream as ReadableStreamNode } from 'node:stream/web'
 import type {
   DataAccessor,
   Guarded,
@@ -15,22 +16,19 @@ import {
 import { S3mini } from 's3mini'
 
 export interface S3DataAccessorArgs {
-  // endpoint: string
-  // accessKeyId: string
-  // secretAccessKey: string
-  region?: string
+  endpoint: string
+  accessKeyId: string
+  secretAccessKey: string
+  region: string
 }
 export class S3DataAccessor implements DataAccessor {
   private readonly s3: S3mini
   public constructor(args: S3DataAccessorArgs) {
     this.s3 = new S3mini({
-      // endpoint: args.endpoint,
-      // accessKeyId: args.accessKeyId,
-      // secretAccessKey: args.secretAccessKey,
-      endpoint: process.env.CSS_S3_ENDPOINT,
-      accessKeyId: process.env.CSS_S3_ACCESS_KEY_ID,
-      secretAccessKey: process.env.CSS_S3_SECRET_ACCESS_KEY,
-      region: args.region ?? 'auto',
+      endpoint: args.endpoint,
+      accessKeyId: args.accessKeyId,
+      secretAccessKey: args.secretAccessKey,
+      region: args.region,
     })
   }
 
@@ -41,13 +39,11 @@ export class S3DataAccessor implements DataAccessor {
   }
 
   public async getData(identifier: ResourceIdentifier): Promise<Guarded<Readable>> {
-    const key = identifier.path
-    const response = await this.s3.getObjectResponse(key)
+    const response = await this.s3.getObjectResponse(identifier.path)
     if (!response || !response.body) {
       throw new NotFoundHttpError()
     }
-    //@ts-ignore
-    return guardStream(Readable.fromWeb(response.body))
+    return guardStream(Readable.fromWeb(response.body as ReadableStreamNode))
   }
 
   public async writeDocument(
@@ -55,13 +51,17 @@ export class S3DataAccessor implements DataAccessor {
     data: Guarded<Readable>,
     metadata: RepresentationMetadata
   ): Promise<void> {
-    //@ts-ignore
-    await this.s3.putAnyObject(identifier.path, Readable.toWeb(data), metadata.contentType)
+    await this.s3.putAnyObject(
+      identifier.path,
+      Readable.toWeb(data) as ReadableStream,
+      metadata.contentType
+    )
   }
 
   public async deleteResource(identifier: ResourceIdentifier): Promise<void> {
     await this.s3.deleteObject(identifier.path)
   }
+
   public async getMetadata(identifier: ResourceIdentifier): Promise<RepresentationMetadata> {
     throw new NotImplementedHttpError('S3DataAccessor does not support getMetadata')
   }
