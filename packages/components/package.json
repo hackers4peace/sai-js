@@ -20,7 +20,11 @@
     "build:ts": "tsc",
     "clean": "rm -rf dist/"
   },
-  "files": ["dist/", "src/", "config/"],
+  "files": [
+    "dist/",
+    "src/",
+    "config/"
+  ],
   "keywords": [],
   "author": "",
   "license": "MIT",
@@ -48,6 +52,7 @@
     "n3": "^1.26.0",
     "postgres": "^3.4.7",
     "rdf-vocabulary": "^1.0.1",
+    "s3mini": "^0.9.1",
     "web-push": "^3.6.6"
   },
   "devDependencies": {

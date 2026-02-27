@@ -1,6 +1,11 @@
 x-postgres-env: &postgres-env
   CSS_POSTGRES_CONNECTION_STRING: postgres://temporal:temporal@postgresql:5432/auth
 
+x-garage-env: &garage-env
+  CSS_S3_ENDPOINT:
+  CSS_S3_ACCESS_KEY_ID:
+  CSS_S3_SECRET_ACCESS_KEY:
+
 x-vapid-env: &vapid-env
   CSS_VAPID_PUBLIC_KEY: BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY
   CSS_VAPID_PRIVATE_KEY: 8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA
@@ -399,6 +404,25 @@ services:
       - traefik.http.routers.id.entrypoints=websecure
       - traefik.http.routers.id.tls=true
       - traefik.http.services.id.loadbalancer.server.port=3000
+
+  garage:
+    image: dxflrs/garage:v2.2.0
+    container_name: garage
+    restart: on-failure
+    networks:
+      - default
+    ports:
+      - "3900:3900"
+      - "3901:3901"
+      - "3902:3902"
+      - "3903:3903"
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml
+      - ./garage/meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+
+volumes:
+  garage_data:
 
 networks:
   default:

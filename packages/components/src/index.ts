@@ -15,6 +15,7 @@ export * from './AdminPermissionReader.js'
 export * from './SparqlStoreEntry.js'
 export * from './HybridDataAccessor.js'
 export * from './HybridResourceStore.js'
+export * from './S3DataAccessor.js'
 
 export * from './util/uriTemplates.js'
 

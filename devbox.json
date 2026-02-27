@@ -18,7 +18,8 @@
     "ragenix@latest",
     "cacert@latest",
     "nixfmt@latest",
-    "nixd@latest"
+    "nixd@latest",
+    "garage@latest"
   ],
   "shell": {
     "init_hook": [
@@ -28,7 +29,7 @@
       "alias jq='jaq'"
     ],
     "scripts": {
-      "up": "make up",
+      "up":   "make up",
       "down": "make down",
       "seed": "bun packages/repl/cmd.ts -- seed-env"
     }
