@@ -7,31 +7,6 @@
   "@graph": [
     {
       "@id": "urn:solid-server:default:ResourceStore_Backend",
-      "@type": "HybridResourceStore",
-      "sparqlStore": { "@id": "urn:solid-server:default:SparqlResourceStore" },
-      "binaryStore": { "@id": "urn:solid-server:default:BinaryStore" }
-    },
-    {
-      "@id": "urn:solid-server:default:SparqlResourceStore",
-      "@type": "RepresentationConvertingStore",
-      "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" },
-      "options_inConverter": { "@id": "urn:solid-server:default:RepresentationConverter" },
-      "options_inPreferences_type": {
-        "RepresentationConvertingStore:_options_inPreferences_type_key": "internal/quads",
-        "RepresentationConvertingStore:_options_inPreferences_type_value": 1
-      },
-      "source": { "@id": "urn:solid-server:default:SparqlDataAccessorStore" }
-    },
-    {
-      "@id": "urn:solid-server:default:SparqlDataAccessorStore",
-      "@type": "DataAccessorBasedStore",
-      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
-      "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
-      "accessor": { "@id": "urn:solid-server:default:SparqlDataAccessor" },
-      "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" }
-    },
-    {
-      "@id": "urn:solid-server:default:BinaryStore",
       "@type": "DataAccessorBasedStore",
       "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
       "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
@@ -42,7 +17,8 @@
       "@id": "urn:sai:default:HybridDataAccessor",
       "@type": "HybridDataAccessor",
       "binaryAccessor": { "@id": "urn:solid-server:default:FileDataAccessor" },
-      "sparqlAccessor": { "@id": "urn:solid-server:default:SparqlDataAccessor" }
+      "sparqlAccessor": { "@id": "urn:solid-server:default:SparqlDataAccessor" },
+      "converter": { "@id": "urn:solid-server:default:RepresentationConverter" }
     }
   ]
 }

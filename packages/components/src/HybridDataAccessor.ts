@@ -1,10 +1,11 @@
 import type { Readable } from 'node:stream'
-import type { Quad } from '@rdfjs/types'
+import { BasicRepresentation } from '@solid/community-server'
 import type {
   DataAccessor,
   FileDataAccessor,
   Guarded,
   Representation,
+  RepresentationConverter,
   ResourceIdentifier,
   SparqlDataAccessor,
 } from '@solid/community-server'
@@ -13,23 +14,26 @@ import {
   INTERNAL_QUADS,
   NotFoundHttpError,
   RepresentationMetadata,
-  UnsupportedMediaTypeHttpError,
   arrayifyStream,
 } from '@solid/community-server'
+import type { Quad } from 'n3'
 import { DataFactory as DF } from 'n3'
-
 export class HybridDataAccessor implements DataAccessor {
   public constructor(
     private binaryAccessor: FileDataAccessor,
-    private sparqlAccessor: SparqlDataAccessor
+    private sparqlAccessor: SparqlDataAccessor,
+    private converter: RepresentationConverter
   ) {}
+
   public async canHandle(representation: Representation): Promise<void> {
-    if (representation.binary) {
-      return this.binaryAccessor.canHandle(representation)
-    }
-    throw new UnsupportedMediaTypeHttpError('Only binary data is supported.')
+    // can handle everything since it falls back to binaryAccessor
   }
+
   public async getData(identifier: ResourceIdentifier): Promise<Guarded<Readable>> {
+    const metadata = await this.getMetadata(identifier)
+    if (metadata.contentType === INTERNAL_QUADS) {
+      return this.sparqlAccessor.getData(identifier)
+    }
     return this.binaryAccessor.getData(identifier)
   }
   public async getMetadata(identifier: ResourceIdentifier): Promise<RepresentationMetadata> {
@@ -45,12 +49,12 @@ export class HybridDataAccessor implements DataAccessor {
     }
     const metadata = new RepresentationMetadata(identifier).addQuads(quads)
     // DON'T override content-type - preserve what's in SPARQL
+    if (!metadata.contentType) metadata.contentType = INTERNAL_QUADS
     return metadata
   }
   public getChildren(
     identifier: ResourceIdentifier
   ): AsyncIterableIterator<RepresentationMetadata> {
-    // @ts-ignore - accessing private method
     return this.sparqlAccessor.getChildren(identifier)
   }
   public async writeDocument(
@@ -58,12 +62,35 @@ export class HybridDataAccessor implements DataAccessor {
     data: Guarded<Readable>,
     metadata: RepresentationMetadata
   ): Promise<void> {
-    // Write binary to binaryAccessor (minimal metadata - just content-type for extension)
-    const fileMetadata = new RepresentationMetadata({ [CONTENT_TYPE]: metadata.contentType })
-    await this.binaryAccessor.writeDocument(identifier, data, fileMetadata)
+    // 1. Already internal/quads - store directly in SparqlDataAccessor
+    if (metadata.contentType === INTERNAL_QUADS) {
+      await this.sparqlAccessor.writeDocument(identifier, data, metadata)
+      return
+    }
+    // 2. Try to convert to internal/quads
+    try {
+      const converted = await this.converter.handle({
+        representation: new BasicRepresentation(data, metadata),
+        identifier,
+        preferences: { type: { [INTERNAL_QUADS]: 1 } },
+      })
 
-    // Write full metadata to SPARQL
-    await this.sparqlAccessor.writeMetadata(identifier, metadata)
+      // 3. Check if conversion resulted in internal/quads
+      if (converted.metadata.contentType === INTERNAL_QUADS) {
+        await this.sparqlAccessor.writeDocument(identifier, converted.data, converted.metadata)
+        return
+      }
+
+      // Conversion didn't produce internal/quads - treat as binary
+      throw new Error('Conversion did not result in internal/quads')
+    } catch {
+      // 4. Can't convert - use binary accessor
+      // Pass only contentType to binaryAccessor (for file extension)
+      const fileMetadata = new RepresentationMetadata({ [CONTENT_TYPE]: metadata.contentType })
+      await this.binaryAccessor.writeDocument(identifier, data, fileMetadata)
+      // Store full metadata in SparqlDataAccessor
+      await this.sparqlAccessor.writeMetadata(identifier, metadata)
+    }
   }
   public async writeContainer(
     identifier: ResourceIdentifier,
@@ -71,26 +98,33 @@ export class HybridDataAccessor implements DataAccessor {
   ): Promise<void> {
     await this.sparqlAccessor.writeContainer(identifier, metadata)
   }
-
   public async writeMetadata(
     identifier: ResourceIdentifier,
     metadata: RepresentationMetadata
   ): Promise<void> {
-    // If incoming content-type is internal/quads, preserve the original content-type
+    // If content-type is internal/quads, preserve the original content-type from the main resource
     if (metadata.contentType === INTERNAL_QUADS) {
-      // Get original metadata from SPARQL
-      const original = await this.getMetadata(identifier)
-      if (original.contentType) {
-        metadata.contentType = original.contentType
+      try {
+        const originalMetadata = await this.getMetadata(identifier)
+        if (originalMetadata.contentType) {
+          metadata.contentType = originalMetadata.contentType
+        }
+      } catch {
+        // Ignore - proceed with internal/quads
       }
     }
-
     await this.sparqlAccessor.writeMetadata(identifier, metadata)
   }
-
   public async deleteResource(identifier: ResourceIdentifier): Promise<void> {
-    // Delete from both stores
-    await this.sparqlAccessor.deleteResource(identifier)
-    await this.binaryAccessor.deleteResource(identifier)
+    try {
+      await this.binaryAccessor.deleteResource(identifier)
+    } catch {
+      // Ignore if not found in binary store
+    }
+    try {
+      await this.sparqlAccessor.deleteResource(identifier)
+    } catch {
+      // Ignore if not found in sparql store
+    }
   }
 }

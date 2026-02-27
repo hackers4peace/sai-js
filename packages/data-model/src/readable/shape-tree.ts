@@ -24,11 +24,11 @@ export class ReadableShapeTree extends ReadableResource {
 
   private async bootstrap(): Promise<void> {
     await this.fetchData()
-    if (this.shape) {
-      this.shapeText = await (
-        await this.fetch(this.shape, { headers: { Accept: 'text/shex' } })
-      ).text()
-    }
+    // if (this.shape) {
+    //   this.shapeText = await (
+    //     await this.fetch(this.shape, { headers: { Accept: 'text/shex' } })
+    //   ).text()
+    // }
     if (this.descriptionLang) {
       await this.getDescription(this.descriptionLang)
     }

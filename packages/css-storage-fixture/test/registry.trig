@@ -11,6 +11,10 @@ PREFIX oidc: <http://www.w3.org/ns/solid/oidc#>
 PREFIX space: <http://www.w3.org/ns/pim/space#>
 PREFIX shapetrees: <https://data/shapetrees/trees/>
 PREFIX pm: <https://vocab.example/project-management/>
+PREFIX uuid: <urn:uuid>
+PREFIX st: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <https://data/shapetrees/shapes/>
+PREFIX ma: <http://www.w3.org/ns/ma-ont#>
 
 
 GRAPH <https://registry/> {
@@ -2308,6 +2312,12 @@ GRAPH <https://data/test-client/public/> {
       <https://data/test-client/public/descriptions-es> .
 }
 
+GRAPH <meta:https://data/test-client/public/id> {
+  <https://data/test-client/public/id>
+    a ldp:Resource ;
+    ma:format "application/ld+json" .
+}
+
 GRAPH <meta:https://data/test-client/public/access-needs> {
   <https://data/test-client/public/access-needs>
     a ldp:Resource .
@@ -2441,6 +2451,288 @@ GRAPH <https://data/test-client/public/descriptions-es> {
     interop:inAccessDescriptionSet <https://data/test-client/public/descriptions-es> ;
     interop:hasAccessNeed <https://data/test-client/public/access-needs#need-file> ;
     skos:prefLabel "El acceso a Archivos permite a Projectron identificar y administrar el trabajo a realizar en un Proyecto determinado."@es .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/Project> {
+  <https://data/shapetrees/trees/Project>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/Project> {
+  shapetrees:Project
+    a st:ShapeTree ;
+    st:expectsType st:Resource ;
+    st:shape solidshapes:Project ;
+    st:describesInstance rdfs:label ;
+    st:references
+      uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d ,
+      uuid:86d54925-eeb5-4360-bca4-d53009bae8c7 ,
+      uuid:85a1d32b-5c91-4900-9bc8-f271117675ed .
+
+
+  uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d
+    st:hasShapeTree shapetrees:Task ;
+    st:viaPredicate pm:hasTask .
+
+  uuid:86d54925-eeb5-4360-bca4-d53009bae8c7
+    st:hasShapeTree shapetrees:Image ;
+    st:viaPredicate pm:hasImage .
+
+  uuid:85a1d32b-5c91-4900-9bc8-f271117675ed
+    st:hasShapeTree shapetrees:File ;
+    st:viaPredicate pm:hasFile .
+
+  shapetrees:desc-en\#Project
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:Project .
+
+  shapetrees:desc-en
+    st:usesLanguage "en"^^xsd:language .
+
+  shapetrees:desc-es\#Project
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:Project .
+
+  shapetrees:desc-es
+    st:usesLanguage "es"^^xsd:language .
+
+  shapetrees:desc-pl\#Project
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:Project .
+
+  shapetrees:desc-pl
+    st:usesLanguage "pl"^^xsd:language .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/Task> {
+  <https://data/shapetrees/trees/Task>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/Task> {
+  shapetrees:Task
+    a st:ShapeTree ;
+    st:expectsType st:Resource ;
+    st:shape solidshapes:Task ;
+    st:describesInstance rdfs:label .
+
+  shapetrees:desc-en\#Task
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:Task .
+
+  shapetrees:desc-en
+    st:usesLanguage "en"^^xsd:language .
+
+  shapetrees:desc-es\#Task
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:Task .
+
+  shapetrees:desc-es
+    st:usesLanguage "es"^^xsd:language .
+
+  shapetrees:desc-pl\#Task
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:Task .
+
+  shapetrees:desc-pl
+    st:usesLanguage "pl"^^xsd:language .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/File> {
+  <https://data/shapetrees/trees/File>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/File> {
+  shapetrees:File
+    a st:ShapeTree ;
+    st:expectsType st:NonRDFResource ;
+    st:shape solidshapes:File ;
+    st:describesInstance rdfs:label .
+
+  shapetrees:desc-en\#File
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:File .
+
+  shapetrees:desc-en
+    st:usesLanguage "en"^^xsd:language .
+
+  shapetrees:desc-es\#File
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:File .
+
+  shapetrees:desc-es
+    st:usesLanguage "es"^^xsd:language .
+
+  shapetrees:desc-pl\#File
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:File .
+
+  shapetrees:desc-pl
+    st:usesLanguage "pl"^^xsd:language .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/Image> {
+  <https://data/shapetrees/trees/Image>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/Image> {
+  shapetrees:Image
+    a st:ShapeTree ;
+    st:expectsType st:NonRDFResource ;
+    st:shape solidshapes:Image ;
+    st:describesInstance rdfs:label .
+
+  shapetrees:desc-en\#Image
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:Image .
+
+  shapetrees:desc-en
+    st:usesLanguage "en"^^xsd:language .
+
+  shapetrees:desc-es\#Image
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:Image .
+
+  shapetrees:desc-es
+    st:usesLanguage "es"^^xsd:language .
+
+  shapetrees:desc-pl\#Image
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:Image .
+
+  shapetrees:desc-pl
+    st:usesLanguage "pl"^^xsd:language .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/desc-en> {
+  <https://data/shapetrees/trees/desc-en>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/desc-en> {
+  shapetrees:desc-en
+    a st:DescriptionSet ;
+    st:usesLanguage "en"^^xsd:language .
+
+  shapetrees:desc-en\#Project
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:Project ;
+    skos:prefLabel "Projects"@en .
+
+  shapetrees:desc-en\#Task
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:Task ;
+    skos:prefLabel "Tasks"@en .
+
+  shapetrees:desc-en\#Image
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:Image ;
+    skos:prefLabel "Images"@en .
+
+  shapetrees:desc-en\#File
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-en ;
+    st:describes shapetrees:File ;
+    skos:prefLabel "Files"@en .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/desc-es> {
+  <https://data/shapetrees/trees/desc-es>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/desc-es> {
+  shapetrees:desc-es
+    a st:DescriptionSet ;
+    st:usesLanguage "es"^^xsd:language .
+
+  shapetrees:desc-es\#Project
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:Project ;
+    skos:prefLabel "Proyectos"@es .
+
+  shapetrees:desc-es\#Task
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:Task ;
+    skos:prefLabel "Tareas"@es .
+
+  shapetrees:desc-es\#Image
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:Image ;
+    skos:prefLabel "Imágenes"@es .
+
+  shapetrees:desc-es\#File
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-es ;
+    st:describes shapetrees:File ;
+    skos:prefLabel "Archivos"@es .
+}
+
+GRAPH <meta:https://data/shapetrees/trees/desc-pl> {
+  <https://data/shapetrees/trees/desc-pl>
+    a ldp:Resource.
+}
+
+GRAPH <https://data/shapetrees/trees/desc-pl> {
+  shapetrees:desc-pl
+    a st:DescriptionSet ;
+    st:usesLanguage "pl"^^xsd:language .
+
+  shapetrees:desc-pl\#Project
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:Project ;
+    skos:prefLabel "Projekty"@pl .
+
+  shapetrees:desc-pl\#Task
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:Task ;
+    skos:prefLabel "Zadania"@pl .
+
+  shapetrees:desc-pl\#Image
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:Image ;
+    skos:prefLabel "Grafiki"@pl .
+
+  shapetrees:desc-pl\#File
+    a st:Description ;
+    st:inDescriptionSet shapetrees:desc-pl ;
+    st:describes shapetrees:File ;
+    skos:prefLabel "Pliki"@pl .
+}
+
+GRAPH <meta:https://data/shapetrees/shapes/Project> {
+  <https://data/shapetrees/shapes/Project>
+    a ldp:Resource ;
+    ma:format "text/shex" .
+}
+
+GRAPH <meta:https://data/shapetrees/shapes/Task> {
+  <https://data/shapetrees/shapes/Task>
+    a ldp:Resource ;
+    ma:format "text/shex" .
+}
+
+GRAPH <meta:https://data/shapetrees/shapes/Image> {
+  <https://data/shapetrees/shapes/Image>
+    a ldp:Resource ;
+    ma:format "text/shex" .
+}
+
+GRAPH <meta:https://data/shapetrees/shapes/File> {
+  <https://data/shapetrees/shapes/File>
+    a ldp:Resource ;
+    ma:format "text/shex" .
 }
 
 GRAPH <https://id/acme> {
