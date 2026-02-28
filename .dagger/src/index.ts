@@ -21,6 +21,10 @@ const CSS_HTTPS_KEY = '/sai/packages/css-storage-fixture/test/certs/key.pem'
 const CSS_HTTPS_CERT = '/sai/packages/css-storage-fixture/test/certs/cert.pem'
 const NODE_TLS_REJECT_UNAUTHORIZED = '0'
 const CSS_SPARQL_ENDPOINT = 'http://sparql/sparql'
+const CSS_S3_ENDPOINT = 'http://garage:3900/sai-dev'
+const CSS_S3_ACCESS_KEY_ID = 'GKd0656430cbd2bba62e2cc12b'
+const CSS_S3_SECRET_ACCESS_KEY = 'aa3594ca915bf7b310c7672d436f2a937f20d2ad022eec90345dfc364e1bdd4c'
+const CSS_S3_REGION = 'garage'
 const CSS_PORT = '443'
 
 const NIX_IMAGE = 'nixos/nix'
@@ -95,6 +99,22 @@ export class SaiJs {
       .withExposedPort(80)
       .asService()
       .withHostname('sparql')
+  }
+
+  @func()
+  garageService(): Service {
+    return dag
+      .container()
+      .from('dxflrs/garage:v2.2.0')
+      .withMountedFile('/etc/garage.toml', this.source.file('garage/garage.toml'))
+      .withMountedDirectory('/var/lib/garage/meta', this.source.directory('garage/meta'))
+      .withMountedDirectory('/var/lib/garage/data', this.source.directory('garage/data'))
+      .withExposedPort(3900)
+      .withExposedPort(3901)
+      .withExposedPort(3902)
+      .withExposedPort(3903)
+      .asService()
+      .withHostname('garage')
   }
 
   @func()
@@ -252,9 +272,14 @@ export class SaiJs {
         'postgres://temporal:temporal@postgresql:5432/auth'
       )
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
+      .withEnvVariable('CSS_S3_ENDPOINT', CSS_S3_ENDPOINT)
+      .withEnvVariable('CSS_S3_ACCESS_KEY_ID', CSS_S3_ACCESS_KEY_ID)
+      .withEnvVariable('CSS_S3_SECRET_ACCESS_KEY', CSS_S3_SECRET_ACCESS_KEY)
+      .withEnvVariable('CSS_S3_REGION', CSS_S3_REGION)
       .withExposedPort(443)
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('sparql', this.sparqlService())
+      .withServiceBinding('garage', this.garageService())
       .withExposedPort(9231)
       .asService({
         args: [
@@ -280,6 +305,7 @@ export class SaiJs {
       .withServiceBinding('worker', this.workerService())
       .withServiceBinding('sparql', this.sparqlService())
       .withServiceBinding('id', this.idService())
+      .withServiceBinding('garage', this.garageService())
       .withWorkdir('/sai/test')
   }
 

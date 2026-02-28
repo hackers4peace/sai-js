@@ -1,6 +1,8 @@
 !devbox.*
 node_modules/
 yarn.lock
+garage/meta/*
+garage/data
 
 dist/
 dev-dist/

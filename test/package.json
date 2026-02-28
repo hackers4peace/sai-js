@@ -15,5 +15,8 @@
     "@elfpavlik/sai-components": "1.0.0-rc.27",
     "@janeirodigital/interop-test-utils": "1.0.0-rc.26",
     "@janeirodigital/interop-utils": "1.0.0-rc.26"
+  },
+  "dependencies": {
+    "s3mini": "^0.9.1"
   }
 }

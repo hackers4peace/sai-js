@@ -420,10 +420,7 @@ services:
     volumes:
       - ./garage/garage.toml:/etc/garage.toml
       - ./garage/meta:/var/lib/garage/meta
-      - garage_data:/var/lib/garage/data
-
-volumes:
-  garage_data:
+      - ./garage/data:/var/lib/garage/data
 
 networks:
   default:
