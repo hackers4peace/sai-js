@@ -6,10 +6,18 @@ specification {
 
 model {
   system h4p {
+    container ReverseProxy 'ReverseProxy' 'Caddy' {
+      style {
+        shape rectangle
+        color blue
+        icon https://gitlab.com/uploads/-/system/project/avatar/44315672/caddy-logo.png
+      }
+    }
     container Auth 'Auth' 'auth.h4p.net' {
       style {
         shape rectangle
         color red
+        icon https://gist.githubusercontent.com/elf-pavlik/fe8ae61ec17d23281c0e927947419c76/raw/a56762e1c6eb203583c75202d0a0cf3dff69a98e/css.svg
       }
       component OP 'Solid-OIDC Provider' 'CSS'
       component SAI 'SAI Agent' 'sai-js'
@@ -19,24 +27,35 @@ model {
       style {
         shape rectangle
         color sky
+        icon https://docs.temporal.io/img/favicon.png
       }
     }
     container Quadstore 'Quadstore' 'oxigraph' {
       style {
         shape storage
         color blue
+        icon https://avatars.githubusercontent.com/u/64649343?s=200&v=4
       }
     }
     container KVstore 'KVstore' 'posgresql' {
       style {
         shape storage
         color blue
+        icon tech:postgresql
+      }
+    }
+    component GarageStorage 'Garage storage (S3)' {
+      style {
+        shape storage
+        color sky
+        icon https://garagehq.deuxfleurs.fr/images/garage-logo.svg
       }
     }
     container Workers 'Temporal workers' {
       style {
         shape rectangle
         color slate
+        icon https://docs.temporal.io/img/favicon.png
       }
       component PushSender 'Push notifications sender' {
         style {
@@ -51,9 +70,8 @@ model {
     }
     container Registry 'Registry' 'reg.h4p.net' {
       style {
-        shape storage
         color red
-        icon http://www.w3.org/RDF/icons/rdf_flyer.64
+        icon https://gist.githubusercontent.com/elf-pavlik/fe8ae61ec17d23281c0e927947419c76/raw/a56762e1c6eb203583c75202d0a0cf3dff69a98e/css.svg
       }
       component RegistrySet 'Registry Set' {
         style {
@@ -103,8 +121,8 @@ model {
     }
     container Data 'Data' '*.data.h4p.net' {
       style {
-        shape storage
         color sky
+        icon https://gist.githubusercontent.com/elf-pavlik/fe8ae61ec17d23281c0e927947419c76/raw/a56762e1c6eb203583c75202d0a0cf3dff69a98e/css.svg
       }
       component DataRegistry 'Data Registry' {
         style {
@@ -122,10 +140,10 @@ model {
           icon http://www.w3.org/RDF/icons/rdf_flyer.64
         }
       }
-      component FilesystemStorage 'Filesystem storage' {
+      component S3Client 'S3Client (Garage)' {
         style {
           color sky
-          icon gcp:filestore
+          icon https://garagehq.deuxfleurs.fr/images/garage-logo.svg
         }
       }
       component DataSolidClient 'Solid Client' {
@@ -138,9 +156,10 @@ model {
       style {
         shape person
         color green
+        icon https://hono.dev/images/logo.svg
       }
     }
-    container Account 'Account' 'account.h4p.net' {
+    container Account 'Account' 'app.h4p.net' {
       style {
         shape browser
         color amber
@@ -175,22 +194,31 @@ model {
     }
   }
 
+  ReverseProxy -> Auth
+  ReverseProxy -> Registry
+  ReverseProxy -> WebID
+  ReverseProxy -> Data
+  ReverseProxy -> Account
+  ReverseProxy -> WWW
   Account -> Auth
   WWW -> Data
+  WWW -> WebID
   Auth -> Data
   Auth -> WebID
   Auth -> Registry
   Registry -> Quadstore
   Data -> Quadstore
+  WebID -> Quadstore
+  Data -> GarageStorage
   Auth -> KVstore
   Registry -> KVstore
   Data -> KVstore
+  Temporal -> KVstore
   Auth -> Temporal
-  Workers -> Temporal
   Registry -> Temporal
   Data -> Temporal
   WebID -> Temporal
-  Workers -> Auth
+  Temporal -> Workers
 }
 
 views {

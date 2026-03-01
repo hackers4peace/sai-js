@@ -809,6 +809,44 @@
         }
       }
     },
+    "oxigraph@latest": {
+      "last_modified": "2026-02-23T15:40:43Z",
+      "resolved": "github:NixOS/nixpkgs/80d901ec0377e19ac3f7bb8c035201e2e098cc97#oxigraph",
+      "source": "devbox-search",
+      "version": "0.5.5",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/4lz1pzqdy24fz6yyhpmwlnhddr61jfkl-oxigraph-0.5.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/4lz1pzqdy24fz6yyhpmwlnhddr61jfkl-oxigraph-0.5.5"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hdf3vyivc79k93al2hzkw259f0qrn3hn-oxigraph-0.5.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hdf3vyivc79k93al2hzkw259f0qrn3hn-oxigraph-0.5.5"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/2i3wf69zfmys4rv6wr1wmds85w7lm7y7-oxigraph-0.5.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/2i3wf69zfmys4rv6wr1wmds85w7lm7y7-oxigraph-0.5.5"
+        }
+      }
+    },
     "pgcli@latest": {
       "last_modified": "2026-01-30T02:32:49Z",
       "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a#pgcli",
