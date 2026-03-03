@@ -1,7 +1,7 @@
 {
   "setup/v6-migration": true,
   "setup/current-base-url": "https://auth/",
-  "setup/current-server-version": "8.0.0-alpha.1",
+  "setup/current-server-version": "8.0.0-alpha.2",
   "idp/keys/cookie-secret": [
     "1d3e45c34d0eeba2ce40c9a3e22916eabfe572207e02b69cf8f7ebc95cb134e3e3107236148bc4feecff7f9b3932c1473b5707af4d5353e8a13a35df9b8c0005"
   ],

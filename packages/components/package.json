@@ -1,6 +1,6 @@
 {
   "name": "@elfpavlik/sai-components",
-  "version": "1.0.0-rc.28",
+  "version": "1.0.0-rc.29",
   "description": "",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components",
   "lsd:components": "dist/components/components.jsonld",
@@ -33,7 +33,7 @@
     "@solid-notifications/discovery": "^0.1.2",
     "@solid-notifications/subscription": "^0.1.2",
     "@solid-notifications/types": "^0.1.2",
-    "@solid/community-server": "8.0.0-alpha.1",
+    "@solid/community-server": "8.0.0-alpha.2",
     "@solidlab/policy-engine": "^0.0.2",
     "@temporalio/client": "^1.13.0",
     "@temporalio/common": "^1.13.0",
