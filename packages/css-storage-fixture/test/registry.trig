@@ -38,7 +38,101 @@ GRAPH <meta:https://registry/acme/> {
 
 GRAPH <meta:https://registry/acme/authorization/> {
   <https://registry/acme/authorization/>
-    a interop:AuthorizationRegistry, ldp:Resource.
+    a interop:AuthorizationRegistry, ldp:Resource;
+    interop:hasAccessAuthorization
+      <https://registry/acme/authorization/c7n2qw/>,
+      <https://registry/acme/authorization/v8k3mx/>.
+}
+
+GRAPH <meta:https://registry/acme/authorization/c7n2qw/> {
+  <https://registry/acme/authorization/c7n2qw/>
+    a interop:AccessAuthorization, ldp:Resource;
+    interop:granted true;
+    interop:grantee <https://id/alice>;
+    interop:grantedBy <https://id/acme>;
+    interop:hasDataAuthorization
+      <https://registry/acme/authorization/c7n2qw/k9m4vp>,
+      <https://registry/acme/authorization/c7n2qw/r5j8tw>.
+}
+
+GRAPH <https://registry/acme/authorization/c7n2qw/k9m4vp> {
+  <https://registry/acme/authorization/c7n2qw/k9m4vp>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/alice>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:scopeOfAuthorization interop:SelectedFromRegistry;
+    interop:hasDataRegistration <https://data/acme-rnd/reb39k/>;
+    interop:hasDataInstance <https://data/acme-rnd/reb39k/pbh2yw>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/acme/authorization/c7n2qw/r5j8tw>
+    interop:inheritsFromAuthorization <https://registry/acme/authorization/c7n2qw/k9m4vp>.
+}
+
+GRAPH <meta:https://registry/acme/authorization/c7n2qw/k9m4vp> {
+        <https://registry/acme/authorization/c7n2qw/k9m4vp> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/authorization/c7n2qw/r5j8tw> {
+  <https://registry/acme/authorization/c7n2qw/r5j8tw>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/alice>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:scopeOfAuthorization interop:Inherited;
+    interop:hasDataRegistration <https://data/acme-rnd/x0md9s/>;
+    interop:inheritsFromAuthorization <https://registry/acme/authorization/c7n2qw/k9m4vp>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/acme/authorization/c7n2qw/r5j8tw> {
+        <https://registry/acme/authorization/c7n2qw/r5j8tw> a ldp:Resource .
+}
+
+GRAPH <meta:https://registry/acme/authorization/v8k3mx/> {
+  <https://registry/acme/authorization/v8k3mx/>
+    a interop:AccessAuthorization, ldp:Resource;
+    interop:granted true;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:hasDataAuthorization
+      <https://registry/acme/authorization/v8k3mx/p3j7mq>,
+      <https://registry/acme/authorization/v8k3mx/m9k4wr>.
+}
+
+GRAPH <https://registry/acme/authorization/v8k3mx/p3j7mq> {
+  <https://registry/acme/authorization/v8k3mx/p3j7mq>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:scopeOfAuthorization interop:AllFromAgent;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/acme/authorization/v8k3mx/m9k4wr>
+    interop:inheritsFromAuthorization <https://registry/acme/authorization/v8k3mx/p3j7mq>.
+}
+
+GRAPH <meta:https://registry/acme/authorization/v8k3mx/p3j7mq> {
+        <https://registry/acme/authorization/v8k3mx/p3j7mq> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/authorization/v8k3mx/m9k4wr> {
+  <https://registry/acme/authorization/v8k3mx/m9k4wr>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/acme>;
+    interop:dataOwner <https://id/acme>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:scopeOfAuthorization interop:Inherited;
+    interop:inheritsFromAuthorization <https://registry/acme/authorization/v8k3mx/p3j7mq>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/acme/authorization/v8k3mx/m9k4wr> {
+        <https://registry/acme/authorization/v8k3mx/m9k4wr> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/acme/agent/> {
@@ -534,7 +628,9 @@ GRAPH <meta:https://registry/alice/> {
 GRAPH <meta:https://registry/alice/authorization/> {
   <https://registry/alice/authorization/>
     a interop:AuthorizationRegistry, ldp:Resource;
-    interop:hasAccessAuthorization <https://registry/alice/authorization/hsyzmp/>.
+    interop:hasAccessAuthorization 
+      <https://registry/alice/authorization/hsyzmp/>,
+      <https://registry/alice/authorization/x9k2m5/>.
 }
 
 GRAPH <meta:https://registry/alice/authorization/hsyzmp/> {
@@ -559,6 +655,52 @@ GRAPH <https://registry/alice/authorization/hsyzmp/w329t6> {
 
 GRAPH <meta:https://registry/alice/authorization/hsyzmp/w329t6> {
         <https://registry/alice/authorization/hsyzmp/w329t6> a ldp:Resource .
+}
+
+GRAPH <meta:https://registry/alice/authorization/x9k2m5/> {
+  <https://registry/alice/authorization/x9k2m5/>
+    a interop:AccessAuthorization, ldp:Resource;
+    interop:granted true;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/alice>;
+    interop:hasDataAuthorization
+      <https://registry/alice/authorization/x9k2m5/p7n4qw>,
+      <https://registry/alice/authorization/x9k2m5/t5m8kr>.
+}
+
+GRAPH <https://registry/alice/authorization/x9k2m5/p7n4qw> {
+  <https://registry/alice/authorization/x9k2m5/p7n4qw>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/alice>;
+    interop:dataOwner <https://id/alice>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:scopeOfAuthorization interop:AllFromRegistry;
+    interop:hasDataRegistration <https://data/alice-home/x1n3cm/>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/alice/authorization/x9k2m5/t5m8kr>
+    interop:inheritsFromAuthorization <https://registry/alice/authorization/x9k2m5/p7n4qw>.
+}
+
+GRAPH <meta:https://registry/alice/authorization/x9k2m5/p7n4qw> {
+        <https://registry/alice/authorization/x9k2m5/p7n4qw> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/authorization/x9k2m5/t5m8kr> {
+  <https://registry/alice/authorization/x9k2m5/t5m8kr>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/alice>;
+    interop:dataOwner <https://id/alice>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:scopeOfAuthorization interop:Inherited;
+    interop:hasDataRegistration <https://data/alice-home/pm1oxz/>;
+    interop:inheritsFromAuthorization <https://registry/alice/authorization/x9k2m5/p7n4qw>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/alice/authorization/x9k2m5/t5m8kr> {
+        <https://registry/alice/authorization/x9k2m5/t5m8kr> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/alice/agent/> {
@@ -1085,7 +1227,54 @@ GRAPH <meta:https://registry/yoyo/> {
 
 GRAPH <meta:https://registry/yoyo/authorization/> {
   <https://registry/yoyo/authorization/>
-    a interop:AuthorizationRegistry, ldp:Resource.
+    a interop:AuthorizationRegistry, ldp:Resource;
+    interop:hasAccessAuthorization <https://registry/yoyo/authorization/r4j9mw/>.
+}
+
+GRAPH <meta:https://registry/yoyo/authorization/r4j9mw/> {
+  <https://registry/yoyo/authorization/r4j9mw/>
+    a interop:AccessAuthorization, ldp:Resource;
+    interop:granted true;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/yoyo>;
+    interop:hasDataAuthorization
+      <https://registry/yoyo/authorization/r4j9mw/k2m5qp>,
+      <https://registry/yoyo/authorization/r4j9mw/t8p3wr>.
+}
+
+GRAPH <https://registry/yoyo/authorization/r4j9mw/k2m5qp> {
+  <https://registry/yoyo/authorization/r4j9mw/k2m5qp>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/yoyo>;
+    interop:dataOwner <https://id/yoyo>;
+    interop:registeredShapeTree shapetrees:Project;
+    interop:scopeOfAuthorization interop:AllFromRegistry;
+    interop:hasDataRegistration <https://data/yoyo-eu/w4n9kx/>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+  <https://registry/yoyo/authorization/r4j9mw/t8p3wr>
+    interop:inheritsFromAuthorization <https://registry/yoyo/authorization/r4j9mw/k2m5qp>.
+}
+
+GRAPH <meta:https://registry/yoyo/authorization/r4j9mw/k2m5qp> {
+        <https://registry/yoyo/authorization/r4j9mw/k2m5qp> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/authorization/r4j9mw/t8p3wr> {
+  <https://registry/yoyo/authorization/r4j9mw/t8p3wr>
+    a interop:DataAuthorization;
+    interop:grantee <https://id/bob>;
+    interop:grantedBy <https://id/yoyo>;
+    interop:dataOwner <https://id/yoyo>;
+    interop:registeredShapeTree shapetrees:Task;
+    interop:scopeOfAuthorization interop:Inherited;
+    interop:hasDataRegistration <https://data/yoyo-eu/m7p3qt/>;
+    interop:inheritsFromAuthorization <https://registry/yoyo/authorization/r4j9mw/k2m5qp>;
+    interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
+}
+
+GRAPH <meta:https://registry/yoyo/authorization/r4j9mw/t8p3wr> {
+        <https://registry/yoyo/authorization/r4j9mw/t8p3wr> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/yoyo/agent/> {
