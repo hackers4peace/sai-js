@@ -41,7 +41,7 @@ export class ReciprocalWebhookHandler extends OperationHttpHandler {
       const temporal = new Temporal()
       await temporal.init()
       await temporal.client.workflow.start(updateDelegatedGrants, {
-        taskQueue: 'crate-grants',
+        taskQueue: 'create-grants',
         args: [
           {
             webId: channel.webId,

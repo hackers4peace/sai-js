@@ -25,7 +25,11 @@ proxy(9229, 'auth', 9229)
 // registry
 proxy(9230, 'registry', 9230)
 
-// data node inspect
+// data
 proxy(9231, 'data', 9231)
+
+// worker
+proxy(9235, 'worker', 9235)
+
 //  https
 proxy(443, 'data', 443)

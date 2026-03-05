@@ -142,7 +142,7 @@ export class SaiJs {
   workerService(): Service {
     return dag
       .container()
-      .from('node:22-slim')
+      .from('node:24-slim')
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
       .withEnvVariable('CSS_VAPID_PUBLIC_KEY', CSS_VAPID_PUBLIC_KEY)
@@ -157,7 +157,11 @@ export class SaiJs {
       .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('temporal', this.temporalService())
-      .asService({ args: ['node', '/sai/packages/components/dist/workers/main.js'] })
+      .withExposedPort(9235)
+      .asService({
+        args: ['node', '--inspect=0.0.0.0:9235', '/sai/packages/components/dist/workers/main.js'],
+      })
+      .withHostname('worker')
   }
 
   @func()
@@ -345,11 +349,13 @@ export class SaiJs {
       .withServiceBinding('auth', this.authService())
       .withServiceBinding('registry', this.registryService())
       .withServiceBinding('data', this.dataService())
+      .withServiceBinding('worker', this.workerService())
       .withMountedFile('/proxy.js', this.source.file('test/proxy.js'))
       .withExposedPort(9240)
       .withExposedPort(9229)
       .withExposedPort(9230)
       .withExposedPort(9231)
+      .withExposedPort(9235)
       .withExposedPort(443)
       .asService({ args: ['node', '/proxy.js'] })
   }

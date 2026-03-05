@@ -9,6 +9,8 @@ import {
   type ShareAuthorizationConfirmation,
 } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
+import { Temporal } from '../temporal/client.js'
+import { createGrantsForAuthorization } from '../temporal/workflows/grants.js'
 
 export const getResource = async (saiSession: AuthorizationAgent, iri: string, lang: string) => {
   const resource = await saiSession.factory.readable.dataInstance(iri, lang)
@@ -42,14 +44,28 @@ export const shareResource = async (
     shareAuthorization as unknown as ShareDataInstanceStructure
   )
 
-  // TODO: this should be handled in a worker
-  await Promise.all(
-    authorizationIris.map((authorizationIri) => saiSession.generateAccessGrant(authorizationIri))
-  )
-
   const clientIdDocument = await saiSession.factory.readable.clientIdDocument(
     shareAuthorization.applicationId
   )
+
+  // TODO: consider a single workflow that will fire-and-forget all the child workflows
+  const temporal = new Temporal()
+  await temporal.init()
+  await Promise.all(
+    authorizationIris.map((authorizationIri) =>
+      temporal.client.workflow.start(createGrantsForAuthorization, {
+        taskQueue: 'create-grants',
+        args: [
+          {
+            authorizationId: authorizationIri,
+            webId: saiSession.webId,
+          },
+        ],
+        workflowId: crypto.randomUUID(),
+      })
+    )
+  )
+
   return {
     callbackEndpoint: clientIdDocument.callbackEndpoint!,
   }

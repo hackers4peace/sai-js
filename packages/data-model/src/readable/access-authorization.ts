@@ -128,12 +128,13 @@ export class ReadableAccessAuthorization extends ReadableResource {
         )
       }
 
-      const priorAccessGrant = granteeRegistration.accessGrant
-      if (priorAccessGrant) {
-        finalGrants = reuseDataGrants(dataGrants, priorAccessGrant.hasDataGrant)
-      } else {
-        finalGrants = dataGrants
-      }
+      // const priorAccessGrant = granteeRegistration.accessGrant
+      // if (priorAccessGrant) {
+      //   finalGrants = reuseDataGrants(dataGrants, priorAccessGrant.hasDataGrant)
+      // } else {
+      // TODO: re-enable reuse of existing data grants after equivalence check adjusted for temporal workflows
+      finalGrants = dataGrants
+      // }
     }
 
     const accessGrantIri = granteeRegistration.iriForContained()

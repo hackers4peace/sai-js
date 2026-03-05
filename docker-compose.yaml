@@ -142,7 +142,7 @@ services:
       - traefik.http.services.data.loadbalancer.server.port=4700
       - traefik.http.middlewares.testheader.headers.customrequestheaders.X-Forwarded-Proto=https
   worker:
-    image: node:22-slim
+    image: node:24-slim
     container_name: worker
     restart: on-failure
     networks:
