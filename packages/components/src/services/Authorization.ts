@@ -22,6 +22,8 @@ import {
 } from '@janeirodigital/sai-api-messages'
 import type { Brand } from 'effect/Brand'
 import type * as S from 'effect/Schema'
+import { Temporal } from '../temporal/client.js'
+import { createGrantsForAuthorization } from '../temporal/workflows/grants.js'
 
 const formatAccessNeed = async (
   accessNeed: ReadableAccessNeed,
@@ -292,6 +294,17 @@ export const recordAuthorization = async (
       response = { ...response, callbackEndpoint: clientIdDocument.callbackEndpoint }
     }
   }
-  await saiSession.generateAccessGrant(recorded.iri)
+  const temporal = new Temporal()
+  await temporal.init()
+  await temporal.client.workflow.execute(createGrantsForAuthorization, {
+    taskQueue: 'create-grants',
+    args: [
+      {
+        authorizationId: recorded.iri,
+        webId: saiSession.webId,
+      },
+    ],
+    workflowId: crypto.randomUUID(),
+  })
   return response
 }

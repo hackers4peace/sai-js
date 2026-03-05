@@ -39,7 +39,7 @@ async function run() {
 
     const grants = await Worker.create({
       connection,
-      taskQueue: 'update-delegated-grants',
+      taskQueue: 'create-grants',
       workflowsPath: fileURLToPath(new URL('../temporal/workflows/grants.js', import.meta.url)),
       activities: grantsActivities,
     })

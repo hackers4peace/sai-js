@@ -1,9 +1,46 @@
 import { proxyActivities, startChild } from '@temporalio/workflow'
 import type * as activities from '../activities/grants.js'
 
-const { findAffectedAuthorizations, updateGrants } = proxyActivities<typeof activities>({
+const {
+  findAffectedAuthorizations,
+  generateGrants,
+  storeDataGrant,
+  storeAccessGrant,
+  setAccessGrant,
+} = proxyActivities<typeof activities>({
   startToCloseTimeout: '1 minute',
 })
+
+export async function createGrantsForAuthorization(
+  payload: activities.CreateGrantsInput
+): Promise<void> {
+  // 1. Generate and filter grants
+  const { accessGrantIri, accessGrantData, dataGrantsToStore } = await generateGrants(payload)
+
+  // 2. Store each NEW data grant
+  const grantTasks = dataGrantsToStore.map((grant) =>
+    storeDataGrant({
+      grantIri: grant.iri,
+      grantData: grant.data,
+    })
+  )
+
+  await Promise.all(grantTasks)
+
+  // 3. Store AccessGrant
+  await storeAccessGrant({
+    accessGrantIri,
+    accessGrantData,
+    dataGrantsToStore,
+  })
+
+  // 4. Link to grantee's registration
+  await setAccessGrant({
+    accessGrantIri,
+    grantedBy: accessGrantData.grantedBy,
+    grantee: accessGrantData.grantee,
+  })
+}
 
 export async function updateDelegatedGrants(
   payload: activities.FindAffectedAuthorizationsInput
@@ -23,5 +60,8 @@ export async function updateDelegatedGrants(
 export async function updateGrantsForAuthorization(
   payload: activities.UpdateGrantsInput
 ): Promise<void> {
-  await updateGrants(payload)
+  await createGrantsForAuthorization({
+    webId: payload.webId,
+    authorizationId: payload.authorizationId,
+  })
 }

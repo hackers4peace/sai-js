@@ -5,6 +5,7 @@ import {
   type CRUDSocialAgentInvitation,
   type CRUDSocialAgentRegistration,
   type DataGrant,
+  type ImmutableAccessGrant,
   ImmutableDataGrant,
   type ReadableAccessAuthorization,
   type ReadableDataAuthorization,
@@ -247,7 +248,7 @@ export class AuthorizationAgent {
     )
   }
 
-  public async generateAccessGrant(accessAuthorizationIri: string): Promise<void> {
+  public async generateAccessGrant(accessAuthorizationIri: string): Promise<ImmutableAccessGrant> {
     const accessAuthorization =
       await this.factory.readable.accessAuthorization(accessAuthorizationIri)
     const agentRegistration = await this.registrySet.hasAgentRegistry.findRegistration(
@@ -256,26 +257,29 @@ export class AuthorizationAgent {
     if (!agentRegistration) {
       throw new Error('agent registration for the grantee does not exist')
     }
-    // generate access grant (with data grants) and store it
-    const accessGrant = await accessAuthorization.generateAccessGrant(
+    return accessAuthorization.generateAccessGrant(
       this.registrySet.hasDataRegistry,
       this.registrySet.hasAgentRegistry,
       agentRegistration
     )
+  }
 
-    // only store new access grant and update registration if any data grant changed
-    // always store if access not granted
-    // TODO: verify if a data grant was removed - previos had more data grants
+  public async storeAccessGrant(accessGrant: ImmutableAccessGrant): Promise<string | null> {
     if (
       !accessGrant.data.granted ||
       accessGrant.dataGrants.some((grant) => grant instanceof ImmutableDataGrant)
     ) {
       const rAccessGrant = await accessGrant.store()
-
-      // link to new access grant and update agent registration
-
-      await agentRegistration.setAccessGrant(rAccessGrant.iri)
+      return rAccessGrant.iri
     }
+    return null
+  }
+
+  public async setAccessGrant(
+    agentRegistration: CRUDSocialAgentRegistration,
+    accessGrantIri: string
+  ): Promise<void> {
+    await agentRegistration.setAccessGrant(accessGrantIri)
   }
 
   /**
