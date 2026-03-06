@@ -4,12 +4,14 @@ import {
   type CRUDAgentRegistry,
   type CRUDAuthorizationRegistry,
   type CRUDDataRegistry,
+  type CRUDGrantRegistry,
   CRUDResource,
 } from '.'
 import type { AuthorizationAgentFactory } from '..'
 
 export type CRUDRegistrySetData = {
   hasAuthorizationRegistry: string
+  hasGrantRegistry: string
   hasAgentRegistry: string
   hasDataRegistry: string[]
 }
@@ -20,6 +22,8 @@ export class CRUDRegistrySet extends CRUDResource {
   declare data?: CRUDRegistrySetData
 
   hasAuthorizationRegistry: CRUDAuthorizationRegistry
+
+  hasGrantRegistry: CRUDGrantRegistry
 
   hasAgentRegistry: CRUDAgentRegistry
 
@@ -42,6 +46,13 @@ export class CRUDRegistrySet extends CRUDResource {
           DataFactory.namedNode(this.data.hasAuthorizationRegistry)
         )
       )
+      this.dataset.add(
+        DataFactory.quad(
+          this.node,
+          INTEROP.hasGrantRegistry,
+          DataFactory.namedNode(this.data.hasGrantRegistry)
+        )
+      )
       for (const id of this.data.hasDataRegistry) {
         this.dataset.add(
           DataFactory.quad(this.node, INTEROP.hasDataRegistry, DataFactory.namedNode(id))
@@ -51,6 +62,9 @@ export class CRUDRegistrySet extends CRUDResource {
       await this.fetchData()
       this.hasAuthorizationRegistry = await this.factory.crud.authorizationRegistry(
         this.getObject('hasAuthorizationRegistry').value
+      )
+      this.hasGrantRegistry = await this.factory.crud.grantRegistry(
+        this.getObject('hasGrantRegistry').value
       )
       this.hasAgentRegistry = await this.factory.crud.agentRegistry(
         this.getObject('hasAgentRegistry').value
