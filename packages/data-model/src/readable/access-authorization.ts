@@ -12,6 +12,7 @@ import type {
   CRUDAgentRegistration,
   CRUDAgentRegistry,
   CRUDDataRegistry,
+  CRUDRegistrySet,
   ImmutableAccessGrant,
   ImmutableDataGrant,
 } from '..'
@@ -104,8 +105,7 @@ export class ReadableAccessAuthorization extends ReadableResource {
    */
 
   public async generateAccessGrant(
-    dataRegistries: CRUDDataRegistry[],
-    agentRegistry: CRUDAgentRegistry,
+    registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
   ): Promise<ImmutableAccessGrant> {
     const dataGrants: ImmutableDataGrant[] = []
@@ -120,11 +120,7 @@ export class ReadableAccessAuthorization extends ReadableResource {
       }
       for (const dataAuthorization of regularAuthorizations) {
         dataGrants.push(
-          ...(await dataAuthorization.generateDataGrants(
-            dataRegistries,
-            agentRegistry,
-            granteeRegistration
-          ))
+          ...(await dataAuthorization.generateDataGrants(registrySet, granteeRegistration))
         )
       }
 

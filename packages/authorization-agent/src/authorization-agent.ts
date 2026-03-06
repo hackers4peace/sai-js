@@ -6,7 +6,6 @@ import {
   type CRUDSocialAgentRegistration,
   type DataGrant,
   type ImmutableAccessGrant,
-  ImmutableDataGrant,
   type ReadableAccessAuthorization,
   type ReadableDataAuthorization,
   type ReadableDataInstance,
@@ -257,29 +256,7 @@ export class AuthorizationAgent {
     if (!agentRegistration) {
       throw new Error('agent registration for the grantee does not exist')
     }
-    return accessAuthorization.generateAccessGrant(
-      this.registrySet.hasDataRegistry,
-      this.registrySet.hasAgentRegistry,
-      agentRegistration
-    )
-  }
-
-  public async storeAccessGrant(accessGrant: ImmutableAccessGrant): Promise<string | null> {
-    if (
-      !accessGrant.data.granted ||
-      accessGrant.dataGrants.some((grant) => grant instanceof ImmutableDataGrant)
-    ) {
-      const rAccessGrant = await accessGrant.store()
-      return rAccessGrant.iri
-    }
-    return null
-  }
-
-  public async setAccessGrant(
-    agentRegistration: CRUDSocialAgentRegistration,
-    accessGrantIri: string
-  ): Promise<void> {
-    await agentRegistration.setAccessGrant(accessGrantIri)
+    return accessAuthorization.generateAccessGrant(this.registrySet, agentRegistration)
   }
 
   public async findSocialAgentsWithAccess(dataInstanceIri: string): Promise<AgentWithAccess[]> {

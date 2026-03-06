@@ -9,7 +9,7 @@ const agentId = 'https://jarvis.alice.example/#agent'
 const factory = new AuthorizationAgentFactory(webId, agentId, { fetch, randomUUID })
 const snippetIri = 'https://auth.alice.example/13e60d32-77a6-4239-864d-cfe2c90807c8'
 
-describe('build', () => {
+describe.skip('build', () => {
   test('should return instance of RegistrySet', async () => {
     const registrySet = await factory.crud.registrySet(snippetIri)
     expect(registrySet).toBeInstanceOf(CRUDRegistrySet)

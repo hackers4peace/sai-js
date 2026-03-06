@@ -88,6 +88,7 @@ export interface StoreAccessGrantInput {
   dataGrantsToStore: Array<{ iri: string; data: DataGrantData }>
 }
 
+// TODO: check case when granted === false
 export async function storeAccessGrant(payload: StoreAccessGrantInput): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.accessGrantData.grantedBy)

@@ -4,8 +4,7 @@ import { ReadableResource, type SelectedFromRegistryDataGrant } from '.'
 import type {
   AuthorizationAgentFactory,
   CRUDAgentRegistration,
-  CRUDAgentRegistry,
-  CRUDDataRegistry,
+  CRUDRegistrySet,
   DataGrantData,
   ImmutableDataGrant,
   InheritableDataGrant,
@@ -112,7 +111,7 @@ export class ReadableDataAuthorization extends ReadableResource {
   }
 
   private async generateDelegatedDataGrants(
-    agentRegistry: CRUDAgentRegistry,
+    registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
   ): Promise<ImmutableDataGrant[]> {
     if (this.scopeOfAuthorization === INTEROP.Inherited.value) {
@@ -122,7 +121,7 @@ export class ReadableDataAuthorization extends ReadableResource {
     }
     let result: ImmutableDataGrant[] = []
 
-    for await (const agentRegistration of agentRegistry.socialAgentRegistrations) {
+    for await (const agentRegistration of registrySet.hasAgentRegistry.socialAgentRegistrations) {
       // data onwer is specified but it is not their registration
       if (this.dataOwner && this.dataOwner !== agentRegistration.registeredAgent) {
         continue
@@ -219,7 +218,7 @@ export class ReadableDataAuthorization extends ReadableResource {
   }
 
   private async generateSourceDataGrants(
-    dataRegistries: CRUDDataRegistry[],
+    registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
   ): Promise<ImmutableDataGrant[]> {
     if (this.scopeOfAuthorization === INTEROP.Inherited.value) {
@@ -231,7 +230,7 @@ export class ReadableDataAuthorization extends ReadableResource {
     const generatedDataGrants: ImmutableDataGrant[] = []
 
     // FIXME handle each data registry independently
-    for (const dataRegistry of dataRegistries) {
+    for (const dataRegistry of registrySet.hasDataRegistry) {
       // const dataRegistrations = dataRegistriesArr.flat();
 
       const dataRegistrations = await asyncIterableToArray(dataRegistry.registrations)
@@ -292,8 +291,7 @@ export class ReadableDataAuthorization extends ReadableResource {
   }
 
   public async generateDataGrants(
-    dataRegistries: CRUDDataRegistry[],
-    agentRegistry: CRUDAgentRegistry,
+    registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
   ): Promise<ImmutableDataGrant[]> {
     const dataGrants: ImmutableDataGrant[] = []
@@ -305,7 +303,7 @@ export class ReadableDataAuthorization extends ReadableResource {
      * Otherwise only delegated data grants are created
      */
     if (!this.dataOwner || this.dataOwner === this.grantedBy) {
-      dataGrants.push(...(await this.generateSourceDataGrants(dataRegistries, granteeRegistration)))
+      dataGrants.push(...(await this.generateSourceDataGrants(registrySet, granteeRegistration)))
     }
 
     // do not create delegated data grants if granted by data owner, source grants will be created instead
@@ -317,9 +315,7 @@ export class ReadableDataAuthorization extends ReadableResource {
      * Otherwise only source data grants are created
      */
     if (!this.dataOwner || this.dataOwner !== this.grantedBy) {
-      dataGrants.push(
-        ...(await this.generateDelegatedDataGrants(agentRegistry, granteeRegistration))
-      )
+      dataGrants.push(...(await this.generateDelegatedDataGrants(registrySet, granteeRegistration)))
     }
 
     return dataGrants

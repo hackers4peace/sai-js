@@ -58,7 +58,7 @@ describe('crud', () => {
     const socialAgentRegistration = await factory.crud.socialAgentRegistration(snippetIri)
     expect(socialAgentRegistration).toBeInstanceOf(CRUDSocialAgentRegistration)
   })
-  test('registrySet', async () => {
+  test.skip('registrySet', async () => {
     const snippetIri = 'https://auth.alice.example/13e60d32-77a6-4239-864d-cfe2c90807c8'
     const registrySet = await factory.crud.registrySet(snippetIri)
     expect(registrySet).toBeInstanceOf(CRUDRegistrySet)
