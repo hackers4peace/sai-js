@@ -24,17 +24,17 @@ export class ImmutableResource extends Resource {
     if (this.stored) {
       throw new Error('this resource has been already stored')
     }
-    const { ok } = await this.fetch(this.iri, {
+    const response = await this.fetch(this.iri, {
       method: 'PUT',
       dataset: this.dataset,
       headers: {
         'If-None-Match': '*',
       },
     })
-    if (ok) {
+    if (response.ok) {
       this.stored = true
-    } else {
-      throw new Error('failed to store')
+      return
     }
+    throw new Error('failed to store')
   }
 }

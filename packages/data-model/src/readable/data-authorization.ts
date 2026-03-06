@@ -80,11 +80,11 @@ export class ReadableDataAuthorization extends ReadableResource {
   private generateChildDelegatedDataGrants(
     parentGrantIri: string,
     sourceGrant: InheritableDataGrant,
-    granteeRegistration: CRUDAgentRegistration
+    registrySet: CRUDRegistrySet
   ): ImmutableDataGrant[] {
     return this.hasInheritingAuthorization
       .map((childAuthorization) => {
-        const childGrantIri = granteeRegistration.iriForContained()
+        const childGrantIri = registrySet.hasGrantRegistry.iriForContained()
         const childSourceGrant = [...sourceGrant.hasInheritingGrant].find(
           (grant) => grant.registeredShapeTree === childAuthorization.registeredShapeTree
         )
@@ -149,12 +149,12 @@ export class ReadableDataAuthorization extends ReadableResource {
 
       result = [
         ...matchingDataGrants.flatMap((sourceGrant) => {
-          const regularGrantIri = granteeRegistration.iriForContained()
+          const regularGrantIri = registrySet.hasGrantRegistry.iriForContained()
 
           const childDataGrants: ImmutableDataGrant[] = this.generateChildDelegatedDataGrants(
             regularGrantIri,
             sourceGrant as InheritableDataGrant,
-            granteeRegistration
+            registrySet
           )
           const data: DataGrantData = {
             grantee: this.grantee,
@@ -187,12 +187,12 @@ export class ReadableDataAuthorization extends ReadableResource {
   private generateChildSourceDataGrants(
     parentGrantIri: string,
     dataRegistrations: ReadableDataRegistration[],
-    granteeRegistration: CRUDAgentRegistration,
+    registrySet: CRUDRegistrySet,
     storageIri: string
   ): ImmutableDataGrant[] {
     return this.hasInheritingAuthorization
       .map((childAuthorization) => {
-        const childGrantIri = granteeRegistration.iriForContained()
+        const childGrantIri = registrySet.hasGrantRegistry.iriForContained()
         // each data registry has only one data registration for any given shape tree
         const dataRegistration = dataRegistrations.find(
           (registration) =>
@@ -252,13 +252,13 @@ export class ReadableDataAuthorization extends ReadableResource {
       if (!matchingRegistration) continue
 
       // create source grant
-      const regularGrantIri = granteeRegistration.iriForContained()
+      const regularGrantIri = registrySet.hasGrantRegistry.iriForContained()
 
       // create children if needed
       const childDataGrants: ImmutableDataGrant[] = this.generateChildSourceDataGrants(
         regularGrantIri,
         dataRegistrations,
-        granteeRegistration,
+        registrySet,
         await dataRegistry.storageIri()
       )
 

@@ -2,7 +2,9 @@ import {
   type AccessGrantData,
   type DataGrantData,
   ImmutableDataGrant,
+  dataGrantTemplate,
 } from '@janeirodigital/interop-data-model'
+import { getAcl } from '@janeirodigital/interop-utils'
 import { buildSessionManager } from '../../builders/sessionManager.js'
 
 export interface FindAffectedAuthorizationsInput {
@@ -74,12 +76,44 @@ export interface StoreDataGrantInput {
   grantData: DataGrantData
 }
 
+export async function createAcr(payload: {
+  grantIri: string
+  grantData: DataGrantData
+}): Promise<void> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.grantData.grantedBy)
+  const headResponse = await session.rawFetch(payload.grantIri, {
+    method: 'HEAD',
+  })
+  const acrId = getAcl(headResponse.headers.get('link'))
+  // TODO: adjust for grants to other social agents
+  const acr = dataGrantTemplate({
+    id: acrId,
+    resource: payload.grantIri,
+    owner: {
+      agent: session.webId,
+      client: session.agentId,
+    },
+    peer: {
+      agent: payload.grantData.grantedBy,
+      client: payload.grantData.grantee,
+    },
+  }).replaceAll('\n', '')
+  const putResponse = await session.rawFetch(acrId, {
+    method: 'PUT',
+    body: acr,
+    headers: {
+      'content-type': 'text/turtle',
+    },
+  })
+  return
+}
 export async function storeDataGrant(payload: StoreDataGrantInput): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.grantData.grantedBy)
 
   const grant = session.factory.immutable.dataGrant(payload.grantIri, payload.grantData)
-  await grant.put()
+  return grant.put()
 }
 
 export interface StoreAccessGrantInput {
@@ -102,7 +136,7 @@ export async function storeAccessGrant(payload: StoreAccessGrantInput): Promise<
     dataGrants,
   })
 
-  await accessGrant.put()
+  return accessGrant.put()
 }
 
 export interface SetAccessGrantInput {
