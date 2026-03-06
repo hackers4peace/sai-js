@@ -54,7 +54,16 @@ GRAPH <https://registry/acme/grant/> {
   <https://registry/acme/grant/>
     ldp:contains
       <https://registry/acme/grant/wwp4j6>,
-      <https://registry/acme/grant/qwvbcu>.
+      <https://registry/acme/grant/qwvbcu>,
+      <https://registry/acme/grant/g4yhtm>,
+      <https://registry/acme/grant/wpqyds>,
+      <https://registry/acme/grant/p9m2vr>,
+      <https://registry/acme/grant/t7k5nw>,
+      <https://registry/acme/grant/x4j8lm>,
+      <https://registry/acme/grant/q2v9pt>,
+      <https://registry/acme/grant/cshspf>,
+      <https://registry/acme/grant/vled83>,
+      <https://registry/acme/grant/wegvwe>.
 
 }
 
@@ -170,8 +179,7 @@ GRAPH <meta:https://registry/acme/agent/je0s7n/> {
 GRAPH <https://registry/acme/agent/je0s7n/> {
   <https://registry/acme/agent/je0s7n/>
     ldp:contains
-      <https://registry/acme/agent/je0s7n/gmaqjb>,
-      <https://registry/acme/agent/je0s7n/g4yhtm>.
+      <https://registry/acme/agent/je0s7n/gmaqjb>.
 }
 
 GRAPH <meta:https://registry/acme/agent/je0s7n/.acr> {
@@ -277,18 +285,18 @@ GRAPH <https://registry/acme/agent/m4k9wp/b8n3kx> {
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/acme>;
     interop:hasDataGrant
-      <https://registry/acme/agent/m4k9wp/p9m2vr>,
-      <https://registry/acme/agent/m4k9wp/t7k5nw>,
-      <https://registry/acme/agent/m4k9wp/x4j8lm>,
-      <https://registry/acme/agent/m4k9wp/q2v9pt> .
+      <https://registry/acme/grant/p9m2vr>,
+      <https://registry/acme/grant/t7k5nw>,
+      <https://registry/acme/grant/x4j8lm>,
+      <https://registry/acme/grant/q2v9pt> .
 }
 
 GRAPH <meta:https://registry/acme/agent/m4k9wp/b8n3kx> {
         <https://registry/acme/agent/m4k9wp/b8n3kx> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/m4k9wp/p9m2vr> {
-  <https://registry/acme/agent/m4k9wp/p9m2vr>
+GRAPH <https://registry/acme/grant/p9m2vr> {
+  <https://registry/acme/grant/p9m2vr>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/acme>;
@@ -298,16 +306,16 @@ GRAPH <https://registry/acme/agent/m4k9wp/p9m2vr> {
     interop:hasDataRegistration <https://data/acme-rnd/reb39k/>;
     interop:scopeOfGrant interop:AllFromRegistry;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
-  <https://registry/acme/agent/m4k9wp/t7k5nw>
-    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/p9m2vr>.
+  <https://registry/acme/grant/t7k5nw>
+    interop:inheritsFromGrant <https://registry/acme/grant/p9m2vr>.
 }
 
-GRAPH <meta:https://registry/acme/agent/m4k9wp/p9m2vr> {
-        <https://registry/acme/agent/m4k9wp/p9m2vr> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/p9m2vr> {
+        <https://registry/acme/grant/p9m2vr> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/m4k9wp/t7k5nw> {
-  <https://registry/acme/agent/m4k9wp/t7k5nw>
+GRAPH <https://registry/acme/grant/t7k5nw> {
+  <https://registry/acme/grant/t7k5nw>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/acme>;
@@ -316,16 +324,16 @@ GRAPH <https://registry/acme/agent/m4k9wp/t7k5nw> {
     interop:hasStorage <https://data/acme-rnd/>;
     interop:hasDataRegistration <https://data/acme-rnd/x0md9s/>;
     interop:scopeOfGrant interop:Inherited;
-    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/p9m2vr>;
+    interop:inheritsFromGrant <https://registry/acme/grant/p9m2vr>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
-GRAPH <meta:https://registry/acme/agent/m4k9wp/t7k5nw> {
-        <https://registry/acme/agent/m4k9wp/t7k5nw> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/t7k5nw> {
+        <https://registry/acme/grant/t7k5nw> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/m4k9wp/x4j8lm> {
-  <https://registry/acme/agent/m4k9wp/x4j8lm>
+GRAPH <https://registry/acme/grant/x4j8lm> {
+  <https://registry/acme/grant/x4j8lm>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/acme>;
@@ -335,16 +343,16 @@ GRAPH <https://registry/acme/agent/m4k9wp/x4j8lm> {
     interop:hasDataRegistration <https://data/acme-hr/p7t9km/>;
     interop:scopeOfGrant interop:AllFromRegistry;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
-  <https://registry/acme/agent/m4k9wp/q2v9pt>
-    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/x4j8lm>.
+  <https://registry/acme/grant/q2v9pt>
+    interop:inheritsFromGrant <https://registry/acme/grant/x4j8lm>.
 }
 
-GRAPH <meta:https://registry/acme/agent/m4k9wp/x4j8lm> {
-        <https://registry/acme/agent/m4k9wp/x4j8lm> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/x4j8lm> {
+        <https://registry/acme/grant/x4j8lm> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/m4k9wp/q2v9pt> {
-  <https://registry/acme/agent/m4k9wp/q2v9pt>
+GRAPH <https://registry/acme/grant/q2v9pt> {
+  <https://registry/acme/grant/q2v9pt>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/acme>;
@@ -353,12 +361,12 @@ GRAPH <https://registry/acme/agent/m4k9wp/q2v9pt> {
     interop:hasStorage <https://data/acme-hr/>;
     interop:hasDataRegistration <https://data/acme-hr/v4n2qx/>;
     interop:scopeOfGrant interop:Inherited;
-    interop:inheritsFromGrant <https://registry/acme/agent/m4k9wp/x4j8lm>;
+    interop:inheritsFromGrant <https://registry/acme/grant/x4j8lm>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
-GRAPH <meta:https://registry/acme/agent/m4k9wp/q2v9pt> {
-        <https://registry/acme/agent/m4k9wp/q2v9pt> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/q2v9pt> {
+        <https://registry/acme/grant/q2v9pt> a ldp:Resource .
 }
 
 GRAPH <https://registry/acme/agent/je0s7n/gmaqjb> {
@@ -368,15 +376,15 @@ GRAPH <https://registry/acme/agent/je0s7n/gmaqjb> {
     interop:grantee <https://id/alice>;
     interop:grantedBy <https://id/acme>;
     interop:hasDataGrant
-      <https://registry/acme/agent/je0s7n/g4yhtm>.
+      <https://registry/acme/grant/g4yhtm>.
 }
 
 GRAPH <meta:https://registry/acme/agent/je0s7n/gmaqjb> {
         <https://registry/acme/agent/je0s7n/gmaqjb> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/je0s7n/g4yhtm> {
-  <https://registry/acme/agent/je0s7n/g4yhtm>
+GRAPH <https://registry/acme/grant/g4yhtm> {
+  <https://registry/acme/grant/g4yhtm>
     a interop:DataGrant;
     interop:grantee <https://id/alice>;
     interop:grantedBy <https://id/acme>;
@@ -387,16 +395,16 @@ GRAPH <https://registry/acme/agent/je0s7n/g4yhtm> {
     interop:hasDataRegistration <https://data/acme-rnd/reb39k/>;
     interop:hasDataInstance <https://data/acme-rnd/reb39k/pbh2yw>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
-  <https://registry/acme/agent/je0s7n/wpqyds>
-    interop:inheritsFromGrant <https://registry/acme/agent/je0s7n/g4yhtm>.
+  <https://registry/acme/grant/wpqyds>
+    interop:inheritsFromGrant <https://registry/acme/grant/g4yhtm>.
 }
 
-GRAPH <meta:https://registry/acme/agent/je0s7n/g4yhtm> {
-        <https://registry/acme/agent/je0s7n/g4yhtm> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/g4yhtm> {
+        <https://registry/acme/grant/g4yhtm> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/je0s7n/wpqyds> {
-  <https://registry/acme/agent/je0s7n/wpqyds>
+GRAPH <https://registry/acme/grant/wpqyds> {
+  <https://registry/acme/grant/wpqyds>
     a interop:DataGrant;
     interop:grantee <https://id/alice>;
     interop:grantedBy <https://id/acme>;
@@ -405,18 +413,18 @@ GRAPH <https://registry/acme/agent/je0s7n/wpqyds> {
     interop:hasStorage <https://data/acme-rnd/>;
     interop:scopeOfGrant interop:Inherited;
     interop:hasDataRegistration <https://data/acme-rnd/x0md9s/>;
-    interop:inheritsFromGrant <https://registry/acme/agent/je0s7n/g4yhtm>;
+    interop:inheritsFromGrant <https://registry/acme/grant/g4yhtm>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
-GRAPH <meta:https://registry/acme/agent/je0s7n/wpqyds> {
-        <https://registry/acme/agent/je0s7n/wpqyds> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/wpqyds> {
+        <https://registry/acme/grant/wpqyds> a ldp:Resource .
 }
 
 GRAPH <https://registry/acme/grant/wwp4j6> {
   <https://registry/acme/grant/wwp4j6>
     a interop:DelegatedDataGrant;
-    interop:delegationOfGrant <https://registry/acme/agent/je0s7n/g4yhtm>;
+    interop:delegationOfGrant <https://registry/acme/grant/g4yhtm>;
     interop:grantee <https://data/test-client/public/id>;
     interop:grantedBy <https://id/alice>;
     interop:dataOwner <https://id/acme>;
@@ -434,52 +442,10 @@ GRAPH <meta:https://registry/acme/grant/wwp4j6> {
         <https://registry/acme/grant/wwp4j6> a ldp:Resource .
 }
 
-GRAPH <meta:https://registry/acme/grant/wwp4j6.acr> {
-        <https://registry/acme/grant/wwp4j6.acr> a ldp:Resource .
-}
-
-GRAPH <https://registry/acme/grant/wwp4j6.acr> {
-  <https://registry/acme/grant/wwp4j6.acr#root>
-    a acp:AccessControlResource;
-    acp:resource <https://registry/acme/grant/wwp4j6>;
-    acp:accessControl
-      <https://registry/acme/grant/wwp4j6.acr#fullOwnerAccess>,
-      <https://registry/acme/grant/wwp4j6.acr#peerReadAccess>.
-
-  <https://registry/acme/grant/wwp4j6.acr#fullOwnerAccess>
-    a acp:AccessControl;
-    acp:apply [
-      a acp:Policy;
-      acp:allow acl:Read, acl:Write, acl:Control;
-      acp:anyOf [
-        a acp:Matcher;
-        acp:agent <https://id/acme>;
-        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
-      ]
-    ].
-
-  <https://registry/acme/grant/wwp4j6.acr#peerReadAccess>
-    a acp:AccessControl;
-    acp:apply [
-      a acp:Policy;
-      acp:allow acl:Read;
-      acp:anyOf [
-        a acp:Matcher;
-        acp:agent <https://id/alice>;
-        acp:client <https://data/test-client/public/id>
-      ],
-      [
-        a acp:Matcher;
-        acp:agent <https://id/alice>;
-        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
-      ]
-    ].
-}
-
 GRAPH <https://registry/acme/grant/qwvbcu> {
   <https://registry/acme/grant/qwvbcu>
     a interop:DelegatedDataGrant;
-    interop:delegationOfGrant <https://registry/acme/agent/je0s7n/wpqyds>;
+    interop:delegationOfGrant <https://registry/acme/grant/wpqyds>;
     interop:grantee <https://data/test-client/public/id>;
     interop:grantedBy <https://id/alice>;
     interop:dataOwner <https://id/acme>;
@@ -495,50 +461,8 @@ GRAPH <meta:https://registry/acme/grant/qwvbcu> {
         <https://registry/acme/grant/qwvbcu> a ldp:Resource .
 }
 
-GRAPH <meta:https://registry/acme/grant/qwvbcu.acr> {
-        <https://registry/acme/grant/qwvbcu.acr> a ldp:Resource .
-}
-
-GRAPH <https://registry/acme/grant/qwvbcu.acr> {
-  <https://registry/acme/grant/qwvbcu.acr#root>
-    a acp:AccessControlResource;
-    acp:resource <https://registry/acme/grant/qwvbcu>;
-    acp:accessControl
-      <https://registry/acme/grant/qwvbcu.acr#fullOwnerAccess>,
-      <https://registry/acme/grant/qwvbcu.acr#peerReadAccess>.
-
-  <https://registry/acme/grant/qwvbcu.acr#fullOwnerAccess>
-    a acp:AccessControl;
-    acp:apply [
-      a acp:Policy;
-      acp:allow acl:Read, acl:Write, acl:Control;
-      acp:anyOf [
-        a acp:Matcher;
-        acp:agent <https://id/acme>;
-        acp:client <https://data/test-client/public/id>
-      ]
-    ].
-
-  <https://registry/acme/grant/qwvbcu.acr#peerReadAccess>
-    a acp:AccessControl;
-    acp:apply [
-      a acp:Policy;
-      acp:allow acl:Read;
-      acp:anyOf [
-        a acp:Matcher;
-        acp:agent <https://id/alice>;
-        acp:client <https://data/test-client/public/id>
-      ],
-      [
-        a acp:Matcher;
-        acp:agent <https://id/alice>;
-        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
-      ]
-    ].
-}
-
-GRAPH <https://registry/acme/agent/fqvaym/cshspf> {
-  <https://registry/acme/agent/fqvaym/cshspf>
+GRAPH <https://registry/acme/grant/cshspf> {
+  <https://registry/acme/grant/cshspf>
     a interop:DataGrant;
     interop:grantee acp:PublicClient;
     interop:grantedBy acp:PublicAgent;
@@ -550,12 +474,12 @@ GRAPH <https://registry/acme/agent/fqvaym/cshspf> {
     interop:accessMode acl:Read.
 }
 
-GRAPH <meta:https://registry/acme/agent/fqvaym/cshspf> {
-        <https://registry/acme/agent/fqvaym/cshspf> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/cshspf> {
+        <https://registry/acme/grant/cshspf> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/fqvaym/vled83> {
-  <https://registry/acme/agent/fqvaym/vled83>
+GRAPH <https://registry/acme/grant/vled83> {
+  <https://registry/acme/grant/vled83>
     a interop:DataGrant;
     interop:grantee acp:PublicClient;
     interop:grantedBy acp:PublicAgent;
@@ -567,16 +491,16 @@ GRAPH <https://registry/acme/agent/fqvaym/vled83> {
     interop:accessMode acl:Read.
 }
 
-GRAPH <meta:https://registry/acme/agent/fqvaym/vled83> {
-        <https://registry/acme/agent/fqvaym/vled83> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/vled83> {
+        <https://registry/acme/grant/vled83> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/acme/.acr> {
         <https://registry/acme/.acr> a ldp:Resource .
 }
 
-GRAPH <https://registry/acme/agent/fqvaym/wegvwe> {
-  <https://registry/acme/agent/fqvaym/wegvwe>
+GRAPH <https://registry/acme/grant/wegvwe> {
+  <https://registry/acme/grant/wegvwe>
     a interop:DataGrant;
     interop:grantee acp:PublicClient;
     interop:grantedBy acp:PublicAgent;
@@ -588,8 +512,8 @@ GRAPH <https://registry/acme/agent/fqvaym/wegvwe> {
     interop:accessMode acl:Read.
 }
 
-GRAPH <meta:https://registry/acme/agent/fqvaym/wegvwe> {
-        <https://registry/acme/agent/fqvaym/wegvwe> a ldp:Resource .
+GRAPH <meta:https://registry/acme/grant/wegvwe> {
+        <https://registry/acme/grant/wegvwe> a ldp:Resource .
 }
 
 GRAPH <https://registry/acme/.acr> {
@@ -631,6 +555,12 @@ GRAPH <meta:https://registry/alice/grant/> {
 }
 
 GRAPH <https://registry/alice/grant/> {
+  <https://registry/alice/grant/>
+    ldp:contains
+      <https://registry/alice/grant/afiooi>,
+      <https://registry/alice/grant/azgyc5>,
+      <https://registry/alice/grant/p3m8kr>,
+      <https://registry/alice/grant/t7k5nw>.
 }
 
 GRAPH <meta:https://registry/alice/authorization/> {
@@ -833,16 +763,16 @@ GRAPH <https://registry/alice/agent/vzp6ky/w9n2qx> {
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/alice>;
     interop:hasDataGrant
-      <https://registry/alice/agent/vzp6ky/p3m8kr>,
-      <https://registry/alice/agent/vzp6ky/t7k5nw> .
+      <https://registry/alice/grant/p3m8kr>,
+      <https://registry/alice/grant/t7k5nw> .
 }
 
 GRAPH <meta:https://registry/alice/agent/vzp6ky/w9n2qx> {
         <https://registry/alice/agent/vzp6ky/w9n2qx> a ldp:Resource .
 }
 
-GRAPH <https://registry/alice/agent/vzp6ky/p3m8kr> {
-  <https://registry/alice/agent/vzp6ky/p3m8kr>
+GRAPH <https://registry/alice/grant/p3m8kr> {
+  <https://registry/alice/grant/p3m8kr>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/alice>;
@@ -852,16 +782,16 @@ GRAPH <https://registry/alice/agent/vzp6ky/p3m8kr> {
     interop:hasDataRegistration <https://data/alice-home/x1n3cm/>;
     interop:scopeOfGrant interop:AllFromRegistry;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
-  <https://registry/alice/agent/vzp6ky/t7k5nw>
-    interop:inheritsFromGrant <https://registry/alice/agent/vzp6ky/p3m8kr>.
+  <https://registry/alice/grant/t7k5nw>
+    interop:inheritsFromGrant <https://registry/alice/grant/p3m8kr>.
 }
 
-GRAPH <meta:https://registry/alice/agent/vzp6ky/p3m8kr> {
-        <https://registry/alice/agent/vzp6ky/p3m8kr> a ldp:Resource .
+GRAPH <meta:https://registry/alice/grant/p3m8kr> {
+        <https://registry/alice/grant/p3m8kr> a ldp:Resource .
 }
 
-GRAPH <https://registry/alice/agent/vzp6ky/t7k5nw> {
-  <https://registry/alice/agent/vzp6ky/t7k5nw>
+GRAPH <https://registry/alice/grant/t7k5nw> {
+  <https://registry/alice/grant/t7k5nw>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/alice>;
@@ -870,12 +800,12 @@ GRAPH <https://registry/alice/agent/vzp6ky/t7k5nw> {
     interop:hasStorage <https://data/alice-home/>;
     interop:hasDataRegistration <https://data/alice-home/pm1oxz/>;
     interop:scopeOfGrant interop:Inherited;
-    interop:inheritsFromGrant <https://registry/alice/agent/vzp6ky/p3m8kr>;
+    interop:inheritsFromGrant <https://registry/alice/grant/p3m8kr>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
-GRAPH <meta:https://registry/alice/agent/vzp6ky/t7k5nw> {
-        <https://registry/alice/agent/vzp6ky/t7k5nw> a ldp:Resource .
+GRAPH <meta:https://registry/alice/grant/t7k5nw> {
+        <https://registry/alice/grant/t7k5nw> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/alice/agent/cvmsa4/> {
@@ -931,9 +861,7 @@ GRAPH <https://registry/alice/agent/cvmsa4/.acr> {
 GRAPH <https://registry/alice/agent/cvmsa4/> {
   <https://registry/alice/agent/cvmsa4/>
     ldp:contains
-      <https://registry/alice/agent/cvmsa4/y1pp6y>,
-      <https://registry/alice/agent/cvmsa4/afiooi>,
-      <https://registry/alice/agent/cvmsa4/azgyc5>.
+      <https://registry/alice/agent/cvmsa4/y1pp6y>.
 }
 
 GRAPH <https://registry/alice/agent/cvmsa4/y1pp6y> {
@@ -944,8 +872,8 @@ GRAPH <https://registry/alice/agent/cvmsa4/y1pp6y> {
     interop:grantedBy <https://id/alice>;
     interop:hasAccessNeedGroup <https://data/test-client/public/access-needs#need-group-pm>;
     interop:hasDataGrant
-      <https://registry/alice/agent/cvmsa4/afiooi>,
-      <https://registry/alice/agent/cvmsa4/azgyc5>,
+      <https://registry/alice/grant/afiooi>,
+      <https://registry/alice/grant/azgyc5>,
       <https://registry/acme/grant/wwp4j6>,
       <https://registry/acme/grant/qwvbcu>.
 }
@@ -954,8 +882,8 @@ GRAPH <meta:https://registry/alice/agent/cvmsa4/y1pp6y> {
         <https://registry/alice/agent/cvmsa4/y1pp6y> a ldp:Resource .
 }
 
-GRAPH <https://registry/alice/agent/cvmsa4/afiooi> {
-  <https://registry/alice/agent/cvmsa4/afiooi>
+GRAPH <https://registry/alice/grant/afiooi> {
+  <https://registry/alice/grant/afiooi>
     a interop:DataGrant;
     interop:grantee <https://data/test-client/public/id>;
     interop:grantedBy <https://id/alice>;
@@ -965,16 +893,16 @@ GRAPH <https://registry/alice/agent/cvmsa4/afiooi> {
     interop:hasDataRegistration <https://data/alice-work/sx86hi/>;
     interop:scopeOfGrant interop:AllFromRegistry;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
-  <https://registry/alice/agent/cvmsa4/azgyc5>
-    interop:inheritsFromGrant <https://registry/alice/agent/cvmsa4/afiooi>.
+  <https://registry/alice/grant/azgyc5>
+    interop:inheritsFromGrant <https://registry/alice/grant/afiooi>.
 }
 
-GRAPH <meta:https://registry/alice/agent/cvmsa4/afiooi> {
-        <https://registry/alice/agent/cvmsa4/afiooi> a ldp:Resource .
+GRAPH <meta:https://registry/alice/grant/afiooi> {
+        <https://registry/alice/grant/afiooi> a ldp:Resource .
 }
 
-GRAPH <https://registry/alice/agent/cvmsa4/azgyc5> {
-  <https://registry/alice/agent/cvmsa4/azgyc5>
+GRAPH <https://registry/alice/grant/azgyc5> {
+  <https://registry/alice/grant/azgyc5>
     a interop:DataGrant;
     interop:grantee <https://data/test-client/public/id>;
     interop:grantedBy <https://id/alice>;
@@ -983,12 +911,12 @@ GRAPH <https://registry/alice/agent/cvmsa4/azgyc5> {
     interop:hasStorage <https://data/alice-work/>;
     interop:hasDataRegistration <https://data/alice-work/btze4a/>;
     interop:scopeOfGrant interop:Inherited;
-    interop:inheritsFromGrant <https://registry/alice/agent/cvmsa4/afiooi>;
+    interop:inheritsFromGrant <https://registry/alice/grant/afiooi>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
-GRAPH <meta:https://registry/alice/agent/cvmsa4/azgyc5> {
-        <https://registry/alice/agent/cvmsa4/azgyc5> a ldp:Resource .
+GRAPH <meta:https://registry/alice/grant/azgyc5> {
+        <https://registry/alice/grant/azgyc5> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/alice/.acr> {
@@ -1258,6 +1186,11 @@ GRAPH <meta:https://registry/yoyo/grant/> {
 }
 
 GRAPH <https://registry/yoyo/grant/> {
+  <https://registry/yoyo/grant/>
+    ldp:contains
+      <https://registry/yoyo/grant/p7n2vx>,
+      <https://registry/yoyo/grant/t5m8qr>.
+
 }
 
 GRAPH <meta:https://registry/yoyo/authorization/> {
@@ -1408,16 +1341,16 @@ GRAPH <https://registry/yoyo/agent/z3k7wm/k9m4wp> {
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/yoyo>;
     interop:hasDataGrant
-      <https://registry/yoyo/agent/z3k7wm/p7n2vx>,
-      <https://registry/yoyo/agent/z3k7wm/t5m8qr> .
+      <https://registry/yoyo/grant/p7n2vx>,
+      <https://registry/yoyo/grant/t5m8qr> .
 }
 
 GRAPH <meta:https://registry/yoyo/agent/z3k7wm/k9m4wp> {
         <https://registry/yoyo/agent/z3k7wm/k9m4wp> a ldp:Resource .
 }
 
-GRAPH <https://registry/yoyo/agent/z3k7wm/p7n2vx> {
-  <https://registry/yoyo/agent/z3k7wm/p7n2vx>
+GRAPH <https://registry/yoyo/grant/p7n2vx> {
+  <https://registry/yoyo/grant/p7n2vx>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/yoyo>;
@@ -1427,16 +1360,16 @@ GRAPH <https://registry/yoyo/agent/z3k7wm/p7n2vx> {
     interop:hasDataRegistration <https://data/yoyo-eu/w4n9kx/>;
     interop:scopeOfGrant interop:AllFromRegistry;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
-  <https://registry/yoyo/agent/z3k7wm/t5m8qr>
-    interop:inheritsFromGrant <https://registry/yoyo/agent/z3k7wm/p7n2vx>.
+  <https://registry/yoyo/grant/t5m8qr>
+    interop:inheritsFromGrant <https://registry/yoyo/grant/p7n2vx>.
 }
 
-GRAPH <meta:https://registry/yoyo/agent/z3k7wm/p7n2vx> {
-        <https://registry/yoyo/agent/z3k7wm/p7n2vx> a ldp:Resource .
+GRAPH <meta:https://registry/yoyo/grant/p7n2vx> {
+        <https://registry/yoyo/grant/p7n2vx> a ldp:Resource .
 }
 
-GRAPH <https://registry/yoyo/agent/z3k7wm/t5m8qr> {
-  <https://registry/yoyo/agent/z3k7wm/t5m8qr>
+GRAPH <https://registry/yoyo/grant/t5m8qr> {
+  <https://registry/yoyo/grant/t5m8qr>
     a interop:DataGrant;
     interop:grantee <https://id/bob>;
     interop:grantedBy <https://id/yoyo>;
@@ -1445,12 +1378,12 @@ GRAPH <https://registry/yoyo/agent/z3k7wm/t5m8qr> {
     interop:hasStorage <https://data/yoyo-eu/>;
     interop:hasDataRegistration <https://data/yoyo-eu/m7p3qt/>;
     interop:scopeOfGrant interop:Inherited;
-    interop:inheritsFromGrant <https://registry/yoyo/agent/z3k7wm/p7n2vx>;
+    interop:inheritsFromGrant <https://registry/yoyo/grant/p7n2vx>;
     interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete.
 }
 
-GRAPH <meta:https://registry/yoyo/agent/z3k7wm/t5m8qr> {
-        <https://registry/yoyo/agent/z3k7wm/t5m8qr> a ldp:Resource .
+GRAPH <meta:https://registry/yoyo/grant/t5m8qr> {
+        <https://registry/yoyo/grant/t5m8qr> a ldp:Resource .
 }
 
 GRAPH <meta:https://registry/kim/authorization/> {
@@ -1499,6 +1432,487 @@ GRAPH <https://registry/kim/.acr> {
         a acp:Matcher;
         acp:agent <https://id/kim>;
         acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/cshspf.acr> {
+        <https://registry/acme/grant/cshspf.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/cshspf.acr> {
+  <https://registry/acme/grant/cshspf.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/cshspf>;
+    acp:accessControl
+      <https://registry/acme/grant/cshspf.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/cshspf.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/cshspf.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/cshspf.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent acp:PublicAgent;
+        acp:client acp:PublicClient
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/vled83.acr> {
+        <https://registry/acme/grant/vled83.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/vled83.acr> {
+  <https://registry/acme/grant/vled83.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/vled83>;
+    acp:accessControl
+      <https://registry/acme/grant/vled83.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/vled83.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/vled83.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/vled83.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent acp:PublicAgent;
+        acp:client acp:PublicClient
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/wegvwe.acr> {
+        <https://registry/acme/grant/wegvwe.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/wegvwe.acr> {
+  <https://registry/acme/grant/wegvwe.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/wegvwe>;
+    acp:accessControl
+      <https://registry/acme/grant/wegvwe.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/wegvwe.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/wegvwe.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/wegvwe.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent acp:PublicAgent;
+        acp:client acp:PublicClient
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/p9m2vr.acr> {
+        <https://registry/acme/grant/p9m2vr.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/p9m2vr.acr> {
+  <https://registry/acme/grant/p9m2vr.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/p9m2vr>;
+    acp:accessControl
+      <https://registry/acme/grant/p9m2vr.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/p9m2vr.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/p9m2vr.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/p9m2vr.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/t7k5nw.acr> {
+        <https://registry/acme/grant/t7k5nw.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/t7k5nw.acr> {
+  <https://registry/acme/grant/t7k5nw.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/t7k5nw>;
+    acp:accessControl
+      <https://registry/acme/grant/t7k5nw.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/t7k5nw.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/t7k5nw.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/t7k5nw.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/x4j8lm.acr> {
+        <https://registry/acme/grant/x4j8lm.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/x4j8lm.acr> {
+  <https://registry/acme/grant/x4j8lm.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/x4j8lm>;
+    acp:accessControl
+      <https://registry/acme/grant/x4j8lm.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/x4j8lm.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/x4j8lm.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/x4j8lm.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/q2v9pt.acr> {
+        <https://registry/acme/grant/q2v9pt.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/q2v9pt.acr> {
+  <https://registry/acme/grant/q2v9pt.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/q2v9pt>;
+    acp:accessControl
+      <https://registry/acme/grant/q2v9pt.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/q2v9pt.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/q2v9pt.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/q2v9pt.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/yoyo/grant/p7n2vx.acr> {
+        <https://registry/yoyo/grant/p7n2vx.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/grant/p7n2vx.acr> {
+  <https://registry/yoyo/grant/p7n2vx.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/yoyo/grant/p7n2vx>;
+    acp:accessControl
+      <https://registry/yoyo/grant/p7n2vx.acr#fullOwnerAccess>,
+      <https://registry/yoyo/grant/p7n2vx.acr#peerReadAccess>.
+
+  <https://registry/yoyo/grant/p7n2vx.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/yoyo>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv>
+      ]
+    ].
+
+  <https://registry/yoyo/grant/p7n2vx.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/yoyo/grant/t5m8qr.acr> {
+        <https://registry/yoyo/grant/t5m8qr.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/yoyo/grant/t5m8qr.acr> {
+  <https://registry/yoyo/grant/t5m8qr.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/yoyo/grant/t5m8qr>;
+    acp:accessControl
+      <https://registry/yoyo/grant/t5m8qr.acr#fullOwnerAccess>,
+      <https://registry/yoyo/grant/t5m8qr.acr#peerReadAccess>.
+
+  <https://registry/yoyo/grant/t5m8qr.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/yoyo>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv>
+      ]
+    ].
+
+  <https://registry/yoyo/grant/t5m8qr.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/g4yhtm.acr> {
+        <https://registry/acme/grant/g4yhtm.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/g4yhtm.acr> {
+  <https://registry/acme/grant/g4yhtm.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/g4yhtm>;
+    acp:accessControl
+      <https://registry/acme/grant/g4yhtm.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/g4yhtm.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/g4yhtm.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/g4yhtm.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/wpqyds.acr> {
+        <https://registry/acme/grant/wpqyds.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/wpqyds.acr> {
+  <https://registry/acme/grant/wpqyds.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/wpqyds>;
+    acp:accessControl
+      <https://registry/acme/grant/wpqyds.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/wpqyds.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/wpqyds.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/wpqyds.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/alice/grant/p3m8kr.acr> {
+        <https://registry/alice/grant/p3m8kr.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/grant/p3m8kr.acr> {
+  <https://registry/alice/grant/p3m8kr.acr#grant>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/alice/grant/p3m8kr>;
+    acp:accessControl
+      <https://registry/alice/grant/p3m8kr.acr#fullOwnerAccess>,
+      <https://registry/alice/grant/p3m8kr.acr#peerReadAccess>.
+
+  <https://registry/alice/grant/p3m8kr.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+
+  <https://registry/alice/grant/p3m8kr.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/alice/grant/t7k5nw.acr> {
+        <https://registry/alice/grant/t7k5nw.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/grant/t7k5nw.acr> {
+  <https://registry/alice/grant/t7k5nw.acr#grant>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/alice/grant/t7k5nw>;
+    acp:accessControl
+      <https://registry/alice/grant/t7k5nw.acr#fullOwnerAccess>,
+      <https://registry/alice/grant/t7k5nw.acr#peerReadAccess>.
+
+  <https://registry/alice/grant/t7k5nw.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+
+  <https://registry/alice/grant/t7k5nw.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/bob>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>
       ]
     ].
 }
@@ -3139,4 +3553,162 @@ GRAPH <https://id/yoyo> {
       solid:oidcIssuer <https://auth/>;
       interop:hasRegistrySet <https://registry/yoyo/>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv> .
+}
+
+GRAPH <meta:https://registry/acme/grant/wwp4j6.acr> {
+        <https://registry/acme/grant/wwp4j6.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/wwp4j6.acr> {
+  <https://registry/acme/grant/wwp4j6.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/wwp4j6>;
+    acp:accessControl
+      <https://registry/acme/grant/wwp4j6.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/wwp4j6.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/wwp4j6.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/wwp4j6.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://data/test-client/public/id>
+      ],
+      [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/acme/grant/qwvbcu.acr> {
+        <https://registry/acme/grant/qwvbcu.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/acme/grant/qwvbcu.acr> {
+  <https://registry/acme/grant/qwvbcu.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/acme/grant/qwvbcu>;
+    acp:accessControl
+      <https://registry/acme/grant/qwvbcu.acr#fullOwnerAccess>,
+      <https://registry/acme/grant/qwvbcu.acr#peerReadAccess>.
+
+  <https://registry/acme/grant/qwvbcu.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/acme>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>
+      ]
+    ].
+
+  <https://registry/acme/grant/qwvbcu.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://data/test-client/public/id>
+      ],
+      [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/alice/grant/afiooi.acr> {
+        <https://registry/alice/grant/afiooi.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/grant/afiooi.acr> {
+  <https://registry/alice/grant/afiooi.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/alice/grant/afiooi>;
+    acp:accessControl
+      <https://registry/alice/grant/afiooi.acr#fullOwnerAccess>,
+      <https://registry/alice/grant/afiooi.acr#peerReadAccess>.
+
+  <https://registry/alice/grant/afiooi.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+
+  <https://registry/alice/grant/afiooi.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://data/test-client/public/id>
+      ]
+    ].
+}
+
+GRAPH <meta:https://registry/alice/grant/azgyc5.acr> {
+        <https://registry/alice/grant/azgyc5.acr> a ldp:Resource .
+}
+
+GRAPH <https://registry/alice/grant/azgyc5.acr> {
+  <https://registry/alice/grant/azgyc5.acr#root>
+    a acp:AccessControlResource;
+    acp:resource <https://registry/alice/grant/azgyc5>;
+    acp:accessControl
+      <https://registry/alice/grant/azgyc5.acr#fullOwnerAccess>,
+      <https://registry/alice/grant/azgyc5.acr#peerReadAccess>.
+
+  <https://registry/alice/grant/azgyc5.acr#fullOwnerAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read, acl:Write, acl:Control;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>
+      ]
+    ].
+
+  <https://registry/alice/grant/azgyc5.acr#peerReadAccess>
+    a acp:AccessControl;
+    acp:apply [
+      a acp:Policy;
+      acp:allow acl:Read;
+      acp:anyOf [
+        a acp:Matcher;
+        acp:agent <https://id/alice>;
+        acp:client <https://data/test-client/public/id>
+      ]
+    ].
 }
