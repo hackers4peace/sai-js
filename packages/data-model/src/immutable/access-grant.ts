@@ -1,12 +1,7 @@
 import { INTEROP, RDF, XSD } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { ImmutableResource } from '.'
-import {
-  type AuthorizationAgentFactory,
-  type DataGrant,
-  ImmutableDataGrant,
-  type ReadableAccessGrant,
-} from '..'
+import type { AuthorizationAgentFactory, DataGrant, ImmutableDataGrant } from '..'
 
 type StringData = {
   grantedBy: string
@@ -61,21 +56,5 @@ export class ImmutableAccessGrant extends ImmutableResource {
         DataFactory.literal(data.granted.toString(), XSD.boolean)
       )
     )
-  }
-
-  public async store(): Promise<ReadableAccessGrant> {
-    // store all immutable data grants first
-    await Promise.all(
-      this.dataGrants.map((grant) => {
-        if (grant instanceof ImmutableDataGrant) {
-          return grant.put()
-        }
-        return Promise.resolve()
-      })
-    )
-
-    await this.put()
-
-    return this.factory.readable.accessGrant(this.iri)
   }
 }

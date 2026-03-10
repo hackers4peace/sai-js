@@ -4,7 +4,7 @@ import {
   webIdTemplate,
 } from '@janeirodigital/interop-data-model'
 import postgres from 'postgres'
-import { agentId } from '../util/uriTemplates.js'
+import { agentId, issuanceUrl } from '../util/uriTemplates.js'
 
 export class AccountService {
   private sql: any
@@ -39,9 +39,8 @@ export class AccountService {
     const uas = agentId(webId)
     const dataRegistry = `https://${handle}.${this.dataOrigin}/`
     const registrySet = `https://${this.regOrigin}/${handle}/`
-    // TODO: add ACR
     const trigDataset = `
-      ${webIdTemplate({ id: webId, document: docId, issuer: this.issuer, uas, registry: registrySet })}
+      ${webIdTemplate({ id: webId, document: docId, issuer: this.issuer, uas, registry: registrySet, issuance: issuanceUrl(webId) })}
       ${dataRegistryTemplate({ id: dataRegistry })}
       ${registrySetTemplate({ id: registrySet, webId, uas, dataRegistry })}
     `

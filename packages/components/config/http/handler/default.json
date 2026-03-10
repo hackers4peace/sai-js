@@ -48,6 +48,7 @@
         "@type": "StatusWaterfallHandler",
         "handlers": [
           { "@id": "urn:sai:default:AuthorizationAgentFrontendApi" },
+          { "@id": "urn:sai:default:GrantIssuanceRouter" },
           { "@id": "urn:sai:default:ReciprocalWebhookRouter" },
           { "@id": "urn:sai:default:AuthorizationAgentDiscoveryHandler" },
           { "@id": "urn:sai:default:InvitationRouter" }
@@ -95,6 +96,21 @@
         "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
         "sessionManager": { "@id": "urn:sai:default:SessionManager" },
         "webIdStore": { "@id": "urn:solid-server:default:WebIdStore" }
+      }
+    },
+    {
+      "comment": "Handles issuance of grants.",
+      "@id": "urn:sai:default:GrantIssuanceRouter",
+      "@type": "OperationRouterHandler",
+      "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "allowedPathNames": ["^/.sai/grants/.*"],
+      "allowedMethods": ["POST"],
+      "handler": {
+        "@id": "urn:sai:default:GrantIssuanceHandler",
+        "comment": "Handles request from another agent requesting grant delegation.",
+        "@type": "GrantIssuanceHandler",
+        "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
+        "sessionManager": { "@id": "urn:sai:default:SessionManager" }
       }
     },
     {

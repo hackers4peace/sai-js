@@ -254,5 +254,86 @@
   ],
   "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Fkim-blue%2F": [
     "9f942f30-2631-4403-9a1a-300f8faae267"
+  ],
+  "accounts/data/f47ac10b-58cc-4372-a567-0e02b2c3d479": {
+    "linkedLoginsCount": 1,
+    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "**uiPushSubscription**": {},
+    "**reciprocalWebhook**": {},
+    "**password**": {
+      "f8a9b1c2-d3e4-4f5a-6b7c-8d9e0f1a2b3c": {
+        "accountId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "email": "acme@acme.example",
+        "password": "$2b$10$lhqm/yiyPZfpc1SjXBCPneugEwn/LHDIPr9QRVIjvmJoJyAkyqV.G",
+        "verified": true,
+        "id": "f8a9b1c2-d3e4-4f5a-6b7c-8d9e0f1a2b3c"
+      }
+    },
+    "**clientCredentials**": {},
+    "**pod**": {
+      "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d": {
+        "baseUrl": "https://data/acme-rnd/",
+        "accountId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "id": "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+        "**owner**": {
+          "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f": {
+            "webId": "https://id/acme",
+            "visible": true,
+            "podId": "a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+            "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f"
+          }
+        }
+      },
+      "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e": {
+        "baseUrl": "https://data/acme-hr/",
+        "accountId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+        "**owner**": {
+          "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a": {
+            "webId": "https://id/acme",
+            "visible": true,
+            "podId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+            "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a"
+          }
+        }
+      }
+    },
+    "**webIdLink**": {
+      "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b": {
+        "webId": "https://id/acme",
+        "accountId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b"
+      }
+    }
+  },
+  "accounts/index/webIdLink/e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Facme": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/password/f8a9b1c2-d3e4-4f5a-6b7c-8d9e0f1a2b3c": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/password/email/acme%40acme.example": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/owner/c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/owner/d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/pod/a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Facme-rnd%2F": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/pod/b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Facme-hr%2F": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
   ]
 }

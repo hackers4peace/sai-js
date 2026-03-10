@@ -57,6 +57,19 @@ export async function discoverAuthorizationAgent(
   return getOneMatchingQuad(userDataset, ...authorizationAgentPattern)?.object.value
 }
 
+export async function discoverDelegationIssuanceEndpoint(
+  webId: string,
+  rdfFetch: RdfFetch
+): Promise<string | undefined> {
+  const userDataset: DatasetCore = await (await rdfFetch(webId)).dataset()
+  const delegationIssuanceEndpointPattern = [
+    DataFactory.namedNode(webId),
+    INTEROP.hasDelegationIssuanceEndpoint,
+    null,
+  ]
+  return getOneMatchingQuad(userDataset, ...delegationIssuanceEndpointPattern)?.object.value
+}
+
 export async function discoverAgentRegistration(
   authorizationAgentIri: string,
   fetch: WhatwgFetch

@@ -2,8 +2,6 @@ import { agentId, buildOidcSession } from '@elfpavlik/sai-components'
 import { getAgentRegistrationIri } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
-const baseUrl = process.env.CSS_BASE_URL
-
 const aliceId = 'https://id/alice'
 const bobId = 'https://id/bob'
 const aliceAgentId = agentId(aliceId)

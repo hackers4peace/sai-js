@@ -4,7 +4,7 @@ import {
   ImmutableDataGrant,
   dataGrantTemplate,
 } from '@janeirodigital/interop-data-model'
-import { getAcl } from '@janeirodigital/interop-utils'
+import { discoverDelegationIssuanceEndpoint, getAcl } from '@janeirodigital/interop-utils'
 import { buildSessionManager } from '../../builders/sessionManager.js'
 
 export interface FindAffectedAuthorizationsInput {
@@ -108,12 +108,41 @@ export async function createAcr(payload: {
   })
   return
 }
+
 export async function storeDataGrant(payload: StoreDataGrantInput): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.grantData.grantedBy)
+  const session = await manager.getSession(payload.grantData.dataOwner)
 
   const grant = session.factory.immutable.dataGrant(payload.grantIri, payload.grantData)
   return grant.put()
+}
+
+export async function requestDelegation(payload: { grantData: DataGrantData }): Promise<string> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.grantData.grantedBy)
+
+  const endpoint = await discoverDelegationIssuanceEndpoint(
+    payload.grantData.dataOwner,
+    session.fetch
+  )
+  const response = await session.fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(payload.grantData),
+  })
+  if (!response.ok) {
+    throw new Error(await response.json())
+  }
+  if (response.status !== 201) {
+    throw new Error(`expected 201 but received ${response.status}`)
+  }
+  const id = response.headers.get('location')
+  if (!id) {
+    throw new Error('response was missing location header')
+  }
+  return id
 }
 
 export interface StoreAccessGrantInput {

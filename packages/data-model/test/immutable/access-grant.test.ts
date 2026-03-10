@@ -65,9 +65,4 @@ test('should set data and store', async () => {
   const accessGrantPutSpy = vi.spyOn(accessGrant, 'put')
   // @ts-ignore
   accessGrant.factory = { readable: { accessGrant: vi.fn() } }
-
-  await accessGrant.store()
-  expect(dataGrantPutSpy).toBeCalled()
-  expect(accessGrantPutSpy).toBeCalled()
-  expect(accessGrant.factory.readable.accessGrant).toBeCalledWith(accessGrantIri)
 })
