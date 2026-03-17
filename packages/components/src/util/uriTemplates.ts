@@ -4,7 +4,7 @@ export function agentId(webId: string): string {
 }
 
 export function issuanceUrl(webId: string): string {
-  return `${process.env.CSS_BASE_URL}.sai/grants/${Buffer.from(webId).toString('base64url')}}`
+  return `${process.env.CSS_BASE_URL}.sai/grants/${Buffer.from(webId).toString('base64url')}`
 }
 
 export function invitationUrl(webId: string): string {

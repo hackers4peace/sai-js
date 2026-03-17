@@ -17,6 +17,7 @@
     "@janeirodigital/interop-utils": "1.0.0-rc.26"
   },
   "dependencies": {
+    "rdf-vocabulary": "^1.0.1",
     "s3mini": "^0.9.1"
   }
 }

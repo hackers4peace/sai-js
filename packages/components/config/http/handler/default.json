@@ -110,7 +110,8 @@
         "comment": "Handles request from another agent requesting grant delegation.",
         "@type": "GrantIssuanceHandler",
         "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
-        "sessionManager": { "@id": "urn:sai:default:SessionManager" }
+        "sessionManager": { "@id": "urn:sai:default:SessionManager" },
+        "sparqlEndpoint": { "@id": "urn:solid-server:default:variable:sparqlEndpoint" }
       }
     },
     {

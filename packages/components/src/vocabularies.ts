@@ -5,6 +5,7 @@ export const INTEROP = createVocabulary(
   'registeredAgent',
   'registeredShapeTree',
   'hasStorage',
+  'dataOwner',
   'grantee',
   'grantedBy',
   'hasStorage',
