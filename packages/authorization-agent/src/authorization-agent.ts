@@ -1,11 +1,11 @@
 import {
+  type AccessGrantData,
   AuthorizationAgentFactory,
   type CRUDApplicationRegistration,
   type CRUDRegistrySet,
   type CRUDSocialAgentInvitation,
   type CRUDSocialAgentRegistration,
   type DataGrant,
-  type ImmutableAccessGrant,
   type ReadableAccessAuthorization,
   type ReadableDataAuthorization,
   type ReadableDataInstance,
@@ -247,7 +247,7 @@ export class AuthorizationAgent {
     )
   }
 
-  public async generateAccessGrant(accessAuthorizationIri: string): Promise<ImmutableAccessGrant> {
+  public async generateAccessGrant(accessAuthorizationIri: string): Promise<AccessGrantData> {
     const accessAuthorization =
       await this.factory.readable.accessAuthorization(accessAuthorizationIri)
     const agentRegistration = await this.registrySet.hasAgentRegistry.findRegistration(

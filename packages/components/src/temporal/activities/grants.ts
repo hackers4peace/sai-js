@@ -1,7 +1,8 @@
 import {
   type AccessGrantData,
   type DataGrantData,
-  ImmutableDataGrant,
+  type FinalAccessGrantData,
+  type FinalDataGrantData,
   dataGrantTemplate,
 } from '@janeirodigital/interop-data-model'
 import { discoverDelegationIssuanceEndpoint, getAcl } from '@janeirodigital/interop-utils'
@@ -37,84 +38,47 @@ export interface CreateGrantsInput {
   authorizationId: string
 }
 
-export interface GenerateGrantsOutput {
-  accessGrantIri: string
-  accessGrantData: AccessGrantData
-  dataGrantsToStore: Array<{ iri: string; data: DataGrantData }>
-}
-
-export async function generateGrants(payload: CreateGrantsInput): Promise<GenerateGrantsOutput> {
+export async function generateGrants(payload: CreateGrantsInput): Promise<AccessGrantData> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId)
 
-  const accessGrant = await session.generateAccessGrant(payload.authorizationId)
-
-  // @ts-ignore - hasInheritingGrant contains class instances, map to plain objects for serialization
-  const dataGrantsToStore = accessGrant.dataGrants
-    .filter((grant): grant is ImmutableDataGrant => grant instanceof ImmutableDataGrant)
-    .map((grant) => ({
-      iri: grant.iri,
-      data: {
-        ...grant.data,
-        hasInheritingGrant: grant.data.hasInheritingGrant?.map((child) => ({ iri: child.iri })),
-      },
-    })) as any
-
-  return {
-    accessGrantIri: accessGrant.iri,
-    accessGrantData: {
-      ...accessGrant.data,
-      // @ts-ignore - dataGrants contains class instances, map to plain objects for serialization
-      dataGrants: accessGrant.dataGrants.map((grant) => ({ iri: grant.iri })),
-    },
-    dataGrantsToStore,
-  }
+  return session.generateAccessGrant(payload.authorizationId)
 }
 
-export interface StoreDataGrantInput {
-  grantIri: string
-  grantData: DataGrantData
-}
-
-export async function createAcr(payload: {
-  grantIri: string
-  grantData: DataGrantData
-}): Promise<void> {
+export async function storeDataGrant(payload: FinalDataGrantData): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.grantData.grantedBy)
-  const headResponse = await session.rawFetch(payload.grantIri, {
+  const session = await manager.getSession(payload.dataOwner)
+
+  const grant = session.factory.immutable.dataGrant(payload.id, payload)
+  return grant.put()
+}
+
+export async function createAcr(payload: FinalDataGrantData): Promise<void> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.grantedBy)
+  const headResponse = await session.rawFetch(payload.id, {
     method: 'HEAD',
   })
   const acrId = getAcl(headResponse.headers.get('link'))
-  // TODO: adjust for grants to other social agents
   const acr = dataGrantTemplate({
     id: acrId,
-    resource: payload.grantIri,
+    resource: payload.id,
     owner: {
       agent: session.webId,
       client: session.agentId,
     },
     peer: {
-      agent: payload.grantData.grantedBy,
-      client: payload.grantData.grantee,
+      agent: payload.grantedBy,
+      client: payload.grantee,
     },
   }).replaceAll('\n', '')
-  const putResponse = await session.rawFetch(acrId, {
+  await session.rawFetch(acrId, {
     method: 'PUT',
     body: acr,
     headers: {
       'content-type': 'text/turtle',
     },
   })
-  return
-}
-
-export async function storeDataGrant(payload: StoreDataGrantInput): Promise<void> {
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.grantData.dataOwner)
-
-  const grant = session.factory.immutable.dataGrant(payload.grantIri, payload.grantData)
-  return grant.put()
 }
 
 export async function requestDelegation(payload: { grantData: DataGrantData }): Promise<string> {
@@ -145,36 +109,17 @@ export async function requestDelegation(payload: { grantData: DataGrantData }): 
   return id
 }
 
-export interface StoreAccessGrantInput {
-  accessGrantIri: string
-  accessGrantData: AccessGrantData
-  dataGrantsToStore: Array<{ iri: string; data: DataGrantData }>
-}
-
 // TODO: check case when granted === false
-export async function storeAccessGrant(payload: StoreAccessGrantInput): Promise<void> {
+export async function storeAccessGrant(payload: FinalAccessGrantData): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.accessGrantData.grantedBy)
+  const session = await manager.getSession(payload.grantedBy)
 
-  const dataGrants = payload.dataGrantsToStore.map((grant) =>
-    session.factory.immutable.dataGrant(grant.iri, grant.data)
-  )
-
-  const accessGrant = session.factory.immutable.accessGrant(payload.accessGrantIri, {
-    ...payload.accessGrantData,
-    dataGrants,
-  })
+  const accessGrant = session.factory.immutable.accessGrant(payload.id, payload)
 
   return accessGrant.put()
 }
 
-export interface SetAccessGrantInput {
-  accessGrantIri: string
-  grantedBy: string
-  grantee: string
-}
-
-export async function setAccessGrant(payload: SetAccessGrantInput): Promise<void> {
+export async function setAccessGrant(payload: FinalAccessGrantData): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.grantedBy)
 
@@ -186,5 +131,5 @@ export async function setAccessGrant(payload: SetAccessGrantInput): Promise<void
     throw new Error('agent registration for the grantee does not exist')
   }
 
-  await agentRegistration.setAccessGrant(payload.accessGrantIri)
+  await agentRegistration.setAccessGrant(payload.id)
 }

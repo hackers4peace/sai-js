@@ -1,52 +1,44 @@
 import { INTEROP } from '@janeirodigital/interop-utils'
 import { Memoize } from 'typescript-memoize'
-import {
-  type AllFromRegistryDataGrant,
-  type DataGrant,
-  type ReadableDataAuthorization,
-  ReadableResource,
-  type SelectedFromRegistryDataGrant,
-} from '.'
+import { type ReadableDataAuthorization, ReadableResource } from '.'
 import type {
+  AccessGrantData,
   AuthorizationAgentFactory,
   CRUDAgentRegistration,
-  CRUDAgentRegistry,
-  CRUDDataRegistry,
   CRUDRegistrySet,
-  ImmutableAccessGrant,
-  ImmutableDataGrant,
+  FinalDataGrantData,
 } from '..'
 
 // reuse equivalent data grants
 // reuse all child grants if parent grant was reused
-function reuseDataGrants(
-  immutableDataGrants: ImmutableDataGrant[],
-  readableDataGrants: DataGrant[]
-): (ImmutableDataGrant | DataGrant)[] {
-  const finalGrants: (ImmutableDataGrant | DataGrant)[] = []
-  const parentGrants = immutableDataGrants.filter(
-    (grant) => grant.data.scopeOfGrant !== INTEROP.Inherited.value
-  )
-  for (const parentGrant of parentGrants) {
-    const priorGrant = readableDataGrants.find((readableGrant) =>
-      parentGrant.checkEquivalence(readableGrant)
-    ) as AllFromRegistryDataGrant | SelectedFromRegistryDataGrant
-    if (priorGrant) {
-      finalGrants.push(priorGrant)
-      if (priorGrant.hasInheritingGrant) {
-        finalGrants.push(...priorGrant.hasInheritingGrant)
-      }
-    } else {
-      finalGrants.push(parentGrant)
-      // push all children if any
-      if (parentGrant.data.hasInheritingGrant?.length) {
-        finalGrants.push(...parentGrant.data.hasInheritingGrant)
-      }
-    }
-  }
+// function reuseDataGrants(
+//   immutableDataGrants: ImmutableDataGrant[],
+//   readableDataGrants: DataGrant[]
+// ): (ImmutableDataGrant | DataGrant)[] {
+//   const finalGrants: (ImmutableDataGrant | DataGrant)[] = []
+//   const parentGrants = immutableDataGrants.filter(
+//     (grant) => grant.data.scopeOfGrant !== INTEROP.Inherited.value
+//   )
+//   for (const parentGrant of parentGrants) {
+//     const priorGrant = readableDataGrants.find((readableGrant) =>
+//       parentGrant.checkEquivalence(readableGrant)
+//     ) as AllFromRegistryDataGrant | SelectedFromRegistryDataGrant
+//     if (priorGrant) {
+//       finalGrants.push(priorGrant)
+//       if (priorGrant.hasInheritingGrant) {
+//         finalGrants.push(...priorGrant.hasInheritingGrant)
+//       }
+//     } else {
+//       finalGrants.push(parentGrant)
+//       // push all children if any
+//       if (parentGrant.data.hasInheritingGrant?.length) {
+//         finalGrants.push(...parentGrant.data.hasInheritingGrant)
+//       }
+//     }
+//   }
 
-  return finalGrants
-}
+//   return finalGrants
+// }
 export class ReadableAccessAuthorization extends ReadableResource {
   declare factory: AuthorizationAgentFactory
 
@@ -107,9 +99,9 @@ export class ReadableAccessAuthorization extends ReadableResource {
   public async generateAccessGrant(
     registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
-  ): Promise<ImmutableAccessGrant> {
-    const dataGrants: ImmutableDataGrant[] = []
-    let finalGrants: (ImmutableDataGrant | DataGrant)[]
+  ): Promise<AccessGrantData> {
+    const sourceGrants: FinalDataGrantData[] = []
+    const delegatedGrants: FinalDataGrantData[] = []
 
     if (this.granted) {
       const regularAuthorizations: ReadableDataAuthorization[] = []
@@ -119,28 +111,26 @@ export class ReadableAccessAuthorization extends ReadableResource {
         }
       }
       for (const dataAuthorization of regularAuthorizations) {
-        dataGrants.push(
-          ...(await dataAuthorization.generateDataGrants(registrySet, granteeRegistration))
-        )
+        const grants = await dataAuthorization.generateDataGrants(registrySet, granteeRegistration)
+        for (const grant of grants) {
+          if (grant.delegationOfGrant) {
+            delegatedGrants.push(grant as FinalDataGrantData)
+          } else {
+            sourceGrants.push(grant as FinalDataGrantData)
+          }
+        }
       }
-
-      // const priorAccessGrant = granteeRegistration.accessGrant
-      // if (priorAccessGrant) {
-      //   finalGrants = reuseDataGrants(dataGrants, priorAccessGrant.hasDataGrant)
-      // } else {
-      // TODO: re-enable reuse of existing data grants after equivalence check adjusted for temporal workflows
-      finalGrants = dataGrants
-      // }
     }
 
-    const accessGrantIri = granteeRegistration.iriForContained()
-    return this.factory.immutable.accessGrant(accessGrantIri, {
+    return {
+      id: granteeRegistration.iriForContained(),
       grantedBy: this.factory.webId,
       grantedWith: this.factory.agentId,
       grantee: this.grantee,
       hasAccessNeedGroup: this.hasAccessNeedGroup,
-      dataGrants: finalGrants,
+      sourceGrants,
+      delegatedGrants,
       granted: this.granted,
-    })
+    }
   }
 }

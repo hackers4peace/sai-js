@@ -6,20 +6,21 @@ const bobId = 'https://id/bob'
 const acmeId = 'https://id/acme'
 const testClient = 'https://data/test-client/public/id'
 
+const grantData = {
+  grantedBy: bobId,
+  dataOwner: acmeId,
+  grantee: testClient,
+  registeredShapeTree: SOLIDTREES.Project,
+  hasStorage: 'https://data/acme-rnd/',
+  hasDataRegistration: 'https://data/acme-rnd/reb39k/',
+  accessMode: [ACL.Read, ACL.Update],
+  scopeOfGrant: INTEROP.AllFromRegistry,
+}
+
 describe('DelegationIssuanceEndpoint', () => {
   describe('agent delegates to application', (): void => {
     test('happy path', async (): Promise<void> => {
       const session = await buildOidcSession(bobId)
-      const grantData = {
-        grantedBy: bobId,
-        dataOwner: acmeId,
-        grantee: testClient,
-        registeredShapeTree: SOLIDTREES.Project,
-        hasStorage: 'https://data/acme-rnd/',
-        hasDataRegistration: 'https://data/acme-rnd/reb39k/',
-        accessMode: [ACL.Read, ACL.Update],
-        scopeOfGrant: INTEROP.AllFromRegistry,
-      }
       const response = await session.authFetch(issuanceUrl(acmeId), {
         method: 'POST',
         body: JSON.stringify(grantData),
@@ -32,14 +33,12 @@ describe('DelegationIssuanceEndpoint', () => {
     })
     test('invalid grantedBy', async (): Promise<void> => {
       const session = await buildOidcSession(bobId)
-      const grantData = {
-        grantedBy: 'https://id/kim',
-        dataOwner: acmeId,
-        grantee: testClient,
-      }
       const response = await session.authFetch(issuanceUrl(acmeId), {
         method: 'POST',
-        body: JSON.stringify(grantData),
+        body: JSON.stringify({
+          ...grantData,
+          grantedBy: 'https://id/kim',
+        }),
       })
       expect(response.status).toBe(400)
     })

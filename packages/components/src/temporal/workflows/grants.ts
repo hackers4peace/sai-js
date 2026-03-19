@@ -1,4 +1,4 @@
-import type { DataGrantData, ImmutableDataGrant } from '@janeirodigital/interop-data-model'
+import type { FinalAccessGrantData, FinalDataGrantData } from '@janeirodigital/interop-data-model'
 import { proxyActivities, startChild } from '@temporalio/workflow'
 import type * as activities from '../activities/grants.js'
 
@@ -14,63 +14,40 @@ const {
   startToCloseTimeout: '1 minute',
 })
 
-async function storeGrantAndAcr(iri: string, data: DataGrantData) {
-  await storeDataGrant({
-    grantIri: iri,
-    grantData: data,
-  })
-  await createAcr({
-    grantIri: iri,
-    grantData: data,
-  })
+async function storeGrantAndAcr(grant: FinalDataGrantData) {
+  await storeDataGrant(grant)
+  await createAcr(grant)
 }
 
-export async function storeGrant(payload: {
-  iri: string
-  data: DataGrantData
-}): Promise<void> {
-  return storeGrantAndAcr(payload.iri, payload.data)
+export async function storeGrant(payload: FinalDataGrantData): Promise<void> {
+  return storeGrantAndAcr(payload)
 }
 
 export async function createGrantsForAuthorization(
   payload: activities.CreateGrantsInput
 ): Promise<void> {
-  // Generate and filter grants
-  const { accessGrantIri, accessGrantData, dataGrantsToStore } = await generateGrants(payload)
+  const accessGrantData = await generateGrants(payload)
 
-  // Store each NEW data grant
-  const sourceGrants = dataGrantsToStore.filter(
-    (grant) => grant.data.dataOwner === grant.data.grantedBy
-  )
-  const grantTasks = sourceGrants.map((grant) => storeGrantAndAcr(grant.iri, grant.data))
-  await Promise.all(grantTasks)
+  await Promise.all(accessGrantData.sourceGrants.map((grant) => storeGrantAndAcr(grant)))
 
-  // Request issuance of delegated grants
-  const delegatedGrants = dataGrantsToStore.filter(
-    (grant) => grant.data.dataOwner !== grant.data.grantedBy
+  const delegatedGrantIds = await Promise.all(
+    accessGrantData.delegatedGrants.map((grant) => requestDelegation({ grantData: grant }))
   )
-  // TODO:
-  const delegatedTasks = delegatedGrants.map((grant) =>
-    requestDelegation({ grantData: grant.data })
-  )
-  const delegatedGrantsIds = await Promise.all(delegatedTasks)
 
-  // Store AccessGrant
-  await storeAccessGrant({
-    accessGrantIri,
-    accessGrantData,
-    dataGrantsToStore: [
-      ...sourceGrants,
-      ...delegatedGrantsIds.map((id) => ({ iri: id, data: {} as DataGrantData })),
+  const finalAccessGrantData: FinalAccessGrantData = {
+    ...accessGrantData,
+    dataGrants: [
+      ...accessGrantData.sourceGrants,
+      ...accessGrantData.delegatedGrants.map((grant, i) => ({
+        ...grant,
+        id: delegatedGrantIds[i],
+      })),
     ],
-  })
+  }
 
-  // Link to grantee's registration
-  await setAccessGrant({
-    accessGrantIri,
-    grantedBy: accessGrantData.grantedBy,
-    grantee: accessGrantData.grantee,
-  })
+  await storeAccessGrant(finalAccessGrantData)
+
+  await setAccessGrant(finalAccessGrantData)
 }
 
 export async function updateDelegatedGrants(

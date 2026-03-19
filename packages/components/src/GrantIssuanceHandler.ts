@@ -1,4 +1,4 @@
-import type { DataGrantData } from '@janeirodigital/interop-data-model'
+import type { DataGrantData, FinalDataGrantData } from '@janeirodigital/interop-data-model'
 import {
   BadRequestHttpError,
   CreatedResponseDescription,
@@ -123,12 +123,7 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
     // TODO: we could use start but it could lead to race conditions
     await temporal.client.workflow.execute(storeGrant, {
       taskQueue: 'create-grants',
-      args: [
-        {
-          iri: grantId,
-          data: grant as unknown as DataGrantData,
-        },
-      ],
+      args: [{ ...grant, id: grantId } as FinalDataGrantData],
       workflowId: crypto.randomUUID(),
     })
     return new CreatedResponseDescription({ path: grantId })

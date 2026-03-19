@@ -1,30 +1,34 @@
 import { INTEROP, RDF, XSD } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { ImmutableResource } from '.'
-import type { AuthorizationAgentFactory, DataGrant, ImmutableDataGrant } from '..'
+import type { AuthorizationAgentFactory } from '..'
+import type { FinalDataGrantData } from './data-grant'
 
-type StringData = {
+type AccessGrantStringData = {
+  id: string
   grantedBy: string
   grantedWith: string
   grantee: string
   hasAccessNeedGroup?: string
-}
-
-export type AccessGrantData = StringData & {
-  dataGrants: (ImmutableDataGrant | DataGrant)[]
   granted: boolean
 }
 
+export type AccessGrantData = AccessGrantStringData & {
+  sourceGrants: FinalDataGrantData[]
+  delegatedGrants: FinalDataGrantData[]
+}
+
+export type FinalAccessGrantData = Omit<AccessGrantData, 'sourceGrants' | 'delegatedGrants'> & {
+  dataGrants: FinalDataGrantData[]
+}
+
 export class ImmutableAccessGrant extends ImmutableResource {
-  dataGrants: (ImmutableDataGrant | DataGrant)[]
+  declare data: FinalAccessGrantData
 
-  declare data: AccessGrantData
-
-  public constructor(iri: string, factory: AuthorizationAgentFactory, data: AccessGrantData) {
+  public constructor(iri: string, factory: AuthorizationAgentFactory, data: FinalAccessGrantData) {
     super(iri, factory, data)
-    this.dataGrants = data.dataGrants ?? []
     this.dataset.add(DataFactory.quad(this.node, RDF.type, INTEROP.AccessGrant))
-    const props: (keyof StringData)[] = [
+    const props: (keyof Omit<AccessGrantStringData, 'granted'>)[] = [
       'grantedBy',
       'grantedWith',
       'grantee',
@@ -37,9 +41,9 @@ export class ImmutableAccessGrant extends ImmutableResource {
         )
       }
     }
-    for (const dataGrant of this.dataGrants) {
+    for (const dataGrant of data.dataGrants) {
       this.dataset.add(
-        DataFactory.quad(this.node, INTEROP.hasDataGrant, DataFactory.namedNode(dataGrant.iri))
+        DataFactory.quad(this.node, INTEROP.hasDataGrant, DataFactory.namedNode(dataGrant.id))
       )
     }
     this.dataset.add(
