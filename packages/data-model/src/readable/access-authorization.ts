@@ -6,6 +6,7 @@ import type {
   AuthorizationAgentFactory,
   CRUDAgentRegistration,
   CRUDRegistrySet,
+  DataGrantData,
   FinalDataGrantData,
 } from '..'
 
@@ -101,7 +102,7 @@ export class ReadableAccessAuthorization extends ReadableResource {
     granteeRegistration: CRUDAgentRegistration
   ): Promise<AccessGrantData> {
     const sourceGrants: FinalDataGrantData[] = []
-    const delegatedGrants: FinalDataGrantData[] = []
+    const delegatedGrants: DataGrantData[] = []
 
     if (this.granted) {
       const regularAuthorizations: ReadableDataAuthorization[] = []
@@ -112,13 +113,8 @@ export class ReadableAccessAuthorization extends ReadableResource {
       }
       for (const dataAuthorization of regularAuthorizations) {
         const grants = await dataAuthorization.generateDataGrants(registrySet, granteeRegistration)
-        for (const grant of grants) {
-          if (grant.delegationOfGrant) {
-            delegatedGrants.push(grant as FinalDataGrantData)
-          } else {
-            sourceGrants.push(grant as FinalDataGrantData)
-          }
-        }
+        sourceGrants.push(...grants.source)
+        delegatedGrants.push(...grants.delegated)
       }
     }
 

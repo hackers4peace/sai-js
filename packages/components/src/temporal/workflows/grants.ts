@@ -19,8 +19,8 @@ async function storeGrantAndAcr(grant: FinalDataGrantData) {
   await createAcr(grant)
 }
 
-export async function storeGrant(payload: FinalDataGrantData): Promise<void> {
-  return storeGrantAndAcr(payload)
+export async function storeGrant(payload: FinalDataGrantData[]): Promise<void> {
+  await Promise.all(payload.map((grant) => storeGrantAndAcr(grant)))
 }
 
 export async function createGrantsForAuthorization(
@@ -31,18 +31,14 @@ export async function createGrantsForAuthorization(
   await Promise.all(accessGrantData.sourceGrants.map((grant) => storeGrantAndAcr(grant)))
 
   const delegatedGrantIds = await Promise.all(
+    // if grant has inheriting it delegation will return a flat array with all the ids
     accessGrantData.delegatedGrants.map((grant) => requestDelegation({ grantData: grant }))
   )
 
+  // TODO: use ids only for dataGrants at this point
   const finalAccessGrantData: FinalAccessGrantData = {
     ...accessGrantData,
-    dataGrants: [
-      ...accessGrantData.sourceGrants,
-      ...accessGrantData.delegatedGrants.map((grant, i) => ({
-        ...grant,
-        id: delegatedGrantIds[i],
-      })),
-    ],
+    dataGrants: [...accessGrantData.sourceGrants.map((g) => g.id), ...delegatedGrantIds.flat()],
   }
 
   await storeAccessGrant(finalAccessGrantData)

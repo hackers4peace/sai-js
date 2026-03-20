@@ -6,9 +6,15 @@ import type {
   CRUDAgentRegistration,
   CRUDRegistrySet,
   DataGrantData,
+  FinalDataGrantData,
   InheritableDataGrant,
   ReadableDataRegistration,
 } from '..'
+
+interface SourceAndDelegatedGrants {
+  source: FinalDataGrantData[]
+  delegated: DataGrantData[]
+}
 
 export class ReadableDataAuthorization extends ReadableResource {
   declare factory: AuthorizationAgentFactory
@@ -182,7 +188,7 @@ export class ReadableDataAuthorization extends ReadableResource {
     dataRegistrations: ReadableDataRegistration[],
     registrySet: CRUDRegistrySet,
     storageIri: string
-  ): DataGrantData[] {
+  ): FinalDataGrantData[] {
     return this.hasInheritingAuthorization
       .map((childAuthorization) => {
         const childGrantIri = registrySet.hasGrantRegistry.iriForContained()
@@ -193,7 +199,7 @@ export class ReadableDataAuthorization extends ReadableResource {
         if (!dataRegistration) {
           return null
         }
-        const childData: DataGrantData = {
+        const childData: FinalDataGrantData = {
           id: childGrantIri,
           grantee: childAuthorization.grantee,
           grantedBy: childAuthorization.grantedBy,
@@ -207,20 +213,20 @@ export class ReadableDataAuthorization extends ReadableResource {
         }
         return childData
       })
-      .filter(Boolean) as DataGrantData[]
+      .filter(Boolean)
   }
 
   private async generateSourceDataGrants(
     registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
-  ): Promise<DataGrantData[]> {
+  ): Promise<FinalDataGrantData[]> {
     if (this.scopeOfAuthorization === INTEROP.Inherited.value) {
       throw new Error(
         'this method should not be callend on data authorizations with Inherited scope'
       )
     }
 
-    const result: DataGrantData[] = []
+    const result: FinalDataGrantData[] = []
 
     for (const dataRegistry of registrySet.hasDataRegistry) {
       // FIXME handle each data registry independently
@@ -247,7 +253,7 @@ export class ReadableDataAuthorization extends ReadableResource {
       const regularGrantIri = registrySet.hasGrantRegistry.iriForContained()
 
       // create children if needed
-      const childGrantData: DataGrantData[] = this.generateChildSourceGrantData(
+      const childGrantData: FinalDataGrantData[] = this.generateChildSourceGrantData(
         regularGrantIri,
         dataRegistrations,
         registrySet,
@@ -257,7 +263,7 @@ export class ReadableDataAuthorization extends ReadableResource {
       let scopeOfGrant = INTEROP.AllFromRegistry.value
       if (this.scopeOfAuthorization === INTEROP.SelectedFromRegistry.value)
         scopeOfGrant = INTEROP.SelectedFromRegistry.value
-      const data: DataGrantData = {
+      const data: FinalDataGrantData = {
         id: regularGrantIri,
         grantee: this.grantee,
         grantedBy: this.grantedBy,
@@ -284,8 +290,11 @@ export class ReadableDataAuthorization extends ReadableResource {
   public async generateDataGrants(
     registrySet: CRUDRegistrySet,
     granteeRegistration: CRUDAgentRegistration
-  ): Promise<DataGrantData[]> {
-    const dataGrantData: DataGrantData[] = []
+  ): Promise<SourceAndDelegatedGrants> {
+    const dataGrantData: SourceAndDelegatedGrants = {
+      source: [],
+      delegated: [],
+    }
     /* Source grants are only created if Data Authorization is registred by the data owner.
      * This can only happen with scope:
      * - All - there will be no dataOwner set
@@ -294,7 +303,7 @@ export class ReadableDataAuthorization extends ReadableResource {
      * Otherwise only delegated data grants are created
      */
     if (!this.dataOwner || this.dataOwner === this.grantedBy) {
-      dataGrantData.push(...(await this.generateSourceDataGrants(registrySet, granteeRegistration)))
+      dataGrantData.source = await this.generateSourceDataGrants(registrySet, granteeRegistration)
     }
 
     // do not create delegated data grants if granted by data owner, source grants will be created instead
@@ -306,8 +315,9 @@ export class ReadableDataAuthorization extends ReadableResource {
      * Otherwise only source data grants are created
      */
     if (!this.dataOwner || this.dataOwner !== this.grantedBy) {
-      dataGrantData.push(
-        ...(await this.generateDelegatedDataGrants(registrySet, granteeRegistration))
+      dataGrantData.delegated = await this.generateDelegatedDataGrants(
+        registrySet,
+        granteeRegistration
       )
     }
 

@@ -1,8 +1,11 @@
 import type { DataGrantData, FinalDataGrantData } from '@janeirodigital/interop-data-model'
+import { discoverAuthorizationAgent, fetchWrapper } from '@janeirodigital/interop-utils'
 import {
+  APPLICATION_JSON,
   BadRequestHttpError,
-  CreatedResponseDescription,
+  BasicRepresentation,
   ForbiddenHttpError,
+  OkResponseDescription,
   OperationHttpHandler,
   arrayifyStream,
   readableToString,
@@ -33,8 +36,11 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
     request,
   }: OperationHttpHandlerInput): Promise<ResponseDescription> {
     const credentials = await this.credentialsExtractor.handleSafe(request)
-    // TODO: check clientId if authorization agent
-    if (!credentials.agent?.webId) {
+    if (!credentials.agent?.webId || !credentials.client?.clientId) {
+      throw new ForbiddenHttpError()
+    }
+    const uasId = await discoverAuthorizationAgent(credentials.agent.webId, fetchWrapper(fetch))
+    if (credentials.client.clientId !== uasId) {
       throw new ForbiddenHttpError()
     }
 
@@ -44,27 +50,39 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
     const ownerId = Buffer.from(encoded, 'base64url').toString('utf8')
     const sai = await this.sessionManager.getSession(ownerId)
 
-    let grant: DataGrantData
+    let topGrant: DataGrantData
     try {
-      grant = JSON.parse(await readableToString(operation.body.data))
+      topGrant = JSON.parse(await readableToString(operation.body.data))
     } catch (err) {
       throw new BadRequestHttpError(err.message)
     }
-    // TODO: validate payload
-    if (credentials.agent.webId !== grant.grantedBy) {
-      // TODO: change to UnprocessableEntityHttpError
-      throw new BadRequestHttpError('invalid grantedBy')
-    }
-    // find grant that can be delegated
-    // TODO: handle multiple grants for the same registration, especially with inheritance
-    const accessModes = grant.accessMode.map((m) => `<${m}>`).join(' ')
 
-    const requiredInstances = grant.hasDataInstance?.length
-      ? grant.hasDataInstance.map((i) => `<${i}>`).join(' ')
-      : ''
+    // TODO: support recursive inheritance
+    const inheritingGrants: FinalDataGrantData[] = [...(topGrant.hasInheritingGrant ?? [])].map(
+      (grant) => ({
+        ...grant,
+        id: sai.registrySet.hasGrantRegistry.iriForContained(),
+      })
+    )
 
-    const selectedScopeConstraint = requiredInstances
-      ? `
+    const fetcher = new SparqlEndpointFetcher()
+
+    for (const grant of [topGrant, ...inheritingGrants]) {
+      // TODO: validate payload
+      if (credentials.agent.webId !== grant.grantedBy) {
+        // TODO: change to UnprocessableEntityHttpError
+        throw new BadRequestHttpError('invalid grantedBy')
+      }
+      // find grant that can be delegated
+      // TODO: handle multiple grants for the same registration, especially with inheritance
+      const accessModes = grant.accessMode.map((m) => `<${m}>`).join(' ')
+
+      const requiredInstances = grant.hasDataInstance?.length
+        ? grant.hasDataInstance.map((i) => `<${i}>`).join(' ')
+        : ''
+
+      const selectedScopeConstraint = requiredInstances
+        ? `
             FILTER NOT EXISTS {
               VALUES ?required { ${requiredInstances} }
               FILTER NOT EXISTS {
@@ -72,11 +90,11 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
               }
             }
         `
-      : ''
+        : ''
 
-    const scopeBlock =
-      grant.scopeOfGrant === INTEROP.SelectedFromRegistry
-        ? `
+      const scopeBlock =
+        grant.scopeOfGrant === INTEROP.SelectedFromRegistry
+          ? `
           {
             ?s <${INTEROP.scopeOfGrant}> <${INTEROP.AllFromRegistry}> .
           }
@@ -86,11 +104,11 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
             ${selectedScopeConstraint}
           }
         `
-        : `
+          : `
           ?s <${INTEROP.scopeOfGrant}> <${grant.scopeOfGrant}> .
         `
 
-    const query = `
+      const query = `
     SELECT * WHERE {
       GRAPH ?g {
         ?s
@@ -107,25 +125,36 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
       }
     }
     `
-    const fetcher = new SparqlEndpointFetcher()
-    const bindingsStream = await fetcher.fetchBindings(this.sparqlEndpoint, query)
-    const queryResults = await arrayifyStream<IBindings>(bindingsStream)
-    if (!queryResults.length) {
-      // TODO: change to UnprocessableEntityHttpError
-      throw new BadRequestHttpError('no grant available for delegation')
+      const bindingsStream = await fetcher.fetchBindings(this.sparqlEndpoint, query)
+      const queryResults = await arrayifyStream<IBindings>(bindingsStream)
+      if (!queryResults.length) {
+        // TODO: change to UnprocessableEntityHttpError
+        throw new BadRequestHttpError('no grant available for delegation')
+      }
     }
+
     // biome-ignore lint/complexity/useLiteralKeys:
-    const upstreamGrantGraph = queryResults[0]?.['g']?.value
+    // const upstreamGrantGraph = queryResults[0]?.['g']?.value
 
     const grantId = sai.registrySet.hasGrantRegistry.iriForContained()
+    const finalGrant = {
+      ...topGrant,
+      id: grantId,
+      hasInheritingGrant: inheritingGrants.map((g) => ({ id: g.id })),
+    } as FinalDataGrantData
+
+    const allGrants = [finalGrant, ...inheritingGrants]
+
     const temporal = new Temporal()
     await temporal.init()
     // TODO: we could use start but it could lead to race conditions
     await temporal.client.workflow.execute(storeGrant, {
       taskQueue: 'create-grants',
-      args: [{ ...grant, id: grantId } as FinalDataGrantData],
+      args: [allGrants],
       workflowId: crypto.randomUUID(),
     })
-    return new CreatedResponseDescription({ path: grantId })
+    const doc = JSON.stringify(allGrants.map((g) => g.id))
+    const representation = new BasicRepresentation(doc, operation.target, APPLICATION_JSON)
+    return new OkResponseDescription(representation.metadata, representation.data)
   }
 }

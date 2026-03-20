@@ -2,7 +2,7 @@ import { INTEROP, RDF, XSD } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { ImmutableResource } from '.'
 import type { AuthorizationAgentFactory } from '..'
-import type { FinalDataGrantData } from './data-grant'
+import type { DataGrantData, FinalDataGrantData } from './data-grant'
 
 type AccessGrantStringData = {
   id: string
@@ -15,11 +15,11 @@ type AccessGrantStringData = {
 
 export type AccessGrantData = AccessGrantStringData & {
   sourceGrants: FinalDataGrantData[]
-  delegatedGrants: FinalDataGrantData[]
+  delegatedGrants: DataGrantData[]
 }
 
 export type FinalAccessGrantData = Omit<AccessGrantData, 'sourceGrants' | 'delegatedGrants'> & {
-  dataGrants: FinalDataGrantData[]
+  dataGrants: string[]
 }
 
 export class ImmutableAccessGrant extends ImmutableResource {
@@ -41,9 +41,9 @@ export class ImmutableAccessGrant extends ImmutableResource {
         )
       }
     }
-    for (const dataGrant of data.dataGrants) {
+    for (const grantId of data.dataGrants) {
       this.dataset.add(
-        DataFactory.quad(this.node, INTEROP.hasDataGrant, DataFactory.namedNode(dataGrant.id))
+        DataFactory.quad(this.node, INTEROP.hasDataGrant, DataFactory.namedNode(grantId))
       )
     }
     this.dataset.add(

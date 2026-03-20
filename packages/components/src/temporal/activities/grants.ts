@@ -81,7 +81,7 @@ export async function createAcr(payload: FinalDataGrantData): Promise<void> {
   })
 }
 
-export async function requestDelegation(payload: { grantData: DataGrantData }): Promise<string> {
+export async function requestDelegation(payload: { grantData: DataGrantData }): Promise<string[]> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.grantData.grantedBy)
 
@@ -99,14 +99,10 @@ export async function requestDelegation(payload: { grantData: DataGrantData }): 
   if (!response.ok) {
     throw new Error(await response.json())
   }
-  if (response.status !== 201) {
-    throw new Error(`expected 201 but received ${response.status}`)
+  if (response.status !== 200) {
+    throw new Error(`expected 200 but received ${response.status}`)
   }
-  const id = response.headers.get('location')
-  if (!id) {
-    throw new Error('response was missing location header')
-  }
-  return id
+  return response.json() as Promise<string[]>
 }
 
 // TODO: check case when granted === false

@@ -25,15 +25,16 @@ test('should set data and store', async () => {
     scopeOfGrant: INTEROP.AllFromRegistry.value,
   }
 
+  const accessGrantIri = 'https://auth.alice.example/5e8d3d6f-9e61-4e5c-acff-adee83b68ad1'
   const accessGrantData: FinalAccessGrantData = {
+    id: accessGrantIri,
     granted: true,
     grantedBy: webId,
     grantedWith: agentId,
     grantee: 'https://projectron.example/#app',
     hasAccessNeedGroup: 'https://projectron.example/#some-access-group',
-    dataGrants: [immutableDataGrant],
+    dataGrants: [immutableDataGrant.id],
   }
-  const accessGrantIri = 'https://auth.alice.example/5e8d3d6f-9e61-4e5c-acff-adee83b68ad1'
   const accessGrantQuads = [
     DataFactory.quad(
       DataFactory.namedNode(accessGrantIri),
