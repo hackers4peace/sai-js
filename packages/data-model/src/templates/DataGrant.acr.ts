@@ -4,9 +4,16 @@ interface DataGrantAcrData {
   resource: string
   owner: AgentAndClient
   peer: AgentAndClient
+  client?: AgentAndClient
 }
 
-export const dataGrantTemplate = ({ id, resource, owner, peer }: DataGrantAcrData): string => `
+export const dataGrantTemplate = ({
+  id,
+  resource,
+  owner,
+  peer,
+  client,
+}: DataGrantAcrData): string => `
   PREFIX acl: <http://www.w3.org/ns/auth/acl#>
   PREFIX acp: <http://www.w3.org/ns/solid/acp#>
   <${id}#grant>
@@ -41,5 +48,16 @@ export const dataGrantTemplate = ({ id, resource, owner, peer }: DataGrantAcrDat
         acp:agent <${peer.agent}>;
         acp:client <${peer.client}>
       ]
+      ${
+        client
+          ? `
+        ,[
+          a acp:Matcher;
+          acp:agent <${client.agent}>;
+          acp:client <${client.client}>
+        ]
+      `
+          : ''
+      }
     ].
 `

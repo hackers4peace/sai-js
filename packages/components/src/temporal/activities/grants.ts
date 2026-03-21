@@ -5,7 +5,12 @@ import {
   type FinalDataGrantData,
   dataGrantTemplate,
 } from '@janeirodigital/interop-data-model'
-import { discoverDelegationIssuanceEndpoint, getAcl } from '@janeirodigital/interop-utils'
+import {
+  discoverAuthorizationAgent,
+  discoverDelegationIssuanceEndpoint,
+  fetchWrapper,
+  getAcl,
+} from '@janeirodigital/interop-utils'
 import { buildSessionManager } from '../../builders/sessionManager.js'
 
 export interface FindAffectedAuthorizationsInput {
@@ -55,7 +60,29 @@ export async function storeDataGrant(payload: FinalDataGrantData): Promise<void>
 
 export async function createAcr(payload: FinalDataGrantData): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.grantedBy)
+  const session = await manager.getSession(payload.dataOwner)
+  // TODO: improve error handling
+  let uasId
+  try {
+    uasId = await discoverAuthorizationAgent(payload.grantee, fetchWrapper(fetch))
+  } catch {}
+  let peer
+  let client
+  if (uasId) {
+    peer = {
+      agent: payload.grantedBy,
+      client: payload.grantee,
+    }
+  } else {
+    peer = {
+      agent: payload.grantedBy,
+      client: await discoverAuthorizationAgent(payload.grantedBy, fetchWrapper(fetch)),
+    }
+    client = {
+      agent: payload.grantedBy,
+      client: payload.grantee,
+    }
+  }
   const headResponse = await session.rawFetch(payload.id, {
     method: 'HEAD',
   })
@@ -67,18 +94,19 @@ export async function createAcr(payload: FinalDataGrantData): Promise<void> {
       agent: session.webId,
       client: session.agentId,
     },
-    peer: {
-      agent: payload.grantedBy,
-      client: payload.grantee,
-    },
+    peer,
+    client,
   }).replaceAll('\n', '')
-  await session.rawFetch(acrId, {
+  const response = await session.rawFetch(acrId, {
     method: 'PUT',
     body: acr,
     headers: {
       'content-type': 'text/turtle',
     },
   })
+  if (!response.ok) {
+    throw new Error(`${response.status} - ${acrId}`)
+  }
 }
 
 export async function requestDelegation(payload: { grantData: DataGrantData }): Promise<string[]> {
