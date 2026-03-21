@@ -335,5 +335,86 @@
   ],
   "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Facme-hr%2F": [
     "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/data/d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a": {
+    "linkedLoginsCount": 1,
+    "id": "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a",
+    "**uiPushSubscription**": {},
+    "**reciprocalWebhook**": {},
+    "**password**": {
+      "e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b": {
+        "accountId": "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a",
+        "email": "yoyo@yoyodyne.example",
+        "password": "$2b$10$lhqm/yiyPZfpc1SjXBCPneugEwn/LHDIPr9QRVIjvmJoJyAkyqV.G",
+        "verified": true,
+        "id": "e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b"
+      }
+    },
+    "**clientCredentials**": {},
+    "**pod**": {
+      "f3a4b5c6-d7e8-4f9a-0b1c-2d3e4f5a6b7c": {
+        "baseUrl": "https://data/yoyo-eu/",
+        "accountId": "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a",
+        "id": "f3a4b5c6-d7e8-4f9a-0b1c-2d3e4f5a6b7c",
+        "**owner**": {
+          "b5c6d7e8-f9a0-4b1c-2d3e-4f5a6b7c8d9e": {
+            "webId": "https://id/yoyo",
+            "visible": true,
+            "podId": "f3a4b5c6-d7e8-4f9a-0b1c-2d3e4f5a6b7c",
+            "id": "b5c6d7e8-f9a0-4b1c-2d3e-4f5a6b7c8d9e"
+          }
+        }
+      },
+      "a4b5c6d7-e8f9-4a0b-1c2d-3e4f5a6b7c8d": {
+        "baseUrl": "https://data/yoyo-na/",
+        "accountId": "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a",
+        "id": "a4b5c6d7-e8f9-4a0b-1c2d-3e4f5a6b7c8d",
+        "**owner**": {
+          "c6d7e8f9-a0b1-4c2d-3e4f-5a6b7c8d9e0f": {
+            "webId": "https://id/yoyo",
+            "visible": true,
+            "podId": "a4b5c6d7-e8f9-4a0b-1c2d-3e4f5a6b7c8d",
+            "id": "c6d7e8f9-a0b1-4c2d-3e4f-5a6b7c8d9e0f"
+          }
+        }
+      }
+    },
+    "**webIdLink**": {
+      "d7e8f9a0-b1c2-4d3e-4f5a-6b7c8d9e0f1a": {
+        "webId": "https://id/yoyo",
+        "accountId": "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a",
+        "id": "d7e8f9a0-b1c2-4d3e-4f5a-6b7c8d9e0f1a"
+      }
+    }
+  },
+  "accounts/index/password/e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/password/email/yoyo%40yoyodyne.example": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/webIdLink/d7e8f9a0-b1c2-4d3e-4f5a-6b7c8d9e0f1a": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fyoyo": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/owner/b5c6d7e8-f9a0-4b1c-2d3e-4f5a6b7c8d9e": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/owner/c6d7e8f9-a0b1-4c2d-3e4f-5a6b7c8d9e0f": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/pod/f3a4b5c6-d7e8-4f9a-0b1c-2d3e4f5a6b7c": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/pod/a4b5c6d7-e8f9-4a0b-1c2d-3e4f5a6b7c8d": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Fyoyo-eu%2F": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
+  ],
+  "accounts/index/pod/baseUrl/https%3A%2F%2Fdata%2Fyoyo-na%2F": [
+    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
   ]
 }
