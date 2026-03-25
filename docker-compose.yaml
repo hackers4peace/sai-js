@@ -160,7 +160,15 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      <<: [*postgres-env, *vapid-env, *idp-env, *certs-env, *temporal-env]
+      <<:
+        [
+          *postgres-env,
+          *vapid-env,
+          *idp-env,
+          *certs-env,
+          *temporal-env,
+          *origin-env,
+        ]
       CSS_BASE_URL: https://auth.docker/
   ui:
     image: node:22-alpine
