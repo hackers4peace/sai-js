@@ -159,20 +159,31 @@ export class ReadableDataAuthorization extends ReadableResource {
           sourceGrant as InheritableDataGrant,
           registrySet
         )
+        const scope: string =
+          this.scopeOfAuthorization === INTEROP.SelectedFromRegistry.value ||
+          sourceGrant.scopeOfGrant.value === INTEROP.SelectedFromRegistry.value
+            ? INTEROP.SelectedFromRegistry.value
+            : INTEROP.AllFromRegistry.value
+        // TODO: handle case if upstream is selected and delegation tries all
         const data: DataGrantData = {
-          id: regularGrantIri,
           grantee: this.grantee,
           grantedBy: this.grantedBy,
           dataOwner: sourceGrant.dataOwner,
           registeredShapeTree: sourceGrant.registeredShapeTree,
           hasDataRegistration: sourceGrant.hasDataRegistration,
           hasStorage: sourceGrant.hasStorage,
-          scopeOfGrant: sourceGrant.scopeOfGrant.value,
+          scopeOfGrant: scope,
           delegationOfGrant: sourceGrant.iri,
           accessMode: this.accessMode.filter((mode) => sourceGrant.accessMode.includes(mode)),
         }
-        if (sourceGrant.scopeOfGrant.value === INTEROP.SelectedFromRegistry.value) {
-          data.hasDataInstance = [...(sourceGrant as SelectedFromRegistryDataGrant).hasDataInstance]
+        if (data.scopeOfGrant === INTEROP.SelectedFromRegistry.value) {
+          if (this.hasDataInstance.length) {
+            data.hasDataInstance = [...this.hasDataInstance]
+          } else {
+            data.hasDataInstance = [
+              ...(sourceGrant as SelectedFromRegistryDataGrant).hasDataInstance,
+            ]
+          }
         }
         if (childGrantData.length) {
           data.hasInheritingGrant = childGrantData
