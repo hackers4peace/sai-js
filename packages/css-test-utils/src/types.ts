@@ -3,7 +3,7 @@ export type Account = {
   email: string
   shortName: string
   password: 'password'
-  registrySet?: string
+  registrySet: string
   auth: string
   data: { [key: string]: string }
 }

@@ -153,6 +153,7 @@
       "@type": "SessionManager",
       "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" },
       "jwkGenerator": { "@id": "urn:solid-server:default:JwkGenerator" },
+      "regOrigin": { "@id": "urn:sai:default:variable:regOrigin" },
       "expiration": 60
     }
   ]

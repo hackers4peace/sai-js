@@ -40,7 +40,7 @@ export class AccountService {
     const dataRegistry = `https://${handle}.${this.dataOrigin}/`
     const registrySet = `https://${this.regOrigin}/${handle}/`
     const trigDataset = `
-      ${webIdTemplate({ id: webId, document: docId, issuer: this.issuer, uas, registry: registrySet, issuance: issuanceUrl(webId) })}
+      ${webIdTemplate({ id: webId, document: docId, issuer: this.issuer, uas, issuance: issuanceUrl(webId) })}
       ${dataRegistryTemplate({ id: dataRegistry })}
       ${registrySetTemplate({ id: registrySet, webId, uas, dataRegistry })}
     `

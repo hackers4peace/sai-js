@@ -203,7 +203,6 @@ export class AuthorizationAgent {
 
   private async bootstrap(): Promise<void> {
     this.webIdProfile = await this.factory.readable.webIdProfile(this.webId)
-    if (!this.registrySetId) this.registrySetId = this.webIdProfile.hasRegistrySet
     if (this.registrySetId) {
       this.registrySet = await this.factory.crud.registrySet(this.registrySetId)
     }
@@ -212,9 +211,9 @@ export class AuthorizationAgent {
   public static async build(
     webId: string,
     agentId: string,
-    dependencies: AuthorizationAgentDependencies,
+    registrySetId: string,
+    dependencies: AuthorizationAgentDependencies
     // TODO: reorder argumets
-    registrySetId?: string
   ): Promise<AuthorizationAgent> {
     const instance = new AuthorizationAgent(webId, agentId, dependencies, registrySetId)
     await instance.bootstrap()

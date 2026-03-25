@@ -159,10 +159,10 @@ async function buildSession(account: Account): Promise<AuthorizationAgent> {
   return await AuthorizationAgent.build(
     account.webId,
     `https://auth.example/${account.shortName}`,
+    account.registrySet,
     {
       fetch: stu.authFetch,
       randomUUID: cuid,
-    },
-    account.registrySet
+    }
   )
 }

@@ -5,25 +5,16 @@ interface WebIdData {
   document: string
   issuer: string
   uas: string
-  registry: string
   issuance: string
 }
 
-export const webIdTemplate = ({
-  id,
-  document,
-  issuer,
-  uas,
-  registry,
-  issuance,
-}: WebIdData): string => `
+export const webIdTemplate = ({ id, document, issuer, uas, issuance }: WebIdData): string => `
   PREFIX solid: <http://www.w3.org/ns/solid/terms#>
   PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 
   GRAPH <${document}> {
     <${id}>
         solid:oidcIssuer <${issuer}>;
-        interop:hasRegistrySet <${registry}>;
         interop:hasDelegationIssuanceEndpoint <${issuance}>;
         interop:hasAuthorizationAgent <${uas}> .
   }

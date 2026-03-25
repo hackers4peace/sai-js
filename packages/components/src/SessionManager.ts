@@ -2,12 +2,13 @@ import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import type { JwkGenerator } from '@solid/community-server'
 import { generateKeyPair } from 'jose'
 import { SelfIssuedSession } from './SelfIssuedSession.js'
-import { agentId } from './util/uriTemplates.js'
+import { agentId, registryId } from './util/uriTemplates.js'
 
 export class SessionManager {
   public constructor(
     private readonly baseUrl: string,
     private readonly jwkGenerator: JwkGenerator,
+    private regOrigin: string,
     private readonly expiration: number
   ) {}
 
@@ -28,7 +29,8 @@ export class SessionManager {
     })
     await oidc.login()
 
-    return AuthorizationAgent.build(webid, agentId(webid), {
+    //TODO: get registryId as argument
+    return AuthorizationAgent.build(webid, agentId(webid), registryId(webid), {
       fetch: oidc.authFetch.bind(oidc),
       randomUUID: crypto.randomUUID.bind(crypto),
     })

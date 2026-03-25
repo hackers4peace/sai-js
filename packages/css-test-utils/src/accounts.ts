@@ -60,6 +60,7 @@ export const solid: Account = {
   email: 'admin@solid.example',
   shortName: 'solid',
   password,
+  registrySet: 'TODO',
   auth: `${host}/solid/`,
   data: {
     solid: `${host}/solid/`,

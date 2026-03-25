@@ -64,11 +64,11 @@ global.buildSession = async function buildSession(account: Account): Promise<Aut
   return await AuthorizationAgent.build(
     account.webId,
     `https://auth.example/${account.shortName}`,
+    account.registrySet,
     {
       fetch: stu.authFetch,
       randomUUID: global.cuid,
-    },
-    account.registrySet
+    }
   )
 }
 

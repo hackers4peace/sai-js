@@ -22,10 +22,11 @@ import {
 
 const webId = 'https://alice.example/#id'
 const agentId = 'https://alice.jarvis.example/#agent'
+const registryId = 'https://auth.alice.example/13e60d32-77a6-4239-864d-cfe2c90807c8'
 
 describe.skip('authorization agent', () => {
   test('should build webIdProfile', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -34,7 +35,7 @@ describe.skip('authorization agent', () => {
   })
 
   test('should build registrySet', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -44,7 +45,7 @@ describe.skip('authorization agent', () => {
   })
 
   test('have access to all the access authorizations', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -57,7 +58,7 @@ describe.skip('authorization agent', () => {
   })
 
   test('have access to all the application registrations', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -70,7 +71,7 @@ describe.skip('authorization agent', () => {
   })
 
   test('should provide shortcut to find application registratons', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -82,7 +83,7 @@ describe.skip('authorization agent', () => {
   })
 
   test('have access to all the social agent registrations', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -95,7 +96,7 @@ describe.skip('authorization agent', () => {
   })
 
   test('should provide shortcut to find social agent registratons', async () => {
-    const agent = await AuthorizationAgent.build(webId, agentId, {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
     })
@@ -146,7 +147,10 @@ describe.skip('authorization agent', () => {
 
     beforeEach(async () => {
       const statefulFetch = createStatefulFetch()
-      agent = await AuthorizationAgent.build(webId, agentId, { fetch: statefulFetch, randomUUID })
+      agent = await AuthorizationAgent.build(webId, agentId, registryId, {
+        fetch: statefulFetch,
+        randomUUID,
+      })
     })
 
     test('should filter out data authorizations where grantee is the same as owner', async () => {
@@ -351,7 +355,7 @@ describe.skip('authorization agent', () => {
       const statefulFetch = createStatefulFetch()
       const accessAuthorizationIri =
         'https://auth.alice.example/eac2c39c-c8b3-4880-8b9f-a3e12f7f6372'
-      const agent = await AuthorizationAgent.build(webId, agentId, {
+      const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
         fetch: statefulFetch,
         randomUUID,
       })
@@ -366,7 +370,7 @@ describe.skip('authorization agent', () => {
     test('should throw if agent registartion for the grantee does not exist', async () => {
       const accessAuthorizationIri =
         'https://auth.alice.example/0d12477a-a5ce-4b59-ab48-8be505ccd64c'
-      const agent = await AuthorizationAgent.build(webId, agentId, {
+      const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
         fetch: statelessFetch,
         randomUUID,
       })
@@ -394,7 +398,10 @@ describe.skip('authorization agent', () => {
 
     beforeEach(async () => {
       const statefulFetch = createStatefulFetch()
-      agent = await AuthorizationAgent.build(webId, agentId, { fetch: statefulFetch, randomUUID })
+      agent = await AuthorizationAgent.build(webId, agentId, registryId, {
+        fetch: statefulFetch,
+        randomUUID,
+      })
       agent.factory.readable.dataInstance = vi.fn(async () => dataInstance)
     })
 
@@ -520,7 +527,7 @@ describe.skip('authorization agent', () => {
     } as unknown as CRUDDataRegistry
 
     test('should share data instance', async () => {
-      const agent = await AuthorizationAgent.build(webId, agentId, {
+      const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
         fetch: statelessFetch,
         randomUUID,
       })
@@ -537,7 +544,7 @@ describe.skip('authorization agent', () => {
   describe('shareDataInstance', () => {
     // TODO: test with multiple agents and multiple child shape trees
     test('should share data instance', async () => {
-      const agent = await AuthorizationAgent.build(webId, agentId, {
+      const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
         fetch: statelessFetch,
         randomUUID,
       })

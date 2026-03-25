@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   cfg = config.services.sai.containers;
   sai-id = pkgs.callPackage ./packages/sai-id.nix { };
@@ -13,7 +18,10 @@ let
       "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld"
       "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
     ];
-    import = [ "sai:config/auth.json" "css:config/http/server-factory/http.json" ];
+    import = [
+      "sai:config/auth.json"
+      "css:config/http/server-factory/http.json"
+    ];
     "@graph" = [
       {
         comment = "The updated OIDC configuration.";
@@ -34,8 +42,15 @@ let
             };
             clockTolerance = 120;
             cookies = {
-              long = { signed = true; maxAge = 86400000; };
-              short = { signed = true; domain = cfg.auth.cookieDomain; path = "/.account/"; };
+              long = {
+                signed = true;
+                maxAge = 86400000;
+              };
+              short = {
+                signed = true;
+                domain = cfg.auth.cookieDomain;
+                path = "/.account/";
+              };
             };
             enabledJWA = {
               dPoPSigningAlgValues = [
@@ -53,16 +68,37 @@ let
               ];
             };
             features = {
-              claimsParameter = { enabled = true; };
-              clientCredentials = { enabled = true; };
-              devInteractions = { enabled = false; };
-              dPoP = { enabled = true; };
-              introspection = { enabled = true; };
-              registration = { enabled = true; };
-              revocation = { enabled = true; };
-              userinfo = { enabled = false; };
+              claimsParameter = {
+                enabled = true;
+              };
+              clientCredentials = {
+                enabled = true;
+              };
+              devInteractions = {
+                enabled = false;
+              };
+              dPoP = {
+                enabled = true;
+              };
+              introspection = {
+                enabled = true;
+              };
+              registration = {
+                enabled = true;
+              };
+              revocation = {
+                enabled = true;
+              };
+              userinfo = {
+                enabled = false;
+              };
             };
-            scopes = [ "openid" "profile" "offline_access" "webid" ];
+            scopes = [
+              "openid"
+              "profile"
+              "offline_access"
+              "webid"
+            ];
             subjectTypes = [ "public" ];
             ttl = {
               AccessToken = 3600;
@@ -87,12 +123,18 @@ let
     oxigraph = {
       image = "docker.io/oxigraph/oxigraph:latest";
       autoStart = true;
-      cmd = ["serve" "--location" "/data" "--bind" "0.0.0.0:7878"];
+      cmd = [
+        "serve"
+        "--location"
+        "/data"
+        "--bind"
+        "0.0.0.0:7878"
+      ];
     };
     sparql = {
       image = "quay.io/hackers4peace/sai-oxigraph:${cfg.sparql.tag}";
       autoStart = true;
-      ports = ["7878:80"];
+      ports = [ "7878:80" ];
       environment = {
         NGINX_RESOLVER = cfg.sparql.resolver;
       };
@@ -100,7 +142,7 @@ let
     id = {
       image = "quay.io/hackers4peace/sai-id:${cfg.id.tag}";
       autoStart = true;
-      ports = ["3000:3000"];
+      ports = [ "3000:3000" ];
       environment = {
         ID_ORIGIN = cfg.id.idOrigin;
         DOC_ORIGIN = cfg.id.docOrigin;
@@ -189,10 +231,10 @@ let
       cmd = [
         "-c"
         ''
-        until nc -z temporal 7233; do
-          sleep 2
-        done
-        sh /etc/temporal/create-namespace.sh
+          until nc -z temporal 7233; do
+            sleep 2
+          done
+          sh /etc/temporal/create-namespace.sh
         ''
       ];
 
@@ -221,7 +263,7 @@ let
     auth = {
       image = "quay.io/hackers4peace/sai-css:${cfg.auth.tag}";
       autoStart = true;
-      ports = ["4800:4800"];
+      ports = [ "4800:4800" ];
       environment = {
         CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
@@ -250,6 +292,8 @@ let
       autoStart = true;
       environment = {
         CSS_BASE_URL = cfg.auth.baseUrl;
+        CSS_ID_ORIGIN = cfg.auth.idOrigin;
+        CSS_REG_ORIGIN = cfg.auth.regOrigin;
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
         TEMPORAL_ADDRESS = "temporal:7233";
         CSS_VAPID_PUBLIC_KEY = cfg.auth.vapidPublicKey;
@@ -263,7 +307,7 @@ let
     registry = {
       image = "quay.io/hackers4peace/sai-css:${cfg.registry.tag}";
       autoStart = true;
-      ports = ["4600:4600"];
+      ports = [ "4600:4600" ];
       environment = {
         CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
@@ -280,7 +324,7 @@ let
     data = {
       image = "quay.io/hackers4peace/sai-css:${cfg.data.tag}";
       autoStart = true;
-      ports = ["4700:4700"];
+      ports = [ "4700:4700" ];
       environment = {
         CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
@@ -297,8 +341,13 @@ let
     };
   };
 
-  containerNames = lib.filter (name: !lib.elem name ["temporal-admin-tools" "temporal-create-namespace"])
-    (builtins.attrNames containers);
+  containerNames = lib.filter (
+    name:
+    !lib.elem name [
+      "temporal-admin-tools"
+      "temporal-create-namespace"
+    ]
+  ) (builtins.attrNames containers);
 in
 {
   options.services.sai.containers = {
@@ -446,26 +495,30 @@ in
       backend = "podman";
       inherit containers;
     };
-    systemd.services = lib.listToAttrs (map (name: {
-      name = "podman-${name}";
-      value = {
-        serviceConfig = {
-          Restart = lib.mkDefault "always";
-          RestartSec = lib.mkDefault 20;
-          StartLimitBurst = lib.mkDefault 4;
+    systemd.services =
+      lib.listToAttrs (
+        map (name: {
+          name = "podman-${name}";
+          value = {
+            serviceConfig = {
+              Restart = lib.mkDefault "always";
+              RestartSec = lib.mkDefault 20;
+              StartLimitBurst = lib.mkDefault 4;
+            };
+          };
+        }) containerNames
+      )
+      // {
+        "podman-temporal-admin-tools" = {
+          serviceConfig = {
+            Restart = lib.mkForce "no";
+          };
+        };
+        "podman-temporal-create-namespace" = {
+          serviceConfig = {
+            Restart = lib.mkForce "no";
+          };
         };
       };
-    }) containerNames) // {
-      "podman-temporal-admin-tools" = {
-        serviceConfig = {
-          Restart = lib.mkForce "no";
-        };
-      };
-      "podman-temporal-create-namespace" = {
-        serviceConfig = {
-          Restart = lib.mkForce "no";
-        };
-      };
-    };
   };
 }

@@ -36,11 +36,12 @@ import { storage } from './oidc-storage';
 
 const webId = 'https://alice.example/#id';
 const agentId = 'https://authz.alice.example/';
+const registryId = 'https://reg.example/alice';
 
 // we assume that webId was used as sessionId the when session was created
 const session = await getSessionFromStorage(webId, storage);
 
-const agent = AuthorizationAgent.build(webId, clientId, {
+const agent = AuthorizationAgent.build(webId, clientId, registryId, {
   fetch: oidcSession.fetch,
   randomUUID
 });

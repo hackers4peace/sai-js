@@ -55,14 +55,14 @@ describe('DelegationIssuanceEndpoint', () => {
       })
       expect(response.status).toBe(400)
     })
-  })
-  test('wrong client', async (): Promise<void> => {
-    const clientId = 'https://data/test-client/public/id'
-    const session = await buildOidcSession(bobId, clientId)
-    const response = await session.authFetch(issuanceUrl(acmeId), {
-      method: 'POST',
-      body: JSON.stringify(projectsGrantData),
+    test('wrong client', async (): Promise<void> => {
+      const clientId = 'https://data/test-client/public/id'
+      const session = await buildOidcSession(bobId, clientId)
+      const response = await session.authFetch(issuanceUrl(acmeId), {
+        method: 'POST',
+        body: JSON.stringify(projectsGrantData),
+      })
+      expect(response.status).toBe(403)
     })
-    expect(response.status).toBe(403)
   })
 })

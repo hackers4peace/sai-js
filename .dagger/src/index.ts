@@ -11,6 +11,10 @@ import {
 } from '@dagger.io/dagger'
 
 const CSS_BASE_URL = 'https://auth/'
+const CSS_ID_ORIGIN = 'id'
+const CSS_DOC_ORIGIN = 'id'
+const CSS_DATA_ORIGIN = 'data'
+const CSS_REG_ORIGIN = 'registry'
 const CSS_VAPID_PUBLIC_KEY =
   'BNUaG9vwp-WE_cX-3dNLebyczW_RivE8wHECIvZIUMUZ3co6P79neE3hueJJtFcg5ezTZ25T1ITciujz-mlAcnY'
 const CSS_VAPID_PRIVATE_KEY = '8d8mM59L2VptBg5hX_2dHnQ7T5VpeUsftbaQ6PfuhGA'
@@ -145,6 +149,8 @@ export class SaiJs {
       .from('node:24-slim')
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
+      .withEnvVariable('CSS_ID_ORIGIN', CSS_ID_ORIGIN)
+      .withEnvVariable('CSS_REG_ORIGIN', CSS_REG_ORIGIN)
       .withEnvVariable('CSS_VAPID_PUBLIC_KEY', CSS_VAPID_PUBLIC_KEY)
       .withEnvVariable('CSS_VAPID_PRIVATE_KEY', CSS_VAPID_PRIVATE_KEY)
       .withEnvVariable('CSS_PUSH_SENDER', CSS_PUSH_SENDER)
@@ -206,10 +212,10 @@ export class SaiJs {
       .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withEnvVariable('CSS_SPARQL_ENDPOINT', CSS_SPARQL_ENDPOINT)
-      .withEnvVariable('CSS_ID_ORIGIN', 'id')
-      .withEnvVariable('CSS_DOC_ORIGIN', 'id')
-      .withEnvVariable('CSS_DATA_ORIGIN', 'data')
-      .withEnvVariable('CSS_REG_ORIGIN', 'reg')
+      .withEnvVariable('CSS_ID_ORIGIN', CSS_ID_ORIGIN)
+      .withEnvVariable('CSS_DOC_ORIGIN', CSS_DOC_ORIGIN)
+      .withEnvVariable('CSS_DATA_ORIGIN', CSS_DATA_ORIGIN)
+      .withEnvVariable('CSS_REG_ORIGIN', CSS_REG_ORIGIN)
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('temporal', this.temporalService())
       .withServiceBinding('id', this.idService())
@@ -302,6 +308,8 @@ export class SaiJs {
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
+      .withEnvVariable('CSS_ID_ORIGIN', CSS_ID_ORIGIN)
+      .withEnvVariable('CSS_REG_ORIGIN', CSS_REG_ORIGIN)
       .withEnvVariable('CSS_ENCODED_PRIVATE_JWK', CSS_ENCODED_PRIVATE_JWK)
       .withServiceBinding('auth', this.authService())
       .withServiceBinding('registry', this.registryService())

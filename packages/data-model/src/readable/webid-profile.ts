@@ -3,10 +3,6 @@ import type { InteropFactory } from '..'
 import { ReadableResource } from './resource'
 
 export class ReadableWebIdProfile extends ReadableResource {
-  get hasRegistrySet(): string | undefined {
-    return this.getObject(INTEROP.hasRegistrySet)?.value
-  }
-
   get label(): string | undefined {
     return this.getObject(RDFS.label)?.value
   }

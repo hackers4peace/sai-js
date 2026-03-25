@@ -6,7 +6,7 @@ import { agentId } from '../util/uriTemplates.js'
 
 export function buildSessionManager(): SessionManager {
   const jwkGenerator = new EnvJwkGenerator(process.env.CSS_ENCODED_PRIVATE_JWK)
-  return new SessionManager(process.env.CSS_BASE_URL, jwkGenerator, 60)
+  return new SessionManager(process.env.CSS_BASE_URL, jwkGenerator, process.env.CSS_REG_ORIGIN, 60)
 }
 
 export async function buildOidcSession(
