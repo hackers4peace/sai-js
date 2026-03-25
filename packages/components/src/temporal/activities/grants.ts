@@ -113,6 +113,7 @@ export async function requestDelegation(payload: { grantData: DataGrantData }): 
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.grantData.grantedBy)
 
+  // TODO: do discovery in previous workflow step and pass endpoint in activity payload
   const endpoint = await discoverDelegationIssuanceEndpoint(
     payload.grantData.dataOwner,
     session.fetch

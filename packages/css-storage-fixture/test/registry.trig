@@ -3519,7 +3519,6 @@ GRAPH <https://id/acme> {
   <https://id/acme>
       rdfs:label "ACME";
       solid:oidcIssuer <https://auth/>;
-      interop:hasDelegationIssuanceEndpoint <https://auth/.sai/grants/aHR0cHM6Ly9pZC9hY21l>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l> .
 }
 
@@ -3527,7 +3526,6 @@ GRAPH <https://id/alice> {
   <https://id/alice>
       rdfs:label "Alice";
       solid:oidcIssuer <https://auth/>;
-      interop:hasDelegationIssuanceEndpoint <https://auth/.sai/grants/aHR0cHM6Ly9pZC9hbGljZQ>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ> .
 }
 
@@ -3535,7 +3533,6 @@ GRAPH <https://id/bob> {
   <https://id/bob>
       rdfs:label "Bob";
       solid:oidcIssuer <https://auth/>;
-      interop:hasDelegationIssuanceEndpoint <https://auth/.sai/grants/aHR0cHM6Ly9pZC9ib2I>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I> .
 }
 
@@ -3543,7 +3540,6 @@ GRAPH <https://id/kim> {
   <https://id/kim>
       rdfs:label "Kim";
       solid:oidcIssuer <https://auth/>;
-      interop:hasDelegationIssuanceEndpoint <https://auth/.sai/grants/aHR0cHM6Ly9pZC9raW0>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0> .
 }
 
@@ -3551,7 +3547,6 @@ GRAPH <https://id/yoyo> {
   <https://id/yoyo>
       rdfs:label "Yoyo";
       solid:oidcIssuer <https://auth/>;
-      interop:hasDelegationIssuanceEndpoint <https://auth/.sai/grants/aHR0cHM6Ly9pZC95b3lv>;
       interop:hasAuthorizationAgent <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv> .
 }
 

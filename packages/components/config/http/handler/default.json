@@ -78,7 +78,8 @@
           "@type": "AgentIdHandler",
           "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
           "sessionManager": { "@id": "urn:sai:default:SessionManager" },
-          "authorizationEndpoint": { "@id": "urn:sai:default:AuthorizationEndpointRoute" }
+          "authorizationEndpoint": { "@id": "urn:sai:default:AuthorizationEndpointRoute" },
+          "delegationEndpoint": { "@id": "urn:sai:default:DelegationEndpointRoute" }
         }
       }
     },
@@ -99,11 +100,22 @@
       }
     },
     {
+      "comment": "Endpoint that issuess delegated grants.",
+      "@id": "urn:sai:default:DelegationEndpointRoute",
+      "@type": "RelativePathInteractionRoute",
+      "base": {
+        "@type": "AbsolutePathInteractionRoute",
+        "path": { "@id": "urn:solid-server:default:variable:baseUrl" }
+      },
+      "relativePath": "/.sai/grants",
+      "ensureSlash": false
+    },
+    {
       "comment": "Handles issuance of grants.",
       "@id": "urn:sai:default:GrantIssuanceRouter",
       "@type": "OperationRouterHandler",
       "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" },
-      "allowedPathNames": ["^/.sai/grants/.*"],
+      "allowedPathNames": ["^/.sai/grants"],
       "allowedMethods": ["POST"],
       "handler": {
         "@id": "urn:sai:default:GrantIssuanceHandler",

@@ -60,14 +60,21 @@ export async function discoverAuthorizationAgent(
 export async function discoverDelegationIssuanceEndpoint(
   webId: string,
   rdfFetch: RdfFetch
-): Promise<string | undefined> {
-  const userDataset: DatasetCore = await (await rdfFetch(webId)).dataset()
+): Promise<string> {
+  const uasId = await discoverAuthorizationAgent(webId, rdfFetch)
+  const authzAgentDocumentResponse = await fetch(uasId, {
+    headers: { Accept: 'application/ld+json' },
+  })
+  const doc = await parseJsonld(
+    await authzAgentDocumentResponse.text(),
+    authzAgentDocumentResponse.url
+  )
   const delegationIssuanceEndpointPattern = [
-    DataFactory.namedNode(webId),
+    DataFactory.namedNode(uasId),
     INTEROP.hasDelegationIssuanceEndpoint,
     null,
   ]
-  return getOneMatchingQuad(userDataset, ...delegationIssuanceEndpointPattern)?.object.value
+  return getOneMatchingQuad(doc, ...delegationIssuanceEndpointPattern)?.object.value
 }
 
 export async function discoverAgentRegistration(

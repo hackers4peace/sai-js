@@ -39,16 +39,12 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
     if (!credentials.agent?.webId || !credentials.client?.clientId) {
       throw new ForbiddenHttpError()
     }
+    // TODO: check if WebID served by this authz agent
+
     const uasId = await discoverAuthorizationAgent(credentials.agent.webId, fetchWrapper(fetch))
     if (credentials.client.clientId !== uasId) {
       throw new ForbiddenHttpError()
     }
-
-    // TODO: extract and reuse this routing logic
-    const regex = /[^/]+$/
-    const encoded = operation.target.path.match(regex)[0]
-    const ownerId = Buffer.from(encoded, 'base64url').toString('utf8')
-    const sai = await this.sessionManager.getSession(ownerId)
 
     let topGrant: DataGrantData
     try {
@@ -56,6 +52,8 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
     } catch (err) {
       throw new BadRequestHttpError(err.message)
     }
+
+    const sai = await this.sessionManager.getSession(topGrant.dataOwner)
 
     // TODO: support recursive inheritance
     const inheritingGrants: FinalDataGrantData[] = [...(topGrant.hasInheritingGrant ?? [])].map(

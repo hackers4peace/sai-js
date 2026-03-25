@@ -15,6 +15,7 @@ describe('AgentIdHandler', () => {
     expect(response.status).toBe(200)
     expect(doc.client_id).toBe(aliceAgentId)
     expect(doc['interop:hasAuthorizationRedirectEndpoint']).toBe('https://ui.auth/authorize')
+    expect(doc['interop:hasDelegationIssuanceEndpoint']).toBe('https://auth/.sai/grants')
   })
   for (const method of ['HEAD', 'GET']) {
     describe('responds with social agent registry in headers', (): void => {
