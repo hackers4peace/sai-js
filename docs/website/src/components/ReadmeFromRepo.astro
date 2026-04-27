@@ -1,0 +1,8 @@
+---
+import { marked } from "marked";
+import readmeSource from "../../../../README.md?raw";
+
+const html = marked.parse(readmeSource, { gfm: true, breaks: false });
+---
+
+<article class="prose readme-md" set:html={html} />

@@ -28,7 +28,7 @@
     "check": "biome check . --write"
   },
   "packageManager": "npm@11.3.0",
-  "workspaces": ["packages/*", "test"],
+  "workspaces": ["packages/*", "test", "docs/website"],
   "lint-staged": {
     "*.{ts,js,vue}": "npm run check"
   },

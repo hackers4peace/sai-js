@@ -1,0 +1,61 @@
+# Publishes docs/website to GitHub Pages when `main` is updated.
+# Requires: Settings → Pages → Build and deployment → Source: GitHub Actions
+name: Docs site → GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Astro docs site
+        working-directory: docs/website
+        env:
+          # Custom domain (e.g. sai.js.org) is served at the URL root; set repo variables:
+          #   PAGES_PUBLIC_URL = https://sai.js.org
+          #   PAGES_BASE_PATH = /   (must be a single / for "root" — not /sai-js/)
+          # Default: GitHub project Pages at https://<org>.github.io/<repo>/
+          ASTRO_SITE: ${{ vars.PAGES_PUBLIC_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          ASTRO_BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/website/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

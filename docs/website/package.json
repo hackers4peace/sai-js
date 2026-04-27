@@ -1,0 +1,22 @@
+{
+  "name": "@janeirodigital/sai-js-docs-website",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "codegen:likec4": "likec4 codegen webcomponent .. -o public/likec4-webcomponent.js",
+    "predev": "npm run codegen:likec4",
+    "dev": "astro dev",
+    "prebuild": "npm run codegen:likec4",
+    "build": "astro build",
+    "preview": "astro preview",
+    "clean": "rm -rf .astro dist node_modules/.vite"
+  },
+  "devDependencies": {
+    "likec4": "^1.42.1"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "marked": "^15.0.0"
+  }
+}

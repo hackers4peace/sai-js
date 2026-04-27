@@ -1,0 +1,135 @@
+---
+import "../styles/global.css";
+import ReadmeFromRepo from "../components/ReadmeFromRepo.astro";
+import { PLAYLIST_VIDEOS } from "../data/playlist";
+
+const assetBase = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>
+      (function () {
+        var k = "sai-js-docs-theme";
+        var stored = null;
+        try {
+          stored = localStorage.getItem(k);
+        } catch (_) {}
+        var prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        var t =
+          stored === "light" || stored === "dark" ? stored : prefersLight ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="generator" content={Astro.generator} />
+    <title>SAI-JS — Architecture & media</title>
+    <script src={`${assetBase}likec4-webcomponent.js`}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header__text">
+        <h1>SAI-JS architecture</h1>
+        <p class="lede">Single page: documentation, C4 landscape, and videos.</p>
+      </div>
+      <button
+        type="button"
+        class="theme-toggle"
+        id="theme-toggle"
+        hidden
+        aria-pressed="false"
+      >
+        <span class="theme-toggle__icon" data-theme-icon aria-hidden="true"></span>
+        <span data-theme-label>Theme</span>
+      </button>
+    </header>
+
+    <main id="content">
+      <section class="section" aria-labelledby="section-doc">
+        <h2 id="section-doc" class="section-title">1. Documentation</h2>
+        <ReadmeFromRepo />
+      </section>
+
+      <section class="section" aria-labelledby="section-c4">
+        <h2 id="section-c4" class="section-title">2. C4 landscape</h2>
+        <p class="section-hint">
+          Interactive view from <code>docs/architecture.c4</code> (view <code>index</code>).
+        </p>
+        <div class="diagram-surface">
+          <likec4-view view-id="index" />
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="section-videos">
+        <h2 id="section-videos" class="section-title">3. Videos</h2>
+        <p class="section-hint">
+          Edit <code>src/data/playlist.ts</code> to set video IDs and titles.
+        </p>
+        <ul class="video-grid" role="list">
+          {PLAYLIST_VIDEOS.map((v) => (
+            <li class="video-item">
+              <p class="video-title">{v.title}</p>
+              <div class="video-embed">
+                <iframe
+                  title={v.title}
+                  src={`https://www.youtube-nocookie.com/embed/${v.id}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                  loading="lazy"
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+    <script is:inline>
+      (function () {
+        var k = "sai-js-docs-theme";
+        var btn = document.getElementById("theme-toggle");
+        var label = btn && btn.querySelector("[data-theme-label]");
+        var icon = btn && btn.querySelector("[data-theme-icon]");
+        if (!btn || !label) return;
+        function current() {
+          return document.documentElement.getAttribute("data-theme") || "dark";
+        }
+        function isDark() {
+          return current() === "dark";
+        }
+        function setTheme(next) {
+          document.documentElement.setAttribute("data-theme", next);
+          try {
+            localStorage.setItem(k, next);
+          } catch (_) {}
+          btn.setAttribute("aria-pressed", isDark() ? "true" : "false");
+          if (isDark()) {
+            label.textContent = "Light mode";
+            if (icon) icon.textContent = "☼";
+            btn.setAttribute("aria-label", "Switch to light mode");
+          } else {
+            label.textContent = "Dark mode";
+            if (icon) icon.textContent = "☽";
+            btn.setAttribute("aria-label", "Switch to dark mode");
+          }
+        }
+        btn.removeAttribute("hidden");
+        setTheme(current());
+        btn.addEventListener("click", function () {
+          setTheme(isDark() ? "light" : "dark");
+        });
+        try {
+          window
+            .matchMedia("(prefers-color-scheme: light)")
+            .addEventListener("change", function (e) {
+              if (localStorage.getItem(k)) return;
+              setTheme(e.matches ? "light" : "dark");
+            });
+        } catch (_) {}
+      })();
+    </script>
+  </body>
+</html>
