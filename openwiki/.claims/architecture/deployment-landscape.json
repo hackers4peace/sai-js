@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a536d5639d92fb846bdd65a30a659572adb3b7f1caf1882de0d5ec994d68c89b",
+  "pageVersion": "sha256:c00e3a23b6cd5c1f336cb8a25bb837b2fe97413547010ebf532128fc24bafb1c",
   "claims": [
     {
       "id": "claim_39d5e1b3e8f54ba3a7092311e5f2b49f",
@@ -81,10 +81,56 @@
           "version": "repo-lines-v1:sha256:cd2426167d591bbedd5a6108917c1ae7cec5682aa0abe31e2aa70f9e952aff6c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwNmU0MmM1MWI2MzE3NjJmZDZkZGNiZDY5NzkxMzgwYzBkOGVmYTNlOWY1MmM5OTk1ZWI4NjAzZjA4MGY3OTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5MWFkMzNhNzdkYTA2NGMxZDUxMWY0ZDdhYjFhZWU2NjhlMDM2MzkzMjU2MDZhODhiNGMyYjU3MzBiM2VlZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_76ac2fa2167948fbbd426cfcae4e8443",
+      "statement": "The production NixOS/Podman configuration declares an oxigraph container and a sai-oxigraph sparql facade, and passes CSS_SPARQL_ENDPOINT=http://sparql/sparql to the CSS servers.",
+      "evidence": [
+        {
+          "resource": "repo://nix/podman.nix#L123-L149",
+          "version": "repo-lines-v1:sha256:6110e2aba7ce8bea50ea8fed2bc0ee2be4b290afeaea245988470b74f1309b5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzNWM1ZjY0NjJkMTJiOGIwZjdmMWNhOTNmY2EyNWMzMGIwNjE3Mzk3ZDkyNzM5YjI4NzdhMjVkNjJjNDM3ODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZWNkZWZhODkwNzdiMWRiMDQ3NDVkZjc3ZDc1ZjVlZGQyNWFlMDQ2ZDU1ZmRiY2VjMDQwY2E2NDRiY2VmMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkZmRhZTczMzg1MTFhYjlkOTE0NWEwZjc2MWYxNTk5OWViNmM4YzhiMDY1Y2UwNjgxNDNlZjlkZTQ2Nzc2NGIifQ"
+        },
+        {
+          "resource": "repo://nix/podman.nix#L268-L329",
+          "version": "repo-lines-v1:sha256:1d5fc590315d0598c4019d3bf8146c852023bad6590f9f15e5b68e3850aa6b34:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhNzcxMjc5MzhmNmExMzlhMjc1ODE5YmJkYTE4M2NiYzAxYWZjODllYmU1YmUzMjVkZjUwN2UyMDhhYzQ5ZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyM2YxMGIzZWE0ZjM0NDNkNmQ0YjFhYzI2NzRiZjAyZmVhNGM5OWZmNTc5MjA4Y2IxM2MwMmFiMTIyZTQ1MDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4901c3c031e64cf694b5269536651492",
+      "statement": "The dev/test Docker Compose stack runs a Fuseki service with an admin API and a Garage service, and gives the worker the Garage admin endpoint/token plus the bucket-less S3 endpoint, so storage provisioning is per-pod rather than a shared endpoint.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yaml#L185-L190",
+          "version": "repo-lines-v1:sha256:5440349e097b9feca87256bf1c29b658fd0546bf2f9d16e1da0daa5273dd8ccd:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDM5NmMwNmM2MjczOTJmNzk3MTk2YzExYjk5MTJmMmU2OTdmMTk1YTAzOWMwNTBhODljZDE4YWQ2MTMwNDgzNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkxOGNiM2JmMTE0ODBiYjkzNjgxY2Q0MWU0NTZhMzNjMzk5MjhiOWY4YjgwMWExYzU1NTg4MTdiZGRhZjRmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNiOTc3MzRjMTU0NTU1ZWExYjRlZjA5ODY1M2E0Njk1ZTEyMDRmNmI4NWQ4YmZlNjI5YzU2MmQ4Y2I1MWIzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQxMzBjYjljODczN2M2NTliNDgwYmNkZDI1MmMxNzM3YTMzMjYwZWMzNWVlMGZjYWQ4MzVjZTgwNGEzZWQ1YyJ9"
+        },
+        {
+          "resource": "repo://docker-compose.yaml#L383-L396",
+          "version": "repo-lines-v1:sha256:f3eba9a52354fb1eed866c547f648b31a21bf4f0670e325a2cd2366ec5a14bc0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiOWI5ZTQ4NWFkMTExNTFjNjQxZWY5OTg5ZDVmMDIwYTI3Y2UzNTQwMTc1ZjE0OTQxYzY0ZTFjYTM1ZDE2NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMTZlZDIzOWEzNjUxYjUwNzljMGU0ZTdmMDc4NDRlYTMyOWM4NzYyOGJmOWZjYzQ2MzY3NzMzZjVlMWU5M2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkNzQwNmM4MWQwM2Q3YjcyZWUxYzMxYmIwYTFlOTQyYTllOTI2YmFjNTE5YWYwODBhOTI5ZTNmNTBlMDI1MWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5MDU5MGU1NDhkZDA4Mzg5Y2E3ZGU3NTgwODc0ZjNjYmQ1NzVkNjdjNWJlNzRiZjM4YjMyMjkyMjhjNzkyM2IifQ"
+        },
+        {
+          "resource": "repo://docker-compose.yaml#L443-L456",
+          "version": "repo-lines-v1:sha256:5d2f905f4f1734f9649ab114457bde6c66ce0d6be9295215ebf202a9cff3d9e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MGFlZDI3YzkzYWMzMjY4ZDFlYzk1ZTEyNTQ4YzQwYzI0NDlhZDRkZDE3NDJjYTk0YWY5OTE3YzJiYWVmMmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxM2Y0ZDk2NjFlOWQyYzNlMWEyODllNTgzMjI5OWJlYTE0Y2RiNjRiZjg4NjYxZGY3MTdiMTJmYTAyZDAxMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwNjgwYmVhM2YwZjI1MjRmMWVjZWVlODg1MjA1NjY0NzI3NjM2ZTBiNjhiNWNmNmQxZDQxYWViMDgxMTJjMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlZmZkNmE5ZDBiMzE1NWQyNmFmYzFhOTQxZmQ1YTE0YzM3NDA2NzBkN2ZiOTc3MWIyYzA0MGNkMGExMGI1Y2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_33733346481647e6949b8255d71a694f",
+      "statement": "The docs/architecture.c4 model declares one shared Quadstore container labeled oxigraph and draws edges from Registry, Data, and WebID to it.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture.c4#L209-L211",
+          "version": "repo-lines-v1:sha256:dd3480b7204f071d615fa40773a5f5127d967e1ef281ed459ffb206abe844356:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWZhYjRiZTQxMzQ0MjQ4MDFjZTBkOWVhOWQxYzY0YWExMmFjNDM4ZjA0YzlhMDA5ZGY3ZGRmYmNhY2RkZTE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY2NTk4ZmIwYTUxNTVmMTcwYTMyZjEzMmRjNDc5NDg0MGU2YmI3ZTU2NzdhZGM2NzRiZDExYjAzMTk3YjdkOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODA0ZWE2NjM0ZWMxMzQ1OGRiZTRhNDE2ZTYxNjk5OTkyYmJkNjE2MTJkOTIyYTU2NjJjNmFkYTRlMDMwYzEyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWY3MTYyNjA0MmNmMGJjYjY5OWEzMWNlNTdlODk0ZmMxODkwZDk0Yzc0NjY1MDBlNDgxMDM2OTgzMjc3YzhkZCJ9"
+        },
+        {
+          "resource": "repo://docs/architecture.c4#L33-L38",
+          "version": "repo-lines-v1:sha256:04c5b664bf1ddc913cf02f426c9872576aa3ba2572a51780c97ea95f940cab18:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJmNGQwMTY1ZmE0NWUxYWUwNWRkYjA3MzVlODRmZTBlMTRjYWM3NmFhNTQ4MDc4NmQ0YTEzMTYwNmUwYzhkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWI2MmY2MGQ4NTkwYTU3OWNmNDZmOGQ2NzM3OGM0YzU3MmI5NjJjZWNjZGI5MGM3YTVmN2I0MmI5NjA3ODJhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGIwMDhlY2RlZjkxODMyOWMxMmYyYmE2NGViYWVhNjA4ZDVjMjVlNWFmNDRiYjcyODFlNWNjMDY1ODQxNjk0OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTVmMTU1NDg4MTNmNjNjZjcyYmRkMjcwMWQ2YTM3MGQwYjkyN2Q5YTAxMzk4MTAxM2MzOGZiMWNhYmY3NmMwNSJ9"
+        }
+      ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:41:59.486Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

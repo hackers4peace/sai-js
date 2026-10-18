@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:228d369b1303db10013052031e30732e261e65d66b8c823de695cbe0b8916da9",
+  "pageVersion": "sha256:cb028d6f05e524d78f329980f7491c6c57a8bd0abc4b20bc1e825c07e12abd00",
   "claims": [
     {
       "id": "claim_6ad365bb567b4686bdb7422b4b2103d5",
@@ -47,7 +47,7 @@
       "statement": "Node processes start OpenTelemetry through packages/components/src/tracing/preload.cjs and bootstrap.ts, exporting OTLP/HTTP to Tempo, with SAI_OTLP_ENDPOINT taking precedence over OTEL_EXPORTER_OTLP_ENDPOINT.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/tracing/bootstrap.ts#L19-L30",
+          "resource": "repo://packages/components/src/tracing/bootstrap.ts#L20-L31",
           "version": "repo-lines-v1:sha256:dfe46d53b5aed37750eab494dabd2be6139ffa6eb0db65da5d7249a072c26a9a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3ZGI0YWQ0M2EwOGIzMTdlNTBiOWJhYzczZjNhMzQ1OTYyMWRhMGFhYmVkZTQyMzE5MmY4NGNkZmIxOWI0YzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNDExMDk1YTVkNTI5ZWM4ZDE1NTVkYzg2ZmZmNTcyMDU0OGVlNDZjMTliMjAyNjgwZmE2YWE1ZjM2NDU4NzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZkZTQ1YmJlZTQyNTZiOGNmZTcwOWY2MGE3MWU3NTM4NDY5YWJkNzQ3YTU4NTQ0MGU4MDM1NDM5OTllNzdkOTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ3MTQ1YWMxYWU0NzEyOWUwN2Q4YjUzMTZhNTUzZWMzODk3YTY1ZDg5MmEwYTljMTJmMDA2MmU2OGI0OWFiNmMifQ"
         }
       ]
@@ -67,7 +67,7 @@
       "statement": "The OpenTelemetry hard-off escape hatch is OTEL_SDK_DISABLED=true or OTEL_TRACES_EXPORTER=none, which makes initNodeTracing return undefined.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/tracing/bootstrap.ts#L21-L23",
+          "resource": "repo://packages/components/src/tracing/bootstrap.ts#L22-L24",
           "version": "repo-lines-v1:sha256:0cf0bdd6e00e25a5a8d17fbf17223d3452bb51802e08b5757435c3ec9af35338:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRjOWQyYTdlOWM5NmE1MTE3ZDY5YWQwMmY4MjExZWUzMDdiMjQ5ZDE5OWVjNjI2ZWE3ZWY1NTU2YmExZGE1NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzZmNGYwMDk4YTE5OGZkMGNiYTYzYTE0ZGY3YzhhMTdhOWZhOGZjODhjZjRhMGY4NzA2N2E1ZWE4NzkyMzQ1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzU3OTVlZDhkYTY5NGQ1NTNiMWZmZTM5NmQ3YTFiNTUyNWRkZDk2N2YzMWQzYjI1MjIyNzk5Nzg1ZTYyMjUzZSJ9"
         }
       ]
@@ -77,14 +77,60 @@
       "statement": "Header capture is opt-in via OTEL_CAPTURE_HEADERS=true and attaches the authorization, cookie, content-type, accept, if-none-match, and link headers as span attributes.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/tracing/bootstrap.ts#L56-L65",
+          "resource": "repo://packages/components/src/tracing/bootstrap.ts#L57-L66",
           "version": "repo-lines-v1:sha256:8ccb120cc970e348bde4541c9c073dd5244e3bea9aab87e0ff7fb639143c0560:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5MzJiOTM5NWYzZTE0NjEyMjI5ZTYxMDE1NjMwMmVkOTdjYjI5YTNkMmNmODlkNjIzODFmOGExOGMzYjRhYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4Nzk0ZDU0MzFjMmZmMTViOTFiMTE0YmEwOTE3ZjdlNDA4YzZlMzk0ZGU1ZmRjMjZlOGQwMDAwNDBlNzllYzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2ZGIwODhhNDQwZDk4ZTU3NDU0ZWQ1ZDMwZThkMGE3NTg0OGFiZjE4YjdlMTlkNzBlZTRkYzMwZmU0NjFlYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3ZGVjODc1ZGU2NmU3YWM3OGJiZGNhOTMwNjkzZjUyYmYwMmIwYTkwODJiOWU0NWQyNTMxODZjYjQyNjE1MzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dc59a5ae86c546dc8408c8b3784cdb5d",
+      "statement": "The Nix image definitions for the CSS, worker, and id services pin pkgs.nodejs_26, matching the repository's Node 26 requirement.",
+      "evidence": [
+        {
+          "resource": "repo://nix/images/sai-css.nix#L16-L16",
+          "version": "repo-lines-v1:sha256:a6b8b25a8348636cbbfe9699b57a16d9a477f6a6f4914174968c764a4eb4a801:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiOGIyNWE4MzQ4NjM2Y2JiZmU5Njk5YjU3YTE2ZDlhNDc3ZjZhNmY0OTE0MTc0OTY4Yzc2NGE0ZWI0YTgwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiOGIyNWE4MzQ4NjM2Y2JiZmU5Njk5YjU3YTE2ZDlhNDc3ZjZhNmY0OTE0MTc0OTY4Yzc2NGE0ZWI0YTgwMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmEwNDZkODBjY2IzNzA4ODRmNmU4MDc0YjM0OGE2YjhiMjA5NGYyZjQxZThlNzA0MDM1Y2ZiODIzZTI2YWI1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2MwODIyNzU1M2FiMjdkODViOTFiODYwNjM4MmYyZjExMzJiN2U4NGM2MzgxZjZhOTkyN2JkMWZmOTUyMDBhMyJ9"
+        },
+        {
+          "resource": "repo://nix/images/sai-id.nix#L16-L16",
+          "version": "repo-lines-v1:sha256:a6b8b25a8348636cbbfe9699b57a16d9a477f6a6f4914174968c764a4eb4a801:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiOGIyNWE4MzQ4NjM2Y2JiZmU5Njk5YjU3YTE2ZDlhNDc3ZjZhNmY0OTE0MTc0OTY4Yzc2NGE0ZWI0YTgwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiOGIyNWE4MzQ4NjM2Y2JiZmU5Njk5YjU3YTE2ZDlhNDc3ZjZhNmY0OTE0MTc0OTY4Yzc2NGE0ZWI0YTgwMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmEwNDZkODBjY2IzNzA4ODRmNmU4MDc0YjM0OGE2YjhiMjA5NGYyZjQxZThlNzA0MDM1Y2ZiODIzZTI2YWI1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGQ3MzJjOWRmZjVmNDExMWQ1ZWIwNzMxM2JhZGNhYTQyMjIyZGE4YjQ3MGIyNDJjMDljMzllY2VhMTgyOTgwNiJ9"
+        },
+        {
+          "resource": "repo://nix/images/sai-worker.nix#L16-L16",
+          "version": "repo-lines-v1:sha256:a6b8b25a8348636cbbfe9699b57a16d9a477f6a6f4914174968c764a4eb4a801:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiOGIyNWE4MzQ4NjM2Y2JiZmU5Njk5YjU3YTE2ZDlhNDc3ZjZhNmY0OTE0MTc0OTY4Yzc2NGE0ZWI0YTgwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiOGIyNWE4MzQ4NjM2Y2JiZmU5Njk5YjU3YTE2ZDlhNDc3ZjZhNmY0OTE0MTc0OTY4Yzc2NGE0ZWI0YTgwMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmEwNDZkODBjY2IzNzA4ODRmNmU4MDc0YjM0OGE2YjhiMjA5NGYyZjQxZThlNzA0MDM1Y2ZiODIzZTI2YWI1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGJhYjliYjhmZDk1NmIxMzllMjMyZWZkMTEzODE4YmEyODUzZWUyMmJmNzc2NDkwOWI2ZTBjMjNhYjY1ZDBlNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_117ca27fae954422aaa2719b9d9b5dd2",
+      "statement": "The production Podman fleet still runs a shared Oxigraph behind the sai-oxigraph sparql facade and gives the services CSS_SPARQL_ENDPOINT=http://sparql/sparql, so the per-pod Fuseki and per-data-pod Garage bucket migration is dev/test-only in this revision.",
+      "evidence": [
+        {
+          "resource": "repo://nix/podman.nix#L123-L149",
+          "version": "repo-lines-v1:sha256:6110e2aba7ce8bea50ea8fed2bc0ee2be4b290afeaea245988470b74f1309b5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzNWM1ZjY0NjJkMTJiOGIwZjdmMWNhOTNmY2EyNWMzMGIwNjE3Mzk3ZDkyNzM5YjI4NzdhMjVkNjJjNDM3ODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZWNkZWZhODkwNzdiMWRiMDQ3NDVkZjc3ZDc1ZjVlZGQyNWFlMDQ2ZDU1ZmRiY2VjMDQwY2E2NDRiY2VmMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkZmRhZTczMzg1MTFhYjlkOTE0NWEwZjc2MWYxNTk5OWViNmM4YzhiMDY1Y2UwNjgxNDNlZjlkZTQ2Nzc2NGIifQ"
+        },
+        {
+          "resource": "repo://nix/podman.nix#L268-L329",
+          "version": "repo-lines-v1:sha256:1d5fc590315d0598c4019d3bf8146c852023bad6590f9f15e5b68e3850aa6b34:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhNzcxMjc5MzhmNmExMzlhMjc1ODE5YmJkYTE4M2NiYzAxYWZjODllYmU1YmUzMjVkZjUwN2UyMDhhYzQ5ZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyM2YxMGIzZWE0ZjM0NDNkNmQ0YjFhYzI2NzRiZjAyZmVhNGM5OWZmNTc5MjA4Y2IxM2MwMmFiMTIyZTQ1MDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fa52e7656df3492cac949191cfbb74c5",
+      "statement": "The production Podman id container is still given CSS_SPARQL_ENDPOINT, while the current services/id server reads CSS_ID_SPARQL_ENDPOINT, so the Nix deployment has not been updated for the Fuseki id dataset.",
+      "evidence": [
+        {
+          "resource": "repo://nix/podman.nix#L142-L150",
+          "version": "repo-lines-v1:sha256:fe21bdb389b0bcab579619a2d0a3341e57623cf6155a2e084e2a7529d89bfaf9:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGE2ZTUyMmEwZTg0ZDgwMTI2ZWJkODM4MWNlOTkzNjViZDNhOTRiYmE3NzM3OTQxYmU5YWI0NDMxMjQxNjU2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmUzM2RjNzMxZTdkMDdiMWYwYzA1Y2ZlYmQ3ZTE5MjIwMjNlNjA3N2JjMGFlN2JhMzAxNDhmNTA4MzNhMjVhOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjlkMmFkYTc2MWJlNjIzMTZiYTc0ZmZmNjUwNzg4NDFjNzkxYzRmMWE4ZTU5OTM5NTg0ZTI4Yjg2YzgzM2Q1NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjllZjdkYjM0ZWE0NjgzNmNjYzM0N2NkYzBmZjkzMmU0YjFlODkwYzEwYjJkOTc4YjNlNmNlMzc1ZGM1OTcwOCJ9"
+        },
+        {
+          "resource": "repo://services/id/server.ts#L15-L17",
+          "version": "repo-lines-v1:sha256:34b6eb6c509568b6cf10432d508bfc5f8fefefa743fb173a2de3f1d1aaaee905:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODYyNGFiYzQ2MzQ2ZmVmNzM2OGY2ZjRiYzk5MjQ3M2UxNDY1OTUzMGRhNDcxY2U1MWVlMDIxZGI1OWZiY2Q2ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODBlZjg5M2Y1OWQ3NzMzOWNiMWMxMTI5OGMxM2MxNWE2NWIyMjU5YTY5ZDFjMzg2MzQzOTk0YTZjZGIxYmRjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzY0ODYwMDNkNGM2OGJlOTlmNzQzMjc5NWFlOThiM2YzZGM5OWE4YzUzMzNlOTMwZTExYzM3ZmE4MjM5OTI2MSJ9"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:04:39.559Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

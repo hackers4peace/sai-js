@@ -3,9 +3,6 @@ type: architecture
 title: Social graph
 description: The inter-peer connection topology — the three connection tiers (push webhook, one-shot request/response, authenticated pod access), the reciprocal-webhook polarity asymmetry, the delegation chain, and the org-vs-admin edges.
 tags: [architecture, social-graph, webhook, delegation, org-context]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
 sources:
   - id: openwiki-source-7b94b7d1bbbc76b34b554505
     resource: repo://packages/components/src/AgentIdHandler.ts
@@ -19,7 +16,12 @@ sources:
     resource: repo://packages/components/src/ReciprocalWebhookStore.ts
   - id: openwiki-source-b407f45a278715ed33b367aa
     resource: repo://packages/components/src/temporal/activities/reciprocal.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+  - id: openwiki-source-ffa35cc9379c0d10f59dfee0
+    resource: repo://packages/utils/src/notifications.ts
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Social graph
@@ -42,16 +44,28 @@ Inter-peer interactions fall into three tiers; only the first is event-driven.
 
 ## Tier 1 — the reciprocal webhook
 
-The per-pair push edge is created by the `establishReciprocal` workflow, which
-is triggered only by an `agentRegistrationAdded` activity written by the
-**inviter's** `InvitationHandler`. Subscriptions are deduped per pair
-(`ReciprocalWebhookStore.findAllBetween`). The webhook watches
+The per-pair push edge is created by the `reciprocalWebhook` Temporal activity,
+invoked from the `establishReciprocal` workflow, which is triggered only by an
+`agentRegistrationAdded` activity written by the **inviter's**
+`InvitationHandler`. Subscriptions are deduped per pair
+(`ReciprocalWebhookStore.findAllBetween`). The subscription itself is created
+with the in-repo `subscribeToNotificationChannel` helper (which replaced the
+`@solid-notifications/*` packages) against a `WebhookChannel2023` whose
+`sendTo` points at our handler. The webhook watches
 `registration.reciprocalRegistration` — the *peer's registration of the
 inviter* — so it fires when the peer PATCHes their registration of the inviter
 (e.g. sets an access need group, or updates `hasDataGrant`). On receipt,
 `ReciprocalWebhookHandler` PUTs a `delegatedGrantsUpdated` activity, whose
 `updateDelegatedGrants` workflow regenerates the inviter's grants where the
 peer is the data owner.
+
+On the owner side, `syncReciprocalMirror` calls `updateReciprocalMirror`, which
+writes a read-only local copy of the peer's reciprocal registration and its
+linked grants into the owner's **registry-pod dataset** (through the owner's
+session endpoint). With per-pod datasets this mirror is effectively the *only*
+way the local session sees peer-side grants — the peer's own dataset is not
+reachable — so the mirror is the upstream for delegated-grant reads (see
+[Per-pod storage and isolation](storage-isolation.md)).
 
 **Polarity asymmetry** is the key property: subscription ownership follows who
 initiated the invitation, with one webhook per pair pointing from the peer's

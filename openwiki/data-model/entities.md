@@ -1,11 +1,8 @@
 ---
 type: data-model
 title: Data model entities
-description: The data-model package's JSON-LD POJO entities — registries, registrations, grants, roles, access needs, shape trees, activities, their ldp:contains containment and wrapper removals, POJO id invariants, and the ACR templates.
+description: The data-model package's JSON-LD POJO entities — registries, registrations, grants, roles, access needs, shape trees, activities — their ldp:contains containment and wrapper removals, POJO id invariants, the JSON-LD ACR builders, and the bootstrap TriG templates.
 tags: [data-model, json-ld, solid, entities, typescript]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T20:45:09.690Z
 sources:
   - id: openwiki-source-1d72172ac5b4243a0342f708
     resource: repo://packages/application/src/grant.ts
@@ -13,6 +10,8 @@ sources:
     resource: repo://packages/authorization-agent/src/access-description-set.ts
   - id: openwiki-source-a53c5361cefa789231b20bc0
     resource: repo://packages/authorization-agent/src/authorization.ts
+  - id: openwiki-source-8b149b790c910713311c36a2
+    resource: repo://packages/data-model/src/acr.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-9d948095f3f5ea720e39040b
@@ -35,7 +34,10 @@ sources:
     resource: repo://packages/data-model/src/registry-set.ts
   - id: openwiki-source-12dd5601be4d1b21ac977892
     resource: repo://packages/data-model/src/templates/index.ts
-generated: { by: "pi", at: "2026-10-09T20:45:09.690Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Data model entities
@@ -43,8 +45,8 @@ generated: { by: "pi", at: "2026-10-09T20:45:09.690Z" }
 `@janeirodigital/interop-data-model` (`packages/data-model`) is the pure,
 dependency-light JSON-LD POJO layer shared by the `application` and
 `authorization-agent` packages. It owns entity data types, `fromJsonLd` readers,
-a single shared `dataModelContext`, and the ACP/ACR Turtle templates. It imports
-neither of the other SAI packages.
+a single shared `dataModelContext`, ACP/ACR JSON-LD builders, and the bootstrap
+TriG templates. It imports neither of the other SAI packages.
 
 The public surface is `packages/data-model/src/index.ts`, which re-exports
 entities both as `type` (the data shape) and as namespaces (helpers such as
@@ -124,17 +126,30 @@ wire format and the typed layers above it. The raw GET/PUT helpers that carry
 these documents are documented in
 [JSON-LD read/write layer](json-ld-layer.md).
 
-## Templates
+## ACR builders and bootstrap templates
 
-`packages/data-model/src/templates/` exports ACP/ACR Turtle generators used when
-the agent bootstraps or grants access:
+Access Control Resources are built as **JSON-LD**, not Turtle.
+`packages/data-model/src/acr.ts` exports:
 
-- `RegistrySet.ts` — the full registry set plus its root ACR.
-- `AgentRegistration.acr.ts` — owner + peer read ACR for an agent registration.
-- `DataGrant.acr.ts` — grantor/peer/client ACLs for a data grant.
-- `WebId.ts` and `DataRegistry.ts` — WebID document and data registry bootstrap.
-- `types.ts` — the shared `AgentAndClient` types.
+- `agentRegistrationAcrJsonLd({ id, owner, peer })` — the owner
+  (read/write/control) plus peer (read) ACR for an agent registration.
+- `dataGrantAcrJsonLd({ id, resource, owner, grantor?, peer?, client? })` — the
+  owner full-access ACR plus optional delegating-grantor read and peer/client
+  read matchers.
+- `rewriteFullAdminAccess(doc, acrId, matchers)` — a pure function that removes
+  the existing `#fullAdminAccess` control (its policies and matchers,
+  transitively) and its `#root` wiring, then adds a fresh control plus wiring
+  from the supplied admin matchers; an empty matcher list drops the control.
 
-The templates are the mechanism by which the service layer materializes
-delegated read access as concrete ACP resources (see
-[RPC contract and service layer](../services/rpc-and-services.md)).
+Callers PUT these compacted documents through `putJsonLd`, so ACP no longer
+crosses a Turtle boundary. The remaining `packages/data-model/src/templates/`
+exports are the **bootstrap TriG** fragments used when provisioning an account:
+
+- `RegistrySet.ts` — the registry set plus its registry containers.
+- `WebId.ts` — the WebID profile (issuer, authorization agent, delegation
+  issuance endpoint).
+- `DataRegistry.ts` — the data registry/storage descriptor.
+- `types.ts` — the shared `AgentAndClient` type.
+
+These templates are posted to the per-pod Fuseki datasets during account
+bootstrap (see [Per-pod storage and isolation](../architecture/storage-isolation.md)).

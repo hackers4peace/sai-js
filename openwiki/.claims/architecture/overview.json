@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:02c29c97dfed4663442bf2bfbb45ad654810e31ecab0b2909534433ad1bf2915",
+  "pageVersion": "sha256:1188956acb0be819b693328350fe37b6fc96f3d31c0858b4b11866a904eb9045",
   "claims": [
     {
       "id": "claim_be2a5323cad44f80802ffc275a1c5006",
       "statement": "sai-js is a private npm workspace named `interop` that groups `packages/*`, the `test` integration suite, and the `docs/website` docs site.",
       "evidence": [
         {
-          "resource": "repo://package.json#L1-L31",
-          "version": "repo-lines-v1:sha256:5a991994f55da6b0886836c14e5f680ab7301381b61ea74b7acec4ae3d988388:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjMjY4ZGZhNmRmOWI4Zjk0NjYyOWZkMGI2MzI4NjdmMjk3YjJjMzIzNDhlOGVmNWYwNGQ1ODAwZDkyNTViYzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4YjVhYjI4M2VhNzBkOWViY2Q4YjYwNzM3ZjIzYWExY2I5YTA3ZWE5MmQ1YmZhMTljMDJiZDA3OGQ4OWNjZDgifQ"
+          "resource": "repo://package.json#L1-L40",
+          "version": "repo-lines-v1:sha256:632888cd52e70a1621edec7c549677511e6cf0b485a537a5f5bd02ed822a793c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlNjRkYzJlNThjYWI3ZGI4MjI5OWJjZTkyMmIzN2Q0NTA5Yzg4Y2JkZjBiMDI1ZDNmZTIxYjI4YzIwMGJhYjUifQ"
         }
       ]
     },
@@ -18,7 +18,7 @@
       "evidence": [
         {
           "resource": "repo://README.md#L7-L14",
-          "version": "repo-lines-v1:sha256:3c3ab064e2a08bdb73d3cd034158abdc2fd364e962882d2cd64e30fd474e2854:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2E3ZTQ0NDEyM2Q0MGM3MGM2ZWIyOTQyYzkxZDUyZjJhNmE4MGM2Y2NkYjg5M2M3N2VkMTYyNzVhMmRkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQzZTlkYzhhOThlYzQ4YWZlZjRiNjkxY2YyZjA0OGUyY2VkODkwMGY3NWEwMTcxNzg3YWMzNThmMzE5NTAyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZkOWIwYjUxMDA5NjU2MTdlNjc1OTQ5ZTZhNWI5MzIzZDc1YWIwMTYwMjdiZTY4NmU2ZjJiMzExMDI2ZWY4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjdmMzIwMTgyZWE5YjEwYTNhNTE0OTlkOWI1YzY3MzkxYTE1Y2ZiNWFmNDIxOTBmMWFjYjU2MjI2NTVhYWIwOSJ9"
+          "version": "repo-lines-v1:sha256:482b474879f51cbaf7610f150ac8c34a26d18e75594faed9f265b4312bd03a45:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2E3ZTQ0NDEyM2Q0MGM3MGM2ZWIyOTQyYzkxZDUyZjJhNmE4MGM2Y2NkYjg5M2M3N2VkMTYyNzVhMmRkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQzZTlkYzhhOThlYzQ4YWZlZjRiNjkxY2YyZjA0OGUyY2VkODkwMGY3NWEwMTcxNzg3YWMzNThmMzE5NTAyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZkOWIwYjUxMDA5NjU2MTdlNjc1OTQ5ZTZhNWI5MzIzZDc1YWIwMTYwMjdiZTY4NmU2ZjJiMzExMDI2ZWY4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjdmMzIwMTgyZWE5YjEwYTNhNTE0OTlkOWI1YzY3MzkxYTE1Y2ZiNWFmNDIxOTBmMWFjYjU2MjI2NTVhYWIwOSJ9"
         }
       ]
     },
@@ -27,11 +27,11 @@
       "statement": "Both the application and authorization-agent packages declare a dependency on `@janeirodigital/interop-data-model`, the shared internal data model.",
       "evidence": [
         {
-          "resource": "repo://packages/application/package.json#L46-L46",
+          "resource": "repo://packages/application/package.json#L44-L44",
           "version": "repo-lines-v1:sha256:aa3a574e7d95e25945403e5cafed4df22b4d9aa8b93ae6d83e4012a7487b53e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWEzYTU3NGU3ZDk1ZTI1OTQ1NDAzZTVjYWZlZDRkZjIyYjRkOWFhOGI5M2FlNmQ4M2U0MDEyYTc0ODdiNTNlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWEzYTU3NGU3ZDk1ZTI1OTQ1NDAzZTVjYWZlZDRkZjIyYjRkOWFhOGI5M2FlNmQ4M2U0MDEyYTc0ODdiNTNlNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjVlZjZjNTExN2ExYTVkMWQ1Yzg0NjBlNzdiZDQyMzJmNzJlNTAwNjljODNhOWI2ZGY4OTI5Yzg3OWU1YmY3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTVjMWM3NmRiN2NkMmI4MjkyYWY4MmM3NGE1ZmUwNWU5OTQ4NWQ1MmZiYzYyZThjZjNjZmVkYzdiZDc5MjRiZCJ9"
         },
         {
-          "resource": "repo://packages/authorization-agent/package.json#L47-L47",
+          "resource": "repo://packages/authorization-agent/package.json#L45-L45",
           "version": "repo-lines-v1:sha256:aa3a574e7d95e25945403e5cafed4df22b4d9aa8b93ae6d83e4012a7487b53e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWEzYTU3NGU3ZDk1ZTI1OTQ1NDAzZTVjYWZlZDRkZjIyYjRkOWFhOGI5M2FlNmQ4M2U0MDEyYTc0ODdiNTNlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWEzYTU3NGU3ZDk1ZTI1OTQ1NDAzZTVjYWZlZDRkZjIyYjRkOWFhOGI5M2FlNmQ4M2U0MDEyYTc0ODdiNTNlNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjVlZjZjNTExN2ExYTVkMWQ1Yzg0NjBlNzdiZDQyMzJmNzJlNTAwNjljODNhOWI2ZGY4OTI5Yzg3OWU1YmY3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmZmYWFhZWE3Yjk1Y2ZhOGI4ODg0MWU5MGI5OWVhNjJjMjg3YWIyMmVmYmY1NzZiYzI0YjUxYTQxNTc5Mzk3NyJ9"
         }
       ]
@@ -48,21 +48,67 @@
     },
     {
       "id": "claim_d41a05c7ae1b480f848d30376b0ee130",
-      "statement": "Unit tests run under Vitest configured by `vitest.workspace.ts` to cover all `packages/*`, while the Dagger-driven integration suite lives separately under `test/`.",
+      "statement": "Unit tests run under Vitest configured by the root `vitest.config.ts` with `test.projects: ['packages/*']` (it replaced the removed `vitest.workspace.ts`), while the Dagger-driven integration suite lives separately under `test/`.",
       "evidence": [
         {
           "resource": "repo://test/package.json#L1-L8",
-          "version": "repo-lines-v1:sha256:5b4349c69da81a91e63e403a6cc00163fdcd5b0b49759c40a193f2b1f377814b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTdmNmYwM2IzOWE1OWNiYTBkYjNlOWViYzI2YWM1MDdkMDliOWM3Y2Q0OTE5YmQyODUwMTFkMTQ5MjYyMGI1YSJ9"
+          "version": "repo-lines-v1:sha256:5b4349c69da81a91e63e403a6cc00163fdcd5b0b49759c40a193f2b1f377814b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTMyZTVkY2Y3ZDM2Y2U5NTczMzhlZGEyODUxMjRlYmM5ZmFhZGI4YWVmYjUzMDg3N2Y5OTRlNTRjZGQ2OTFmNSJ9"
         },
         {
-          "resource": "repo://vitest.workspace.ts#L1-L1",
-          "version": "repo-lines-v1:sha256:5b201cd9b125fbc656c4574c8f3bbf276ab397bcf4687616954920b1196473f9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIyMDFjZDliMTI1ZmJjNjU2YzQ1NzRjOGYzYmJmMjc2YWIzOTdiY2Y0Njg3NjE2OTU0OTIwYjExOTY0NzNmOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIyMDFjZDliMTI1ZmJjNjU2YzQ1NzRjOGYzYmJmMjc2YWIzOTdiY2Y0Njg3NjE2OTU0OTIwYjExOTY0NzNmOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+          "resource": "repo://vitest.config.ts#L1-L10",
+          "version": "repo-lines-v1:sha256:45176a473ba7e9acd73985d560e8b8b101e443ac10fe3fe895ed3f633836bac7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzNDYxYzY0YTBkNGFmMGRiOWRmMGVlZjVkNWIzMWZmMTA5NWVkYzMwNWY4Njk1Nzg5MjZhZDlkMjliYWYwNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cf2816d99fc24d6c8b3cc17e5789ff6e",
+      "statement": "The public packages (for example utils) are no-build ESM packages whose `main`, `types`, and `exports` point directly at `src/index.ts`, while the components package is the exception that compiles to `dist/` for Components.js.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/package.json#L15-L16",
+          "version": "repo-lines-v1:sha256:6de4e1092c08672adbf2657b2b026282c1191431112947e17934436fac090967:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzRkOWE1YzAwM2NhYjIxMWFiMGZkYzAzZDYwNjk2NjQzY2M1MDI2NGM2MTNkZGMzMThhOWEzNDAwNGNkZjE3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzZjZjc0MDgxOGNmMzRmMzYwNjI1YTI1NDE5Njg2MzlhYjNhZGJjZTdjMmQyMzZjNDZmNDJhMWJjNjI0Y2M1OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2Q4MTk0NDQ5YTMyZDE1YWJhZTI0M2RlMWUwOGMxOGVhOGViNjhlNjFiMDk4ZTA1NTI3MmE1OThiNDk0YzI0YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWU2MzNjMzc1NDQwMWJiOWQxMzUzNzYxMWYwOTVjOWQ3MjJiNmIyNjc3YjdlYWMxZTZkMDhmMTc4OGFmYjc5MyJ9"
+        },
+        {
+          "resource": "repo://packages/utils/package.json#L24-L35",
+          "version": "repo-lines-v1:sha256:e11c574d6e8e3231f6dae7ed58f6b7af3b27526272638f7939378ef368f638e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1NmQ4MzA5MGM2ZmI5MzQ2M2FkNGYyZjg1ZjhjYTU1NzZmN2U4NWUxMjFkOTU4YTUzNzE4ZTIxZDlmNzZlNmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwNjE4YzEzOTMyZmEyMmQzNWRhYmMwODBkNTdkYjJjMmI4Nzg3NmJkZjBmYmExZGQ3NGQ4ZTJlNGI2OGIyNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlNmYzODUzOGZkYjAxNDZjOTI4OGVjMTE0YmU2NWQyMjJmYjg1YmFkOWQ4ZjcyODQ2ZDgxMzc0MTEzNTdlNWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_19a5801712ed4ab7b1a13d8cf3c1f963",
+      "statement": "The project targets Node.js 26 or higher and uses npm 11 as its package manager.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/ci.yml#L7-L11",
+          "version": "repo-lines-v1:sha256:7784a5d6943488b3927b822fc0c5e5958bfb0a6b37027a2ec08ad418fa638900:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzg5OTkxMTAzZjZiYTg4OGUzZGU3NjUxYzVhMzA1Yzc3ZTU1NDc2NzczYWJhODM5NTkxZWNjNWJkMGYyYWIxZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGViZTYzMjEyNGE2OGRjMDJiMGI0ZTlmOTNlOWMyZGM4NGYyZjVlOWU0N2Q5M2YwYmMwZTM4NDE0MzM5YjM3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWZiMmQ1NTk0NTcwMTQ4MmNiMjI5NzY4NWMzMjlkNmRlMTAzYWM2NDE2OTNkY2Q3MjIxM2FjMGJiMmUxYWZmNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmVjZWNmYjMzNWQ5NTM3NzhiMGU5MmRkMzdlYjNjNjU3NTcxYmFiNDQ3YzRmNGFjYWIwZjhhNzBhOGJjMmNmNiJ9"
+        },
+        {
+          "resource": "repo://README.md#L27-L27",
+          "version": "repo-lines-v1:sha256:7bbc8babdab8d7918c1a7b8cf2748b6619f57181cb053e8ebba24ea3981b23c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2JiYzhiYWJkYWI4ZDc5MThjMWE3YjhjZjI3NDhiNjYxOWY1NzE4MWNiMDUzZThlYmJhMjRlYTM5ODFiMjNjMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2JiYzhiYWJkYWI4ZDc5MThjMWE3YjhjZjI3NDhiNjYxOWY1NzE4MWNiMDUzZThlYmJhMjRlYTM5ODFiMjNjMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWM4MDczYTYwN2M5Yzg1M2VkNDEzOTgxMmE4ZjM5N2JiNDAyMTRjZWY2OWZhYWQ4MjkyMzIzNzBkYWUwMWFmZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTg3OTIxY2M4MGQ2NGNlODRhMDEyOTM3NTYwNWIyMmYxMjAwZjQ2ZTcyZjBlMjEwMmRjZWExMTNmMmZlM2RmMiJ9"
+        },
+        {
+          "resource": "repo://package.json#L35-L35",
+          "version": "repo-lines-v1:sha256:d6c67b824a976a5d0f6e26aa3c958a30d36f163e5248503b76a4426ef4b22a26:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZjNjdiODI0YTk3NmE1ZDBmNmUyNmFhM2M5NThhMzBkMzZmMTYzZTUyNDg1MDNiNzZhNDQyNmVmNGIyMmEyNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZjNjdiODI0YTk3NmE1ZDBmNmUyNmFhM2M5NThhMzBkMzZmMTYzZTUyNDg1MDNiNzZhNDQyNmVmNGIyMmEyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjMwMGVhZTBmNmVjOGE5YjEyNmVlOTU1YTMyMmExY2MzZjczM2NlODBkMDYwYThiMmM5ZmUxNTNkZmQ0ZjY1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWNiZTMwZDgzOWM4Y2M1NzZkZDgwYjdhZTQ4MzNkNDY4YWNmMjJjZTZjYTgxODZhMDcwY2IwNDAxMGVkZDEwZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_420fdb34c4674663bd3342c0aa123efb",
+      "statement": "Linting and formatting are done with oxlint and oxfmt (replacing Biome), and `npm run typecheck` runs `tsgo --noEmit` over the no-build packages under a shared strict nodenext tsconfig.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L28-L33",
+          "version": "repo-lines-v1:sha256:527af238360429550b8403c4663200eb7f87e735ff021d6fa0155e3121a19e1e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEwNjBkNmU3ODVjZWExNTZiMzk5NzBiMjc0ZTY3Zjc2YzU1Yjc1MDM4YzM3MzgzMzljMWYxODgwMDE4ZDU4ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjM5ZDM4ZTZiNmI3YTdmMzMzN2NiZGU2NjhiYWI3Y2Y2NTE3YmU5ZGE1NTBlY2RmMjEwMWY4OTg5YWQ0ODRjMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjg1NTZiZDZjMjgzOGFjZjkyZGE3MWNmODQ4NDQ5YjFhNjE3MzMzZmE0NzA4NmM1ZTQ4NWMxZDMyZGUyYzM4MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmYzYjgwMGI4NjI1NDlhYzQ4ODZkNmY4YTJhZmM3YjQwNjAyNmFiZjMyOThmMTU4MDNhNjBkODJhMzQ0NjFhYSJ9"
+        },
+        {
+          "resource": "repo://tsconfig.base.json#L1-L16",
+          "version": "repo-lines-v1:sha256:91044361da72812ff4fd2b6e334fad2357f4c0a679391faea44da56ca882985d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T19:35:35.072Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

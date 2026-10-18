@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b3ca13028dfe36dbac031c52f05f875cb2576ec50d2211e85686edce7464885f",
+  "pageVersion": "sha256:09dfc1d79da5a159cb19cce913112b8b0f37872227d7ea6ca74121f6d8b733d6",
   "claims": [
     {
       "id": "claim_8c7199519a8143bcb06e138d401a49f2",
-      "statement": "The local dev stack is defined in docker-compose.yaml and runs auth, registry, data, worker, ui, router (Traefik), dns (dnsmasq), postgresql, temporal, oxigraph/sparql, id, garage, tempo, and grafana services.",
+      "statement": "The local dev stack is defined in docker-compose.yaml and runs auth, registry, data, worker, ui, vuejectron, router (Traefik), dns (dnsmasq), postgresql, temporal (with admin-tools, create-namespace, and temporal-ui), fuseki, id, garage, tempo, and grafana services.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L34-L486",
-          "version": "repo-lines-v1:sha256:5e030c2bf75ba8956959333defb3d30a62aa29b4e89582adfd07bac5fb487199:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5M2Q4ZjE3MDhkMzk2NDUzODgwY2RiNDk1NzJhNzZiMWJmODhhOWJkZGZkYmM0ZjcyYmU2ZDMwYTBlM2M1NGIxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkZGJlODQ2ZTlkZDAzZmI0ZDc4ZTRmYTIyMDIwMWYzNGQ1Y2QyMTY2NWQzOGNhMWNmNGY2NGRlOWE3MzM1ZWJjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4ZDFkZjhhYWYwMGU0MTlhYjYxOTY1OTE0NGZhOWMxYzU3ZmNhNjcyZTQ0ODNiMzk0MzdhNWIxNjVhMWM5NTEyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlOGU1ODkyYWI4MWEwNjNhOWVmZjU4NWI4NWI4MzYwNWJjNzQ4MDU0NzQ5Mjg2MTI2MjFjNzU3YzA0NjZjODU2In0"
+          "resource": "repo://docker-compose.yaml",
+          "version": "repo-file-v1:sha256:c8d77f83eefa29d8afa7f3e266ba883707f901d4281a4a6959bb9435df060f8e"
         }
       ]
     },
@@ -21,7 +21,7 @@
           "version": "repo-lines-v1:sha256:520c9389ca7a9bcb99ae6cf0cb2467967c857d60942cf2cabd580e23208f35d7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTIwYzkzODljYTdhOWJjYjk5YWU2Y2YwY2IyNDY3OTY3Yzg1N2Q2MDk0MmNmMmNhYmQ1ODBlMjMyMDhmMzVkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTIwYzkzODljYTdhOWJjYjk5YWU2Y2YwY2IyNDY3OTY3Yzg1N2Q2MDk0MmNmMmNhYmQ1ODBlMjMyMDhmMzVkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTI4YzFlNmQ4ODEzZTljZWJlNzI0YTYxYThlOGE0Nzc3Nzc2OTE4ZmFmM2IwZjcwOTcxZTlmMjkwMDNlYTA0NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTMzMmUxMzU4NjY1OGMwMWE3ZTRlNzdmZDA0NThlNzU5MmQ5MzE1YTY3NDI0MzMxYmMyMDg5NDgzYjY5NjJhZiJ9"
         },
         {
-          "resource": "repo://docker-compose.yaml#L40-L41",
+          "resource": "repo://docker-compose.yaml#L44-L45",
           "version": "repo-lines-v1:sha256:0ce291068dc87cbcdb48b9ed4a05fd6a82339721ab2fc964c8a33beb7b382097:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTQxYzUzN2NmMGRjYWNkODA2ZDQ0ZDYwN2RmODI4NDMwZGQ5ZGFhNDkwN2Q1NDNhNTljZGU1MDFlOTJjYTUyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI4ZDhhNzgzZWIzMTRhMjU5YmUyODE0YzQwODIzMDgzMTIzMGI2ZTk0N2UxNWRhYWUwNDhhM2Q2NWNmNDU2MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDc1MWU5MDEwMWMzM2Q3ZTE5MzE2N2QwZWYxY2FmNmY2YWM2ZGY2ZGUzZjc1ZjZiZDRmYTY2OThhMDI3MGE1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGUxNTA3ZjY4MzZhMDFiMWQ2NWI2OWI5MjhjYmRiM2RiOGM3YWU0OThlNmI1ZThjN2VkN2QwYjZmZTBhMDc1YiJ9"
         }
       ]
@@ -52,17 +52,51 @@
     },
     {
       "id": "claim_1f91cfa55fa644e08e0364aa6d6d74a4",
-      "statement": "Seeding is a devbox script that runs `bun packages/repl/cmd.ts -- seed-env` rather than a Make target.",
+      "statement": "Seeding is a devbox script that runs `node packages/repl/cmd.ts -- seed-env` rather than a Make target.",
       "evidence": [
         {
-          "resource": "repo://devbox.json#L36-L36",
-          "version": "repo-lines-v1:sha256:cc015d31f56cea2afd97f004e891dfcf0fd33d3c3d54affad731f6198ea9b141:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2MwMTVkMzFmNTZjZWEyYWZkOTdmMDA0ZTg5MWRmY2YwZmQzM2QzYzNkNTRhZmZhZDczMWY2MTk4ZWE5YjE0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2MwMTVkMzFmNTZjZWEyYWZkOTdmMDA0ZTg5MWRmY2YwZmQzM2QzYzNkNTRhZmZhZDczMWY2MTk4ZWE5YjE0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjA1MDBmM2Y5M2QwZDA0ZTUyMmMxYWI3ODViZmEwZWZmNzRkNTgzNzVjMzNlNTM0ZjVjZjExMjUwZWVlNjgyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGUwZjcyOTNkMTU2YTZkMTI1MjhkYjEyOTMzNzllNTJhNWY4MzY3MDQ0Mjk3YjIyODJiOTdmZjJjODYwNDM4ZCJ9"
+          "resource": "repo://devbox.json#L32-L36",
+          "version": "repo-lines-v1:sha256:11e070ee15e175d3f03013182d395ef9220fdc68cfe473d98fe602af77526be6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTA4ZjFiMzE4ODdjZTRlYTY2ZTQ4MjcyN2IxNjkxZTEwNGYyNWZlMTNhZmJiNWNkNzNiMjQ2MTEyNGQzOTNlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzUxYzYxZmNjYzNlZmRhNzIxM2E1ZjU1MDcwNTAwY2RiZmNhMzNlNTc4NDM5ODI1Yjk2ZjBmZmRiODkyMzQ0NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGY3MzlhMDZjMWNiYjEyNDRlMzM2M2QzOGJjZjlmYTUwY2U4NGZlZDM5OWMyMTkzYTNjN2YwOGQ1OTkxOGIyYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f1f5668214d3473c97a922b1643588b8",
+      "statement": "In dev the worker alone holds the Garage admin endpoint and token plus the bucket-less S3 endpoint, while the data server receives only CSS_S3_REGION and resolves each pod's bucket and credentials from its objectEndpoint record.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yaml#L183-L190",
+          "version": "repo-lines-v1:sha256:09c02b52ed6fd6ee14f673d0c874356df73fc164412f9c8398224414dc8488ee:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmFhZThhMGNhNzZmOThmN2I3ZGM3OTg0OTUxZDYzZTU3ZGIzYzY0NTU3OWNhNTFiYWQ2YTUzOWQ2MTRlZGJiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkxOGNiM2JmMTE0ODBiYjkzNjgxY2Q0MWU0NTZhMzNjMzk5MjhiOWY4YjgwMWExYzU1NTg4MTdiZGRhZjRmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTA3ZmFhOTRlNDhmNDNiM2QyOGVjMzhjOGY2N2VjMjEzMDRkNWJmNTllOWUyNmFhZTk4Zjg4MjM2MTRlZmQ1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQxMzBjYjljODczN2M2NTliNDgwYmNkZDI1MmMxNzM3YTMzMjYwZWMzNWVlMGZjYWQ4MzVjZTgwNGEzZWQ1YyJ9"
+        },
+        {
+          "resource": "repo://docker-compose.yaml#L7-L10",
+          "version": "repo-lines-v1:sha256:f6f0df4d1ea338b3a87e2e4bc797fbf07a6b3b74855bfaa871a06a88da2fb330:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYTJiMDRmODYwMGM2OGZjZjFlODU3YWJhNTAwNmRiOWRkOTAyNGM1OTBjNWNkNGQyN2U1OWNlYTcxOTA1OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGQyYTA2ZTkxYWQ4MmU1NzEyYWNiMDcxYjc3YzJmNjNkNGU0ZDVmNjcwNjI3OGRhMmVkNjY5ZDYxYzRjYjEwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzQ1ZTgzNWRhMDUzYjE1YzQ1N2EzMzQxM2ZkZDMwODE4N2NiNzFkZTQzMDBhYTEwYzcxZGVkZjQ3ZjE4MWI1MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWM2YmY5ODM2ZWJiZTkyMmNlOWVmYTY4Y2EyMDczNWEzYTA5ODI4NmU1YmRkM2NhMDk1YzRjMmE5NGNjNzVjMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_98cd932197104b6f9fbce6ff3cff9952",
+      "statement": "The seed command splits the fixture per pod with splitFixtureByPod, provisions one Garage bucket and key per data pod through the admin API with seedObjectEndpoints, writes the resulting endpoint records and KV fixture to Postgres, and loads each per-pod dataset into Fuseki.",
+      "evidence": [
+        {
+          "resource": "repo://packages/repl/cmd.ts#L218-L260",
+          "version": "repo-lines-v1:sha256:c2bdb3d32f608fe752cc869c2a442198cf69580ca17939844c98fa66cb9e2fe1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3MTE1YWZmYjY2ZDY1N2RiY2U1YzViNjg5ZDYyMGNjZDUyYjliYzc2OGU0ZmQzNDllZGUzZTY4ZDk4MGZmOTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5NTViMDEwZDcyNjc5YjE2YjMzZDY2NTJmOGU2YjE2NDVjNjVkYWViZTcwNjg1YjVlNDU5ZjUzZjdiNDIyMzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyNjAzODc0NWNhNzg4ODcyNDIzYTlhYTgzNzA2MTdhMDM2OTA3NGNhMGQzNTg3MDdlMWExYWM1NjYxZGMyMGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_42606e69f5f74b8087f813b8c2127926",
+      "statement": "The Fuseki dev configuration pre-declares the fixture datasets (id and per-pod reg-<handle>/data-<pod> services), while new account signups create their datasets dynamically through the Fuseki admin API.",
+      "evidence": [
+        {
+          "resource": "repo://environments/css/fuseki.config.ttl#L1-L8",
+          "version": "repo-lines-v1:sha256:7fb6ff9007faa93133d734017ce4648807757217e74bff932cd2665fca6c9244:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhlNzY2ZDUxMGQzYjQ3YWM2ZTc1N2EyODg4ZWEyMGJjYjRhODM3NmE0ZDY0MDBjZTliY2U5NWZiNTZhZDQzMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzI3MjE5MjMxMmUwZGZlYjE2ZDM5YTBhNGI2MDk2ZGIzMjM3NDU3NjMzODA3NDAxMDlkMTZhYTAwN2NjODFjYyJ9"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T19:35:35.072Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:561b5b82a5f446462ecc1aac7eee3bd6db0b002b262b9c20acf0cc99a46eb962",
+  "pageVersion": "sha256:4e1f91de544a54494056cf06bf4e061de50fdf69a5a92f97f22aaf563f26c5b4",
   "claims": [
     {
       "id": "claim_69cce4fee46d4f28aa02dcf3cd0c8720",
       "statement": "fetchJsonLd performs a raw JSON-LD GET with Accept: application/ld+json and throws on a non-OK response.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L353-L374",
+          "resource": "repo://packages/utils/src/jsonld.ts#L372-L393",
           "version": "repo-lines-v1:sha256:7fb5e9c9df42b5fdfaebdc0b3ff1a21c68c55358e168bb1621d2ae0d3c7145de:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5Y2Y1MGQ5OTY2OGRlMjA2Mjg4MWEzZWVkYzAzYWIwY2UzZGM1ZWFjMWYzNGJjZjM0ZWNjMzY5MTNkNmZlY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4YjY1MGE0YzdhNmFhZTE5Y2VjMzA0NWU3NWQwNDlkODM5MjA0MzkwYjYxNjIyOWFhMGU4MDYxMDI4MDgzMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkN2Q0OWY1ZmY5NDYxODEyMGIzOTA3YzFhODdjMzhlZDY2YjY5YTEzMjVlZjdiNDk0NGY1MjJmN2Q3NDJmOTMifQ"
         }
       ]
@@ -17,7 +17,7 @@
       "statement": "putJsonLd expands the document via jsonld.expand, JSON-stringifies it, and PUTs it with Content-Type: application/ld+json, so the wire body never carries a client @context.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L398-L443",
+          "resource": "repo://packages/utils/src/jsonld.ts#L417-L462",
           "version": "repo-lines-v1:sha256:71699612b8fc6cd30bd6c9bc10b4261e7fdfcf2b11b6c79230663b2210e86a77:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzZGYwNmQxNmZlNDIwZDg2MmFiNjNiZmQ5ZTUyMjRiYWM4MTBhMDkyNWViOTNlNTY1ZGZiZWFiNTkwZjM5MDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmMGEwOTZmOTBhZTllZjhmYThmZDZlOGNlMWI4MGRmYjU5YTQ0NzU0MWVjYzkyZmYyMjFkM2NhYjY4YmViNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5OTUzZGM5NzQ1Njc0ZmQxZTc3NDQ1YWE4OTgyMzBjYzI0ZTRiMDRiYmIyYWY4NmNjNmFhMGFhNWRlYWY4OGEifQ"
         }
       ]
@@ -27,12 +27,12 @@
       "statement": "frameDoc frames one node via jsonld.frame with a buildFrame defaulting to @embed '@never' and @omitDefault true, throwing if the node is absent.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L127-L159",
-          "version": "repo-lines-v1:sha256:f836d8acace183f3b38388086942860cfff9af3c6009888cf86c5890296e9344:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNzM5MjU2ODRlYjRjNzVjYTc1MjM4Yzk5MmZmMzZjNjQ1NTAxY2M1N2RkODY5ZmRmNmI5OTZlMzMzNGUxMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkMTI1ODQ2MmExZDJjNjMwYzZkM2U0ODUyNDBjZjQ4NGNkNDc2NzgyMjM1ZDUzMzJjYjgzMDQ1OWI5ZDlhMGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzNzE2MTg3NmFhOTRjNjcwMDFjZDNmYWMwNWM2ZGM5ZDA4YmY0ZWQ3ZTQ3ZDljYzk4NDZjZmJmNzQ1Y2MxYjQifQ"
+          "resource": "repo://packages/utils/src/jsonld.ts#L123-L158",
+          "version": "repo-lines-v1:sha256:df1c7666f9d1265ba96253cb2c4375ca96462dd94297d28f09640d49d3b23c5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNzM5MjU2ODRlYjRjNzVjYTc1MjM4Yzk5MmZmMzZjNjQ1NTAxY2M1N2RkODY5ZmRmNmI5OTZlMzMzNGUxMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkMTI1ODQ2MmExZDJjNjMwYzZkM2U0ODUyNDBjZjQ4NGNkNDc2NzgyMjM1ZDUzMzJjYjgzMDQ1OWI5ZDlhMGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzNzE2MTg3NmFhOTRjNjcwMDFjZDNmYWMwNWM2ZGM5ZDA4YmY0ZWQ3ZTQ3ZDljYzk4NDZjZmJmNzQ1Y2MxYjQifQ"
         },
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L56-L91",
-          "version": "repo-lines-v1:sha256:1d33239b690cefd640043036522c018289cbb5b8fbc40d38e2ae0812bb7bd2ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OGI1OTEwODlhNTMyZWU5YmEwNzgxOGJhZGViZDI3NzY5YWE5ZTA5MmVhYTdjMDgzZGUxMzUwZTk2MmJkOTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0NzJkZjJmZjUwYjE3NGIzMjQ4MTFhY2QyOTVlMmI1YTkxMTM5ZjFmYTZjZThiNDI3NGUxNDhjODgxOTA3NWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlOTMyODljZDBiZjkwMzMwNmY2ZjM2ZmMwYWFhOGZjMmYyNTkwMjhkZWYwYzEwYzJhOGNmYTBjM2E2NDdjNjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI2OTFlMWFmMzU5YjU1NDExNjE0ZTI3YzlkMjY1ZGE2NzZhNmJjZDAzOGE3Nzk2OGVmNTgwNjJjNjk1ZmU0YmIifQ"
+          "resource": "repo://packages/utils/src/jsonld.ts#L52-L90",
+          "version": "repo-lines-v1:sha256:c0341ac26018e93d6d690d3e2cf4ffae2877182431ca176028b543d14245d428:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OGI1OTEwODlhNTMyZWU5YmEwNzgxOGJhZGViZDI3NzY5YWE5ZTA5MmVhYTdjMDgzZGUxMzUwZTk2MmJkOTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlOTMyODljZDBiZjkwMzMwNmY2ZjM2ZmMwYWFhOGZjMmYyNTkwMjhkZWYwYzEwYzJhOGNmYTBjM2E2NDdjNjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyYjFkY2NkNDdjYmZkODdjN2MwNDI4MDllNDA3Mzk3YmQ0NGMxZDlkODFiNGRiN2U1YjhjYTkyMTIxNWY1NzkifQ"
         }
       ]
     },
@@ -41,18 +41,18 @@
       "statement": "The shared dataModelContext maps @type to a @set container so type is always a string[] on reads and expanded writes.",
       "evidence": [
         {
-          "resource": "repo://packages/data-model/src/context.ts#L51-L55",
+          "resource": "repo://packages/data-model/src/context.ts#L53-L57",
           "version": "repo-lines-v1:sha256:d135690ad096bc8aaaa1b89330c6fe083ac817ac28ca74d80bfdcf06e4d2742b:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I3NDc0NGFjNTVlMTlkNDBjMDJhMTFkZDgxODk3NzJiMDc5NmIzMWZhMTFkNmIyMWVlYjhkYzgyZmJiNGQ2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWNjYTM5ZDc0Nzc1YmU2ODAwMzUwZTNmODQ4M2Q3M2M5NWI4MmFlOWY4ZTYwYThmZGRlOTRmN2MyZjEwMjc2ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWY4NTEyMWQwZmM0NDdhOTdmZjQzMjRkZDNjMmNmYjVhODUzZDZjZDRiMTI1YmE3NmI4NDY4NGRmNzlmZjA0OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTE5MDIzOTNhMTEzMjVkOTYyNjQ5ZjdlMjFlMzY3MWNkM2U2NjgxOThjMDRhYzliNjdiOTk2YWY1M2Y1MjRiMSJ9"
         }
       ]
     },
     {
       "id": "claim_2f402c74df2f432b8e49d715c9f70a3d",
-      "statement": "createContainer PUTs an empty container first (CSS ignores the body) and then applyPatches the triples onto the discovered description resource.",
+      "statement": "createContainer PUTs an empty container first (CSS ignores the body) and then applyPatches a JSON-LD document, serialized as INSERT DATA, onto the discovered description resource.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/container.ts#L28-L41",
-          "version": "repo-lines-v1:sha256:8a0b7ae374e4f5b7dc8d6048c2b83601234779b6b80e588d09edf390b6413350:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3ZTk3OGJkODFjNTcwZDVkZDEzYWI5ZjViYzk4NWYzZjY5MjU1YWEwM2JhMTlhZDEzNDFlOGEyMjM0YTg4MzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmY2Y5NGIzZWM1NGM5ODc4ODA3YTk1MjEyOGZlYjMwYzg1NjI1NTU2NDRkOGExMjhkODg1OTcxZDc1Mzc0MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/utils/src/container.ts#L27-L40",
+          "version": "repo-lines-v1:sha256:d86e43ed73dc5844fd008a08e1a7608498078fda6acb359e1f7594d5a067e95c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3ZTk3OGJkODFjNTcwZDVkZDEzYWI5ZjViYzk4NWYzZjY5MjU1YWEwM2JhMTlhZDEzNDFlOGEyMjM0YTg4MzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzNTBjZjMyYTQ1ODYwMmNlMDI3ZmVlZGY2YzJiY2Y4YjBlMjVkMmU3YTI5NTc0M2M3M2IzNTRjMjBjMjI0NDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -68,33 +68,19 @@
     },
     {
       "id": "claim_d1299320f466491fa5b1bdb7dcd1027e",
-      "statement": "Resource CRUD uses raw JSON-LD (putJsonLd/fetchJsonLd/frameNode) while the SPARQL-patch layer keeps quad machinery (DatasetCore, N3 Store, graphDoc via jsonld.fromRDF).",
+      "statement": "Resource CRUD uses raw JSON-LD; the SPARQL-patch layer serializes JSON-LD documents to N-Quads (toNQuads, used by insertPatch/deletePatch), while the authorization-agent sparql.ts keeps quad machinery (N3 Store, graphDoc via jsonld.fromRDF) to convert transport results back to JSON-LD.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L164-L164",
-          "version": "repo-lines-v1:sha256:3314a01d126d2b0df3427e0a159538bd8dcc94c9442e5eb07c5865377e9175e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzMxNGEwMWQxMjZkMmIwZGYzNDI3ZTBhMTU5NTM4YmQ4ZGNjOTRjOTQ0MmU1ZWIwN2M1ODY1Mzc3ZTkxNzVlNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzMxNGEwMWQxMjZkMmIwZGYzNDI3ZTBhMTU5NTM4YmQ4ZGNjOTRjOTQ0MmU1ZWIwN2M1ODY1Mzc3ZTkxNzVlNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzk3MWNiODU5MmQxZmI1YmU1YzgzNTgwOTliNjRmMjYwODM0ZGU5OTUwOGQwZWUwMWY5ZDcxZmY3OWY4NWQwNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzc5MjllOTFlMGY5OWMzZTgyNWRlNjliNDM1ZmI2NDg0ZDFiMGExZGYyZjQ2NTYxYWJmMWEyOWYwNDE4OGI4OCJ9"
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L150-L159",
+          "version": "repo-lines-v1:sha256:c80f1d368189410128b389639517066d3bfc56e64cb293564bf2ff7dd8c030ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzZTc4YjhkMGU5NzliYWU5ZDEyOTk5OGZkNjBiOThkMjgxMmY0MWY2MDlkOWU5MTI4NGE4OWJlOTkzMWNhNDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc3ZmY5YjU4ZDJlMTI4NDlkMDQ2YTc5OWE0ODM4MTM2MGE4ODJiZTBhNTFlYjZjMjMyNjMyNDRhNzM4YjA3NjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NjEyZmZkYjBhNjM5NTc0YWVhOTYyZDkxYmJmMThmNDhlMjdkYTI0ZGY4YjcxODcwYjE0ZTJjN2ZlMDM0ZmUifQ"
         },
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L25-L28",
-          "version": "repo-lines-v1:sha256:41f23ebec88fc81fa955f5f94a72ae98ca4253847e114aa087bc5668ee549983:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTE4MjA1N2MyZTYwZmZmMjRkNmNiNDJiZWJiYWY4NWNkZDAxMTU0OGMzY2FiMTcyNzY5NjBlYjNmZWI0ZjQ4NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2JkNmRhMDY0ZDZkY2MwMDZjZGM0YTA0YmNlMDI4MmIwMDhkNjAyMGFhNDgxMmQxOTdmYTg1MDZlMWI5YjExNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjQxYzk5NmUzNTFiMmQ2MWFmMWY1OGZhM2ZjMWIxM2Y3NmMwYjkxMzdjNGU5ZmM0MmY2ZmZjODUwOTUxZjcwYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTFhNjljYjI3MmVhNWQzZjFiY2E0MGQ3ZTE2ODBhNzM1Yzk3NThiMzc5NTQwMjJjOTRjNDRhNjBkMjhhZWM2MCJ9"
+          "resource": "repo://packages/utils/src/jsonld.ts#L356-L362",
+          "version": "repo-lines-v1:sha256:cd87532b5e6032b3e89172d93b34b1d50dfd499c05de00428ea4076c74b815fb:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFhODYyYWFlY2Q4OWZjMzNhNmFlZDBjZWUyODZkM2YxMGVjNTU2NmY5OWY5YzZlZTJhZTNhYTA0MmM5NTcyZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTEzZjg4YWZhZmM0NGYyNzZmOGExMDEwM2FhNTMxMzdhMjUyZTU4YTQ5ODAyMjE0NDA1NjdmZWY3ZGExODJiZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTQ4NDZhOTk3MWI5ZTMwMDg5ZDI3OWM5MjZhYjIxOWIxNDFkMmRhNjQwNTRkMjk0YjIwZTEzYTRkZTFhOGYwNCJ9"
         },
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L60-L60",
-          "version": "repo-lines-v1:sha256:0f44c4462a8e2a09ecfa19500deee37b9f011d2ced3ec54e353b806bc21775de:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGY0NGM0NDYyYThlMmEwOWVjZmExOTUwMGRlZWUzN2I5ZjAxMWQyY2VkM2VjNTRlMzUzYjgwNmJjMjE3NzVkZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGY0NGM0NDYyYThlMmEwOWVjZmExOTUwMGRlZWUzN2I5ZjAxMWQyY2VkM2VjNTRlMzUzYjgwNmJjMjE3NzVkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWM3ZmY4NDRkNzMxNjQwN2IwODc2ZDBkZDRkNTA5MjI5MTA5MzA1ZTU5OWEwMmExZGM1ODg0NDlhYmNhYjk4YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDQzZGIwZTZmNjdkNzgzYTAwMDcwOTA0NzQzN2NiYmM2YWYzNGE4MDQ0NmE4NjQwMzRiYWI1YzM1ZDFhMjcyZiJ9"
-        }
-      ]
-    },
-    {
-      "id": "claim_bacd25e45ea344379516e001ff7707a4",
-      "statement": "Turtle survives only at the ACP/ACR template boundary (setAcr parses the ACR template and PUTs text/turtle) and the SPARQL INSERT/DELETE DATA patches (which embed serializeTurtle).",
-      "evidence": [
-        {
-          "resource": "repo://packages/authorization-agent/src/agent-registration.ts#L25-L42",
-          "version": "repo-lines-v1:sha256:8151c50003ac216b9ff2710f3d6b5c8bdb61ffecb4bd235114b84b14d779dcba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlZmQ4MWM0MjlmNDljNjM0ZThiMGFhODhhZmQ1OTM1YjAyOTllODkwNDM2MWEyNDJjNmUwNWZhMWM5NGEwMWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZDhkZTlhOGQ5MTljMGNkYmMyMGRmOWMwMDQwMjA0MTdlMDU0NGYzZmMxYTAxNDQ3YmJmMDViMGExOWY3ZWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlZjM4Yjc5Yjc0OTUwYWU3Yjc2NDlhODE4ZWZkZDE3MDRmNjZmODcxNDZhZTMwNGE4YjI2MWRjMzZhZTc1ZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUxZGJiMmJjMTU1MGE0YWRkNGI0ZjUxNzA1ODdmMjg3OTQzMDU4Y2NmZDBhYjhmNGU5NGMzMDBkZWJjOTMxOTUifQ"
-        },
-        {
-          "resource": "repo://packages/utils/src/sparql-update.ts#L7-L13",
-          "version": "repo-lines-v1:sha256:5a651034e9760afd75ff5b7ad222211f89262423c0070d23b2df23bafe8b9ebf:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDQwYjlmOWY1ZjNlMTBiMWViNzk2MDM0ZDdkZTM2Mjk3NGIxNTY0ZTBhOWU4ZDA0NzM1MDMyYWM4NzE2NDU4ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2Q5YmFjOGYzY2ZmNGVlZGI5YjY1OTJmNGJmZDVlNzM4MjRhNzFjYzZhMTdiNTU2NzY1NTBjYzJlMjExODVmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE2MGVkZjA4ZTQ5YzYxOTA2NzJiNTg5Zjc0NDFkMWZhYWRjYTMwOGJiZmEyZjEzMDkwYzg2OWYzOWNhYmIyNSJ9"
+          "resource": "repo://packages/utils/src/sparql-update.ts#L5-L16",
+          "version": "repo-lines-v1:sha256:3a67bf35e360836c3befa2d3ba7678cdf1663bd8a6258ce1ba8c157177982d69:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhM2JiYjgyYzI1ZjY4MmI0N2UxOTA4NjdkMDBhZmZlOWQ2YWVhMzQ1N2RlYmVhMDczOGRjYWEzNGRhZmI5NTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxNjBlZGYwOGU0OWM2MTkwNjcyYjU4OWY3NDQxZDFmYWFkY2EzMDhiYmZhMmYxMzA5MGM4NjlmMzljYWJiMjUifQ"
         }
       ]
     },
@@ -103,7 +89,7 @@
       "statement": "selectNode is the per-model whitelist: framing emits every property of the focus node, and selectNode keeps id/type plus exactly the model's terms with no defaults (absent values are undefined).",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L206-L221",
+          "resource": "repo://packages/utils/src/jsonld.ts#L207-L222",
           "version": "repo-lines-v1:sha256:a37d2457eeb10d2280f9169f58121fe62bd6af173912d697f1fbac5d5387451a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlYTQ5OGE1YjAxN2NjMWM0MzA5NjE0YzZlMWY2ZWFhMzQwMjVhMTI3ODY5MmM4YzAzMTFjYWQ4Zjk0OTY0ZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlZTY2MTBkMDBkYzA2YjIzZjA2YjQ5MDI4ZTJhZWU0OGQ1YmYzYzI1ZjBjYjI4OWRlZDgwYjQ2ODIyNWIxNWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1MTAyM2NlYTIzMzVlODdjMWU1YWVjNjAzMDJkNDMwNDZjMzMxZTVhZGVmOTM2NGExNTEyM2E2NTg5ODQ0MGMifQ"
         }
       ]
@@ -113,7 +99,7 @@
       "statement": "There are no loadX exports; consumers compose the generic loader(fromJsonLd) factory, which infers the type and threads fetchJsonLd through the reader.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L387-L390",
+          "resource": "repo://packages/utils/src/jsonld.ts#L406-L409",
           "version": "repo-lines-v1:sha256:c3630583a6d6757609deb1907f27d5f8b8f49817c10d56c0d5607706d0c00624:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjEwNzNlMmMxZDUwYzQ3ODNjYzJiNDJjOWMxNWY1YjI5ODY4NTY0NGY2MTljMmJmMjAxNTIzNTQyNzcxNjc5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWZmZTJmNjhmZDQ0NzUwODMwZjFmNjY5MjcyZDhjOWRjZDU5YmJlZmVhZTZiNzQ3YWJkOWM5ZDJjODdhMTRlNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmNlZDRiM2E4MjMyM2E2NTRmNzg2MmM5NTNjYWFkNzc1NWJiOGU0OGVlNGEyYjRkMjRkMWJkMWMwZDMwZGI1YSJ9"
         }
       ]
@@ -123,7 +109,7 @@
       "statement": "frameActivity sniffs the document @type and picks a frame per class: a two-phase re-frame for AuthorizationGranted, a deep @embed:@always frame for need-based classes, and a wildcard @embed:@always on object for everything else.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/activity-registry.ts#L87-L112",
+          "resource": "repo://packages/authorization-agent/src/activity-registry.ts#L86-L111",
           "version": "repo-lines-v1:sha256:ff6bfaa8f74082532e13c3a8e1fde30000281b2c94c8f3af868f29f070e8c6cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwOTI1Njk5MjdkODRkMWU4NTQ5NjU0NDljNjEyNzNmOTI0OWI1MGJmOTEwNDNmMjcxNmJhMzc5ZThjZWUzZTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4ZTk1YzJkMTg4ZmZmMDg5YWFlNzE3NmNjZmM5ZGFmYmE1Y2EwZjVjOTFhYjljOWFhNTIyNmRmZjYyOTE5MzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkMjhlMmQ0ZDVjMmQ2ZTEzMDU5Mzk0OTg4NDdlYmUxYTc0NjU4MGJlMTQ5YjkzZjllMDc0NzlkZjk3NjUzYTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4YWY2YjI1ZWM1MjUxY2FhNTFhNzA2NjNiNzRlMzM3YWU3YTFkMWQxNWFmMzc1NTI0MDE2MGE5OTQzZTE4NTQifQ"
         }
       ]
@@ -133,14 +119,42 @@
       "statement": "Self-graph SPARQL scoping (FILTER(?g = ?s)) guards authoritative reads: findRolesWithMember uses FILTER(?g = ?role) so an embedded activity-graph projection of a to-be role cannot assert phantom membership that keeps matching forever.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L367-L385",
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L361-L379",
           "version": "repo-lines-v1:sha256:eb2b68f2c1564fe0077b84073b4afb57da4ff77302c272c539f0a8d90fb5294b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwNzhmNzA4YWVjZDJmY2Q1NmRhZDk0MTVkOGFiZmRjNzI2NGNhOTZkYzc4ODZmMGYwN2VhYmY1N2IxY2MyYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlODgwZDJhODBjNzVkNzI4YmFmODQwODFlZGMxNjc0OTE3YjY3ZjhkOGE5NjhhNzc0MjE4MDgyMjI0ZWQwMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NDVkZGQyYmMxYmMxNjBiZWM0ZjY3MGIyY2Q4MjMyODdmZDQxYjk2NzMwNmEzMjViMjk0ZmRmZmQzMGVmMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fddb632a18674e4e98de660fb1a096b6",
+      "statement": "SPARQL INSERT/DELETE DATA patch bodies are produced by serializing JSON-LD to N-Quads with jsonld.toRDF through toNQuads; the utils insertPatch/deletePatch/addStatement/removeStatement/replaceStatement helpers now accept JSON-LD documents instead of DatasetCore/Quad values.",
+      "evidence": [
+        {
+          "resource": "repo://packages/utils/src/jsonld.ts#L350-L362",
+          "version": "repo-lines-v1:sha256:7625fb8847acf8a8396c8c19a6ec669038d22881639b3ca65fcb445fc6c288fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1M2EwNThiZGYzZTVhYTVkZjBlMmYxZWUxNDIwYTFjNTYwNmE2ODllNWY2NzNhZTQ1ZjY3MDM1NWFhMGUxNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0ODQ2YTk5NzFiOWUzMDA4OWQyNzljOTI2YWIyMTliMTQxZDJkYTY0MDU0ZDI5NGIyMGUxM2E0ZGUxYThmMDQifQ"
+        },
+        {
+          "resource": "repo://packages/utils/src/sparql-update.ts#L5-L16",
+          "version": "repo-lines-v1:sha256:3a67bf35e360836c3befa2d3ba7678cdf1663bd8a6258ce1ba8c157177982d69:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhM2JiYjgyYzI1ZjY4MmI0N2UxOTA4NjdkMDBhZmZlOWQ2YWVhMzQ1N2RlYmVhMDczOGRjYWEzNGRhZmI5NTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxNjBlZGYwOGU0OWM2MTkwNjcyYjU4OWY3NDQxZDFmYWFkY2EzMDhiYmZhMmYxMzA5MGM4NjlmMzljYWJiMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5a0bd58583b24bb6be1064d7e9a76b99",
+      "statement": "The in-repo notifications helpers replace the external @solid-notifications packages: ChannelType names the channel-type IRIs, discoverSubscriptionService finds the service from the topic's storage description, and subscribeToNotificationChannel POSTs a compacted JSON-LD channel request and returns the server-assigned channel.",
+      "evidence": [
+        {
+          "resource": "repo://packages/utils/src/notifications.ts#L35-L41",
+          "version": "repo-lines-v1:sha256:9f5972894c57af468b3c772ad416e8e0683f4527fd26a84dfd51b15746f9b1c2:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGU5ZWU4MjczMmYyMjk2MmYyODBjZWRhMzVjMjk4NWFjNGM1NDU3MjBlMDVmMTJhOGEzZDM0MGU2MjE5ZjkzMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDJlZWJkNzI4NGUyODM2NWFhY2RlMWM0OTc4NmM1Mjg0MmNmY2QyNWM3NGFhNzk2MWMxOTU4MWU4ODM4NzA1YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzJlMTdmMjY5OTIyMDE2NzA0OGExMDI5YTMwNDdjMDRhYjQyNjEwOWNiNmM2NWFjMjQxMjM3N2FjNDdlYTI4YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjk2OGY3ODhiMjJiOGNjNGM2NGQxMjQ1ZTZmZTRiYzQwZTc2ZjQ4NDY4N2Q0YThkNTZhNjRmYjg3ZDM0ZTRlZCJ9"
+        },
+        {
+          "resource": "repo://packages/utils/src/notifications.ts#L52-L110",
+          "version": "repo-lines-v1:sha256:e4e03c8f104faad209faf1467d1238af402eaedcde36737cc49850bc510be0ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxOGEwZDYxMjNjZmM5M2U1ODk2Yzk3MmJjOWE2MjhlODlhM2U5MmZmNjI0ODgyNTBhMjI1ZGU3YzJkZmQ5NDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1YmZiNjlkZjI2MTdlYWU0NzE1ZjdiM2U1NDdlZDQ4NTg0MGI3NmRmMmZlMGYzZjViM2NmNjhlOWNhYzUyNmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjN2Y3NzU5OTk0MzU1NWQwNTlhMzdhYjM5NDEyYjIyZTExYjEwMDMwYzc5YTA4MzVjOGU3YzQ0MDg1NGI2MWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:04:39.559Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

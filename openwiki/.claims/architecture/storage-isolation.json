@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7681255c71d55892d37e4f632ec79ab48f60411026b9cf10d2bc67567456b11d",
+  "claims": [
+    {
+      "id": "claim_cdb927c3d0174925b70f73d9558c35a0",
+      "statement": "PodEndpointStore keeps two typed records in the CSS AccountLoginStorage — `sparqlEndpoint` for every pod and `objectEndpoint` for data pods — both keyed by `podUrl` with an `accountId` backlink; finders resolve records by pod URL, account, WebID (via the account lookup), or longest pod-URL prefix over an IRI.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/PodEndpointStore.ts#L12-L28",
+          "version": "repo-lines-v1:sha256:fdad52cac3ecf5cccd281970a6758e98ecc611642fef2b73b9858d74a1fba809:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiNmE3ZTcwYzg0MDkzNWNjNTJmYmI4ZjA3OWMxOThkNjhjYWRjNzhhZjQ2ZmQ1MjAwNmVjZTUyZjhjNTk4ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3MjMzNGRmNzYxZjFlY2E4YjEzNzJmNzMwMWNmYzEzMmFjMGU2MDdkZWRkNjY2MGI3MWUyMWFkMDVkMGFhMWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzNjBiZWNlNWU3ZDJmMWQzMWJkY2QyYmE2YTQ4NDY2YjVmMDlmYWRkODFhN2VkODhiZDQ0OWQ4NjVhMzQxMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhNmI0MWVkYTBkZTM3MGY5NTJjNzg4ZDhjOWE2NGE0ZDdkMWUwMzg3MjJkMTEzZDU5YTNjMDM5ODVlZmNmNmQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/PodEndpointStore.ts#L124-L167",
+          "version": "repo-lines-v1:sha256:80f29ad581f99c10e60fac24b45b74f97e925ac157725558e49eef0485b6cf48:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1NmIyOWU0OWYxZWRmOTUwY2VjZjJjMWM2YmIyMTVhNWRlNWRjYTgyMzY0MjI4NWY3MDA0ZDI0NGM2YTExYWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0MDljZWU3Mzc3MGJkNDcxYjQyNzlkMzg5MTJiM2I3NDliOWI1ODRmOGZlMWI4M2U3YTcwOGFlYmVjOWMzODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4MWNkYzY3MzQ2YzE4ZDFiODExNmJhZTRjZjRlMzI1ZGYzMGFiOGUwZTg3YzkzYjdmMjcyN2NmNTEzODQ1OTkifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/PodEndpointStore.ts#L199-L215",
+          "version": "repo-lines-v1:sha256:c222e47a0d9870fb2876943c25980202c40358f0768d49faaa7557be7e5c9f00:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MGI0Yjg3N2I4YzAzNGQxNjg0ZDEzZDFhMTJmMzE4ZTJkNTljZDI4MGQ2NTIxNTliMTdhZjc3ZjBmNDM3ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzZTZkYjI3NzliMGI5NWM5ZTY5YjdlNzQ1NDE4MjYzZGYzYzQ0YTk1YzUxYmIxYmE4YzZkYjAxOGE2NDQ4N2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmNThmZmQ0ZWVkMmZjNGE0YjUxNGNmNjIyNjgzNzE3OGQ4M2EzMThkMTgxMGRjODk3ZDdmMTExY2I3ZDdjY2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6624fd55b15c4dc08ff47d17a56c5a97",
+      "statement": "Both routed accessors resolve the pod from StorageLocationStrategy and fail closed: an identifier that is not under a pod raises NotFoundHttpError, while a pod with no endpoint record throws instead of falling back to a shared/default store.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/RoutedS3DataAccessor.ts#L59-L72",
+          "version": "repo-lines-v1:sha256:981fb540471b73585438721cbfb37e2d64532a163b0e9d3d229d17f0c5ac02f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmM5NDhiYTM4MGY4ODA0MjM4OWRiYWIxOTcwYWFjNjRiZTMwNDY3ZjM3ODliYmQwMjAwZjJjMDNjMDcwMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3OGMyZjlmMzJhZDkyNzhmNzczMmNmNmY0MjcxZWI1OWI2YjhlZTU4NjA4MWZjMjI1YzQyYjY0M2VjYzk0ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0NTM3Njk1ODUwNTU0NTM4NTU5MTdjYWRlZTE1OGUwY2U3NmZkNjk4NDVkZWEyYWJiY2EwYzFjZTkwYzc5ZmYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/RoutedSparqlDataAccessor.ts#L53-L67",
+          "version": "repo-lines-v1:sha256:0910cd0fdd96e963cac4aa5cdec2016b1c109509b1e8d2580bd84a3dfef3cadf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYzBlNjk4YjdjMWQ0N2ZmODcxMDI1YjJlOTBhODI3MGE5N2IwODFhNzJiNzFkMGRjMDI4NGM2ODAxZmM0OTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3OGMyZjlmMzJhZDkyNzhmNzczMmNmNmY0MjcxZWI1OWI2YjhlZTU4NjA4MWZjMjI1YzQyYjY0M2VjYzk0ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI2OTU4NGQzODQ0M2RkYzZmYTcwNWE1YWZlODQ3NmE4NjJlYjgwZjlmYjEyOTY0MzU5YTk4NzZmMmVjZGI3YTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5ce9a9a8aae94d8e80c4d051ef765e5b",
+      "statement": "HybridDataAccessor routes quads (and all metadata, children, and containers) to the SPARQL plane and binary documents to the S3 plane, writing binary metadata to the SPARQL plane, and deleteResource attempts both planes tolerating not-found.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/HybridDataAccessor.ts#L22-L27",
+          "version": "repo-lines-v1:sha256:00c4e416d2c5c97cd1a73d307b6ddd7c8483ebc405acaa5f937a41f094ecca06:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2IyZmMxOWFiNDA4ZTg3MDA4ZThkMDhhODU2ZTRkZGJjMDY3OWZlMDljOTFiZGI3YmE5OWFlNjZlZWUwNTY0ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmQ5NDliZDM4ZjQ4ZmFmZjRkOGJlNWYxM2Y4YmMwYTUzYTliY2UwNGYyMWFjZmNkMTAyMWE5YmQyZWM3MDU4NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjBhMjEzODVhMzM1NmU3ODM4YWNhZDY5YTk4MDJkYzQ1NjIyMWU1NTlhNjk0NmMwYzQxNjZjMzY5ZmRmZjMyNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGYwYjE1OTNmNmUyYWIyYzM5YTViYmEwYjI1NWFkMGE0ZjgxMDM2OWE4MTg5MDU1MDlkMTg3MGI1MmQyNDIzYiJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/HybridDataAccessor.ts#L37-L61",
+          "version": "repo-lines-v1:sha256:b2e8627a5bff92b57e07a03916c7eefc802f27deb78ab228fea834fe4f80634d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiMGQ0NDQ3Zjk5Y2IzMzU5N2MzZmU4ZWE0MzA2MDM0NjlhYmY4YjE3ZTYzZGIyMGZhMzA2ZTI1MGVkMGJmOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MTJmMDZkN2I2MjZiZjBlZjFlMGJkNTA2YzBmMGJkZTJiZTIyMzk3OGVhZjQwM2E4NGU1YjczY2QxMDhjOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkMTEyNGNmODU2ZjM2ZjgyOGVlMTMzYmY2ZTBlZWYzNGE4NjE1ZWJlMTE1MTUxNWFhODQxNTcxMWM3ZDcyMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0YjQ5YTQ5N2IzZDIyODE0MmEyMmEzMmIxYmE1NjE2N2U4OWE1MmI5M2ViMzM4ZWNiMmZjM2NlYjNlNTY5NjcifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/HybridDataAccessor.ts#L87-L96",
+          "version": "repo-lines-v1:sha256:30c5ad7ebfeb748322a4f3420f5552ae184f0ce97bfb2c1a2369aa498b6df5df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkMDI5YTIxYzk4OWM0M2E3OGNiNDI5MTYzZjg1NzdhZDljZjQ5MmU5Y2MyNWUzMDhmZjNlODU1M2UyM2FkY2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5YjBjMGQzYjNkMGFhYWUyNWNiOTAyOGNmMDYzMDJlMWU2YzZlZWJjYmRkYWY1NmE5NWI1Yjk4ZmYxNDkyY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMThmMTJlM2RjNjg0ZTk3ZDJjZjg2ZWU0OGEzMGM3MDA4YTAyZTI1YmIyMmI0NmU3OTE0N2UyZmM1ZDk2NjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMGY3MjkzZDE1NmE2ZDEyNTI4ZGIxMjkzMzc5ZTUyYTVmODM2NzA0NDI5N2IyMjgyYjk3ZmYyYzg2MDQzOGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d155b6b2f5e34bda934c182b7a14a045",
+      "statement": "SessionManager builds an owner-scoped `podUrl -> endpoint` allowlist from the owner's endpoint records and passes it to AuthorizationAgent.build as `sparqlEndpoints`; a session whose registry-pod endpoint is missing throws rather than falling back.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SessionManager.ts#L84-L98",
+          "version": "repo-lines-v1:sha256:a4af702ef19929eada0f322590233cdf54795073b56109ff771508f973ad9ea0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmNzUwMzcwZmQzN2NmMjljODljYzRjZDI5OGVjYjg4YzQ4MGMwZTE5Mzg1OWM4ZjNlZWJmM2Q2YmM1NWIxM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3Nzk1MTA3MDEwNTZiZGRhZDEzZjYyY2M4MzlhMjEwM2RiYjM0OGI2OWUzMDNlM2ZjNTZhMDFkYmFkMDE3ZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBmNzc2NWZkNGFjZGJmZTNlMTZmNzMzNjdhM2NiZjE3NmI0NGQxYjA5YmRkZTE4ZDhlODJlNGFiNzNjZjNjYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiOTRlYjFlZjhiZGNiZWRlYjM1OWRkNDg3ZjBlNWFlMmRlY2VlYWEyOTc5YzQxYzM2ODEwN2U5NmJmMzZkZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f0c1936ba6a7417fa501d42fcc340ac1",
+      "statement": "ResolvedContext carries an `endpoints` allowlist: the personal context reuses the session's sparqlEndpoints, while the org context reads the org's own records via endpointStore.findSparqlByWebId so the admin cannot widen the scope.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/Context.ts#L67-L95",
+          "version": "repo-lines-v1:sha256:dc1485dffa51154ccdd08a5652326182c6466a18084bb14ac9706fb93568e326:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWFlZmYwOTJmMzFmMTAxZmJiNTdlNWMzNTkyZTI4MTZlY2QyMjA3Mjg0MjFmNGE3Njc5OTk2NWQ5ODUxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4ZmNjZjQ2OGU4NjNkM2MyYzI5NGU2YTRkMzg5YmI4ZjJlZTYzZGRlYzljZDNkZDJjMzMxYmRhMTQwZGUzMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_df27f1eaed8042ed8876c8be20c2f325",
+      "statement": "Because grants live in the owner's registry pod, SaiAuthorizationManager resolves the storage owner's registry-pod SPARQL endpoint from the pod's base URL and owner WebID; an unknown pod or owner yields no grants (deny) and a store outage propagates.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiAuthorizationManager.ts#L43-L60",
+          "version": "repo-lines-v1:sha256:c8b3528f1a80b8972202f9472d87bac3cad73d9c223a9c710cec2c5a82fee672:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhNmI5ZjdkMWNiY2RjNmJhZmVkZDNmYTBiMGQ4YzM1OWIyYzkwYWY5MmRkNzA0YmVhZTM0ODY2YTFhZWFmOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZjk4ZWRiYzVkZmFhMDg1ZmI1M2E1YmU2NDFmOWI4MGVhZmUzOWJmOWIzMzdiZWQzMzZhZjM1YzE0YWRkNmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OGUzYmI0ZTc0MDExOTU2NzJlOTIyZDZlNGZkOTE2OWRjODcwMzZjZjI0MzY1NTYzYWI5YzVmZjVkN2NjYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiZmI1ZTNhNGJkYzAwYWJhNjliMDJmMThkODhkZmJhMDllZDFjNmNhZTI5MGE0Y2JmMjhhNmZkMGE4Y2NlY2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4494e62d38dd4eaab85f143033e5be0f",
+      "statement": "SaiPermissionsEngine resolves the resource's own data-pod SPARQL endpoint (via StorageLocationStrategy plus findSparqlByPodUrl) to read the resource graph, returning no result when the resource is not under a pod.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L320-L340",
+          "version": "repo-lines-v1:sha256:2cfe767291c5f46bd41946bf689add6fac5dfcf7499265835b6ce44c74ec48d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3Y2VhNWYyNGE4YzkyOGU5NDgxYWVhODRkOTI0NmE3YTQ3NWQyMTg0Y2U5Njg4NWFkM2FjMGZjNmVkMGNkMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwZWU5ZTkxZmY3ODg2MmE0MDA0ZGMwNWE4NTNkN2U4OGIzYjUyZjNmY2ZiNmZhN2M5MjMxOWNjNGM4ZmVlNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5M2RjOWQ0NGM3OWFjNmI3YTQ5ZTU1ZjU1YTdiZWVlMGRkYjU5ZWI1M2FmNjU5ZjUwOGZlMDU1MmE3NzFiYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkMzVhNDFjOTQyOTc1NmNjOTE5YTNiMTlkYmJiMDg3ZmVjZTJlZmJhOWRjODQxNzM5YmJhYjMwMThmNDUxYWIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L41-L50",
+          "version": "repo-lines-v1:sha256:fb53cc411bf2ed817bf13022147a87524860d27012bc8d19a70fccb03572155f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyNGUzZDZlYmIzN2U3YzEwZmFhYzE1NzQ2YTQyODdjZjU4OTBiZmZkMWI3YzVlMTA4NDk2OGQ3YjU4YTgzNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkYWVmNTRlYTUyNDQ1NTAwYTE5YmEzYjgzODg2ZjlkZGNiNmI4Zjg0NjNlZjc4YjdmYjAwOTg0YmYxYmM2YTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY2YWRiY2QwMGM2MDEwY2NjOTIyM2IyZWE3MzdkNDYxZTQyOTFjM2JiMWNhOWRmNzg0MGUwYTRhNDNjZWFmNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjODM5M2E0YjBkODExOGE5NTBlMzg2MTI2MzJlNzU5ZmM0N2RmOWFjNTg3ZDUxYzYzNTg3ZDBiNDZiNmJkNjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_41791f8b8efb48fc9b54c9bacbb9c20e",
+      "statement": "The bootstrapAccount workflow runs five ordered, find-first activities: createFusekiDatasets, createObjectBucket (Garage bucket plus a scoped key with compensation), writeEndpointRecords, postBootstrapTriG, and writeAccountRecords.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/account.ts#L110-L196",
+          "version": "repo-lines-v1:sha256:16053f56a541533d45f503fefc021b0e9fb1e58c64c7f47ac11b204d5fd94015:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNzU1YzU4ZDU2OTYyZGNmNzgwZjM2Y2Q5YmYxMjk5OWI0ODQ4YmEzMzU0NzQzMDNiY2I2NDRiNjExOTM3OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyNjZlNjg2ZGJiZWRmMTc5ZDE0MGVkYTcyM2FlMDJlMjNiMTk0MDNhMDUzMjM2NjkwZDgzNTljMjViY2RhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1ZGMyMzM2ZGEyOTI0MWNiOWI0NzcyNTEzMDdmY2I5NTJhYzI1NGIzY2M2NWJkNDQ3OGVlMDlmOTE1YjMwNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNWE5NGI1ZTY4MDc2MDY4YzJlMDcyNDFkOWY4MGNjMGMyMTdjYzc3YTExN2E1N2FiOGUzZDY3ODMwMDhjOTIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/account.ts#L24-L30",
+          "version": "repo-lines-v1:sha256:5e30961106e887b60cc45f2e4170a89bb6637164fd362edbfc5caf18332894b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFhOTcyNTZiZjYxNjEwZGI1YzNiZmNmYWUzMjRjMzFmMzljMDIyNDQ1NzhhZTBmNjRlZmIzMWY2MTAzY2M5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGVmMzc2MDE5NGMzMTkxZjc5MGE2ZGZhOGYzNjhlZTg4YTBiNWZiYTI4MmUzYzk1NWVkNGYzMDA1YWM0MGZhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_69398b6e99e942bca14f21ea1796961b",
+      "statement": "AccountService.startBootstrapAccount derives the account IRIs, starts the account-bootstrap workflow with the stable workflowId `account-bootstrap:<accountId>` on the create-grants queue, and returns the WebID immediately; the worker registers the account activities on that same queue.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/Account.ts#L49-L75",
+          "version": "repo-lines-v1:sha256:69880899e1040e8e9289b8420b178c78877ea9165b379130769b94c9721ce2ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/workers/main.ts#L57-L72",
+          "version": "repo-lines-v1:sha256:459c66f3ab06b14c3f644449e6e43f84810f3ab8d45bea2ab3a1a6914a22777c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkNTgzNmE0ZTUzNDM3NjBlNDUyYjdjMDYxYzgxNWEzY2NiZDc4MGE5ODg4YTY1MjM3YzllMGI1YTZiY2UxZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NzhlMjUwM2I4Y2YzN2EwNmY3ZDZmMGEzYTZiNmZlMzU2OTFmYmNhYjUwYjg3NzVjYWI2ZmFiYzcxYzU5MmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMDA0YjU5NGI0MGI3NDg3NWRjNzE3NGIzZDU1YjU0NWQ0OTRlNTNiNzI0MDU3ZTU4YzAyYWJlZWJhMzM0MDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxMDA0YjU5NGI0MGI3NDg3NWRjNzE3NGIzZDU1YjU0NWQ0OTRlNTNiNzI0MDU3ZTU4YzAyYWJlZWJhMzM0MDIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
+  }
+}

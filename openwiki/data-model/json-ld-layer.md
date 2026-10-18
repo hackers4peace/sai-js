@@ -3,14 +3,9 @@ type: data-model
 title: JSON-LD read/write layer
 description: The JSON-LD-first transport shared by the data-model and authorization-agent packages — framing-not-compacting, the selectNode whitelist, the loader factory, the read and write paths, the activity-registry class-gated decode, embedding semantics, manual helpers, and the self-graph SPARQL scoping hygiene.
 tags: [json-ld, transport, framing, typescript, solid, sparql]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
 sources:
   - id: openwiki-source-82daddf07d8ad3efedbe52d2
     resource: repo://packages/authorization-agent/src/activity-registry.ts
-  - id: openwiki-source-654e83ca378000da767000a7
-    resource: repo://packages/authorization-agent/src/agent-registration.ts
   - id: openwiki-source-81f61b66ae2ead4432d4358a
     resource: repo://packages/authorization-agent/src/sparql.ts
   - id: openwiki-source-5f3a5827ade0bebc11f29499
@@ -19,18 +14,25 @@ sources:
     resource: repo://packages/utils/src/container.ts
   - id: openwiki-source-d900b4364e5e03dbadc6c83e
     resource: repo://packages/utils/src/jsonld.ts
+  - id: openwiki-source-ffa35cc9379c0d10f59dfee0
+    resource: repo://packages/utils/src/notifications.ts
   - id: openwiki-source-5fb2d11486c54acb71821300
     resource: repo://packages/utils/src/sparql-update.ts
   - id: openwiki-source-228968b8fb4f70750899249e
     resource: repo://packages/utils/src/whatwg-fetch.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # JSON-LD read/write layer
 
 The entity POJOs (see [Data model entities](entities.md)) are carried to and
-from the Solid servers through a JSON-LD transport in `packages/utils`, with
-Turtle/quad machinery kept at the SPARQL and ACP/ACR boundaries.
+from the Solid servers through a JSON-LD transport in `packages/utils`. Quad
+machinery now survives only at the SPARQL boundary: JSON-LD documents are
+serialized to N-Quads for `INSERT/DELETE DATA`, and CONSTRUCT results are
+converted back with `jsonld.fromRDF`. There is no Turtle parse/serialize layer.
 
 ## Core helpers (`packages/utils/src/jsonld.ts`)
 
@@ -49,6 +51,10 @@ Turtle/quad machinery kept at the SPARQL and ACP/ACR boundaries.
   `node[propertyIri] ?? []`.
 - `withContext(context, node)` — attaches the `@context` to a POJO for the
   `toJsonLd` write path.
+- `toNQuads(doc, base?)` — serializes a JSON-LD document to N-Quads via
+  `jsonld.toRDF`. A default-graph document yields N-Triples (valid Turtle data
+  for `INSERT DATA`); a `{ '@id': graph, '@graph': doc }` wrapper yields
+  N-Quads with the graph label in the fourth term.
 
 ## Framing invariants
 
@@ -111,17 +117,32 @@ sniffs the raw doc's `@type` and picks a frame per class:
 
 ## Container creation
 
-`createContainer(id, fetch, dataset)` PUTs an empty container first (CSS
-ignores the body), then `applyPatch`s the triples onto the discovered
-description resource; the container-creating callers route through it.
+`createContainer(id, fetch, doc)` PUTs an empty container first (CSS ignores
+the body), then `applyPatch`es the **JSON-LD document** serialized as
+`INSERT DATA { ... }` onto the discovered description resource. The
+container-creating callers route through it.
 
 ## Fetch boundary
 
 `packages/utils/src/whatwg-fetch.ts` is the single `WhatwgFetch` type. Resource
-CRUD uses raw JSON-LD; the SPARQL-patch layer keeps quad machinery (`DatasetCore`,
-N3 `Store`, `graphDoc` via `jsonld.fromRDF`) in
-`packages/authorization-agent/src/sparql.ts`. Turtle survives only at the
-ACP/ACR template boundary and the SPARQL `INSERT/DELETE DATA` patches.
+CRUD uses raw JSON-LD. The SPARQL-patch layer (`sparql-update.ts`) now takes
+**JSON-LD documents** and serializes them with `toNQuads` — `insertPatch`,
+`deletePatch`, `addStatement`, `removeStatement`, and `replaceStatement` no
+longer accept `DatasetCore`/`Quad`. The authorization-agent `sparql.ts` still
+keeps quad machinery (`N3 Store`, `graphDoc` via `jsonld.fromRDF`) to turn
+transport results back into JSON-LD for the framed POJO path. `text/turtle`
+survives only as an output representation (the id service `Accept` branch and
+`@jeswr/pretty-turtle` there), while ACP/ACR is JSON-LD and the bootstrap seed
+is TriG.
+
+## Notification helpers
+
+`packages/utils/src/notifications.ts` replaces the external
+`@solid-notifications/*` packages. `ChannelType` names the `WebhookChannel2023`
+and `WebSocketChannel2023` channel-type IRIs; `discoverSubscriptionService`
+HEADs a topic for its storage description, GETs that description as JSON-LD,
+and finds the `notify:channelType` match; `subscribeToNotificationChannel` POSTs
+a compacted JSON-LD channel request and returns the server-assigned channel.
 
 ## SPARQL graph scoping
 

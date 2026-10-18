@@ -1,12 +1,13 @@
 ---
-type: integration
-title: Auxiliary services
-description: The supporting services around the SAI core — the WebID/CID Hono service in services/id, the Community Solid Server instance configs in services/css, and the Cloudflare shape-tree worker in shapetrees.
-tags: [integration, webid, cid, css, shapetrees, cloudflare]
+type: "Reference"
+title: "Auxiliary services"
+openwiki_generated: true
 verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T19:35:35.072Z
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 sources:
+  - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
+    resource: repo://docker-compose.yaml
   - id: openwiki-source-c4c901bbae020feec3d29213
     resource: repo://services/css/auth.json
   - id: openwiki-source-e78a59eda6a92be12d4886a5
@@ -19,8 +20,9 @@ sources:
     resource: repo://services/id/server.ts
   - id: openwiki-source-ba7d0112a176643ef8b07b66
     resource: repo://shapetrees/functions/%5Bcollection%5D/%5Bname%5D.js
-generated: { by: "pi", at: "2026-10-09T19:35:35.072Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
 ---
+
 
 # Auxiliary services
 
@@ -31,14 +33,17 @@ but are essential to a running deployment.
 ## WebID / CID service (`services/id`)
 
 `services/id` is a Hono HTTP service that serves **WebID profile documents** and
-derived **Controlled Identifier Documents (CIDs)** from an oxigraph-backed
-SPARQL store. `services/id/http.ts` is the default plain-HTTP entry (port 3000)
-and `services/id/https.ts` is the TLS variant; both mount the Hono app exported
+derived **Controlled Identifier Documents (CIDs)** from the Fuseki `id` dataset.
+`services/id/http.ts` is the default plain-HTTP entry (port 3000) and
+`services/id/https.ts` is the TLS variant; both mount the Hono app exported
 from `services/id/server.ts`.
 
-The server reads `ID_ORIGIN`, `DOC_ORIGIN`, and `CSS_SPARQL_ENDPOINT` at module
-load and throws if any is missing. It installs permissive CORS and exposes two
-routes:
+The server reads `ID_ORIGIN`, `DOC_ORIGIN`, and `CSS_ID_SPARQL_ENDPOINT` at
+module load and throws if any is missing. The `CSS_ID_SPARQL_ENDPOINT` points at
+the Fuseki dataset whose `sparql` service holds the WebID profiles (for example
+`http://fuseki:3030/id/sparql` in dev); it is distinct from the per-pod registry
+datasets (see [Per-pod storage and isolation](../architecture/storage-isolation.md)).
+The service installs permissive CORS and exposes two routes:
 
 - `GET /` is the subdomain router: the `Host` must be exactly one label deeper
   than `ID_ORIGIN` and end in it, and it 303-redirects to

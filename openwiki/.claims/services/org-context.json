@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:9a08902345232d7c9a1837d1dacca6822d7ce184cb5f489470901d7cbdf81a94",
+  "pageVersion": "sha256:cce90e85a2d16913f78e215ca48c9180955f504465cf1c253fd52435a481864b",
   "claims": [
     {
       "id": "claim_b5871d230f8c4e0f9c3ae3d8ea64b36b",
-      "statement": "adminSparqlTransport implements fetchBindings (SELECT) and fetchTriples (CONSTRUCT) over HTTP QUERY to /.sai/sparql-admin/<base64url-org>, and sparqlTransportFor dispatches personal contexts to localSparqlTransport and org contexts to adminSparqlTransport.",
+      "statement": "adminSparqlTransport implements fetchBindings (SELECT) and fetchTriples (CONSTRUCT) over HTTP QUERY to /.sai/sparql-admin/<base64url-org> (optionally with ?pod=), sparqlTransportFor dispatches registry-plane reads to localSparqlTransport or adminSparqlTransport, and sparqlTransportForPod dispatches data-plane reads to the session's per-pod transport or the admin transport for that pod.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/queries/org.ts#L129-L169",
-          "version": "repo-lines-v1:sha256:954a175728e35668bd062358453e247a865ba715f65417674ba1f4ecfca01d44:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlZDk4YWJlODUwYTUwMWIzOThiZGZiYjA5ZjdlNjI1YjNmMjg0MTYxMzk3NjNkYWJlYThhYzZhZjBhNWIyMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZjZjliYmZhYTM3Mjg4YzIzY2Y2YTRiNTdmMzAzNzM4Y2JlOThhYWQ1ZGJmNTg2ZDYzZDM3ZGMyNWJmYmUzNTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/src/services/queries/org.ts#L136-L160",
+          "version": "repo-lines-v1:sha256:84173c98759a0a488ecab736b550346c5c133c5ce496bf12759cf398f3d9495b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyM2NmMDM4YzEyNDA2NzQxMzQ3YTY2MTBiMTZhNzdkODdiYWM2NmE2Y2Q5YTMzYmZiODdkNGMwZjhmMDk1YjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzOTJiMmE1YWU0NmE3M2U1NmQ5OGE2OWI1MGNiOTMwOTM5ZTBkN2FhODE4N2FkZTE2MGY3NjRmOGMxNjY5NGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzZjcxMTI0OThjOWM4YTYwNDMwMDBiOWQyMTFlODg0NmVhMWQ2ZWEwNmFiNzMzYTMxMTM3MjBmOGYzYmI2NzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYTY5NGU2M2VhZmYzNzY1ODgzMjU5OGJiOWEyODEwYjM3ZDVhOWY4YzJhYTEyYjVmZjRiNmQxODZmNzE5NGIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/queries/org.ts#L176-L193",
+          "version": "repo-lines-v1:sha256:0208112ee81eada469a562f11924f95cf8d1c9661d042ae7a19a693bfcaf2130:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3ZTljNjBkNGU0MDRlOGMyYzIxMzdlZjkwOTkwMzFjZjM3OTEzMjZjZmM4NTYyYjQ5ODM5YjUwN2UwYTFhNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4MjM2OTU3MmQ1OTU2Mzg0YzY4NGY3NTQ2YzVjNDJmMTg1NjY0NTM0OWQzZDU1OTAwMzY1OTljMDU4NWFmODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -17,7 +21,7 @@
       "statement": "The /.sai/sparql-admin handler accepts QUERY only (rejecting other methods with MethodNotAllowedHttpError(['QUERY'])) and requires requireOrgAdmin.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/AdminSparqlHandler.ts#L91-L99",
+          "resource": "repo://packages/components/src/AdminSparqlHandler.ts#L127-L135",
           "version": "repo-lines-v1:sha256:a0ad3bc2830229e5c7eb968c3c736d49a6a30187b3d1f50002db0787a34559a0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZhNzllMTg0Nzk2YTEyMzQ5YzAwMzEzNDdiMDFjMzA4MDAyNjEzYWYwZmUwNDUzMDIxYzI0NmM0ZjUwMDlmYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTBlNTBiNjAxM2Y3YzRmYzRkYzUwZjAyNWJlYWZkMWY0ODU4YTc5ZTRiZmViMDgxMmRlNjM3MTBmODk0YzFjOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWYyNDk2ZGUzZWZlYTNhZjJlYmQzYjMyNzBiYTczNTljNDdhM2NjN2FhMGM1NmU4NDA2NjIxODhhNTY1ZDhiZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjRjNjZkZmJjZjRmZDA0MWE0NTIzMjhlMGRlYmU1NTlkMzVkMDM3NDRmYWViZTBmYjZhZWVlM2YyZDBmMzJkNCJ9"
         }
       ]
@@ -27,7 +31,7 @@
       "statement": "requireOrgAdmin returns 403 unless the org's registration of the caller carries a non-empty hasAdminGrant, making an unknown org indistinguishable from a non-admin.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/adminGate.ts#L37-L57",
+          "resource": "repo://packages/components/src/services/adminGate.ts#L38-L58",
           "version": "repo-lines-v1:sha256:3441414923a8d8603755749084814ce1263a5f14f45cf35a465922d1eabec0e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NmZiZTg4YWIwN2VhZWExMTliZGFjMjJhOTI0ZTA1OTQyZDc1ODhmMmFmYWI5ZGMyZGMwZjNhNjQ3YzZkMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2ZjQwNWRlMThlYTcyODBjNmY3ZGFhZjJlNjNlODVlNmUxNTExODhjZmY0YjUwYjkzOWExNjcxM2ZlNWIyZWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0MjQyMDAyYjMzZDMxNzk5N2QwMWIzYWNhNTlhODFmZWM4OTQzZGYzYjQ4ZTI3YzI5YzU2N2RhMjg5MmE0NGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlMmViMTVjZTRiNjAxNThlYTU1MzU4YmQxZTQyZTYzYzcwZjUwZTk4OWNmYzBkYTQxZGU4ZTg3NTA4NWExNGEifQ"
         }
       ]
@@ -37,11 +41,11 @@
       "statement": "The /.sai/proxy-admin handler is GET-only, resolves the org webId from the base64url path segment, gates on requireOrgAdmin, and enforces JSON-LD-only responses.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ProxyAdminHandler.ts#L108-L115",
+          "resource": "repo://packages/components/src/ProxyAdminHandler.ts#L109-L116",
           "version": "repo-lines-v1:sha256:89031e8f4230743446c000a2e9377282f015017129d40b95a9b0fedb64f719a4:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTlkZDZiNGJlMTE1ODgyYTZiNWE4ODQ2MmU3MTYzY2Q0YjVhNzA5NjVjYjgxNWI1ZDIyNzk1YzA5ZjA3ODExMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGVkYzRlMzI3Mjg4NzQ5NzVkYWM5NDZmMDg4MjIwMjI4YzIzZjNhZjcyOTMxZGFmZjMzNWU1YjdmYzY5ODE0MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGMxNTIyMDY2YTlkMTE4MzY4NTg1NTNhNzhhMGFlZmQ4MDI3NjE5MGI5ZDExMWFhNzE5OGM0MTVkYjQxZTFjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhODU3NDc3Yjk0ZWE2NTQyNzk1NTJhODU5MDc5YmEyNGMzNWZhM2RhNDVlYWM5YjcyM2JhMmY3OWEyOGJmNCJ9"
         },
         {
-          "resource": "repo://packages/components/src/ProxyAdminHandler.ts#L61-L71",
+          "resource": "repo://packages/components/src/ProxyAdminHandler.ts#L62-L72",
           "version": "repo-lines-v1:sha256:5d9119cca002674ee025f29c457fdbf516b1f85c98aff3328bc04a94c3dc7012:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5YTM1YzJhMWUzZGQ4MGUzZTZmMTQ2NTk3ZTJhZTBhN2IwNDNhNmI5OTM2NGQ3MWM0ODM0Y2U4NmEyZmY5YjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhYTc3M2U5ZTA0YzBlNzIzZWZjNTZhZjJkYjk5OGI2OTE5YzgxMjgzOWZlYmFiYmQxOWIwY2EzNzRkODk2YTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0MDFhMjU4ZDc5NjVmYjlmMmViZTc4YzNhYjMwNGU0MGZiZDljMzMyYWIyN2ViNmExZmRlNDJmYjU0MmVlMzkifQ"
         }
       ]
@@ -55,11 +59,11 @@
           "version": "repo-lines-v1:sha256:622c5b25d1a3b3f2dfa5da93277943853753e9cdd8d3add1f5c017991f024ddf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyNWNhZTdmOTg0YjY3ZDkwODM4NzVhNjA4YTcxNjAyNmY3ODBkOGQ4NGM4MmY2NmM4NWU3YTYwODA4ZmE0NmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjMWY4MmMwNTQ3NjkyMzM1MDExMWRhNWNjYzVkNThlOGVlNjUzY2I5N2FlOWU5YjNlZTgwNTViZjVjZTVmM2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/components/src/services/peerProxy.ts#L54-L87",
+          "resource": "repo://packages/components/src/services/peerProxy.ts#L55-L88",
           "version": "repo-lines-v1:sha256:39a3302c44f9825842ce9a836f5a329e7d5fb8c795961700e44c67a11aa9ef80:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0YmQxOGY3MWMyZTk4NGVhM2QxNDNmMzFjZjUxNzI0MmQ5ZWU2YjJlYzQ2OTgxZmEyZGFjODJiMDM2YmZlMzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiNDU1MDM4YTBjMDJjYzgzYTYyZGNmZDEzYWMwZjlhMDU3MWZmNTNiODQ3OWFhYTVjMzczZmVlYmE5NjFkZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjMjYyMzA2YTBlYmJkZjM0MWYyN2Y4ZjM4NDllOWMzNzMzNzZhNjMzZmJkMTc2MzE4MDE3ZGYyNTE0ODRjZmYifQ"
         },
         {
-          "resource": "repo://packages/components/src/services/peerProxy.ts#L99-L170",
+          "resource": "repo://packages/components/src/services/peerProxy.ts#L100-L171",
           "version": "repo-lines-v1:sha256:8113aea94ec5393206d55ec9fa550089691258ae158c24a91237bc13777d09e5:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjYjlkMjNiNzgwOGM3ZDczMThhZTYwNjc0YjljNTEyYzQ5ODIwN2Q5NzMwZGVjMjczYzI4NmYzZjhlMDk3MjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyOTcyM2ZmY2FhOTE5ODYwZjFmMjcxYjJmYTg2N2JjNWNjNTE2Y2NlMDMzZDUxYjUwN2EzYzA2MTQxZDM4YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
@@ -69,7 +73,7 @@
       "statement": "SparqlTransport is a two-op interface (fetchBindings for SELECT, fetchTriples for CONSTRUCT), and query functions are endpoint-agnostic, taking the transport as their first argument.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L58-L60",
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L52-L54",
           "version": "repo-lines-v1:sha256:d1d3dfb258eca7ed2486657945049b2378b93cdea6ea7c72298f12b198a6b74e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzNlNDI4MTM5MDI4NTliNWYyYTY2ODEwZTNiOWNjMGU0OTgyYjcyODU2NmYzYzJlZjE5NjFmNWM5MTcxODJkNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGY0NGM0NDYyYThlMmEwOWVjZmExOTUwMGRlZWUzN2I5ZjAxMWQyY2VkM2VjNTRlMzUzYjgwNmJjMjE3NzVkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODkwZGJkZTVjNjMyZmY1MzU4YWVkOTg4NGVkMzJjOGM4YjFhNDlhYjQ2MzJiYmJiNjI5YzBiMTc2NDliMTZhMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDQzZGIwZTZmNjdkNzgzYTAwMDcwOTA0NzQzN2NiYmM2YWYzNGE4MDQ0NmE4NjQwMzRiYWI1YzM1ZDFhMjcyZiJ9"
         }
       ]
@@ -79,14 +83,38 @@
       "statement": "localSparqlTransport runs the same endpoint-agnostic queries over the internal endpoint via SparqlEndpointFetcher, used for the personal context and the AA's own session reads.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L74-L82",
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L68-L76",
           "version": "repo-lines-v1:sha256:35d9b51201180ef4d42ca9449af1a82c9e10fa3fd8ec43c2e1a5f6bf20bd28f1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFjNTU1MjQ3MjljZTQyZDBiMzA5ZDdiODA4MzkxODM3ZmU0NTc4NTA3ZjQ0NGU3ZmQ4MjBkM2VmZDZiNDJlYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzViMTRhYmFmMmQ5MDJhOGZlNTlkYzNjNzk1ZDk0OWRkMjViY2U4ZWQ1OGFhZTgyYWEyZDdkY2I4NzgwY2ZkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTU5MTE5ODI4NDFmZDY5ZjcyNDZlYTkzM2EzNzBmYjZkMDNkMTA0NmYyZjRjMDBjYjE0MWU4YjA2ZjUxNDA5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjhlMGQyOTgwNDcwYmNjNzhiYmE3YWM0MTg2MWFmODYwMzhhNzU2NDFjMDUzYTFmYWVhNjdiMmU4OTRmN2RjOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_91f8d5d4cf5946818a5c19d8e63a1cc7",
+      "statement": "The /.sai/sparql-admin handler resolves the org's registry-pod endpoint from the endpoint store by default, and an explicit ?pod=<podUrl> is served only when the endpoint record's accountId matches the org's account, otherwise ForbiddenHttpError.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AdminSparqlHandler.ts#L103-L116",
+          "version": "repo-lines-v1:sha256:addb73e399988d21fea35ac33f1e19d7e9c81aa97639b284a89712ebb6eaa12b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhMzZlNzVjOGE3YTRiZTNhMzg2MDcxZTUwZWI1MDFmZmZhMDM2MDlmMDU0YzQzZWM3NDk0NTMzN2FmNmM2YWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1NGIwZTk0MGJhNTQ3MGQ5YzEyODNjNmI4ZjE1ZDljZGU5YTBlOWM1N2YyY2MxNTEyZmVkNWFiMWUwOTYyY2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4MjVkYTNkOGNmMmUzZTRlNzNmMWRkM2UyYjdkNmM0YzZjYmM4ZGI1ZWEyNmZhNGE5NGJhMDJlNzk1ZjdkZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzNDlmZTYxMzFiZjU0YWI1YzYyMzg2YjJjYTIwNWI4MTY5NWZjY2MwMTJhZWJkYTM3MmU2ZDI4YzJlMWQwMmIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/AdminSparqlHandler.ts#L133-L136",
+          "version": "repo-lines-v1:sha256:7f5d8b81cce5d1027afc9d9d9162c96ed18aa6e00b7c107381be3ebc0d8b2453:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ4NjA4YTgyNDE1NDk2N2E0NGE1YjU3YTYyMDNiYTc3ODZhNWFlN2Q1Y2EzZWY2MjI1ZGY0OWQyYjY2MDQwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWIyYTlhOWU4NDhmNzE1YjVkNjJmZjQ0M2JmM2M0NzNkZjRlYzk4MmZmOGQxYzM3MzY2MDE3NTM5MTI5YmY3MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDNjYzE1YTI2MWUwODEyMTNkZDcxYzBmNTkzZDY5MmNhYWY4NWYyMGUwNzU3NDc2ZmUxMzM1NmZkMjBkMzZkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjRjNjZkZmJjZjRmZDA0MWE0NTIzMjhlMGRlYmU1NTlkMzVkMDM3NDRmYWViZTBmYjZhZWVlM2YyZDBmMzJkNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e982890d301f41379fb077853e7bec9e",
+      "statement": "Admin MUST/CONSTRUCT-style queries are returned as application/ld+json by converting the fetched triples with jsonld.fromRDF, replacing the former text/turtle response.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AdminSparqlHandler.ts#L180-L194",
+          "version": "repo-lines-v1:sha256:103b2027e677b6901f7b2956d204a25267a74eb84f9a2d7cd18c7f56c9819813:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1NDA0YWM4MjFmNjcwNDJjMjE3NWIyODE5NDY5YjgwMjY2OTIyZjVkMjBmOWMxNDk4ZDEyMGEyN2YwYWVlZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkNzI5MDVhMmQwYjhiM2IyM2I1ODc2NTA0NDc2NmUzY2FjYWNhZjkyOGEyMTVlOTQzOGZiZjFkZmRkZmIwMDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzYWQxNTgxY2ZmNTQ0MDJlMGM5MTJjMzdkNGE5ZGNiMjM5YTU4ZWExMDM2OGM1Y2FjNzRiZjNhZmEwNTgwMmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhZmMxMjAwMmNhYjUxZTNiZGFlZTVmMTI2N2E3ZTYwMmY3MTc1YmE0NjA3MGViMjIyNTQ3NTZlM2VkZGE1NDMifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:04:39.559Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

@@ -1,15 +1,19 @@
 ---
 type: architecture
 title: Deployment landscape
-description: The h4p.net production landscape modeled in docs/architecture.c4 — reverse proxy, auth (SAI agent, Solid-OIDC provider, FedCM), registry set, data, webid, account UI, workers, and their quadstore/postgres/S3 storage backends.
+description: The h4p.net production landscape modeled in docs/architecture.c4 — reverse proxy, auth (SAI agent, Solid-OIDC provider, FedCM), registry set, data, webid, account UI, workers, and their quadstore/postgres/S3 storage backends, plus the current dev/test per-pod Fuseki and Garage divergence.
 tags: [architecture, deployment, solid, c4, h4p]
 verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:41:59.486Z
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 sources:
+  - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
+    resource: repo://docker-compose.yaml
   - id: openwiki-source-d0f68fe32d2ff3a73bba3cb6
     resource: repo://docs/architecture.c4
-generated: { by: "pi", at: "2026-10-09T21:41:59.486Z" }
+  - id: openwiki-source-833782312af20d943c4bd83d
+    resource: repo://nix/podman.nix
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
 ---
 
 # Deployment landscape
@@ -30,7 +34,7 @@ single top-level system `h4p` that contains the containers and components.
 | `ReverseProxy` | — | Caddy edge that fronts every other container |
 | `Auth` | `auth.h4p.net` | Solid-OIDC provider (CSS) plus the SAI agent and a FedCM IdP |
 | `Temporal` | — | Temporal server backing the workflow machinery |
-| `Quadstore` | — | Oxigraph RDF store |
+| `Quadstore` | — | Oxigraph RDF store (one shared store in the model and in `nix/podman.nix`) |
 | `KVstore` | — | PostgreSQL key-value store |
 | `Workers` | — | Temporal workers (push sender + webhook sender) |
 | `Registry` | `reg.h4p.net` | Registry Set (authorization/agent/role registries) with ACP policy engine |
@@ -38,6 +42,21 @@ single top-level system `h4p` that contains the containers and components.
 | `Data` | `*.data.h4p.net` | Data Registries with SAI policy engine and S3 (Garage) object storage |
 | `WebID` | `*.h4p.net` & `id.h4p.net` | WebID documents |
 | `Account` | `app.h4p.net` | Account management UI (authorization screen, credential management, social graph, pod/webid management) |
+
+## Model versus current storage
+
+The C4 model and the production NixOS/Podman configuration still describe and
+run a **single shared Oxigraph** (`nix/podman.nix` keeps the `oxigraph` and
+`sparql` containers and exports `CSS_SPARQL_ENDPOINT=http://sparql/sparql` to
+the CSS servers). The **dev/test** stack has diverged: Docker Compose and the
+Dagger harness run **Fuseki** with one dataset per registry/data pod, and
+**Garage** with one bucket and access key per data pod, resolved through the
+`PodEndpointStore` rather than a shared endpoint. Production does not yet
+follow that migration, so the model remains a fair picture of production while
+understating the dev/test isolation model — see
+[Per-pod storage and isolation](storage-isolation.md).
+
+## Components and decomposition
 
 The `Auth` container decomposes into three components: the **Solid-OIDC Provider**
 (Community Solid Server), the **SAI Agent** (`sai-js`), and a **FedCM IdP**

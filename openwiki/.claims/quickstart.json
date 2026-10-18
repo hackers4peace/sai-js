@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b029d841bea39a114acb2ec602253dd4fb205cbbed36f5e780d88bb232bc96dd",
+  "pageVersion": "sha256:99a3b360cdacc3a36b35926b29dd2ac4ef2155ef251b96d1e8b68b21544d397d",
   "claims": [
     {
       "id": "claim_128945ceebdb43de9c58258b39f648ac",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://README.md#L7-L14",
-          "version": "repo-lines-v1:sha256:3c3ab064e2a08bdb73d3cd034158abdc2fd364e962882d2cd64e30fd474e2854:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2E3ZTQ0NDEyM2Q0MGM3MGM2ZWIyOTQyYzkxZDUyZjJhNmE4MGM2Y2NkYjg5M2M3N2VkMTYyNzVhMmRkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQzZTlkYzhhOThlYzQ4YWZlZjRiNjkxY2YyZjA0OGUyY2VkODkwMGY3NWEwMTcxNzg3YWMzNThmMzE5NTAyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZkOWIwYjUxMDA5NjU2MTdlNjc1OTQ5ZTZhNWI5MzIzZDc1YWIwMTYwMjdiZTY4NmU2ZjJiMzExMDI2ZWY4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjdmMzIwMTgyZWE5YjEwYTNhNTE0OTlkOWI1YzY3MzkxYTE1Y2ZiNWFmNDIxOTBmMWFjYjU2MjI2NTVhYWIwOSJ9"
+          "version": "repo-lines-v1:sha256:482b474879f51cbaf7610f150ac8c34a26d18e75594faed9f265b4312bd03a45:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2E3ZTQ0NDEyM2Q0MGM3MGM2ZWIyOTQyYzkxZDUyZjJhNmE4MGM2Y2NkYjg5M2M3N2VkMTYyNzVhMmRkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQzZTlkYzhhOThlYzQ4YWZlZjRiNjkxY2YyZjA0OGUyY2VkODkwMGY3NWEwMTcxNzg3YWMzNThmMzE5NTAyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZkOWIwYjUxMDA5NjU2MTdlNjc1OTQ5ZTZhNWI5MzIzZDc1YWIwMTYwMjdiZTY4NmU2ZjJiMzExMDI2ZWY4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjdmMzIwMTgyZWE5YjEwYTNhNTE0OTlkOWI1YzY3MzkxYTE1Y2ZiNWFmNDIxOTBmMWFjYjU2MjI2NTVhYWIwOSJ9"
         }
       ]
     },
@@ -17,14 +17,28 @@
       "statement": "The repository's npm workspaces group the packages under packages/*, the test integration suite under test, and the docs website under docs/website.",
       "evidence": [
         {
-          "resource": "repo://package.json#L31-L31",
-          "version": "repo-lines-v1:sha256:cc268dfa6df9b8f946629fd0b632867f297b2c32348e8ef5f04d5800d9255bc6:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2MyNjhkZmE2ZGY5YjhmOTQ2NjI5ZmQwYjYzMjg2N2YyOTdiMmMzMjM0OGU4ZWY1ZjA0ZDU4MDBkOTI1NWJjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2MyNjhkZmE2ZGY5YjhmOTQ2NjI5ZmQwYjYzMjg2N2YyOTdiMmMzMjM0OGU4ZWY1ZjA0ZDU4MDBkOTI1NWJjNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDFiOWE5ZmViZmQ0OGQ0OWMyYzJhOTY4MjRmMWE5NzFkZmI5N2VjZTdlM2MzMTgzYmJlZDZkYzMyNzE4ZTA1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzhiNWFiMjgzZWE3MGQ5ZWJjZDhiNjA3MzdmMjNhYTFjYjlhMDdlYTkyZDViZmExOWMwMmJkMDc4ZDg5Y2NkOCJ9"
+          "resource": "repo://package.json#L36-L40",
+          "version": "repo-lines-v1:sha256:5934d45330c12219bb1fdbbe8b5f3ca1b5d5f7086d01f9539743a5eef276a6b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRhZWViY2I3ZGEwOWIzYTdjOTU4YzE0OWMxNmJiYmY5MTYxMmVjNjFkNDQyN2IzZWUxZTYzMjJhOGYyYmEwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0ZDhjMDczNDI5ODkzMTAxNTc2ZDg4ZDk5MTI3ZTg5ZDY4OTFkM2IxN2U4OWRmMDJlYzlhZTcwNzA1ZDhiZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2UwMzc0MDM1NzYxMWRkNzVmZGEzNWIwMjdkOGZjMmQ5MDJkYTZkMDQ2YWVlYTJiZDg0ODY1NjI4MTkyNzY4YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU2NGRjMmU1OGNhYjdkYjgyMjk5YmNlOTIyYjM3ZDQ1MDljODhjYmRmMGIwMjVkM2ZlMjFiMjhjMjAwYmFiNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_644de53d0b914f9490fa98f443e9bd8b",
+      "statement": "Dev/test storage is per pod (one Fuseki dataset per registry/data pod and one Garage bucket per data pod, resolved through the endpoint store) and new accounts are provisioned asynchronously by the bootstrapAccount Temporal workflow started by startBootstrapAccount.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yaml#L383-L396",
+          "version": "repo-lines-v1:sha256:f3eba9a52354fb1eed866c547f648b31a21bf4f0670e325a2cd2366ec5a14bc0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiOWI5ZTQ4NWFkMTExNTFjNjQxZWY5OTg5ZDVmMDIwYTI3Y2UzNTQwMTc1ZjE0OTQxYzY0ZTFjYTM1ZDE2NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMTZlZDIzOWEzNjUxYjUwNzljMGU0ZTdmMDc4NDRlYTMyOWM4NzYyOGJmOWZjYzQ2MzY3NzMzZjVlMWU5M2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkNzQwNmM4MWQwM2Q3YjcyZWUxYzMxYmIwYTFlOTQyYTllOTI2YmFjNTE5YWYwODBhOTI5ZTNmNTBlMDI1MWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5MDU5MGU1NDhkZDA4Mzg5Y2E3ZGU3NTgwODc0ZjNjYmQ1NzVkNjdjNWJlNzRiZjM4YjMyMjkyMjhjNzkyM2IifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/Account.ts#L49-L75",
+          "version": "repo-lines-v1:sha256:69880899e1040e8e9289b8420b178c78877ea9165b379130769b94c9721ce2ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:04:39.559Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

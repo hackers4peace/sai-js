@@ -1,5 +1,6 @@
 # Files
 
-- [Deployment landscape](deployment-landscape.md) - The h4p.net production landscape modeled in docs/architecture.c4 — reverse proxy, auth (SAI agent, Solid-OIDC provider, FedCM), registry set, data, webid, account UI, workers, and their quadstore/postgres/S3 storage backends.
-- [Architecture overview](overview.md) - The sai-js monorepo, the Solid Application Interoperability specification it implements, its npm-workspace package layout, and the build/test tooling that ties the packages together.
+- [Deployment landscape](deployment-landscape.md) - The h4p.net production landscape modeled in docs/architecture.c4 — reverse proxy, auth (SAI agent, Solid-OIDC provider, FedCM), registry set, data, webid, account UI, workers, and their quadstore/postgres/S3 storage backends, plus the current dev/test per-pod Fuseki and Garage divergence.
+- [Architecture overview](overview.md) - The sai-js monorepo, the Solid Application Interoperability specification it implements, its npm-workspace package layout, the no-build ESM/JSR package surface, and the Node 26/Turborepo/Vitest/oxlint toolchain.
 - [Social graph](social-graph.md) - The inter-peer connection topology — the three connection tiers (push webhook, one-shot request/response, authenticated pod access), the reciprocal-webhook polarity asymmetry, the delegation chain, and the org-vs-admin edges.
+- [Per-pod storage and isolation](storage-isolation.md) - How dev/test storage is isolated per pod — one Fuseki dataset per registry/data pod, one Garage bucket and key per data pod, the typed PodEndpointStore records, the routed SPARQL/S3 and hybrid accessors, session/context endpoint allowlists, permission-engine endpoint resolution, reciprocal mirrors, and the account-bootstrap workflow.

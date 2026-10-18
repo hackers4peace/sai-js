@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:6fdacd8a52125972390f7014738cca86d4aa09018a1b2b6a733082869c37eb8d",
+  "pageVersion": "sha256:c54b6bb257c4c8277cf6855134cd5e8053267676cd55687c296d3a5926dd09ab",
   "claims": [
     {
       "id": "claim_0b97b522438c41f6b1d20f9ebba9164d",
-      "statement": "services/id is a Hono service that serves WebID documents and derived Controlled Identifier Documents (CIDs) from a SPARQL store, reading ID_ORIGIN, DOC_ORIGIN, and CSS_SPARQL_ENDPOINT at startup.",
+      "statement": "services/id is a Hono service that serves WebID documents and derived Controlled Identifier Documents (CIDs) from a SPARQL store, reading ID_ORIGIN, DOC_ORIGIN, and CSS_ID_SPARQL_ENDPOINT at startup.",
       "evidence": [
         {
-          "resource": "repo://services/id/server.ts#L13-L25",
-          "version": "repo-lines-v1:sha256:abbf7cc57cf15bb5008c89823064675b292686992552218b48794eb2014097df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzMzUxZjdlODY5MDRjNTc5YWUxNGVkYzNhZTc5YTBkN2IxOTYxYzkzYjVjN2JmY2U5ZjQ5MGFmMjI1YmM4OGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOGJhMGYwYzE2YjA3N2ViMjExMGZmNjdiYjNlYTdlMmMwOGQ5NDk0ZDIxZDJmN2M0NjhlYTg4MjUwZWI1YjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkNTA1MTRiZWI5YTBiZTJiMDA2NjY3ZmI5MTU3N2MxMjU2NGMyNWZkNWU3ZGVkYzc5N2UwOWRiODNlZmNjMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmMjVkNTQ2MmFmZjY5ZjM1MjUzODdkNWJiODBhNjc5NmE2NmUyMGQ3ZjEwZTU5MTcyNjJhOTg5YTliYjQ2MzEifQ"
+          "resource": "repo://services/id/server.ts#L13-L17",
+          "version": "repo-lines-v1:sha256:4e0658873d30a64f87f245cf7d6ae83bf9a0622c05bd80d18580a60f7f108569:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWJhNmJkNzlkNDE1YzRmMjc2MjNiMGEwMDk0OWNiNDU2N2ZkNjFkZDM2MDAzOGEyMDYxOTJlODI1NTA3NTI3MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzY0ODYwMDNkNGM2OGJlOTlmNzQzMjc5NWFlOThiM2YzZGM5OWE4YzUzMzNlOTMwZTExYzM3ZmE4MjM5OTI2MSJ9"
         }
       ]
     },
@@ -17,7 +17,7 @@
       "statement": "The services/id `GET /:handle` route CONSTRUCTs every triple in the requested graph, returns 404 for an empty graph, and content-negotiates application/ld+json, text/turtle, and default application/cid.",
       "evidence": [
         {
-          "resource": "repo://services/id/server.ts#L45-L70",
+          "resource": "repo://services/id/server.ts#L46-L71",
           "version": "repo-lines-v1:sha256:d9bfdeb028fee41677642ac9205a17f47964a5b843f95adb6503003b80c8f2bf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MTFiZjA1YzcwZjRlM2Q2OGI1YWE4NjVhOTZiZTg0NDU2YmFlZTgzNDQyYjg0MjI5N2Y0MmFiYjg1NWNhZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4MDk5Mzk3NDJlNTIyZDEwMDE0OTg4MWU4YjkwY2VmMTZhMjlmYzg2NTliMTBkZWEzZjExNzg2NzBkZjQ4OGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjYTllM2I3MTBiOGZjNTNiYmRmMDk1OWQzMjJkMWQ3ZWU2MThmYjQ3NWE2Njg2MzNhNjQwODQ1OWU2YmRkZDUifQ"
         }
       ]
@@ -27,7 +27,7 @@
       "statement": "toCidDocument derives a CID with an n3 Reasoner that maps solid:oidcIssuer to an lws:OpenIdProvider did:service and interop:hasAuthorizationAgent to an interop:AuthorizationAgent did:service.",
       "evidence": [
         {
-          "resource": "repo://services/id/cid.ts#L19-L42",
+          "resource": "repo://services/id/cid.ts#L14-L37",
           "version": "repo-lines-v1:sha256:8a51164b6a1714d9aecbd0f707e02c7f7adcb9f3eb539c1aa0e6b65c2032ac46:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGVjYTRmNGQ0OThiZGFhNTg2ZDE1OGZjZjZmMzFkZDM1MDczZTAwNDU4ZGQ5YWQ1M2RmNTM3ZDA1MDE0MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNTA1ODQxOWVhODlhM2EyMzY5OGEwNWQ2MzRjMjEzM2I1ZGQ0Yjc3YWVhZTQwOWE1Njg1ZDk5NGUzZWRiZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4Zjk5MWNkNTA4ZjlmNzdmNjEzMzI3Y2NhMWE3NjAxNjQ0ZTllYjVjNmYyMzViMzlhOTdiODVhZWY1YjYzYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzYzViNzBkMzAwNzY2NjczZjFhNTJkZDY1M2E4YzkwNGI0NzA2NThkZmU0ZjhkMjg5Y2I2NzA3Y2I5YTk0MjYifQ"
         }
       ]
@@ -63,10 +63,24 @@
           "version": "repo-lines-v1:sha256:b89631ba1e826b3f61132f0032bd19cfb0dfa62a695f0d56bf3a6225cb088279:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZDYwY2Q2ZWZkYTU4MzI3ZDIxMjU5ZGJhNTEwMTY1ZDRlMzY3N2ZkODM4Y2RmNDcxNDY5NDg4OWEyNGQ5MWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmY2NhZTk2ODQyNDJlYmEyYTAxODEwY2EwYzdlZDljOGJiMGY5OGY2ZjMyNjgwZGMwNDM5MzQwZWY2MTE5OWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_f5d63b88985849e182b297e31bb07735",
+      "statement": "The id service reads WebID profiles from the Fuseki `id` dataset via CSS_ID_SPARQL_ENDPOINT (dev compose sets it to http://fuseki:3030/id/sparql), separate from the per-pod registry/data datasets.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yaml#L431-L431",
+          "version": "repo-lines-v1:sha256:a7472e8ac3a7e4236d09320d459eee5f66ce4bb8ba5017789b19c08b81b2dafc:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTc0NzJlOGFjM2E3ZTQyMzZkMDkzMjBkNDU5ZWVlNWY2NmNlNGJiOGJhNTAxNzc4OWIxOWMwOGI4MWIyZGFmYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTc0NzJlOGFjM2E3ZTQyMzZkMDkzMjBkNDU5ZWVlNWY2NmNlNGJiOGJhNTAxNzc4OWIxOWMwOGI4MWIyZGFmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzZkMmFhNDFmODUxMjM0MTYyMDRlMDYzOGY4OGE5M2FkN2NiNGE4NWQ1ZjNkMTY1NzRhZWM2YTllMzFmZDRiYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM2MWEwNDIzYjM1MTNhMDM1M2ZlODUxOTAwOTRkZGUyNWI2ZjM3MjA5NzQwNDdlY2VmNDgyNjY1NWJmZmQ5YSJ9"
+        },
+        {
+          "resource": "repo://services/id/server.ts#L46-L60",
+          "version": "repo-lines-v1:sha256:29da76f87e24fb5e4321090af7172f0eba3b58352d02803586dd376bdafb440b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MTFiZjA1YzcwZjRlM2Q2OGI1YWE4NjVhOTZiZTg0NDU2YmFlZTgzNDQyYjg0MjI5N2Y0MmFiYjg1NWNhZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4MDk5Mzk3NDJlNTIyZDEwMDE0OTg4MWU4YjkwY2VmMTZhMjlmYzg2NTliMTBkZWEzZjExNzg2NzBkZjQ4OGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZkYzY1ZjFlZGNjOGQ2Yjk1YTA3NTdlOGI0YWYyZjA1YjJlYThjODg1ZDU3OTgwZGY3ZjhhY2JkM2Y0MzhmZDYifQ"
+        }
+      ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T19:35:35.072Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

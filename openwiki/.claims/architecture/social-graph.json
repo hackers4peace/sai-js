@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a0293e37c5e7ba085601fb5d868098bd78eaa81084f1ef4b9798421cb798c440",
+  "pageVersion": "sha256:9351b006700c8369b0500bbdcbc13f80b4d859ea5c20babc63d7bbd3cbfe42b4",
   "claims": [
     {
       "id": "claim_b084119345de4585950b672b287c836c",
       "statement": "The reciprocal webhook is created by the reciprocalWebhook activity, which dedupes the per-pair subscription via store.findAllBetween and is triggered only by an agentRegistrationAdded activity.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ReciprocalWebhookStore.ts#L80-L90",
-          "version": "repo-lines-v1:sha256:fb9a2a72ca553f05828bc0c03eaecc60d0b987418b26179e239e97d6d10ad1c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmZmU3NDBjYmQwOGJmNjE3NGQzYmI4ZGNkNWYzMTVmMTQ5MmI1MjU2MjA3NjI3YjY1YmI0YmYyNzYyNTJkNmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjYmY2MGQ4NmVjZThkY2Y4Y2IzOGQ0ZTRjODZjMjQzNmMxYjMzY2Y4YzhmNDBlZjlkNzUyMjVhMTIwMmY2ZTEifQ"
+          "resource": "repo://packages/components/src/ReciprocalWebhookStore.ts#L80-L88",
+          "version": "repo-lines-v1:sha256:cb5326ce6b0b235e1c3fee5259a363efb6c0599ddc22414c739bb7498449e5cb:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWZmZTc0MGNiZDA4YmY2MTc0ZDNiYjhkY2Q1ZjMxNWYxNDkyYjUyNTYyMDc2MjdiNjViYjRiZjI3NjI1MmQ2ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTgzNTUyYWI1NzE0OTRiMzk5YjE4MTk5NjIyZGJlM2IzODI2ZWI2MWZjZDFmNzRjZmIxMmFiY2Y4OGU0ZjcyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTdkODYzMmU1NGU5Mjk4YWJiOTU4NzI3ZTJkNTE0MDhhYmFmMTM2NjAzNTM3OTEwMTQwYWJmNjViMzBhYjYxMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGJmMzlhODcyMzY3MGViMGExYWZiYTEzNmExOTBhMzcyNzM3NmMyYmZkMDExZjBmZWEyMTM1NzU1YjRmOGQ2MiJ9"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L183-L196",
-          "version": "repo-lines-v1:sha256:e206fc181008e443d040115c4391b3675911c846d416e8cc4ac68c3934b26f48:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwYzlkZjk3ZTExNWZhMDZjYzNmMWQzNzZmMDRmYTk0NzlkOGYwZjQzMDgxZDdiNWZkZWU1YTA2NWNiM2ZkNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1NGU3MmM2ODFjNTBlOTdjNDQyZDI3NmM4ZTVhNzUwODg2NWI0ZWYxMDZhYmNlYzczNzE4MmZlNGRmNGY4MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2OGZjNTQwMjkyNGZlYjI5MjRhNGRkNzY3YTFmZGVjMjUyMTgwNTVkODM4MWNjNjM1NzE4ODZlYjUxZDk3YjYifQ"
+          "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L189-L204",
+          "version": "repo-lines-v1:sha256:967eb92a495471cb0f6dfc703969076f8b3e05d5bd9db863d320618872f17adf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwYzlkZjk3ZTExNWZhMDZjYzNmMWQzNzZmMDRmYTk0NzlkOGYwZjQzMDgxZDdiNWZkZWU1YTA2NWNiM2ZkNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhOTg4Y2NmMWEyOTM1MzA4ZTcyOTI3MTc0ZTE3Njc1NTdjZjhkODBiNGQ0YjkyMjlhOWE2MTc3M2YwNzI0N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -21,7 +21,7 @@
       "statement": "ReciprocalWebhookHandler writes a DelegatedGrantsUpdated activity on receipt of the peer's reciprocal-registration Update, feeding the outbox.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L61-L70",
+          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L62-L71",
           "version": "repo-lines-v1:sha256:855a537cf9280aea91632f3b5eef7dc08366c6e8137c5b2a8d995a2ece973780:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjMDYyYzdmMzUwZDM2YTJjZWM5YTI2M2RmZmFhZTFiNDk1MjY4YzU0MGU5NDA3ZjE0ZTM4OTliMWNiNDhlZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyZTAyNGNmMDU4ODhhZjJmYzQwZmUwZjhmMjIwNDY4NjcxY2RmYWJlNjVmZjk5NTFjM2U3YmY0MGIwNjVkMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5ZDdmNjM2N2MxMTI1MWMxMDliMDUxMzcyNTBjNzFhZWUwYjZjOGNiYzdjNmQ2YzhjODMyY2Y2MjQxOTRiYzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjYmNiMDQ1MDQxNTQwMzVhYWMzNTBhZTAzNzFlMWU5NmM3ZTFhYWE0MTkzMWUzNDg4MTM3YjQwNWMwNjhiZWMifQ"
         }
       ]
@@ -31,7 +31,7 @@
       "statement": "InvitationHandler writes the AgentRegistrationAdded activity that triggers the establishReciprocal workflow.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/InvitationHandler.ts#L66-L67",
+          "resource": "repo://packages/components/src/InvitationHandler.ts#L67-L68",
           "version": "repo-lines-v1:sha256:ee019927870d455791989ed5b6bcc5a1be5e24b0959c34bbfd92687852867e3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJiZDNlMTM2MDg3YjE3MDI4NjI1YjQxNzE0NTQ4ZTVkYWYyMzIzODA0MjU1NWE1OGM3Y2JhN2Y0ZmU5YjMwYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmMjY3YjcwNTEyMjZiOTM3ZjdiOTE5MzBkMDM4NGQwMTM5YTVmODcwN2U2ZjhmOGUzMjZmYzJlOWEwNDgzNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTk5MTVlMjZjM2U1MmYxNDI4OGRiODlhMTk5MjhhZDFlNzgwOWFhZTg1OWZlYjU0NjFkZThjZGJiMjJmMDljMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGE0ZTQ4MmUxYWJmMzFkYjRmMDY4YzA2OGNlNDg4YjkwYWFmYzdiNjQ0ZjFjNTlhZDE3OWJmMDY3ZjYzMTUzZiJ9"
         }
       ]
@@ -41,7 +41,7 @@
       "statement": "GrantIssuanceHandler executes the storeGrant workflow directly (awaiting completion), bypassing the activity outbox on the data-owner side of delegated-grant issuance.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L189-L189",
+          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L191-L191",
           "version": "repo-lines-v1:sha256:f9d04b8bec0fe6288bf8290e2ed07c5a4c1c043f70da3b179cdcc48b0c2f81c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjlkMDRiOGJlYzBmZTYyODhiZjgyOTBlMmVkMDdjNWE0YzFjMDQzZjcwZGEzYjE3OWNkY2M0OGIwYzJmODFjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjlkMDRiOGJlYzBmZTYyODhiZjgyOTBlMmVkMDdjNWE0YzFjMDQzZjcwZGEzYjE3OWNkY2M0OGIwYzJmODFjOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE0MGE3ZWViNjlmNjZiYTYyNzQ5Y2FhMmRjYzc0ODU3MmM4NTFhNDdmMjU4MmQ5ZmUxZDA2NWU0NGRkNzVmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNlM2M2MzhkODQyOTBhM2FiNThjN2IxNDdhZjQwOTQxZmI3YjQ3ZGJkNWQwY2JmNWUyOTRlZTQyYmY1Y2RlOCJ9"
         }
       ]
@@ -51,14 +51,42 @@
       "statement": "AgentIdHandler adds a Link header with rel=interop:hasRegistrySet pointing at the org's registry set for admin requesters, evaluated against the request credentials so it stays admin-only.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/AgentIdHandler.ts#L77-L77",
+          "resource": "repo://packages/components/src/AgentIdHandler.ts#L78-L78",
           "version": "repo-lines-v1:sha256:b9dcf9666941ca530d0e1c2d9d46b66e9495f516df49b370c67cc3c7e2beb30c:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjlkY2Y5NjY2OTQxY2E1MzBkMGUxYzJkOWQ0NmI2NmU5NDk1ZjUxNmRmNDliMzcwYzY3Y2MzYzdlMmJlYjMwYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjlkY2Y5NjY2OTQxY2E1MzBkMGUxYzJkOWQ0NmI2NmU5NDk1ZjUxNmRmNDliMzcwYzY3Y2MzYzdlMmJlYjMwYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTYwNTJjY2MyYWNmOWVlZmVmOWIwMjFmZGIyMTQ1NjYzMTZkYTRhMmI2NjRiMDVlNTU3ZDNhOTkxMDhkMzc5MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjQ5OWU4OGE0MGYyOGE5NjE5ODY5NTI5YTNkNmViZmJlYzljMzMxNzA4ZDQ4MjA5NTI2NDA5YWQwYzRmODczNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4a5669e147644a0b9a3029a1b04f582b",
+      "statement": "The per-pair reciprocal subscription is created with the in-repo subscribeToNotificationChannel helper for ChannelType.WebhookChannel2023, which replaced the external @solid-notifications packages for discovery and subscription.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L14-L19",
+          "version": "repo-lines-v1:sha256:56b08a2362e97d2f78c3f3a65de488bf44f8ba8ad166a6779a655863550a857e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTgyMDA5NjRhOTc4NjM1NTIyYjJhYjA5MGM2NTA2NWQ4ZWY4ZTg1YzQ3MzBiYjJlYjA0NjBkMzRjNjc3ZGRiYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzMzODcwNTM5OTZkOWNjOTNiZWMxMDA5M2MzMDIzODI3YzQyYjJhNmMwZmY3MzkwYWYzMTY1ZDYyYWI0MDA3MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmNjOTFiYzY3ZWZkYjI2MmJhODZkZjZlNTc5ZmY3ODhhYTRmNWFkZmE5MGVhMWNhNGEyZGJlYmY4OTJjMTJiMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzdjOWYyMjM3ZTE5NjE3NmFmMTU1MzgyZmRhYTQ2YTJhYjE2ZDI5YmJkY2I2MmY2ZGYxZTgxZjRlY2MxYTU4NiJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L197-L203",
+          "version": "repo-lines-v1:sha256:47d84b6ef73736fd215df8cf4c06a1ae9567eb073be2f2dacfa5dcf987d688a4:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc4ODU0YmNjZDJhNDk2NjQ5YTQyNWYzZjdiMjEwYzcxMDlhMzBkNTJkZWIzYjJiZWJmNjA5ZmVjNTc5NDVlZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTI5YjgxOGIzNTM0ZjNkMTIyYTA0MmI5NTM0OTAyZTk5ODUyNzI5MGI2NjBkYTlmOTJmODMyZDEzZDgyZGY4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTA1MTdkNGJiMjIwM2Q4MzU3ODg4MzM3ZTViNTMxZThkODMyYjM2MmFkYzMyOTMzOWQ1ZWY0MWQ0YzdlZTc0NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://packages/utils/src/notifications.ts#L83-L110",
+          "version": "repo-lines-v1:sha256:31a471b22c1cd68242bb176128736e2536393b2c56ad401e7064445d198258c9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4OWY5YWNhOGUyNTllNWQzOTIyNmZiMTA2ZjBlNmVkMjJlMjQ5NDkzOTRmZTVkNWI4NzY3MzdhMGFiMmQyMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1YmZiNjlkZjI2MTdlYWU0NzE1ZjdiM2U1NDdlZDQ4NTg0MGI3NmRmMmZlMGYzZjViM2NmNjhlOWNhYzUyNmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5MTAxMjYwOWYyMDVkYjFiOTU2Zjg0ZjU3YmNkNTA5MWZlYjRjMGYyNzA3ZDBlY2RlMmNjMDA0MDA3OTEzN2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba0e2c522c7e41adb4024091e364083a",
+      "statement": "syncReciprocalMirror writes the peer's reciprocal registration and its linked grants into the owner's registry-pod dataset via updateReciprocalMirror, using the owner session's registry-pod endpoint as the write target.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L153-L168",
+          "version": "repo-lines-v1:sha256:46e659cc1266a26636115576b69371f22b6e07bc1344ff90dba8775f9fe4a1ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyOGM2ZDI3ZjczNjJiZDczNjUxNzEzM2MzNWQ0NmQ2OGFjNDJjMGY5M2Q0ZWFlZGE0NDNjN2UyYjYyMDQ4MjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiYmNlYTYyODE3MjA5ZjRiODlmZWI3ZTMwOTQ4YjkyMzJmMjEzYjY0ZTkzN2Q3ZmE1ODg0MDQyM2Y0YzM5MTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyNmZlMDFjODBkYmNmMjRkZGM4NTJkMmVlN2MwNGQzZjVhZjY4Yjk0ZWU1ZTQ3ZDk5OTM4YzY3MTM3OWQzMDAifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:04:39.559Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

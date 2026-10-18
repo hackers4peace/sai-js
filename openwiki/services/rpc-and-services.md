@@ -3,19 +3,21 @@ type: architecture
 title: RPC contract and service layer
 description: The @effect/rpc contract, the ApiHandler entrypoint, the peer layer diagram, personal-versus-org context resolution (owner identity is the org), and what each component service owns.
 tags: [rpc, effect, services, architecture, typescript]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
 sources:
   - id: openwiki-source-39263cf4b989bfbe674c72c0
     resource: repo://packages/api-messages/src/effect.ts
   - id: openwiki-source-92862eeddb750415b0a0a89f
     resource: repo://packages/components/src/ApiHandler.ts
+  - id: openwiki-source-3e8f48f62968e08a27cd3572
+    resource: repo://packages/components/src/services/Account.ts
   - id: openwiki-source-452244fad48fe4fdb39195dd
     resource: repo://packages/components/src/services/Context.ts
   - id: openwiki-source-20e9ce588a1e0e4469c2c993
     resource: repo://packages/components/src/services/RoleRegistry.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # RPC contract and service layer
@@ -77,6 +79,14 @@ envelope `traceId/spanId` from the active OpenTelemetry span, builds a
 the request context and delegates to a service function, and finally runs
 `RpcRouter.toHandlerNoStream(router)` inside `Effect.provide`.
 
+Its constructor now takes a **`PodEndpointStore`** (not a raw SPARQL endpoint):
+every `resolveContext` call receives it, and `revokeGrants` gets it too, so the
+service layer resolves per-pod endpoints rather than a single shared store (see
+[Per-pod storage and isolation](../architecture/storage-isolation.md)). The
+account paths were renamed accordingly: `bootstrapAccount` calls
+`accountService.startBootstrapAccount`, and `addAdmin`/`removeAdmin` take an
+`agentWebId`.
+
 ## Context resolution (personal vs org)
 
 `services/Context.ts` owns `ResolvedContext`. The invariant is that the session
@@ -94,6 +104,13 @@ are short-lived (per request / per Temporal activity) and hold a webId-keyed
 registry-set map: the user's own is eager-loaded, every org's is lazy-resolved
 on demand, so there is no cross-request cache to invalidate.
 
+`resolveContext(userSession, context, endpointStore)` also returns an
+**`endpoints` allowlist** (`podUrl -> endpoint`): the personal context reuses
+`userSession.sparqlEndpoints`, while an org context reads the org's own records
+via `endpointStore.findSparqlByWebId(context)`, so the admin never gets a wider
+endpoint set than the context's pods. Downstream data-plane reads use this map
+(through `sparqlTransportForPod`) instead of a shared endpoint.
+
 The org-context read and proxy endpoints this resolution selects are documented
 in [Org-context data plane](org-context.md).
 
@@ -101,7 +118,11 @@ in [Org-context data plane](org-context.md).
 
 Each file under `packages/components/src/services/` owns one domain:
 
-- `Account` — handle uniqueness + account/webId/registry-set bootstrap.
+- `Account` — handle uniqueness (`checkHandle`) plus `startBootstrapAccount`,
+  which derives the account IRIs, starts the `bootstrapAccount` Temporal
+  workflow on the `create-grants` queue, and returns the WebID immediately
+  (account provisioning is asynchronous; see
+  [Per-pod storage and isolation](../architecture/storage-isolation.md)).
 - `ApplicationRegistry` — application listings and unregistered-app profiles.
 - `SocialAgentRegistry` — social agent listing, profiles, `acceptInvitation`.
 - `RoleRegistry` — role CRUD (`createRole`, `updateRole`, `deleteRole`).

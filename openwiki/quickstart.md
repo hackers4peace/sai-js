@@ -4,14 +4,18 @@ title: Quickstart
 description: Task-routing map of the sai-js wiki — architecture, data model, service layer, activity pipeline, Temporal workflows, UI, testing, and operations pages at a glance.
 tags: [quickstart, index, navigation]
 sources:
+  - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
+    resource: repo://docker-compose.yaml
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
     resource: repo://package.json
+  - id: openwiki-source-3e8f48f62968e08a27cd3572
+    resource: repo://packages/components/src/services/Account.ts
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
     resource: repo://README.md
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
 verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Quickstart
@@ -26,6 +30,7 @@ Use this map to find the page for the topic you need.
 | --- | --- |
 | Understand the repo and packages | [Architecture overview](architecture/overview.md) |
 | See the production landscape | [Deployment landscape](architecture/deployment-landscape.md) |
+| Understand per-pod storage and isolation | [Per-pod storage and isolation](architecture/storage-isolation.md) |
 | See the inter-peer topology | [Social graph](architecture/social-graph.md) |
 | Learn the JSON-LD entities | [Data model entities](data-model/entities.md) |
 | Learn the JSON-LD read/write helpers | [JSON-LD read/write layer](data-model/json-ld-layer.md) |
@@ -48,3 +53,9 @@ Notifications webhook `Add` reaches `ActivityWebhookHandler`, which forwards it
 to the events stream and (on the owner channel) starts a **Temporal workflow**
 whose activities materialize grants/registrations and write an
 **ActivityCompleted** — which the events stream delivers back to the UI.
+
+Storage is **per pod**: one Fuseki dataset per registry/data pod and one Garage
+bucket per data pod, resolved through the `PodEndpointStore` (see
+[Per-pod storage and isolation](architecture/storage-isolation.md)). New
+accounts are provisioned asynchronously by the `bootstrapAccount` Temporal
+workflow; `startBootstrapAccount` returns the WebID immediately.

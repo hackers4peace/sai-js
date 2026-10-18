@@ -3,18 +3,19 @@ type: architecture
 title: Activity outbox and events pipeline
 description: The append-only Activity Registry outbox and its pending/done state machine, the producer and consumer (workflow) tables, the Solid Notifications webhook delivery, ActivityWebhookHandler routing, the ActivityEvents bus, the embedded DataAuthorizationData POJO carrier, and the reconcileActivities backstop.
 tags: [activities, webhook, events, solid-notifications, architecture]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
 sources:
   - id: openwiki-source-82daddf07d8ad3efedbe52d2
     resource: repo://packages/authorization-agent/src/activity-registry.ts
+  - id: openwiki-source-c154d0515a7154469b1f503c
+    resource: repo://packages/components/config/http/notifications/ndjson.json
   - id: openwiki-source-a9275a0e3a23f49eea3d9b3f
     resource: repo://packages/components/src/ActivityEvents.ts
   - id: openwiki-source-c18acf0c50387f2e5ea026d1
     resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-a9727c97c08565f7dac9c147
     resource: repo://packages/components/src/EventsHandler.ts
+  - id: openwiki-source-d8a4328f642d2e3760ef7fcd
+    resource: repo://packages/components/src/NdjsonNotification.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
@@ -25,18 +26,24 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
     resource: repo://packages/data-model/src/activities.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+  - id: openwiki-source-ffa35cc9379c0d10f59dfee0
+    resource: repo://packages/utils/src/notifications.ts
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Activity outbox and events pipeline
 
 The SAI service layer is **activity-first**: RPC handlers validate input and
 append one typed `Activity` to a per-webId **Activity Registry** outbox, then
-return a pending acknowledgement. Solid Notifications delivers the container
-`Add` to a webhook; `ActivityWebhookHandler` decodes it and either starts a
-Temporal workflow (owner channel) or only forwards it (observer/admin channel).
-Workflows finish by writing a minimal `ActivityCompleted` resource, which is
-forwarded as `done`.
+return a pending acknowledgement. Solid Notifications (subscribed through the
+in-repo `subscribeToNotificationChannel` helper, which replaced the
+`@solid-notifications/*` packages) delivers the container `Add` to a webhook;
+`ActivityWebhookHandler` decodes it and either starts a Temporal workflow (owner
+channel) or only forwards it (observer/admin channel). Workflows finish by
+writing a minimal `ActivityCompleted` resource, which is forwarded as `done`.
 
 ## The state machine
 
@@ -131,6 +138,17 @@ by loading its `target` original. `EventsHandler` serves `GET /.sai/events`,
 resolves the webId from the account cookie, subscribes a stream, flushes
 headers with an initial heartbeat, and heartbeats every ~30s. There is no
 replay — clients must listen first.
+
+### Notification wire format
+
+CSS webhook deliveries are JSON-LD. For **streaming** channels the server
+advertises `application/x-ndjson` through `NdjsonNotificationSerializer` and
+`NdjsonStreamingHttpRequestHandler` (`packages/components/src/NdjsonNotification.ts`,
+wired by `config/http/notifications/ndjson.json`): each line is one expanded
+JSON-LD notification, because the stock CSS serializer and streaming handler
+hardcode Turtle and the notification context is not publicly resolvable. The
+`GET /.sai/events` stream is a separate, sai-owned NDJSON stream served by
+`EventsHandler` (not the CSS notification machinery).
 
 ## Leaky edges (accepted)
 

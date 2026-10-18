@@ -3,9 +3,6 @@ type: operations
 title: Production deployment and observability
 description: The NixOS/Podman VPS deployment (nixos-anywhere, flake hosts, ragenix-encrypted secrets, Caddy reverse proxy) and the OpenTelemetry env contract, mechanics, and Tempo/Grafana observability path for sai-js.
 tags: [operations, nixos, podman, caddy, ragenix, opentelemetry, tempo]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
 sources:
   - id: openwiki-source-3eda5d2b85501c78fc0ba02d
     resource: repo://flake.nix
@@ -13,13 +10,24 @@ sources:
     resource: repo://nix/caddy.nix
   - id: openwiki-source-b5b7c7b18f157aa016a62301
     resource: repo://nix/h4p.nix
+  - id: openwiki-source-4a0a78bc752d0516a23440a7
+    resource: repo://nix/images/sai-css.nix
+  - id: openwiki-source-f17a99c6d8bccb141c65fb47
+    resource: repo://nix/images/sai-id.nix
+  - id: openwiki-source-cba26730439008725c490cef
+    resource: repo://nix/images/sai-worker.nix
   - id: openwiki-source-833782312af20d943c4bd83d
     resource: repo://nix/podman.nix
   - id: openwiki-source-60ea044d0e14ab98032a8e8c
     resource: repo://packages/components/src/tracing/bootstrap.ts
+  - id: openwiki-source-2fd7b9e9b2c7414ea65e9cc2
+    resource: repo://services/id/server.ts
   - id: openwiki-source-c862349b5581cece054d0a3b
     resource: repo://tempo/tempo.yaml
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Production deployment and observability
@@ -45,7 +53,22 @@ OpenTelemetry → Tempo → Grafana trace pipeline.
 `backend = "podman"` and declares the full service fleet (oxigraph, sparql, id,
 postgresql, temporal, auth, worker, registry, data). Containers get systemd
 `Restart = "always"` by default; the one-shot Temporal schema/namespace setup
-jobs force `Restart = "no"`.
+jobs force `Restart = "no"`. The image definitions
+(`nix/images/sai-css.nix`, `nix/images/sai-worker.nix`, …) pin `pkgs.nodejs_26`
+to match the repo's Node 26 requirement.
+
+### Production still uses a shared Oxigraph
+
+The Podman fleet is **not** part of the per-pod storage migration yet:
+`nix/podman.nix` keeps the `oxigraph` container and the `sai-oxigraph`
+`sparql` facade image, and gives auth, registry, data, and worker
+`CSS_SPARQL_ENDPOINT = "http://sparql/sparql"` instead of an endpoint store
+with one dataset per pod. The Fuseki + per-data-pod Garage buckets described
+in [Per-pod storage and isolation](../architecture/storage-isolation.md)
+currently apply to the Docker Compose dev/test stack only; Nix images and the
+NixOS deployment would need a follow-up. The lag is visible in the `id`
+container too: Podman still passes `CSS_SPARQL_ENDPOINT`, while the current
+`services/id` server reads `CSS_ID_SPARQL_ENDPOINT`.
 
 ## Caddy and secrets
 

@@ -3,25 +3,31 @@ type: architecture
 title: Temporal workflows and activities
 description: The Temporal client and worker bootstrap, the three task queues (create-grants, reciprocal-registration, forward-to-push), the typed *Id boundary objects, the self-contained createGrantsForAgent regeneration, findRoleUsage routing, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
 tags: [temporal, workflows, activities, worker, architecture]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T20:45:09.690Z
 sources:
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
     resource: repo://packages/components/src/services/ShareResource.ts
+  - id: openwiki-source-b3f53b3cc2943909883f8582
+    resource: repo://packages/components/src/temporal/activities/account.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-e04884959e0812782a6d49fe
     resource: repo://packages/components/src/temporal/client.ts
+  - id: openwiki-source-4dbb1c79cd1a93efa0f3bf2d
+    resource: repo://packages/components/src/temporal/workflows/account.ts
+  - id: openwiki-source-1478d95c096325a2041fecee
+    resource: repo://packages/components/src/temporal/workflows/create-grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
     resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-09T20:45:09.690Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Temporal workflows and activities
@@ -39,9 +45,16 @@ a `new Temporal()` per request rather than pooling connections.
 `packages/components/src/workers/main.ts` is the worker entrypoint: it connects
 with an infinite 500 ms retry, initializes tracing (`sai-worker`), registers
 three `Worker.create` instances, runs them concurrently, then shuts down OTel
-and the connection. The `services/worker` package is only a skeleton; the
-deployed entry is `packages/components/dist/workers/main.js` run by the Compose
-`worker` service.
+and the connection. The three registrations are:
+
+- `forward-to-push` — `forward-to-push` workflows + push activities;
+- `reciprocal-registration` — reciprocal workflows plus grants activities
+  (because `establishReciprocal` calls `markActivitiesDone`);
+- `create-grants` — the `create-grants.ts` barrel plus the grants, admin,
+  invitation, access-request, **and account** activity sets.
+
+The `services/worker` package is only a skeleton; the deployed entry is
+`packages/components/dist/workers/main.js` run by the Compose `worker` service.
 
 ## Task queues
 
@@ -49,8 +62,8 @@ The three queues are inline string literals (no exported constants), repeated
 by the producers in `ActivityWebhookHandler` and the grant handlers:
 
 - `create-grants` — the main queue; hosts the `create-grants.ts` barrel
-  (grants + admin + invitation + access-request workflows) and registers all
-  four activity sets.
+  (grants + admin + invitation + access-request + **account** workflows) and
+  registers all five activity sets accordingly.
 - `reciprocal-registration` — `reciprocal.ts` workflows, registering
   reciprocal **and** grants activities (because `establishReciprocal` calls
   `markActivitiesDone`).
@@ -70,6 +83,10 @@ by the producers in `ActivityWebhookHandler` and the grant handlers:
   `syncReciprocalMirror` (with its own retry policies).
 - `access-request.ts` — `processNeedBasedAccessRequest`,
   `processNeedBasedAccessRequestReceived`, `detectGrantedRequests`.
+- `account.ts` — `bootstrapAccount`, the five-step storage-provisioning
+  workflow: `createFusekiDatasets`, `createObjectBucket`,
+  `writeEndpointRecords`, `postBootstrapTriG`, `writeAccountRecords` (each
+  find-first; a retry mints a fresh Garage key and compensates on failure).
 - `forward-to-push.ts` — `sendPushNotifications`.
 
 ## Boundary objects and routing
@@ -111,6 +128,10 @@ Every activity lazily resolves a session via
 `buildSessionManager().getSession(webId)` and then calls the
 authorization-agent / service APIs (`findAffectedGrantees`,
 `generateDataGrants`, `RoleRegistry.updateRole`, `ActivityRegistry.createCompletion`, …).
+The account activities are the exception: they do not run in a CSS server, so
+they read their own process env (`CSS_FUSEKI_BASE_URL`/`CSS_FUSEKI_ADMIN`,
+`CSS_GARAGE_ADMIN_ENDPOINT`/`CSS_GARAGE_ADMIN_TOKEN`, `CSS_S3_ENDPOINT`,
+`CSS_POSTGRES_CONNECTION_STRING`) and use `getSharedEndpointStore()`.
 Activities are deliberately find-first idempotent (`If-None-Match: *` PUTs,
 404-tolerant deletes) so retries and `reconcileActivities` are safe. A CSS
 SPARQL-backend `dcterms:modified` race forces serialized loops instead of

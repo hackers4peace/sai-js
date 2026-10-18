@@ -1,11 +1,8 @@
 ---
 type: architecture
 title: Org-context data plane
-description: The org-admin data plane — the SPARQL transport abstraction (one query, endpoint chosen by context), the /sparql-admin HTTP-QUERY endpoint, the /.sai/proxy-admin GET-only JSON-LD-only proxy, the admin-side peer clients, and the ACP non-cascade constraint with its seeded-resource mutation debt.
+description: The org-admin data plane with per-pod endpoints — the SPARQL transport abstraction (one query, endpoint chosen by context), the /sparql-admin HTTP-QUERY endpoint with its ?pod ownership gate, the /.sai/proxy-admin GET-only JSON-LD-only proxy, the admin-side peer clients, and the ACP non-cascade constraint.
 tags: [org-context, sparql, proxy, admin, architecture]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
 sources:
   - id: openwiki-source-81f61b66ae2ead4432d4358a
     resource: repo://packages/authorization-agent/src/sparql.ts
@@ -21,7 +18,10 @@ sources:
     resource: repo://packages/components/src/services/peerProxy.ts
   - id: openwiki-source-d5d71ad8cddece4a004d0065
     resource: repo://packages/components/src/services/queries/org.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Org-context data plane
@@ -45,27 +45,40 @@ never the query or the mapping. The transport + query core lives in
 - `localSparqlTransport(endpoint)` is the internal endpoint via
   `SparqlEndpointFetcher` (used for the **personal** context and the AA's own
   session reads).
-- `adminSparqlTransport(session, orgWebId)` issues HTTP `QUERY`
+- `adminSparqlTransport(session, orgWebId, podUrl?)` issues HTTP `QUERY`
   (`application/sparql-query`) to `/.sai/sparql-admin/<base64url-org>`
-  authenticated as the admin (the **org** context); it lives in
+  authenticated as the admin (the **org** context), adding `?pod=<podUrl>` when
+  the query targets a specific pod; it lives in
   `packages/components/src/services/queries/org.ts`.
-- `sparqlTransportFor(ctx)` is the single dispatch: personal →
-  `localSparqlTransport`, org → `adminSparqlTransport`.
+- `sparqlTransportFor(ctx)` dispatches the **registry-plane** reads: personal →
+  `localSparqlTransport(ctx.session.sparqlEndpoint)`, org →
+  `adminSparqlTransport`.
+- `sparqlTransportForPod(ctx, podUrl)` dispatches the **data-plane** reads to the
+  named pod: personal → `ctx.session.sparqlTransportFor(podUrl)` (restricted to
+  the session's allowlist), org → `adminSparqlTransport(..., podUrl)` (the
+  handler verifies the pod belongs to the org).
 
 Queries are **IRI-parametrized** (keyed by resource/graph IRI, never by
 `session.webId`), so they resolve unchanged to mirror graphs at the per-owner
 store split. **Writes stay REST/LDP** (the enforcement path); only registry-set
 reads use SPARQL — data-instance content, webid/client-id profiles, shape-tree
 descriptions, and storage descriptions stay HTTP. The personal context uses the
-same query functions as the org context, routed to the session's internal
-endpoint.
+same query functions as the org context, routed to the session's own pod
+endpoints; the endpoint allowlist is in
+[Per-pod storage and isolation](../architecture/storage-isolation.md).
 
 ## Admin-gated endpoints
 
 - **`/.sai/sparql-admin`** (`AdminSparqlHandler`) accepts `QUERY` only — any
   other method is rejected with `MethodNotAllowedHttpError(['QUERY'])` — and
   calls `requireOrgAdmin`. The route config also pins `allowedMethods:
-  ["QUERY"]`.
+  ["QUERY"]`. Without `?pod` it forwards to the org's **registry-pod** endpoint
+  resolved from the store; with `?pod=<podUrl>` it forwards to that pod, but only
+  when the endpoint record's `accountId` matches the org's account
+  (`ForbiddenHttpError` otherwise), so an admin cannot read another owner's
+  dataset. SELECT returns `application/sparql-results+json`; CONSTRUCT/DESCRIBE
+  now returns `application/ld+json` (converted from the triples with
+  `jsonld.fromRDF`), not Turtle.
 - **`/.sai/proxy-admin`** (`ProxyAdminHandler`) is GET-only; it resolves the
   org webId from the base64url path segment (`orgWebIdFromPath`), gates on
   `requireOrgAdmin`, and serves JSON-LD only (`isJsonLdContentType` check,

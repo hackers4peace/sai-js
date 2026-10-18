@@ -1,28 +1,32 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:aa84bdaeebf6c0bebf0248c9d49a32d701ceebe6adb05227c043d9b218a5e6f6",
+  "pageVersion": "sha256:4d3067e0690ed40e03111ea15edd344e072388041832387b579bef7adfd10488",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
       "statement": "The integration suite runs under Dagger via `npm run dagger:test` = `vitest run --no-file-parallelism`, executing one test file at a time in the test container.",
       "evidence": [
         {
-          "resource": "repo://.dagger/src/index.ts#L449-L517",
-          "version": "repo-lines-v1:sha256:79c81ee5e4d6147aba264cbabdef6826c78f61d542a4fb8ab08666b14e9994b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlN2E3ZjVkNDc4N2RmOWMzNTE0MjlmMGQ2YzZiY2YyZTExMzM3ZDk4MGVkOGRmMjVmZGY0YWVlNGRlN2MwODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkMjkwNTNhYTkyYTU4MTlhNTA2YTVkYWJmYzA2OWFjZDI2N2ExYWY2ZGU5OTk4OTNlMTkxODAxOWNkYWY5NzQifQ"
+          "resource": "repo://.dagger/src/index.ts#L441-L505",
+          "version": "repo-lines-v1:sha256:42b0be8082076e16b60b1d7a9c5897d131570f4a1208885229f947fa1f09dd6a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5NzlhMTdjMWQwOGYxOThjOTEwNzJmZWIzNjQzMzQyMTg3M2NiMzU0OTYxYmE1ZDVkYzQ1YmRkYzk2ODgwNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2N2E3Yjg5NDM5MWQ2NmJlODZjYTFkMDk2OTg2Y2RjZDEwMjgzNzg5YmMyZWZkNDY0OTQ2N2RjOTRlMGJjMjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxZTI3NTcwMTQxNzViNGNkYzAxNTkxNGM5N2FlMmFhZDA2MWVjNWNkOGRkNzUzMzk5ZjUwYTdkMTcyZTIyMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NTYyYjY3M2YzMzZmMjFmMTNkNzc3YWQwNTMyYTRkOWFhMjgxYTJmZTUzOGJlYTgxYTQ5NjQ0YTcyYTAzMjQifQ"
         },
         {
-          "resource": "repo://test/package.json#L1-L8",
-          "version": "repo-lines-v1:sha256:5b4349c69da81a91e63e403a6cc00163fdcd5b0b49759c40a193f2b1f377814b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTdmNmYwM2IzOWE1OWNiYTBkYjNlOWViYzI2YWM1MDdkMDliOWM3Y2Q0OTE5YmQyODUwMTFkMTQ5MjYyMGI1YSJ9"
+          "resource": "repo://test/package.json#L8-L8",
+          "version": "repo-lines-v1:sha256:34833d5949c03a40ca952491610a6659644b3aa466362f799020dbf1981547db:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjk2YmY1ZjczN2ZhOTQ3ZTQ3MzRmNGIxZjJkY2FmMTA0OGU1MzAzMjQxZjFjYWUyNWFkOWJjNTJmOGRmNTJkYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTMyZTVkY2Y3ZDM2Y2U5NTczMzhlZGEyODUxMjRlYmM5ZmFhZGI4YWVmYjUzMDg3N2Y5OTRlNTRjZGQ2OTFmNSJ9"
         }
       ]
     },
     {
       "id": "claim_8aab63797b664c829e1bc57e38588ee8",
-      "statement": "test/setup.ts re-seeds the Postgres key-value store and the oxigraph quadstore in a beforeEach, so every test starts from the pristine environments/data seed and leftover state is wiped.",
+      "statement": "test/setup.ts provisions per-pod storage at module load (fixturePodDatasets/splitFixtureByPod for one Fuseki dataset per pod and seedObjectEndpoints for one Garage bucket/key per data pod) and re-seeds the Postgres key-value store plus every per-pod Fuseki dataset in a beforeEach, so every test starts from the pristine environments/data seed.",
       "evidence": [
         {
-          "resource": "repo://test/setup.ts#L58-L104",
-          "version": "repo-lines-v1:sha256:359d3db86e0cc2586638a4e338f2a850ac5916acd5aec79597d2d88b0ea28f0c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0NjQzMmM0ZTg2ZTdmZGIwZjJjMjc3MDkyNmUwNmY0YWIzOTBiYTg2MTY1ZjAxYmI4Nzk3ODcxNGUzYWE1NTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiYWM3ZmY5N2JkZjVkNTcwYjE5M2Q0YjAzNWM1MjI0MzgxNzM0MjI2YWQyOTQyYWE5ZDI2MzM0YzNjZDUxODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUifQ"
+          "resource": "repo://test/setup.ts#L136-L143",
+          "version": "repo-lines-v1:sha256:4d103aae88e2d33d382936ce5651543dc6ef26fe825783edddc8cee62b0fb588:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzVlMDgwYzEzODJmNmY0YzliOWRiNmQ5OTViODA0N2ZhNDliNWU2OTY2ODI4ZjY5NGU5MmJjYTBjMDIxMTA4MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODU4MGI3NjUxOGRhZTk3OWZhZWJkMDIzNjdhMjkyOTJhNTBkOTc2MDkyMjUxYTM4YTZjZTMwODgwYmE0MjgyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDE1MGE4MDBlYjNkNmI3NTJjM2NiOTEzMjRlMmUzMDkxN2NhNjhkZDQyN2IwNDg1MjFjOWQ1MzI1YzE3OGFiOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://test/setup.ts#L88-L105",
+          "version": "repo-lines-v1:sha256:24bb25606f07bb45a456d738b117daa8a1ee162c0bd104ed28385857caff33c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNTQ3YjM5MjRjMmY0N2QyOTM5MWVhMjI3NTYwYWY3MTYwM2VmYmZhZTAxYTA1NTY4NTNhYzBkMjU4YzAwZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyYWYyMGU1OTkwZmM0NzZlYmUxYjMwZGIxODBmMDA0ZjhmODA1MDgwNzFkNzA5ZTZhNzg5YzkxNTJmODA5MGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliYmE3ZjNjZWExN2ExZmVjMzVlZTFkNTNmMmFkM2QwOWYzYzc4OGI0NDZkODc4ZWY5NDkwMDJiMmM2NmRjYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlZTQyNGIzM2UxZDEyY2JhODMwMjdhNGNiMGY5ZjcxMWQ1NWY1ZmM1NmUxODBhYjI5MzNhOWZkNDI0M2MwMDAifQ"
         }
       ]
     },
@@ -31,12 +35,12 @@
       "statement": "environments/data/registry.trig seeds every party's RegistrySet, registrations, and ACRs, while environments/data/kv.json seeds accounts, cookies, and pre-wired activityWebhook/reciprocalWebhook channels.",
       "evidence": [
         {
-          "resource": "repo://environments/data/registry.trig#L1-L20",
-          "version": "repo-lines-v1:sha256:ae6d7a129925804fcdfc57e0d907d5efe99456b9f2532894d31240324e807893:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MDgxMGU3Y2U0ODE3NWEyYzY5ZmM3ZTViNDRiY2E3NDkwZGI5NzUyYzlhMTdkZWFlYjAxN2NkMWE5NTUyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZjI2YjEzMGMzYTY5MmViODRjY2ZiMTMyYzEzNGYwYTkxNzZhMmVhODkyNzRiZjQwZjExMTdjNzRkMTk0NTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlZGMwNmMwZGNkZjRjOTVhOTk3OGFiNTEwZjEwMzVjOWNkOTNkYWUzNWUwYzNiNDY4N2ZhOWMyNmQwYmUzYzIifQ"
+          "resource": "repo://environments/data/registry.trig#L1-L12",
+          "version": "repo-lines-v1:sha256:7366e5510867df950e3168452ca8ae1329132601412a87c074fc4652aeda7bbc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MDgxMGU3Y2U0ODE3NWEyYzY5ZmM3ZTViNDRiY2E3NDkwZGI5NzUyYzlhMTdkZWFlYjAxN2NkMWE5NTUyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1M2JmZGNhYzJmMjE3YTE0M2ViNDc0OWZiODUzZjExNTFlYTY0MzViMjAzYThmNDU5ZDMyYjcxNjEyYzhmNTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMjdmOTVjN2YzZmU4YmI4NzI2ZTAwZmJjNDc4NTJlNDYwNmUwODdiMTRiYTU4ZGNjMGQyYzcxYjMxN2FiZDgifQ"
         },
         {
-          "resource": "repo://test/setup.ts#L59-L65",
-          "version": "repo-lines-v1:sha256:5bf07cb48a75775c054984342e070a15d1da15b899163ac446f3f089ed83f700:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjljMGNiY2JmMzE1ZGFhZjYwYTlkOGI4ZjVhODFmZGY3NzNiNGY3MDA0Y2Y2MTI1YmU0NDFhNWNmNzRiMWE3NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzg0MTJjZjAzYmIxY2UxZjdkMmE3ZDc0Y2VhMTg1NzI0YzVkYWM1NzZjMTFmYWY0ZjU0ODNlMmYxM2I1OTJhZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzRmZjI4YjVkNmRlNWEyZjg0OWI4OTdhMDE2YTM2ODE5ZTZlZDg3ZDFhMzdlNzU3NzA0MmVhYTg2OTQxY2I1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWYwMWI5NGY2ODczZmQwOWZhNDEwZGZkMWI0NjEwODczNTlkYzRlNjMxZjY2MmYwZjQ5ZDBmM2UwY2YxMDVmOCJ9"
+          "resource": "repo://test/setup.ts#L69-L75",
+          "version": "repo-lines-v1:sha256:248401c355e6a35b0661ddd810dcf6b957e300b5f646844184f45da879fce884:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjljMGNiY2JmMzE1ZGFhZjYwYTlkOGI4ZjVhODFmZGY3NzNiNGY3MDA0Y2Y2MTI1YmU0NDFhNWNmNzRiMWE3NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzg0MTJjZjAzYmIxY2UxZjdkMmE3ZDc0Y2VhMTg1NzI0YzVkYWM1NzZjMTFmYWY0ZjU0ODNlMmYxM2I1OTJhZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNjZjkxMDBjMjkxMTVjOTAyMjQxZDg1NmY3ZjNhM2ZlNTEzNjY2NGIzYTAzOGU2NDNhMTRjNmMwNjZiNjE5YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWMyYmM1ZDI5YTBhMzRkNzcyNGE4MWI3Nzg0NGYxMTk3N2Y4ZDg5MjExMGZiZWYxNGUwOGQ1MjAwYzE5NjRkYyJ9"
         }
       ]
     },
@@ -45,7 +49,7 @@
       "statement": "waitForQuiescence waits until none of the webIds has pending activities for two consecutive polls, treating a transient registry 500 as unsettled.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L195-L237",
+          "resource": "repo://test/util.ts#L216-L258",
           "version": "repo-lines-v1:sha256:aa9986ea32cc81773e7bac1da8b400cdfd6f7da59d81eb222810f87b3a0fa6ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDg2YzlkYzEwY2U0NjZkNDAwYzU3ZjhiNjA2YWRlZmEyZTQwOGJjNzY0NTE3NzNmZDJjNDRlMzM4MzMxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGU2NzRmMzZhMzYwMmQ0NzY2ZGE3M2RmNjJkNzFmZjljM2JlYzAwMGJmODVkMGQ1YjAzMjlhMTdhOGJhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyMDU3ZjZmOGI1YWUzYTEwMzIxYzMwMTRhMTE0YWM0ZGUxMmE5NWY0YmRmZGRkZTA1M2VmZTVmOWM2NmY1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMzg3YjUwYjg4ZTVhZmM3YmJkMjdhNGMxYjJiN2M1NjVkMWY2ODkzM2Q2NGY5MWQwOTk2NzE1MDgxZWFmMjMifQ"
         }
       ]
@@ -55,7 +59,7 @@
       "statement": "awaitGrantCompletion is the listen-first barrier: it opens the registration notification stream, runs one RPC trigger, awaits the registration Update, then waits for quiescence because the Update fires mid-chain before the parent workflow's completion tail.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L240-L254",
+          "resource": "repo://test/util.ts#L261-L275",
           "version": "repo-lines-v1:sha256:e1b08cd5303499cda169cda607ac490afbec9d413863eacc4510c952247dff78:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZGY5NGI2Zjk1M2M0YmViYzYzMTJjMGVkNDFiYTY3ZjkwMGRjYWU0ZDlhMmMyOTIwZTliYzc5NzUxYWU0NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2NTI2NjNhZDlkNTY0NjJmZmVjZTBhOTVhMGRjYzU2ZWZmY2JjYzY0NjJjMWQzMzI4MzJjMGIwY2IyNTc0MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1MzljZjY4NWU5OGIzZGQyZGY2YTZhZTk2NjJhNWRmNWQ0YjJjODM3ZjQ2ZWM1OGU3NmMxNDUxMzAzODBiZTUifQ"
         }
       ]
@@ -69,10 +73,24 @@
           "version": "repo-lines-v1:sha256:e8706552bd2202b4f83a61ca3ecee3637ae0444c4a3599ff90345c1050704876:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhmZGZhZmFiZTk0Y2E5OWZjMzEwODZiZTA2YzU5NzUwMzRlY2RhYjA3ZTlmMTkyODYyNjFiYzUxNTc5ZWFjNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDk5Mjg4MmU3NTIzMWY4MDQ2YmNlOTAwNzczMDVmZWFlODY0MGM1ZjdkYWE2NGFmZDk0NWZhODQ5NmQ2YjRmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTM5NzQ0MDNlNmM2OTUzN2RhM2JjYzM1ZDMxZTUwN2U0NjE3ZGY2YmZmNzFmYzcyYmRiMmU5OGNjMTc3NjI1ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_a380c538d2ef4593baf579d5997f2338",
+      "statement": "Integration tests observe changes through listen-first NDJSON streams: openNotificationStream reads the CSS streaming notification channel, whose lines are expanded JSON-LD, and must be opened before the triggering action because there is no replay.",
+      "evidence": [
+        {
+          "resource": "repo://test/util.ts#L23-L28",
+          "version": "repo-lines-v1:sha256:a2ee1684a905a6d5bc61ce67c14fc6ec3878f676f02efbdc801d22ee1519c9fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRlNzEzMTU2ZGZiOWFiZjQ3N2Y3M2FkZmFkYTViNjcyNjRmZmJlODRiZWU1N2QxMWUzZGIzOTc4NGNiZjNjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2IxMmVmOWEwMmJiYTE3NjA5Mzg2ZWM3MTZiODVkNDI0NDQwZmEyNDM3M2EwMzMxOGRhOWFkMzA4OGZmY2FkYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjdhZTAyMTYyZGE3YWVmNmM1MDczMzAyYmRjNzlmZjY4Mzk2MWMzYjE2NzA4ZTBhN2Y0ODJhZGJmOWI4ZGZlYiJ9"
+        },
+        {
+          "resource": "repo://test/util.ts#L64-L80",
+          "version": "repo-lines-v1:sha256:8003026d029aedae7fab49399e328798d5dfccb49a4f10881ce052727f9fd07b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZjZkMzBjYzc5NDMyZjYyNTEwZmU2OTIxNjY4MzY2YzRhYWZkMjE4NTliZTg0NjNlZmYzMDM1OTQwZThlYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3MjBkNWEzNGQwMjQ2ZTdmNzc4NTJiNjM0Y2UzN2EyZGI2N2I1MzhjMjE3OTJjNjk0NGEzZWFmOGU4NDZlZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1NGZhNWRlZjBlOWY2ZGM5YTQ0ZDlkNjcwMTQ5OWIzZWViYjNlNzc4NmExYjE1ZWE5MWMyZjA0YzE5ZGRmNTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:04:39.559Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }

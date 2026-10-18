@@ -16,16 +16,16 @@ sources:
     resource: repo://test/setup.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
 verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
+  - by: openwiki/0.7.2
+    at: 2026-10-18T21:45:34.463Z
 ---
 
 # Integration test suite
 
 The `test/` workspace drives end-to-end verification against a real Dockerized
-cluster (auth/registry/data/worker/temporal/sparql/garage), not mocks. It runs
+cluster (auth/registry/data/worker/temporal/fuseki/garage), not mocks. It runs
 under **Dagger** via `npm run dagger:test` =
 `vitest run --no-file-parallelism`, so one test file runs at a time in the test
 container.
@@ -33,24 +33,31 @@ container.
 ## Dagger pipeline
 
 `.dagger/src/index.ts` defines the `SaiJs` object with service factories
-(`postgresService`, `oxigraphService`, `sparqlService`, `garageService`,
-`temporalService`, `workerService`, `idService`, `authService`,
-`registryService`, `dataService`) and a `testBase()` that assembles a node
-container mounting the repo at `/sai`, binding every service by hostname, and
-setting env (TLS off, `CSS_SPARQL_ENDPOINT`, `TEMPORAL_ADDRESS`). The `test`
-pipeline function runs `vitest run --no-file-parallelism`. `test/proxy.js`
-forwards local ports to the debug services.
+(`postgresService`, `fusekiService`, `garageService`, `temporalService`,
+`workerService`, `idService`, `authService`, `registryService`,
+`dataService`) and a `testBase()` that assembles a node container mounting the
+repo at `/sai`, binding every service by hostname, and setting env
+(`CSS_FUSEKI_BASE_URL`, `CSS_ID_SPARQL_ENDPOINT`, `CSS_S3_ENDPOINT`,
+`CSS_GARAGE_ADMIN_ENDPOINT`, `TEMPORAL_ADDRESS`). The `test` pipeline function
+runs `vitest run --no-file-parallelism` (and accepts `--tempo-endpoint` so
+Dagger runs can export OTLP to a host Tempo). `test/proxy.js` forwards local
+ports to the debug services.
 
 ## Seed and per-test reset
 
-`environments/data/registry.trig` is the quadstore seed (every party's
-RegistrySet, registrations, ACRs, and the Alice↔Kim reciprocal pair and YoYo
-admin marker reused by tests), and `environments/data/kv.json` seeds CSS's
-Postgres key-value store with accounts, cookies, and pre-wired
-`activityWebhook`/`reciprocalWebhook` channels. `test/setup.ts` re-seeds both
-(`pg.seedKeyValue` + `seedQuadstore`) in a `beforeEach` — every test starts
-from the pristine seed, wiping leftover state and pending activities — and
-puts/deletes the client-id document in Garage in `beforeAll`/`afterAll`.
+`environments/data/registry.trig` holds every party's RegistrySet,
+registrations, ACRs, and the Alice↔Kim reciprocal pair and YoYo admin marker
+reused by tests; `environments/data/kv.json` seeds CSS's Postgres key-value
+store with accounts, cookies, and pre-wired `activityWebhook`/`reciprocalWebhook`
+channels. At module load, `test/setup.ts` maps the fixture per pod
+(`fixturePodDatasets` + `splitFixtureByPod`) and provisions one Garage bucket
+and key per data pod with `seedObjectEndpoints`, merging the generated
+`objectEndpoint` records into the fixture. Its `beforeEach` then re-seeds the
+key-value store (`pg.seedKeyValue`) and **every per-pod Fuseki dataset**
+(`seedFusekiDataset`, which runs `DROP ALL` first) — every test starts from the
+pristine seed, wiping leftover state and pending activities. The client-id
+document is PUT/DELETEd directly in the test-client bucket in
+`beforeAll`/`afterAll`.
 
 ## Race prevention
 
@@ -68,16 +75,23 @@ deterministic:
   completion activity, and `openNotificationStream`/`openEventsStream` open
   listen-first streams (no replay).
 
+`openNotificationStream` reads the CSS **streaming notification** channel,
+whose lines are NDJSON of expanded JSON-LD (`test/util.ts` parses each line);
+`openEventsStream` reads the separate `/.sai/events` NDJSON stream. Both must be
+opened *before* the trigger, because neither replays.
+
 Temporal retries are off in the dev config (`maximumAttempts: 1`), so failures
 are one-shot.
 
 ## Coverage
 
 Each file verifies one protocol surface: `access-request.test.ts` (need-based
-requests), `admin-events.test.ts` (org-admin activity forwarding),
+requests), `account-creation.test.ts` (bootstrap workflow provisioning),
+`admin-events.test.ts` (org-admin activity forwarding),
 `agent-discovery.test.ts` / `discovery.test.ts` (Link-header discovery),
-`authorization.test.ts` (authorization + approval), `delegation-endpoint.test.ts`
-(issuance/revocation), `invitation.test.ts` (personal + org invitation),
+`agents.test.ts`, `authorization.test.ts` (authorization + approval),
+`delegation-endpoint.test.ts` (issuance/revocation), `invitation.test.ts`
+(personal + org invitation), `key-scoping.test.ts`,
 `org-context.test.ts` (admin org context + proxy/sparql-admin),
 `personal-admin.test.ts` (AddAdmin/RemoveAdmin + ACR),
 `policy-engine.test.ts` (WAC/ACP matrix), `reciprocal-webhook.test.ts`,

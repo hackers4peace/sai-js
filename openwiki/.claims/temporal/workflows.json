@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:f09d79dc4336b556020c46155c5c1a27176a9dd058b1f4eff4b950144718f67f",
+  "pageVersion": "sha256:a82bde403581753fac8c0af312691d8650e519a251d8bf63ee1a1eafe970aae9",
   "claims": [
     {
       "id": "claim_1750ced8cbb445bf8b3bec11cce51086",
       "statement": "The Temporal client is bootstrapped lazily by the Temporal class init() which opens a Connection to TEMPORAL_ADDRESS and builds a Client with an optional OpenTelemetryPlugin, and is constructed per HTTP request.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/client.ts#L8-L20",
+          "resource": "repo://packages/components/src/temporal/client.ts#L9-L21",
           "version": "repo-lines-v1:sha256:c3df613ee77722f83ae8f92b3a1609a542a488f22743d3d1314af7976491e135:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhN2RhZWU2NDA3MDJkODljMGI3MDgyODRiYTNjNmNlNGZlZWZhYzNkNTA1ZDE5NTBlNzNiMGU2NmFhZjdhZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkY2QyOTlhMmRhMjI1ZGE3Y2RkNmY2ZGJmODEyMTNjOGVlNDdjYTA2N2Q2NzZlYjcyMDViMjM1NDNlYzRiYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
@@ -17,18 +17,22 @@
       "statement": "The worker entrypoint (workers/main.ts) connects with an infinite retry, then registers three Worker instances on the forward-to-push, reciprocal-registration, and create-grants task queues and runs them concurrently.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L29-L74",
-          "version": "repo-lines-v1:sha256:56310d40c4f1957e67129e5fa4bd3cee162fa48ae39c9a54acdb37e76e70aa88:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzMGQ2NjVjNjJiYzg4ZDBkNDc0ODJhYzI5NWY2NmM2ZDQzZjlmMDMzN2NiNTFhN2UzNmFjZTZlYmU5ZWZhYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2YjlhYmYwYmEyZTFiOTFjN2Q4N2EyODM2NDE3MTU1NzU2NjIyYjBlZjljYzEzNmFlYTY4NWU3NGIzYjE4MjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1NjQ4MWQ3MWU1ODQ2ZjUxMWRmZjI2NjBlNmVjYjk0YTc2MDgwZTc5OTFiODlhMjNhOWIxMDBkYWNhZGFhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzOTY5ZDhiOWE5NzliZjNmNjE3YzAwYjI3ZGVhMDYyYzUzMzNkMmYyMTFjZmZhYzk1MTQ0YzkzNDEyODQ1MjEifQ"
+          "resource": "repo://packages/components/src/workers/main.ts#L25-L77",
+          "version": "repo-lines-v1:sha256:f67bacfce069a77afff52cb9428e2838c59d0ca502a5bd761c6c4f30b029d11a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlZDkyYTE4ZDBmMjhjOTY2NGVjOGFmZDJlM2MyZmM4N2MzNDY5NmNmMTY1MThjMDMyMTc0NjZmNzYyZTcwYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlNDRhZjgyMzQyOGU1Y2M2MjM0NTg3ODllODE3MTRjZWUwMDVmYTE4ZWI1ZDI2NzAyMjBiOGYwYWY4MDhjN2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MjA4MGMwYzcxZGU1OGE2Zjc3ZDBlNTFkNDc3NmI4NWNiMjE4NjYyODRmNDkwNzU4YzYzNTJjY2UzYWJhYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NGYwOGI0YjFiNjU3NGFiMzdiYzM3MGQ3MWRmNWYzOWNlNTIxMGY5MGVhNTAxNzRmZTQ4NDQwNTE0MjEzNDUifQ"
         }
       ]
     },
     {
       "id": "claim_3e55797b84984a04843668a24d7c8d7a",
-      "statement": "The create-grants queue hosts a barrel of grants, admin, invitation, and access-request workflows and registers all four corresponding activity sets.",
+      "statement": "The create-grants queue hosts a barrel of grants, admin, invitation, access-request, and account workflows and registers all five corresponding activity sets.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L58-L71",
-          "version": "repo-lines-v1:sha256:7ad677ead9bded167eef1b063418a48e8f340c2099295cf9ccf3404859f6f9c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNjg3NmE3NGUxZmExZTNiNTcyOTVmODA3ZTNmMDA2NzM5YWM1Njk4OTRkMTFiYmRjNWM0OTc1OTFiMDNhMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwOTgxOWRjNmVhY2M2N2NhYzk5MGI0Yjg2MmNhNWY2YTljOWY5NzI2NDViN2ZhZThmZTlhZmIwNWE1YmZkYzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyZTA5ZDFiMDQxMWEwYmMyYzRmNTQ1ZjFkZDkwZWUzM2JhZDkyMmNiYzU2M2RiNmExNjU5NmY0MTg4OGQ3YjcifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/create-grants.ts#L1-L11",
+          "version": "repo-lines-v1:sha256:9c12b117cdbf2a50ff090390830c28c81a91cc904692f3b5dac42537fbd37ec7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0MTE5N2YwMzc2MWMwZGRhMzk1MjJkNTE3M2VkYjYxY2ExM2UwMDg0MjBjNTBlZDMwNjMwYTBkZThhZDE4ODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3ZTk5NjJkNTEyNzEyYzlhODExNTNlYTlmMjFmZDg5ZDk3MWRhMTAxM2UwZmI2NGFmNTlmMzFkZTA2NDlhNDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/workers/main.ts#L57-L74",
+          "version": "repo-lines-v1:sha256:85208092778949f76de86c1b49575ba6ffa519ef5f6b9bd5b8db892b2ebd5f7f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkNTgzNmE0ZTUzNDM3NjBlNDUyYjdjMDYxYzgxNWEzY2NiZDc4MGE5ODg4YTY1MjM3YzllMGI1YTZiY2UxZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NzVlOTRhOTA0YWM0OWIzMTU0ZDQ2NzJhNjZlODYyOWI4NmRhYzc0ZTNlMjkzN2JlNjkyN2FlM2RhMTFjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMDA0YjU5NGI0MGI3NDg3NWRjNzE3NGIzZDU1YjU0NWQ0OTRlNTNiNzI0MDU3ZTU4YzAyYWJlZWJhMzM0MDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2YzU0NDMwYzU3YzEwM2JjNWYxMzBlOTM4Nzg1M2E5M2ViYmJhYjcxNDBlOGIyMzFkZmQ3ZmRkY2RhMDdiMjMifQ"
         }
       ]
     },
@@ -37,7 +41,7 @@
       "statement": "The reciprocal-registration queue registers reciprocal and grants activities together because establishReciprocal calls markActivitiesDone.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L45-L56",
+          "resource": "repo://packages/components/src/workers/main.ts#L48-L59",
           "version": "repo-lines-v1:sha256:9c676d3dcf5d4bb6915f84185ad2e377a2aee0a46f13fa98b804cc17b60dfafb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhOTY2YTI4NzNmY2ZhMjcyYzczMjNhMDdhZDEzNDEyOGQ5YjljMTllZDBiNzA4YjYwZDYzNzY5YWVjMzBiYzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZTFhMzlkNDAxMjFjNmU1ZDRmNDM1MTE4ZTU3YTg0N2EzNTgyNmU0OTRkZDNmYzc4OGE1ZmY0M2E5NDMwZGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZDRlNTM0M2Y3Y2M5MDc4Y2JmYTk1ZDRhODlhN2E4ZWZmZWQ2OGIwMTQzYjAzNWQ0YmNmMTNkOTM3MjE4M2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhYjVhZmQ2YmZiMWYwY2FmMGRkZWQ2MTJjMDc2YmM2MGQyMzNkMGEyNTEzY2YwOWY3NGU4MjA1OWIxY2RjY2QifQ"
         }
       ]
@@ -47,8 +51,8 @@
       "statement": "grants.ts defines the core grant workflows including processGranteeActivities (a start-or-signal consumer), processAuthorizationGranted, updateDelegatedGrants, createRole, processRoleMembershipChange, processRoleDeletion, and reconcileActivities.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L91-L431",
-          "version": "repo-lines-v1:sha256:0f73a99e01a39683880c3ffffac8ad3bc41f30dde800acb4fb93488a68855699:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1N2U5MzcwZmU1ZjdjNzFmNDNkNzUzZTY4OTRlYmQ0MDM2OTYxMzNmMDU4Y2IwMjNhYzRkOGJlZWU4NTJjMjhjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI1Yzk0ZTE2MzlhMTAyMzAxN2NhYzVkYTQzNTRmNTMxNTQyMzI1YmJhZjEzNjRhOTQ3YTAyZjEyYjJhY2RiZjZlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmOTg5NGQxZjZhZjA1OWVhOWVmYWM1OGRlM2E4NjdiZWRkZThmMzQ2YTJiYmFkMTkxMjFmN2ViODFlNDYzOWRhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyYjc3NTYwYjIyMGZmMjdkMzdmM2VlZWIyOWRkYzk3NzEwOTM5MjE5YWVlZDZjM2Q0Y2RiOTU1Nzg1N2E5Nzg5In0"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L131-L440",
+          "version": "repo-lines-v1:sha256:ea74086e17d255554c7975a9ae51aac1a7d6008cf7695f18c1824e1174f54fe0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyYzU3M2NiNjY1Mjg3YWE4YmZlNTUzNDVjM2JkNGQ5MmQxZTg1Y2ZiNzUxYzdjYzc3MGQyMDllMDMzNjI5ZmJjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3YWE0NDllNGM5NzlhODZmZjIzYzRlNTI4Y2JkN2JlNmY1ZTgyMDBmODM3ODI4NTY5OTU4MTkwMDNhYWZiY2MwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5NzkzYzkwNmMwOWZiYTQ0NTZhOGM0YzAwMjI2N2ZjODg3NTRhYTY2NjIzMDc2MTEwOTA5NTMxYTJhNjI5YzBhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmODlmNTAxNWZmM2JhMGU4N2NhYzcwOTFkN2U1ODU5ZjU3ZTQyOWVjYTE0MzQ0OWI3MWQ0M2MzYjEzZDcyMTA4In0"
         }
       ]
     },
@@ -57,11 +61,11 @@
       "statement": "Activities lazily resolve a session via buildSessionManager().getSession(webId) and then call the authorization-agent/service APIs, using find-first idempotent PUTs and 404-tolerant deletes so retries and reconciliation are safe.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L113-L124",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L114-L125",
           "version": "repo-lines-v1:sha256:0b4ca2e1e9f695178d586b04ca0284c9a97c271b96e52a9927c9c65d809c4903:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2OTYxYWIwM2I2MzY0Mjg4OGVmZDU0NDYzMWJlOWI3MWYyNjcyYzg5MjdlNmY0NTVmNWM5NGNiOWM5ZDdkNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhNWFkMTU4MDZlNmYzZWMwYTUzZWFmODU2OThkZDU4ZDA3ZDc2YzY0ZmI3ZWRkODVjZTRmN2Y1NjcxOWM5MzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2ZjE4ZjhiMzJhY2E5ODc0MWNmMTU2NDVkNWUxYjM3ZWY1NzNhMDIwNmZjN2I5MDJhZjUzNDVhNzYzMDI1MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1ZTliYmQwOGMzYmQyYmFkNGVjZWMzYmFkNjk2YmYxOTNmZDYyNzM0OTZiYjNlYjA4NTg0ZjQzN2UwNDY0MWIifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L778-L790",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L776-L788",
           "version": "repo-lines-v1:sha256:8d38244f2719252534effc10e1afd3c1268d51c71db020705dff5659a793d346:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMGFhMTdjODgzODlhMmQxM2U1MmJlNDljY2E1YjA3OTU1YWIxNDNkMGM1Y2FiZjkyYmJkYzljNDE2Njc5MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmOWU5ZWViMGYyNDdhNGNkYzdlODE5NDUxMGNlOGM4Nzg3OGI3OGZjYzQ1YzMwMDBjZTlhNTIyMGY2MjVjZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
@@ -71,11 +75,11 @@
       "statement": "AgentId (SocialAgentId | ApplicationId) and AgentOrRoleId (AgentId | RoleId) are the typed {id, type} boundary objects passed across workflow and activity payloads.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L59-L95",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L60-L96",
           "version": "repo-lines-v1:sha256:d73aecf9182133fa324cb8abf7358a9c8665283cd8745a0a06bb6b9a9c9ebc88:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMzM0MWU5NTRjNWQ1YTlmNTU5MTk4NmNkMGY3MmMzMTM1NWQ0MTMzNDU0ZjFlY2I4Mjc5NDBiZTk4MTBlNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmMDFiMDI3MDdjMjc3MDg2YjQ1N2MyYzYxMzYzZDJjMzJhMzdjZjU0ZGUyMzZiMmMzNWNhYzcyZDMxZTZlYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmMDcyZTMxYjEyMzFmYTYzNGU2ZGU4NzNhMmYxY2U1MWM0OTlkYjFmYTk5MGUyMGUxNzQyYjk5Mjg1YTBlYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1ODMxYjM1YjNlMDZjYzJmZTVlNjQ3Nzc4ZjM0MTI4NzM1OTIzMDNiZGQ5YzJjYzI5MzViNTEzMjBhZTExYTYifQ"
         },
         {
-          "resource": "repo://packages/data-model/src/index.ts#L104-L107",
+          "resource": "repo://packages/data-model/src/index.ts#L107-L110",
           "version": "repo-lines-v1:sha256:02e4d29c479d3fbe927378511d454767f73531dc9c6bb90163e3054e107e4e34:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QwN2I1ODFlODQxZjkzYThjMDdkY2MxYjkyNTA4MGVjYzMzOWQzODJiMGM2YTcyNmQzOWY5ODRkZTIxNTRjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWE3MjgzYjJlMWVlOWUyN2I0NmNiOWQ3Y2E1ZjAzMTY4NzdlZWU4ZDU0MWFjZDk3NzEwYjg2YmM0MmVkMjRlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjQ2YThlZDYyMDQxMTZiNjJjYWY3ZDZkMWJlYTVjY2Q3ODBkNzk2OTZlZDRmZTE0MDc2MjMwNzY3YzlmYmU4NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
@@ -85,8 +89,8 @@
       "statement": "createGrantsForAgent is a self-contained full regeneration: it fetches all the grantee's authorizations (including via roles) and existing grants itself, handles the empty/deny case, generates and stores grants, and rewrites the registration links.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L578-L651",
-          "version": "repo-lines-v1:sha256:f6a35c4912e54a439dc44f9828fcb8e019b8d4dec0cd11f97af99d2d559f0894:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhODI3ZmE0ZGE1ZDBkN2NhMjMzZTJkNDZmZGRmOWI5M2U5MzJkMjljNDBkYjMxODI3ZTI2YTBmOGQ4NzJkYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L575-L647",
+          "version": "repo-lines-v1:sha256:e27a0bfdb77d86c82916885d62a87cb5f9db9d89c9300f5ac293f4f56ed9a8f0:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhODI3ZmE0ZGE1ZDBkN2NhMjMzZTJkNDZmZGRmOWI5M2U5MzJkMjljNDBkYjMxODI3ZTI2YTBmOGQ4NzJkYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -95,11 +99,11 @@
       "statement": "findRoleUsage delegates to session.findRoleUsage, and the membership/deletion workflows route role-as-grantee to the changed members versus role-as-dataOwner to the affected grantees.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L119-L127",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L120-L128",
           "version": "repo-lines-v1:sha256:4bae9b3bd30e31645227a8c721c832b84784d235d377b2d8b7e7fbd31355f9c7:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDM0ZTg3ZmY1N2NmYzI2YzdhNmRhNDE3OWFiNDcyNTNhZWNkMWJkNmNlNTgzMzM4YzQyMzE2YTJkMjc2MmE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmU1NDY3NGY4N2ViNzk4NmU4MjA0MWQyY2I3NzY5YjI3ZGYxMDEyYjVlZDljYzNkNDQwMWVmNDE2MTgzYTc2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzNkYjQzYjc0MzFhOTkxZGJiYmZhM2NjYTZiNzMzZmQ0YTI5ZTA1ZTE0Yjk2Mzk2MzdkMzEyMmU0YTIxZDY2NCJ9"
         },
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L337-L348",
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L336-L347",
           "version": "repo-lines-v1:sha256:f764940037b0696cdfc353a1256f2c0fda04e6eec47bbaf04b1e5c1c041d0a38:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2OWQxOGJhZDk4OGU1ZDViZDRmM2EzYzUxZTkzYjViMTIwYjU2OGE5NGZlNzg5NDY4ZWYwODFiMGQxMDUyYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhYzU2ZjYwZGJhMjMwNmNkMTdmZjU3ODRhM2I2YjY0ZTA3MGRlZDc5M2RjYzg3NTcwM2Q1MjExNGQ3YTBhYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MDhlZTZlYmEyMzM1YTczYWM5YTQ5ZGNjMWJjZjI5NmJmNWNkODU4N2U4YzUzMmQ4NzUyNmZkNGE4NDlhZTYifQ"
         }
       ]
@@ -109,11 +113,11 @@
       "statement": "Grant generation relies on grantees always being registered, and replaceDataGrantsOnRegistration throws when no registration is found.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L256-L258",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L257-L259",
           "version": "repo-lines-v1:sha256:08e27e3ffebc99715769fa211c4e1f59df9385845b0521a843259fdd2fffcb13:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2VhYTVkMzZiNTIzNzUzMjQyM2FiMDI0ZTVhNWUyZTFkMDQwY2QyZDQ4OTQyY2M4OTQyZWY0MTMyOGM3MGMyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2UzYmM2MDc2MGE4NDg5ODIxNzhjZTNiZWRmYzE1YjRiN2M0Y2MyMTJjZTAwMjZmMDMyNDBmMDVjOTk4ZTA1ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2M4N2E3ZGY2MmY1ZDZmNTA5NzM3ODE0YzY1MDY5NjQyOGEwYmM1ZDA5MmNlM2ZlOTBkMWM4MWM4NjQ5YzZhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGZlYTE5YTYwMjA0OWE2YWYxZTMzNmIyODU4NDc2NmE3MDViNGI4YWYxMzFkNjA1YTAzNjc3M2NkZDA3OWRlYiJ9"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L504-L506",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L502-L504",
           "version": "repo-lines-v1:sha256:f6ce8ddd219fee88832bd97496e6fd35b828d09143736bd15159e6f6e354f78b:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODMwOThiYzlkYTFlODNlNDg3OWE0YTJhYThhYjZiOTE2ZWFiNzEzOTI3ZTI0MmNkNzdmMTJiZTE4NTcxZjg2YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzI3N2E2ODcyMmQ0MTA3OTVhZmMxM2E1ZTM3NWNmODMzMGZjNzZhY2QwZTc4NTlhMmVhNzlhMzMzZDlmYWEyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQxZGNmMWUyOTNkY2Q0MDYwNGY4MGZjYzU3YjBjMjU2MDc2MzdjOTlkMDUzNGMwNThiMGMzYmUzZmEyMjNhOSJ9"
         }
       ]
@@ -123,8 +127,8 @@
       "statement": "Workflow modules run in the Temporal sandbox and avoid runtime imports; grants.ts defines local IRI constants and a sandbox-safe isActivityClass instead of importing them.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L46-L57",
-          "version": "repo-lines-v1:sha256:02d85b40a8dc666cacc505a459ee4916da398a2e76833f2f35cf91e753de2af4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2MDczMDA0MjIwYzJmNDE3NjQ1MjIwMTY3ZjljNmVkZGE3OGEyY2Q2ZjkxMDU0ZjM3MWI1NzcyNThiODM1OTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwZTM1NzI0OWUzYTM0YzdmOTNhOTIzNGQ2NDg3YTI1YzlhYjY2NWEwZDBmZmQzZGU0N2VlNTA5NjA5MmZmNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjMzA0YWY5NjBlNWFmMTY3Yzc0ZTVhYThmNWQ5YTJlOWY4NWVkNDQ5ZmE3MDkyNDg5ZTFjMTY3YjVjZjVhMzIifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L49-L56",
+          "version": "repo-lines-v1:sha256:d165d28178786b5215fcc42ed6afc9b6603560ff4380e59c6845b286703a6f71:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc3OThmYjBkYzYwOGU0NmY0ZGFlYTQ4YjRhYmJiMTA0NWEwZGUyNDg3MTg3MzgxZGFjZTcxMzVmYTI4ODU4ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzYwNGRhZTAxMzRlNjViYzZiZTA4NjQxOTMzMmYzZDk3YjRkOTM2NGNhNGU5YzU3OGJmN2RjODdlNGI3NWM5MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWMzMDRhZjk2MGU1YWYxNjdjNzRlNWFhOGY1ZDlhMmU5Zjg1ZWQ0NDlmYTcwOTI0ODllMWMxNjdiNWNmNWEzMiJ9"
         }
       ]
     },
@@ -133,7 +137,7 @@
       "statement": "recordAuthorization writes one AuthorizationGranted activity with the dataAuthorizations object, and shareResource writes one AuthorizationGranted for all grantees.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L383-L400",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L386-L403",
           "version": "repo-lines-v1:sha256:1aa1c4b8cc241f7ebf3da2d48f4edbc586ea2b68e1b994df7cce7b3689a6c841:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4ODJkNTJhYzMzN2JjN2U3ZWNmZjI5MjhlMTkxMTM0NmRiZDVjNjMyMDIzN2JkYWMzYjk4ZjE5NDdlYTJjMmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlMTU1ZDcxMjExMzMxMzBjNmExNDUxNzEwNGQwNzRjY2RkNDBmNWY0ZmI0MzI2YTkwNzE0ZDk4NTRlMzkwYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3MzM2NDlhOTllYjk5ZTk2NmRkZGFkOGFkNGU1ZWIxZWMyMzhiNzliNzE2N2UwNTQ3YTlmOGU4Y2JjMmJmYmEifQ"
         },
         {
@@ -147,14 +151,28 @@
       "statement": "processAuthorizationGranted groups the AuthorizationGranted object by grantee and fans out an executeChild of processGranteeAuthorization per group, with the parent completing only after all children succeed.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L201-L247",
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L200-L246",
           "version": "repo-lines-v1:sha256:81905f4932397e6a8cebf3964814bec3cf96725dac2bc9eb1eff431608fe54a3:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ZTdkYTM3ZmE4ZWYwMTIxMTEyM2JkOWNjNDM3YWM1Y2FjODI4NjNiODY2YmIyMmY2M2ZiYTZhOTNmYjM1NzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyNjg1ZGNjZWUxYWU4NjEzNWNkYjJlNDc1ZGIwNDUyZGI3YjAxNmUzYjgzMWIzZmY4MjVmNjAxNjYyY2ZiYTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhNTdlYTRlM2YwMzhlYTdmMjc5YzEyYTZiMmU1MTcxNDA1Y2VkMzhmNjc3YmJjZTU3ZjY0MjQxOGUwMmMxZTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_82e59529ef8e4d12bac5f881065fe7f7",
+      "statement": "The bootstrapAccount workflow runs five ordered account activities — createFusekiDatasets, createObjectBucket, writeEndpointRecords, postBootstrapTriG, writeAccountRecords — each find-first, with a freshly minted Garage key and compensation on failure.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/account.ts#L110-L196",
+          "version": "repo-lines-v1:sha256:16053f56a541533d45f503fefc021b0e9fb1e58c64c7f47ac11b204d5fd94015:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNzU1YzU4ZDU2OTYyZGNmNzgwZjM2Y2Q5YmYxMjk5OWI0ODQ4YmEzMzU0NzQzMDNiY2I2NDRiNjExOTM3OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyNjZlNjg2ZGJiZWRmMTc5ZDE0MGVkYTcyM2FlMDJlMjNiMTk0MDNhMDUzMjM2NjkwZDgzNTljMjViY2RhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1ZGMyMzM2ZGEyOTI0MWNiOWI0NzcyNTEzMDdmY2I5NTJhYzI1NGIzY2M2NWJkNDQ3OGVlMDlmOTE1YjMwNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNWE5NGI1ZTY4MDc2MDY4YzJlMDcyNDFkOWY4MGNjMGMyMTdjYzc3YTExN2E1N2FiOGUzZDY3ODMwMDhjOTIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/account.ts#L24-L30",
+          "version": "repo-lines-v1:sha256:5e30961106e887b60cc45f2e4170a89bb6637164fd362edbfc5caf18332894b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFhOTcyNTZiZjYxNjEwZGI1YzNiZmNmYWUzMjRjMzFmMzljMDIyNDQ1NzhhZTBmNjRlZmIzMWY2MTAzY2M5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGVmMzc2MDE5NGMzMTkxZjc5MGE2ZGZhOGYzNjhlZTg4YTBiNWZiYTI4MmUzYzk1NWVkNGYzMDA1YWM0MGZhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T20:45:09.690Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-18T21:45:34.463Z"
   }
 }
