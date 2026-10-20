@@ -85,7 +85,7 @@ export async function materializeNeedBasedAccessRequest(
 }
 
 // ──────────────────────────
-// Granted-request detection (access-request-tracking.md §3)
+// Granted-request detection (see the OpenWiki `services/activity-lifecycle.md`)
 // ──────────────────────────
 
 /**
@@ -119,9 +119,9 @@ export interface DetectGrantedRequestsInput {
 }
 
 /**
- * The detector (access-request-tracking.md §3): runs on the requester's
+ * The detector (see the OpenWiki `services/activity-lifecycle.md`): runs on the requester's
  * plane — reads the OPEN sent requests and the requester's received grants
- * (shared-store shortcut, federation.md §1), matches them best-effort and
+ * (shared-store shortcut, openwiki/architecture/federation.md §1), matches them best-effort and
  * writes an `AccessRequestGranted` activity per match (light `{ id, type }`
  * ref — `id` = the Sent activity's SNAPSHOT id). TERMINAL resolution — no
  * `ActivityCompleted` written (the class IS the outcome, §1).

@@ -8,7 +8,7 @@ import type {
 } from '@janeirodigital/interop-data-model'
 // (a2) the AuthorizationStructure/DataAuthorizationStructure canonical shapes
 // moved verbatim into data-model — re-exported here for source compatibility
-// (payload-contract-alignment §2).
+// (see the OpenWiki `data-model/entities.md`).
 export type {
   AuthorizationStructure,
   DataAuthorizationStructure,

@@ -72,7 +72,7 @@ export async function processNeedBasedAccessRequestReceived(
 }
 
 /**
- * The granted-request detector (access-request-tracking.md §3): started as
+ * The granted-request detector (see the OpenWiki `services/activity-lifecycle.md`): started as
  * a FIRE-AND-FORGET child at the end of the `updateDelegatedGrants` workflow
  * (the trigger that leaves the requester-side received-grant view fresh) —
  * `startChild` with `ParentClosePolicy.ABANDON` (the default TERMINATE

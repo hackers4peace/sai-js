@@ -1,10 +1,11 @@
 # SAI architecture — thin services/handlers, workflow-orchestrated, domain logic in `authorization-agent`
 
 > **Status: design — decided (2026-09).** The architectural principle the
-> activity-first refactors (`activity-first-services.md`,
-> [`authorization-granting.md`](authorization-granting.md)) follow.
-> Companion to [`features.md`](../features.md) (the activity catalogue) and
-> `payload-contract-alignment.md` (the wire contract).
+> activity-first refactors (now documented in the OpenWiki
+> `services/activity-lifecycle.md` and `services/rpc-and-services.md`, with the
+> granting work in [`authorization-granting.md`](authorization-granting.md))
+> follow. Companion to [`features.md`](../features.md) (the activity catalogue)
+> and the OpenWiki `services/activity-lifecycle.md` (the wire contract).
 
 ## 1. Principle (decided)
 
@@ -74,7 +75,8 @@ per-grantee consumer):
 
 ## 5. Compliance checklist for new steps (the invariants)
 
-For every activity-first step (from `activity-first-services.md`, tightened):
+For every activity-first step (from the design now documented in the OpenWiki
+`services/activity-lifecycle.md`, tightened):
 
 - [ ] **data-model** — types + context rows for the class; **no logic**.
 - [ ] **authorization-agent** — the SAI rule (if any) lands here, with a
@@ -87,7 +89,7 @@ For every activity-first step (from `activity-first-services.md`, tightened):
 - [ ] **handler** — one dispatch branch per class (schema-decode +
   `client.workflow.start`); forward-before-dispatch unchanged.
 - [ ] **UI** — activity label + done-row refresh.
-- [ ] **docs** — `events.md`/`features.md` rows, c4 view.
+- [ ] **docs** — `openwiki/services/activity-lifecycle.md`/`features.md` rows, c4 view.
 - [ ] **tests** — packages vitest (agent-run) + `/test` wait-for (user-run).
 
 ## 6. Open items (current-plan scope)

@@ -60,7 +60,7 @@
       </v-card-title>
     </v-card>
 
-    <!-- peer detail — open access requests (access-request-tracking.md §4.2):
+    <!-- peer detail — open access requests (see the OpenWiki `services/activity-lifecycle.md`):
          incoming approval entries + outgoing sent requests, one action per
          request (approve/archive any of them — the multi-request future) -->
     <v-card

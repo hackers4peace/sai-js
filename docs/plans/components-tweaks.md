@@ -243,15 +243,15 @@ permissions based on **pod ownership** (`podStore.getOwners`: storage owner
 ⇒ all permissions when the request comes from the owner's UAS) — a different
 "admin" notion than the registry-plane `hasAdminGrant` marker used
 everywhere else. Under the current single-deployment shared-store design this
-is presumably intentional (`federation.md` shortcut 3: "pod/storage ownership
+is presumably intentional (`openwiki/architecture/federation.md` shortcut 3: "pod/storage ownership
 is local"), but the divergence (data-plane owner vs registry-plane org-admin)
 is worth confirming deliberately; it is **not** a candidate for the AA.
 
 ## 7. Out of scope / follow-ups
 
 - Org-context transport and mirror/proxy infra (`queries/org.ts`,
-  `ReciprocalMirror.ts`, `peerProxy.ts`/`peerFetch.ts`) — stays (phase 4b /
-  `isolated-datasets-and-sparql`).
+  `ReciprocalMirror.ts`, `peerProxy.ts`/`peerFetch.ts`) — stays (see
+  `openwiki/architecture/storage-isolation.md`).
 - ACR/ACP automation (`createAcr`, `createAdminGrantAcr`, `syncAdminAcr`) —
   stays in components.
 - Temporal workflow orchestration, storage accessors, OIDC session,

@@ -63,7 +63,7 @@ export const useAppStore = defineStore('app', () => {
   const contexts = ref<{ webId: string; label: string }[]>([])
 
   // ──────────────────────────
-  // Activity tracker + snackbar (activity-first-services step 0) — record
+  // Activity tracker + snackbar (see the OpenWiki `ui/authorization-ui.md`) — record
   // every stream activity pending → done; claims bind a user-triggered
   // action to its activity by the ack-echoed activity id (uniform anchor,
   // uniform across as:object forms); the app-shell snackbar

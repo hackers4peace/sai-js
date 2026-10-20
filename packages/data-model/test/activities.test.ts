@@ -14,7 +14,7 @@ import {
   dataModelContext,
 } from '../src'
 
-// payload-contract-alignment step 3 (amended wire): the typed activity union
+// The wire contract (see the OpenWiki `services/activity-lifecycle.md`): the typed activity union
 // is the wire shape — as:object forms, flat plain-IRI fields, `as:*` types.
 
 describe('ActivityData typed union', () => {

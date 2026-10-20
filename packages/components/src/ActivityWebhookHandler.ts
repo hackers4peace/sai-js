@@ -78,7 +78,7 @@ const socialAgentRef = (id: string): { id: string; type: string[] } => ({
  * fail fast), and starts the matching workflow with the activity's
  * plain-IRI/object fields. grantee activities (authorizationRecorded/
  * authorizationRevoked) join the per-target consumer; admin activities
- * (adminAuthorizationRecorded/adminAuthorizationRevoked) run the sequential
+ * (adminAuthorizationGranted/adminAuthorizationRevoked) run the sequential
  * orchestrator (grants → ACR rewrite → mark done).
  */
 export class ActivityWebhookHandler extends OperationHttpHandler {

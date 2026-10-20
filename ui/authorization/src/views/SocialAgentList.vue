@@ -115,7 +115,7 @@ const showAdd = ref(false)
 /** Open incoming request count + the access-button target: a SINGLE open
  *  request keeps the direct-to-authorization flow (`request: <iri>` opens
  *  the approval screen); multiple requests route to the peer detail where
- *  each entry is approvable (access-request-tracking.md §4.2). */
+ *  each entry is approvable (see the OpenWiki `services/activity-lifecycle.md`). */
 function accessRoute(agent: { id: string; accessRequestsReceived: readonly string[] }) {
   if (agent.accessRequestsReceived.length === 1) {
     return {

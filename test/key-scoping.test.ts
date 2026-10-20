@@ -3,7 +3,7 @@ import { S3mini } from 's3mini'
 import { afterAll, describe, expect, test } from 'vitest'
 
 // ──────────────────────────────────────────────────────────────────────────
-// Per-data-pod object isolation (docs/plans/isolated-s3-buckets.md step 5).
+// Per-data-pod object isolation (openwiki/architecture/storage-isolation.md).
 //
 // The seed gives every data pod its own bucket + key (from its `objectEndpoint`
 // record). These are the same credentials the data server uses, so exercising

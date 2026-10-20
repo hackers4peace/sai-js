@@ -11,7 +11,7 @@ import { agentId, issuanceUrl } from '../util/uriTemplates.js'
  * The auth server's account service. `checkHandle` is a synchronous lookup;
  * `startBootstrapAccount` only derives the account's IRIs and starts the
  * account-bootstrap Temporal workflow (the worker owns the Fuseki/Garage/
- * record I/O — docs/plans/isolated-s3-buckets.md), returning the WebID
+ * record I/O — openwiki/architecture/storage-isolation.md), returning the WebID
  * immediately.
  */
 export class AccountService {

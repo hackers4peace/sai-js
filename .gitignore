@@ -4,7 +4,7 @@ yarn.lock
 # Garage state. Only the node identity (node_key[.pub]) and the applied layout
 # (cluster_layout) need to be committed; everything else (db, data_layout, the
 # data-dir marker, runtime state) is regenerated on start. See garage/README or
-# docs/plans/isolated-s3-buckets.md.
+# openwiki/architecture/storage-isolation.md.
 garage/meta/*
 garage/data/*
 !garage/meta/.gitkeep

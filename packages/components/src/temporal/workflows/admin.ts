@@ -44,7 +44,7 @@ export interface AdminWorkflowInput {
 }
 
 /**
- * Add — `adminAuthorizationRecorded`: materialize the admin marker. One
+ * Add — `adminAuthorizationGranted`: materialize the admin marker. One
  * RegistrySet-scoped AdminGrant (linked on the registration via
  * `hasAdminGrant` in a single PATCH — one Update) plus one Read-only
  * DataRegistry-scoped grant per data registry in the org's RegistrySet, each

@@ -89,6 +89,23 @@ by the producers in `ActivityWebhookHandler` and the grant handlers:
   find-first; a retry mints a fresh Garage key and compensates on failure).
 - `forward-to-push.ts` — `sendPushNotifications`.
 
+Two access-request/invitation workflows deserve their own note:
+
+- `detectGrantedRequests` is started as a **fire-and-forget child at the end of
+  `updateDelegatedGrants`**. It reads the requester's open sent requests and
+  received grants, matches them, and writes one terminal `AccessRequestGranted`
+  activity per match (no completion — the class is the outcome).
+- `acceptInvitation` is the **acceptor-side** workflow started from the
+  `InvitationAccepted` activity by the webhook handler on
+  `reciprocal-registration`. It POSTs the opaque capabilityUrl as the acceptor,
+  builds the acceptor → inviter registration and reciprocal, subscribes the
+  reciprocal webhook, and marks the activity done (personal and org contexts
+  alike).
+
+The terminal resolution classes `AccessRequestGranted`, `AccessRequestArchived`,
+and `AuthorizationDenied` never start a workflow and never get a completion;
+`reconcileActivities` closes their outbox rows instead.
+
 ## Boundary objects and routing
 
 - **Typed `{id, type}` boundary objects** — `AgentId = SocialAgentId |

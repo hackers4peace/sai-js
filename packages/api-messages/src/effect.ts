@@ -139,8 +139,8 @@ export const SocialAgent = S.Struct({
    * INCOMING — OPEN need-based access requests sent by this agent (owner
    * side): the AccessRequest IRIs (approval entries — each opens the
    * authorization screen with `accessRequestIri`, §6.8). Empty when nothing
-   * is pending — granted/denied dropped the entries (access-request-tracking
-   * .md §4.1).
+   * is pending — granted/denied dropped the entries (see the OpenWiki
+   * `services/activity-lifecycle.md`).
    */
   accessRequestsReceived: S.Array(IRI),
   /**
@@ -194,7 +194,8 @@ export const SocialAgentInvitationList = S.Array(SocialAgentInvitation)
 /**
  * Pending acknowledgment of an accepted invitation — the acceptance itself
  * completes asynchronously via the acceptor's `invitationAccepted` workflow.
- * `Message` suffix per the RPC naming rule (payload-contract-alignment §2):
+ * `Message` suffix per the RPC naming rule (see the OpenWiki
+ * `services/rpc-and-services.md`):
  * the name `InvitationAccepted` is the activity class Schema below.
  */
 export const InvitationAcceptedMessage = S.Struct({
@@ -232,7 +233,7 @@ export const NeedBasedAccessRequestSentMessage = S.Struct({
 })
 
 /**
- * The archive acknowledgement (access-request-tracking.md §4.2) — the RPC
+ * The archive acknowledgement (see the OpenWiki `services/activity-lifecycle.md`) — the RPC
  * writes the `AccessRequestArchived` activity (TERMINAL resolution — no
  * workflow, no `ActivityCompleted`) and echoes its IRI. `archived: false`
  * means the request was NOT open (unknown snapshot or already resolved —
@@ -306,7 +307,7 @@ export const RoleCreatedMessage = S.Struct({
  * Pending acknowledgment of an admin promotion (activity-first step 5 — R1
  * re-decision: validation reads stay in the RPC, the write moves to the
  * workflow) — the RPC pre-mints the AdminAuthorization id and writes the
- * `adminAuthorizationRecorded` activity (object = the AdminAuthorization-to-be,
+ * `adminAuthorizationGranted` activity (object = the AdminAuthorization-to-be,
  * real-id embedded projection at that id); the `addAdmin` workflow PUTs the
  * resource there, then grants + ACR rewrite, then completes. The ack echoes
  * the pre-minted id (pending handle) + the triggering activity id (the
@@ -315,7 +316,7 @@ export const RoleCreatedMessage = S.Struct({
 export const AdminAuthorizationGrantedMessage = S.Struct({
   /** the pre-minted AdminAuthorization IRI the workflow will PUT at */
   id: IRI,
-  /** the triggering `adminAuthorizationRecorded` activity's IRI */
+  /** the triggering `adminAuthorizationGranted` activity's IRI */
   activityId: IRI,
 })
 
@@ -338,8 +339,8 @@ export const AdminAuthorizationRevokedMessage = S.Struct({
 })
 
 // ──────────────────────────
-// Activity projections (the outbox) — payload-contract-alignment step 3
-// (amended wire). Same field sets as the data-model ActivityData union
+// Activity projections (the outbox) — the wire contract in the OpenWiki
+// `services/activity-lifecycle.md` (amended wire). Same field sets as the data-model ActivityData union
 // (wire truth), UNBRANDED: every IRI field is plain S.String — no refs on
 // the wire, so no ActorRef (refs stay data-model XId types for temporal
 // inputs). The `as:object` forms: live-link objects are plain S.String,

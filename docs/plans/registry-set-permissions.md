@@ -19,7 +19,7 @@ is unused:
 | Authorization | org AA / admin RPC (`recordAuthorization`, `AddAdmin` records the AdminAuthorization) | UI authorization views; workflows (authorization iterators, SPARQL) | **Read+Write** |
 | Grant | **org AA only** (Temporal: `storeGrant`, `createAcr`, revocation — owner session) | grantee via **per-grant `.acr`** (`peerReadAccess`); engine via SPARQL (`getAuthorizationData`), not HTTP | **none** |
 | Role | org AA / owner (roles service) | UI role views | Read+Write (unchanged) |
-| Activity | org AA workflows (`activityCompleted`); **admin RPC** (`AddAdmin` writes the `adminAuthorizationRecorded` activity) | UI events stream (`ActivityEvents`); `ActivityWebhookHandler` (org AA) | **Read + create/append** |
+| Activity | org AA workflows (`activityCompleted`); **admin RPC** (`AddAdmin` writes the `adminAuthorizationGranted` activity) | UI events stream (`ActivityEvents`); `ActivityWebhookHandler` (org AA) | **Read + create/append** |
 
 The deciding facts:
 
@@ -46,7 +46,7 @@ Replace the blanket `#fullAdminAccess` with per-registry access controls:
    CSS ACP implementation: whether creating a new member under the container
    needs `acl:Write` on the container or `acl:Append` suffices (and how it maps
    to the engine's `PERMISSIONS`). The `AddAdmin`/`RemoveAdmin` RPC writes the
-   `adminAuthorizationRecorded` activity — in the admin context that write
+   `adminAuthorizationGranted` activity — in the admin context that write
    comes from the **admin's** UAS, so admins must hold the create/append mode
    for it to keep working.
 3. **Agent / Authorization / Role:** admin Read+Write (+ Control for the owner)
@@ -92,6 +92,6 @@ changes.
 ## Related docs
 
 - `org-admin-feature.md` (R1) — the admin grant/authorization model this scopes;
-  `events.md` — the domain events written into the Activity Registry;
-  `federation.md` — cross-server notes this follows on; `immutable-activities.md`
+  `openwiki/services/activity-lifecycle.md` — the domain events written into the Activity Registry;
+  `openwiki/architecture/federation.md` — cross-server notes this follows on; `immutable-activities.md`
   — append-only activity semantics.

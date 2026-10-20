@@ -5,18 +5,25 @@ against the current codebase and git history. A plan's own `Status` header is th
 primary source.
 
 All **completed** implementation plans have been removed; their resulting design
-is documented in the [OpenWiki](../openwiki/index.md).
+is documented in the [OpenWiki](../openwiki/index.md). The `federation.md` and
+`events.md` design notes were also absorbed into the OpenWiki
+(`openwiki/architecture/federation.md` and the domain event catalogue in
+`openwiki/services/activity-lifecycle.md`). The completed Turtle-removal plan is
+also removed; its remaining `n3` phase is now `reconsider-n3-package.md`. The
+three per-pod storage plans are **done and removed**; their landed design is in
+`openwiki/architecture/storage-isolation.md` and
+`openwiki/architecture/federation.md`, with remaining follow-ups in
+`pod-isolation-followup.md`.
 
 ## Summary
 
 | Status | Count | Plans |
 |---|---|---|
-| ✅ complete | 1 | `esm-jsr-no-build` |
-| 🔶 partial | 2 | `revoke-delegation-chain`, `fuseki-per-pod-sparql` |
-| ⬜ not started / design only | 16 | `authorization-revoked`, `authorization-revocation`, `check-equivalence`, `durable-webhook-delivery`, `remove-turtle-serialization`, `webhook-subscription-bootstrap`, `federation`, `events`, `registry-set-permissions`, `isolated-datasets-and-sparql`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `production-consumer-cleanup`, `npm-publishing` |
+| 🔶 partial | 1 | `revoke-delegation-chain` |
+| ⬜ not started / design only | 14 | `authorization-revoked`, `authorization-revocation`, `check-equivalence`, `durable-webhook-delivery`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing` |
 | ⬜ follow-up backlog (all items open) | 1 | `revoke-delegation-chain-follow-ups` |
 
-**20 plans total.**
+**16 plans total.**
 
 ## Full table
 
@@ -24,22 +31,17 @@ is documented in the [OpenWiki](../openwiki/index.md).
 |---|---|---|---|
 | `revoke-delegation-chain.md` | 🔶 partial — first cut (steps 1–5) landed | Revocation as a boundary operation at the delegation endpoint (`AccessRevocation`, all-or-nothing validation, requester hop, `RevokeGrants` RPC); replaces direct cross-peer DELETE | references `authorization-revoked` (deny-RPC precedent) |
 | `authorization-revoked.md` | ⬜ not done (design only) | Producer writes the typed `authorizationRevoked` activity for deny; routing/consumer/sweep already handle the type | — |
-| `authorization-revocation.md` | ⬜ not done (design only — deferred) | The authorization-revocation leg, extracted from `activity-first-services` step 4: UI revokes an **authorization** (never grants directly) → the `authorizationRevoked` producer → a workflow revokes the derived grants at the **issuance boundary with the org session** (fixes seeded-ACR 403) + clears the grantor's projection; decides whether the retired `grantsRevoked`/`processGrantsRevocation` wiring is revived (the `activity-first` step-4 cleanup retires the dormant temporal artifacts) | `authorization-revoked` (the typed producer); `revoke-delegation-chain` (+ its follow-ups — the boundary + `grantsRevoked` observability item); `activity-first-services` (steps 4 cleanup, 7–8 carrier re-pins) |
+| `authorization-revocation.md` | ⬜ not done (design only — deferred) | The authorization-revocation leg, extracted from the landed activity-first design (OpenWiki `services/activity-lifecycle.md`): UI revokes an **authorization** (never grants directly) → the `authorizationRevoked` producer → a workflow revokes the derived grants at the **issuance boundary with the org session** (fixes seeded-ACR 403) + clears the grantor's projection; decides whether the retired `grantsRevoked`/`processGrantsRevocation` wiring is revived | `authorization-revoked` (the typed producer); `revoke-delegation-chain` (+ its follow-ups — the boundary + `grantsRevoked` observability item) |
 | `check-equivalence.md` | ⬜ not done (design only) | Real `checkEquivalence`: reuse equivalent existing grants (incl. child trees); workflow already fully wired | — |
 | `durable-webhook-delivery.md` | ⬜ not done (design only) | `DurableWebhookEmitter` enqueues a `deliverWebhook` Temporal workflow (bounded retries, 4xx non-retryable) on registry/data servers | `forward-to-push` worker |
+| `reconsider-n3-package.md` | ⬜ decision needed — keep vs drop | Reconsider the remaining `n3` dependency: current Store/DataFactory footprint, the `ReciprocalMirror` N-Quads/GRAPH-block and TriG test/seed sites, options A/B/C, and a recommended partial drop | completed Turtle-removal work (OpenWiki `data-model/json-ld-layer.md`); `fetch-sparql-endpoint` keeps `n3` transitively |
+| `pod-isolation-followup.md` | ⬜ not started | Remaining per-pod isolation edge cases: mirror backfill/drift scan, unregister mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion cleanup, cross-pod/mirror-freshness tests, and the named-graph patch guard | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `update-deployment.md` for production |
 | `webhook-subscription-bootstrap.md` | ⬜ not done (design only) | `ensureActivityWebhookChannel` at account creation + startup/periodic healing for real deployments (dev/test are pre-seeded) | — |
-| `remove-turtle-serialization.md` | ✅ phases 0–6 landed (phase 7 `n3` drop ⬜) | Drops `parseTurtle`/`serializeTurtle`: `toNQuads` for SPARQL patches, JSON-LD ACRs, `application/ld+json` CONSTRUCT, named-graph N-Quads mirror, NDJSON notification streams (custom CSS components) | builds on the landed `fetchJsonLd`/`putJsonLd` infra; external `@elfpavlik/sai-components` |
 | `revoke-delegation-chain-follow-ups.md` | ⬜ all 9 items open | Items 1–9 of the revocation follow-up: full chain calculation, scope/mode-coverage ordering, replace-vs-delete race, grantor trigger integration (`grantsRevoked` producer), grantee self-revocation, error-detail schema, drop vestigial `delegationOfGrant`, sweep validation, `reconcileActivities` scheduling | `revoke-delegation-chain` (first cut) |
-| `federation.md` | ⬜ design note (org-admin companion) | Single-deployment shortcuts the org-admin data-plane relies on: shared SPARQL endpoint, global-fetch UAS/storage discovery, local pod-storage ownership, `hasRegistrySet` link across servers, webhook delivery; future federated lookups | `org-admin-feature` (umbrella) |
-| `events.md` | ⬜ design note (org-admin companion) | Domain-event (activityType) catalogue incl. the new `adminAuthorizationRecorded` event → parallel `createAdminGrants` + `syncAdminAcr` workflows; deferred/future events (data-registry-added regeneration, admin revocation) | `org-admin-feature` (umbrella) |
 | `registry-set-permissions.md` | ⬜ not started (design) | Scope the blanket `#fullAdminAccess` per structural registry: per-container ACRs, GrantRegistry owner-only (admins never write grants; per-grant ACRs serve reads), ActivityRegistry Read + create/append (append-only immutable log) instead of blanket Write; seed ACR hygiene for the ACR-less yoyo DataGrants | `org-admin-feature` R1 |
-| `isolated-datasets-and-sparql.md` | ⬜ not started (design only) | Per-pod datasets + SPARQL: 4a endpoint registry in `AccountLoginStorage` (registry pod + each data pod, env-var fallback) → 4b per-pod store cutover (joint checkpoint): mirror activation + backfill, serialized syncs, `/sparql-admin` → the org's own registry pod, external admin-endpoint discovery, environment work, cross-pod isolation + mirror-freshness tests. The IRI-parametrized org-context SPARQL reads resolve to mirrors unchanged | `federation.md` shortcuts 1/1a |
-| `fuseki-per-pod-sparql.md` | 🔶 stages 1–3 landed + integration-hardened (allowlist, Fuseki mirror-write, `entries` fix) + typed endpoint records (`PodEndpointStore`: SPARQL + object/S3 per pod) + no shared/default endpoint (dedicated `id` dataset; fail-closed resolution); 4b follow-ups open | Infrastructure realization of 4a/4b: Oxigraph → Apache Jena Fuseki swap (dev compose + dagger), fixture split into one dataset per pod (registry pod + each data pod) plus a dedicated `id` dataset, CSS `PodEndpointStore` (typed SPARQL + object/S3 records, pod-keyed, owner indirect) + `Account.ts` bootstrap (creates both datasets) + `RoutedSparqlDataAccessor` + permission-engine resolution so the LDP write path and grant lookups isolate too, session/context endpoint allowlist from the account store, `kv.json` endpoint seeds + both-direction reciprocal webhooks; three green stages (Fuseki drop-in → endpoint registry → per-pod split), production Nix + per-data-pod bucket provisioning in a Temporal account-creation workflow deferred | `isolated-datasets-and-sparql` (4a/4b); `federation.md` 1/1a |
-| `isolated-s3-buckets.md` | ⬜ not started (design) | One bucket + key per data pod: account creation as a Temporal workflow using the Garage v2 admin API (`CreateBucket`/`CreateKey`/`AllowBucketKey`; the worker holds the admin token), the typed `objectEndpoint` records consumed by a new `RoutedS3DataAccessor`, per-pod key scoping; `region` stays global; removes the temporary `sai-dev` default + `CSS_S3_BUCKET`. Builds on the landed `objectEndpoint` records + bucket-less `CSS_S3_ENDPOINT` | `fuseki-per-pod-sparql` (typed records); `isolated-datasets-and-sparql` 4b |
 | `components-tweaks.md` | ⬜ design only (investigation write-up) | Residual SAI domain/spec logic still in components after the reorganize phases: extract `SaiPermissionsEngine`'s grant-evaluation predicates (grant→request coverage, Inherited-chain resolution, admin modes) and the 4×-duplicated `hasAdminGrant` admin-marker rule to AA session methods/predicates; move the delegation-endpoint inheritance completion (`GrantIssuanceHandler`) and `buildAdminGrants` materialization to AA; plane-based session `findRegistration` | — |
-| `esm-jsr-no-build.md` | ✅ complete | ESM-only source, no build step for the 5 interop libs, Node 26 native TS everywhere, `tsgo --noEmit` typecheck (strict), `.ts` imports, vitest 5 on Node; deferred work split into the plans below | — |
-| `production-consumer-cleanup.md` | ⬜ not started | nix packages/images → Node 26 + repo source (drop `buildNpmPackage`/`pkgs.nodejs`/`dist`); `services/id`, `ui/authorization`, `docs/website`, README, dagger/compose | `esm-jsr-no-build` (D5=A, D10=B) |
-| `npm-publishing.md` | ⬜ not started (future goal) | Move all packages to the `@hackers4peace` npm org and publish there (rename scopes, published artifact, release workflow) | `esm-jsr-no-build` (ESM/no-build/`.ts` groundwork landed) |
+| `update-deployment.md` | ⬜ not started | Production NixOS/Podman cutover to per-pod Fuseki + Garage, Node 26 source images, env/secrets/volumes, data/account migration, OCI/flake/hosts, deployed smoke test (folds in the former `production-consumer-cleanup` workstream) | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `pod-isolation-followup.md` mirror-backfill prerequisite |
+| `npm-publishing.md` | ⬜ not started (future goal) | Move all packages to the `@hackers4peace` npm org and publish there (rename scopes, published artifact, release workflow); **not** a deployment prerequisite | the landed ESM/no-build groundwork (OpenWiki `architecture/overview.md`); see `update-deployment.md` for the source-build path |
 | `extract-temporal-workflows.md` | ⬜ not started — blocked on a cycle decision | Move all Temporal code out of `packages/components` into a private `temporal-workflows` package and shrink `components` to Components.js-only; a `components ↔ temporal` dependency cycle needs option A/B/C resolved first | overlaps `components-tweaks.md` |
 | `specific-instance-access-requests.md` | ⬜ not started (design only) | Access requests targeting specific data instances (`hasDataInstance` on `AccessNeed`); deferred from the granting work — no request-side caller yet | — |
 | `generic-auditing.md` | ⬜ not started (design only) | A generic auditing mechanism for creation metadata (creator agent/client, creation/modification times), replacing the removed hand-written `interop:registeredBy`/`registeredWith`/`registeredAt`/`updatedAt` writes | — |
@@ -60,7 +62,6 @@ authorization-revocation ⬜     (depends on authorization-revoked + revoke-dele
 check-equivalence ⬜            (replaces the shipped checkEquivalence dummy)
 durable-webhook-delivery ⬜     (forward-to-push worker)
 webhook-subscription-bootstrap ⬜
-remove-turtle-serialization ⬜
 ```
 
 ### Org-admin workstream companion docs
@@ -68,19 +69,17 @@ remove-turtle-serialization ⬜
 `org-admin-feature.md` is the umbrella for the org-admin workstream (itself not
 tracked in this index). The landed org-context read plane and the
 `/.sai/proxy-admin` / `/sparql-admin` endpoints are documented in the OpenWiki
-(`services/org-context.md`). The remaining companions:
+(`services/org-context.md`); the single-deployment/federation assumptions are
+in `openwiki/architecture/federation.md`, and the domain event catalogue is in
+`openwiki/services/activity-lifecycle.md`. The remaining companions:
 
-- `federation.md` — design note; cross-checks with `org-admin-feature` §2.4 (C2)
-  and the engine path in `registry-set-permissions`.
-- `events.md` — design note; builds on the activity outbox model (the
-  `activityWorkflows` map / `GRANTEE_ACTIVITY_TYPES` dispatch).
 - `registry-set-permissions.md` — ⬜ design; follow-up to `org-admin-feature` R1.
-- `isolated-datasets-and-sparql.md` — ⬜ design; per-pod datasets + SPARQL
-  endpoints, mirror activation + backfill, external admin-endpoint discovery —
-  joint `/test` checkpoint at the store-split cutover.
-- `fuseki-per-pod-sparql.md` — 🔶 stages 1–3 landed + integration-hardened;
-  the infra realization of the above (Fuseki swap, per-pod fixture split, CSS
-  endpoint store + routed accessor, session/context allowlist, `kv.json` seeds).
+- `pod-isolation-followup.md` — ⬜ not started; mirror backfill/unregister,
+  external admin-endpoint discovery, S3 orphan/account deletion, and the
+  cross-pod/mirror-freshness tests. The landed per-pod storage design is in the
+  OpenWiki (`architecture/storage-isolation.md`, `architecture/federation.md`).
+- `update-deployment.md` — ⬜ not started; the production Nix/podman/OCI
+  cutover, secrets/volumes, data migration, and Fuseki/Garage hardening.
 
 ### Independent / deferred
 
@@ -90,7 +89,10 @@ tracked in this index). The landed org-context read plane and the
   request-side caller yet.
 - `generic-auditing` — future creation-metadata mechanism; the removed writes
   had no readers.
-- `remove-turtle-serialization` — independent of the workflow/revocation arcs.
+- `reconsider-n3-package` — decision-only: `n3` is still used for `Store`/
+  `DataFactory` and for the N-Quads/GRAPH-block + TriG seed/test sites; drop
+  the mechanical runtime uses first (recommended) and decide separately on the
+  parser/writer sites.
 - `revoke-delegation-chain-follow-ups` — depends only on the landed first cut;
   internal ordering: 1 (chain calc) → 2 (coverage ordering) → 4 (trigger
   integration); 3 (replace-vs-delete race) is orthogonal; 8 → 9 (sweep
@@ -104,95 +106,57 @@ tracked in this index). The landed org-context read plane and the
 - `webhook-subscription-bootstrap` — **unblocked**: builds on the landed
   ActivityRegistry module + `ActivityWebhookStore`/handler; runtime-only
   (dev/test are pre-seeded).
+- `update-deployment` — production Nix/podman/OCI cutover; depends on the
+  landed per-pod storage code and the `pod-isolation-followup` mirror-backfill
+  prerequisite, not on the remaining design-only plans.
+- `pod-isolation-followup` — mirrors/object lifecycle and cross-pod tests; the
+  landed design is in the OpenWiki, not in a plan.
 
 ## Federation
 
-**[`federation.md`](federation.md)** — design note, not a tracked plan:
-documents the **single-deployment shortcuts** the org-admin data plane
-relies on and what actually breaks once servers/stores split. It is the
-primary reference for the isolation work; each shortcut maps to a plan
-below:
-
-| `federation.md` shortcut | What it is | Plan(s) that address / depend on it |
-|---|---|---|
-| **1 — shared SPARQL store** | one triple store behind the registry + data servers; every graph visible from every endpoint | the org-context SPARQL read plane (reads resolve against it today; see the OpenWiki); ended by the `isolated-datasets-and-sparql.md` 4b store split, concretely by `fuseki-per-pod-sparql.md` (Fuseki datasets per pod + routed CSS accessor) |
-| **1a — reciprocal mirrors** | the federated replacement for cross-graph reads: org-local copies of peers' registrations + grants, named after the source IRIs | the dormant reciprocal-mirror writer (see the OpenWiki); `isolated-datasets-and-sparql.md` 4b (activation, backfill, serialized syncs) |
-| **2 — UAS/storage discovery via global fetch** | discovery uses the global fetch, not a session-bound one — fine on one compose network | no dedicated plan yet; revisit when servers split across hosts (noted in `federation.md`) |
-| **3 — pod/storage ownership is local** | `podStore.getOwners` decides "owner of this storage" per server | no dedicated plan yet (the data-plane admin-status path, see "Cases the design must keep working" in `federation.md`) |
-| **4 — org's AA serves the registry-set link across servers** | the *intended* federation shape for the registry plane: `Link: rel="interop:hasRegistrySet"` served by the org's agent-id doc, resolved by the admin's AA | `org-admin-feature.md` §2.4 (C2, umbrella — not tracked in this index) |
-| **5 — activity/outbox delivery on one notification path** | webhooks from the org's Activity Registry → admin UI assume co-location | `durable-webhook-delivery.md` (cross-server delivery, ⬜); `webhook-subscription-bootstrap.md` (channel provisioning for real deployments, ⬜) |
-
-Directly related plans: **`isolated-datasets-and-sparql.md`** (the
-per-pod cutover that ends shortcut 1 and makes 1a load-bearing) and its
-environment realization **`fuseki-per-pod-sparql.md`**, the two
-webhook-delivery plans above (shortcut 5), and `registry-set-permissions.md`
-(which server's ACRs grant what across owners — seed hygiene for ACR-less
-yoyo DataGrants). The landed org-context read plane and proxy endpoints are
-documented in the OpenWiki `services/org-context.md`.
+The single-deployment shortcuts, the reciprocal-mirror role, and what must keep
+working when servers split are documented in the OpenWiki
+`architecture/federation.md`; the store split is in
+`architecture/storage-isolation.md`, and the production/dev divergence in
+`architecture/deployment-landscape.md`. Open plan work:
+`pod-isolation-followup.md` (mirror backfill/unregister + cross-pod tests),
+`durable-webhook-delivery.md`, `webhook-subscription-bootstrap.md`, and
+`update-deployment.md` (production).
 
 ## Security
 
-Security-relevant work that spans plans is catalogued here; a section of
-the plan is only listed once the plan spells out an enforcement boundary.
-For now:
-
-- **[`isolated-datasets-and-sparql.md`](isolated-datasets-and-sparql.md)** —
-  the per-pod SPARQL read plane's authorization boundaries: per-pod
-  endpoint records in `AccountLoginStorage` (4a), the `/sparql-admin`
-  `hasAdminGrant` gate forwarding into the org's own store (4b, closing
-  the who-not-which-graphs caveat), the mirror **single-writer invariant**
-  (only server-side sync writes mirror graphs; admin code read-only), and
-  the cross-owner isolation tests (Dan querying Alice's endpoint → 403 by
-  gate; no cross-graph leakage even at his own endpoint).
-- **[`fuseki-per-pod-sparql.md`](fuseki-per-pod-sparql.md)** — the physical
-  boundary that makes those gates meaningful: one Fuseki dataset per pod
-  (registry + data), the endpoint as a stored capability, and the
-  `RoutedSparqlDataAccessor` that prevents the LDP write path from
-  cross-writing. Note the open item on Fuseki auth on the internal network (a
-  leaked endpoint URL is a real capability
-  leak).
-- The landed `/.sai/proxy-admin` / `/sparql-admin` enforcement boundaries —
-  `requireOrgAdmin` (caller must be an admin of the org; unknown org
-  indistinguishable from non-admin), GET/QUERY-only, JSON-LD-only contract
-  (pinned `Accept`, upstream content-type guard — no binary), and
-  safe-by-grant upstream authorization (the org's credentials only succeed
-  where the org holds a data grant) — are documented in the OpenWiki
-  `services/org-context.md`.
-
-(More plans will be listed here as their security aspects are spelled
-out — e.g. ACR/ACP scoping such as `registry-set-permissions.md`.)
+The enforcement boundaries themselves are documented in the OpenWiki:
+`services/org-context.md` (`requireOrgAdmin`, `/.sai/proxy-admin`,
+`/.sai/sparql-admin`), `architecture/storage-isolation.md` (endpoint allowlist,
+fail-closed routing, endpoint-as-capability), and `architecture/federation.md`
+(single-deployment shortcuts). Security-relevant plan work:
+`pod-isolation-followup.md` (mirror single-writer, cross-owner isolation tests,
+named-graph patch guard), `update-deployment.md` (Fuseki/Garage internal auth,
+Garage admin token, `findSparqlByIri` scan), and `registry-set-permissions.md`
+(ACR/ACP scoping per structural registry).
 
 ## Custom Community Solid Server (CSS) components
 
-All three servers deploy this repo's custom Components.js components — published as
-`@elfpavlik/sai-components` (the in-repo `packages/components`), compiled by
-`componentsjs-generator` into `dist/components/*.jsonld`, wired via
-`sai:config/<server>.json` → `sai:config/http/handler/default.json`, imported by
-`environments/css/{auth,data,registry}.json`. CSS built-ins can be replaced with
-`@type: Override` configs in `packages/components/config/overrides/` (existing
-precedent: `jwks.json`, `disable-ui.json`). Two flavours of plans exist:
+The Components.js package/build/wiring and override mechanics (including the
+per-server notification config) are documented in the OpenWiki
+`integrations/auxiliary-services.md`. This index only tracks the remaining CSS
+plans:
 
-### Override CSS's built-in components (only these two, both on the registry + data servers)
+### Override CSS's built-in components (the remaining webhook-emitter plan)
 
-The **auth** server imports `css:config/http/notifications/disabled.json` — no emitter
-anywhere near it. The two servers with notifications enabled (`css:config/http/notifications/all.json`)
-are **registry** (`config/registry.json`) and **data** (`config/data.json`). Both plans
-below replace a stock CSS notification pipeline piece on those two servers:
+The durable webhook emitter is the only remaining plan that rewrites a CSS
+built-in; the NDJSON streaming stack is already landed (OpenWiki
+`services/activity-lifecycle.md`):
 
 | Plan | CSS built-in replaced | Notes |
 |---|---|---|
 | `durable-webhook-delivery.md` ⬜ | `urn:solid-server:default:WebhookEmitter` → `DurableWebhookEmitter` (extends it; starts a `deliverWebhook` Temporal workflow with bounded retry instead of fire-and-forget POST) | New `config/overrides/emitter.json` mirroring the `jwks.json` override pattern, imported by `registry.json` + `data.json`; class exported from `packages/components` index for the generator |
-| `remove-turtle-serialization.md` ⬜ (Phase 3) | Streaming-HTTP notification internals → custom NDJSON emitter stack (`accept: application/x-ndjson`, expanded JSON-LD + `\n` per notification): replaces `StreamingHttp2023Emitter`, `BaseNotificationSerializer`, `StreamingHttp2023RequestHandler`, `StreamingHttpListeningActivityHandler` (or a full streaming-http override) | Lives in `packages/components` (the plan's `@elfpavlik/sai-components`); only the streaming channel — webhook delivery above is separate; optional content negotiation keeps Turtle consumers working |
-
-These are adjacent (same notification area, same servers, same override mechanism) but
-independent. They are the **only** plans that rewrite CSS internals.
 
 ### Extend the CSS config with custom "sai" components (already shipped; not overrides)
 
 | Plan | Custom components added |
 |---|---|
 | `revoke-delegation-chain.md` 🔶 | `GrantRevocationHandler` + `AccessRevocation` dispatch on the delegation endpoint (`GrantIssuanceRouter`), and the `RevokeGrants` RPC (`services/Revocation.ts` via `ApiHandler`) |
-| `fuseki-per-pod-sparql.md` 🔶 | `PodEndpointStore` (AccountLoginStorage typed records `sparqlEndpoint` + `objectEndpoint`) + `RoutedSparqlDataAccessor` (selects the per-pod dataset for every LDP read/write); no CSS built-in is replaced in the notification sense — a new backend accessor is added |
 | `webhook-subscription-bootstrap.md` ⬜ | Reuses the existing `ActivityWebhookStore` + the **stock** CSS notification API (`SubscriptionClient` → `WebhookChannel2023`, kv-backed `KeyValueChannelStorage`) — no new components |
 
 ### No CSS components needed

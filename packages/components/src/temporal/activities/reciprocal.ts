@@ -45,8 +45,8 @@ export interface AcceptInvitationOutput {
 }
 
 /**
- * The acceptor side of the common accept protocol (org-context-improvements
- * plan): POSTs the **opaque** capabilityUrl as the acceptor — its own AA
+ * The acceptor side of the common accept protocol (see the OpenWiki
+ * `temporal/workflows.md`): POSTs the **opaque** capabilityUrl as the acceptor — its own AA
  * session, personal or org — so the inviter's AA creates *its* registration of
  * the acceptor and returns the inviter's webId (the only place the inviter's
  * identity is learned). Then creates the acceptor's registration of the
@@ -130,7 +130,7 @@ export async function reciprocalRegistration(
   // NOTE: the initial reciprocal-mirror write is deliberately NOT here — it
   // is orchestrated by the establishReciprocal workflow (its own activity,
   // own retry policy), currently disabled until phase 4b
-  // (org-context-sparql.md / federation.md 1a)
+  // (org-context-sparql.md / openwiki/architecture/federation.md 1a)
   return {
     accountId,
     webId,

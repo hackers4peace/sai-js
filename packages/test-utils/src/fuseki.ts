@@ -137,7 +137,7 @@ function applyReciprocalMirrors(
  * Split a TriG fixture into one TriG payload per pod dataset, with the
  * reciprocal mirrors backfilled. Used by `test/setup.ts` and `packages/repl`
  * to seed each per-pod Fuseki dataset
- * (docs/plans/fuseki-per-pod-sparql.md stage 3).
+ * (openwiki/architecture/storage-isolation.md).
  */
 export async function splitFixtureByPod(
   trig: string,

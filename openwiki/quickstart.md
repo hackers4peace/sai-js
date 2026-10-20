@@ -31,6 +31,7 @@ Use this map to find the page for the topic you need.
 | Understand the repo and packages | [Architecture overview](architecture/overview.md) |
 | See the production landscape | [Deployment landscape](architecture/deployment-landscape.md) |
 | Understand per-pod storage and isolation | [Per-pod storage and isolation](architecture/storage-isolation.md) |
+| Understand cross-server/federation assumptions | [Federation constraints](architecture/federation.md) |
 | See the inter-peer topology | [Social graph](architecture/social-graph.md) |
 | Learn the JSON-LD entities | [Data model entities](data-model/entities.md) |
 | Learn the JSON-LD read/write helpers | [JSON-LD read/write layer](data-model/json-ld-layer.md) |

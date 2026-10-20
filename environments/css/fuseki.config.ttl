@@ -1,4 +1,4 @@
-# Per-pod Fuseki datasets (docs/plans/fuseki-per-pod-sparql.md stage 3).
+# Per-pod Fuseki datasets (openwiki/architecture/storage-isolation.md).
 # Generated from environments/data/registry.trig + kv.json — do not hand-edit.
 # Datasets: id, data-acme-hr, data-acme-rnd, data-alice-home, data-alice-work, data-bob, data-dan-east, data-dan-west, data-kim-blue, data-kim-red, data-shapetrees, data-test-client, data-yoyo-eu, data-yoyo-na, reg-acme, reg-alice, reg-bob, reg-dan, reg-kim, reg-yoyo
 

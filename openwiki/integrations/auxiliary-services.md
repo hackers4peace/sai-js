@@ -75,6 +75,39 @@ These `services/css/*.json` files are thin wrappers; the authoritative config
 graphs live under `packages/components/config/`. The Docker Compose stack mounts
 near-identical copies from `environments/css/` instead.
 
+### Components.js customization
+
+`@elfpavlik/sai-components` is the in-repo `packages/components` package. It is
+the only workspace package that builds to `dist/`: `tsc` produces the runtime
+JavaScript and `componentsjs-generator -s dist -c dist/components -r sai -i
+.componentsignore` produces the Components.js descriptors. The package's
+`lsd:module` / `lsd:components` / `lsd:importPaths` fields point CSS at
+`dist/components/` and the `config/` directory, so a config can import both
+`sai:config/<server>.json` (custom components) and stock `css:config/...`
+modules.
+
+CSS built-ins are replaced with `@type: Override` entries in
+`packages/components/config/overrides/`: `overrideInstance` names the stock
+component, and `overrideParameters` (or `overrideSteps` for list edits) supply
+the replacement. Existing precedents are `jwks.json`, `disable-ui.json`,
+`disable-v6-migration.json`, and `base-http-handler.json` (which swaps CSS's
+`StaticAssetHandler` for `RootStaticAssetGuard`). Custom SAI components are
+added the same way — by `@id`/`@type` graph entries — rather than by editing
+CSS itself: the storage/routing set (`PodEndpointStore`, the routed SPARQL/S3
+accessors, `HybridDataAccessor`), the auth/permission set (`SessionManager`,
+`SaiAuthorizationManager`, `SaiPermissionsEngine`, `CustomWebIdStore`), the
+activity/events set (`ActivityWebhookHandler`, `EventsHandler`,
+`NdjsonNotification`), the delegation handlers, and the account/Garage
+components.
+
+Notification wiring differs per server: **auth** imports
+`css:config/http/notifications/disabled.json`; **registry** and **data** import
+`css:config/http/notifications/all.json` plus
+`sai:config/http/notifications/ndjson.json` (the NDJSON streaming serializer and
+handler). The durable webhook emitter is still a plan
+(`durable-webhook-delivery.md`); channel provisioning reuses the stock webhook
+API (`webhook-subscription-bootstrap.md`).
+
 ## Shape-tree worker (`shapetrees`)
 
 `shapetrees` is a Cloudflare Pages Functions worker serving **shape trees and

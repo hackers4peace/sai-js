@@ -10,7 +10,7 @@ import { invitationUrl } from '../../util/uriTemplates.js'
 /**
  * The activity-first createInvitation leg (step 1): PUT the invitation at the
  * pre-minted id with the context's own session, generating the capabilityUrl
- * here — the opaque protocol link (federation.md: the acceptor must not parse
+ * here — the opaque protocol link (openwiki/architecture/federation.md: the acceptor must not parse
  * it, so it is the one protocol-opaque plain string). Idempotent under
  * workflow retries and reconcile re-delivery: find-first by the STABLE
  * pre-minted invitation id (never by the per-run capabilityUrl — a retry

@@ -19,7 +19,7 @@ import { S3DataAccessor } from './S3DataAccessor.js'
 
 /**
  * Routes binary LDP reads/writes to the object (S3) bucket of the resource's
- * data pod (docs/plans/isolated-s3-buckets.md).
+ * data pod (openwiki/architecture/storage-isolation.md).
  *
  * Mirrors {@link RoutedSparqlDataAccessor}: `StorageLocationStrategy` yields
  * the pod base URL, which is the `objectEndpoint` registry's key, so a single

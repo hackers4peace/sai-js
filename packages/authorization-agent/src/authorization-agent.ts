@@ -16,7 +16,7 @@ import {
   type RoleData,
   // (a2) ShareDataInstanceStructure canonical shape moved verbatim into
   // data-model — re-exported here for source compatibility
-  // (payload-contract-alignment §2)
+  // (see the OpenWiki `data-model/entities.md`)
   type ShareDataInstanceStructure,
   type SocialAgentRegistrationData,
   WebIdProfile,

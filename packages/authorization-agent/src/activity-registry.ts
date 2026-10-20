@@ -356,7 +356,7 @@ export async function loadActivity(id: string, fetch: WhatwgFetch): Promise<Acti
         ...base,
         type: canonicalType as ['Activity', 'AuthorizationGranted'],
         actor,
-        // the owner-span close (access-request-tracking.md §5) — optional,
+        // the owner-span close (see the OpenWiki `services/activity-lifecycle.md`) — optional,
         // direct approvals without a request carry none
         satisfiesAccessRequest:
           node.satisfiesAccessRequest === undefined
@@ -376,7 +376,7 @@ export async function loadActivity(id: string, fetch: WhatwgFetch): Promise<Acti
         createdAt: asString(node.createdAt),
         type: canonicalType as ['Activity', 'AuthorizationDenied'],
         actor,
-        // the owner-span close (access-request-tracking.md §5) — optional,
+        // the owner-span close (see the OpenWiki `services/activity-lifecycle.md`) — optional,
         // direct declines without a request carry none
         satisfiesAccessRequest:
           node.satisfiesAccessRequest === undefined
@@ -393,7 +393,7 @@ export async function loadActivity(id: string, fetch: WhatwgFetch): Promise<Acti
       }
     }
     case 'AccessRequestGranted': {
-      // requester-side resolution (access-request-tracking.md §1.1) — the
+      // requester-side resolution (see the OpenWiki `services/activity-lifecycle.md`) — the
       // light `{ id, type }` ref of the Sent activity's SNAPSHOT id (the
       // grant landed — written by the detectGrantedRequests child). No
       // `target`, no `ActivityCompleted` (terminal resolution).
@@ -410,7 +410,7 @@ export async function loadActivity(id: string, fetch: WhatwgFetch): Promise<Acti
       }
     }
     case 'AccessRequestArchived': {
-      // requester-side user close (access-request-tracking.md §4.2) — the
+      // requester-side user close (see the OpenWiki `services/activity-lifecycle.md`) — the
       // light `{ id, type }` ref of the Sent activity's SNAPSHOT id (the
       // archiveAccessRequest RPC). No `target`, no `ActivityCompleted`.
       const embedded = node.object as EmbeddedAccessRequestRef | undefined

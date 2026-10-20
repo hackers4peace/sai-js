@@ -387,7 +387,7 @@ export const recordAuthorization = async (
       type: ['Activity', 'AuthorizationGranted'],
       actor: ctx.webId,
       target: ctx.registrySet.hasAuthorizationRegistry.id,
-      // the owner-span close (access-request-tracking.md §5): the flat
+      // the owner-span close (see the OpenWiki `services/activity-lifecycle.md`): the flat
       // activity-level back-link — absent on direct approvals without a request
       ...(accessRequestIri ? { satisfiesAccessRequest: accessRequestIri } : {}),
       // always the array (possibly [] — an all-filtered/self-grant writes no
@@ -415,7 +415,7 @@ export const recordAuthorization = async (
   const activity: Omit<AuthorizationDenied, 'id'> = {
     type: ['Activity', 'AuthorizationDenied'],
     actor: ctx.webId,
-    // the owner-span close (access-request-tracking.md §5): the flat
+    // the owner-span close (see the OpenWiki `services/activity-lifecycle.md`): the flat
     // activity-level back-link — absent on direct declines without a request
     ...(accessRequestIri ? { satisfiesAccessRequest: accessRequestIri } : {}),
     object: snapshot(),
@@ -431,7 +431,7 @@ export const recordAuthorization = async (
 
 /**
  * Archive an OPEN outgoing need-based access request
- * (access-request-tracking.md §4.2): the requester closes the span — the
+ * (see the OpenWiki `services/activity-lifecycle.md`): the requester closes the span — the
  * request leaves `accessRequestsSent` on the next refresh. The `request`
  * arg is the SNAPSHOT id (urn:uuid — the stable profile entry). The
  * open-set query doubles as the ownership check: the snapshot must appear

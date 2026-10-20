@@ -1,10 +1,11 @@
 # Authorization revocation — UI revokes an authorization, a workflow revokes the grants
 
-> **Status: design only — deferred.** Extracted from
-> `activity-first-services.md` step 4 (the `revokeGrants` leg, re-framed
+> **Status: design only — deferred.** Extracted from the activity-first design
+> (now documented in the OpenWiki `services/activity-lifecycle.md` and
+> `services/rpc-and-services.md`), step 4 (the `revokeGrants` leg, re-framed
 > 2026-09): the grant-revocation *temporal* artifacts dormant in that step
-> are **retired** by the activity-first cleanup (step 4 there) — this plan
-> captures the authorization-revocation leg itself, to be worked later.
+> are **retired** by the activity-first cleanup — this plan captures the
+> authorization-revocation leg itself, to be worked later.
 > Builds on [`authorization-revoked.md`](authorization-revoked.md) (the typed
 > `authorizationRevoked` producer — routed today, only the producer missing)
 > and [`revoke-delegation-chain.md`](revoke-delegation-chain.md) (the
@@ -23,9 +24,9 @@ a workflow revokes the grants as a derived consequence.
 - (a) **Issuance endpoint** — `GrantRevocationHandler` (the AccessRevocation
   POST boundary, live: the `revoke-delegation-chain.md` first-cut slice) —
   direct HTTP revocation.
-- (b) **Workflows** — role membership change / role deletion (steps 2–3 of
-  `activity-first-services.md`: derived regeneration — registration links
-  cleared, grant resources left as orphans), and this plan's
+- (b) **Workflows** — role membership change / role deletion (the activity-first
+  derived regeneration — registration links cleared, grant resources left as
+  orphans; see the OpenWiki `services/activity-lifecycle.md`), and this plan's
   authorization-revocation leg.
 
 ## 2. The leg
@@ -48,16 +49,16 @@ a workflow revokes the grants as a derived consequence.
    embedded / live-link object form, `target` dropped) lands with
    [`authorization-granting.md`](authorization-granting.md) (the extracted
    granting pair — the `AuthorizationRecorded`/`Revoked` re-pins) per the
-   `activity-first-services.md` contract snapshot; this leg consumes that
-   shape.
+   activity-first contract snapshot now documented in the OpenWiki
+   `services/activity-lifecycle.md`; this leg consumes that shape.
 
 ## 3. Open decisions
 
 1. **Revocation orchestrator** — reuse the (currently retired)
    `processGrantsRevocation` requester-hop shape, revived for this leg, vs a
    dedicated local-revoke workflow. If reused, the dormant temporal wiring
-   retired by the cleanup (§4, `activity-first-services.md`) is re-landed
-   here — deliberately, with a producer.
+   retired by the activity-first cleanup is re-landed here — deliberately, with
+   a producer.
 2. **`grantsRevoked` observability** — the delegation-chain follow-up's
    "grantor trigger integration (`grantsRevoked` producer)" item
    (`revoke-delegation-chain-follow-ups.md` item 4) rides this plan — either
@@ -69,7 +70,7 @@ a workflow revokes the grants as a derived consequence.
 - The **dormant temporal grant-revocation artifacts** (`grantsRevoked`
   activity class + api-messages projection + handler/reconcile branches +
   `processGrantsRevocation` + `requestGrantRevocation` /
-  `removeDataGrantsFromRegistration` activities + the `events.ts`/events.md
+  `removeDataGrantsFromRegistration` activities + the `events.ts`/openwiki/services/activity-lifecycle.md
   rows) are **retired by the activity-first cleanup** — this plan revives
   only what the leg needs, under decision 1.
 - The **issuance endpoint** itself stays exactly as landed

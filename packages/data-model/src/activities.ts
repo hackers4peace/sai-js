@@ -6,7 +6,8 @@ import type { RoleData } from './role.ts'
 import type { SocialAgentInvitationData } from './social-agent-invitation.ts'
 
 // ──────────────────────────
-// Activity types (the outbox) — payload-contract-alignment (amended wire)
+// Activity types (the outbox) — wire contract in the OpenWiki
+// `services/activity-lifecycle.md` (amended wire)
 //
 // One interface per activity RDF class (capitalized). `type` is the
 // discriminant: the class tuple `['Activity', '<Class>', <as:*>]` — the
@@ -165,7 +166,8 @@ export type NeedBasedAccessRequestReceivedId = {
  * snapshot (grantee, grantedBy, dataOwner, need group + per-need
  * registeredShapeTree) lives ONCE on the Sent activity — the open-set
  * queries join `outcome.object.id → sent.object.id` inside the same
- * Activity Registry (access-request-tracking.md §1.1/§3.1).
+ * Activity Registry (the access-request resolution spans in the OpenWiki
+ * `services/activity-lifecycle.md`).
  */
 export type EmbeddedAccessRequestRef = {
   id: string
@@ -175,8 +177,8 @@ export type EmbeddedAccessRequestRef = {
 /**
  * Requester-side resolution: an open sent request was GRANTED (the
  * detector — a fire-and-forget child at the end of the `updateDelegatedGrants`
- * workflow — observed the new grant and wrote this, access-request-tracking.md
- * §3). `target` dropped: the object is the light ref (the Sent activity's
+ * workflow — observed the new grant and wrote this (see the OpenWiki
+ * `services/activity-lifecycle.md`). `target` dropped: the object is the light ref (the Sent activity's
  * SNAPSHOT id). No owner→requester notification needed — the outcome is
  * observed from the received-grant view. TERMINAL resolution — no
  * `ActivityCompleted`.
@@ -191,7 +193,8 @@ export type AccessRequestGranted = Omit<ActivityBase, 'target'> & {
 
 /**
  * Requester-side user close: an open sent request was ARCHIVED (the
- * `archiveAccessRequest` RPC — access-request-tracking.md §4.2). `target`
+ * `archiveAccessRequest` RPC; see the OpenWiki
+ * `services/activity-lifecycle.md`). `target`
  * dropped: the object is the light ref (the Sent activity's SNAPSHOT id —
  * stable forever, so the archive works at any future point). Direct write +
  * ownership check — no workflow. TERMINAL resolution — no `ActivityCompleted`.
@@ -368,7 +371,7 @@ export type AuthorizationGranted = ActivityBase & {
   /** as:actor — plain IRI (the registry owner) */
   actor: string
   /** the resolved need-based access request (activity-level back-link — the
-   *  owner-span close, access-request-tracking.md §5). Optional: direct
+   *  owner-span close; see the OpenWiki `services/activity-lifecycle.md`). Optional: direct
    *  approvals without a request carry none */
   satisfiesAccessRequest?: string
   /** the AuthorizationRegistry */
@@ -392,7 +395,7 @@ export type AuthorizationDenied = Omit<ActivityBase, 'target'> & {
   /** as:actor — plain IRI (the registry owner) */
   actor: string
   /** the resolved need-based access request (activity-level back-link — the
-   *  owner-span close, access-request-tracking.md §5). Optional: direct
+   *  owner-span close; see the OpenWiki `services/activity-lifecycle.md`). Optional: direct
    *  declines without a request carry none */
   satisfiesAccessRequest?: string
   /** the request-structure snapshot (urn:uuid) carrying `grantee` */

@@ -55,7 +55,9 @@ are prefixed with `${backendBaseUrl}/.sai/api` and send
 `credentials: 'include'` (cookie auth), wrapped in `UiTracingLive` so browser
 OTLP spans supply the `traceparent` the server reads. Every exported function
 (`getWebId`, `authorizeApp`, `shareResource`, …) builds a typed `@effect/rpc`
-request and `Effect.runPromise`s it.
+request and `Effect.runPromise`s it. Activity-first RPCs echo the triggering
+activity IRI as `activityId`; the app store records it as the claim anchor and
+the stream handler matches the incoming row by exact id (no cross-binding).
 
 `src/events.ts` opens `GET /.sai/events` (NDJSON, cookie-authed), runs
 `fullRefresh()` on first connect and every reconnect, and `handleActivity`
@@ -71,6 +73,14 @@ Store freshness is soft, with three refresh kinds: **synchronous** (right after
 the RPC returns — what the service already mutated), **completion-driven**
 (a `done` event → targeted refetch by activity type), and **baseline** (view
 mount + the `fullRefresh` on every (re)connect).
+
+Access-request indicators are per-request collections: the `SocialAgent`
+projection carries `accessRequestsSent` and `accessRequestsReceived`, and the
+social-agent/data-registry views show their counts as badges and open the
+matching authorization screen. An owner can archive a still-open request from
+the list (`archiveAccessRequest`); `AccessRequestGranted` and
+`AccessRequestArchived` are terminal resolutions, so the events stream clears
+the indicator without a follow-up workflow.
 
 ## Localization and PWA
 

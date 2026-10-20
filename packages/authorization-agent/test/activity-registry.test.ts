@@ -4,7 +4,8 @@ import { describe, test } from 'vitest'
 
 import { expect } from './expect'
 
-// payload-contract-alignment flip: JSON-LD `@type` is an unordered set — the
+// The wire contract (see the OpenWiki `services/activity-lifecycle.md`):
+// JSON-LD `@type` is an unordered set — the
 // SPARQL-backed store may frame it back in ANY order (the dagger runs showed
 // `["AuthorizationGranted", "Activity"]`). loadActivity must discriminate by
 // set membership and canonicalize the tuple, or every consumer (handler
@@ -296,7 +297,8 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
 
   test('canonicalizes the AccessRequestGranted resolution (light snapshot ref)', async () => {
     // requester-side close — the object is the light `{ id, type }` ref of
-    // the Sent activity's SNAPSHOT id (access-request-tracking.md §1.1);
+    // the Sent activity's SNAPSHOT id (see the OpenWiki
+    // `services/activity-lifecycle.md`);
     // reversed tuple exercises set-membership discrimination again
     const doc = {
       '@context': dataModelContext,
@@ -349,7 +351,8 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
   })
 
   test('carries the satisfiesAccessRequest back-link on granted + denied (owner-span close)', async () => {
-    // access-request-tracking.md §5 — the flat activity-level back-link;
+    // the flat activity-level back-link (see the OpenWiki
+    // `services/activity-lifecycle.md`);
     // absent on direct approvals (without a request)
     const grantedDoc = {
       '@context': dataModelContext,

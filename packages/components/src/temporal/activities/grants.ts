@@ -516,7 +516,7 @@ export async function replaceDataGrantsOnRegistration(
 
 /**
  * The grantee of an `authorizationRecorded`/`authorizationRevoked` or
- * `adminAuthorizationRecorded`/`adminAuthorizationRevoked` activity, read
+ * `adminAuthorizationGranted`/`adminAuthorizationRevoked` activity, read
  * from the `as:object` (parties ride the object). Authorizations: the first
  * object DataAuthorization's `grantee`, its kind resolved in the store
  * (`session.typeGrantee` — role vs social agent vs application). Admin

@@ -208,7 +208,7 @@ export const SPACE = createVocabulary('http://www.w3.org/ns/pim/space#', 'Storag
 
 export const AS = createVocabulary(
   'https://www.w3.org/ns/activitystreams#',
-  // payload-contract-alignment: activities are typed RDF classes — `actor`
+  // activities are typed RDF classes (see the OpenWiki `services/activity-lifecycle.md`) — `actor`
   // (the registry owner, plain IRI on the wire), the as:target/as:object
   // wire fields, and the ASV activity types carried beside the interop class
   // in the `type` tuple (`['Activity', '<Class>', 'as:Accept']` — spelled as

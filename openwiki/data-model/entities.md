@@ -46,7 +46,8 @@ verified:
 dependency-light JSON-LD POJO layer shared by the `application` and
 `authorization-agent` packages. It owns entity data types, `fromJsonLd` readers,
 a single shared `dataModelContext`, ACP/ACR JSON-LD builders, and the bootstrap
-TriG templates. It imports neither of the other SAI packages.
+TriG templates. It imports neither of the other SAI packages (the shared
+`DataModelDependencies` type lives in `authorization-agent/src/types.ts`).
 
 The public surface is `packages/data-model/src/index.ts`, which re-exports
 entities both as `type` (the data shape) and as namespaces (helpers such as
@@ -74,9 +75,15 @@ type and its helpers.
   `AccessNeedGroupDescriptionData`).
 - **Roles** — `RoleData` with a language-mapped `label` and `members`.
 - **Shape trees** — `ShapeTreeData` (with `references` via `viaPredicate`) and
-  `ShapeTreeDescriptionData`.
+  `ShapeTreeDescriptionData`. Shape trees are read through `frameNode` plus an
+  expanded-document walk for `references`/description languages — there is no
+  quad-based `fromDataset`/`toDataset` pair anymore.
 - **Activities** — `ActivityData`, a discriminated union of one member per RDF
-  activity class, with `isActivityClass(activity, cls)` membership checks.
+  activity class (including the terminal `AccessRequestGranted` and
+  `AccessRequestArchived`), with `isActivityClass(activity, cls)` membership
+  checks. The wire form is flat: `type` is the class tuple and fields are plain
+  IRIs/literals (no nested `payload`, no `{ id, type }` ref objects stored in
+  registries).
 - **Messages and identity** — `AccessRequestMessage` / `NeedBasedAccessRequest*`
   / `AccessRevocationMessage`, `WebIdProfileData`, `ClientIdDocumentData`, and
   `DataOwnerData`.

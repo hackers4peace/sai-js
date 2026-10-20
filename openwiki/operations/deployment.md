@@ -66,9 +66,12 @@ The Podman fleet is **not** part of the per-pod storage migration yet:
 with one dataset per pod. The Fuseki + per-data-pod Garage buckets described
 in [Per-pod storage and isolation](../architecture/storage-isolation.md)
 currently apply to the Docker Compose dev/test stack only; Nix images and the
-NixOS deployment would need a follow-up. The lag is visible in the `id`
-container too: Podman still passes `CSS_SPARQL_ENDPOINT`, while the current
-`services/id` server reads `CSS_ID_SPARQL_ENDPOINT`.
+NixOS deployment would need a follow-up. The production cutover (Fuseki,
+Garage, env/secrets/volumes, data migration, OCI/flake/hosts) is planned in
+[`docs/plans/update-deployment.md`](../../docs/plans/update-deployment.md).
+The lag is visible in the `id` container too: Podman still passes
+`CSS_SPARQL_ENDPOINT`, while the current `services/id` server reads
+`CSS_ID_SPARQL_ENDPOINT`.
 
 ## Caddy and secrets
 

@@ -64,7 +64,7 @@ export async function establishReciprocal(
   const result = await reciprocalRegistration(webId, registration, accountId)
   await reciprocalWebhook(result)
   // phase 4b: stores are per-pod, so mirror the peer's reciprocal registration
-  // (federation.md 1a — the mirror is the only source for peer data now)
+  // (openwiki/architecture/federation.md 1a — the mirror is the only source for peer data now)
   await syncMirrorActivity({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     peerId: { id: registration.registeredAgent, type: [SOCIAL_AGENT_TYPE] },

@@ -168,7 +168,7 @@ topic`) forwards + dispatches workflows, the admin channel **forwards only**
 admin channels never take over workflow dispatch.
 
 - **Establishment — with `AddAdmin`.** In `createAdminGrants` (trigger
-  `adminAuthorizationRecorded`, runs as the org's AA), after the grants:
+  `adminAuthorizationGranted`, runs as the org's AA), after the grants:
   ensure the admin's org channel — `webId` = admin, `topic` = the org's
   Activity Registry, `accountId` via `CustomWebIdStore.findAccout(adminWebId)`
   (the auth-server kv webIdLink index). Subscribe with the **org's own

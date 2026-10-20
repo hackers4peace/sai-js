@@ -1,5 +1,5 @@
 /**
- * Per-data-pod Garage seeding (docs/plans/isolated-s3-buckets.md step 4).
+ * Per-data-pod Garage seeding (openwiki/architecture/storage-isolation.md).
  *
  * There is no shared bucket: each data pod gets its own bucket + key, created
  * through the Garage v2 admin API. Keys are generated, so they cannot live in

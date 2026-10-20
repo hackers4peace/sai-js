@@ -72,7 +72,7 @@ function handleActivity(activity: ActivityEvent) {
   // track every activity (pending → done) — the step-0 tracker; claims bind
   // a user-triggered action to its activity (create: the echoed as:object id)
   appStore.recordActivity(activity)
-  // terminal resolutions (access-request-tracking.md §6) — the class IS the
+  // terminal resolutions (see the OpenWiki `services/activity-lifecycle.md`) — the class IS the
   // outcome and never gets an `activityCompleted`, so react to the row at
   // ANY status: the REQUESTER's outgoing badge/list clears as soon as the
   // granted/archived Add lands (no done-row to wait for)

@@ -1,5 +1,5 @@
 /**
- * Account-bootstrap activities (docs/plans/isolated-s3-buckets.md): the
+ * Account-bootstrap activities (openwiki/architecture/storage-isolation.md): the
  * I/O half of account creation, moved out of the synchronous
  * `AccountService.bootstrapAccount` so the whole flow runs as a Temporal
  * workflow with find-first retries and compensation.

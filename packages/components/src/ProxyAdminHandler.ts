@@ -38,7 +38,7 @@ import type { SessionManager } from './SessionManager'
  * Gate: same as `/sparql-admin` (`requireOrgAdmin` — the caller must be an
  * admin of the org). Read-only by construction: GET only, and the proxy
  * never issues writes upstream. Peer-side access is enforced by the
- * peer's permission engine against its data grants (federation.md §1) —
+ * peer's permission engine against its data grants (openwiki/architecture/federation.md §1) —
  * the org's credentials only succeed where the org holds a grant
  * (safe-by-grant; no peer allow-list needed).
  *

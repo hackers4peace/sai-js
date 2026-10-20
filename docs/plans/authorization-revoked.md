@@ -2,8 +2,8 @@
 
 > **Status: design only — adopted by the separate plan
 > [`authorization-revocation.md`](authorization-revocation.md) (the
-> authorization-revocation leg, extracted from `activity-first-services.md`
-> step 4).** Extracted from
+> authorization-revocation leg, extracted from the activity-first design now
+> documented in the OpenWiki `services/activity-lifecycle.md`).** Extracted from
 > `workflow-temporal-decupling.md` Phase 4.4. The routing (handler,
 > per-target consumer, reconciliation sweep) already supports
 > `authorizationRevoked`; only the **producer** still needs to write it — the

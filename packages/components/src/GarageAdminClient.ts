@@ -1,6 +1,6 @@
 /**
  * Minimal client for the Garage **v2 administration API**
- * (`docs/plans/isolated-s3-buckets.md`).
+ * (`openwiki/architecture/storage-isolation.md`).
  *
  * The data server never talks to this API; it only consumes the credentials an
  * `objectEndpoint` record carries. Account provisioning (a Temporal activity)

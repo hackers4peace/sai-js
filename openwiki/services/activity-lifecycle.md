@@ -50,7 +50,7 @@ writing a minimal `ActivityCompleted` resource, which is forwarded as `done`.
 The Activity Registry is an append-only log; state is never mutated — a
 transition is a new log entry. There are exactly two derived states:
 
-- **`pending`** — a change activity (`activityType !== 'ActivityCompleted'`)
+- **`pending`** — a change activity (any class other than `ActivityCompleted`)
   with no completion referencing it.
 - **`done`** — an `ActivityCompleted` whose `target` is the activity IRI exists.
 
@@ -61,14 +61,25 @@ while connected, so correlation is via the completion's `target`, not ordering.
 A permanently failing workflow leaves the activity `pending` forever (there is
 no dead-letter state); `reconcileActivities` is the reprocessing backstop.
 
+**Terminal resolution classes have no completion.** `AuthorizationDenied`,
+`AccessRequestGranted`, and `AccessRequestArchived` are outcomes in themselves —
+nothing materializes after them, so no workflow runs and no `ActivityCompleted`
+is written. `events.ts` reacts to their rows at any status, and
+`reconcileActivities` treats them as terminal (no dispatch, no completion).
+
 ## The activity union
 
 `ActivityData` is the typed discriminant union of one member per activity RDF
 class (`InvitationAccepted`, `AuthorizationGranted`, `DelegatedGrantsUpdated`,
 `ActivityCompleted`, …), and `isActivityClass(activity, cls)` checks membership
-in the class tuple. The comment on the union codifies the extension seam:
-adding a class means extending the union plus the vocab/context entry, and
-updating the handler, `reconcileActivities`, and the UI `events.ts` row.
+in the class tuple. The wire form is **flat**: each interface is named after its
+RDF class, `type` is the class tuple (`['Activity', '<Class>', <as:*>]`), and
+fields are plain IRIs/literals inline — there is no nested `payload` blob and no
+`{ id, type }` ref object stored in a SPARQL-queried registry (typed `XId` refs
+exist only in Temporal inputs). Every activity also carries `actor` (`as:actor`).
+The comment on the union codifies the extension seam: adding a class means
+extending the union plus the vocab/context entry, and updating the handler,
+`reconcileActivities`, and the UI `events.ts` row.
 
 ## Activity object carrier
 
@@ -79,30 +90,75 @@ term gap). `recordAuthorization` pre-mints the data authorizations and embeds
 them as `AuthorizationGranted.object: DataAuthorizationData[]`, and
 `shareResource` does the same with the `buildShareDataAuthorizations` output.
 
-## Producers and consumers
+## Access-request resolution spans
 
-Producers PUT a change activity into the registry set the request operates in
-(the **org's** Activity Registry in an org context); the producer's synchronous
-writes (if any) happen before/with the PUT:
+A need-based access request is tracked as a **span** across two activities: the
+request activity opens it (`NeedBasedAccessRequestSent` on the requester's
+registry, a `urn:uuid` snapshot; `NeedBasedAccessRequestReceived` on the
+owner's registry at the owner-minted request id), and a resolution activity
+closes it:
 
-| Producer | activityType |
-| --- | --- |
-| `Authorization.recordAuthorization` | `AuthorizationGranted` (grant) / `AuthorizationDenied` (decline — pure, no delete) |
-| `ShareResource.shareResource` | `AuthorizationGranted` (ONE activity for all grantees) |
-| `RoleRegistry.updateRole` / `deleteRole` | `RoleMembershipChanged` / `RoleDeleted` |
-| `InvitationHandler` | `AgentRegistrationAdded` |
-| `ReciprocalWebhookHandler` (peer `Update`) | `DelegatedGrantsUpdated` |
-| `Admin.addAdmin` / `removeAdmin` | `AdminAuthorizationGranted` / `AdminAuthorizationRevoked` |
+| Resolution class | Registry | Producer | Outcome |
+| --- | --- | --- | --- |
+| `AccessRequestGranted` | requester's | `detectGrantedRequests` (a fire-and-forget child started at the end of `updateDelegatedGrants`) | a grant for the request was detected → open request closed |
+| `AccessRequestArchived` | requester's | `archiveAccessRequest` RPC (user closes a still-open request) | user archived → open request closed |
+| `AuthorizationGranted` / `AuthorizationDenied` | owner's | `recordAuthorization`, carrying a `satisfiesAccessRequest` back-link | owner-side span closed |
 
-Consumers (the owner channel's `dispatch`) map each class to a workflow on a
-task queue: `AuthorizationGranted` → `processAuthorizationGranted` (parent) →
-per-grantee `processGranteeAuthorization` children on `create-grants`;
-`AuthorizationDenied` is forward-only; `RoleMembershipChanged`/`RoleDeleted` →
-`processRoleMembershipChange`/`processRoleDeletion`; `AgentRegistrationAdded` →
-`establishReciprocal` on `reciprocal-registration`; `DelegatedGrantsUpdated` →
-`updateDelegatedGrants`; the admin classes → `createAdminGrants`/
-`revokeAdminGrants` + `syncAdminAcr`. Admin channels never dispatch — the org's
-owner channel runs the org's workflows.
+All resolutions are immutable and addressable forever, so an open-request list is
+derivable at any time and an archive can target a stable id. The `SocialAgent`
+projection exposes `accessRequestsSent` and `accessRequestsReceived` as
+collections (not single flags), and the detector matches open sent requests
+against the requester's received grants, writing one `AccessRequestGranted` per
+match.
+
+## Domain event catalogue
+
+Producers write one typed Activity into the registry set the request operates
+in (the **org's** Activity Registry in an org context).
+`ActivityWebhookHandler` forwards every `Add` to the events bus and then
+dispatches on the class:
+
+| Activity class | Producer | Consumer / outcome |
+| --- | --- | --- |
+| `InvitationCreated` | `InvitationRegistry.createInvitation` (activity-only; the RPC mints the invitation id) | `createInvitation` on `create-grants` — PUTs the invitation, generates the capabilityUrl, completes |
+| `InvitationAccepted` | `SocialAgentRegistry.acceptInvitation` | `acceptInvitation` on `reciprocal-registration` — POSTs the capabilityUrl, builds the acceptor registration + reciprocal, subscribes, completes |
+| `AgentRegistrationAdded` | `InvitationHandler` (inviter's registry) | `establishReciprocal` on `reciprocal-registration` — builds both registrations/reciprocals, subscribes the reciprocal webhook, completes |
+| `AuthorizationGranted` | `Authorization.recordAuthorization` (grant), `ShareResource.shareResource` | `processAuthorizationGranted` parent → per-grantee `processGranteeAuthorization` children on `create-grants` (one activity for all grantees) |
+| `AuthorizationDenied` | `Authorization.recordAuthorization` (decline) | **terminal / forward-only** — no workflow; the reconcile sweep closes the row |
+| `AuthorizationRevoked` | none yet (see [`authorization-revocation.md`](../../docs/plans/authorization-revocation.md)) | per-grantee `processGranteeActivities` consumer (start-or-signal) |
+| `RoleCreated` | `RoleRegistry.createRole` (activity-only) | `createRole` on `create-grants` — PUTs the role at the minted id, completes |
+| `RoleMembershipChanged` | `RoleRegistry.updateRole` | `processRoleMembershipChange` on `create-grants` |
+| `RoleDeleted` | `RoleRegistry.deleteRole` | `processRoleDeletion` on `create-grants` |
+| `AdminAuthorizationGranted` | `Admin.addAdmin` | `processAdminAuthorizationGranted` on `create-grants` — records the AA at the pre-minted id, `createAdminGrants`, `syncAdminAcr`, completes |
+| `AdminAuthorizationRevoked` | `Admin.removeAdmin` | `processAdminAuthorizationRevoked` on `create-grants` — deletes the AA at `object.id`, `revokeAdminGrants`, `syncAdminAcr`, completes |
+| `NeedBasedAccessRequestSent` | `ShareResource.requestAccessUsingApplicationNeeds` / `requestAccessUsingAccessNeeds` | `processNeedBasedAccessRequest` on `create-grants` — forwards to the data owner's issuance endpoint |
+| `NeedBasedAccessRequestReceived` | `GrantIssuanceHandler` (owner's issuance endpoint) | `processNeedBasedAccessRequestReceived` on `create-grants` — PUTs the immutable AccessRequest |
+| `AccessRequestGranted` | `detectGrantedRequests` (child of `updateDelegatedGrants`) | **terminal** — no workflow/completion |
+| `AccessRequestArchived` | `Authorization.archiveAccessRequest` | **terminal** — no workflow/completion |
+| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | `updateDelegatedGrants` (plus the serialized `syncReciprocalMirror` on `reciprocal-registration`) |
+| `ActivityCompleted` | Temporal completions | forwarding only (`done`); never dispatches |
+| `grantsRevoked` (retired) | none | wiring retired by the activity-first cleanup; revocation now goes through the issuance boundary and workflows |
+
+**Dispatch rules.** The owner channel dispatches; an admin channel is
+forward-only (keyed by the admin's webId). `AuthorizationDenied`,
+`AccessRequestGranted`, `AccessRequestArchived`, and `ActivityCompleted` never
+start a workflow. The admin orchestrators are sequential: the AdminAuthorization
+write/delete happens first, then the grant materialization, then the ACR rewrite
+(`syncAdminAcr` reads the AuthorizationRegistry as source of truth and
+re-guards the last admin); the completion is written only after all succeed.
+`createAdminGrants` writes one `RegistrySet`-scope admin marker plus one
+Read-only `DataRegistry`-scope grant per data registry in the set, which is what
+the data-server permission engine reads. Add and remove are distinct classes
+with distinct object shapes: add embeds the AdminAuthorization-to-be at the
+pre-minted id, remove embeds the existing AdminAuthorization at its real id;
+the admin's grantee is read from the object (no `granted: false` reuse).
+
+**Deferred events.** A `RegistrySet`-scope admin authorization should expand to
+a new `DataRegistry`-scope admin grant when the org gains a data registry; no
+`dataRegistryAdded`-style producer exists yet. A public
+`adminAuthorizations()` iteration API is deferred — the workflows read the
+AuthorizationRegistry directly, type-filtered. `grantsRevoked` remains retired;
+the authorization-revocation leg has no producer yet.
 
 ## Full arc (AuthorizeApp)
 
@@ -116,7 +172,7 @@ owner channel runs the org's workflows.
    child per grantee → each stores DAs + grants + ACRs and PATCHes the
    registration; the parent writes the single completion.
 5. The completion `Add` is loaded via `target` and emitted as `done`.
-6. The UI maps `done(activityType)` to list refetches.
+6. The UI maps `done(<activity class>)` to list refetches.
 
 ## Webhook entrypoint and routing
 
@@ -148,7 +204,9 @@ wired by `config/http/notifications/ndjson.json`): each line is one expanded
 JSON-LD notification, because the stock CSS serializer and streaming handler
 hardcode Turtle and the notification context is not publicly resolvable. The
 `GET /.sai/events` stream is a separate, sai-owned NDJSON stream served by
-`EventsHandler` (not the CSS notification machinery).
+`EventsHandler` (not the CSS notification machinery). `packages/application`'s
+`NotificationManager` consumes the same NDJSON stream (discarding the initial
+state line) and parses each line with `toStore`.
 
 ## Leaky edges (accepted)
 

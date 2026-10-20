@@ -1,8 +1,9 @@
 // ──────────────────────────
 // Authorization structures (domain-shaped)
 //
-// Relocated from authorization-agent (payload-contract-alignment §2, decision
-// (a2)): `data-model` is the anchor of the payload contract and must not
+// Relocated from authorization-agent (the payload contract; see the OpenWiki
+// `services/activity-lifecycle.md` and `data-model/entities.md`): `data-model`
+// is the anchor of the payload contract and must not
 // import from authorization-agent, so the canonical shapes live here;
 // authorization-agent re-exports them (source-compatible). The activity
 // classes `AuthorizationRequested`/`ShareRequested` that could embed them

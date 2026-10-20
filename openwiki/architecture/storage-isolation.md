@@ -215,3 +215,12 @@ The dev/test environment pre-declares the fixture pods in
 `environments/css/fuseki.config.ttl` and splits the fixture seed per pod; see
 [Local development environment](../operations/development.md) and
 [Integration test suite](../testing/integration-tests.md).
+
+## Remaining follow-ups
+
+The landed per-pod design still leaves mirror backfill/drift scan, unregister
+mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion
+cleanup, and the cross-pod/mirror-freshness tests — tracked in
+[`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md). The
+production Nix/podman/OCI cutover and hardening are in
+[`update-deployment.md`](../../docs/plans/update-deployment.md).

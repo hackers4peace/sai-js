@@ -267,7 +267,7 @@ export async function updateDelegatedGrants(
       activities: [{ id: payload.activityId }],
     })
   }
-  // fire-and-forget granted-detection (access-request-tracking.md §3): the
+  // fire-and-forget granted-detection (see the OpenWiki `services/activity-lifecycle.md`): the
   // requester's received-grant view is FRESH here — start the detector child
   // and deliberately do NOT await its result. `ParentClosePolicy.ABANDON` is
   // REQUIRED: the default policy TERMINATES children when their parent

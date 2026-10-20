@@ -12,7 +12,7 @@
 
 R1 replaces the `interop:AdminRegistration` rdf:type on the registration with a
 grant/authorization pair mirroring the data model. Decisions recorded with the
-maintainer (see `events.md` for the event model, `federation.md` for the
+maintainer (see `openwiki/services/activity-lifecycle.md` for the event model, `openwiki/architecture/federation.md` for the
 single-store assumptions the engine path relies on):
 
 - **Model.** `AdminAuthorization` in the org's AuthorizationRegistry (like
@@ -47,7 +47,7 @@ single-store assumptions the engine path relies on):
   create/delete the `AdminAuthorization` in the org's AuthorizationRegistry
   (erroring on already-admin / non-admin — decided) and write a domain activity
   to the org's Activity
-  Registry — **distinct shapes**: `adminAuthorizationRecorded` on add,
+  Registry — **distinct shapes**: `adminAuthorizationGranted` on add,
   `adminAuthorizationRevoked` on remove (mirroring the
   `authorizationRecorded`/`authorizationRevoked` precedent — no `granted: false`
   reuse). `ActivityWebhookHandler` starts **parallel workflows** from the
@@ -70,7 +70,7 @@ single-store assumptions the engine path relies on):
   runtime).
 - **TODO (not Phase 1):** a new data registry added to a RegistrySet must expand
   the All-scope authorization into a new DataRegistry grant — future domain
-  event (`events.md`).
+  event (`openwiki/services/activity-lifecycle.md`).
 
 ## Phase map & verification
 
@@ -336,14 +336,14 @@ Added Dan as an admin of YoYo (IDs generated with `npx @paralleldrive/cuid2 --le
 `AddAdmin`/`RemoveAdmin` (RPC) synchronously create/delete the
 `AdminAuthorization` in the org's AuthorizationRegistry — mirroring the
 data-authorization and `deleteRole` paths — then write a domain activity to the
-org's Activity Registry (`events.md`) — **distinct shapes** for add and remove,
+org's Activity Registry (`openwiki/services/activity-lifecycle.md`) — **distinct shapes** for add and remove,
 no `granted: false` reuse:
-`adminAuthorizationRecorded` on `AddAdmin`, `adminAuthorizationRevoked` on
+`adminAuthorizationGranted` on `AddAdmin`, `adminAuthorizationRevoked` on
 `RemoveAdmin` (mirroring the `authorizationRecorded`/`authorizationRevoked`
 precedent). `ActivityWebhookHandler` starts **parallel workflows** from the
 trigger, diverging on the activity type:
 
-**Add — `adminAuthorizationRecorded`:**
+**Add — `adminAuthorizationGranted`:**
 
 1. **`createAdminGrants`** — generate the RegistrySet-scoped AdminGrant (and
    link it on the registration) plus one Read-only DataRegistry-scoped grant
@@ -379,7 +379,7 @@ EMPTY admin list removes the `#fullAdminAccess` access control entirely
 **Workflow specs — outcome / producer / test verification (decided [Q4];
 revisit after implementation).**
 
-`createAdminGrants` (trigger `adminAuthorizationRecorded`):
+`createAdminGrants` (trigger `adminAuthorizationGranted`):
 - **Outcome.** The admin's RegistrySet-scoped `AdminGrant` exists in the org's
   GrantRegistry and is linked on the registration via `hasAdminGrant` (single
   PATCH replace, mirroring §4.0 of `workflow-temporal-decupling.md` → one
@@ -387,7 +387,7 @@ revisit after implementation).**
   from the RegistrySet (`hasStorage`, `acl:Read`), each with its own `.acr`
   (org `fullOwnerAccess`, admin `peerReadAccess`).
 - **Producer.** The `ActivityWebhookHandler` branch starts it on
-  `adminAuthorizationRecorded`, payload org `webId` + `admin`.
+  `adminAuthorizationGranted`, payload org `webId` + `admin`.
 - **Verification.** Listen on the admin's registration in the org's agent
   registry (e.g. `yoyoSession.findSocialAgentRegistration('https://id/dan')`)
   before the RPC; await `AS.Update`; re-read → assert the RegistrySet grant
@@ -422,7 +422,7 @@ reciprocal channels today but no Activity-Registry channel.
 
 **TODO (not Phase 1):** on a new data registry added to the RegistrySet, expand
 the All-scope authorization into a fresh DataRegistry grant — future domain
-event (`events.md`).
+event (`openwiki/services/activity-lifecycle.md`).
 
 ### 3.8 Type-filtered authorization iterators (R1)
 
@@ -484,8 +484,8 @@ Phase-1 sections are §3.6 (seed), §3.7 (workflows) and §3.8 (type filter);
   record an `AdminAuthorization` (`grantee`, `grantedBy` the org,
   `scopeOfAuthorization interop:All`, `iriForContained` + PUT as with
   authorizations/activities), then PUT the domain activity via
-  `ActivityRegistry.createActivity` (`adminAuthorizationRecorded` on add /
-  `adminAuthorizationRevoked` on remove, events.md). **Synchronous
+  `ActivityRegistry.createActivity` (`adminAuthorizationGranted` on add /
+  `adminAuthorizationRevoked` on remove, openwiki/services/activity-lifecycle.md). **Synchronous
   AuthorizationRegistry change + error semantics (decided):** the RPC changes
   the registry first — create the `AdminAuthorization` on add, delete it on
   remove (mirroring `recordAuthorization` / `deleteRole`) — and only then
@@ -510,10 +510,10 @@ Phase-1 sections are §3.6 (seed), §3.7 (workflows) and §3.8 (type filter);
   `packages/api-messages/src/effect.ts`.
 - **1.5 Handler wiring** — `packages/components/src/ApiHandler.ts`: add the
   service to `SaiService.of({...})`; add an `ActivityWebhookHandler` branch
-  routing `adminAuthorizationRecorded` → `createAdminGrants` + `syncAdminAcr`
+  routing `adminAuthorizationGranted` → `createAdminGrants` + `syncAdminAcr`
   and `adminAuthorizationRevoked` → `revokeAdminGrants` + `syncAdminAcr` (two
   starts per activity or one fan-out via `executeChild` — settle in
-  implementation, events.md).
+  implementation, openwiki/services/activity-lifecycle.md).
 
 **Decided:** [Q1] org's own AA session (owner acts for the org; the non-owner
 admin gate lands in Phase 2). [Q2] last-admin guard both at RPC time and in
@@ -577,7 +577,7 @@ type-filter so one module serves the RPC guard, `syncAdminAcr`, and step 1.2.
   `recordAccessAuthorization` reuse/equivalence also skips `AdminAuthorization`s.
 - **Service (§3.9)** (`packages/components` test of `services/Admin.ts`):
   `AddAdmin` creates the `AdminAuthorization` and writes the
-  `adminAuthorizationRecorded` activity; `RemoveAdmin` deletes it and writes
+  `adminAuthorizationGranted` activity; `RemoveAdmin` deletes it and writes
   `adminAuthorizationRevoked`. Unknown webId → error; **`AddAdmin` on an
   existing admin → error (no write, no activity); `RemoveAdmin` on a non-admin
   → error**. Setup: the org's own AA session ([Q1]); assert the RPC-time
@@ -628,9 +628,9 @@ type-filter so one module serves the RPC guard, `syncAdminAcr`, and step 1.2.
     whether `shareResource` needs a data instance (for a label) to work (see
     §2.8).
 - **Activity write.** Decided (R1): `AddAdmin`/`RemoveAdmin` append a domain
-  activity to the org's Activity Registry — `adminAuthorizationRecorded` on
+  activity to the org's Activity Registry — `adminAuthorizationGranted` on
   add, distinct `adminAuthorizationRevoked` on remove (own shape; no
-  `granted: false` reuse) — driving the grant/ACR workflows (`events.md`,
+  `granted: false` reuse) — driving the grant/ACR workflows (`openwiki/services/activity-lifecycle.md`,
   §3.7).
 - **Admin of *which* registry — ✅ confirmed: placement is sufficient, no
   explicit link needed.**
@@ -1055,13 +1055,13 @@ the event's registry owner (`payload.webId`) equals the current context —
 organizational events refresh org-context views while the user operates in
 that org; events for any other context are ignored (`switchContext` already
 performs a full store refresh, so no cross-context refetch is needed);
-- the done-mapping gains `adminAuthorizationRecorded` /
+- the done-mapping gains `adminAuthorizationGranted` /
   `adminAuthorizationRevoked` → `listSocialAgents` (admin flags in the
   org-context agent list — closes the toggle-admin follower);
 - `pending` stays ignored (optional "applying…" indicator, out of scope).
 
 Example: Dan promotes Bob in the YoYo context → the RPC writes
-`adminAuthorizationRecorded` → yoyo's owner channel dispatches the grants/ACR
+`adminAuthorizationGranted` → yoyo's owner channel dispatches the grants/ACR
 workflows while dan's YoYo channel forwards `pending`/`done` into dan's stream
 → `listSocialAgents` reruns against the YoYo context and Bob's admin flag
 appears without a manual refresh.
@@ -1115,7 +1115,7 @@ reflect only what the feature *breaks* or leaves undefined.
    another peer's registries*, not the owner of the registries it mutates (C1).
 4. **Producer-table rows for the admin activities (Phase 1).** `AddAdmin`/
    `RemoveAdmin` *do* write org-context activities —
-   `adminAuthorizationRecorded` / `adminAuthorizationRevoked` (§3.7) —
+   `adminAuthorizationGranted` / `adminAuthorizationRevoked` (§3.7) —
    processed by the **org's** AA/workflows. Add those two rows to the peer.md
    producer/consumer tables (the earlier "write no activity" note no longer
    applies).

@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest'
 import { matchGrantedRequests } from '../src/temporal/activities/access-request.js'
 
 // ──────────────────────────
-// Fixtures (access-request-tracking.md §3.3)
+// Fixtures (see the OpenWiki `services/activity-lifecycle.md`)
 // ──────────────────────────
 
 const sentRequest = (

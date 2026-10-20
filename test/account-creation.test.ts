@@ -18,7 +18,7 @@ import { rpcPayload, waitFor } from './util'
 //
 // Prereq: the Fuseki admin API must accept the service account
 // (`ADMIN_PASSWORD` on the fuseki service, `CSS_FUSEKI_ADMIN` on auth) — new
-// signups create their datasets dynamically (docs/plans/fuseki-per-pod-sparql.md).
+// signups create their datasets dynamically (openwiki/architecture/storage-isolation.md).
 // ──────────────────────────────────────────────────────────────────────────
 
 const accountApi = 'https://auth/.account/'

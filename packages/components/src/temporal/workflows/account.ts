@@ -1,4 +1,4 @@
-// Account-bootstrap workflow (docs/plans/isolated-s3-buckets.md): account
+// Account-bootstrap workflow (openwiki/architecture/storage-isolation.md): account
 // creation runs as a Temporal workflow so a half-created account (datasets or
 // bucket without records) is retried, and Garage is provisioned by the worker
 // (which holds the admin token), never by the auth server.

@@ -301,7 +301,8 @@ describe('findAffectedGrantees — delegation sweep via SPARQL', () => {
 
 // ──────────────────────────
 // resolveActivityGrantee — the grantee rides the object (parties ride the
-// object; payload-contract-alignment). Granted authorizations embed the
+// object; the wire contract in the OpenWiki `services/activity-lifecycle.md`).
+// Granted authorizations embed the
 // DataAuthorization POJO(s)-to-be — the grantee is read from the first DA
 // (no deref — the resource does not exist until the workflow PUTs it).
 // (The old deny-snapshot dispatch moved out of this path in Step 4 —

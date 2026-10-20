@@ -2,7 +2,7 @@
  * Seed a Fuseki dataset with a TriG payload.
  *
  * `datasetBaseUrl` is the dataset URL *without* a trailing service name, e.g.
- * `http://fuseki:3030/id` (Stage 1 of docs/plans/fuseki-per-pod-sparql.md). The
+ * `http://fuseki:3030/id` (see openwiki/architecture/storage-isolation.md). The
  * helper derives the SPARQL update endpoint (`/sparql`) and the Graph Store
  * Protocol endpoint (`/data`) from it.
  *

@@ -53,7 +53,7 @@ export async function getSocialAgentInvitations(ctx: ResolvedContext, lang: stri
 }
 
 /**
- * Activity-first (step 1 of activity-first-services.md): the RPC only mints
+ * Activity-first (see the OpenWiki `services/rpc-and-services.md`): the RPC only mints
  * the invitation id (`iriForContained`) and writes the `invitationCreated`
  * activity — the `createInvitation` workflow PUTs the invitation resource at
  * the minted id and generates the capabilityUrl there (unknowable before the

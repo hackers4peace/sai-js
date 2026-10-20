@@ -106,3 +106,7 @@ authorization (stale `ldp:contains` after `replaceDataAuthorizationsForGrantee`;
 CSS SPARQL-backend `dcterms:modified` metadata corruption). Iterators
 (`findAuthorizationsForAgent`, `dataAuthorizations`) have no 404/410 tolerance
 yet.
+
+The explicit **SPARQL cross-pod isolation** and **mirror-freshness** end-to-end
+cases are still to be added; they are tracked in
+[`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md).

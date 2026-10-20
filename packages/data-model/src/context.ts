@@ -92,7 +92,8 @@ export const dataModelContext: JsonLdContext = {
   hasAccessRequestRegistry: iriTermDef(INTEROP, 'hasAccessRequestRegistry'),
   callbackEndpoint: iriTermDef(INTEROP, 'hasAuthorizationCallbackEndpoint'),
 
-  // activity registry (outbox) — payload-contract-alignment wire: typed
+  // activity registry (outbox) — the wire contract in the OpenWiki
+  // `services/activity-lifecycle.md`: typed
   // classes + as:target/as:object links, plain-IRI/literal fields. The
   // `as:` prefix resolves the ASV activity types in the `type` tuple
   // (`as:Accept`, `as:Create`, `as:Add`) to compact IRIs on read; the

@@ -42,7 +42,7 @@ export type SparqlBindingTerm = {
  *
  * - `localSparqlTransport` — the session's internal endpoint (own registry /
  *   personal context / server-side sessions): reads the graphs of the
- *   session's own store (shared-store shortcut federation.md §1 until 4b);
+ *   session's own store (shared-store shortcut openwiki/architecture/federation.md §1 until 4b);
  * - `adminSparqlTransport` — the **org's** `/sparql-admin` endpoint over
  *   HTTP (org context, in `packages/components/src/services/queries/org.ts`):
  *   the query travels as `application/sparql-query` with the admin's session
@@ -161,8 +161,8 @@ export async function graphDoc(transport: SparqlTransport, iri: string): Promise
 /**
  * Children of a registry container — the registration listing. Reads the
  * server-managed `ldp:contains` quads from the container's REGULAR graph
- * (the single membership home — `meta:` graphs hold type declarations only,
- * access-request-tracking.md §6; docs/sparql.md graph scoping). One query
+ * (the single membership home — `meta:` graphs hold type declarations only;
+ * see the OpenWiki `data-model/json-ld-layer.md` graph scoping). One query
  * for every dedicated registry: grants, roles, authorizations, and the three
  * agent registries (social-agent, application, invitation — the former
  * `has*Registration` interop predicates are gone).
@@ -353,7 +353,8 @@ export async function getDataAuthorization(
  * Role IRIs in the given role registry whose membership includes `member`
  * (`interop:hasMember`). One SELECT (docs/sparql.md step 2): the container
  * membership — `ldp:contains` in the container's REGULAR graph (the single
- * membership home, access-request-tracking.md §6 — no `meta:` read) — is
+ * membership home — no `meta:` read; see the OpenWiki
+ * `data-model/json-ld-layer.md`) — is
  * joined with the `hasMember` triple living in each role's own graph, so the
  * result is scoped to this registry set's roles (the store is shared across
  * owners). The roles listing would be N graph reads, so this is deliberately
@@ -562,8 +563,8 @@ export async function findDelegableGrant(
 }
 
 /**
- * One open sent access request (requester plane — §3.1 of
- * access-request-tracking.md): the `NeedBasedAccessRequestSent` activity WITH
+ * One open sent access request (requester plane — see the OpenWiki
+ * `services/activity-lifecycle.md`): the `NeedBasedAccessRequestSent` activity WITH
  * its embedded request snapshot (grantee/grantedBy/dataOwner + the per-need
  * registeredShapeTrees) that has NO referencing resolution activity
  * (`AccessRequestGranted`/`AccessRequestArchived`). The open-set source for
@@ -630,7 +631,7 @@ SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree WHERE {
 
 /**
  * OPEN need-based access requests in the owner's AccessRequestRegistry
- * (incoming — §3.1 of access-request-tracking.md): the container's
+ * (incoming — see the OpenWiki `services/activity-lifecycle.md`): the container's
  * `ldp:contains` members (regular graph only) that have NO
  * `AuthorizationGranted`/`AuthorizationDenied` with the flat
  * `satisfiesAccessRequest` back-link. Replaces the removed store-wide
@@ -664,10 +665,10 @@ SELECT DISTINCT ?request ?grantee WHERE {
 }
 
 /**
- * The grants received by `webId` across the requester's plane (§3.2 of
- * access-request-tracking.md) — the grantor's DataGrants naming the
+ * The grants received by `webId` across the requester's plane (see the
+ * OpenWiki `services/activity-lifecycle.md`) — the grantor's DataGrants naming the
  * requester as `grantee` (the dev/test env resolves them via the
- * shared-store shortcut, federation.md §1). Feeds the detector's
+ * shared-store shortcut, openwiki/architecture/federation.md §1). Feeds the detector's
  * best-effort match (§3.3): `grantedBy` (the owner) + per-grant
  * `registeredShapeTree`.
  */

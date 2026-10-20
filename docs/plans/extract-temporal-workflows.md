@@ -1,9 +1,10 @@
 # Extract Temporal workflows; shrink `components` to Components.js-only
 
 > **Status:** 📋 planning — blocked on a dependency-cycle decision (see
-> "Dependency cycle"). Extracted from `esm-jsr-no-build.md` (where it was
-> Phase 9) so that plan can close out; this refactor is independent of the
-> ESM/no-build/publishing work and is **not** part of it.
+> "Dependency cycle"). Extracted from the completed ESM/no-build work (now
+> documented in the OpenWiki `architecture/overview.md`) so that work can close
+> out; this refactor is independent of the ESM/no-build/publishing work and is
+> **not** part of it.
 
 ## Goal
 

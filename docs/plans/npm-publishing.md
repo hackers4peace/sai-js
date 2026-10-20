@@ -1,7 +1,18 @@
 # npm publishing (`@hackers4peace`)
 
 > **Status:** 📋 not started — future goal. Replaces the dropped JSR plan;
-> extracted from `esm-jsr-no-build.md` (Phase 6 + §6).
+> extracted from the completed ESM/no-build work (now documented in the OpenWiki
+> `architecture/overview.md`). **Not a deployment prerequisite** — see
+> [`update-deployment.md`](update-deployment.md).
+
+## Relationship to deployment
+
+Deployment does **not** wait for this plan. `update-deployment.md` ships the
+repo TypeScript source under Node 26 (workspace symlinks) so production can run
+without published interop tarballs. If this plan lands (built JS artifacts under
+`@hackers4peace`), the image build can switch to installing those artifacts and
+drop the source-symlink layout; that is a simplification, not a gate.
+Publishing is also independent of the storage migration.
 
 ## Goal
 

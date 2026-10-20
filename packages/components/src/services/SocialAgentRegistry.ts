@@ -28,7 +28,7 @@ import {
  * registration of us / of the org) via SPARQL — personal context hits the
  * session's internal endpoint, org context the org's `/sparql-admin`
  * (`sparqlTransportFor`). The peer's graphs live in the shared store
- * (federation.md shortcut 1); their `.acr`s grant the org/registered agent,
+ * (openwiki/architecture/federation.md shortcut 1); their `.acr`s grant the org/registered agent,
  * never the admin.
  */
 async function getReciprocalRegistration(
@@ -78,12 +78,12 @@ export const findSocialAgentRegistrationInContext = async (
 }
 
 /** The owner's OPEN access requests keyed by grantee — the approval entries
- *  (access-request-tracking.md §4.1 — the request IRIs open the
- *  authorization screen, §6.8). */
+ *  (see the OpenWiki `services/activity-lifecycle.md` — the request IRIs open the
+ *  authorization screen). */
 export type AccessRequestsByGrantee = Map<string, string[]>
 
 /** The requester's OPEN sent requests keyed by dataOwner — the archive
- *  targets (access-request-tracking.md §4.1 — the snapshot ids). */
+ *  targets (see the OpenWiki `services/activity-lifecycle.md` — the snapshot ids). */
 export type SentAccessRequestsByDataOwner = Map<string, string[]>
 
 /**
@@ -130,7 +130,7 @@ export const buildSocialAgentProfile = async (
     note: registration.note,
     //authorizationDate: registration.registeredAt!.toISOString(),
     //lastUpdateDate: registration.updatedAt?.toISOString(),
-    // access-request-tracking.md §4.1 — the open-request collections:
+    // see the OpenWiki `services/activity-lifecycle.md` — the open-request collections:
     // incoming (owner side — approval entries) / outgoing (requester side —
     // archive targets); granted/denied/archived drop the entries, so these
     // finally clear (the "never clears" cause)
@@ -238,8 +238,8 @@ export const getSocialAgents = async (ctx: ResolvedContext, lang: string) => {
 
 /**
  * Record the acceptance and let the acceptor's own workflow perform the
- * cross-AA legs — the capabilityUrl is opaque here (org-context-improvements
- * plan: “activity-first, both contexts”). The `invitationAccepted` activity
+ * cross-AA legs — the capabilityUrl is opaque here (see the OpenWiki
+ * `temporal/workflows.md`: “activity-first, both contexts”). The `invitationAccepted` activity
  * lands in the acceptor's Activity Registry (own for personal, the org's for
  * admin context); `ActivityWebhookHandler` dispatches the acceptor's
  * `acceptInvitation` workflow, which POSTs the opaque capabilityUrl as the

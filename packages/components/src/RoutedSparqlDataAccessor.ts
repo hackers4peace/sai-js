@@ -20,7 +20,7 @@ import type { PodEndpointStore } from './PodEndpointStore.js'
 
 /**
  * Routes LDP reads/writes to the SPARQL dataset of the resource's pod
- * (docs/plans/fuseki-per-pod-sparql.md stage 3).
+ * (openwiki/architecture/storage-isolation.md).
  *
  * `StorageLocationStrategy.getStorageIdentifier` yields the pod base URL for
  * both server shapes: a subdomain pod on the data server, the first container

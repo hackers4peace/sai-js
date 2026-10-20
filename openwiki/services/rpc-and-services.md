@@ -40,7 +40,7 @@ ApiHandler (RPC router)                          EventsHandler (stream)
   │  resolveContext → the user's own AA session    ▲  subscribes under the signed-in webId
   ▼                                                   │
 Services (Authorization, ShareResource, RoleRegistry, …)
-  │  synchronous writes + PUT activity (into the org's Activity Registry in an org context)
+  │  validation reads + PUT activity (into the org's Activity Registry in an org context)
   ▼
 Activity Registry (append-only outbox)
   ▼  container Add → WebhookChannel2023
@@ -63,10 +63,10 @@ success types, and `failure: S.Never`. The service surface is the `SaiService`
 `Context.Tag` interface, and the exported `router` is
 `RpcRouter.make(...)` mapping each tagged request to a method that pulls
 `SaiService` from the Effect context. Output IRIs are unbranded `S.String` on
-the wire; `IRI` is a `S.brand('IRI')` used for internal typing only. The
-`AuthorizeApp` request returns an `AuthorizationGrantedMessage` as its success
-type; the older `AccessAuthorization` schema (`S.Array(RecordedDataAuthorization)`)
-still exists in `effect.ts` but is no longer referenced by any tagged request.
+the wire; `IRI` is a `S.brand('IRI')` used for internal typing only. Names use
+`id` (not `iri`), and a `Message` suffix marks RPC projections wherever a name
+would collide with the data-model type. The `AuthorizeApp` request returns an
+`AuthorizationGrantedMessage` as its success type.
 
 ## The entrypoint (`ApiHandler`)
 
@@ -124,11 +124,18 @@ Each file under `packages/components/src/services/` owns one domain:
   (account provisioning is asynchronous; see
   [Per-pod storage and isolation](../architecture/storage-isolation.md)).
 - `ApplicationRegistry` — application listings and unregistered-app profiles.
-- `SocialAgentRegistry` — social agent listing, profiles, `acceptInvitation`.
+- `SocialAgentRegistry` — social agent listing, profiles, `acceptInvitation`
+  (records an activity-first `InvitationAccepted` in the acceptor's registry
+  and returns `{ accepted: true, activityId }`; the acceptor's own
+  `acceptInvitation` workflow performs the capabilityUrl POST).
 - `RoleRegistry` — role CRUD (`createRole`, `updateRole`, `deleteRole`).
 - `InvitationRegistry` — invitation listing and `createInvitation`.
 - `DataRegistry` — data registries and data-instance listing.
-- `Authorization` — descriptions, `recordAuthorization`, `archiveAccessRequest`.
+- `Authorization` — descriptions, `recordAuthorization` (writes the activity
+  with the `satisfiesAccessRequest` back-link that closes the owner-side request
+  span), and `archiveAccessRequest` (writes a terminal `AccessRequestArchived`;
+  an unknown or already-resolved snapshot is a no-op returning
+  `archived: false`).
 - `ShareResource` — `shareResource`, `requestAccessUsing*`, access matching.
 - `Revocation` — `revokeGrants` (delegates to `GrantRevocationHandler`).
 - `Admin` — `addAdmin`/`removeAdmin` with a last-admin guard.
@@ -140,3 +147,5 @@ Writes are **activity-first**: the service validates and appends one activity
 to the Activity Registry, then returns a pending ack; a Temporal workflow
 materializes the resource and completes it (see
 [Activity outbox and events pipeline](../services/activity-lifecycle.md)).
+Activity-first acks echo the triggering activity IRI as `activityId`; the UI
+stores it and binds the stream event by exact id (the uniform claim anchor).

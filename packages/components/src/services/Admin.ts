@@ -18,7 +18,7 @@ import { findSocialAgentRegistrationInContext } from './SocialAgentRegistry.js'
  * Promote a registered social agent to org admin (activity-first step 5 — R1
  * re-decision): the RPC keeps the VALIDATION reads (registered + not-already-
  * admin) and pre-mints the AdminAuthorization id, then writes the
- * `adminAuthorizationRecorded` activity (object = the AdminAuthorization-to-be,
+ * `adminAuthorizationGranted` activity (object = the AdminAuthorization-to-be,
  * real-id embedded projection at that id — `target` dropped). The `addAdmin`
  * workflow PUTs the resource at the pre-minted id, materializes the admin
  * grants + ACR rewrite, then completes. Runs on the signed-in user's AA — the

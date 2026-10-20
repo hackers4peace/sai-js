@@ -76,7 +76,7 @@ export class SessionManager {
     })
     await oidc.login()
 
-    // per-pod endpoint registry (isolated-datasets-and-sparql.md 4a): the
+    // per-pod endpoint registry (openwiki/architecture/storage-isolation.md): the
     // owner's records from the internal account storage are the session's
     // endpoint allowlist; the registry pod URL is the registry-set IRI. There
     // is no shared/default endpoint — a missing registry record fails closed.
