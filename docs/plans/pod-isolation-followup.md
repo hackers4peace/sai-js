@@ -33,7 +33,7 @@ mirrors and object storage, plus the end-to-end isolation tests.
 - **Staleness policy:** decide whether to re-poll on a webhook gap. The
   `reconcileActivities` sweep already re-drives a pending `delegatedGrantsUpdated`
   through the delegated-grants consumer, and that consumer syncs the mirror
-  before regenerating (`improve-grant-replication.md` §3.3) — so a *recorded but
+  before regenerating (`openwiki/architecture/federation.md`) — so a *recorded but
   unprocessed* delivery self-heals once the sweep has a schedule. What remains
   here is the case with **no** pending activity: a delivery that never arrived,
   and pairs whose mirror was never written. The drift scan is that check.

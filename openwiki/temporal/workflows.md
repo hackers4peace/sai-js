@@ -4,6 +4,8 @@ title: Temporal workflows and activities
 description: The Temporal client and worker bootstrap, the four task queues (create-grants, reciprocal-registration, forward-to-push, webhook-delivery), the typed *Id boundary objects, the self-contained createGrantsForAgent regeneration, findRoleUsage routing, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
 tags: [temporal, workflows, activities, worker, architecture]
 sources:
+  - id: openwiki-source-c18acf0c50387f2e5ea026d1
+    resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-06025454564b63e0817ca135
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
@@ -26,16 +28,20 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/create-grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
+  - id: openwiki-source-fabda8691f79a477b70b0c57
+    resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
   - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
     resource: repo://packages/components/src/workers/main.ts
+  - id: openwiki-source-9b409abe21ade962fb73ed30
+    resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
+generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T01:39:52.421Z
+    at: 2026-10-21T05:20:05.106Z
 ---
 
 # Temporal workflows and activities
@@ -75,7 +81,11 @@ exception: the emitter and worker share the exported
 
 - `create-grants` — the main queue; hosts the `create-grants.ts` barrel
   (grants + admin + invitation + access-request + **account** workflows) and
-  registers all five activity sets accordingly.
+  registers all five activity sets accordingly. Because `grants.ts` imports
+  `syncReciprocalMirror` from `reciprocal.ts` (the mirror child of the
+  delegated-grants consumer), the reciprocal workflows are also present in this
+  bundle — harmless: Temporal routes a run by its start queue, so they are
+  still started on `reciprocal-registration`.
 - `reciprocal-registration` — `reciprocal.ts` workflows, registering
   reciprocal **and** grants activities (because `establishReciprocal` calls
   `markActivitiesDone`).
@@ -84,16 +94,20 @@ exception: the emitter and worker share the exported
 
 ## Workflow catalog
 
-- `grants.ts` — `storeGrant`, `revokeGrants`, `processGranteeActivities` (a
-  start-or-signal consumer), `createGrantsForAuthorization`,
-  `processAuthorizationGranted`, `processGranteeAuthorization`,
-  `updateDelegatedGrants`, `createRole`, `processRoleMembershipChange`,
-  `processRoleDeletion`, `reconcileActivities`, and `createGrantsForAgent`.
+- `grants.ts` — `storeGrant`, `revokeGrants`, `processGranteeActivities` and
+  `processDelegatedGrantsUpdated` (the two start-or-signal consumers),
+  `createGrantsForAuthorization`, `processAuthorizationGranted`,
+  `processGranteeAuthorization`, `updateDelegatedGrants`, `createRole`,
+  `processRoleMembershipChange`, `processRoleDeletion`, `reconcileActivities`,
+  and `createGrantsForAgent`.
 - `admin.ts` — `createAdminGrants`, `revokeAdminGrants`, `syncAdminAcr`, and
   the `processAdminAuthorizationGranted/Revoked` orchestrators.
 - `invitation.ts` — `createInvitation`.
-- `reciprocal.ts` — `establishReciprocal`, `acceptInvitation`,
-  `syncReciprocalMirror` (with its own retry policies).
+- `reciprocal.ts` — `establishReciprocal`, `acceptInvitation` (both seed the
+  reciprocal mirror as their last step before completing), and
+  `syncReciprocalMirror` — the replication step, run as an activity directly by
+  the invitation workflows and as a **child workflow** (explicit
+  `taskQueue: 'reciprocal-registration'`) by the delegated-grants consumer.
 - `access-request.ts` — `processNeedBasedAccessRequest`,
   `processNeedBasedAccessRequestReceived`, `detectGrantedRequests`.
 - `account.ts` — `bootstrapAccount`, the five-step storage-provisioning
@@ -115,12 +129,34 @@ Two access-request/invitation workflows deserve their own note:
   `InvitationAccepted` activity by the webhook handler on
   `reciprocal-registration`. It POSTs the opaque capabilityUrl as the acceptor,
   builds the acceptor → inviter registration and reciprocal, subscribes the
-  reciprocal webhook, and marks the activity done (personal and org contexts
-  alike).
+  reciprocal webhook, seeds the local mirror of the inviter's registration of
+  the acceptor, and marks the activity done (personal and org contexts alike).
+  Its inviter-side counterpart `establishReciprocal` does the same seeding for
+  its own leg, so a pair is mirrored on both ends from the moment its
+  invitation completes.
 
 The terminal resolution classes `AccessRequestGranted`, `AccessRequestArchived`,
 and `AuthorizationDenied` never start a workflow and never get a completion;
 `reconcileActivities` closes their outbox rows instead.
+
+## The two consumers
+
+Two long-lived workflows coalesce bursts per target instead of running one
+workflow per activity. Both are started with a deterministic id and
+start-or-signal (a failed start means a run is live, so the handler signals it;
+a closed run is restarted), drain their pending set in a loop, and write the
+completions themselves. After an empty drain each waits ~3s for a signal, then
+exits — the residual exit-window gap is the reconcile sweep's concern.
+
+| Consumer | Workflow id | Drained set | Steps |
+| --- | --- | --- | --- |
+| `processGranteeActivities` | `grantee:<webId>:<authorizationGrantee>` | pending `AuthorizationGranted` / `AuthorizationRevoked` for that grantee | resolve grantees → `createGrantsForAgent` per grantee → complete |
+| `processDelegatedGrantsUpdated` | `delegated-grants:<webId>:<peerId>` | pending `DelegatedGrantsUpdated` whose `target` is that peer | `syncReciprocalMirror` child (replication) → `updateDelegatedGrants` **without** `activityId` → complete |
+
+The delegated-grants consumer deliberately passes no `activityId` to
+`updateDelegatedGrants`: with one, that workflow would write the completion by
+itself, before the consumer owns the barrier. `reconcileActivities` reuses both
+consumers (start-or-join) rather than calling the underlying workflows.
 
 ## Boundary objects and routing
 

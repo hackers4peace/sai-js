@@ -4,12 +4,10 @@ title: Activity outbox and events pipeline
 description: The append-only Activity Registry outbox and its pending/done state machine, the producer and consumer (workflow) tables, the Solid Notifications webhook delivery, ActivityWebhookHandler routing, the ActivityEvents bus, the embedded DataAuthorizationData POJO carrier, and the reconcileActivities backstop.
 tags: [activities, webhook, events, solid-notifications, architecture]
 sources:
-  - id: openwiki-source-0287d02e668cd550d1f3ce6d
-    resource: repo://docs/plans/improve-grant-replication.md
+  - id: openwiki-source-df278cf0a9970a69b70cfc00
+    resource: repo://docs/plans/update-deployment.md
   - id: openwiki-source-82daddf07d8ad3efedbe52d2
     resource: repo://packages/authorization-agent/src/activity-registry.ts
-  - id: openwiki-source-0531e8ebff475ca0a556fc29
-    resource: repo://packages/authorization-agent/src/grant-generation.ts
   - id: openwiki-source-c154d0515a7154469b1f503c
     resource: repo://packages/components/config/http/notifications/ndjson.json
   - id: openwiki-source-a9275a0e3a23f49eea3d9b3f
@@ -34,16 +32,18 @@ sources:
     resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
+  - id: openwiki-source-fabda8691f79a477b70b0c57
+    resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
+generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T01:32:20.770Z
+    at: 2026-10-21T05:20:05.106Z
 ---
 
 # Activity outbox and events pipeline
@@ -147,7 +147,7 @@ dispatches on the class:
 | `NeedBasedAccessRequestReceived` | `GrantIssuanceHandler` (owner's issuance endpoint) | `processNeedBasedAccessRequestReceived` on `create-grants` — PUTs the immutable AccessRequest |
 | `AccessRequestGranted` | `detectGrantedRequests` (child of `updateDelegatedGrants`) | **terminal** — no workflow/completion |
 | `AccessRequestArchived` | `Authorization.archiveAccessRequest` | **terminal** — no workflow/completion |
-| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | `updateDelegatedGrants` plus the parallel, serialized `syncReciprocalMirror` on `reciprocal-registration`. Delegated grant generation reads the peer mirror. |
+| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | per-peer `processDelegatedGrantsUpdated` consumer on `create-grants` (start-or-signal, workflow id `delegated-grants:<webId>:<peerId>`). Each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration` first, then `updateDelegatedGrants`, then writes the completions. |
 | `ActivityCompleted` | Temporal completions | forwarding only (`done`); never dispatches |
 | `grantsRevoked` (retired) | none | wiring retired by the activity-first cleanup; revocation now goes through the issuance boundary and workflows |
 
@@ -215,12 +215,17 @@ the dedupe seam. The receivers still use `sendTo` as a capability URL and do not
 verify the stock emitter's DPoP token, so the durable path sends no
 `Authorization` or `DPoP` headers.
 
-The `DelegatedGrantsUpdated` completion is written by
-`updateDelegatedGrants`. The parallel `syncReciprocalMirror` has no completion
-activity, so `done(DelegatedGrantsUpdated)` does not by itself prove the mirror
-is fresh. Delegated grant generation reads the local mirror in
-`generateDelegatedDataGrants`; `improve-grant-replication.md` is the design to
-replicate the mirror before regeneration so generation uses only replicas.
+For `DelegatedGrantsUpdated`, **`done` means the peer mirror is current**: the
+completion is written by the per-peer consumer only after its drain replicated
+the mirror (`syncReciprocalMirror`) *and* regenerated the delegated grants, so
+`generateDelegatedDataGrants` never reads a mirror that predates the delivery.
+The correlate is that the consumer's mirror step keeps `syncReciprocalMirror`'s
+five-attempt retry cap: a peer that stays unreadable leaves the activity
+`pending` (visible, not stale-done), and only the reconcile sweep — still
+unscheduled — would re-drive it. Grants where the context is the `grantedBy`
+rather than the grantee are not part of this mirror (the data owner holds the
+authoritative copies); see
+[Federation constraints](../architecture/federation.md#the-reciprocal-mirror-in-detail).
 
 ## Events bus and stream
 
@@ -261,7 +266,9 @@ state line) and parses each line with `toStore`.
 
 `reconcileActivities` (a Temporal workflow) reprocesses every activity that has
 no completion referencing it, using the same owner-channel routing. It skips
-`AgentRegistrationAdded` and reuses deterministic grantee workflow ids so a
-running consumer absorbs entries. Its `DelegatedGrantsUpdated` branch calls
-`updateDelegatedGrants` but does not start `syncReciprocalMirror`. It currently
-has no scheduler/caller and is run on demand (e.g. directly by tests).
+`AgentRegistrationAdded` and reuses the deterministic consumer ids (per-grantee
+and `delegated-grants:<webId>:<peerId>`) so a running consumer absorbs entries;
+the `DelegatedGrantsUpdated` branch therefore starts that consumer, which
+replicates the mirror before regenerating and owns the completion — the sweep
+never writes a completion that could predate the mirror. It currently has no
+scheduler/caller and is run on demand (e.g. directly by tests).

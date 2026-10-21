@@ -36,7 +36,7 @@ import type { Quad } from 'n3'
  * (`syncReciprocalMirror`) using the context's own session; UI/service code
  * treats them strictly read-only.
  *
- * Where the writes come from (improve-grant-replication.md §3):
+ * Where the writes come from (openwiki/architecture/federation.md):
  *
  * - **initial mirror** — both invitation legs, `establishReciprocal` (inviter)
  *   and `acceptInvitation` (acceptor), before their activity is marked done;
@@ -103,7 +103,7 @@ async function fetchDoc(iri: string, fetch: WhatwgFetch): Promise<unknown> {
  * grants are fetched and inserted; no-longer-linked ones are DROPped.
  * Idempotent — re-running produces the same store content.
  *
- * Presence, not content (improve-grant-replication.md S7): immutability makes a
+ * Presence, not content: immutability makes a
  * mirrored grant body either current or absent, so the only gap left is a graph
  * that is linked but has no body — produced by writers outside this function
  * (the fixture/backfill splitter copies graph by graph, an ops restore can take
@@ -124,7 +124,7 @@ async function fetchDoc(iri: string, fetch: WhatwgFetch): Promise<unknown> {
  * race is a stale-drop from an older snapshot dropping a graph a concurrent
  * newer sync just re-linked — healed by the next sync. Runtime refreshes are
  * serialized per (webId, peerId) by the delegated-grants consumer
- * (improve-grant-replication.md §3.3); the invitation-time initial syncs are
+ * (openwiki/architecture/federation.md); the invitation-time initial syncs are
  * per-pair and non-overlapping.
  */
 export async function updateReciprocalMirror(

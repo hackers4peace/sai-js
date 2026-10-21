@@ -776,7 +776,7 @@ export interface DelegatedGrantsConsumerInput {
 
 /**
  * Pending `delegatedGrantsUpdated` activities **for one peer** — the
- * delegated-grants consumer's drain (improve-grant-replication.md §3.3).
+ * delegated-grants consumer's drain (openwiki/architecture/federation.md).
  * `getPendingActivities` lists everything pending in the registry; this
  * narrows it to the class and to the peer in `target` (the consumer is
  * per-`(webId, peerId)`, so unrelated activities stay with their own

@@ -8,14 +8,24 @@ sources:
     resource: repo://.dagger/src/index.ts
   - id: openwiki-source-6028df227cf0c5e36d839191
     resource: repo://environments/data/registry.trig
+  - id: openwiki-source-e00ad90a057384916ebd690e
+    resource: repo://packages/authorization-agent/test/grant-generation.test.ts
   - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
     resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
+  - id: openwiki-source-9b409abe21ade962fb73ed30
+    resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-23684c4afa0b096bb7c0aa5d
     resource: repo://packages/components/test/durable-webhook-emitter.test.ts
+  - id: openwiki-source-015d2f3faf2ecfac16eafb8e
+    resource: repo://packages/components/test/reciprocal-mirror.test.ts
+  - id: openwiki-source-81028398d49b5413dde247f1
+    resource: repo://packages/test-utils/src/fuseki.ts
   - id: openwiki-source-900a2d8c960b090aaf5dc614
     resource: repo://temporal/dynamicconfig/development-sql.yaml
+  - id: openwiki-source-1bc7541f22daab19be8ab8ba
+    resource: repo://test/invitation.test.ts
   - id: openwiki-source-b7181b4d7359d016a13b092d
     resource: repo://test/package.json
   - id: openwiki-source-6996f47c4d119fbaf101afe4
@@ -26,10 +36,10 @@ sources:
     resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
+generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T01:32:20.770Z
+    at: 2026-10-21T05:20:05.106Z
 ---
 
 # Integration test suite
@@ -69,8 +79,18 @@ key-value store (`pg.seedKeyValue`) and **every per-pod Fuseki dataset**
 pristine seed, wiping leftover state and pending activities. The client-id
 document is PUT/DELETEd directly in the test-client bucket in
 `beforeAll`/`afterAll`. The fixture split also backfills reciprocal mirrors at
-seed time (`applyReciprocalMirrors`); that is fixture state, not a runtime
-replication step.
+seed time (`applyReciprocalMirrors`): for every pod whose registration graph
+carries a `reciprocalRegistration` link it copies the peer's registration and
+the grants linked from it into that pod's dataset. That models a **federation
+that already exists and has been backfilled** — no invitation flow ever runs
+for the seeded pairs, so nothing at runtime would create those mirrors and
+removing the backfill would make every reciprocal read fail for fixture
+reasons. It is fixture state, not a runtime replication path: runtime initial
+replication is asserted separately by the invitation tests (see
+[`architecture/federation.md`](../architecture/federation.md#the-reciprocal-mirror-in-detail)).
+Note that it copies only `hasDataGrant` targets (which include children) and
+no parent-side `hasInheritingGrant`, so child delegation cannot be exercised
+from seeded data.
 
 ## Race prevention
 
@@ -95,9 +115,20 @@ opened *before* the trigger, because neither replays.
 
 `roles.test.ts` and `share.test.ts` read the peer mirror through
 `reciprocalRegistration` and poll it with `waitFor`. The mirror is refreshed by
-a webhook-triggered workflow, so it can lag the grantor registration Update
-that the barrier already saw. The poll observes eventual consistency; it does
-not write or manually replicate the mirror.
+the per-peer delegated-grants consumer before it completes the
+`DelegatedGrantsUpdated` activity, so the poll still observes eventual
+consistency (the barrier's registration `Update` can arrive before the mirror
+write). The poll does not write or manually replicate the mirror. Migrating
+these assertions to public RPCs (asserting the grantee-facing result after the
+`done` barrier) is the remaining test-reorganisation work in
+[`grant-replication-follow-ups.md`](../../docs/plans/grant-replication-follow-ups.md).
+
+`test/util.ts` also exposes `localMirror(session, peerId)` — it resolves the
+peer's registration of `session.webId` through the reading side's own SPARQL
+plane, so a missing replica fails with `Node <iri> not found in framed output`.
+The invitation suite uses it to assert that both legs of a **runtime-created**
+pair (no seeded relationship) are mirrored once their completion activity is
+done, which is the runtime-replication counterpart to the fixture backfill.
 
 The Temporal default activity retry policy is `maximumAttempts: 1`, but the
 webhook-delivery and reciprocal workflows set explicit retry policies. The
@@ -111,6 +142,34 @@ enqueue arguments and queue, the direct-POST fallback when the enqueue fails,
 `postWebhook` status classification (`400`/`410`/`413`/`415`/`422` permanent;
 other 4xx, 5xx, network retryable), and the `410` response from both webhook
 handlers for an unknown `sendTo`.
+
+## Package-level replication tests
+
+These run under `npm test` (vitest projects under `packages/*`) and may mock;
+the black-box `/test` suite may not.
+
+- `packages/components/test/delegated-grants.test.ts` mocks
+  `@temporalio/workflow` and asserts the consumer's contract: the exact order
+  replicate → regenerate → complete, the mirror child carrying the
+  `reciprocal-registration` task queue and the consumer payload,
+  `updateDelegatedGrants` receiving no `activityId`, burst coalescing into one
+  pass, a mid-flight signal re-draining with a fresh mirror, the idle no-op, and
+  the reconcile arm starting the same consumer without completing the activity
+  itself.
+- `packages/components/test/reciprocal-mirror.test.ts` mocks
+  `fetch-sparql-endpoint` and drives `updateReciprocalMirror` /
+  `deleteReciprocalMirror` against a scripted mirror. It asserts the oracle
+  reads both the resource graph and its `meta:` twin, that a linked-but-absent
+  grant body is re-fetched while present ones are skipped, that the newly
+  linked grant is fetched, and that drops cover the `meta:` twins.
+- `packages/authorization-agent/test/grant-generation.test.ts` serves a
+  mirror-only fake transport and a `deps.fetch` stub that throws on any call,
+  so it proves delegated-grant generation never dereferences a peer. It also
+  pins the peer-side read count per regeneration, the field carry-over and
+  shape-tree matching, both `MirrorIncompleteError` kinds (registration and
+  grant), the child-grant delegation through the parent's reverse
+  `inheritsFromGrant` edge, and that registration bodies are found in `meta:`
+  graphs.
 
 ## Coverage
 
@@ -138,4 +197,7 @@ yet.
 
 The explicit **SPARQL cross-pod isolation** and **mirror-freshness** end-to-end
 cases are still to be added; they are tracked in
-[`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md).
+[`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md). The
+mirror-freshness case can lean on the consumer's ordering: `done` on a
+`DelegatedGrantsUpdated` activity now implies the mirror write happened, so an
+assertion after the barrier needs no extra polling.

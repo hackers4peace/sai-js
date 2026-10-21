@@ -114,7 +114,7 @@ beforeEach(() => {
   sparql.present = new Set()
 })
 
-describe('updateReciprocalMirror — oracle (improve-grant-replication.md S7)', () => {
+describe('updateReciprocalMirror — oracle (presence, not content)', () => {
   test('re-fetches a linked grant whose body is missing, skips present ones', async () => {
     // the mirror lists G1, G2 and a no-longer-linked STALE; G1 has a body, G2
     // does not (non-atomic writer / restore), STALE only survives as a meta twin

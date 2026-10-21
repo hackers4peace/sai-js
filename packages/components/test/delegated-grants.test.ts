@@ -114,7 +114,7 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-describe('processDelegatedGrantsUpdated — per-peer consumer (improve-grant-replication.md §3.3)', () => {
+describe('processDelegatedGrantsUpdated — per-peer consumer', () => {
   test('replicates, regenerates, then completes — in that order', async () => {
     const first = pendingActivity('https://registry/acme/activity/a1')
     h.state.batches = [[first]]
@@ -192,7 +192,7 @@ describe('processDelegatedGrantsUpdated — per-peer consumer (improve-grant-rep
   })
 })
 
-describe('reconcileActivities — delegatedGrantsUpdated arm (improve-grant-replication.md §3.3/S4)', () => {
+describe('reconcileActivities — delegatedGrantsUpdated arm', () => {
   test('starts the per-peer consumer and leaves completion to it', async () => {
     h.state.pending = [pendingActivity('https://registry/acme/activity/a1')]
 

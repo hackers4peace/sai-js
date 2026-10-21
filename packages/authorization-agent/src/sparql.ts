@@ -337,7 +337,7 @@ export async function getDataRegistration(
  * `MirrorIncompleteError` for a seeded registration.
  *
  * Used by delegated-grant generation: the local reciprocal mirror is the only
- * peer source there (improve-grant-replication.md §2), so a linked-but-absent
+ * peer source there (openwiki/architecture/federation.md), so a linked-but-absent
  * graph must surface as a mirror gap rather than as a generic framing error.
  */
 export async function presentGraphs(

@@ -180,7 +180,7 @@ export const delegatedGrantsUpdatedSignal = defineSignal<[]>('delegatedGrantsUpd
 
 /**
  * Per-peer consumer for `delegatedGrantsUpdated`
- * (improve-grant-replication.md §3.3): started by the webhook handler and by
+ * (openwiki/architecture/federation.md): started by the webhook handler and by
  * the reconciliation sweep with a deterministic workflowId per
  * `(webId, peerId)`. Each drain runs the same three ordered steps:
  *
@@ -526,7 +526,7 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
       roleActivities.push(activity)
     } else if (isActivityClass(activity, 'DelegatedGrantsUpdated')) {
       // the same per-peer consumer as the webhook path
-      // (improve-grant-replication.md §3.3): replicate the mirror, regenerate
+      // (openwiki/architecture/federation.md): replicate the mirror, regenerate
       // from it, then complete the activity. Start-or-join — a run that is
       // already live picks the activity up in one of its drains; a closed one
       // is restarted here. The consumer owns completion, so the sweep must not

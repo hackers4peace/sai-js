@@ -427,7 +427,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
 
     if (isActivityClass(activity, 'DelegatedGrantsUpdated')) {
       const decoded = S.decodeUnknownSync(DelegatedGrantsUpdated)(activity)
-      // per-peer consumer (improve-grant-replication.md §3.3): replicate the
+      // per-peer consumer (openwiki/architecture/federation.md): replicate the
       // peer's reciprocal registration (+ its grants) into the local mirror
       // FIRST, then regenerate the delegated grants from it, then mark the
       // activity done. The previous shape started the mirror sync and

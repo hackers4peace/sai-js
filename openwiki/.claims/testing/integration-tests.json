@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:40d57d2f9cd059a3f7f34e1f83d13164d9d25591749a29e3f2880e2f2fab28dd",
+  "pageVersion": "sha256:78f53ab851cb706dbb62fa19776a2db4c8508c5519b481428048f6e26240ced4",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
@@ -49,7 +49,7 @@
       "statement": "waitForQuiescence waits until none of the webIds has pending activities for two consecutive polls, treating a transient registry 500 as unsettled.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L216-L258",
+          "resource": "repo://test/util.ts#L243-L285",
           "version": "repo-lines-v1:sha256:aa9986ea32cc81773e7bac1da8b400cdfd6f7da59d81eb222810f87b3a0fa6ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDg2YzlkYzEwY2U0NjZkNDAwYzU3ZjhiNjA2YWRlZmEyZTQwOGJjNzY0NTE3NzNmZDJjNDRlMzM4MzMxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGU2NzRmMzZhMzYwMmQ0NzY2ZGE3M2RmNjJkNzFmZjljM2JlYzAwMGJmODVkMGQ1YjAzMjlhMTdhOGJhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyMDU3ZjZmOGI1YWUzYTEwMzIxYzMwMTRhMTE0YWM0ZGUxMmE5NWY0YmRmZGRkZTA1M2VmZTVmOWM2NmY1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMzg3YjUwYjg4ZTVhZmM3YmJkMjdhNGMxYjJiN2M1NjVkMWY2ODkzM2Q2NGY5MWQwOTk2NzE1MDgxZWFmMjMifQ"
         }
       ]
@@ -59,7 +59,7 @@
       "statement": "awaitGrantCompletion is the listen-first barrier: it opens the registration notification stream, runs one RPC trigger, awaits the registration Update, then waits for quiescence because the Update fires mid-chain before the parent workflow's completion tail.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L261-L275",
+          "resource": "repo://test/util.ts#L288-L302",
           "version": "repo-lines-v1:sha256:e1b08cd5303499cda169cda607ac490afbec9d413863eacc4510c952247dff78:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZGY5NGI2Zjk1M2M0YmViYzYzMTJjMGVkNDFiYTY3ZjkwMGRjYWU0ZDlhMmMyOTIwZTliYzc5NzUxYWU0NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2NTI2NjNhZDlkNTY0NjJmZmVjZTBhOTVhMGRjYzU2ZWZmY2JjYzY0NjJjMWQzMzI4MzJjMGIwY2IyNTc0MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1MzljZjY4NWU5OGIzZGQyZGY2YTZhZTk2NjJhNWRmNWQ0YjJjODM3ZjQ2ZWM1OGU3NmMxNDUxMzAzODBiZTUifQ"
         }
       ]
@@ -79,11 +79,11 @@
       "statement": "Integration tests observe changes through listen-first NDJSON streams: openNotificationStream reads the CSS streaming notification channel, whose lines are expanded JSON-LD, and must be opened before the triggering action because there is no replay.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L23-L28",
+          "resource": "repo://test/util.ts#L24-L29",
           "version": "repo-lines-v1:sha256:a2ee1684a905a6d5bc61ce67c14fc6ec3878f676f02efbdc801d22ee1519c9fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRlNzEzMTU2ZGZiOWFiZjQ3N2Y3M2FkZmFkYTViNjcyNjRmZmJlODRiZWU1N2QxMWUzZGIzOTc4NGNiZjNjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2IxMmVmOWEwMmJiYTE3NjA5Mzg2ZWM3MTZiODVkNDI0NDQwZmEyNDM3M2EwMzMxOGRhOWFkMzA4OGZmY2FkYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjdhZTAyMTYyZGE3YWVmNmM1MDczMzAyYmRjNzlmZjY4Mzk2MWMzYjE2NzA4ZTBhN2Y0ODJhZGJmOWI4ZGZlYiJ9"
         },
         {
-          "resource": "repo://test/util.ts#L64-L80",
+          "resource": "repo://test/util.ts#L91-L107",
           "version": "repo-lines-v1:sha256:8003026d029aedae7fab49399e328798d5dfccb49a4f10881ce052727f9fd07b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZjZkMzBjYzc5NDMyZjYyNTEwZmU2OTIxNjY4MzY2YzRhYWZkMjE4NTliZTg0NjNlZmYzMDM1OTQwZThlYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3MjBkNWEzNGQwMjQ2ZTdmNzc4NTJiNjM0Y2UzN2EyZGI2N2I1MzhjMjE3OTJjNjk0NGEzZWFmOGU4NDZlZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1NGZhNWRlZjBlOWY2ZGM5YTQ0ZDlkNjcwMTQ5OWIzZWViYjNlNzc4NmExYjE1ZWE5MWMyZjA0YzE5ZGRmNTMifQ"
         }
       ]
@@ -143,10 +143,74 @@
           "version": "repo-lines-v1:sha256:00697c1bf42998303271dcfe5e0f4e851242c6020f827a38a1972d0bb86abaad:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcyNjNhZGFkNWZkZThmOGM3Njc5NjdiOGViZjk2OGZiM2JlMjYxNjViMjY0NjhlODBhMmFlMzRmZWMxMjNhZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDk5Mjg4MmU3NTIzMWY4MDQ2YmNlOTAwNzczMDVmZWFlODY0MGM1ZjdkYWE2NGFmZDk0NWZhODQ5NmQ2YjRmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2JjMGU1NDM5M2JiMzAzODI0MzM2ODJlM2VmNDAwZTk5YTA1YmYxYTUyMWQ2NDE4Mjc2ZWQ5MDI0ZGMzNTMxMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_a5d1443c44f14552afc85beb76f69704",
+      "statement": "The fixture splitter backfills reciprocal mirrors at seed time for every pod whose registration graph carries a reciprocalRegistration link, modelling a federation that already exists rather than exercising runtime replication; it copies only hasDataGrant targets and no parent-side hasInheritingGrant.",
+      "evidence": [
+        {
+          "resource": "repo://packages/test-utils/src/fuseki.ts#L95-L134",
+          "version": "repo-lines-v1:sha256:97c030b8f167482962d6384992a79e54a48a87dc1582abab7d06729e3ff13848:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MzUxYTRkYTMzZDBhNDJhMTViMGJjNDk2ZTk4OTcyYTc4N2YwMWNmOGM2YTMwNzRiMDlkNGNlODBiNDk3ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ3N2RmZTU4Njc5MTkzYThiNmU0OGRmNzFjODJhM2YzMTQ3ZWVmYjNhZjg4NWQ1Y2VhMTRkYTc5ZTNjZjIzZDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzZmQ1OWM5ZTlmNGI0NTJiYmEyMTRjYmU1NGY3ZmU4ODEzMGRlMGIzNjczNTc2NDgwMWM3YTczMzlhMTdjNDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0d88bf4628444157b17c3162d6330feb",
+      "statement": "test/util.ts exposes localMirror(session, peerId), which resolves the peer's registration of session.webId through the reading side's own SPARQL plane; a missing replica fails with Node <iri> not found in framed output, so the helper doubles as the mirror-existence assertion.",
+      "evidence": [
+        {
+          "resource": "repo://test/invitation.test.ts#L26-L45",
+          "version": "repo-lines-v1:sha256:e7a4e0f7ff66eb84013f61c1cccbec7a179034ee0244ac61107d86ee715c6c39:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNTVhMjY3YjVhZGNiOTNiYjRiNTc5OTFhMjg0YzdlNzg4ZWEzZjg5ZGI3MjYxYjE2ZGY1ZDlkN2EzYzhmNDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1Njc0NWQ3MTIwYWJkODM2YWIzNzc0ZGQxOTM1N2MwOTRkZjgyNWExY2VjMWYyMDI4ZmZmZmI2ODA0ZDdlNjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhZDViYTE0ODUxMjUzMDc3OTMzYTdmMDgyMDMxNjNmZDRmOWUxNTdhNjlmNmE0MDg1NWVkN2QzMjVkZTQxMDUifQ"
+        },
+        {
+          "resource": "repo://test/util.ts#L69-L83",
+          "version": "repo-lines-v1:sha256:3e378041f78c53deece58a0fcd3cab47f90246f803c89ab39e6a13f065776667:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MDhlM2Y4NGUyODJlNTZjNmQ0MWExMTliZDQ2MzUyNzk1OWU1ODkyMGQ5YWQ5MDc4NjQyNWYyYjVhOWFlYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0ZWQ3OTY3YWY4N2NkMDczZDVjNmI1M2Q5NmYyYzI5ZTRiYzZmMDVmZmQyZWZjZjFkNzRiNGE3MWEyMTQwNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4YzYzOTg3Yjk3MTZmOGYxNzZhNmY0MTA4MzhmOTI0MTJlYzczZDJjMzU3MTI1MmRjN2FhMzlkYWZjMjIxYzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_106fb4a3cdf44d34afa9b40dd99a1540",
+      "statement": "The invitation suite asserts the reciprocal mirror on both legs of a runtime-created pair (no seeded relationship) once each side's completion activity is done, which is the runtime counterpart to the fixture backfill.",
+      "evidence": [
+        {
+          "resource": "repo://test/invitation.test.ts#L100-L200",
+          "version": "repo-lines-v1:sha256:8f0eeb88e745bee65b73e4051221b169a553ce4f28acebd425ffca1e7f91e383:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1ZGY1MDQ0N2UyYTBkNGVjYzdlZGI3MzFmZDUwMzExYjc4NzFjYTIzZjhlZmYxNTY2OTRjZGJkY2UxYWJmN2MwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlNDcwOGE1NGE1NmYzOThkNGNkNGUwZjAyNzVhZWY3OWQwMGU4NmQ3ZTc4ZGFkZDhkN2Y0OWJjMzE2MmVmYmMzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiZDA5YTlhMjcxZDk3ZTg3ZjI0MzAzYjAxMzM4YzM0OTBlMGI0Yzk4NjgzYzZlMDA2YzBiZTM4M2JiNzQ5NzAxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4N2NjZTljMDc5ZTBjZDk4ZTkzZTg4M2RiNjc2Mzg5YTgwZjc4ZmRkMzkyNWFkMWFiMzdiYmU2MzhhNWRjZjBlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_d224d55d644143959a789c767f2649c0",
+      "statement": "delegated-grants.test.ts mocks @temporalio/workflow and asserts the consumer's ordered contract (replicate, regenerate, complete), burst coalescing, mid-flight re-drain with a fresh mirror, the idle no-op, and the reconcile arm starting the same consumer without completing the activity itself.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/delegated-grants.test.ts#L20-L213",
+          "version": "repo-lines-v1:sha256:6e81302b1c47d9d4663988020ae6dafa432561c804e4fc6804bf909d887e2038:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTUwZjZlZjkxOTM1OTgyMzg2M2U4NzVkN2Q0YmM4Zjc1MWQxZDFkNmZlOWExZDRjOTA0YzFkMmYwNjM4YmQ1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5YzFlNGNiMTZmYjAxYTBlNWFjMGNjZDhhYjU1YWUzOWI5M2JmY2IzOTBhYWQ5ZjY4ZTEzZmUxNDZkZTE3MjI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_790c689978c044d78f47c58bbd619e06",
+      "statement": "reciprocal-mirror.test.ts drives the mirror writer against a scripted mirror: the oracle reads the resource graph and its meta: twin, an absent-but-linked grant is re-fetched while present ones are skipped, and drops cover the meta: twins.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/reciprocal-mirror.test.ts#L1-L175",
+          "version": "repo-lines-v1:sha256:1e55da4beaf5b2c1f34ef10cfa4bd6a1b64d5913281a7f3365331b31b378da0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTc1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NzExMGMyY2YyYjBlNmZhNjAzNTg4NGEyMWFhY2Y2YWMyOTRhYmU4OTkzNzlkMTNiYTkzYWNiNTU3ZTI2ZDNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_c3046012ab4048b58a8b375695c6a3d7",
+      "statement": "grant-generation.test.ts serves a mirror-only fake transport with a deps.fetch stub that throws on any call, proving delegated-grant generation performs no peer dereference, and pins both MirrorIncompleteError kinds plus child-grant delegation through the parent's reverse inheritsFromGrant edge.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/test/grant-generation.test.ts#L30-L200",
+          "version": "repo-lines-v1:sha256:6f059a83ed67791a9f597d3929d18c48e453c023c81088db783cd5792ffd629e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTdiNWI1YjQ4N2MyMGRiZmNlZWQ5ZjZlNDZmOTVkM2E0ZWJjMDAyMGRjYTMwNDFkZmE4Y2NlYjA1MjRmMWQ4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjNjNkNTM1Y2UzODA2M2Q2YjRjNTFkOGMzODZhN2Y5YjNlNTgwYTE0YTEwYzA3YjE5OGRmYWYxOWM5M2EzYmZlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMjc2YTgyNmM0YjMyZmE4NmE0NmM4YzlhZjFlOTE2YjI3NjdlMGQxMGRlZDE3OTkzY2U5ZTEyMDQ4NmEzOTM0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhZDkyODEzMjg4MDkzYzM1YTZkNWEzODI0MDc0ODNmOWRkYmU3YWU5ZDFmM2RmODgyMDVmNGUzM2VkMjMzNzQ0In0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T01:32:20.770Z"
+    "at": "2026-10-21T05:20:05.106Z"
   }
 }

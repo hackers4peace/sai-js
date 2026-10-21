@@ -4,8 +4,6 @@ title: Sequence and discovery flows
 description: A catalogue of the dynamic views in docs/temporal.c4 — discovery, reciprocal registration, invitation, admin, roles, share/request access, and authorization flows — plus the LikeC4 authoring conventions used to keep them consistent.
 tags: [likec4, sequences, flows, temporal, discovery]
 sources:
-  - id: openwiki-source-0287d02e668cd550d1f3ce6d
-    resource: repo://docs/plans/improve-grant-replication.md
   - id: openwiki-source-f94e6df9b22c5d9088de9576
     resource: repo://docs/temporal.c4
   - id: openwiki-source-c18acf0c50387f2e5ea026d1
@@ -14,10 +12,14 @@ sources:
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-b51f04210bf90c2ec8824400
     resource: repo://packages/components/src/ReciprocalWebhookHandler.ts
-generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
+  - id: openwiki-source-03c71d0f7eed5c1f113d08e3
+    resource: repo://packages/components/src/temporal/workflows/grants.ts
+  - id: openwiki-source-fabda8691f79a477b70b0c57
+    resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
+generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T01:32:20.770Z
+    at: 2026-10-21T05:20:05.106Z
 ---
 
 # Sequence and discovery flows
@@ -77,13 +79,16 @@ The dynamic views follow a fixed set of authoring conventions:
 - `reciprocal-registration-update` — a peer's `Update` is written as a
   `DelegatedGrantsUpdated` activity. The activity Add reaches auth through the
   durable `DurableWebhookEmitter` and `deliverWebhook` path. `ActivityWebhookHandler`
-  then starts `updateDelegatedGrants` and the serialized
-  `syncReciprocalMirror`; the mirror sync currently runs in parallel.
-  `updateDelegatedGrants` finds affected authorizations, fans out grant updates
-  and delegation registration, then writes `ActivityCompleted`.
-  `improve-grant-replication.md` is the design to run the mirror replication
-  before delegated grant generation. The LikeC4 view does not show the
-  webhook-delivery queue.
+  then start-or-signals the per-peer `processDelegatedGrantsUpdated` consumer
+  (workflow id `delegated-grants:<webId>:<peerId>`); each drain runs the
+  `syncReciprocalMirror` child workflow on `reciprocal-registration` **first**,
+  then `updateDelegatedGrants` (finding the affected authorizations, fanning out
+  grant updates and delegation registration), then writes the completion — so
+  `done` means the mirror is current.
+  **Model drift:** `docs/temporal.c4` still draws the previous shape (a direct
+  `start updateDelegatedGrants workflow` plus a parallel, serialized mirror
+  sync); the view needs updating the next time the model is touched. The LikeC4
+  view does not show the webhook-delivery queue.
 
 ## Invitation
 
@@ -91,6 +96,11 @@ The dynamic views follow a fixed set of authoring conventions:
 - `admin-invitation-send` / `admin-invitation-receive` — org-context
   invitations where a person invites an org (accepted by the org admin) and an
   org admin invites a person.
+
+Both invitation flows also seed the reciprocal mirror before completing:
+`establishReciprocal` on the inviter side and `acceptInvitation` on the acceptor
+side each run `syncReciprocalMirror` as their last step before
+`markActivitiesDone`, so a pair starts out mirrored on both ends.
 
 ## Admin
 

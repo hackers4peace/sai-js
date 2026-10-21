@@ -116,9 +116,9 @@ Production NixOS/Podman matches the dev/test storage model:
 - [ ] **webhook retries**. `reconcileActivities` is the backstop for deliveries
   that exhaust their retries. It has no scheduler yet; scheduling stays
   separate from this cutover.
-- [ ] **mirror-sync retry cap — reconsider before cutover.** After
-  [`improve-grant-replication.md`](improve-grant-replication.md) lands, the
-  mirror step of the `DelegatedGrantsUpdated` flow keeps today's 5-attempt cap
+- [ ] **mirror-sync retry cap — reconsider before cutover.** With the
+  replicate-before-regenerate flow landed (`openwiki/architecture/federation.md`),
+  the mirror step of the `DelegatedGrantsUpdated` flow keeps today's 5-attempt cap
   (`packages/components/src/temporal/workflows/reciprocal.ts`, the
   `syncReciprocalMirror` proxy) and `done` on that activity means "the peer
   mirror is current". A peer that stays unreachable or keeps answering 403/5xx

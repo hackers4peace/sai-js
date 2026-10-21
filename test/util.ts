@@ -63,7 +63,7 @@ export async function dataGrants(
  *
  * Throws `Node <iri> not found in framed output` when the mirror graph has not
  * been written, which is exactly the invariant the replication steps must
- * satisfy (improve-grant-replication.md §2): the invitation workflows seed it
+ * satisfy (openwiki/architecture/federation.md): the invitation workflows seed it
  * per leg, the delegated-grants consumer refreshes it before regenerating.
  */
 export async function localMirror(

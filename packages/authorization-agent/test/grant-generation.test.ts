@@ -272,7 +272,7 @@ const authorization = (suffix: string, over: Partial<DataAuthorizationData> = {}
     ...over,
   }) as DataAuthorizationData
 
-describe('delegated-grant generation — mirror only (improve-grant-replication.md §2/§5)', () => {
+describe('delegated-grant generation — mirror only', () => {
   test('reads the mirrored peer side once for a batch of authorizations', async () => {
     const transport = mirrorTransport(mirroredPeerGraphs())
     const { deps: dataModelDeps, fetchStub } = deps()

@@ -129,8 +129,8 @@ export async function reciprocalRegistration(
   }
   // NOTE: the initial reciprocal-mirror write is deliberately NOT here — it
   // is orchestrated by the calling workflow as its own activity with its own
-  // retry policy (`establishReciprocal` and, since improve-grant-replication.md
-  // S1, `acceptInvitation`), so the activity completion means "mirror written"
+  // retry policy (`establishReciprocal` and `acceptInvitation`), so the
+  // activity completion means "mirror written"
   // (openwiki/architecture/federation.md 1a)
   return {
     accountId,

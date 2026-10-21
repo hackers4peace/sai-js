@@ -89,7 +89,7 @@ opposite direction):
 - **Bodies:** the grant documents. For source grants they are already in our
   grant registry; for delegated ones they are on the data owner's registry.
 - **Freshness: none needed.** Grants are immutable (a change mints a fresh IRI —
-  `improve-grant-replication.md` §2), so a replicated body is either current or
+  `openwiki/architecture/federation.md`), so a replicated body is either current or
   absent. Replicate once when the link is written, drop the graphs whose link
   left the registration, and the mirror is correct by construction; only drift
   repair (a graph-at-a-time writer or a single-graph restore) needs a scan.
@@ -105,9 +105,9 @@ Deliberately **not** proposed: on-demand caching inside `checkEquivalence`.
 Reuse decisions must be a pure function of replicated state, otherwise the
 "same input → same grants" property this plan is about cannot be tested.
 
-> Coordination: `improve-grant-replication.md` T8 tracks the same gap from the
-> replication side. If that plan's post-S9 work lands first with an issuance
-> echo, this plan only needs to consume the replicated bodies.
+> Coordination: `grant-replication-follow-ups.md` T8 tracks the same gap from
+> the replication side. If that work lands first with an issuance echo, this plan
+> only needs to consume the replicated bodies.
 
 ## 3. Target: the real comparison
 
@@ -236,5 +236,5 @@ non-equivalent old grants remain orphaned. What reuse changes:
 - Drift repair for the issuer-side mirror (§2.1): a graph-at-a-time backfill or
   single-graph restore can leave a linked grant without a body. Same class as
   the reciprocal mirror's `MirrorIncompleteError` / presence check
-  (`improve-grant-replication.md` S7) — reuse that primitive rather than a
+  (`openwiki/architecture/federation.md`) — reuse that primitive rather than a
   second implementation.

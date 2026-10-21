@@ -168,7 +168,7 @@ async function generateChildDelegatedGrantData(
 /**
  * Raised when the local reciprocal mirror does not hold a graph the delegation
  * path needs. Delegated-grant generation may only read replicated peer data
- * (improve-grant-replication.md §2/§5) — a missing graph means the mirror sync
+ * (openwiki/architecture/federation.md) — a missing graph means the mirror sync
  * has not landed yet, and generating without it would silently produce fewer
  * (or wrong) delegated grants. The workflow retries; the delegated-grants
  * consumer replicates before every regeneration.

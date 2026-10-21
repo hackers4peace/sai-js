@@ -29,7 +29,7 @@ const { invitationAcceptance, reciprocalRegistration, reciprocalWebhook } = prox
 // registration probes. Fewer retries than reciprocalRegistration — a save
 // from the cap comes from the delegated-grants consumer (its next drain syncs
 // again) or the reconcile sweep, which restarts that consumer
-// (improve-grant-replication.md §3.3/S4); a permanent 403 stays pending, see
+// (openwiki/architecture/federation.md); a permanent 403 stays pending, see
 // docs/plans/update-deployment.md.
 const { syncReciprocalMirror: syncMirrorActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
@@ -104,7 +104,7 @@ export async function acceptInvitation(
   // `establishReciprocal`. Both legs must seed it: it is the ONLY local copy
   // of the peer's registration of us and of the grants the peer issued to us,
   // and delegated-grant generation reads those graphs from the local store
-  // without any peer dereference (improve-grant-replication.md §2/§3.1).
+  // without any peer dereference (openwiki/architecture/federation.md).
   // Ordering is safe: the webhook subscription above targets the same
   // registration, so its ACR already admits this session's read.
   await syncMirrorActivity({
@@ -122,7 +122,7 @@ export async function acceptInvitation(
  * workflows (initial mirror, one per leg) and, per `delegatedGrantsUpdated`
  * activity, by the delegated-grants consumer (which serializes it per
  * `(webId, peerId)` and runs it BEFORE regenerating grants —
- * improve-grant-replication.md §3). Re-fetches the peer's reciprocal
+ * openwiki/architecture/federation.md). Re-fetches the peer's reciprocal
  * registration (+ data grants) with the context's own credentials and
  * rewrites the local mirror graphs.
  */

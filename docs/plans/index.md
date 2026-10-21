@@ -19,9 +19,9 @@ three per-pod storage plans are **done and removed**; their landed design is in
 
 | Status | Count | Plans |
 |---|---|---|
-| 🔶 partial | 2 | `revoke-delegation-chain`, `improve-grant-replication` |
+| 🔶 partial | 1 | `revoke-delegation-chain` |
 | ⬜ not started / design only | 13 | `authorization-revoked`, `authorization-revocation`, `check-equivalence`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing` |
-| ⬜ follow-up backlog (all items open) | 1 | `revoke-delegation-chain-follow-ups` |
+| ⬜ follow-up backlog (all items open) | 2 | `revoke-delegation-chain-follow-ups`, `grant-replication-follow-ups` |
 
 **16 plans total.**
 
@@ -32,8 +32,8 @@ three per-pod storage plans are **done and removed**; their landed design is in
 | `revoke-delegation-chain.md` | 🔶 partial — first cut (steps 1–5) landed | Revocation as a boundary operation at the delegation endpoint (`AccessRevocation`, all-or-nothing validation, requester hop, `RevokeGrants` RPC); replaces direct cross-peer DELETE | references `authorization-revoked` (deny-RPC precedent) |
 | `authorization-revoked.md` | ⬜ not done (design only) | Producer writes the typed `authorizationRevoked` activity for deny; routing/consumer/sweep already handle the type | — |
 | `authorization-revocation.md` | ⬜ not done (design only — deferred) | The authorization-revocation leg, extracted from the landed activity-first design (OpenWiki `services/activity-lifecycle.md`): UI revokes an **authorization** (never grants directly) → the `authorizationRevoked` producer → a workflow revokes the derived grants at the **issuance boundary with the org session** (fixes seeded-ACR 403) + clears the grantor's projection; decides whether the retired `grantsRevoked`/`processGrantsRevocation` wiring is revived | `authorization-revoked` (the typed producer); `revoke-delegation-chain` (+ its follow-ups — the boundary + `grantsRevoked` observability item) |
-| `check-equivalence.md` | ⬜ not done (design only) | Real `checkEquivalence`: reuse equivalent existing grants (incl. child trees); workflow already fully wired. **Prerequisite (§2.1):** replicate the grant bodies where we are `grantedBy` (onward delegated grants live on the data owner's registry) — equivalence compares body-only fields, so a peer read or IRI-only input is not enough | issuer-side replication (issuance echo or post-issuance store); reuses `improve-grant-replication.md` T8 |
-| `improve-grant-replication.md` | 🔶 partial — S1–S7 landed; S8–S9 open | Make the local mirror the complete and current source for delegated-grant generation: initial mirror on both invitation legs, per-peer consumer that replicates via a `reciprocal-registration` child workflow before regenerating (replicate → regenerate → complete), the same consumer from the reconcile sweep, mirror-only generation with `MirrorIncompleteError` + one peer index per regeneration, and a self-healing mirror oracle (presence-not-content, `meta:` union, twin drops). Open: test reorganisation (S8), grantee-side read optimisations (S9) | landed reciprocal mirror and durable webhook delivery; `pod-isolation-followup` A1 (drift scan) for missed webhooks |
+| `check-equivalence.md` | ⬜ not done (design only) | Real `checkEquivalence`: reuse equivalent existing grants (incl. child trees); workflow already fully wired. **Prerequisite (§2.1):** replicate the grant bodies where we are `grantedBy` (onward delegated grants live on the data owner's registry) — equivalence compares body-only fields, so a peer read or IRI-only input is not enough | issuer-side replication (issuance echo or post-issuance store); reuses `grant-replication-follow-ups.md` T8 |
+| `grant-replication-follow-ups.md` | ⬜ follow-up backlog (all items open) | What remains after the replicate-before-regenerate work landed: the terminal-error policy for peer 404/410 vs 401/403 (today everything retries into the cap), the test reorganisation (mirror assertions out of `roles`/`share`, one dedicated federation file), and the grantee-side read optimisations T1–T8 (query-cost rewrites, `requestDelegation` batching, the issuer-side replica that real grant reuse needs). The landed design is in the OpenWiki (`architecture/federation.md`, `services/activity-lifecycle.md`, `temporal/workflows.md`) | landed mirror + consumer work; `check-equivalence.md` §2.1 for T8; `pod-isolation-followup` A1 for drift |
 | `reconsider-n3-package.md` | ⬜ decision needed — keep vs drop | Reconsider the remaining `n3` dependency: current Store/DataFactory footprint, the `ReciprocalMirror` N-Quads/GRAPH-block and TriG test/seed sites, options A/B/C, and a recommended partial drop | completed Turtle-removal work (OpenWiki `data-model/json-ld-layer.md`); `fetch-sparql-endpoint` keeps `n3` transitively |
 | `pod-isolation-followup.md` | ⬜ not started | Remaining per-pod isolation edge cases: mirror backfill/drift scan, unregister mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion cleanup, cross-pod/mirror-freshness tests, and the named-graph patch guard | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `update-deployment.md` for production |
 | `webhook-subscription-bootstrap.md` | ⬜ not done (design only) | `ensureActivityWebhookChannel` at account creation + startup/periodic healing for real deployments (dev/test are pre-seeded) | — |
@@ -60,7 +60,7 @@ revoke-delegation-chain 🔶 (403 → boundary revocation)
 authorization-revoked ⬜        (deny activity producer)
 authorization-revocation ⬜     (depends on authorization-revoked + revoke-delegation-chain)
 check-equivalence ⬜            (replaces the shipped checkEquivalence dummy)
-improve-grant-replication 🔶    (mirror before delegated grants — S1–S5 landed)
+grant-replication-follow-ups ⬜ (terminal-error policy, test reorg, read optimisations)
 webhook-subscription-bootstrap ⬜
 ```
 
@@ -101,11 +101,11 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
   `reused`; only the activity needs a real implementation.
 - `authorization-revoked` — **unblocked**: routing, per-target consumer and
   sweep already support the type; only `recordAuthorization` needs to write it.
-- `improve-grant-replication` — 🔶 **partly landed**: the `DelegatedGrantsUpdated`
-  path runs through the per-peer consumer (replicate → regenerate → complete),
-  the invitation legs seed the mirror, generation is mirror-only, and the mirror
-  oracle self-heals (presence-not-content + `meta:` twins). Remaining: test
-  reorganisation (S8) and the grantee-side read optimisations (S9).
+- `grant-replication-follow-ups` — the replicate-before-regenerate design is
+  landed and documented in the OpenWiki (`architecture/federation.md` and
+  friends); only the open items remain: the terminal-error policy for peer
+  404/410 vs 401/403, the test reorganisation, and T1–T8. T8 overlaps
+  `check-equivalence` §2.1 (the issuer-side replica), so land them together.
 - `webhook-subscription-bootstrap` — **unblocked**: builds on the landed
   ActivityRegistry module + `ActivityWebhookStore`/handler; runtime-only
   (dev/test are pre-seeded).
@@ -123,7 +123,7 @@ working when servers split are documented in the OpenWiki
 `architecture/storage-isolation.md`, and the production/dev divergence in
 `architecture/deployment-landscape.md`. Open plan work:
 `pod-isolation-followup.md` (mirror backfill/unregister + cross-pod tests),
-`improve-grant-replication.md` (S8–S9 remaining: test reorganisation,
+`grant-replication-follow-ups.md` (terminal-error policy, test reorganisation,
 grantee-side read optimisations),
 `webhook-subscription-bootstrap.md`, and `update-deployment.md` (production).
 
