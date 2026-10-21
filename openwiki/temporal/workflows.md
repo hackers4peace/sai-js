@@ -1,9 +1,11 @@
 ---
 type: architecture
 title: Temporal workflows and activities
-description: The Temporal client and worker bootstrap, the three task queues (create-grants, reciprocal-registration, forward-to-push), the typed *Id boundary objects, the self-contained createGrantsForAgent regeneration, findRoleUsage routing, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
+description: The Temporal client and worker bootstrap, the four task queues (create-grants, reciprocal-registration, forward-to-push, webhook-delivery), the typed *Id boundary objects, the self-contained createGrantsForAgent regeneration, findRoleUsage routing, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
 tags: [temporal, workflows, activities, worker, architecture]
 sources:
+  - id: openwiki-source-06025454564b63e0817ca135
+    resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
@@ -12,22 +14,28 @@ sources:
     resource: repo://packages/components/src/temporal/activities/account.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
+  - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
+    resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-e04884959e0812782a6d49fe
     resource: repo://packages/components/src/temporal/client.ts
+  - id: openwiki-source-55f67d07018be4b3c4161eb1
+    resource: repo://packages/components/src/temporal/queues.ts
   - id: openwiki-source-4dbb1c79cd1a93efa0f3bf2d
     resource: repo://packages/components/src/temporal/workflows/account.ts
   - id: openwiki-source-1478d95c096325a2041fecee
     resource: repo://packages/components/src/temporal/workflows/create-grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
+  - id: openwiki-source-4b9eeba4dd0aabcf86743edc
+    resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
   - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
     resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T01:39:52.421Z
 ---
 
 # Temporal workflows and activities
@@ -44,22 +52,26 @@ a `new Temporal()` per request rather than pooling connections.
 
 `packages/components/src/workers/main.ts` is the worker entrypoint: it connects
 with an infinite 500 ms retry, initializes tracing (`sai-worker`), registers
-three `Worker.create` instances, runs them concurrently, then shuts down OTel
-and the connection. The three registrations are:
+four `Worker.create` instances, runs them concurrently, then shuts down OTel
+and the connection. The four registrations are:
 
 - `forward-to-push` — `forward-to-push` workflows + push activities;
 - `reciprocal-registration` — reciprocal workflows plus grants activities
   (because `establishReciprocal` calls `markActivitiesDone`);
 - `create-grants` — the `create-grants.ts` barrel plus the grants, admin,
-  invitation, access-request, **and account** activity sets.
+  invitation, access-request, **and account** activity sets;
+- `webhook-delivery` — the `webhook-delivery.ts` workflow plus the
+  `postWebhook` activity.
 
 The `services/worker` package is only a skeleton; the deployed entry is
 `packages/components/dist/workers/main.js` run by the Compose `worker` service.
 
 ## Task queues
 
-The three queues are inline string literals (no exported constants), repeated
-by the producers in `ActivityWebhookHandler` and the grant handlers:
+Most queues are inline string literals repeated by the producers in
+`ActivityWebhookHandler` and the grant handlers. The webhook queue is the
+exception: the emitter and worker share the exported
+`WEBHOOK_DELIVERY_TASK_QUEUE` constant.
 
 - `create-grants` — the main queue; hosts the `create-grants.ts` barrel
   (grants + admin + invitation + access-request + **account** workflows) and
@@ -67,7 +79,8 @@ by the producers in `ActivityWebhookHandler` and the grant handlers:
 - `reciprocal-registration` — `reciprocal.ts` workflows, registering
   reciprocal **and** grants activities (because `establishReciprocal` calls
   `markActivitiesDone`).
-- `forward-to-push` — `forward-to-push.ts` and the push activity.
+- `forward-to-push` — `forward-to-push.ts` and the push activity;
+- `webhook-delivery` — `webhook-delivery.ts` and the `postWebhook` activity.
 
 ## Workflow catalog
 
@@ -88,6 +101,9 @@ by the producers in `ActivityWebhookHandler` and the grant handlers:
   `writeEndpointRecords`, `postBootstrapTriG`, `writeAccountRecords` (each
   find-first; a retry mints a fresh Garage key and compensates on failure).
 - `forward-to-push.ts` — `sendPushNotifications`.
+- `webhook-delivery.ts` — `deliverWebhook`, a one-activity workflow with a
+  1-minute start-to-close timeout and retry 1s, backoff 2, maximum 60s,
+  maximumAttempts 10.
 
 Two access-request/invitation workflows deserve their own note:
 
@@ -138,6 +154,16 @@ that object by `grantee` and fans out an `executeChild` of
 `processGranteeAuthorization` per group; each child materializes its data
 authorizations and regenerates the grantee's grants, and the parent completes
 only after all children succeed.
+
+## Webhook delivery activity
+
+`postWebhook` reads a `PostWebhookInput` of `sendTo`, `body`, and optional
+`contentType`, then POSTs to `sendTo`. It returns on any 2xx. It throws a
+non-retryable `ApplicationFailure` for `400`, `410`, `413`, `415`, and `422`;
+other 4xx, 5xx, and network errors are retryable. Delivery is at-least-once, so
+a lost 2xx or a 5xx after receiver processing can repeat the notification.
+`DurableWebhookEmitter` starts `deliverWebhook` with a random workflow id and
+falls back to a direct POST when the enqueue fails.
 
 ## Activities and the service layer
 

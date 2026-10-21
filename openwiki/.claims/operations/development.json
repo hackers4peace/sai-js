@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:09dfc1d79da5a159cb19cce913112b8b0f37872227d7ea6ca74121f6d8b733d6",
+  "pageVersion": "sha256:2ccd6e97ca1a88bed1d8c53bc5267bbd2c0fe802cecf9bf62ec5c3af2a9f936c",
   "claims": [
     {
       "id": "claim_8c7199519a8143bcb06e138d401a49f2",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://docker-compose.yaml",
-          "version": "repo-file-v1:sha256:c8d77f83eefa29d8afa7f3e266ba883707f901d4281a4a6959bb9435df060f8e"
+          "version": "repo-file-v1:sha256:45be2b6cfdd4be5699cc2e844da15aa0edc1ab46d3218d9a0eccfb4e21c7fa44"
         }
       ]
     },
@@ -90,13 +90,55 @@
       "evidence": [
         {
           "resource": "repo://environments/css/fuseki.config.ttl#L1-L8",
-          "version": "repo-lines-v1:sha256:7fb6ff9007faa93133d734017ce4648807757217e74bff932cd2665fca6c9244:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhlNzY2ZDUxMGQzYjQ3YWM2ZTc1N2EyODg4ZWEyMGJjYjRhODM3NmE0ZDY0MDBjZTliY2U5NWZiNTZhZDQzMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzI3MjE5MjMxMmUwZGZlYjE2ZDM5YTBhNGI2MDk2ZGIzMjM3NDU3NjMzODA3NDAxMDlkMTZhYTAwN2NjODFjYyJ9"
+          "version": "repo-lines-v1:sha256:94cecac40fb8bb803eac01c3798d24c13878a2f294b70e2f136ea88f713eb16a:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2EyMGYxOGZmMTljYTcxZWUxOWMxZGM3ZDExYzM3ZWZhNzAyOTIyNGRmNGI1YTZlODMxNTMxMWQ3Y2U4MDYyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzI3MjE5MjMxMmUwZGZlYjE2ZDM5YTBhNGI2MDk2ZGIzMjM3NDU3NjMzODA3NDAxMDlkMTZhYTAwN2NjODFjYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5a4cdcf700954f93b556c4fc6d82c3ed",
+      "statement": "The Compose registry and data services include the shared temporal environment anchor and therefore receive TEMPORAL_ADDRESS along with auth and worker.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yaml#L101-L141",
+          "version": "repo-lines-v1:sha256:8286a43dd51a48eb48d98e239061eaa28596ea039dc1b59b946b04c8636fda22:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNzQ2MzM0ZmRiZDY1MTMyMzlmMTMyNmRiOGI2MTI3NTdiNWIzMmMwODA4YjUwODFhOTkzN2Y2NTMzYjhkYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiYjQyNzkzNzdhZGUyNjZlNmI5ODgyMGVhMzllNzkwODI4ZjIxMjhhMWFlNDI0ODQ0ZDdjNjhmMTMyNTBkYmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNjAyNTA4NmFhZDU5ZTk4MTY3NTM5NWVhMzJiOWM4MzIyMzJjNjRiYWZkYTEzNDE1Y2RkNzdkZjlmOTViMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1Nzc4YTkxY2M5OGI4YWIwNDI4N2MxNjMwM2U3MWY4MDdhYzNhZWYwNjQ3M2MxY2NmNzUxNjQ3ODgyNjdmYjQifQ"
+        },
+        {
+          "resource": "repo://docker-compose.yaml#L61-L62",
+          "version": "repo-lines-v1:sha256:264a0b2bcc5cee87505bb7b3610b0af4957d32b159d7c972094ab18dfcb589a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBkZmEzODcxZTA2ZTc3NzNkZTJkM2I0ZTQ5NWI2ZjFlM2Q2NDQ5OGFlZGZlY2I0NzFiZTBhN2EzZWQxMzM1MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzEzZDAzZmIxZDMyNTk2N2Y3MDk3NDNiMTQxYTc0NmM2ZTM0MGM4MjdmMDY4NmI0Y2NjMjA5YTkxMDZhNTgwOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fca8705c7f484559b5008bacaf2eb243",
+      "statement": "The Dagger registry and data service factories bind the Temporal service, and the test command waits for a reachable Temporal before running vitest.",
+      "evidence": [
+        {
+          "resource": "repo://.dagger/src/index.ts#L375-L434",
+          "version": "repo-lines-v1:sha256:08c8b499b54c697dc434115872b094631798b98c08401cffcf9befafc84934f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlODg5ZTZmMmJiMzcxODQzZmI4NTlhNWJhZDFlYWNiZTNkNTY2MDEyMzgwNTI0YzU5ZTVmMzFkNmNiMjA0ODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YWE1MTc1ZDcwOTRlZDRiZDVhZGU1OTIyNGViMzU5MTA2ZTU0OTZjZmY5NjExNDJmZmJlMjE1N2VhZDMxM2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4YmRhZDE1OGM3YWU0NmIwOTg4NTFjMmFiZTk0NjA2NWQ3MjY2MmMwZWEwYWI3MWY0MWM3OGUxZDEwMmMxZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViZThiM2Q0ZmEzYjFhZGRhNmViOTU3MTJjZjFiMDI0MjU2ZjFjN2Y3ZjJiOWM2MGRkM2E4NTVhMzA1ZTMxNDkifQ"
+        },
+        {
+          "resource": "repo://.dagger/src/index.ts#L511-L529",
+          "version": "repo-lines-v1:sha256:5de789030eb1a05417a07c09232dfcb7bad404cf2480bacab62bd8e7d96893a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0NTQzZTc3OTcwODU3YzAyNTY2OTFiNGFhZWViMzYwYWNhYjk0YzMzNDE1NmQ4YTk1YjViMDUxYjlhNmYxMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4YWRmYmRhNjlhNjA4NmUzMWFhMDEzYTEyMDRkMTk5MzE4ZjU0OTZmZmFiNTQxYzcyOWZmNTg3YmJkZmZlMGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkZmVmNzgxMjY1ZGYwYWUwNDk3NTJiZTRjZTk2NGJlZDhlYzQ4ZGRiZDlmZTFiMjAxNDExZjdjMTU5YjllNTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0MjNlN2RjMTM5ZTU3NjgxYTM4MzkyOWI3OWU4M2ViYTdkODc5MDA2Y2FiYzcxOTk4MGZjMTAwNDllMTdhNTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_308c9c55943643eebb4d6fca2c739a8c",
+      "statement": "The worker process registers four queues: forward-to-push, reciprocal-registration, webhook-delivery, and create-grants.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/queues.ts#L1-L2",
+          "version": "repo-lines-v1:sha256:6847784df029b69c7ce781235b6377e1b7d97d2ba5ae161c957aa3cdc519b2de:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmNiNmEyOTlkOGQ1ZDIyOTIyMDEyYWMzZjM1MjcyYWQzOGUyNzU5NGVlNWMwYzUyYWU4YTFiZjJjMzFhYWY0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQzYzQ5NDNlYjEwZDQzZWVjM2I5YTRiNjE3YjI3NTQ1Nzk1YjFlYWNmMzg5NTU5MGQzNjE4YTM2Y2JmZjBkMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/workers/main.ts#L38-L89",
+          "version": "repo-lines-v1:sha256:87523417454ec9088cb16ed7de722480165af4606cfe748a2102d8d8b868378b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxNzgyYWExZTkyZDkwYTc3OTAzZGU4YzhjZTY3MjA2NjU2MTE2MDc4NmFiNGEwMGZkYmZjMzIwZGJmYWQzOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiOTFmNTRjNTAwMWQzYTYyNmViNTEyOTE1ZDFkMThiOTFmN2MyZDRiYmZlZjM1ODE1MmIwZTU3YzJmYWM4ODAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NGYwOGI0YjFiNjU3NGFiMzdiYzM3MGQ3MWRmNWYzOWNlNTIxMGY5MGVhNTAxNzRmZTQ4NDQwNTE0MjEzNDUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T01:32:20.770Z"
   }
 }

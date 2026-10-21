@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1fe9ca75f25e3580b591cb2856b3ef948cb5b8f90d29e27e2dc75f99733a2817",
+  "claims": [
+    {
+      "id": "claim_2c9534d31d6c4b28bef91cfdf0a334d0",
+      "statement": "Registry and data webhook delivery is durable through DurableWebhookEmitter, which starts the deliverWebhook workflow on the webhook-delivery queue, uses bounded at-least-once retries in postWebhook, and falls back to a direct POST when enqueueing fails.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/overrides/emitter.json#L7-L16",
+          "version": "repo-lines-v1:sha256:ccf40529508340813d85c76069bb6eaff9a0e0054df2f1665e3f38ffe6a9a667:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NGU4MjI1N2M4OTBjZDViZjQ2YWY0MzljZWNhN2RlNTcwMWM1ZTVhY2RmNjViM2JkYTYyZmM4MzI0YjZlNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4ZTZmZTlmZjNjYTQ4OWFkNWQ5MWRmYjdjYWE3YjEzMzU1YjFiN2FkZWFmYzAxNWIwMTM5OTkyNmIxMmEwOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3ZjY5OTZlM2IxNWRmYjQzODYzMDAxYzcyZDNhNTM5ZGU3MGUzOGUyYTllZDIwZGU1OTExMDRhODI4NjRmNjYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L28-L62",
+          "version": "repo-lines-v1:sha256:cc596d8990c89d6d80ef89393a2b2e5688e3d3a3c9b1ecc83770e8203a0edc7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0ODdmYmRjMDE4MzNiYjJiMDU1ZTJlZTRmYmFmNjNhMWFjYzE5ZTk2MzY3NDZlNDM3MzliODQ2OWNkMDhlYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZmZhZjY2ZTFhODZkOTJmNmJkZDcxZjUzMDlmOTM0ZTUxZjZjNjQyMzM2NmMyNGQ4NWExNjhkMjE0ZDljNmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4NzQ2ZDZhZTEyNjEyMWQ4NzE3MDNmYWU1MzYwMGZiZTZhNjg5MzlkOTcyMzlkYzZhMmYxZWY2OWNhN2YzOWMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts#L9-L36",
+          "version": "repo-lines-v1:sha256:2765fb316bd9980cbf1cc55b90c50f854eef90562b80644edc11ce9886ec40b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1Mzc1Y2VmZDdmYzA2Y2ZlYmE2YzlmZjNjNGQ1NzRlNzIyYzZjYWNjNjg3MmIyMjU4MTZjMTY4NDIzYjQ0ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNGExMGUwNjM2NThmNzk2ZmY1YmZlNzg0ZmQ5ZDVlODM0MGNhN2FjMWJlYjRlNjZiNzNjNTMwYmE5MTJhMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0MTY3MGE0ZDkyMjYwZjA0ZTYyMmQ4ZmY1ZWJjYWZiMjQ1MGUxNzQ5YTZiOWE3YmNhZjM3ZWNhYmJkYjY3ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/webhook-delivery.ts#L5-L20",
+          "version": "repo-lines-v1:sha256:0a7ebda252424b30b4634f3d9166c48e3a20674b3571cbd3e13cffda2c658a44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNWFmNGRlZWY0NzMwYjI5MTczYWM3YzA5YTE0ZmVmNjJhNWE5OTE3NTVhNGI5NjhjODU4MTU0MDdlMzBhMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmNTQyYTkyMDk2NWQ1MDI1ZTAxZDUxMmYwMTRjMjE3MzAxOWNmNDYxZmMxZDQ3YWZiOWZlNTVjMDc0NTQzNWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxMWVjYWI3YTM0OWI4NTZjYTdlYTMzZDg4MDgyOTU1OWUyYmE0NWU4ODdlODlhMTg1ZGU2MmNlNGU5ZDkxMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5665821c62f43978a12117a64d61e20",
+      "statement": "generateDelegatedDataGrants reads the peer's mirrored reciprocal registration and mirrored grant documents as the source grants for delegated grant generation; the mirror is not only a UI cache.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/grant-generation.ts#L198-L246",
+          "version": "repo-lines-v1:sha256:50230e250ddb91980eecf519344d39400d81f2b16673a64600ee0d0580537c54:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkOTFlYjM4MjY1YjAyOGRmM2EwN2RlMzkwNDg1Yzc2N2MxMzU0N2MyMzgzMTc4ZTNiMzgzNDEyYWE4YjZlODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2MTllZjJmNmI0ZWM4OWEwNzI5ZTkzMzk0MTQyNGNkYTg1NTY2M2RhNmY3ZGJlNTgwM2ZhNzZhMjU0MWQ5MTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBmNmNkYmI3ZmRkM2NlNzNlNzQ4MTgzNjMyMDYxMmViNjFmZGQwMTQwOWI0MzNjMmE3ZjIyZjA4ZGZkZTlmNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhY2E3ZGJmOTMxMmIzYjY3MDM0MjM1ZDllNjUwZTk0OGY0NTVhN2FhY2NmNzA4YTVkN2E4NDNjN2VjMzhiNGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d9a00b9874d248f2b62acaf3964472c1",
+      "statement": "The live DelegatedGrantsUpdated handler starts updateDelegatedGrants and syncReciprocalMirror in parallel, and improve-grant-replication.md is the plan to replicate the mirror first and generate delegated grants only from replicas.",
+      "evidence": [
+        {
+          "resource": "repo://docs/plans/improve-grant-replication.md#L8-L43",
+          "version": "repo-lines-v1:sha256:25623252f524fc379e73ce50b6f9ce9803790d8b6b0a850c8bd3aa5bcef097a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMDFiY2FiY2U4MjRiYjkyN2FkOGE4YzdjZmY3N2EwMDFhMjQ2MmY0YmFlNTZmNTY0OGM0NjM1MDRiMGU2M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxNDBlNTNmMzlkMTJiNTMwNGJiZjBkZjQzMWM1NWUyYjRmZGUxMDY2YTYzMGFmYTU0NjBkZWQ2MWVhOTcyNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZDZmYzFjMWIwNjA3MmQ3Mzk4OTk2MWRiNDA5ZmIxNjhlYTY5NDgwYTQwMzQ4MjgzODA4NDI1MzNkYzYwMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzM2RlMDc4MTFhZDNmZmZiNmU2MzBhN2NlZGZlMzEyNzczNTc3MWE0NWRjMWMzY2ZmYjA0ZDU0MWFjNDc0NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L443-L472",
+          "version": "repo-lines-v1:sha256:869c05f4642626db88d0d005c7e95cfdcaf0f090cce0c4eb7587de66fa46ef07:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlY2UyNmFkOWUwYmRlOWU5ZjdkMzE4ZGNjOGMzNDQzMGNlZjllOTc1M2YwM2ZhN2NiMmJlYTY5MWI0YTg4MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjYTYyNDIyMjFhMzdmYTg0NDY4NTNkNmI2NDFlNjhlNTQxYjJiN2IwNGQyOTYyNTZjYmVlNDE5ZGU0ZmM3M2YifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-21T01:32:20.770Z"
+  }
+}

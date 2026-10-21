@@ -8,18 +8,28 @@ sources:
     resource: repo://.dagger/src/index.ts
   - id: openwiki-source-6028df227cf0c5e36d839191
     resource: repo://environments/data/registry.trig
+  - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
+    resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
+  - id: openwiki-source-4b9eeba4dd0aabcf86743edc
+    resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
+  - id: openwiki-source-23684c4afa0b096bb7c0aa5d
+    resource: repo://packages/components/test/durable-webhook-emitter.test.ts
   - id: openwiki-source-900a2d8c960b090aaf5dc614
     resource: repo://temporal/dynamicconfig/development-sql.yaml
   - id: openwiki-source-b7181b4d7359d016a13b092d
     resource: repo://test/package.json
+  - id: openwiki-source-6996f47c4d119fbaf101afe4
+    resource: repo://test/roles.test.ts
   - id: openwiki-source-11c141224a72985968f722ac
     resource: repo://test/setup.ts
+  - id: openwiki-source-681173e11e9e253d0432fde4
+    resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T01:32:20.770Z
 ---
 
 # Integration test suite
@@ -38,10 +48,11 @@ container.
 `dataService`) and a `testBase()` that assembles a node container mounting the
 repo at `/sai`, binding every service by hostname, and setting env
 (`CSS_FUSEKI_BASE_URL`, `CSS_ID_SPARQL_ENDPOINT`, `CSS_S3_ENDPOINT`,
-`CSS_GARAGE_ADMIN_ENDPOINT`, `TEMPORAL_ADDRESS`). The `test` pipeline function
-runs `vitest run --no-file-parallelism` (and accepts `--tempo-endpoint` so
-Dagger runs can export OTLP to a host Tempo). `test/proxy.js` forwards local
-ports to the debug services.
+`CSS_GARAGE_ADMIN_ENDPOINT`, `TEMPORAL_ADDRESS`). The registry and data service factories bind Temporal. The `test` pipeline
+function runs a Temporal-reachability wait before `vitest run
+--no-file-parallelism` (and accepts `--tempo-endpoint` so Dagger runs can export
+OTLP to a host Tempo). `test/proxy.js` forwards local ports to the debug
+services.
 
 ## Seed and per-test reset
 
@@ -57,7 +68,9 @@ key-value store (`pg.seedKeyValue`) and **every per-pod Fuseki dataset**
 (`seedFusekiDataset`, which runs `DROP ALL` first) — every test starts from the
 pristine seed, wiping leftover state and pending activities. The client-id
 document is PUT/DELETEd directly in the test-client bucket in
-`beforeAll`/`afterAll`.
+`beforeAll`/`afterAll`. The fixture split also backfills reciprocal mirrors at
+seed time (`applyReciprocalMirrors`); that is fixture state, not a runtime
+replication step.
 
 ## Race prevention
 
@@ -80,8 +93,24 @@ whose lines are NDJSON of expanded JSON-LD (`test/util.ts` parses each line);
 `openEventsStream` reads the separate `/.sai/events` NDJSON stream. Both must be
 opened *before* the trigger, because neither replays.
 
-Temporal retries are off in the dev config (`maximumAttempts: 1`), so failures
-are one-shot.
+`roles.test.ts` and `share.test.ts` read the peer mirror through
+`reciprocalRegistration` and poll it with `waitFor`. The mirror is refreshed by
+a webhook-triggered workflow, so it can lag the grantor registration Update
+that the barrier already saw. The poll observes eventual consistency; it does
+not write or manually replicate the mirror.
+
+The Temporal default activity retry policy is `maximumAttempts: 1`, but the
+webhook-delivery and reciprocal workflows set explicit retry policies. The
+webhook path retries transient failures up to 10 attempts and stops on
+permanent 4xx responses.
+
+## Package-level webhook tests
+
+`packages/components/test/durable-webhook-emitter.test.ts` covers the emitter
+enqueue arguments and queue, the direct-POST fallback when the enqueue fails,
+`postWebhook` status classification (`400`/`410`/`413`/`415`/`422` permanent;
+other 4xx, 5xx, network retryable), and the `410` response from both webhook
+handlers for an unknown `sendTo`.
 
 ## Coverage
 

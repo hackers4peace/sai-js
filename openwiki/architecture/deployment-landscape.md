@@ -5,7 +5,7 @@ description: The h4p.net production landscape modeled in docs/architecture.c4 �
 tags: [architecture, deployment, solid, c4, h4p]
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T01:32:20.770Z
 sources:
   - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
     resource: repo://docker-compose.yaml
@@ -13,7 +13,15 @@ sources:
     resource: repo://docs/architecture.c4
   - id: openwiki-source-833782312af20d943c4bd83d
     resource: repo://nix/podman.nix
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+  - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
+    resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
+  - id: openwiki-source-55f67d07018be4b3c4161eb1
+    resource: repo://packages/components/src/temporal/queues.ts
+  - id: openwiki-source-4b9eeba4dd0aabcf86743edc
+    resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
+  - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
+    resource: repo://packages/components/src/workers/main.ts
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 ---
 
 # Deployment landscape
@@ -36,7 +44,7 @@ single top-level system `h4p` that contains the containers and components.
 | `Temporal` | — | Temporal server backing the workflow machinery |
 | `Quadstore` | — | Oxigraph RDF store (one shared store in the model and in `nix/podman.nix`) |
 | `KVstore` | — | PostgreSQL key-value store |
-| `Workers` | — | Temporal workers (push sender + webhook sender) |
+| `Workers` | — | Temporal workers for push, webhook delivery, reciprocal registration, and grant workflows |
 | `Registry` | `reg.h4p.net` | Registry Set (authorization/agent/role registries) with ACP policy engine |
 | `WWW` | `www.h4p.net` | Public website |
 | `Data` | `*.data.h4p.net` | Data Registries with SAI policy engine and S3 (Garage) object storage |
@@ -56,6 +64,12 @@ follow that migration, so the model remains a fair picture of production while
 understating the dev/test isolation model — see
 [Per-pod storage and isolation](storage-isolation.md).
 
+The Temporal dependency is no longer limited to auth, the worker, and WebID.
+`nix/podman.nix` and the Compose stack now set `TEMPORAL_ADDRESS` on the
+`registry` and `data` containers as well, because their CSS processes run the
+durable webhook emitter. The shared-Oxigraph storage model described above is
+unchanged by that addition.
+
 ## Components and decomposition
 
 The `Auth` container decomposes into three components: the **Solid-OIDC Provider**
@@ -65,7 +79,9 @@ Registry, Agent Registry, Role Registry) plus an **ACP Policy Engine**, a
 **SPARQL endpoint**, and a Solid client; `Data` mirrors this with a Data
 Registry, **SAI Policy Engine**, SPARQL endpoint, S3 (Garage) client, and a
 Solid client. `Workers` hosts the **Push notifications sender** and the
-**Webhook sender**.
+**Webhook sender**. The webhook sender has its own `webhook-delivery` queue; the
+same worker process also registers the push, reciprocal-registration, and
+grant queues.
 
 ## Relationships
 
@@ -73,8 +89,12 @@ The edge routes everything through `ReverseProxy`; it fronts `Auth`, `Registry`,
 `WebID`, `Data`, `Account`, and `WWW`. On the service-to-service plane the
 notable edges are:
 
-- `Auth`, `Registry`, `Data`, and `WebID` each reach `Temporal` (workflow
-  dispatch) and `Auth`/`Registry`/`Data`/`Temporal` use `KVstore`.
+- `Auth`, `Registry`, `Data`, and `WebID` each reach `Temporal`. Registry and
+  data use it for durable webhook delivery as well as workflow dispatch;
+  `Auth`/`Registry`/`Data`/`Temporal` use `KVstore`.
+- The worker process registers four queues: `forward-to-push`,
+  `reciprocal-registration`, `create-grants`, and `webhook-delivery`. The last
+  one carries `deliverWebhook` and its `postWebhook` activity.
 - `Auth` talks to `Data`, `WebID`, and `Registry`; `Registry` and `Data` and
   `WebID` read the `Quadstore`; `Data` uses `GarageStorage` (S3).
 - `Account` depends on `Auth`; `WWW` depends on `Data` and `WebID`.

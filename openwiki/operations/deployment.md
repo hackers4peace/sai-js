@@ -18,16 +18,22 @@ sources:
     resource: repo://nix/images/sai-worker.nix
   - id: openwiki-source-833782312af20d943c4bd83d
     resource: repo://nix/podman.nix
+  - id: openwiki-source-06025454564b63e0817ca135
+    resource: repo://packages/components/src/DurableWebhookEmitter.ts
+  - id: openwiki-source-55f67d07018be4b3c4161eb1
+    resource: repo://packages/components/src/temporal/queues.ts
   - id: openwiki-source-60ea044d0e14ab98032a8e8c
     resource: repo://packages/components/src/tracing/bootstrap.ts
+  - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
+    resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-2fd7b9e9b2c7414ea65e9cc2
     resource: repo://services/id/server.ts
   - id: openwiki-source-c862349b5581cece054d0a3b
     resource: repo://tempo/tempo.yaml
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T01:32:20.770Z
 ---
 
 # Production deployment and observability
@@ -73,6 +79,12 @@ The lag is visible in the `id` container too: Podman still passes
 `CSS_SPARQL_ENDPOINT`, while the current `services/id` server reads
 `CSS_ID_SPARQL_ENDPOINT`.
 
+The Temporal dependency is wider than the storage migration. The `auth` and
+`worker` containers already carried `TEMPORAL_ADDRESS`; the `registry` and `data`
+containers now carry it too because their CSS processes run the durable webhook
+emitter. The worker process registers four queues, including the dedicated
+`webhook-delivery` queue for `deliverWebhook` and `postWebhook`.
+
 ## Caddy and secrets
 
 `nix/caddy.nix` defines the container options and Caddy `virtualHosts` for
@@ -99,6 +111,7 @@ off by construction — with no env vars the SDK is a no-op.
 | `OTEL_SERVICE_NAME` | span `service.name` (sai-test / sai-uas / sai-id / sai-registry / sai-data / sai-worker) |
 | `OTEL_CAPTURE_HEADERS=true` | attach `authorization` / `cookie` / `content-type` / `accept` / `if-none-match` / `link` as span attributes |
 | `OTEL_SDK_DISABLED=true` / `OTEL_TRACES_EXPORTER=none` | hard-off |
+| `TEMPORAL_ADDRESS` | Temporal endpoint for auth, worker, registry, and data. Registry and data need it for durable webhook delivery as well as workflow dispatch. |
 
 `SAI_OTLP_ENDPOINT` wins because the Dagger engine injects the standard vars for
 its own telemetry; the dedicated endpoint is passed straight to the exporter so
@@ -111,7 +124,7 @@ the injected standard vars are ignored.
 services are killed). `ApiHandler` wraps each RPC call in a `sai.rpc.handle`
 span; the JSON-LD helpers emit `sai.jsonld.raw` / `sai.jsonld.framed` /
 `sai.jsonld.expanded` spans; SPARQL reads run inside `sparql.query` spans;
-Temporal uses `OpenTelemetryPlugin` on the three workers and the client. Browser
+Temporal uses `OpenTelemetryPlugin` on the four workers and the client. Browser
 spans export from the UI to `/otlp`, routed by Traefik to `tempo:4318`.
 
 `tempo/tempo.yaml` runs single-binary Tempo: OTLP ingestion on `4317` (gRPC)

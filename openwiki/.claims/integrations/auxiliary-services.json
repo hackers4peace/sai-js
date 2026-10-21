@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:c54b6bb257c4c8277cf6855134cd5e8053267676cd55687c296d3a5926dd09ab",
+  "pageVersion": "sha256:a12b05c4de662798c528d25f810833954dba104c316d91ac5a8af62cf07e1b25",
   "claims": [
     {
       "id": "claim_0b97b522438c41f6b1d20f9ebba9164d",
@@ -77,10 +77,56 @@
           "version": "repo-lines-v1:sha256:29da76f87e24fb5e4321090af7172f0eba3b58352d02803586dd376bdafb440b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MTFiZjA1YzcwZjRlM2Q2OGI1YWE4NjVhOTZiZTg0NDU2YmFlZTgzNDQyYjg0MjI5N2Y0MmFiYjg1NWNhZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4MDk5Mzk3NDJlNTIyZDEwMDE0OTg4MWU4YjkwY2VmMTZhMjlmYzg2NTliMTBkZWEzZjExNzg2NzBkZjQ4OGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZkYzY1ZjFlZGNjOGQ2Yjk1YTA3NTdlOGI0YWYyZjA1YjJlYThjODg1ZDU3OTgwZGY3ZjhhY2JkM2Y0MzhmZDYifQ"
         }
       ]
+    },
+    {
+      "id": "claim_bf509f04388c4c5ba00522be81a61a91",
+      "statement": "Auth imports the disabled CSS notification config, while registry and data import css:config/http/notifications/all.json, sai:config/http/notifications/ndjson.json, and sai:config/overrides/emitter.json.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/auth.json#L20-L22",
+          "version": "repo-lines-v1:sha256:6203e334371cc181813e4f38393dae011d26ba372a9de8aa3ab2bfd008ca6adb:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjE5NGMxODQ0MDE4MzEyMzJkOGFjYjY4YzJiZTA5NzExZDkyMzU4ZjRiNzRkY2ZlNmZmNDQ3MWIwZjU2YmI1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzEyZDdhMWE5YzVhMWE2OWUwNGI1MWViZWE0NDk2ODBkOWJhM2QzOWU3YjM1ZjUwNGIzMzI4MDg2ZWRlN2ExYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE2NjA0OTcyZGE5ODBkODUzZjkxYzFhMWE5NWExNjZkNzQ4MTQ4ODI1MzgzZjhjMDg2NjFiMDk4NjIyZTU5NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzBmZWU0NGUzODE4ZjEwMmRkMDUyZTAyZTQ3ZWJhNDc3MGVjNzAzNTNhNDc0NTM4YjExNTNlNjExOGNmY2FiNSJ9"
+        },
+        {
+          "resource": "repo://packages/components/config/data.json#L44-L49",
+          "version": "repo-lines-v1:sha256:f65a89eff0243c6861d2b1fd6977b59c9a0740dc554daea19abc7c56f6c15c13:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTQzZjE4OWM2Mzc0N2E0Njk4ZjNkZDljNjc3MmU0OTQ5YTI3YmE2MzE2MGJhMTcxYzViMzIwODJmYWY3MTFiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzhjZTllMjUwMmY2Mjk0ZTNkNGEzODAwMTI1MWZjYTM1NWY3MDhiN2ZlYTZkNGRjZDM0M2Y5ZDMyYTU2N2ViNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGFhZGQzMzhlNGU0N2E2OWI5ZGUyOTc1NmM3ODM4NGRkZTMyZDFjMGE5ZjIzMTZlZTk1NzAyZTE0NmUyNzgyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTdmNjk5NmUzYjE1ZGZiNDM4NjMwMDFjNzJkM2E1MzlkZTcwZTM4ZTJhOWVkMjBkZTU5MTEwNGE4Mjg2NGY2NiJ9"
+        },
+        {
+          "resource": "repo://packages/components/config/registry.json#L13-L43",
+          "version": "repo-lines-v1:sha256:8efa28bc28e14e17fc74aa14fa88ddb6937708e9c533b0d7b6494ff0a1e4126d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMzU5NGQ4Mjc0NWMxMGI4NmFlMjM5MzgzZTRiNTU4ODA2YjBjYWFjOGZhYTYxNGQ4OTJhNjI4ODE4NzVmYmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmZjc2MjZkNGNmNmY1OGZmNzBmYTljMDY3ZTU5MDBiYWM3NjM2MmRkNzYxMzhkYmRlYjFiNTQzOTg2YmViZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiMzUwYmUzNjQ2NjE2Zjk1YmZhZTc5MWE5YTg5M2FmNDQ2ZmIyNjkwMjU5YTA4YzFjNjAyMzViZTU2ZjM2NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzOTcxNTYyNTMwZDUyODFiMWI5ZmY4NGE1YmIxYWYyMzk5NTU1ODY0YzVhYTgzZjRiNmMwZjE4MDZiNzUzNzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ca26b1bb5b01438ea3b4d887bd9c5e7c",
+      "statement": "The emitter.json Override replaces urn:solid-server:default:WebhookEmitter with DurableWebhookEmitter, and the class is exported from the components index for componentsjs-generator.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/overrides/emitter.json#L7-L16",
+          "version": "repo-lines-v1:sha256:ccf40529508340813d85c76069bb6eaff9a0e0054df2f1665e3f38ffe6a9a667:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NGU4MjI1N2M4OTBjZDViZjQ2YWY0MzljZWNhN2RlNTcwMWM1ZTVhY2RmNjViM2JkYTYyZmM4MzI0YjZlNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4ZTZmZTlmZjNjYTQ4OWFkNWQ5MWRmYjdjYWE3YjEzMzU1YjFiN2FkZWFmYzAxNWIwMTM5OTkyNmIxMmEwOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3ZjY5OTZlM2IxNWRmYjQzODYzMDAxYzcyZDNhNTM5ZGU3MGUzOGUyYTllZDIwZGU1OTExMDRhODI4NjRmNjYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/index.ts#L9-L11",
+          "version": "repo-lines-v1:sha256:f649d124ee8c33b1dfbd22ba3b182f3aee4093c06025cc6c02a5a124860ea489:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ4ZGY2ZDY5MzM1NmNhMjU0NmMyNjNmNGJjNzkwMjA4Y2M0MDFhZjk5NDY1ZWQ1YjcwZmFjNWFmNmRlNzA5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2Q4ZmMxYmI5OWZhODhhNzkzMWM5MjFiNTVkMDc2ZTY1NWEyNTkzMjFlMDIzYThhNDJkZDQ1YmE2ZTFjMmQ3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDdkM2E1MzQ4NTM5YWYyODc4ZmUzN2UzODFhMTc0YTU0ZjlkN2UzNzczNjdjMTM5NjA1MjkxMGRmOWRhNGY5MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2RlY2IxZDQ3NTI5ZjYxZTg3ZWY1NWFlZTA4MmJiZGUyOTNlOWZkYmNhOGQ5ODhhNTQ2OTg0OWUyMGU4MzRkYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c34ae214a5a24d899176652e325a03d9",
+      "statement": "DurableWebhookEmitter serializes the notification once, starts deliverWebhook on the webhook-delivery queue, and falls back to a direct POST when enqueueing fails; it sends no Authorization or DPoP headers because sendTo is treated as a capability URL.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L20-L72",
+          "version": "repo-lines-v1:sha256:76601141dc47eff162c06c792fc764daa13271fef8570750bf564598848a8f4c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4MDQ3ZTg5ZGE3NWMyNTVmNmUxNzkxN2Q3OWVlMTljNTI3Y2U4ZTZhMTgxMTQxY2Q3OGM5YzMwMzdiMjVmNzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1NGNmNGExM2FiYjAwODc5NzY1MzMxM2NhZDA4OWQzOTIxYjA4MTg0NDcyZTk5NzI3YTViZWZkNDQ0MGUzZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/queues.ts#L1-L2",
+          "version": "repo-lines-v1:sha256:6847784df029b69c7ce781235b6377e1b7d97d2ba5ae161c957aa3cdc519b2de:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmNiNmEyOTlkOGQ1ZDIyOTIyMDEyYWMzZjM1MjcyYWQzOGUyNzU5NGVlNWMwYzUyYWU4YTFiZjJjMzFhYWY0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQzYzQ5NDNlYjEwZDQzZWVjM2I5YTRiNjE3YjI3NTQ1Nzk1YjFlYWNmMzg5NTU5MGQzNjE4YTM2Y2JmZjBkMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T01:32:20.770Z"
   }
 }

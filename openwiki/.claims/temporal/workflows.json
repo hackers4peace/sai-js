@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a82bde403581753fac8c0af312691d8650e519a251d8bf63ee1a1eafe970aae9",
+  "pageVersion": "sha256:c997a7e54d274033cddfdcf0b48974918fa9c564c5c6d1836a8347c9a3463637",
   "claims": [
     {
       "id": "claim_1750ced8cbb445bf8b3bec11cce51086",
@@ -14,11 +14,11 @@
     },
     {
       "id": "claim_3466ae0f0f8e4327b8d31424f0e3fbc0",
-      "statement": "The worker entrypoint (workers/main.ts) connects with an infinite retry, then registers three Worker instances on the forward-to-push, reciprocal-registration, and create-grants task queues and runs them concurrently.",
+      "statement": "The worker entrypoint connects with an infinite retry, registers four Worker instances on the forward-to-push, reciprocal-registration, webhook-delivery, and create-grants task queues, and runs them concurrently.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L25-L77",
-          "version": "repo-lines-v1:sha256:f67bacfce069a77afff52cb9428e2838c59d0ca502a5bd761c6c4f30b029d11a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlZDkyYTE4ZDBmMjhjOTY2NGVjOGFmZDJlM2MyZmM4N2MzNDY5NmNmMTY1MThjMDMyMTc0NjZmNzYyZTcwYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlNDRhZjgyMzQyOGU1Y2M2MjM0NTg3ODllODE3MTRjZWUwMDVmYTE4ZWI1ZDI2NzAyMjBiOGYwYWY4MDhjN2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MjA4MGMwYzcxZGU1OGE2Zjc3ZDBlNTFkNDc3NmI4NWNiMjE4NjYyODRmNDkwNzU4YzYzNTJjY2UzYWJhYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NGYwOGI0YjFiNjU3NGFiMzdiYzM3MGQ3MWRmNWYzOWNlNTIxMGY5MGVhNTAxNzRmZTQ4NDQwNTE0MjEzNDUifQ"
+          "resource": "repo://packages/components/src/workers/main.ts#L25-L89",
+          "version": "repo-lines-v1:sha256:1642c5273af5060da30fa51bb0a35f89f5cfe2b2feb12f3d1f83ea178198419f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYjlhNjZmNWU0MDliYmVkZDFjY2Q1ZDdjNDA3YzIyNjU5NDNjZjAwNWY2ZDhlZTdhZjdiMTlkMjVmNjc4YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxNzgyYWExZTkyZDkwYTc3OTAzZGU4YzhjZTY3MjA2NjU2MTE2MDc4NmFiNGEwMGZkYmZjMzIwZGJmYWQzOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3MDlmYzdjMjlmZDJiOGM1OTJmM2M2NWVlODZmZmE3NmJmYWIwZjJiYTE4ZjQyNjNiZWJlNDI5ZGIxZGVmYjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NGYwOGI0YjFiNjU3NGFiMzdiYzM3MGQ3MWRmNWYzOWNlNTIxMGY5MGVhNTAxNzRmZTQ4NDQwNTE0MjEzNDUifQ"
         }
       ]
     },
@@ -31,7 +31,7 @@
           "version": "repo-lines-v1:sha256:9c12b117cdbf2a50ff090390830c28c81a91cc904692f3b5dac42537fbd37ec7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0MTE5N2YwMzc2MWMwZGRhMzk1MjJkNTE3M2VkYjYxY2ExM2UwMDg0MjBjNTBlZDMwNjMwYTBkZThhZDE4ODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3ZTk5NjJkNTEyNzEyYzlhODExNTNlYTlmMjFmZDg5ZDk3MWRhMTAxM2UwZmI2NGFmNTlmMzFkZTA2NDlhNDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L57-L74",
+          "resource": "repo://packages/components/src/workers/main.ts#L69-L86",
           "version": "repo-lines-v1:sha256:85208092778949f76de86c1b49575ba6ffa519ef5f6b9bd5b8db892b2ebd5f7f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkNTgzNmE0ZTUzNDM3NjBlNDUyYjdjMDYxYzgxNWEzY2NiZDc4MGE5ODg4YTY1MjM3YzllMGI1YTZiY2UxZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NzVlOTRhOTA0YWM0OWIzMTU0ZDQ2NzJhNjZlODYyOWI4NmRhYzc0ZTNlMjkzN2JlNjkyN2FlM2RhMTFjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMDA0YjU5NGI0MGI3NDg3NWRjNzE3NGIzZDU1YjU0NWQ0OTRlNTNiNzI0MDU3ZTU4YzAyYWJlZWJhMzM0MDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2YzU0NDMwYzU3YzEwM2JjNWYxMzBlOTM4Nzg1M2E5M2ViYmJhYjcxNDBlOGIyMzFkZmQ3ZmRkY2RhMDdiMjMifQ"
         }
       ]
@@ -41,8 +41,8 @@
       "statement": "The reciprocal-registration queue registers reciprocal and grants activities together because establishReciprocal calls markActivitiesDone.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L48-L59",
-          "version": "repo-lines-v1:sha256:9c676d3dcf5d4bb6915f84185ad2e377a2aee0a46f13fa98b804cc17b60dfafb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhOTY2YTI4NzNmY2ZhMjcyYzczMjNhMDdhZDEzNDEyOGQ5YjljMTllZDBiNzA4YjYwZDYzNzY5YWVjMzBiYzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZTFhMzlkNDAxMjFjNmU1ZDRmNDM1MTE4ZTU3YTg0N2EzNTgyNmU0OTRkZDNmYzc4OGE1ZmY0M2E5NDMwZGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZDRlNTM0M2Y3Y2M5MDc4Y2JmYTk1ZDRhODlhN2E4ZWZmZWQ2OGIwMTQzYjAzNWQ0YmNmMTNkOTM3MjE4M2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhYjVhZmQ2YmZiMWYwY2FmMGRkZWQ2MTJjMDc2YmM2MGQyMzNkMGEyNTEzY2YwOWY3NGU4MjA1OWIxY2RjY2QifQ"
+          "resource": "repo://packages/components/src/workers/main.ts#L50-L71",
+          "version": "repo-lines-v1:sha256:3c9dcc0df2095bf82fe9414002e1e153408f2cfa666b75d87da88c050175987e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhOTY2YTI4NzNmY2ZhMjcyYzczMjNhMDdhZDEzNDEyOGQ5YjljMTllZDBiNzA4YjYwZDYzNzY5YWVjMzBiYzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZTFhMzlkNDAxMjFjNmU1ZDRmNDM1MTE4ZTU3YTg0N2EzNTgyNmU0OTRkZDNmYzc4OGE1ZmY0M2E5NDMwZGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZDRlNTM0M2Y3Y2M5MDc4Y2JmYTk1ZDRhODlhN2E4ZWZmZWQ2OGIwMTQzYjAzNWQ0YmNmMTNkOTM3MjE4M2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhYjVhZmQ2YmZiMWYwY2FmMGRkZWQ2MTJjMDc2YmM2MGQyMzNkMGEyNTEzY2YwOWY3NGU4MjA1OWIxY2RjY2QifQ"
         }
       ]
     },
@@ -52,7 +52,7 @@
       "evidence": [
         {
           "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L131-L440",
-          "version": "repo-lines-v1:sha256:ea74086e17d255554c7975a9ae51aac1a7d6008cf7695f18c1824e1174f54fe0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyYzU3M2NiNjY1Mjg3YWE4YmZlNTUzNDVjM2JkNGQ5MmQxZTg1Y2ZiNzUxYzdjYzc3MGQyMDllMDMzNjI5ZmJjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3YWE0NDllNGM5NzlhODZmZjIzYzRlNTI4Y2JkN2JlNmY1ZTgyMDBmODM3ODI4NTY5OTU4MTkwMDNhYWZiY2MwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5NzkzYzkwNmMwOWZiYTQ0NTZhOGM0YzAwMjI2N2ZjODg3NTRhYTY2NjIzMDc2MTEwOTA5NTMxYTJhNjI5YzBhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmODlmNTAxNWZmM2JhMGU4N2NhYzcwOTFkN2U1ODU5ZjU3ZTQyOWVjYTE0MzQ0OWI3MWQ0M2MzYjEzZDcyMTA4In0"
+          "version": "repo-lines-v1:sha256:67be0fa223aaf654a07ce4a8c34593ab8eeca5a333bf2a4d6e8d595ff9930144:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyYzU3M2NiNjY1Mjg3YWE4YmZlNTUzNDVjM2JkNGQ5MmQxZTg1Y2ZiNzUxYzdjYzc3MGQyMDllMDMzNjI5ZmJjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3YWE0NDllNGM5NzlhODZmZjIzYzRlNTI4Y2JkN2JlNmY1ZTgyMDBmODM3ODI4NTY5OTU4MTkwMDNhYWZiY2MwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5NzkzYzkwNmMwOWZiYTQ0NTZhOGM0YzAwMjI2N2ZjODg3NTRhYTY2NjIzMDc2MTEwOTA5NTMxYTJhNjI5YzBhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmODlmNTAxNWZmM2JhMGU4N2NhYzcwOTFkN2U1ODU5ZjU3ZTQyOWVjYTE0MzQ0OWI3MWQ0M2MzYjEzZDcyMTA4In0"
         }
       ]
     },
@@ -138,7 +138,7 @@
       "evidence": [
         {
           "resource": "repo://packages/components/src/services/Authorization.ts#L386-L403",
-          "version": "repo-lines-v1:sha256:1aa1c4b8cc241f7ebf3da2d48f4edbc586ea2b68e1b994df7cce7b3689a6c841:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4ODJkNTJhYzMzN2JjN2U3ZWNmZjI5MjhlMTkxMTM0NmRiZDVjNjMyMDIzN2JkYWMzYjk4ZjE5NDdlYTJjMmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlMTU1ZDcxMjExMzMxMzBjNmExNDUxNzEwNGQwNzRjY2RkNDBmNWY0ZmI0MzI2YTkwNzE0ZDk4NTRlMzkwYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3MzM2NDlhOTllYjk5ZTk2NmRkZGFkOGFkNGU1ZWIxZWMyMzhiNzliNzE2N2UwNTQ3YTlmOGU4Y2JjMmJmYmEifQ"
+          "version": "repo-lines-v1:sha256:397138b10a58c248229f2752d901eb69b90ccc74dead682b1cac321579bf778d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4ODJkNTJhYzMzN2JjN2U3ZWNmZjI5MjhlMTkxMTM0NmRiZDVjNjMyMDIzN2JkYWMzYjk4ZjE5NDdlYTJjMmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlMTU1ZDcxMjExMzMxMzBjNmExNDUxNzEwNGQwNzRjY2RkNDBmNWY0ZmI0MzI2YTkwNzE0ZDk4NTRlMzkwYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3MzM2NDlhOTllYjk5ZTk2NmRkZGFkOGFkNGU1ZWIxZWMyMzhiNzliNzE2N2UwNTQ3YTlmOGU4Y2JjMmJmYmEifQ"
         },
         {
           "resource": "repo://packages/components/src/services/ShareResource.ts#L167-L201",
@@ -169,10 +169,52 @@
           "version": "repo-lines-v1:sha256:5e30961106e887b60cc45f2e4170a89bb6637164fd362edbfc5caf18332894b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFhOTcyNTZiZjYxNjEwZGI1YzNiZmNmYWUzMjRjMzFmMzljMDIyNDQ1NzhhZTBmNjRlZmIzMWY2MTAzY2M5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGVmMzc2MDE5NGMzMTkxZjc5MGE2ZGZhOGYzNjhlZTg4YTBiNWZiYTI4MmUzYzk1NWVkNGYzMDA1YWM0MGZhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_21281dd4556743d89509ee70dd64e7c0",
+      "statement": "The webhook-delivery queue registers the deliverWebhook workflow and the postWebhook activity, and the emitter and worker share the exported WEBHOOK_DELIVERY_TASK_QUEUE constant.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L49-L55",
+          "version": "repo-lines-v1:sha256:865db61393f273c308baa90089f8cd99a1f77d8ed6c76961c5f1fb8caf0699bd:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFkZjg3YTQ3MzE2YzcwOGM1NTAyMDk4ZTlhZjZjNDQ1MzRlYjgwYmVhZGNmNjA2MzAyOGVmY2E4NTkzN2FiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTgzNTUyYWI1NzE0OTRiMzk5YjE4MTk5NjIyZGJlM2IzODI2ZWI2MWZjZDFmNzRjZmIxMmFiY2Y4OGU0ZjcyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmJlODM5NTQxOTU1NGJmMzMwMmQzNzVhMDhhOGUzZDUyYzNlZDRhNzY0OWVjNDgyMzJmZTAyNGVjYzM5NmNjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzJlOTZhNzk0YTZkMjdjYzZiMDVhYTBkMGU1NGY0ZWYzM2NkODA4NzJlMjkwYjE5MDA4OGZjNWY3ZWFlMzJkYSJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/queues.ts#L1-L2",
+          "version": "repo-lines-v1:sha256:6847784df029b69c7ce781235b6377e1b7d97d2ba5ae161c957aa3cdc519b2de:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmNiNmEyOTlkOGQ1ZDIyOTIyMDEyYWMzZjM1MjcyYWQzOGUyNzU5NGVlNWMwYzUyYWU4YTFiZjJjMzFhYWY0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQzYzQ5NDNlYjEwZDQzZWVjM2I5YTRiNjE3YjI3NTQ1Nzk1YjFlYWNmMzg5NTU5MGQzNjE4YTM2Y2JmZjBkMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/workers/main.ts#L59-L67",
+          "version": "repo-lines-v1:sha256:9fe1553f2add1442d691d6f6824eb61d7af12d07711c8388b8a19272e1997430:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTg4YzU2NTU0OTZkOWRkZmEyNDY0OGVmMDViMTEyYjUxYWRiYjljYTNjYmY2ZDE3MmJiMjY2NTJhNTZlOWRkNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ3NWU5NGE5MDRhYzQ5YjMxNTRkNDY3MmE2NmU4NjI5Yjg2ZGFjNzRlM2UyOTM3YmU2OTI3YWUzZGExMWM1MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjEwMDRiNTk0YjQwYjc0ODc1ZGM3MTc0YjNkNTViNTQ1ZDQ5NGU1M2I3MjQwNTdlNThjMDJhYmVlYmEzMzQwMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWU4MzQwNmZhY2E2ZDE0ZGU3Mzg2YjYxYTVhYjViNTdlY2VjMzhhMDRjZjQxNmMzNDExYzdjMWU1NjU4ZWExMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e38d14ba2f6d432d8efdfc2eededa5e3",
+      "statement": "deliverWebhook calls postWebhook with a 1-minute start-to-close timeout and retry 1s, backoff 2, maximum 60s, maximumAttempts 10; postWebhook succeeds on 2xx, marks 400/410/413/415/422 non-retryable, and retries other 4xx, 5xx, and network failures under an at-least-once contract.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts#L9-L36",
+          "version": "repo-lines-v1:sha256:2765fb316bd9980cbf1cc55b90c50f854eef90562b80644edc11ce9886ec40b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1Mzc1Y2VmZDdmYzA2Y2ZlYmE2YzlmZjNjNGQ1NzRlNzIyYzZjYWNjNjg3MmIyMjU4MTZjMTY4NDIzYjQ0ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNGExMGUwNjM2NThmNzk2ZmY1YmZlNzg0ZmQ5ZDVlODM0MGNhN2FjMWJlYjRlNjZiNzNjNTMwYmE5MTJhMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0MTY3MGE0ZDkyMjYwZjA0ZTYyMmQ4ZmY1ZWJjYWZiMjQ1MGUxNzQ5YTZiOWE3YmNhZjM3ZWNhYmJkYjY3ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/webhook-delivery.ts#L5-L20",
+          "version": "repo-lines-v1:sha256:0a7ebda252424b30b4634f3d9166c48e3a20674b3571cbd3e13cffda2c658a44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNWFmNGRlZWY0NzMwYjI5MTczYWM3YzA5YTE0ZmVmNjJhNWE5OTE3NTVhNGI5NjhjODU4MTU0MDdlMzBhMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmNTQyYTkyMDk2NWQ1MDI1ZTAxZDUxMmYwMTRjMjE3MzAxOWNmNDYxZmMxZDQ3YWZiOWZlNTVjMDc0NTQzNWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxMWVjYWI3YTM0OWI4NTZjYTdlYTMzZDg4MDgyOTU1OWUyYmE0NWU4ODdlODlhMTg1ZGU2MmNlNGU5ZDkxMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_290a30836eb847598fe5f938dfb55ccb",
+      "statement": "DurableWebhookEmitter starts deliverWebhook with a random workflow id and falls back to a direct POST when the enqueue fails.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L49-L61",
+          "version": "repo-lines-v1:sha256:ab79ff9a3bd90c2b89a4ed24c93df8e95a6e18599881668a47113fe0184f171a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJiZTgzOTU0MTk1NTRiZjMzMDJkMzc1YTA4YThlM2Q1MmMzZWQ0YTc2NDllYzQ4MjMyZmUwMjRlY2MzOTZjYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkNGM5M2E3YWNhNjRmYzc2MzI4NTEyNDMzMzE2ZGRiODljMDFjNzkxMDA4MjY3MDYyNGJhN2Q1ZmQ4MjUzMzAifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T01:39:52.421Z"
   }
 }

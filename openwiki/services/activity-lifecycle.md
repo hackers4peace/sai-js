@@ -4,34 +4,46 @@ title: Activity outbox and events pipeline
 description: The append-only Activity Registry outbox and its pending/done state machine, the producer and consumer (workflow) tables, the Solid Notifications webhook delivery, ActivityWebhookHandler routing, the ActivityEvents bus, the embedded DataAuthorizationData POJO carrier, and the reconcileActivities backstop.
 tags: [activities, webhook, events, solid-notifications, architecture]
 sources:
+  - id: openwiki-source-0287d02e668cd550d1f3ce6d
+    resource: repo://docs/plans/improve-grant-replication.md
   - id: openwiki-source-82daddf07d8ad3efedbe52d2
     resource: repo://packages/authorization-agent/src/activity-registry.ts
+  - id: openwiki-source-0531e8ebff475ca0a556fc29
+    resource: repo://packages/authorization-agent/src/grant-generation.ts
   - id: openwiki-source-c154d0515a7154469b1f503c
     resource: repo://packages/components/config/http/notifications/ndjson.json
   - id: openwiki-source-a9275a0e3a23f49eea3d9b3f
     resource: repo://packages/components/src/ActivityEvents.ts
   - id: openwiki-source-c18acf0c50387f2e5ea026d1
     resource: repo://packages/components/src/ActivityWebhookHandler.ts
+  - id: openwiki-source-06025454564b63e0817ca135
+    resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-a9727c97c08565f7dac9c147
     resource: repo://packages/components/src/EventsHandler.ts
   - id: openwiki-source-d8a4328f642d2e3760ef7fcd
     resource: repo://packages/components/src/NdjsonNotification.ts
+  - id: openwiki-source-b51f04210bf90c2ec8824400
+    resource: repo://packages/components/src/ReciprocalWebhookHandler.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
     resource: repo://packages/components/src/services/ShareResource.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
+  - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
+    resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
+  - id: openwiki-source-4b9eeba4dd0aabcf86743edc
+    resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T01:32:20.770Z
 ---
 
 # Activity outbox and events pipeline
@@ -135,7 +147,7 @@ dispatches on the class:
 | `NeedBasedAccessRequestReceived` | `GrantIssuanceHandler` (owner's issuance endpoint) | `processNeedBasedAccessRequestReceived` on `create-grants` — PUTs the immutable AccessRequest |
 | `AccessRequestGranted` | `detectGrantedRequests` (child of `updateDelegatedGrants`) | **terminal** — no workflow/completion |
 | `AccessRequestArchived` | `Authorization.archiveAccessRequest` | **terminal** — no workflow/completion |
-| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | `updateDelegatedGrants` (plus the serialized `syncReciprocalMirror` on `reciprocal-registration`) |
+| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | `updateDelegatedGrants` plus the parallel, serialized `syncReciprocalMirror` on `reciprocal-registration`. Delegated grant generation reads the peer mirror. |
 | `ActivityCompleted` | Temporal completions | forwarding only (`done`); never dispatches |
 | `grantsRevoked` (retired) | none | wiring retired by the activity-first cleanup; revocation now goes through the issuance boundary and workflows |
 
@@ -177,13 +189,38 @@ the authorization-revocation leg has no producer yet.
 ## Webhook entrypoint and routing
 
 `ActivityWebhookHandler.handle` resolves the delivery channel by `sendTo`
-(404 if unknown), parses the body (400 on malformed JSON), and acts only on
+(410 if unknown), parses the body (400 on malformed JSON), and acts only on
 `Add` notifications that carry an `object`. It loads the activity with the
 channel's session, then **forwards to the events bus before dispatch** so every
 `Add` emits a line. Owner versus observer is decided by
 `session.registrySet.hasActivityRegistry?.id === channel.topic`: a non-owner
 (admin) channel returns 200 forwarding-only; the owner channel proceeds to
 `dispatch`.
+
+## Durable webhook delivery
+
+Registry and data do not POST webhook notifications directly. Their
+`DurableWebhookEmitter` reads the serialized notification once and starts the
+`deliverWebhook` workflow on the dedicated `webhook-delivery` queue. The
+workflow has one `postWebhook` activity with a 1-minute start-to-close timeout
+and a bounded retry policy: 1s initial interval, backoff 2, 60s maximum, 10
+attempts. `postWebhook` treats `400`, `410`, `413`, `415`, and `422` as
+non-retryable; other 4xx, 5xx, and network failures retry. If enqueueing fails,
+the emitter falls back to the direct POST the stock CSS emitter performs.
+
+Delivery is at-least-once. A lost 2xx response or a 5xx after the receiver
+processed the notification can repeat an `Add`, so the dispatched workflows must
+tolerate duplicates. The handlers document a future `Idempotency-Key` header as
+the dedupe seam. The receivers still use `sendTo` as a capability URL and do not
+verify the stock emitter's DPoP token, so the durable path sends no
+`Authorization` or `DPoP` headers.
+
+The `DelegatedGrantsUpdated` completion is written by
+`updateDelegatedGrants`. The parallel `syncReciprocalMirror` has no completion
+activity, so `done(DelegatedGrantsUpdated)` does not by itself prove the mirror
+is fresh. Delegated grant generation reads the local mirror in
+`generateDelegatedDataGrants`; `improve-grant-replication.md` is the design to
+replicate the mirror before regeneration so generation uses only replicas.
 
 ## Events bus and stream
 
@@ -213,7 +250,8 @@ state line) and parses each line with `toStore`.
 - No `failed`/dead-letter state — permanent failure leaves `pending` forever.
 - `done` without `pending` — ordering is not guaranteed; `done` is authoritative.
 - Duplicate `done`s (concurrent consumer + sweep) are harmless but may cause
-  redundant UI refetches.
+  redundant UI refetches. At-least-once webhook delivery can also repeat a
+  `pending`/`done` pair, so receivers must tolerate duplicate `Add`s.
 - `AgentRegistrationAdded` stuck-pending on permanent failure — the sweep skips
   it (no `accountId` in its payload).
 - `GrantIssuanceHandler` bypasses the outbox (starts `storeGrant` directly), so
@@ -224,5 +262,6 @@ state line) and parses each line with `toStore`.
 `reconcileActivities` (a Temporal workflow) reprocesses every activity that has
 no completion referencing it, using the same owner-channel routing. It skips
 `AgentRegistrationAdded` and reuses deterministic grantee workflow ids so a
-running consumer absorbs entries. It currently has no scheduler/caller and is
-run on demand (e.g. directly by tests).
+running consumer absorbs entries. Its `DelegatedGrantsUpdated` branch calls
+`updateDelegatedGrants` but does not start `syncReciprocalMirror`. It currently
+has no scheduler/caller and is run on demand (e.g. directly by tests).

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:90b3fd4298126a5a6e2fcd7fa2d89425815d994f10a53b0ba0be54386376d1e0",
+  "pageVersion": "sha256:46d821eaeae626e36f528a68fc7ff032176ed09575a00e22e7a0a3ad627275ba",
   "claims": [
     {
       "id": "claim_c0d040529023490a8a016339ae020d13",
@@ -69,10 +69,32 @@
           "version": "repo-lines-v1:sha256:783edbfd75c5da07f02c1e5a82f646020cc652839cc2cedc96f37769e8cad0a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzgzZWRiZmQ3NWM1ZGEwN2YwMmMxZTVhODJmNjQ2MDIwY2M2NTI4MzljYzJjZWRjOTZmMzc3NjllOGNhZDBhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzgzZWRiZmQ3NWM1ZGEwN2YwMmMxZTVhODJmNjQ2MDIwY2M2NTI4MzljYzJjZWRjOTZmMzc3NjllOGNhZDBhOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQzYWQ5MWE4ZGJkMzNjZTBkYWViNzVkYmQ1ZGQ5YTMzN2RjYjMyZWE5ZWJlZmE3MTRhZTZjMmQyMjNiZDNlYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGZjMWFiODZiZWRkYzc1N2E5NWEwNTQ1N2UzMTlhZjVkN2NmMzg0ZGYwMzQ2NTM4NDVjZTFmYWZkMGQ2NTJmOSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_6dcc6b4d5b864ce89ea849a03f17033b",
+      "statement": "The reciprocal-registration-update runtime path writes a DelegatedGrantsUpdated activity, delivers its Add through the durable webhook path, then starts updateDelegatedGrants and the parallel serialized syncReciprocalMirror; improve-grant-replication.md sequences replication before delegated grant generation.",
+      "evidence": [
+        {
+          "resource": "repo://docs/plans/improve-grant-replication.md#L8-L43",
+          "version": "repo-lines-v1:sha256:25623252f524fc379e73ce50b6f9ce9803790d8b6b0a850c8bd3aa5bcef097a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMDFiY2FiY2U4MjRiYjkyN2FkOGE4YzdjZmY3N2EwMDFhMjQ2MmY0YmFlNTZmNTY0OGM0NjM1MDRiMGU2M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxNDBlNTNmMzlkMTJiNTMwNGJiZjBkZjQzMWM1NWUyYjRmZGUxMDY2YTYzMGFmYTU0NjBkZWQ2MWVhOTcyNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZDZmYzFjMWIwNjA3MmQ3Mzk4OTk2MWRiNDA5ZmIxNjhlYTY5NDgwYTQwMzQ4MjgzODA4NDI1MzNkYzYwMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzM2RlMDc4MTFhZDNmZmZiNmU2MzBhN2NlZGZlMzEyNzczNTc3MWE0NWRjMWMzY2ZmYjA0ZDU0MWFjNDc0NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L443-L472",
+          "version": "repo-lines-v1:sha256:869c05f4642626db88d0d005c7e95cfdcaf0f090cce0c4eb7587de66fa46ef07:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlY2UyNmFkOWUwYmRlOWU5ZjdkMzE4ZGNjOGMzNDQzMGNlZjllOTc1M2YwM2ZhN2NiMmJlYTY5MWI0YTg4MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjYTYyNDIyMjFhMzdmYTg0NDY4NTNkNmI2NDFlNjhlNTQxYjJiN2IwNGQyOTYyNTZjYmVlNDE5ZGU0ZmM3M2YifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L38-L62",
+          "version": "repo-lines-v1:sha256:315819fc7ec4f56ac90fe0fe40448e262fed1f74eb13028041110e843d7d6263:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxYTQyMWYwMjBhNDUxYmIyYThhYzY4OTM5MzNhNDAzOTQ1N2UyMmM1YzAzNzljOTUwZTUxN2JhNmIzZDUxNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4NzQ2ZDZhZTEyNjEyMWQ4NzE3MDNmYWU1MzYwMGZiZTZhNjg5MzlkOTcyMzlkYzZhMmYxZWY2OWNhN2YzOWMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L52-L82",
+          "version": "repo-lines-v1:sha256:9e3650e152fd2c60d470f0c1dba7dc2f35aaf528d176e1244f66da45c3f69b2a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MTZhYTYyYzg3NDI4OTZjMmMyMGU0ZGZiYjg4YzE4NWZhY2ZlZDRjYjMyMTMzYzBmNTQ3MmE1NTU5OTMzZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MjIwZDFjOTgyNmFiYTNiYzc2MTRjOWQ4MDMyZDY3MDU1M2ZhZmI1ZmE5ZWQyZmU0MzZhMGRlZDQ3YjgzYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2MTU0YThiZjgyYWM3MjdmMDJlZWIwMjlmZGFkNDVmZjFmOGRlM2E3ZTJjYjVjOTgzNjY0OWMwZDQwMTI2NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkYjMwNTBmYzA5NzFhZjY2YTNkM2ZkZjZkZGQ3MTQxMTA0NGE0ZGU0NTU5NmZjZDY3ZTdmY2U1ZDFlZTBhZDMifQ"
+        }
+      ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.1",
-    "at": "2026-10-09T21:41:59.486Z"
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-21T01:32:20.770Z"
   }
 }

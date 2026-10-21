@@ -4,12 +4,20 @@ title: Sequence and discovery flows
 description: A catalogue of the dynamic views in docs/temporal.c4 — discovery, reciprocal registration, invitation, admin, roles, share/request access, and authorization flows — plus the LikeC4 authoring conventions used to keep them consistent.
 tags: [likec4, sequences, flows, temporal, discovery]
 sources:
+  - id: openwiki-source-0287d02e668cd550d1f3ce6d
+    resource: repo://docs/plans/improve-grant-replication.md
   - id: openwiki-source-f94e6df9b22c5d9088de9576
     resource: repo://docs/temporal.c4
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+  - id: openwiki-source-c18acf0c50387f2e5ea026d1
+    resource: repo://packages/components/src/ActivityWebhookHandler.ts
+  - id: openwiki-source-06025454564b63e0817ca135
+    resource: repo://packages/components/src/DurableWebhookEmitter.ts
+  - id: openwiki-source-b51f04210bf90c2ec8824400
+    resource: repo://packages/components/src/ReciprocalWebhookHandler.ts
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:41:59.486Z
+  - by: openwiki/0.7.2
+    at: 2026-10-21T01:32:20.770Z
 ---
 
 # Sequence and discovery flows
@@ -66,10 +74,16 @@ The dynamic views follow a fixed set of authoring conventions:
 
 ## Reciprocal registration
 
-- `reciprocal-registration-update` — a peer's `DelegatedGrantsUpdated` webhook
-  `Update` triggers `updateDelegatedGrants`: find affected authorizations,
-  fan out grant updates and delegation registration, then write
-  `ActivityCompleted`.
+- `reciprocal-registration-update` — a peer's `Update` is written as a
+  `DelegatedGrantsUpdated` activity. The activity Add reaches auth through the
+  durable `DurableWebhookEmitter` and `deliverWebhook` path. `ActivityWebhookHandler`
+  then starts `updateDelegatedGrants` and the serialized
+  `syncReciprocalMirror`; the mirror sync currently runs in parallel.
+  `updateDelegatedGrants` finds affected authorizations, fans out grant updates
+  and delegation registration, then writes `ActivityCompleted`.
+  `improve-grant-replication.md` is the design to run the mirror replication
+  before delegated grant generation. The LikeC4 view does not show the
+  webhook-delivery queue.
 
 ## Invitation
 

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:71daf3ae549f6532ef128f64c55b838f694d90b4115364bf20b68b55ec095ccc",
+  "pageVersion": "sha256:8aa744c15b64e524864cf1cd1d03f1853daa2a78b5c9e70617aaecc482b51c6b",
   "claims": [
     {
       "id": "claim_2dbdd57724204bb28552ccc4b24a6ea5",
       "statement": "ActivityData is a discriminated union of one member per activity RDF class, with an isActivityClass(activity, cls) check, and its definition documents the extension seam for adding a class.",
       "evidence": [
         {
-          "resource": "repo://packages/data-model/src/activities.ts#L495-L529",
+          "resource": "repo://packages/data-model/src/activities.ts#L498-L532",
           "version": "repo-lines-v1:sha256:561e414c375eb91d4641df06503957d40007eb7669f08bd82654e11b8b690aca:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzYzhkZGJkYWViYTYwYWJlMmZjMzJlZThhMjU1OTkxOWM5ZmY1NDcxYjZkMDc1ODJlZDEwMjQ0YzRkYmQwZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxNDI1MmFhZGIyMzNjNzFhNmEyYzFmYjhkODJlNmU4ZDk3YjAzMDA4MWY1M2QzMTI4N2U2OGMzZGUwNmQ1NjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNjFiOTdkZjFlZWI4ZmU3ZjVmYjYwNmU5Y2FkYzQzYTBiNDU4ODljZGVlNzJjZTE4MTAzYjc5NDJmODkyMzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhMDgzMDc0MTAyMjk3MWU0MzAwNTFlYTU0MDgxNThhYzdlMGY2OTA3OThhYjEyYWFhZWYwZWQyNDFlOWEwMTMifQ"
         }
       ]
@@ -17,8 +17,8 @@
       "statement": "ActivityWebhookHandler.handle acts only on Add notifications with an object, forwards to the events bus before dispatch, and routes owner channels to workflow dispatch while non-owner (admin) channels return 200 forwarding-only.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L94-L132",
-          "version": "repo-lines-v1:sha256:d6976c4f012ea4874681770ab2f5577886ecda348e99ae055f4ccfba710cf432:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOTk4ZDA1ZDg1YTE4NTk2ZDc5YTliZmFjYmVmNTFjYmUwMmRhZWVjYjU2NDgwNzAyZTJjNGQ4MmI4ZDI4MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExN2NmMmZhOTBlZTM4OGM1ODVkOGJiZTU3MzQ5OTZkMmY0NGQ4NDFiMjdjZmUyZmI1MjY3ZDQ3ZDNjYzQ5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwYTlmNWVkMzI1NWJjYTRiNDZkYzNmMTNhNDZiODI0MTEzN2RjNzdiMDAxN2Y5OGMzNGU1ODdmMzNlMGYyZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMDM2MmY4ZmNlZjBkMWNhZjc5MjIxZGRiZjM5NTBjZmJmMzAyNzU0ZWFiYjE3ZDM2OWZhNDk1ODBjMDBiNDAifQ"
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L98-L137",
+          "version": "repo-lines-v1:sha256:f37f8cad0869e291608efddc3b86d0f4a647ca8f5322b9faa49735547a1583ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOTk4ZDA1ZDg1YTE4NTk2ZDc5YTliZmFjYmVmNTFjYmUwMmRhZWVjYjU2NDgwNzAyZTJjNGQ4MmI4ZDI4MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExN2NmMmZhOTBlZTM4OGM1ODVkOGJiZTU3MzQ5OTZkMmY0NGQ4NDFiMjdjZmUyZmI1MjY3ZDQ3ZDNjYzQ5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwYTlmNWVkMzI1NWJjYTRiNDZkYzNmMTNhNDZiODI0MTEzN2RjNzdiMDAxN2Y5OGMzNGU1ODdmMzNlMGYyZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMDM2MmY4ZmNlZjBkMWNhZjc5MjIxZGRiZjM5NTBjZmJmMzAyNzU0ZWFiYjE3ZDM2OWZhNDk1ODBjMDBiNDAifQ"
         }
       ]
     },
@@ -27,7 +27,7 @@
       "statement": "The owner-versus-observer decision compares session.registrySet.hasActivityRegistry.id to the channel topic, so an admin subscription forwards but does not run workflows.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L119-L128",
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L124-L133",
           "version": "repo-lines-v1:sha256:7ed144b4c42161b5566aa3158c0774f9ce88c1f649687e8b4015e9dccf19cc80:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkNDMyMGM3OGQ4NmU4NjlkZWVmNTkyZjc4OTg5MTM2ZmMzNWNjOWIxYjBiMzZiODE2NjZmODNhOTFhZmQzMzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlZDNkMzczYTExMWRjY2FjYjZiOThlMTJjNDI1ZmI4NjFlOTdiMDYwMGNiNzhkYjkyYzYzY2Q5MmE1ZDc3NTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1MTgxODc0ZThiNmI2YWEzZTgzYmYyNjE0YmFmOTEwNzkzZDcxNDIyNDg5ZmM2ZWM1NTQ2YjcyOTU2MTk4MjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2OGM0ZTY3NTViMjI5OWExNzdhODUyMzVlZDc3OWRhMGI0OGMxYjEyMTY2YTc1MmZiYzAyYzI0NmY3YmI3YzQifQ"
         }
       ]
@@ -67,12 +67,12 @@
       "statement": "Granting activities embed the term-covered DataAuthorizationData POJOs directly on the activity object at pre-minted ids, so no separate RPC structure crosses the wire.",
       "evidence": [
         {
-          "resource": "repo://packages/data-model/src/activities.ts#L30-L32",
+          "resource": "repo://packages/data-model/src/activities.ts#L31-L33",
           "version": "repo-lines-v1:sha256:0104be93c4fe919b112326b708ae86dd532b18b0db09942aaec3d80623d48a12:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzU2MWExMWE4YTYzNTg0OTVjOTc0NGQyZmQ2ZmViYjI2NTUwYWE0MTRjY2NiZmRlODk4MmExZGFlYzFhNzJmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI3ZDlkMWYxYjVhZjU5MmZkZTlhMTlhMDBmYmQ2NzdlNDIzNWVhN2I3YzM0ZGM5YmRjZjlhMWM5NTEyZTU5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmRlODY3NjM4NDg2ZjRkOWMzNjNkZWE0Y2ViYjkyNTNiY2Y2M2FhZWQzYWFjMjZiYzIwMGFlOWZhOWRiNmRiMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWEwNzIwNWNhOWFmY2VjZmQ0NTY4NjU2ODM0NDlhZjgyNjQxMGM0OGE3NDU5NTMwMzhiYzRhOWNhOWY1YjQwYiJ9"
         },
         {
-          "resource": "repo://packages/data-model/src/activities.ts#L366-L378",
-          "version": "repo-lines-v1:sha256:56d5c16fa7a2e0285df84c69872aa463294104c6c68e80ec665913f31d723097:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMjE0MDhhYWE2NzU0NzVhNzMyMjM3N2YyODljZjcxOTNjYzVjYWY5NDAxNmU3NWM5Y2M1NGRlZjY4ZTE4ZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1ZTM1ZDFiMTVkMjg3ZDAyOWNiNjBhYjZmNjMyODc5ZTlkMmFmNmM1MzBmMWZiYTExNjQyMDEwOGUzNjFlMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2OTJjYjRiMTM4N2M2YWNiYjA1YWY2MmYzNmM5MzkxNjY3YjA3YTU1OGZkOWYzYzZhYmE0Mzc4NDFhNDI2NGUifQ"
+          "resource": "repo://packages/data-model/src/activities.ts#L369-L381",
+          "version": "repo-lines-v1:sha256:f060c97671dcddfe824b7e5afa8c703b4aaac1fb289d40d609f254239636d2c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMjE0MDhhYWE2NzU0NzVhNzMyMjM3N2YyODljZjcxOTNjYzVjYWY5NDAxNmU3NWM5Y2M1NGRlZjY4ZTE4ZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1ZTM1ZDFiMTVkMjg3ZDAyOWNiNjBhYjZmNjMyODc5ZTlkMmFmNmM1MzBmMWZiYTExNjQyMDEwOGUzNjFlMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2OTJjYjRiMTM4N2M2YWNiYjA1YWY2MmYzNmM5MzkxNjY3YjA3YTU1OGZkOWYzYzZhYmE0Mzc4NDFhNDI2NGUifQ"
         }
       ]
     },
@@ -82,7 +82,7 @@
       "evidence": [
         {
           "resource": "repo://packages/components/src/services/Authorization.ts#L370-L397",
-          "version": "repo-lines-v1:sha256:1b8be598f3a54778c4d88f0ece85a727843fdff215ee10cdd4c54c8d0e4bb80b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjNGE3MWE3ODRjMzczNzAyYzZhMGU2Yjk1YjNjMzUxMzE5ZTQxZTc4YjIwMTM2NDA1ODgwNjI4ZTkxZmYxNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2NzM0NGQ5NmMyNmRiZjllZTZhZWZmZjQ0MWJmZWE4YTI4Y2UwN2RhZGJmMDllYmMxMmZiYTZhYzhjNTZiODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZWM0NmUxNjdkMjMwNzI0MzAzZDhkMjIxZjJlMTgwMmM5OThhZTlkNTM5ODM5MGRlZmUwMjdiNGE2NjZlZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3YjYwMzNlNGFiMTI5MTcyNjViYzY1NGE0MThkMmUzMzZhNmY4NjZlNjM2ZTBhYWRkYmEzOTIzN2I1NjAwYzAifQ"
+          "version": "repo-lines-v1:sha256:85bde74a72e8be6926f9ce5c0c2609ebd526fa53e858c67e3fc7f33f8c60bdfb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjNGE3MWE3ODRjMzczNzAyYzZhMGU2Yjk1YjNjMzUxMzE5ZTQxZTc4YjIwMTM2NDA1ODgwNjI4ZTkxZmYxNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2NzM0NGQ5NmMyNmRiZjllZTZhZWZmZjQ0MWJmZWE4YTI4Y2UwN2RhZGJmMDllYmMxMmZiYTZhYzhjNTZiODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZWM0NmUxNjdkMjMwNzI0MzAzZDhkMjIxZjJlMTgwMmM5OThhZTlkNTM5ODM5MGRlZmUwMjdiNGE2NjZlZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3YjYwMzNlNGFiMTI5MTcyNjViYzY1NGE0MThkMmUzMzZhNmY4NjZlNjM2ZTBhYWRkYmEzOTIzN2I1NjAwYzAifQ"
         },
         {
           "resource": "repo://packages/components/src/services/ShareResource.ts#L167-L195",
@@ -109,7 +109,7 @@
       "statement": "The AgentRegistrationAdded activity is dispatched to the establishReciprocal workflow on the reciprocal-registration task queue.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L254-L257",
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L259-L262",
           "version": "repo-lines-v1:sha256:ef69a87d1e9f751d50429629413a16d1e0c5744b8a81f3dce283625103ac620e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJhNDZhNmYyNmUwZjYxM2NmNGE5OTE5ZjMyMmIwMWVlM2M3YzE3NWFlMDU3ZjI0MjJjM2FiZmY1MzQ5ODYyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2RkYWRiZTlmMGI2ZjBjNjkzNzFlZWJmMjg5OGFiOWM2Njc0OTZkMDAzOTVmZWQ1MDc1YTVmZGYzZjhlZTQ3NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ5N2ZmYTA3YjcwOTFjOTE4N2RlYjQxMDJjYmEyY2Q5MjNlYjUwYjY4MDQ5NDc3MTE3ZDk3MWM4YmNhMTlkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTNjMTU3NTA2ZWUwOTE1NTUzNDAyODNjZTU3YjRiZWZjYTVkZGI3NjRjN2ViMWEyYjQwNWExMDg4ZGFiYzFlMCJ9"
         }
       ]
@@ -137,10 +137,92 @@
           "version": "repo-lines-v1:sha256:066dd640e4dafa6ce2b7eb65d47e13ea3f777ac48d1774d5f23e548245d3f8a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyNTI0ZTg3OWY3ZGFmZWJhYTQ1ZjgzZDkxM2JjYjk1Mjk2ZjIyYWYzNmYyZTJhMGFmYmIxNjNlMTJlNWU2ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiMTg3ZjdhN2Q5MDA0NmZhMzgwMjBkMmU5MTJjMjc0YTZlN2JjNDBlYmY2YmNhNTQ3YjQ3ZjFjNjBhMmNhZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczNmVjYmJlZjUwYzE2NWJlNmI1YjE2MjY1YzdlZGFjYzVmZjllMjNiYTM1MzM4NzZhNjk1OTYxNjhiZTcyOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1ZWJiYTU0NTI1MmQ5MjE1NGQ5YWNkZDQzNmQzZTVkMmE0ZjRmYTk4ZTdhNjBjOGQxZGJmZTQ3ZTczNGNhNGUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_47f8fef54f4c4cecaeb0792b76497b12",
+      "statement": "Registry and data webhook delivery goes through DurableWebhookEmitter, which starts deliverWebhook on the webhook-delivery queue; the postWebhook activity retries transient failures with a bounded policy and treats 400, 410, 413, 415, and 422 as non-retryable, while the emitter falls back to a direct POST when enqueueing fails.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L20-L72",
+          "version": "repo-lines-v1:sha256:76601141dc47eff162c06c792fc764daa13271fef8570750bf564598848a8f4c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4MDQ3ZTg5ZGE3NWMyNTVmNmUxNzkxN2Q3OWVlMTljNTI3Y2U4ZTZhMTgxMTQxY2Q3OGM5YzMwMzdiMjVmNzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1NGNmNGExM2FiYjAwODc5NzY1MzMxM2NhZDA4OWQzOTIxYjA4MTg0NDcyZTk5NzI3YTViZWZkNDQ0MGUzZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts#L9-L36",
+          "version": "repo-lines-v1:sha256:2765fb316bd9980cbf1cc55b90c50f854eef90562b80644edc11ce9886ec40b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1Mzc1Y2VmZDdmYzA2Y2ZlYmE2YzlmZjNjNGQ1NzRlNzIyYzZjYWNjNjg3MmIyMjU4MTZjMTY4NDIzYjQ0ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNGExMGUwNjM2NThmNzk2ZmY1YmZlNzg0ZmQ5ZDVlODM0MGNhN2FjMWJlYjRlNjZiNzNjNTMwYmE5MTJhMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0MTY3MGE0ZDkyMjYwZjA0ZTYyMmQ4ZmY1ZWJjYWZiMjQ1MGUxNzQ5YTZiOWE3YmNhZjM3ZWNhYmJkYjY3ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/webhook-delivery.ts#L5-L20",
+          "version": "repo-lines-v1:sha256:0a7ebda252424b30b4634f3d9166c48e3a20674b3571cbd3e13cffda2c658a44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNWFmNGRlZWY0NzMwYjI5MTczYWM3YzA5YTE0ZmVmNjJhNWE5OTE3NTVhNGI5NjhjODU4MTU0MDdlMzBhMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmNTQyYTkyMDk2NWQ1MDI1ZTAxZDUxMmYwMTRjMjE3MzAxOWNmNDYxZmMxZDQ3YWZiOWZlNTVjMDc0NTQzNWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxMWVjYWI3YTM0OWI4NTZjYTdlYTMzZDg4MDgyOTU1OWUyYmE0NWU4ODdlODlhMTg1ZGU2MmNlNGU5ZDkxMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_726a0d9ada60428fab8c89e26d48575f",
+      "statement": "Webhook delivery is at-least-once, so a notification Add can repeat and workflows must tolerate duplicates; the receivers still treat sendTo as a capability URL and do not verify a DPoP token, so the durable path sends no Authorization or DPoP headers.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L80-L105",
+          "version": "repo-lines-v1:sha256:01c2b39bbf314551c0ccc606d793536ffe7ac27188af68c5e5786c3ee575fdc7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0N2JhZTQ1N2FkOTU3NzlkYTRjYWZhMjIzMDEzNmZiMTRjNzM5NzE3MjgzZThkYjcxYzc1ODZlYjlkMWQ3NTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4MDU3OGFmMTcyMzAzMWNhZjU1YWRkMmUxZGM1ZWYxOWIwZjI2NmZjMjc5MTRhODczYzFhZDZmY2Y2ZjQ3ZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0Mjc3YjJjMTJiNjEzNzE4NGRhZDg1YTQ3YjdmZjllODczMjZjNGZlYmEzN2EzMjhlMTYwYmNiZGNlODJhZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2YzE1NmFjOTdmM2QyNTNhNzFkOWJhMzk0MjZhMjFmMzQzYTlmMTlhNGVmMWNlMzgyZTVjM2NlMzczYWQ5Y2QifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L20-L27",
+          "version": "repo-lines-v1:sha256:e607bcb3b7e715628df169911022aeea66d51889d14e01e98a6c93527e982cce:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDgwNDdlODlkYTc1YzI1NWY2ZTE3OTE3ZDc5ZWUxOWM1MjdjZThlNmExODExNDFjZDc4YzljMzAzN2IyNWY3MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzU0Y2Y0YTEzYWJiMDA4Nzk3NjUzMzEzY2FkMDg5ZDM5MjFiMDgxODQ0NzJlOTk3MjdhNWJlZmQ0NDQwZTNkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTc3MjlhZmNjM2U0MDJiYWUwMzMzYzk4MTNjYTc2NWZkOGEzZDMwZTJhODdiOGE2YjE0MjYxYjc3Njg0YTdmMiJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts#L11-L36",
+          "version": "repo-lines-v1:sha256:c10c6a3a5a5ccbed14ce8b8067a34f0803a859bb0e9431aa2fefda947781b421:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNGExMGUwNjM2NThmNzk2ZmY1YmZlNzg0ZmQ5ZDVlODM0MGNhN2FjMWJlYjRlNjZiNzNjNTMwYmE5MTJhMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmNDU3ODljZTI4ZjU2ZDllOTVlZDZlY2UyMDM4ZmQzZDkwM2FhZWFiZTFkYmE0YTVjYzlkMjc1ZGY0YWUyYTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea6d52c597d84f529e9f9dad56a01751",
+      "statement": "The ActivityWebhookHandler returns 410 for an unknown sendTo and 400 for malformed JSON; internal failures remain 5xx.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L97-L111",
+          "version": "repo-lines-v1:sha256:9dc9f03510a5dab4a8ae6f45839b2353e4865f31dc283ae82dd06c497d88b152:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2OGNhYTJhNjE3NzFjYWRlZTA4YzMxZGU1ZDFjZWVhMGQ3NjVkOTcwZGUyZTYxMmY0NzYyMTE0MjIyNDJhYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmOThiYjIyZWVjODg1YmVmYWQxMGVmODc0Mzc1MGUxNGY1ZDAyNGJiZjMxYTI2M2NlNmE1NWY0YWUyMzRiNDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0ODI1N2FlZmZiZjBlODliNTNhZjgzZGVhZTdlZDc5OWJiMjA4NWI2ZTY2YzI1MjVmMzAyMzNkOWY0OWMyOTcifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L31-L51",
+          "version": "repo-lines-v1:sha256:b0212ab87d9bdd332560fb87ca3f56ebb2654ab697305fc9254550658913b915:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2OGNhYTJhNjE3NzFjYWRlZTA4YzMxZGU1ZDFjZWVhMGQ3NjVkOTcwZGUyZTYxMmY0NzYyMTE0MjIyNDJhYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmOThiYjIyZWVjODg1YmVmYWQxMGVmODc0Mzc1MGUxNGY1ZDAyNGJiZjMxYTI2M2NlNmE1NWY0YWUyMzRiNDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyNzBkMWQzNDhlZjc2YWJlMDAxY2M2Mjc2YzIwMTc0NDA3YzcxYmRkYzkxODk1YTJmMzE1NjJiNTVmYmE2Y2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6d806372d6c44b39968ad90a4e0a22fb",
+      "statement": "The DelegatedGrantsUpdated completion is written by updateDelegatedGrants, while syncReciprocalMirror runs in parallel with no completion activity; delegated grant generation reads the local mirror, and improve-grant-replication.md is the plan to replicate it before regeneration.",
+      "evidence": [
+        {
+          "resource": "repo://docs/plans/improve-grant-replication.md#L8-L43",
+          "version": "repo-lines-v1:sha256:25623252f524fc379e73ce50b6f9ce9803790d8b6b0a850c8bd3aa5bcef097a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMDFiY2FiY2U4MjRiYjkyN2FkOGE4YzdjZmY3N2EwMDFhMjQ2MmY0YmFlNTZmNTY0OGM0NjM1MDRiMGU2M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxNDBlNTNmMzlkMTJiNTMwNGJiZjBkZjQzMWM1NWUyYjRmZGUxMDY2YTYzMGFmYTU0NjBkZWQ2MWVhOTcyNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZDZmYzFjMWIwNjA3MmQ3Mzk4OTk2MWRiNDA5ZmIxNjhlYTY5NDgwYTQwMzQ4MjgzODA4NDI1MzNkYzYwMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzM2RlMDc4MTFhZDNmZmZiNmU2MzBhN2NlZGZlMzEyNzczNTc3MWE0NWRjMWMzY2ZmYjA0ZDU0MWFjNDc0NTUifQ"
+        },
+        {
+          "resource": "repo://packages/authorization-agent/src/grant-generation.ts#L198-L246",
+          "version": "repo-lines-v1:sha256:50230e250ddb91980eecf519344d39400d81f2b16673a64600ee0d0580537c54:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkOTFlYjM4MjY1YjAyOGRmM2EwN2RlMzkwNDg1Yzc2N2MxMzU0N2MyMzgzMTc4ZTNiMzgzNDEyYWE4YjZlODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2MTllZjJmNmI0ZWM4OWEwNzI5ZTkzMzk0MTQyNGNkYTg1NTY2M2RhNmY3ZGJlNTgwM2ZhNzZhMjU0MWQ5MTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBmNmNkYmI3ZmRkM2NlNzNlNzQ4MTgzNjMyMDYxMmViNjFmZGQwMTQwOWI0MzNjMmE3ZjIyZjA4ZGZkZTlmNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhY2E3ZGJmOTMxMmIzYjY3MDM0MjM1ZDllNjUwZTk0OGY0NTVhN2FhY2NmNzA4YTVkN2E4NDNjN2VjMzhiNGYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L443-L472",
+          "version": "repo-lines-v1:sha256:869c05f4642626db88d0d005c7e95cfdcaf0f090cce0c4eb7587de66fa46ef07:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlY2UyNmFkOWUwYmRlOWU5ZjdkMzE4ZGNjOGMzNDQzMGNlZjllOTc1M2YwM2ZhN2NiMmJlYTY5MWI0YTg4MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjYTYyNDIyMjFhMzdmYTg0NDY4NTNkNmI2NDFlNjhlNTQxYjJiN2IwNGQyOTYyNTZjYmVlNDE5ZGU0ZmM3M2YifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L248-L288",
+          "version": "repo-lines-v1:sha256:2fee4db5f6ffa6001f515b07f1c75a68723282f86905ca2f25698eeb74c147a0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjZGJmNTk5MmRjZTAxMjIxMGE3NDRiNWNjMmYxMTRlMjNiMmMwZjhhNGVmMGQwZWYxODdlOTBhMGY2YjAzNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzMjRkYmUwMzdkMDk1YmZhNjlmMmI4MjgzNGYxMzc2NTk2Mzk2MjkwNTRmMGI5ZTNmNTFhN2JiMjY5NTBlNzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhNmNjM2E5OTIzOTU4MDBmNTA4ZDFkZTAzMzU4M2MyOWRiZWYxMDVjNDg0OGMzMzYyZmMyYjQ1MTY5OTNjYzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_500edaef20c9475ab1eb569c008eaf7d",
+      "statement": "The reconcileActivities DelegatedGrantsUpdated branch calls updateDelegatedGrants but does not start syncReciprocalMirror.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L462-L472",
+          "version": "repo-lines-v1:sha256:7fcc4b7062178e4e18119d1d8134964aa79d3c962f1538f5fd0731b9714427b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3Y2NjMmJjZjk3YzZmNzc2Yzk5NWE2ZjhmNTk2NTY1MDk1YThkYzdhMjkyNjdkNGRkZTFjYzgxNmFjOTJiMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiMzllMTZkY2I1YTAyODlmMTQ0MGJiMGNmOGQ1MmRiZTU4MWQyYWI2N2IzNmIzNDQwZWRmZjRmMWRmOGFlNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlYjczYjQ0NGNjZmQxNDQ3MjhlMDJiYThkYzM3MmUyNTI0MWNiYzU5NjgxODY2ZTE0NDhkOThiMTVjODRjNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2N2MyZGRhZTUwNjljN2RjMjVhZjZlNDcyY2VmZWEyNWRmNTI3ZTY3NzlmZTcxOGUyNWY1MWQ0OTA3MzQ3MDMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T01:32:20.770Z"
   }
 }

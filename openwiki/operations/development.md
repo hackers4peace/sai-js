@@ -4,6 +4,8 @@ title: Local development environment
 description: The Docker Compose dev stack (auth, registry, data, worker, ui, vuejectron, router, dns, temporal, fuseki, garage, tempo, grafana), wildcard *.docker DNS via dnsmasq, mkcert TLS, Node 26, and the per-pod devbox seed workflow.
 tags: [operations, docker, development, dns, mkcert, devbox]
 sources:
+  - id: openwiki-source-a8a954b9de2bc6c0b4ca5044
+    resource: repo://.dagger/src/index.ts
   - id: openwiki-source-4835a4ac60ade4980988746a
     resource: repo://.env
   - id: openwiki-source-09746815d483fcef938cf59c
@@ -16,12 +18,16 @@ sources:
     resource: repo://Makefile
   - id: openwiki-source-ccdcdbc048f49246514e9069
     resource: repo://mkcert.sh
+  - id: openwiki-source-55f67d07018be4b3c4161eb1
+    resource: repo://packages/components/src/temporal/queues.ts
+  - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
+    resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-8dce2ce795a3d6ab234dc34d
     resource: repo://packages/repl/cmd.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T01:32:20.770Z
 ---
 
 # Local development environment
@@ -36,11 +42,15 @@ The Compose stack runs the full cluster:
 
 - **Solid/OIDC and SAI**: `auth`, `registry`, `data` (three Community Solid
   Server instances), plus `worker` (the Temporal worker) and `ui` (the
-  authorization console); `vuejectron` runs the demo application.
+  authorization console); `vuejectron` runs the demo application. Auth,
+  registry, data, and worker all receive `TEMPORAL_ADDRESS`; registry and data
+  need it because their CSS processes run the durable webhook emitter.
 - **Routing and DNS**: `router` (Traefik) and `dns` (dnsmasq).
 - **Infrastructure**: `postgresql`, `temporal` (plus the one-shot admin-tools
   and create-namespace jobs and `temporal-ui`), `fuseki` (per-pod datasets),
-  `id`, and `garage` (per-data-pod S3 buckets).
+  `id`, and `garage` (per-data-pod S3 buckets). The worker process registers
+  four queues: push, reciprocal registration, grants, and the dedicated
+  `webhook-delivery` queue.
 - **Observability**: `tempo` and `grafana`.
 
 Fuseki replaces the former Oxigraph + nginx pair: it exposes the admin API on
@@ -80,6 +90,11 @@ macOS users add bridge routes with `docker-mac-routes-add.sh`.
   data pod through the admin API (`seedObjectEndpoints`), writes the resulting
   `objectEndpoint`/`sparqlEndpoint` records plus the rest of the KV fixture to
   Postgres, and loads each dataset into Fuseki (`seedFusekiDataset`).
+
+The Dagger test harness binds the `registry` and `data` services to Temporal
+and runs a Temporal-reachability wait before vitest. That gate prevents the
+durable webhook emitter from paying the Temporal connect timeout on the first
+webhook in a test run.
 
 The dev URL→IRI mapping is in `environments/dev/map.json`; the production
 equivalent is the NixOS/Podman deployment documented in
