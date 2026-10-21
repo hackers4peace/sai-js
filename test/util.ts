@@ -44,6 +44,33 @@ export function rpcPayload(request: unknown) {
   ]
 }
 
+const RPC_ENDPOINT = 'https://auth/.sai/api'
+
+/**
+ * Call the RPC endpoint with an account cookie and unwrap the Effect RPC
+ * envelope (asserts HTTP 200 + `Success`, returns `value`) — the same public
+ * contract the UI uses, so grantee-facing assertions go through the product
+ * surface rather than internal reads.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the RPC envelope is untyped at the wire
+export async function rpcCall<T = any>(payload: unknown, cookie: string): Promise<T> {
+  const response = await fetch(RPC_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Cookie: cookie,
+    },
+    body: JSON.stringify(payload),
+  })
+  if (response.status !== 200) throw new Error(`rpc failed with HTTP ${response.status}`)
+  const body = (await response.json()) as { _tag: string; value?: unknown; message?: string }[]
+  const result = body[0]
+  if (result?._tag !== 'Success') {
+    throw new Error(`rpc returned ${result?._tag}: ${result?.message ?? 'no message'}`)
+  }
+  return result.value as T
+}
+
 /**
  * Data grants of a registration, read via the session's SPARQL plane —
  * the SPARQL counterpart of the removed data-model HTTP `getDataGrants`.

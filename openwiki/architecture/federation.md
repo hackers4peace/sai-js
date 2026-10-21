@@ -5,10 +5,8 @@ description: The single-deployment shortcuts the SAI implementation still relies
 tags: [architecture, federation, storage, discovery, org-context, webhooks, mirror]
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T05:20:05.106Z
+    at: 2026-10-21T12:54:01.599Z
 sources:
-  - id: openwiki-source-0287d02e668cd550d1f3ce6d
-    resource: repo://docs/plans/improve-grant-replication.md
   - id: openwiki-source-ab7b36e81b6383f76d2ccee3
     resource: repo://docs/plans/revoke-delegation-chain.md
   - id: openwiki-source-0531e8ebff475ca0a556fc29
@@ -17,14 +15,16 @@ sources:
     resource: repo://packages/authorization-agent/src/sparql.ts
   - id: openwiki-source-0b475136796d3c6391256850
     resource: repo://packages/components/config/overrides/emitter.json
-  - id: openwiki-source-c18acf0c50387f2e5ea026d1
-    resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-06025454564b63e0817ca135
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-99a0f343f48d54d1c1e98086
     resource: repo://packages/components/src/GrantIssuanceHandler.ts
   - id: openwiki-source-c4233c9bce7ccb07d3edd54a
     resource: repo://packages/components/src/services/ReciprocalMirror.ts
+  - id: openwiki-source-a3ebe61b7dbf9a95d1051312
+    resource: repo://packages/components/src/temporal/activities/grants.ts
+  - id: openwiki-source-b407f45a278715ed33b367aa
+    resource: repo://packages/components/src/temporal/activities/reciprocal.ts
   - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
     resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
@@ -33,7 +33,7 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
-generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 ---
 
 # Federation constraints
@@ -51,7 +51,7 @@ must keep working when real federation lands.
 | # | Shortcut | Today | What breaks when servers/stores split |
 | --- | --- | --- | --- |
 | 1 | One shared SPARQL store | Dev/test uses one Fuseki dataset per pod (registry/data) plus a dedicated `id` dataset, resolved through `PodEndpointStore` with **no default fallback**; production Nix still runs one Oxigraph (see [Deployment landscape](deployment-landscape.md) and [Per-pod storage and isolation](storage-isolation.md)). | The old cross-graph grant query (`GRAPH ?g {?s interop:hasStorage <storage>}` over every graph) no longer sees other owners' grants. The per-pod replacement is two lookups: the resource's data-pod dataset for the resource graph (`SaiPermissionsEngine`), and the storage owner's registry-pod dataset for grants (`SaiAuthorizationManager` via `podStore.getOwners` → `registryId(owner)`). |
-| 1a | Reciprocal mirrors | `updateReciprocalMirror` writes the peer's reciprocal registration and the grants it links into the context's own registry-pod dataset. The mirror is **seeded on both invitation legs** — `establishReciprocal` (inviter) and `acceptInvitation` (acceptor) — before their activity completes, and afterwards refreshed **only** by the per-peer delegated-grants consumer (`processDelegatedGrantsUpdated`, workflow id `delegated-grants:<webId>:<peerId>`): each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration`, then regenerates the delegated grants from the fresh mirror, then completes the activity. The mirror is the input to `generateDelegatedDataGrants`, not a UI cache. | The mirror is the **only** source for peer-side registry data once stores are split; freshness is eventually consistent and depends on webhook delivery. A delivery that never arrives, or a pair whose mirror was never written, is repaired only by the drift scan/backfill in [`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md) A1 — the reconcile sweep has no schedule yet. The mirror sync keeps a 5-attempt retry cap, so a permanently unreadable peer leaves the activity `pending` (documented in [`update-deployment.md`](../../docs/plans/update-deployment.md)). Unregister propagation (`deleteReciprocalMirror`) is implemented but still has no caller. |
+| 1a | Reciprocal mirrors | `updateReciprocalMirror` writes the peer's reciprocal registration and the grants it links into the context's own registry-pod dataset. The mirror is **seeded on both invitation legs** — `establishReciprocal` (inviter) and `acceptInvitation` (acceptor) — before their activity completes, and afterwards refreshed **only** by the per-peer delegated-grants consumer (`processDelegatedGrantsUpdated`, workflow id `delegated-grants:<webId>:<peerId>`): each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration`, then regenerates the delegated grants from the fresh mirror, then completes the activity. The mirror is the input to `generateDelegatedDataGrants`, not a UI cache. | The mirror is the **only** source for peer-side registry data once stores are split; freshness is eventually consistent and depends on webhook delivery. A delivery that never arrives, or a pair whose mirror was never written, is repaired only by the drift scan/backfill in [`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md) A1 — the reconcile sweep has no schedule yet. A `404`/`410` on the peer's registration is terminal (the replica is dropped and the activity completes without regenerating); every other failure keeps retrying, and after the 5-attempt cap a permanently unreadable peer leaves the activity `pending` (documented in [`update-deployment.md`](../../docs/plans/update-deployment.md)). Unregister propagation (`deleteReciprocalMirror`) is implemented but still has no caller. |
 | 2 | UAS/storage discovery uses the global `fetch` | `SaiPermissionsEngine` and `AdminPermissionReader` call `discoverAuthorizationAgent(agent, fetch)` with the global fetch; storage-description discovery does the same. | Peers' WebID profiles and storage descriptions must be reachable and DNS-resolvable. Revisit when servers are actually split across hosts. |
 | 3 | Pod/storage ownership is local | `AdminPermissionReader.requestFromAdmin` decides "owner of this storage" via the local `podStore.getOwners(storage.id)`. | A data server must mirror remote org ownership or resolve it on the wire (e.g. via the org's agent-id document / registry set). |
 | 4 | The org's Authorization Agent serves the registry-set link | The org's AA may live on a different server than the admin's; it serves the org's agent-id document and the admin-only `Link: <registrySet>; rel="interop:hasRegistrySet"` header, and runs the org's Activity Registry workflows. The admin's AA performs the UI interactions. | This is the **intended** federation shape for the registry plane: the header carries the authoritative RegistrySet IRI across servers. |
@@ -82,9 +82,23 @@ replica by everything else.
   restore would stay missing forever. Every `DROP` covers both the resource
   graph and its `meta:` twin, so a seeded/restored meta copy cannot shadow the
   fresh graph through the union.
-- **Failure behaviour.** A mirror gap surfaces as `MirrorIncompleteError(<iri>,
-  kind)` from delegated-grant generation instead of a generic framing error; the
-  consumer retries, and the sync's 5-attempt retry cap bounds the retrying.
+- **Failure classification.** `fetchJsonLd` raises a typed `HttpStatusError`
+  (iri + status) and `syncReciprocalMirror` classifies it: a `404`/`410` **on the
+  peer's registration** is terminal — the replica is dropped and the activity is
+  completed **without regenerating** (there is no source left), so a peer that
+  unregistered us cannot block `done` forever. A `404` on a *linked grant* is
+  retryable (the reciprocal document still lists a grant the peer already
+  replaced; the next sync reads the updated link set and the replica is kept).
+  `401`/`403`, `5xx` and network errors retry, and the sync's 5-attempt cap
+  bounds them. A mirror gap inside a successful sync surfaces as
+  `MirrorIncompleteError(<iri>, kind)` from delegated-grant generation instead of
+  a generic framing error.
+- **Grantee-side reads are batched.** Consent and browsing views
+  (`getDescriptions` data owners, `DataRegistry` grant index + instance listing,
+  the social-agent list's `adminOf` and data-owner rows, the org-admin gate) read
+  the replica through `getReciprocalGrants` (link set + all bodies in two
+  queries), `getRegistrationLinks` and `getLinkedGrantOwners` (one query each)
+  instead of framing a registration and every linked grant per peer.
 
 ## Cases the design must keep working
 
@@ -115,6 +129,8 @@ replica by everything else.
   is reused by `reconcileActivities`).
 - Mirror-only delegated-grant generation: one peer index per regeneration and an
   explicit `MirrorIncompleteError` when a reciprocal-linked graph is absent.
+- The terminal-error policy (`404`/`410` on the peer registration ⇒ drop the
+  replica, complete without regenerating) and the batched grantee-side reads.
 - Durable webhook delivery: `DurableWebhookEmitter` on registry/data, the `deliverWebhook` workflow and `postWebhook` activity on the `webhook-delivery` queue, at-least-once retries, and the direct-POST fallback when enqueueing fails.
 - The owner-registry-pod grant lookup and the data-pod resource lookup in the
   permission engine.
@@ -122,12 +138,11 @@ replica by everything else.
 
 Open work remains tracked in
 [`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md)
-(mirror backfill/drift scan, unregister deletion, external admin-endpoint
+(mirror backfill/drift scan, unregister deletion — including the dangling
+reciprocal link a terminal `404`/`410` leaves behind — external admin-endpoint
 discovery, cross-pod tests),
-[`grant-replication-follow-ups.md`](../../docs/plans/grant-replication-follow-ups.md)
-(test reorganisation, grantee-side read optimisations, terminal-error policy —
-including the issuer-side replica that real grant reuse needs, recorded in
-[`check-equivalence.md`](../../docs/plans/check-equivalence.md) §2.1), and
+[`check-equivalence.md`](../../docs/plans/check-equivalence.md) (the issuer-side
+replica that real grant reuse needs, §2.1), and
 [`webhook-subscription-bootstrap.md`](../../docs/plans/webhook-subscription-bootstrap.md)
 (real-deployment channel provisioning). The production cutover is in
 [`update-deployment.md`](../../docs/plans/update-deployment.md).

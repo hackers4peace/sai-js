@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a58a7bd20bea6d8683804a268d063f00c90e8b8e59ef19697eeb1eb76395ff35",
+  "pageVersion": "sha256:8d96efa53484d8446921824f6c766dd8c6fbdf5c563821b21789f80aad581968",
   "claims": [
     {
       "id": "claim_dab50ed8b3754de2ab938bdffc459a8d",
       "statement": "packages/api-messages declares every operation as an S.TaggedRequest with effect Schema payload/success types and failure S.Never, exposes the SaiService Context.Tag interface, and builds the RPC router with RpcRouter.make.",
       "evidence": [
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L1014-L1023",
+          "resource": "repo://packages/api-messages/src/effect.ts#L1015-L1024",
           "version": "repo-lines-v1:sha256:2b4478088a991e2a30430d936b06c8c11d7abeb4f191da5670b4495f9166d88b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0ZGM5YjQ2MzQyNDBkOTVhMTQ3NzQ1MTA4Y2YxNmQwNjk1OTEyMGZlMDI1MDViNWE2MjMzY2ZkMzJlMWUzOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0Yjk1NDg0MDY2Y2RkZjZhODFkYjYwMjNmMzJiYjJkZDQ3YzY1NTMxYzhhZDA4YTVjMmVkZmI5OTI5ZGI0YWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYTgzOTRkYzkwOTI4YjQ2NjkzMDVmNjQyMzNiYzJmMmE2YzIwNWQ0Nzk5YzVmNTI1ZmM2ZGE1MWMyYzQwYTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkZTFlZTM0MjBmNjAzZjFkZTkzYmI5OGJkOGIxMDNkODY3NzJkNmM3OTYzODI0YTEwMDFmZTViY2U3NTBiOTAifQ"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L1124-L1133",
+          "resource": "repo://packages/api-messages/src/effect.ts#L1125-L1134",
           "version": "repo-lines-v1:sha256:7cd174d8e289a6619f18b04f1c36d6899d774bfcc0f29c50e4057768b87de4e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmMjEwOWJjZGU3NGU2NzE3ZGNkNTU1N2E2MDBkODZhZGY0MjI0Yzk4NjM4OTUyM2Q4NzIxZGE1OTU2MDNjOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMDY2ZWQ5ZWQ3YjU0NWRiYzJkNGQxYTFjMDkzYTViZTU4ZDMzYTE2ZWU5ODlmMGUyOGE2M2IyNzU5NGI3MDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1YTljYWY0MzJiYjZiNTkxMGEzOTAxM2ViZTI3ZTFkODQwNWU2ZWE3ZWU0NmJmNTRmMWMxODEyNGJiYzA2YmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4MDdkNDM1OWI4MDgyMWNmMDM2N2E1Mjg5YjViMTJiZGQ4ZjQ0ZDBkNTM1NTY0NzFjMTlmMTU5MjY0ZTY4NzYifQ"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L748-L748",
+          "resource": "repo://packages/api-messages/src/effect.ts#L749-L749",
           "version": "repo-lines-v1:sha256:5be747ba06b51ab6a1577483ef9199e47d5924fc000faa1f9113577b5c77d7c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJlNzQ3YmEwNmI1MWFiNmExNTc3NDgzZWY5MTk5ZTQ3ZDU5MjRmYzAwMGZhYTFmOTExMzU3N2I1Yzc3ZDdjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJlNzQ3YmEwNmI1MWFiNmExNTc3NDgzZWY5MTk5ZTQ3ZDU5MjRmYzAwMGZhYTFmOTExMzU3N2I1Yzc3ZDdjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDk3OTU0MWUzNDdkMTllMWU5OWE0MGQwNWI1OTA2NWRmZmMxODEwNWZhNDAxMmRlZjAwMjg4YWJlZTYyODYwMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjc0MjQzMWE4MmUwZGI4NjZmYjA5YWE0MDBkODRiY2QxNjUzNThlNDc2OTQ3ZDdhZTVjNDE4OTI4YjBjZTU1NSJ9"
         }
       ]
@@ -39,18 +39,18 @@
       "statement": "Context resolution always uses the signed-in user's own AuthorizationAgent session: the personal context resolves to the user's registry set, while an org context requires the isAdminOf check on the org's reciprocal registration before resolving the org registry set.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Context.ts#L67-L95",
+          "resource": "repo://packages/components/src/services/Context.ts#L70-L98",
           "version": "repo-lines-v1:sha256:dc1485dffa51154ccdd08a5652326182c6466a18084bb14ac9706fb93568e326:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWFlZmYwOTJmMzFmMTAxZmJiNTdlNWMzNTkyZTI4MTZlY2QyMjA3Mjg0MjFmNGE3Njc5OTk2NWQ5ODUxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4ZmNjZjQ2OGU4NjNkM2MyYzI5NGU2YTRkMzg5YmI4ZjJlZTYzZGRlYzljZDNkZDJjMzMxYmRhMTQwZGUzMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
     },
     {
       "id": "claim_4f9a77f4879945d4a2810ef758e286a3",
-      "statement": "The org-context admin check is satisfied when the org's reciprocal registration of the user carries a non-empty hasAdminGrant link.",
+      "statement": "The org-context admin check is satisfied when the org's reciprocal registration of the user carries a non-empty hasAdminGrant link, read as a single link query (getRegistrationLinks) on the session's internal endpoint.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Context.ts#L42-L55",
-          "version": "repo-lines-v1:sha256:e0ccf9a9aab7d7768c0ff9c300deb4925996de4c878376e0bb4723867772418c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwOGNiMzVlMzRkNThiZWIzNjA0NDIwODkwZmM2NDkzMGY0YjE4OTcxMzJkZDE5YzQ0YzhlYjM1N2ZlY2M4ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhYzk3MzE0ODQ4ZjAzMDdmNmJhNDI0M2QwYjc1YTEwN2MxZmQ3MGEzY2QwMWY2OTYzOTM4YzlhODNmMzhlYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhY2NkMTg5YzFhYmI5MWM0NzUzZTA3MGMzNzRkYzEyYWI3Yjk4NWU5NGY0NjY5OTI5N2UyM2QxYzMyYWY4OWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2NDNiOTBjMGY5ZmNiMWI0OWU2OTRjNjUzMTgwMGRiNGZkOWQzZDFkYTk2MjE0MWNjMzBlYWVhNzJlNWUyMmMifQ"
+          "resource": "repo://packages/components/src/services/Context.ts#L36-L53",
+          "version": "repo-lines-v1:sha256:74310bae9ce4fed1699134c072184237c8d7ca532467dfa60bd45290007e7115:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExNGNiMWQ5ZWQ1NGY4Njc0NDY2ZjU2MDQ1M2QxODUyNDAxMjViNDQ5ZjFmZTgyMzllYmUxNWRhMWRiMjUyYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxYTQyODQxMDMzZmRhNDIyYmJiMzBlYmE4ODlmNjZmMjAyNDFjNDM1ZGEzNmNkYmVjNzY2NjU4YmM5YWMyZmYifQ"
         }
       ]
     },
@@ -69,11 +69,11 @@
       "statement": "The AuthorizeApp request returns an AuthorizationGrantedMessage as its success type, and the older AccessAuthorization schema (S.Array(RecordedDataAuthorization)) still exists in effect.ts but is no longer referenced by any tagged request.",
       "evidence": [
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L730-L746",
+          "resource": "repo://packages/api-messages/src/effect.ts#L731-L747",
           "version": "repo-lines-v1:sha256:cdeba26200be3bd0e762e91a95997ea597168156533f2521f385b437d65db195:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkZWEyYTQyN2IwOGI5NzJkNTBiYzAyOGRhNmE4YTZhM2MyNjU5ZThhM2QxZGIzYjcwNTcwYTE0YzRiNTRhYzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiN2VjYTMyZjFiNjBmMzlhMTY2YmEzYjJiODRlYTI5NTU0OWUxYjFjMzIyZjljYmIwZWQ0ZGNkZGE4ZjdhYzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNjY3ZTY4MWZkMjVmODE3ODA5NDE3N2Q4YWU2MjM2N2M2NDU4MTk5ZWMxOTExYmEwNTVhODJkMjA3YzI3ZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNTI2NGYxYWI1ODc1Njc5ZWM2M2YxY2E0MTM4MDc2ZTk2Y2MyZWFjNzIwNzEwNjg2NWIyMjMyMjE0NDZlMTQifQ"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L981-L991",
+          "resource": "repo://packages/api-messages/src/effect.ts#L982-L992",
           "version": "repo-lines-v1:sha256:87a06fb8c16217d5ca000d588bc6b174c0667617810f6797366633a759110eb3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3YWM1YTAwNDZhY2FiMWYyNjg1YmQxZTVjYzEwZWYzZDZlNzYwNmE4NmY3YzhmMGMyZDM1YmU1YWI1MThjM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjZTViYjkwNzEwODQxYTAyNTNkZDRkODg5NTA3OGUxMDBmYWRkOTY1YzVmMzVkOWQ1OWZhYmIwNGRkM2Q0OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1ODlmMjViNjQ0Mzk4NDU3MjZmOTM0YjQ2Mzg3Yjk0ODRkNDgyZWJkMWRkMTYwMmQ1MGIwMzIzNWVmN2NjMGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwNGY2NTRmMzVjMmRjNmYzNWZhZWY5NDBjZmZhZWIyOTA0ZGViOTkwZWE4MDA2OWZkMWNjNzBiYWMzOTdiYzQifQ"
         }
       ]
@@ -83,7 +83,7 @@
       "statement": "In an org context the owner identity is the org, not the admin: resolveContext returns webId = the context (org) while userWebId = the signed-in user, so the admin only authenticates and every record is owned by the org.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Context.ts#L67-L95",
+          "resource": "repo://packages/components/src/services/Context.ts#L70-L98",
           "version": "repo-lines-v1:sha256:dc1485dffa51154ccdd08a5652326182c6466a18084bb14ac9706fb93568e326:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWFlZmYwOTJmMzFmMTAxZmJiNTdlNWMzNTkyZTI4MTZlY2QyMjA3Mjg0MjFmNGE3Njc5OTk2NWQ5ODUxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4ZmNjZjQ2OGU4NjNkM2MyYzI5NGU2YTRkMzg5YmI4ZjJlZTYzZGRlYzljZDNkZDJjMzMxYmRhMTQwZGUzMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
@@ -111,11 +111,11 @@
       "statement": "ResolvedContext carries an `endpoints` allowlist (podUrl to endpoint): the personal context reuses the session's sparqlEndpoints and the org context is built from the org's own endpoint-store records.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Context.ts#L20-L34",
+          "resource": "repo://packages/components/src/services/Context.ts#L21-L35",
           "version": "repo-lines-v1:sha256:d1e421b403f41b5710d9bafbc66f61582639765550d126c04b2d69cd0371ae7f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyYTdlZjVlNThjODY4ZTBhMzdkYjllZDQ3NDUxMjYyYzg5ODU1NjZmMTQ2OTFkMTU3NDMwZGYzNWE0YmZhNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyZDBhYTExMDFhMWNhNGYzOTJmYjU1ODRkMTE5NDdjNWY2NWVkNmNkNWRlODZiYzk0MThhYWYxOTY1MTFmYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4ZjczYjdlZjRlYTdlZjVmMmJlMTJjMTIyMTY4NjUxNDk4ZjgyMmRkNDJlZmNmYjkyMDk0ZTkwYmQzNDBiNTcifQ"
         },
         {
-          "resource": "repo://packages/components/src/services/Context.ts#L72-L95",
+          "resource": "repo://packages/components/src/services/Context.ts#L75-L98",
           "version": "repo-lines-v1:sha256:998237217ac677d57b1a95618c8a137dc84992f6d21f13ad870005000af769fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNGJiOGRkMWJkOWNiNzgyNTQ2YzJmODNmYjVmM2ExMjEzYWQ1YzJlMWY1OWJhNmMyOWFhNDQzZmVmYjk2YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0NjUwYzUwNWFhMWJjNWIzYzk4ZWY3YjIxZGRkZWY4NTZlYWM2YzBkNGUwZmQxMzliMjlmOTNiNWQ2MGU4MjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
@@ -133,10 +133,24 @@
           "version": "repo-lines-v1:sha256:69880899e1040e8e9289b8420b178c78877ea9165b379130769b94c9721ce2ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_306b2b636d664500b07bfa501a94c978",
+      "statement": "The admin check is fail-closed: a missing reciprocal link or a replica without the marker yields false instead of an error, because getRegistrationLinks returns the (possibly empty) link set rather than framing the registration.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L374-L396",
+          "version": "repo-lines-v1:sha256:fbebc142874f6bdbb9e52e78a88d764eab776c90b50a6f03bd6c1de921dea411:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNTllMmQ4NjAyNzQ0M2EyNWEwMGFkZTQ0NmU0ZWJlNzQzMzAxZmZmMGMxZDY5ODcxZmZhMzI4MmJiMTJkZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhNWM1NWNlMjhkNjdjNmE0MzRiN2M5M2I2N2VkZDcxNWY5YjIwY2EyMzQ5ZjE3OWJiNzlhY2FmOGFiMGNkM2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliY2VjYzM1ZDNhYTVkZmU5YjNlNDRhY2VkM2E4OTdjNDFhNDIzNDYwNjQwZDY2NmJkNmJhNWYwMTE0MWJlMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhODA2YWNlMGE2NDI3ODA1MGQxZGQ3ODMwZTc0YjI4MzEzMDA2YjZmZjdiNmY0ZTgyN2I0MmIxYjYzN2VjNzIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/Context.ts#L42-L53",
+          "version": "repo-lines-v1:sha256:8cbeb46b176297ab058e89057b150ec59bd75a787d9be809ced0395fedac5c5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzYjE2ZTFlM2U1ZTk0MzNiNDcwN2YzODhlMDEyZmI0ZmY3MjU4MDM0ZmM0NmQ1MjcwOTZhMjQ0ZGRlODJjYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxYTQyODQxMDMzZmRhNDIyYmJiMzBlYmE4ODlmNjZmMjAyNDFjNDM1ZGEzNmNkYmVjNzY2NjU4YmM5YWMyZmYifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T12:54:01.599Z"
   }
 }

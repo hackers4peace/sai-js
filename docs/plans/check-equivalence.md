@@ -105,9 +105,10 @@ Deliberately **not** proposed: on-demand caching inside `checkEquivalence`.
 Reuse decisions must be a pure function of replicated state, otherwise the
 "same input → same grants" property this plan is about cannot be tested.
 
-> Coordination: `grant-replication-follow-ups.md` T8 tracks the same gap from
-> the replication side. If that work lands first with an issuance echo, this plan
-> only needs to consume the replicated bodies.
+> Coordination: the replication side already stopped fetching grant bodies
+> (`getExistingGrants` returns IRIs only), so this plan owns the replica itself.
+> If an issuance echo lands, this plan only needs to consume the replicated
+> bodies.
 
 ## 3. Target: the real comparison
 

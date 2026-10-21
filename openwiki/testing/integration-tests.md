@@ -8,22 +8,32 @@ sources:
     resource: repo://.dagger/src/index.ts
   - id: openwiki-source-6028df227cf0c5e36d839191
     resource: repo://environments/data/registry.trig
+  - id: openwiki-source-8550437c8cb83e5ccf36217b
+    resource: repo://packages/authorization-agent/test/get-reciprocal-grants.test.ts
   - id: openwiki-source-e00ad90a057384916ebd690e
     resource: repo://packages/authorization-agent/test/grant-generation.test.ts
+  - id: openwiki-source-5f0cad26b57bfa61e0dea5c4
+    resource: repo://packages/authorization-agent/test/registration-links.test.ts
   - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
     resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
   - id: openwiki-source-9b409abe21ade962fb73ed30
     resource: repo://packages/components/test/delegated-grants.test.ts
+  - id: openwiki-source-7cee32971e9a12bcc4227ff9
+    resource: repo://packages/components/test/delegation-request.test.ts
   - id: openwiki-source-23684c4afa0b096bb7c0aa5d
     resource: repo://packages/components/test/durable-webhook-emitter.test.ts
   - id: openwiki-source-015d2f3faf2ecfac16eafb8e
     resource: repo://packages/components/test/reciprocal-mirror.test.ts
+  - id: openwiki-source-c4ce6c0448c661ad179c011a
+    resource: repo://packages/components/test/reciprocal-sync.test.ts
   - id: openwiki-source-81028398d49b5413dde247f1
     resource: repo://packages/test-utils/src/fuseki.ts
   - id: openwiki-source-900a2d8c960b090aaf5dc614
     resource: repo://temporal/dynamicconfig/development-sql.yaml
+  - id: openwiki-source-72256836fb28a2c54e04cb89
+    resource: repo://test/federation-mirror.test.ts
   - id: openwiki-source-1bc7541f22daab19be8ab8ba
     resource: repo://test/invitation.test.ts
   - id: openwiki-source-b7181b4d7359d016a13b092d
@@ -36,10 +46,10 @@ sources:
     resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T05:20:05.106Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # Integration test suite
@@ -113,22 +123,37 @@ whose lines are NDJSON of expanded JSON-LD (`test/util.ts` parses each line);
 `openEventsStream` reads the separate `/.sai/events` NDJSON stream. Both must be
 opened *before* the trigger, because neither replays.
 
-`roles.test.ts` and `share.test.ts` read the peer mirror through
-`reciprocalRegistration` and poll it with `waitFor`. The mirror is refreshed by
-the per-peer delegated-grants consumer before it completes the
-`DelegatedGrantsUpdated` activity, so the poll still observes eventual
-consistency (the barrier's registration `Update` can arrive before the mirror
-write). The poll does not write or manually replicate the mirror. Migrating
-these assertions to public RPCs (asserting the grantee-facing result after the
-`done` barrier) is the remaining test-reorganisation work in
-[`grant-replication-follow-ups.md`](../../docs/plans/grant-replication-follow-ups.md).
+The black-box suite does **not** read replica graphs while asserting a product
+outcome. `roles.test.ts` and `share.test.ts` assert instead on the authoritative
+sides: the grantor's own registration links the grant (local), the grant body is
+read with the **data owner's** session (the grantor for source grants, the peer
+owner for delegated ones — where the authoritative copy lives), and the
+grantee-facing result comes from `ListDataRegistries` with the grantee's context
+(the RPC behind the UI's "data of <peer> that I can see" view). That RPC is
+served from the grantee's replica, so it is polled with `waitFor`: replication is
+webhook-driven and can lag the barrier's registration `Update`.
 
 `test/util.ts` also exposes `localMirror(session, peerId)` — it resolves the
 peer's registration of `session.webId` through the reading side's own SPARQL
-plane, so a missing replica fails with `Node <iri> not found in framed output`.
-The invitation suite uses it to assert that both legs of a **runtime-created**
-pair (no seeded relationship) are mirrored once their completion activity is
-done, which is the runtime-replication counterpart to the fixture backfill.
+plane, so a missing replica fails with `Node <iri> not found in framed output` —
+and `rpcCall(payload, cookie)`, which unwraps the Effect RPC envelope (200 +
+`Success`) so assertions go through the public surface.
+
+## The one replica-reading file
+
+`federation-mirror.test.ts` is the only file that reads replica graphs directly,
+because the replication contract ("the grantee's local copy of the peer's
+registration and of every grant linked from it is present and current") has no
+product surface of its own — a missing replica only shows up later as a
+wrong/empty view. It asserts that a seeded pair starts with a complete replica
+(every linked grant body resolves) and that a grant write converges the replica
+to the peer's authoritative link set, with the grant semantics the delegation
+path needs (`hasDataInstance`, `scopeOfGrant`, `accessMode`). No test writes a
+mirror.
+
+The invitation suite additionally asserts both legs of a **runtime-created** pair
+(no seeded relationship) are mirrored once their completion activity is done —
+the runtime counterpart to the fixture backfill.
 
 The Temporal default activity retry policy is `maximumAttempts: 1`, but the
 webhook-delivery and reciprocal workflows set explicit retry policies. The
@@ -153,9 +178,29 @@ the black-box `/test` suite may not.
   replicate → regenerate → complete, the mirror child carrying the
   `reciprocal-registration` task queue and the consumer payload,
   `updateDelegatedGrants` receiving no `activityId`, burst coalescing into one
-  pass, a mid-flight signal re-draining with a fresh mirror, the idle no-op, and
-  the reconcile arm starting the same consumer without completing the activity
-  itself.
+  pass, a mid-flight signal re-draining with a fresh mirror, the idle no-op, the
+  reconcile arm starting the same consumer without completing the activity
+  itself, and the **terminal** case (a `peerGone` mirror result completes the
+  batch with no regeneration).
+- `packages/components/test/reciprocal-sync.test.ts` pins the failure
+  classification of `syncReciprocalMirror` against a stubbed session and service:
+  `404`/`410` **on the reciprocal** drops the replica and returns `peerGone`;
+  a `404` on a *linked grant* stays retryable and keeps the replica;
+  `401`/`403`/`500`/network reject; a registration without a reciprocal link is
+  a no-op.
+- `packages/components/test/delegation-request.test.ts` asserts that
+  `requestDelegations` sends one `interop:AccessRequest` POST for the whole group
+  (returning every assigned IRI), no-ops on an empty group, rejects a mixed
+  `dataOwner` batch, and surfaces a non-200 from the issuance endpoint.
+- `packages/authorization-agent/test/registration-links.test.ts` covers the
+  one-query link reads: `hasAdminGrant` presence from the resource graph and its
+  `meta:` twin, and `getLinkedGrantOwners` returning the distinct owners behind
+  the linked grants (skipping links without bodies).
+- `packages/authorization-agent/test/get-reciprocal-grants.test.ts` pins the
+  batched grantee-side read: the link set from the `meta:` twin plus every body in
+  exactly two queries, links without bodies skipped, the reverse
+  `inheritsFromGrant` edge surfacing as `hasInheritingGrant`, and no body query
+  when nothing is linked.
 - `packages/components/test/reciprocal-mirror.test.ts` mocks
   `fetch-sparql-endpoint` and drives `updateReciprocalMirror` /
   `deleteReciprocalMirror` against a scripted mirror. It asserts the oracle
@@ -173,12 +218,13 @@ the black-box `/test` suite may not.
 
 ## Coverage
 
-Each file verifies one protocol surface: `access-request.test.ts` (need-based
+Each `/test` file verifies one protocol surface: `access-request.test.ts` (need-based
 requests), `account-creation.test.ts` (bootstrap workflow provisioning),
 `admin-events.test.ts` (org-admin activity forwarding),
 `agent-discovery.test.ts` / `discovery.test.ts` (Link-header discovery),
 `agents.test.ts`, `authorization.test.ts` (authorization + approval),
-`delegation-endpoint.test.ts` (issuance/revocation), `invitation.test.ts`
+`delegation-endpoint.test.ts` (issuance/revocation), `federation-mirror.test.ts`
+(replica contents, the only replica-reading file), `invitation.test.ts`
 (personal + org invitation), `key-scoping.test.ts`,
 `org-context.test.ts` (admin org context + proxy/sparql-admin),
 `personal-admin.test.ts` (AddAdmin/RemoveAdmin + ACR),

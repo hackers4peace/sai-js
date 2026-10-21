@@ -6,6 +6,8 @@ tags: [rpc, effect, services, architecture, typescript]
 sources:
   - id: openwiki-source-39263cf4b989bfbe674c72c0
     resource: repo://packages/api-messages/src/effect.ts
+  - id: openwiki-source-81f61b66ae2ead4432d4358a
+    resource: repo://packages/authorization-agent/src/sparql.ts
   - id: openwiki-source-92862eeddb750415b0a0a89f
     resource: repo://packages/components/src/ApiHandler.ts
   - id: openwiki-source-3e8f48f62968e08a27cd3572
@@ -14,10 +16,10 @@ sources:
     resource: repo://packages/components/src/services/Context.ts
   - id: openwiki-source-20e9ce588a1e0e4469c2c993
     resource: repo://packages/components/src/services/RoleRegistry.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # RPC contract and service layer
@@ -96,6 +98,12 @@ registry set. Otherwise `isAdminOf` must pass (the org's reciprocal
 registration of the user carries a non-empty `hasAdminGrant`), after which the
 org's registry set is resolved through the org's agent-id document and writes
 are owned by `ctx.webId` as the org. Failure throws `ContextError`.
+
+The admin check is a single link query over the mirrored reciprocal
+(`getRegistrationLinks(..., hasAdminGrant)` on the session's internal endpoint),
+not a framed registration read — and it is fail-closed: a registration without a
+reciprocal link or a replica that is missing/absent reads as "not an admin"
+rather than erroring.
 
 In an org context the **owner identity is the org** (not the admin): every
 record is written with the org as data owner / `grantedBy` / ACR

@@ -1,9 +1,10 @@
 import {
   type AuthorizationAgent,
-  getSocialAgentRegistration,
+  getRegistrationLinks,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import { type RegistrySetData, getAdminGrantIris } from '@janeirodigital/interop-data-model'
+import type { RegistrySetData } from '@janeirodigital/interop-data-model'
+import { INTEROP } from '@janeirodigital/interop-utils'
 
 import type { PodEndpointStore } from '../PodEndpointStore.js'
 
@@ -42,13 +43,15 @@ export type ResolvedContext = {
 async function isAdminOf(userSession: AuthorizationAgent, orgWebId: string): Promise<boolean> {
   const registration = await userSession.findSocialAgentRegistration(orgWebId)
   if (!registration?.reciprocalRegistration) return false
-  // the reciprocal via the shared SPARQL query (same as the service layer's
-  // org-context reads) over the session's internal endpoint
-  const reciprocal = await getSocialAgentRegistration(
+  // only the link presence matters — one link query over the mirrored reciprocal
+  // on the session's internal endpoint, no registration framing
+  // (see openwiki/architecture/federation.md)
+  const markers = await getRegistrationLinks(
     localSparqlTransport(userSession.sparqlEndpoint),
-    registration.reciprocalRegistration
+    registration.reciprocalRegistration,
+    INTEROP.hasAdminGrant
   )
-  return getAdminGrantIris(reciprocal).length > 0
+  return markers.length > 0
 }
 
 /**

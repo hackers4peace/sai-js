@@ -6,8 +6,6 @@ tags: [likec4, sequences, flows, temporal, discovery]
 sources:
   - id: openwiki-source-f94e6df9b22c5d9088de9576
     resource: repo://docs/temporal.c4
-  - id: openwiki-source-c18acf0c50387f2e5ea026d1
-    resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-06025454564b63e0817ca135
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-b51f04210bf90c2ec8824400
@@ -16,10 +14,10 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-fabda8691f79a477b70b0c57
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
-generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T05:20:05.106Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # Sequence and discovery flows
@@ -83,8 +81,10 @@ The dynamic views follow a fixed set of authoring conventions:
   (workflow id `delegated-grants:<webId>:<peerId>`); each drain runs the
   `syncReciprocalMirror` child workflow on `reciprocal-registration` **first**,
   then `updateDelegatedGrants` (finding the affected authorizations, fanning out
-  grant updates and delegation registration), then writes the completion — so
-  `done` means the mirror is current.
+  grant updates and a **batched** delegation request per data owner), then
+  writes the completion — so `done` means the mirror is current. If the peer
+  deleted its registration of us (`404`/`410`), the drain skips the regeneration
+  and completes anyway (terminal).
   **Model drift:** `docs/temporal.c4` still draws the previous shape (a direct
   `start updateDelegatedGrants workflow` plus a parallel, serialized mirror
   sync); the view needs updating the next time the model is touched. The LikeC4

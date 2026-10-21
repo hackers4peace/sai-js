@@ -362,8 +362,27 @@ export async function toNQuads(doc: Record<string, unknown>, base?: string): Pro
 }
 
 /**
+ * A non-2xx response from a JSON-LD GET. Carries the status so callers can
+ * classify the failure — e.g. the mirror sync treats `404`/`410` on a peer's
+ * registration as "peer gone" (terminal) while everything else retries.
+ * The message is unchanged (`failed to fetch <iri>: <status>`) so existing
+ * string assertions and logs keep reading the same.
+ */
+export class HttpStatusError extends Error {
+  public readonly iri: string
+  public readonly status: number
+
+  public constructor(iri: string, status: number) {
+    super(`failed to fetch ${iri}: ${status}`)
+    this.name = 'HttpStatusError'
+    this.iri = iri
+    this.status = status
+  }
+}
+
+/**
  * Raw JSON-LD GET — returns the parsed document (expanded, compacted, or
- * flattened form). Throws if the request fails.
+ * flattened form). Throws `HttpStatusError` when the response is not ok.
  *
  * Tracing: emits a `fetchJsonLd` span carrying the RAW wire document
  * (`sai.jsonld.raw` — no envelope). The auto HTTP client span (undici/http
@@ -377,7 +396,7 @@ export async function fetchJsonLd(iri: string, fetch: WhatwgFetch): Promise<unkn
         headers: { Accept: 'application/ld+json' },
       })
       if (!response.ok) {
-        throw new Error(`failed to fetch ${iri}: ${response.status}`)
+        throw new HttpStatusError(iri, response.status)
       }
       const doc: unknown = await response.json()
       if (span.isRecording()) span.setAttribute('sai.jsonld.raw', JSON.stringify(doc))

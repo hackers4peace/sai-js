@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:78f53ab851cb706dbb62fa19776a2db4c8508c5519b481428048f6e26240ced4",
+  "pageVersion": "sha256:b6f6df8dbb0ad5edaf55791c3aeb3174f7d5243e3e94a24727d9e63a2035c6d1",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
@@ -49,7 +49,7 @@
       "statement": "waitForQuiescence waits until none of the webIds has pending activities for two consecutive polls, treating a transient registry 500 as unsettled.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L243-L285",
+          "resource": "repo://test/util.ts#L270-L312",
           "version": "repo-lines-v1:sha256:aa9986ea32cc81773e7bac1da8b400cdfd6f7da59d81eb222810f87b3a0fa6ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDg2YzlkYzEwY2U0NjZkNDAwYzU3ZjhiNjA2YWRlZmEyZTQwOGJjNzY0NTE3NzNmZDJjNDRlMzM4MzMxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGU2NzRmMzZhMzYwMmQ0NzY2ZGE3M2RmNjJkNzFmZjljM2JlYzAwMGJmODVkMGQ1YjAzMjlhMTdhOGJhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyMDU3ZjZmOGI1YWUzYTEwMzIxYzMwMTRhMTE0YWM0ZGUxMmE5NWY0YmRmZGRkZTA1M2VmZTVmOWM2NmY1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMzg3YjUwYjg4ZTVhZmM3YmJkMjdhNGMxYjJiN2M1NjVkMWY2ODkzM2Q2NGY5MWQwOTk2NzE1MDgxZWFmMjMifQ"
         }
       ]
@@ -59,7 +59,7 @@
       "statement": "awaitGrantCompletion is the listen-first barrier: it opens the registration notification stream, runs one RPC trigger, awaits the registration Update, then waits for quiescence because the Update fires mid-chain before the parent workflow's completion tail.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L288-L302",
+          "resource": "repo://test/util.ts#L315-L329",
           "version": "repo-lines-v1:sha256:e1b08cd5303499cda169cda607ac490afbec9d413863eacc4510c952247dff78:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZGY5NGI2Zjk1M2M0YmViYzYzMTJjMGVkNDFiYTY3ZjkwMGRjYWU0ZDlhMmMyOTIwZTliYzc5NzUxYWU0NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2NTI2NjNhZDlkNTY0NjJmZmVjZTBhOTVhMGRjYzU2ZWZmY2JjYzY0NjJjMWQzMzI4MzJjMGIwY2IyNTc0MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1MzljZjY4NWU5OGIzZGQyZGY2YTZhZTk2NjJhNWRmNWQ0YjJjODM3ZjQ2ZWM1OGU3NmMxNDUxMzAzODBiZTUifQ"
         }
       ]
@@ -83,7 +83,7 @@
           "version": "repo-lines-v1:sha256:a2ee1684a905a6d5bc61ce67c14fc6ec3878f676f02efbdc801d22ee1519c9fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRlNzEzMTU2ZGZiOWFiZjQ3N2Y3M2FkZmFkYTViNjcyNjRmZmJlODRiZWU1N2QxMWUzZGIzOTc4NGNiZjNjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2IxMmVmOWEwMmJiYTE3NjA5Mzg2ZWM3MTZiODVkNDI0NDQwZmEyNDM3M2EwMzMxOGRhOWFkMzA4OGZmY2FkYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjdhZTAyMTYyZGE3YWVmNmM1MDczMzAyYmRjNzlmZjY4Mzk2MWMzYjE2NzA4ZTBhN2Y0ODJhZGJmOWI4ZGZlYiJ9"
         },
         {
-          "resource": "repo://test/util.ts#L91-L107",
+          "resource": "repo://test/util.ts#L118-L134",
           "version": "repo-lines-v1:sha256:8003026d029aedae7fab49399e328798d5dfccb49a4f10881ce052727f9fd07b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZjZkMzBjYzc5NDMyZjYyNTEwZmU2OTIxNjY4MzY2YzRhYWZkMjE4NTliZTg0NjNlZmYzMDM1OTQwZThlYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3MjBkNWEzNGQwMjQ2ZTdmNzc4NTJiNjM0Y2UzN2EyZGI2N2I1MzhjMjE3OTJjNjk0NGEzZWFmOGU4NDZlZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1NGZhNWRlZjBlOWY2ZGM5YTQ0ZDlkNjcwMTQ5OWIzZWViYjNlNzc4NmExYjE1ZWE5MWMyZjA0YzE5ZGRmNTMifQ"
         }
       ]
@@ -104,15 +104,15 @@
     },
     {
       "id": "claim_10c3b5de630941308354086a8569600b",
-      "statement": "roles.test.ts and share.test.ts load the peer mirror through reciprocalRegistration and poll it with waitFor because the mirror refresh is a separate webhook-triggered workflow that can lag the grantor registration update.",
+      "statement": "roles.test.ts and share.test.ts do not read replica graphs: they assert the grantor's registration link, the grant body read with the data owner's session, and the grantee-facing ListDataRegistries result, polling the RPC because replication is webhook-driven.",
       "evidence": [
         {
-          "resource": "repo://test/roles.test.ts#L39-L62",
-          "version": "repo-lines-v1:sha256:fafcebeed955d97c2f193f732b086858f37636c3421de22a221869ea795cca59:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2Zjc2NGRjNGFiYmYzNjI3NGI3MzY3NzkxNWIxMjk5Zjc1NDZhZWNiM2E1ZmY3ZWM2Y2I1ZWZhMTZmZjQ5ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyOWE2Y2E2NTQyNDMxNDk5Yzg3YzM0MTIzOWIzNGVkYjQ0N2EyMTkxZDQ0NjJjMjVjODQ0NThkZjkxYjQ1MWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI0NTgwZDA2NmFkYWUwYWIwODdiZmZlNjlmODJhMzZlNGZlZjA3MDVhZGY4ZDRhNGYwMTNiNmRiMmFjOWRkMDEifQ"
+          "resource": "repo://test/roles.test.ts#L32-L95",
+          "version": "repo-lines-v1:sha256:8f910c0783ba411188dac137944b1f1555afebe56eab2d91eb044e0deddf82cd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2OWRlMTE2YWExOTRlZDE0Y2ZhNzE4OGEwYmYyMGE4ZWU5YjA2OGM0ZmZjOWQ1M2M5MGVhZjU1ZTI5NTM5MDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNGUyMWIxOWU5YjBhN2JlODI1MjE0NTFhZjZmMWFhNjQxYWYyYTJkOGJmMmNmZmI0MGFkMDlhZTgwZTZlODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlYmQ2NDUwYWExZTU5NGVhZDQ5OWRjMjk5ZDNmMDdlOTdlYjlhYzFmODQxMTIyZTk5MzAwMTg0YTM3OWUxM2MifQ"
         },
         {
-          "resource": "repo://test/share.test.ts#L67-L88",
-          "version": "repo-lines-v1:sha256:c944e7a4f438a01f0ae44d4b936f8e8ce35c8f828eba5df2c7f82f6810571fe5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZWJjYmMzMDJlZTRlZWRkMWEyYTU0YTlhYjRjYmFmM2U3OGEzZWJmMmM2ZWU5MjhiMjc4NTlhYWZhODdlY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkMGJjNmIzNDE3MzkxZDM3Yjg5YzEwZjViY2ZkYzkwODAxYTY0NDkwMzBhZTgzNzY3ODU5NzczMGY3NjEwZTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg0ZTVhZDgyMzk4YjI1N2RlMjZlMGYyNDQ4NmI5NTI0MGU3ZDk2M2RiYzMyYWYzOWE4YTY4YTA1OWYzOWQ4YzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlYjEwOTk5ZGJkNGExN2FhMjk4YzQ1MjcxZWJhMDEyMDk5MjU0MjE5YmQ0NTlhMDg4MmQzZjE0ZjFjY2RiODQifQ"
+          "resource": "repo://test/share.test.ts#L63-L100",
+          "version": "repo-lines-v1:sha256:49454ddedbadd2b0690eebb238a22bf39efe29b82a24e5b96b5931e38dc9c107:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1ZGJiMDI0MjEwN2E5MGQ0NmMwZTRjOWEyZjA0MzU3ZjM3OWMxMDAyZmM3YmQ5NDUzY2YzOTdiMDlmNzNmMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjMTI4Mzg1ZTI3M2Q2YmE1NzdjZTA1NzMzMDYyNmY4NzM5Y2U0NGI2ZGNjNTFiODkyOTRkMDU1YjY3ZmQ0NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
         }
       ]
     },
@@ -163,7 +163,7 @@
           "version": "repo-lines-v1:sha256:e7a4e0f7ff66eb84013f61c1cccbec7a179034ee0244ac61107d86ee715c6c39:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNTVhMjY3YjVhZGNiOTNiYjRiNTc5OTFhMjg0YzdlNzg4ZWEzZjg5ZGI3MjYxYjE2ZGY1ZDlkN2EzYzhmNDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1Njc0NWQ3MTIwYWJkODM2YWIzNzc0ZGQxOTM1N2MwOTRkZjgyNWExY2VjMWYyMDI4ZmZmZmI2ODA0ZDdlNjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhZDViYTE0ODUxMjUzMDc3OTMzYTdmMDgyMDMxNjNmZDRmOWUxNTdhNjlmNmE0MDg1NWVkN2QzMjVkZTQxMDUifQ"
         },
         {
-          "resource": "repo://test/util.ts#L69-L83",
+          "resource": "repo://test/util.ts#L96-L110",
           "version": "repo-lines-v1:sha256:3e378041f78c53deece58a0fcd3cab47f90246f803c89ab39e6a13f065776667:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MDhlM2Y4NGUyODJlNTZjNmQ0MWExMTliZDQ2MzUyNzk1OWU1ODkyMGQ5YWQ5MDc4NjQyNWYyYjVhOWFlYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0ZWQ3OTY3YWY4N2NkMDczZDVjNmI1M2Q5NmYyYzI5ZTRiYzZmMDVmZmQyZWZjZjFkNzRiNGE3MWEyMTQwNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4YzYzOTg3Yjk3MTZmOGYxNzZhNmY0MTA4MzhmOTI0MTJlYzczZDJjMzU3MTI1MmRjN2FhMzlkYWZjMjIxYzUifQ"
         }
       ]
@@ -180,11 +180,11 @@
     },
     {
       "id": "claim_d224d55d644143959a789c767f2649c0",
-      "statement": "delegated-grants.test.ts mocks @temporalio/workflow and asserts the consumer's ordered contract (replicate, regenerate, complete), burst coalescing, mid-flight re-drain with a fresh mirror, the idle no-op, and the reconcile arm starting the same consumer without completing the activity itself.",
+      "statement": "delegated-grants.test.ts mocks @temporalio/workflow and asserts the consumer's ordered contract (replicate, regenerate, complete), burst coalescing, mid-flight re-drain with a fresh mirror, the idle no-op, the peer-gone case completing without regeneration, and the reconcile arm starting the same consumer without completing the activity itself.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/delegated-grants.test.ts#L20-L213",
-          "version": "repo-lines-v1:sha256:6e81302b1c47d9d4663988020ae6dafa432561c804e4fc6804bf909d887e2038:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTUwZjZlZjkxOTM1OTgyMzg2M2U4NzVkN2Q0YmM4Zjc1MWQxZDFkNmZlOWExZDRjOTA0YzFkMmYwNjM4YmQ1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5YzFlNGNiMTZmYjAxYTBlNWFjMGNjZDhhYjU1YWUzOWI5M2JmY2IzOTBhYWQ5ZjY4ZTEzZmUxNDZkZTE3MjI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/delegated-grants.test.ts#L20-L234",
+          "version": "repo-lines-v1:sha256:24dd9a65c1ccc834dd7cb1931100a2e27a5e3c0f2e8346858bd060a68c184b02:eyJzZWxlY3RlZExpbmVDb3VudCI6MjE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTUwZjZlZjkxOTM1OTgyMzg2M2U4NzVkN2Q0YmM4Zjc1MWQxZDFkNmZlOWExZDRjOTA0YzFkMmYwNjM4YmQ1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5YzFlNGNiMTZmYjAxYTBlNWFjMGNjZDhhYjU1YWUzOWI5M2JmY2IzOTBhYWQ5ZjY4ZTEzZmUxNDZkZTE3MjI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -194,7 +194,7 @@
       "evidence": [
         {
           "resource": "repo://packages/components/test/reciprocal-mirror.test.ts#L1-L175",
-          "version": "repo-lines-v1:sha256:1e55da4beaf5b2c1f34ef10cfa4bd6a1b64d5913281a7f3365331b31b378da0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTc1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NzExMGMyY2YyYjBlNmZhNjAzNTg4NGEyMWFhY2Y2YWMyOTRhYmU4OTkzNzlkMTNiYTkzYWNiNTU3ZTI2ZDNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "version": "repo-lines-v1:sha256:a826be321b6b2f212f292b64725f57097a7aded36ca493d9be9ddface140a2b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTc1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NzExMGMyY2YyYjBlNmZhNjAzNTg4NGEyMWFhY2Y2YWMyOTRhYmU4OTkzNzlkMTNiYTkzYWNiNTU3ZTI2ZDNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -207,10 +207,68 @@
           "version": "repo-lines-v1:sha256:6f059a83ed67791a9f597d3929d18c48e453c023c81088db783cd5792ffd629e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTdiNWI1YjQ4N2MyMGRiZmNlZWQ5ZjZlNDZmOTVkM2E0ZWJjMDAyMGRjYTMwNDFkZmE4Y2NlYjA1MjRmMWQ4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjNjNkNTM1Y2UzODA2M2Q2YjRjNTFkOGMzODZhN2Y5YjNlNTgwYTE0YTEwYzA3YjE5OGRmYWYxOWM5M2EzYmZlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMjc2YTgyNmM0YjMyZmE4NmE0NmM4YzlhZjFlOTE2YjI3NjdlMGQxMGRlZDE3OTkzY2U5ZTEyMDQ4NmEzOTM0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhZDkyODEzMjg4MDkzYzM1YTZkNWEzODI0MDc0ODNmOWRkYmU3YWU5ZDFmM2RmODgyMDVmNGUzM2VkMjMzNzQ0In0"
         }
       ]
+    },
+    {
+      "id": "claim_e3099cad08ff4f3ba86169e804d4dc8e",
+      "statement": "federation-mirror.test.ts is the only black-box file that reads replica graphs: it asserts a seeded pair starts with a complete replica (every linked grant body resolves) and that a grant write converges the replica to the peer's authoritative link set with the grant semantics the delegation path needs.",
+      "evidence": [
+        {
+          "resource": "repo://test/federation-mirror.test.ts",
+          "version": "repo-file-v1:sha256:7a5d012d0723dcc9323f144f2c5505b884aa161bb7d59fa1f35c5825dc158f94"
+        }
+      ]
+    },
+    {
+      "id": "claim_27b5adf568c342fcb9b8d5158102dda9",
+      "statement": "test/util.ts provides the shared black-box helpers rpcCall (unwraps the Effect RPC envelope: HTTP 200 plus Success) and localMirror (resolves the peer's registration of session.webId through the reading side's own SPARQL plane, so a missing replica fails loudly).",
+      "evidence": [
+        {
+          "resource": "repo://test/util.ts#L41-L72",
+          "version": "repo-lines-v1:sha256:c1414dbe1257e50d39d4ea321cdb40b41f9359e5b563a6afde7da035bcf6ed64:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1ZmQ4MGIwZmQwMTcxM2U0MTQ5Zjk2NmZjN2ViOTRiN2U4ZDk4MmVjNzU0ZTBmZTZiOWQ0NDRmNDdjYjUyMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlMTc5ZmQxYzFlNzkzODY0NmNlZDBjOTE1ZjRlMTQzNjIxY2UyM2VkNjNmMDA5MWZkMDc5ZDllNTJmNWY1YzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjZDExNWE4YTk4ZGQwZTk4YTM0ODRmOGQzOTczOTVhMjhmZDAxNTIwZTkxMmMxNDk3N2Q4ZDczNjZmMmFlOTUifQ"
+        },
+        {
+          "resource": "repo://test/util.ts#L69-L83",
+          "version": "repo-lines-v1:sha256:a627b3336d1c1a22b56e122e425bbd6bded78379404a01926a29f5e42f1d354a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllYzY4NDExMGQyYTYwOWNlY2ZkZjhmZDIwMzljYjM4MTFhZWZiYWVhNjIzYjg2YTMwODcyMmI3NDYwZWEzZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5OGRkMGUxYjlkMDllNTUxZDJlM2I5OGRjNWQzNzQ2MzY3MDZlYTdiMWZhNWE2MzRiZTA5MDRlY2I0ZGQ5YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiMjBmYWRjYWUyOGY1ZDJlY2YwZjYyMjY4ZDJiM2I3ZWQ5MjJjOGEyNDI3ZGYxZjM0NGVhZTljZDljYmE1Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d9f05ffb752f475a98d98a1e0bbcda37",
+      "statement": "reciprocal-sync.test.ts pins the mirror sync's failure classification: 404/410 on the reciprocal drops the replica and reports peerGone, a 404 on a linked grant stays retryable and keeps the replica, 401/403/500 and network errors reject, and a registration without a reciprocal link is a no-op.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/reciprocal-sync.test.ts#L1-L116",
+          "version": "repo-lines-v1:sha256:81487d2ca4c4132e1bea570b198d61eddfd2bb5de3be0d068d9637dd4568a2c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjEwM2U1NDIxMDYyOTRkMmNjZDA1NmFhYzRjZDhjMmVmZGQ4M2IwNzdhMzllYzViNWI0M2U4MzA5ZTE0ODEwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_127d143ace2e45c1af219cc30d403ec0",
+      "statement": "delegation-request.test.ts asserts requestDelegations sends one AccessRequest POST for the whole group and returns every assigned IRI, no-ops on an empty group, rejects a mixed dataOwner batch, and surfaces a non-200 response.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/delegation-request.test.ts#L1-L99",
+          "version": "repo-lines-v1:sha256:0657e4e1a85a8f8913ab36f82cac3f423b068ef24f9e181534d7c161409f0117:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4YzlkNjhjODY3ODE1MWRlODQ4NTIzZmU3MDVlMzZlMTcwN2Y3NTlkMTJhMDIxMTlkY2QzMzkwOWQ2MTk4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b0d24262d44947798f6f151d096937d5",
+      "statement": "registration-links.test.ts and get-reciprocal-grants.test.ts pin the batched replica reads: one query for link presence or distinct grant owners, and two queries for the reciprocal's full grant list with bodies skipped when absent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/test/get-reciprocal-grants.test.ts#L1-L152",
+          "version": "repo-lines-v1:sha256:7afe596b4afb3246a710c0801fa2cd7f85f9f26213672c387da00004d99faac3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmN2I1NjViZjQ2NjY1ZWVmZWJhYmZlNDUzZGU3OGFiNTJiYjViM2IzOGY4OWJjZDhiOTBjNjE5MjEwNzliYTM3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://packages/authorization-agent/test/registration-links.test.ts#L1-L124",
+          "version": "repo-lines-v1:sha256:3d2ac1d7b277122c3dfd3ba6d0cada1c66199dfd39e8e30d3611ada4c9b1387c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyOGM5ZDY4Yzg2NzgxNTFkZTg0ODUyM2ZlNzA1ZTM2ZTE3MDdmNzU5ZDEyYTAyMTE5ZGNkMzM5MDlkNjE5ODE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T05:20:05.106Z"
+    "at": "2026-10-21T12:54:01.599Z"
   }
 }

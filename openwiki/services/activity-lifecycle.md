@@ -40,10 +40,10 @@ sources:
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T05:20:05.106Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # Activity outbox and events pipeline
@@ -147,7 +147,7 @@ dispatches on the class:
 | `NeedBasedAccessRequestReceived` | `GrantIssuanceHandler` (owner's issuance endpoint) | `processNeedBasedAccessRequestReceived` on `create-grants` — PUTs the immutable AccessRequest |
 | `AccessRequestGranted` | `detectGrantedRequests` (child of `updateDelegatedGrants`) | **terminal** — no workflow/completion |
 | `AccessRequestArchived` | `Authorization.archiveAccessRequest` | **terminal** — no workflow/completion |
-| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | per-peer `processDelegatedGrantsUpdated` consumer on `create-grants` (start-or-signal, workflow id `delegated-grants:<webId>:<peerId>`). Each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration` first, then `updateDelegatedGrants`, then writes the completions. |
+| `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | per-peer `processDelegatedGrantsUpdated` consumer on `create-grants` (start-or-signal, workflow id `delegated-grants:<webId>:<peerId>`). Each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration` first, then `updateDelegatedGrants`, then writes the completions. A **terminal** sync (`404`/`410` on the peer's registration) skips the regeneration and still completes — a peer that unregistered us must not stay `pending` forever. |
 | `ActivityCompleted` | Temporal completions | forwarding only (`done`); never dispatches |
 | `grantsRevoked` (retired) | none | wiring retired by the activity-first cleanup; revocation now goes through the issuance boundary and workflows |
 
@@ -219,12 +219,16 @@ For `DelegatedGrantsUpdated`, **`done` means the peer mirror is current**: the
 completion is written by the per-peer consumer only after its drain replicated
 the mirror (`syncReciprocalMirror`) *and* regenerated the delegated grants, so
 `generateDelegatedDataGrants` never reads a mirror that predates the delivery.
-The correlate is that the consumer's mirror step keeps `syncReciprocalMirror`'s
-five-attempt retry cap: a peer that stays unreadable leaves the activity
-`pending` (visible, not stale-done), and only the reconcile sweep — still
-unscheduled — would re-drive it. Grants where the context is the `grantedBy`
-rather than the grantee are not part of this mirror (the data owner holds the
-authoritative copies); see
+The one exception is the terminal case: when the sync reports that the peer
+deleted its registration of us (`404`/`410`), the consumer completes the batch
+**without regenerating** — there is no source left to regenerate from, and
+retrying into the cap would leave the activity `pending` forever. Every other
+failure retries, and the mirror step keeps `syncReciprocalMirror`'s five-attempt
+retry cap (a permanently unreadable or `403` peer therefore stays `pending`,
+visible rather than stale-done; only the reconcile sweep — still unscheduled —
+would re-drive it). Grants where the context is the `grantedBy` rather than the
+grantee are not part of this mirror (the data owner holds the authoritative
+copies); see
 [Federation constraints](../architecture/federation.md#the-reciprocal-mirror-in-detail).
 
 ## Events bus and stream

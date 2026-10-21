@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:19a0a7d573997f4d7ffe1e0bab5a6e8d4854d20033a079a292b6a85c494d8ef9",
+  "pageVersion": "sha256:e2f0f43b488198cc8b604eff7c505bf811a5ed2e2aded9031fcb31a2256d1040",
   "claims": [
     {
       "id": "claim_c0d040529023490a8a016339ae020d13",
@@ -72,23 +72,23 @@
     },
     {
       "id": "claim_6dcc6b4d5b864ce89ea849a03f17033b",
-      "statement": "The reciprocal-registration-update runtime path writes a DelegatedGrantsUpdated activity, delivers its Add through the durable webhook path, then start-or-signals the per-peer processDelegatedGrantsUpdated consumer, whose drain runs syncReciprocalMirror before updateDelegatedGrants and only then completes the activity.",
+      "statement": "The reciprocal-registration-update runtime path writes a DelegatedGrantsUpdated activity, delivers its Add through the durable webhook path, then start-or-signals the per-peer processDelegatedGrantsUpdated consumer, whose drain runs syncReciprocalMirror before updateDelegatedGrants and only then completes the activity (a terminal peer-gone sync skips the regeneration and still completes).",
       "evidence": [
-        {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L428-L452",
-          "version": "repo-lines-v1:sha256:d355567f0ac4054b4692a106b37436c2aeacb0f5381473147c316e184a29567a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlY2UyNmFkOWUwYmRlOWU5ZjdkMzE4ZGNjOGMzNDQzMGNlZjllOTc1M2YwM2ZhN2NiMmJlYTY5MWI0YTg4MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhOTI5M2ZkODA1NGI2ZTQ3MjQ4MzczZjM5ZjRkZDc3ODAwMTA1ZWI3NTgzNDg2ODcyNTQyODVjZDEyODJiNzgifQ"
-        },
         {
           "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L38-L62",
           "version": "repo-lines-v1:sha256:315819fc7ec4f56ac90fe0fe40448e262fed1f74eb13028041110e843d7d6263:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxYTQyMWYwMjBhNDUxYmIyYThhYzY4OTM5MzNhNDAzOTQ1N2UyMmM1YzAzNzljOTUwZTUxN2JhNmIzZDUxNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4NzQ2ZDZhZTEyNjEyMWQ4NzE3MDNmYWU1MzYwMGZiZTZhNjg5MzlkOTcyMzlkYzZhMmYxZWY2OWNhN2YzOWMifQ"
         },
         {
-          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L52-L82",
-          "version": "repo-lines-v1:sha256:de78b04af2f5f9d0baeacaa11cc619eb1e6924adb738f1d7e3c99e943593baf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MTZhYTYyYzg3NDI4OTZjMmMyMGU0ZGZiYjg4YzE4NWZhY2ZlZDRjYjMyMTMzYzBmNTQ3MmE1NTU5OTMzZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5NWIxZWU2ZWUyNjIwOGQ0OGZkMDc5YWE2YmFhNTQ2ODBlYTBhY2FjZjNiY2EzNjk5Y2Y5MzQ0NmZkZDA5ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2MTU0YThiZjgyYWM3MjdmMDJlZWIwMjlmZGFkNDVmZjFmOGRlM2E3ZTJjYjVjOTgzNjY0OWMwZDQwMTI2NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1N2E4OGYyOTI4YTEyYjc2ZWFlODA2NzJjN2ExYmRhOGU2OWYxN2RkNjZhMDZlMDNhYWY4NzMzYTI4YWI2OTQifQ"
+          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L52-L76",
+          "version": "repo-lines-v1:sha256:a2d4d4bddede8d5b405793f23e984990fe061f6fc7854cf62173f12ab33bb5b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MTZhYTYyYzg3NDI4OTZjMmMyMGU0ZGZiYjg4YzE4NWZhY2ZlZDRjYjMyMTMzYzBmNTQ3MmE1NTU5OTMzZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyZTAyNGNmMDU4ODhhZjJmYzQwZmUwZjhmMjIwNDY4NjcxY2RmYWJlNjVmZjk5NTFjM2U3YmY0MGIwNjVkMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2MTU0YThiZjgyYWM3MjdmMDJlZWIwMjlmZGFkNDVmZjFmOGRlM2E3ZTJjYjVjOTgzNjY0OWMwZDQwMTI2NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjYmNiMDQ1MDQxNTQwMzVhYWMzNTBhZTAzNzFlMWU5NmM3ZTFhYWE0MTkzMWUzNDg4MTM3YjQwNWMwNjhiZWMifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L203-L233",
-          "version": "repo-lines-v1:sha256:20bfc4ede4139e77095811511bb7b7d5ce6696e1c9333454341ed674ab87feb6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4N2ZlNGJhOGU0OTQ5MTU2MGI4MmM0MmEzNTlkMGI1M2ZkYTZiNGE5OTYxZmI2NmJkNmUxZWY2NGEwNjllZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTQxZTQ2NzNlZTMzZmJlZTUxOGJiYTA5Y2NhMTNiZjY1YzBkYzJmYzEyZDJjOTg2NzZiNmM2MmQ0YzBjOWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMTFkM2NkNDRiN2M2MDhjMzRhNjIwY2IwNGFkNWQxMzZiMjUwOGNkYWNlMTZkNjVlMzY0NzdiZTQ3ZjE1MzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwZDA5MjI4ODBjZmI1MjMxNTBiMzU0NzA1YjM5YjdhMzQ0MjFiY2UwYTgyZWFlZjIwYzBhMmYwYTg0MzU5Y2EifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L203-L243",
+          "version": "repo-lines-v1:sha256:67a1abc88182f6ab6c0d8f33e6f143f7821c3d0e78a98216960a933c3740ffd9:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0ZGQ0NTZmZjU1YWUzYWQxNjFhMTAwZGNmZTgwODBjYWI2NTlkNzg4ZWI0Mzk2MGM4ZjlhZGM0MjhlMjZmYmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2ODI5ZWQzZWY0ODliNDJhZmRhZDA2NGZjY2Y1ZDU5NWZkZjczNzE3MmFiOWJiMDM5ZDYyYzMwZWRhMWU4NGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0ZmEyOWY3NmI2MGU2OWI2NTM3ZThjZmRhNTBjMTkxYTQzMTc4N2I0ODNkZjk3NTg5OTBhY2FjYTlmNTMyY2MifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/reciprocal.ts#L145-L149",
+          "version": "repo-lines-v1:sha256:4d7428cc42e0c134ace1889c6ea7078e616250bd2978a0a7920b36ddcef9ff09:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmI2OTE1YWU2YTY3OTZkMDcwNjhmMmM5YmJiMzc3ZTAzN2ZmNzk4ZGE5YmYwZDFjMzI1YWM1YmYyMmFmODNkMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjg3ODI5ODBiZTcxYzQ5MzI1ODUyZjU0OTEzODA4ZjY2NjlhZWEzMzVjNjE4ZDBjN2MwMWZmM2M5MzI5ZTdlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     },
@@ -107,14 +107,14 @@
       "statement": "Both invitation flows seed the reciprocal mirror before completing: establishReciprocal on the inviter side and acceptInvitation on the acceptor side run syncReciprocalMirror as their last step before markActivitiesDone.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/workflows/reciprocal.ts#L60-L120",
-          "version": "repo-lines-v1:sha256:194d396c83ac8ac60122b2e7bf92862eb2f325381c531721bcca6aa7d319abb7:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlNjdmMDNkN2M4ZWE5N2QwOGM0ZDA1ZjYxN2EyODVmZTdjMzQwNjkwMzQ5MDMxYjM5MTMwOWY2ZjZhNGJkMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjNGEyZTdhODJmZjMxZGRmMDBjNmUzMGNkNjNiZjIwMTIwM2JmMzQ2NDNhN2I5MjVmYmUzN2Q1MDY1NDhlZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyODJmNWMwODVlZTAzNmUxZGNlZDcwMzc1N2U1N2ZlZjkwZTZhZDQyZWM4N2ZhNTMzNzkwOTM1ZjUzYjQ2MmIifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/reciprocal.ts#L60-L143",
+          "version": "repo-lines-v1:sha256:9f2f81e0abaee678a86833166da2f3791bb67121527922b7828cef2d8a121eb6:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlNjdmMDNkN2M4ZWE5N2QwOGM0ZDA1ZjYxN2EyODVmZTdjMzQwNjkwMzQ5MDMxYjM5MTMwOWY2ZjZhNGJkMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1YTgwYzJkNzFlODIzZjYxZmI0ODkzNmIyNDU3Yzg4ZDkyZGUwNDY0NzQwNmQ2OGMwNDkzYWNlMGIzM2M1ZTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjNGEyZTdhODJmZjMxZGRmMDBjNmUzMGNkNjNiZjIwMTIwM2JmMzQ2NDNhN2I5MjVmYmUzN2Q1MDY1NDhlZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlN2U1YTg5MTBjZDFhMjBkYmZmNzZlMTA2NDAyN2NhOTBiMWIzM2E0M2U0NTZlNDllZDhkY2FiZDgxMjlmZjcifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T05:20:05.106Z"
+    "at": "2026-10-21T12:54:01.599Z"
   }
 }

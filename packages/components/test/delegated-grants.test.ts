@@ -34,7 +34,9 @@ const h = vi.hoisted(() => {
     fireSignalOnNextWait: boolean
     mirrorOptions?: ChildOptions
     consumerOptions?: ChildOptions
-  } = { batches: [], pending: [], fireSignalOnNextWait: false }
+    /** what the mirror child reports back (terminal peer-gone case) */
+    mirrorResult: { peerGone: boolean }
+  } = { batches: [], pending: [], fireSignalOnNextWait: false, mirrorResult: { peerGone: false } }
 
   const activities = {
     // the per-peer drain
@@ -69,6 +71,7 @@ vi.mock('@temporalio/workflow', () => ({
     if (options?.taskQueue === 'reciprocal-registration') {
       h.calls.push('mirror')
       h.state.mirrorOptions = options
+      return h.state.mirrorResult
     } else if (options?.workflowId?.startsWith('delegated-grants:')) {
       h.calls.push('consumer')
       h.state.consumerOptions = options
@@ -111,6 +114,7 @@ beforeEach(() => {
   h.state.fireSignalOnNextWait = false
   h.state.mirrorOptions = undefined
   h.state.consumerOptions = undefined
+  h.state.mirrorResult = { peerGone: false }
   vi.clearAllMocks()
 })
 
@@ -179,6 +183,23 @@ describe('processDelegatedGrantsUpdated — per-peer consumer', () => {
     expect(h.activities.markActivitiesDone).toHaveBeenNthCalledWith(2, {
       webId,
       activities: [second],
+    })
+  })
+
+  test('a peer-gone sync completes the batch without regenerating', async () => {
+    const first = pendingActivity('https://registry/acme/activity/a1')
+    h.state.batches = [[first]]
+    // the peer deleted its registration of us: the mirror child drops the
+    // replica and reports it — there is no source to regenerate from
+    h.state.mirrorResult = { peerGone: true }
+
+    await processDelegatedGrantsUpdated({ webId, peerId })
+
+    expect(h.calls).toEqual(['mirror', 'complete'])
+    expect(h.activities.findAffectedGrantees).not.toHaveBeenCalled()
+    expect(h.activities.markActivitiesDone).toHaveBeenCalledWith({
+      webId,
+      activities: [first],
     })
   })
 

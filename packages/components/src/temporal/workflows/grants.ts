@@ -9,6 +9,7 @@ import type {
   DelegatedGrantsUpdated,
   FinalDataAuthorizationData,
   FinalGrantData,
+  GrantData,
   GrantId,
   InvitationCreated,
   NeedBasedAccessRequestReceived,
@@ -72,7 +73,7 @@ const {
   createRoleAtId,
   storeDataGrant,
   createAcr,
-  requestDelegation,
+  requestDelegations,
   replaceDataGrantsOnRegistration,
   getPendingGranteeActivities,
   getPendingDelegatedGrantsUpdates,
@@ -193,6 +194,11 @@ export const delegatedGrantsUpdatedSignal = defineSignal<[]>('delegatedGrantsUpd
  * 3. **complete** — `markActivitiesDone` for the drained batch, so `done`
  *    always means "mirror and delegated grants are current".
  *
+ * Terminal-error policy: when the sync reports `peerGone` (the peer deleted its
+ * registration of us — `404`/`410`), step 2 is skipped and the batch completes.
+ * There is no source left to regenerate from, and retrying into the mirror cap
+ * would leave the activity pending forever.
+ *
  * Re-draining after every signal is what prevents a lost update: a delivery
  * that lands while a run is in flight is picked up by the next drain, whose
  * mirror sync starts AFTER that delivery. Joining an already-running sync
@@ -219,11 +225,18 @@ export async function processDelegatedGrantsUpdated(
     // no explicit workflowId on the child: the consumer already serializes per
     // (webId, peerId), and a deterministic id would collide with an in-flight
     // sync started by the previous parallel-start path during a rollout
-    await executeChild(syncReciprocalMirror, {
+    const mirror = await executeChild(syncReciprocalMirror, {
       taskQueue: 'reciprocal-registration',
       args: [payload],
     })
-    await updateDelegatedGrants({ webId: payload.webId, peerId: payload.peerId })
+    if (!mirror.peerGone) {
+      await updateDelegatedGrants({ webId: payload.webId, peerId: payload.peerId })
+    }
+    // terminal case (`peerGone`): the peer deleted its registration of us, so
+    // there is no source to regenerate from — completing beats retrying into
+    // the mirror cap forever. The dangling reciprocal link on our registration
+    // is cleaned up by the unregister flow (pod-isolation-followup A2), which
+    // is also when the delegated grants sourced from that peer go away.
     await markActivitiesDone({ webId: payload.webId, activities: pending })
   }
 }
@@ -659,10 +672,7 @@ export async function createGrantsForAgent(
 
   // deny case — no authorizations: clear all existing grants + registration
   if (authorizations.length === 0) {
-    // await deleteDataGrants({
-    //   webId: payload.webId,
-    //   grants: existing.map((grant) => ({ id: grant.id!, type: grant.type })),
-    // })
+    // await deleteDataGrants({ webId: payload.webId, grants: existing })
     await replaceDataGrantsOnRegistration({
       webId: payload.webId,
       grantee: payload.grantee,
@@ -696,14 +706,19 @@ export async function createGrantsForAgent(
     newGrantIds.push({ id: grant.id, type: grant.type })
   }
 
-  // TODO CSS SPARQL backend has a race condition on dcterms:modified when
-  // multiple resources are PUT concurrently in the same container,
-  // causing "Multiple results for http://purl.org/dc/terms/modified".
-  // Change back to Promise.all after the CSS bug is fixed.
+  // one delegation request per data owner: the issuance endpoint accepts a
+  // batch (it already requires a single dataOwner), so each peer sees one POST
+  // instead of one per grant. Serialized between owners — the CSS
+  // `dcterms:modified` race keeps the writes sequential.
+  const delegatedByOwner = new Map<string, GrantData[]>()
   for (const grant of generated.delegatedGrants) {
     if (reusedGenerated.has(grant)) continue
-    const delegatedGrantIds = await requestDelegation({ grantData: grant })
-    newGrantIds.push(...delegatedGrantIds)
+    const group = delegatedByOwner.get(grant.dataOwner) ?? []
+    group.push(grant)
+    delegatedByOwner.set(grant.dataOwner, group)
+  }
+  for (const grants of delegatedByOwner.values()) {
+    newGrantIds.push(...(await requestDelegations({ webId: payload.webId, grants })))
   }
 
   // delete the old grant resources that are not reused

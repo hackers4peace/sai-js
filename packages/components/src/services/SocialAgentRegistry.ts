@@ -15,30 +15,34 @@ import type * as S from 'effect/Schema'
 import type { ResolvedContext } from './Context.js'
 import {
   findSocialAgentRegistration as findRegistrationFromSparql,
-  getDataGrant as getDataGrantFromSparql,
+  getLinkedGrantOwners,
   getOpenAccessRequestsOnRegistry,
   getOpenSentAccessRequests,
+  getRegistrationLinks,
   getSocialAgentRegistration as getRegistrationFromSparql,
   listContained,
   sparqlTransportFor,
 } from './queries/org.js'
 
 /**
- * Resolve the reciprocal registration of `registration` (the peer's
- * registration of us / of the org) via SPARQL — personal context hits the
+ * Whether the peer's registration of us carries an admin marker (`adminOf`) —
+ * a single link query over the mirrored reciprocal, without framing the whole
+ * registration. Personal context hits the
  * session's internal endpoint, org context the org's `/sparql-admin`
- * (`sparqlTransportFor`). The peer's graphs live in the shared store
- * (openwiki/architecture/federation.md shortcut 1); their `.acr`s grant the org/registered agent,
- * never the admin.
+ * (`sparqlTransportFor`); peer `.acr`s grant the org/registered agent, never the
+ * admin, which is why the mirrored copy is the only source.
  */
-async function getReciprocalRegistration(
+async function reciprocalAdminMarkers(
   ctx: ResolvedContext,
   registration: SocialAgentRegistrationData
-): Promise<SocialAgentRegistrationData> {
-  if (!registration.reciprocalRegistration) {
-    throw new Error(`no reciprocal registration on ${registration.id}`)
-  }
-  return getRegistrationFromSparql(sparqlTransportFor(ctx), registration.reciprocalRegistration)
+): Promise<boolean> {
+  if (!registration.reciprocalRegistration) return false
+  const links = await getRegistrationLinks(
+    sparqlTransportFor(ctx),
+    registration.reciprocalRegistration,
+    INTEROP.hasAdminGrant
+  )
+  return links.length > 0
 }
 
 /**
@@ -110,16 +114,14 @@ export const buildSocialAgentProfile = async (
   accessRequestsByGrantee: AccessRequestsByGrantee = new Map(),
   sentAccessRequestsByDataOwner: SentAccessRequestsByDataOwner = new Map()
 ) => {
-  const reciprocal = registration.reciprocalRegistration
-    ? await getReciprocalRegistration(ctx, registration)
-    : undefined
   // Phase 5: the direct marker is read the same way in BOTH contexts — from
   // the context's registration of the agent (org: the org's registration;
   // personal: the user's own registration — the owner's admins)
   const admin = getAdminGrantIris(registration).length > 0
   // the reciprocal marker — the agent's registration of the user (the
-  // "orgs I administer" discovery flag; the switcher source, §2.2)
-  const adminOf = reciprocal ? getAdminGrantIris(reciprocal).length > 0 : false
+  // "orgs I administer" discovery flag; the switcher source, §2.2). Only the
+  // link presence matters, so it is one query rather than a framed registration
+  const adminOf = await reciprocalAdminMarkers(ctx, registration)
 
   // TODO (angel) data validation and how to handle when the social agents profile is missing some components?
   return SocialAgent.make({
@@ -196,24 +198,19 @@ export const getSocialAgents = async (ctx: ResolvedContext, lang: string) => {
   const seenIds = new Set(profiles.map((p) => p.id))
   for (const registration of registrations) {
     if (!registration.reciprocalRegistration) continue
-    const reciprocalReg = await getRegistrationFromSparql(
-      transport,
-      registration.reciprocalRegistration
-    )
-    if (getDataGrantIris(reciprocalReg).length === 0) continue
-    const dataGrants = await Promise.all(
-      reciprocalReg.hasDataGrant.map((grantIri) => getDataGrantFromSparql(transport, grantIri))
-    )
-    for (const dataGrant of dataGrants) {
-      const ownerIri = IRI.make(dataGrant.dataOwner)
+    // only the owners matter here: one query per peer instead of framing every
+    // linked grant
+    const owners = await getLinkedGrantOwners(transport, registration.reciprocalRegistration)
+    for (const owner of owners) {
+      const ownerIri = IRI.make(owner)
       if (seenIds.has(ownerIri)) continue
       seenIds.add(ownerIri)
-      let label = dataGrant.dataOwner
+      let label = owner
       try {
         const profile = await loadWebIdProfile(ownerIri, ctx.session.fetch)
         // the profile's label is a language map — picked for the requested
         // language; absent profile/label falls back to the owner IRI
-        label = pickLanguage(profile.label, lang) ?? dataGrant.dataOwner
+        label = pickLanguage(profile.label, lang) ?? owner
       } catch {
         /* fallback to IRI */
       }

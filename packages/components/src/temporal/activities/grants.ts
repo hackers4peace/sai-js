@@ -26,7 +26,6 @@ import {
   type FinalDataAuthorizationData,
   type FinalGrantData,
   type GeneratedGrants,
-  Grant,
   type GrantData,
   type GrantId,
   type IncomingGrantData,
@@ -41,7 +40,6 @@ import {
   toJsonLd,
 } from '@janeirodigital/interop-data-model'
 const loadRole = loader(Role.fromJsonLd)
-const loadGrant = loader(Grant.fromJsonLd)
 const loadDataAuthorization = loader(DataAuthorization.fromJsonLd)
 const loadClientIdDocument = loader(ClientIdDocument.fromJsonLd)
 
@@ -91,7 +89,8 @@ export interface CheckEquivalenceInput {
   webId: SocialAgentId
   grantee: AgentId
   generated: GeneratedGrants
-  existing: GrantData[]
+  /** the grantee's current grant IRIs (from `getExistingGrants`) */
+  existing: GrantId[]
 }
 
 export interface EquivalenceResult {
@@ -253,16 +252,22 @@ export async function generateGrants(payload: GenerateGrantsInput): Promise<Gene
 // ---------------------------------------------------------------------------
 
 /**
- * Read the grantee's current grants from their agent registration (hasDataGrant).
+ * The grantee's current grant **IRIs**, read from the grantor's registration of
+ * the grantee (`hasDataGrant`) — local, one registration read, no grant bodies.
  *
- * Returns [] when the registration has no grants; tolerates grants that no
- * longer exist (already deleted at the data owner). (Registration itself is
- * guaranteed to exist — see plan design decision 8.)
+ * Why IRIs only: every grant where the context
+ * is the `grantedBy` and a peer is the `dataOwner` lives in the *peer's* grant
+ * registry, so loading the bodies would be one HTTP dereference per grant — for
+ * a value only `checkEquivalence` consumes, and that activity is still a dummy.
+ * When real equivalence lands it needs the bodies (body-only fields like
+ * `registeredShapeTree`/`scopeOfGrant`); those must come from an issuer-side
+ * replica, not a peer read — see
+ * [`docs/plans/check-equivalence.md`](../../../../docs/plans/check-equivalence.md) §2.1.
  */
 export async function getExistingGrants(payload: {
   webId: SocialAgentId
   peerId: AgentId
-}): Promise<GrantData[]> {
+}): Promise<GrantId[]> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const agentRegistration = await AgentRegistry.findRegistration(
@@ -274,15 +279,7 @@ export async function getExistingGrants(payload: {
   if (!agentRegistration) {
     throw new Error('agent registration for the peer does not exist')
   }
-  const grants: GrantData[] = []
-  for (const grantIri of getDataGrantIris(agentRegistration)) {
-    try {
-      grants.push(await loadGrant(grantIri, session.fetch))
-    } catch {
-      // grant resource no longer exists (already deleted at the data owner) — tolerate
-    }
-  }
-  return grants
+  return getDataGrantIris(agentRegistration).map((id) => ({ id, type: [INTEROP.DataGrant] }))
 }
 
 /**
@@ -437,20 +434,35 @@ export async function createAcr(payload: FinalGrantData): Promise<void> {
   )
 }
 
-/** Request delegated grants from the data owner; returns the assigned GrantIds. */
-export async function requestDelegation(payload: { grantData: GrantData }): Promise<GrantId[]> {
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.grantData.grantedBy)
+export interface RequestDelegationsInput {
+  /** the grantor (`grantedBy`) whose session issues the request */
+  webId: SocialAgentId
+  /** grants delegated to one data owner — the endpoint accepts them together */
+  grants: GrantData[]
+}
 
-  // TODO: do discovery in previous workflow step and pass endpoint in activity payload
-  const endpoint = await discoverDelegationIssuanceEndpoint(
-    payload.grantData.dataOwner,
-    session.fetch
-  )
+/**
+ * Request delegated grants from the data owner in **one** call: grants for a
+ * single `dataOwner` travel in one `interop:AccessRequest` envelope (the
+ * issuance endpoint already validates a single data owner and materializes the
+ * whole batch), so endpoint discovery and the POST happen once instead of once
+ * per grant.
+ */
+export async function requestDelegations(payload: RequestDelegationsInput): Promise<GrantId[]> {
+  if (payload.grants.length === 0) return []
+  const dataOwners = new Set(payload.grants.map((grant) => grant.dataOwner))
+  if (dataOwners.size !== 1) {
+    throw new Error('requestDelegations requires grants of a single data owner')
+  }
+  const [dataOwner] = [...dataOwners]
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+
+  const endpoint = await discoverDelegationIssuanceEndpoint(dataOwner, session.fetch)
   // the delegation endpoint takes an interop:AccessRequest envelope (§3)
   const message: AccessRequestMessage = {
     type: [INTEROP.AccessRequest],
-    grants: [payload.grantData as unknown as IncomingGrantData],
+    grants: payload.grants as unknown as IncomingGrantData[],
   }
   // the whole delegation endpoint now requires application/ld+json
   // (authorization-granting.md §6.2) — the AccessRequest envelope is

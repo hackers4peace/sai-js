@@ -20,10 +20,10 @@ sources:
     resource: repo://packages/utils/src/sparql-update.ts
   - id: openwiki-source-228968b8fb4f70750899249e
     resource: repo://packages/utils/src/whatwg-fetch.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # JSON-LD read/write layer
@@ -37,7 +37,10 @@ converted back with `jsonld.fromRDF`. There is no Turtle parse/serialize layer.
 ## Core helpers (`packages/utils/src/jsonld.ts`)
 
 - `fetchJsonLd(iri, fetch)` — a raw GET with `Accept: application/ld+json`,
-  returning `response.json()` and throwing on a non-OK response.
+  returning `response.json()`; a non-OK response raises `HttpStatusError`
+  carrying the `iri` and `status` (same message as before), so callers can
+  classify the failure — the reciprocal mirror treats a `404`/`410` on a peer
+  registration as terminal while everything else retries.
 - `putJsonLd(iri, fetch, doc, headers?)` — expands the doc via
   `expandedJsonLd` (a context-stripping `jsonld.expand`), JSON-stringifies it,
   and PUTs with `Content-Type: application/ld+json`. The expanded form means

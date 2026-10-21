@@ -43,9 +43,8 @@ import type * as S from 'effect/Schema'
 import type { ResolvedContext } from './Context.js'
 import { dataRegistrationContains } from './peerProxy.js'
 import {
-  getDataGrant as getDataGrantFromSparql,
   getDataRegistration as getDataRegistrationFromSparql,
-  getSocialAgentRegistration as getRegistrationFromSparql,
+  getReciprocalGrants,
   listRegistrationsByShapeTrees,
   sparqlTransportFor,
   sparqlTransportForPod,
@@ -249,14 +248,11 @@ export const getDescriptions = async (
 
   for (const socialAgentRegistration of await listSocialAgentRegistrations(ctx)) {
     if (socialAgentRegistration.reciprocalRegistration) {
-      const reciprocalRegistration = await getRegistrationFromSparql(
+      // the mirrored reciprocal's grants in two queries, no matter how many are
+      // linked
+      const dataGrants = await getReciprocalGrants(
         transport,
         socialAgentRegistration.reciprocalRegistration
-      )
-      const dataGrants = await Promise.all(
-        reciprocalRegistration.hasDataGrant.map((grantIri) =>
-          getDataGrantFromSparql(transport, grantIri)
-        )
       )
       const dataRegistrations = await findSocialAgentDataRegistrations(
         dataGrants,

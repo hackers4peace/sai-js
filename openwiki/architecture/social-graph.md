@@ -16,12 +16,14 @@ sources:
     resource: repo://packages/components/src/ReciprocalWebhookStore.ts
   - id: openwiki-source-b407f45a278715ed33b367aa
     resource: repo://packages/components/src/temporal/activities/reciprocal.ts
+  - id: openwiki-source-fabda8691f79a477b70b0c57
+    resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # Social graph
@@ -55,17 +57,27 @@ with the in-repo `subscribeToNotificationChannel` helper (which replaced the
 `registration.reciprocalRegistration` — the *peer's registration of the
 inviter* — so it fires when the peer PATCHes their registration of the inviter
 (e.g. sets an access need group, or updates `hasDataGrant`). On receipt,
-`ReciprocalWebhookHandler` PUTs a `delegatedGrantsUpdated` activity, whose
-`updateDelegatedGrants` workflow regenerates the inviter's grants where the
-peer is the data owner.
+`ReciprocalWebhookHandler` PUTs a `delegatedGrantsUpdated` activity (its
+`object` is the subscription's own `topic` — the reciprocal registration IRI —
+recorded for traceability only). The per-peer consumer
+(`processDelegatedGrantsUpdated`) then replicates the mirror, regenerates the
+inviter's grants where the peer is the data owner, and only then completes.
 
-On the owner side, `syncReciprocalMirror` calls `updateReciprocalMirror`, which
-writes a read-only local copy of the peer's reciprocal registration and its
-linked grants into the owner's **registry-pod dataset** (through the owner's
-session endpoint). With per-pod datasets this mirror is effectively the *only*
-way the local session sees peer-side grants — the peer's own dataset is not
-reachable — so the mirror is the upstream for delegated-grant reads (see
+`syncReciprocalMirror` calls `updateReciprocalMirror`, which writes a read-only
+local copy of the peer's reciprocal registration and its linked grants into the
+writing context's **registry-pod dataset** (through that session's endpoint).
+With per-pod datasets this mirror is effectively the *only* way the local
+session sees peer-side grants — the peer's own dataset is not reachable — so the
+mirror is the upstream for delegated-grant reads (see
 [Per-pod storage and isolation](storage-isolation.md)).
+
+Both invitation legs seed the mirror before completing (`establishReciprocal` on
+the inviter side, `acceptInvitation` on the acceptor side), so a pair is mirrored
+on both ends from the moment its invitation finishes. Later refreshes come only
+from the peer's `Update`. A `404`/`410` on the peer's registration is terminal —
+the replica is dropped and the activity completes without regenerating — while
+grant-level `404`s, `401`/`403`, `5xx` and network errors retry (see
+[Federation constraints](federation.md#the-reciprocal-mirror-in-detail)).
 
 **Polarity asymmetry** is the key property: subscription ownership follows who
 initiated the invitation, with one webhook per pair pointing from the peer's

@@ -58,16 +58,12 @@ export class ReciprocalWebhookHandler extends OperationHttpHandler {
       const session = await this.sessionManager.getSession(channel.webId)
       const activityRegistry = session.registrySet.hasActivityRegistry
       if (!activityRegistry) throw new Error('activity registry not found in registry set')
-      // the reciprocal registration (the peer's reciprocal — informational;
-      // `target` is the peer). Tolerantly read: the registration may not
-      // exist yet on the first peer update.
-      let reciprocalRegistration = ''
-      try {
-        const registration = await session.findSocialAgentRegistration(channel.peerId)
-        reciprocalRegistration = registration?.reciprocalRegistration ?? ''
-      } catch {
-        // informational only — never fail the webhook
-      }
+      // `object` is the reciprocal registration IRI — informational (no workflow
+      // reads it; the consumer derives the peer from `target`). The subscription
+      // channel already records it as its `topic`, so no registration read is
+      // needed.
+      const { topic } = channel.channel
+      const reciprocalRegistration = Array.isArray(topic) ? (topic[0] ?? '') : topic
       const activity: Omit<DelegatedGrantsUpdated, 'id'> = {
         type: ['Activity', 'DelegatedGrantsUpdated'],
         actor: channel.webId,

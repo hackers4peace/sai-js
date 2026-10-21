@@ -22,9 +22,8 @@ import type * as S from 'effect/Schema'
 import type { ResolvedContext } from './Context.js'
 import { peerInstanceIris, peerInstanceNode } from './peerProxy.js'
 import {
-  getDataGrant as getDataGrantFromSparql,
   getDataRegistration as getDataRegistrationFromSparql,
-  getSocialAgentRegistration as getRegistrationFromSparql,
+  getReciprocalGrants,
   listContained,
   sparqlTransportFor,
   sparqlTransportForPod,
@@ -113,31 +112,33 @@ function indexFromGrants(dataGrants: GrantData[]): Record<string, GrantData[]> {
 }
 
 /**
- * The data grants the context has for `agentId` (peer branch): the
- * reciprocal of the context's registration of `agentId`, then its linked
- * grants — via SPARQL in both contexts (`sparqlTransportFor`: personal →
- * internal endpoint, org → `/sparql-admin`; peer `.acr`s never grant the
- * admin). Fallback scan: any registration's reciprocal grants that name
- * `agentId` as `dataOwner`.
+ * The data grants linked from a mirrored reciprocal registration — two queries
+ * per registration (link set + all linked bodies) instead of the previous
+ * 1 + N. Both contexts go through
+ * `sparqlTransportFor`: personal → internal endpoint, org → `/sparql-admin`;
+ * peer `.acr`s never grant the admin.
+ */
+async function reciprocalGrants(ctx: ResolvedContext, reciprocalIri: string): Promise<GrantData[]> {
+  return getReciprocalGrants(sparqlTransportFor(ctx), reciprocalIri)
+}
+
+/**
+ * The data grants the context has for `agentId` (peer branch): the reciprocal
+ * of the context's registration of `agentId`, then its linked grants.
+ *
+ * Fallback scan (kept deliberately — it is load-bearing for delegated chains):
+ * a grant naming `agentId` as `dataOwner` can arrive through *another* peer's
+ * reciprocal (an onward delegated grant), when the context has no registration
+ * of `agentId` at all. Only that per-registration batching was optimised.
  */
 async function dataGrantIndexForAgent(
   ctx: ResolvedContext,
   agentId: string
 ): Promise<Record<string, GrantData[]>> {
-  const transport = sparqlTransportFor(ctx)
-  const directGrants = await (async () => {
-    const socialAgentRegistration = await findSocialAgentRegistrationInContext(ctx, agentId)
-    if (!socialAgentRegistration?.reciprocalRegistration) return []
-    const reciprocalReg = await getRegistrationFromSparql(
-      transport,
-      socialAgentRegistration.reciprocalRegistration
-    )
-    return Promise.all(
-      (reciprocalReg.hasDataGrant ?? []).map((grantIri) =>
-        getDataGrantFromSparql(transport, grantIri)
-      )
-    )
-  })()
+  const socialAgentRegistration = await findSocialAgentRegistrationInContext(ctx, agentId)
+  const directGrants = socialAgentRegistration?.reciprocalRegistration
+    ? await reciprocalGrants(ctx, socialAgentRegistration.reciprocalRegistration)
+    : []
 
   const directIndex = indexFromGrants(directGrants)
   if (Object.keys(directIndex).length > 0) return directIndex
@@ -146,23 +147,10 @@ async function dataGrantIndexForAgent(
   const scanned: GrantData[] = []
   for (const registration of await listSocialAgentRegistrations(ctx)) {
     if (!registration.reciprocalRegistration) continue
-    const grants = await getReciprocalGrantsSparql(ctx, registration.reciprocalRegistration)
+    const grants = await reciprocalGrants(ctx, registration.reciprocalRegistration)
     scanned.push(...grants.filter((grant) => grant.dataOwner === agentId))
   }
   return indexFromGrants(scanned)
-}
-
-async function getReciprocalGrantsSparql(
-  ctx: ResolvedContext,
-  reciprocalIri: string
-): Promise<GrantData[]> {
-  const transport = sparqlTransportFor(ctx)
-  const reciprocalReg = await getRegistrationFromSparql(transport, reciprocalIri)
-  return Promise.all(
-    (reciprocalReg.hasDataGrant ?? []).map((grantIri) =>
-      getDataGrantFromSparql(transport, grantIri)
-    )
-  )
 }
 
 export const getDataRegistries = async (
@@ -214,19 +202,12 @@ export const listDataInstances = async (
     // non-owners; the reciprocal/grant list here resolves via SPARQL
     // (personal: internal endpoint, org: `/sparql-admin`).
     const transport = sparqlTransportFor(ctx)
-    const reciprocalReg = socialAgentRegistration?.reciprocalRegistration
-      ? await getRegistrationFromSparql(transport, socialAgentRegistration.reciprocalRegistration)
-      : undefined
-    let dataGrants: GrantData[]
-    if (reciprocalReg && (reciprocalReg.hasDataGrant ?? []).length > 0) {
-      dataGrants = await Promise.all(
-        (reciprocalReg.hasDataGrant ?? []).map((grantIri) =>
-          getDataGrantFromSparql(transport, grantIri)
-        )
-      )
-    } else {
-      dataGrants = Object.values(await dataGrantIndexForAgent(ctx, agentId)).flat()
-    }
+    const direct = socialAgentRegistration?.reciprocalRegistration
+      ? await reciprocalGrants(ctx, socialAgentRegistration.reciprocalRegistration)
+      : []
+    const dataGrants: GrantData[] = direct.length
+      ? direct
+      : Object.values(await dataGrantIndexForAgent(ctx, agentId)).flat()
     if (!dataGrants.length) {
       throw new Error(`missing social agent registration: ${agentId}`)
     }

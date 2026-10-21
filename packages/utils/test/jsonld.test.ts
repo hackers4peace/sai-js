@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import {
   type WhatwgFetch,
+  HttpStatusError,
   documentValues,
   fetchJsonLd,
   findNodeIdByType,
@@ -28,6 +29,13 @@ describe('fetchJsonLd', () => {
     await expect(fetchJsonLd('https://example.example/missing', fetch)).rejects.toThrow(
       'failed to fetch https://example.example/missing: 404'
     )
+  })
+
+  test('carries the status so callers can classify the failure', async () => {
+    const fetch = mockFetch({ ok: false, status: 410 })
+    const error = await fetchJsonLd('https://example.example/gone', fetch).catch((err) => err)
+    expect(error).toBeInstanceOf(HttpStatusError)
+    expect(error).toMatchObject({ iri: 'https://example.example/gone', status: 410 })
   })
 })
 

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:4e1f91de544a54494056cf06bf4e061de50fdf69a5a92f97f22aaf563f26c5b4",
+  "pageVersion": "sha256:aa19841b8f58604f8fd73b96b33d091e8d0bc48efcde7529eccd8c22546f6802",
   "claims": [
     {
       "id": "claim_69cce4fee46d4f28aa02dcf3cd0c8720",
       "statement": "fetchJsonLd performs a raw JSON-LD GET with Accept: application/ld+json and throws on a non-OK response.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L372-L393",
-          "version": "repo-lines-v1:sha256:7fb5e9c9df42b5fdfaebdc0b3ff1a21c68c55358e168bb1621d2ae0d3c7145de:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5Y2Y1MGQ5OTY2OGRlMjA2Mjg4MWEzZWVkYzAzYWIwY2UzZGM1ZWFjMWYzNGJjZjM0ZWNjMzY5MTNkNmZlY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4YjY1MGE0YzdhNmFhZTE5Y2VjMzA0NWU3NWQwNDlkODM5MjA0MzkwYjYxNjIyOWFhMGU4MDYxMDI4MDgzMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkN2Q0OWY1ZmY5NDYxODEyMGIzOTA3YzFhODdjMzhlZDY2YjY5YTEzMjVlZjdiNDk0NGY1MjJmN2Q3NDJmOTMifQ"
+          "resource": "repo://packages/utils/src/jsonld.ts#L370-L392",
+          "version": "repo-lines-v1:sha256:2e242ee6f2f52f49eef64e45e7d1b6a8c02df17583e8d7fd073f0c481c288d06:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZTc0NzY5YTE4N2Q2NjU2MjA0NTQ2ZjRlNWE3MjdmOGRhZTNhM2ZjNDhmMDJiOGQzZmY4ZDZkOGIwZTVlYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmZDA2MDU0YjZhNjY5YWQ5YmM3ZTg4N2Y5N2JmMmUyY2ViNzA4NmQ4ZGRiNjg0ZGVmZmZlYWFlOTBhZDcxZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxMjE4ZmFlMDQxMzNiNzlmZGM4MGVmYjA2OWUwZTMxNGUxY2MwYTE4YjBlODU0N2YwMGQ5MDBjYTIzYWJhMTQifQ"
         }
       ]
     },
@@ -17,7 +17,7 @@
       "statement": "putJsonLd expands the document via jsonld.expand, JSON-stringifies it, and PUTs it with Content-Type: application/ld+json, so the wire body never carries a client @context.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L417-L462",
+          "resource": "repo://packages/utils/src/jsonld.ts#L436-L481",
           "version": "repo-lines-v1:sha256:71699612b8fc6cd30bd6c9bc10b4261e7fdfcf2b11b6c79230663b2210e86a77:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzZGYwNmQxNmZlNDIwZDg2MmFiNjNiZmQ5ZTUyMjRiYWM4MTBhMDkyNWViOTNlNTY1ZGZiZWFiNTkwZjM5MDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmMGEwOTZmOTBhZTllZjhmYThmZDZlOGNlMWI4MGRmYjU5YTQ0NzU0MWVjYzkyZmYyMjFkM2NhYjY4YmViNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5OTUzZGM5NzQ1Njc0ZmQxZTc3NDQ1YWE4OTgyMzBjYzI0ZTRiMDRiYmIyYWY4NmNjNmFhMGFhNWRlYWY4OGEifQ"
         }
       ]
@@ -99,7 +99,7 @@
       "statement": "There are no loadX exports; consumers compose the generic loader(fromJsonLd) factory, which infers the type and threads fetchJsonLd through the reader.",
       "evidence": [
         {
-          "resource": "repo://packages/utils/src/jsonld.ts#L406-L409",
+          "resource": "repo://packages/utils/src/jsonld.ts#L425-L428",
           "version": "repo-lines-v1:sha256:c3630583a6d6757609deb1907f27d5f8b8f49817c10d56c0d5607706d0c00624:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjEwNzNlMmMxZDUwYzQ3ODNjYzJiNDJjOWMxNWY1YjI5ODY4NTY0NGY2MTljMmJmMjAxNTIzNTQyNzcxNjc5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWZmZTJmNjhmZDQ0NzUwODMwZjFmNjY5MjcyZDhjOWRjZDU5YmJlZmVhZTZiNzQ3YWJkOWM5ZDJjODdhMTRlNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmNlZDRiM2E4MjMyM2E2NTRmNzg2MmM5NTNjYWFkNzc1NWJiOGU0OGVlNGEyYjRkMjRkMWJkMWMwZDMwZGI1YSJ9"
         }
       ]
@@ -119,7 +119,7 @@
       "statement": "Self-graph SPARQL scoping (FILTER(?g = ?s)) guards authoritative reads: findRolesWithMember uses FILTER(?g = ?role) so an embedded activity-graph projection of a to-be role cannot assert phantom membership that keeps matching forever.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L361-L379",
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L505-L523",
           "version": "repo-lines-v1:sha256:eb2b68f2c1564fe0077b84073b4afb57da4ff77302c272c539f0a8d90fb5294b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwNzhmNzA4YWVjZDJmY2Q1NmRhZDk0MTVkOGFiZmRjNzI2NGNhOTZkYzc4ODZmMGYwN2VhYmY1N2IxY2MyYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlODgwZDJhODBjNzVkNzI4YmFmODQwODFlZGMxNjc0OTE3YjY3ZjhkOGE5NjhhNzc0MjE4MDgyMjI0ZWQwMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NDVkZGQyYmMxYmMxNjBiZWM0ZjY3MGIyY2Q4MjMyODdmZDQxYjk2NzMwNmEzMjViMjk0ZmRmZmQzMGVmMDAifQ"
         }
       ]
@@ -151,10 +151,20 @@
           "version": "repo-lines-v1:sha256:e4e03c8f104faad209faf1467d1238af402eaedcde36737cc49850bc510be0ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxOGEwZDYxMjNjZmM5M2U1ODk2Yzk3MmJjOWE2MjhlODlhM2U5MmZmNjI0ODgyNTBhMjI1ZGU3YzJkZmQ5NDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1YmZiNjlkZjI2MTdlYWU0NzE1ZjdiM2U1NDdlZDQ4NTg0MGI3NmRmMmZlMGYzZjViM2NmNjhlOWNhYzUyNmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjN2Y3NzU5OTk0MzU1NWQwNTlhMzdhYjM5NDEyYjIyZTExYjEwMDMwYzc5YTA4MzVjOGU3YzQ0MDg1NGI2MWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_9d3b2b7a3ec6401089ad1dfc25599b99",
+      "statement": "A non-OK JSON-LD GET raises HttpStatusError, which carries the resource IRI and the HTTP status so callers can classify the failure (for example the reciprocal mirror sync's terminal 404/410 policy).",
+      "evidence": [
+        {
+          "resource": "repo://packages/utils/src/jsonld.ts#L362-L392",
+          "version": "repo-lines-v1:sha256:e88b8efa76ee312e01a2a401b72df8b9f049371fd78bbac16b6aa911e7207953:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZTc0NzY5YTE4N2Q2NjU2MjA0NTQ2ZjRlNWE3MjdmOGRhZTNhM2ZjNDhmMDJiOGQzZmY4ZDZkOGIwZTVlYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3NzQ0YzI3Y2Q5YzhiZjZkN2IwZDZkMDBkZTkwNTUxNjc5YjY5ZTVlODEwOTFkYWFmZWY0ZjEwNDMxNjllOTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxMjE4ZmFlMDQxMzNiNzlmZGM4MGVmYjA2OWUwZTMxNGUxY2MwYTE4YjBlODU0N2YwMGQ5MDBjYTIzYWJhMTQifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T12:54:01.599Z"
   }
 }

@@ -363,6 +363,110 @@ export async function presentGraphs(
 }
 
 /**
+ * IRIs linked from a registration body via `predicate` — resource graph UNION
+ * its `meta:` twin, one query, no framing.
+ *
+ * For views that only care about link *presence* this replaces framing the whole
+ * registration: `hasAdminGrant` for the admin markers (`adminOf` in the
+ * social-agent list, `isAdminOf` for the org-context switcher) and
+ * `hasDataGrant` for listings.
+ */
+export async function getRegistrationLinks(
+  transport: SparqlTransport,
+  registrationIri: string,
+  predicate: string
+): Promise<string[]> {
+  const bindings = await transport.fetchBindings(
+    `SELECT DISTINCT ?value WHERE {
+  { GRAPH <${registrationIri}> { <${registrationIri}> <${predicate}> ?value } }
+  UNION
+  { GRAPH <meta:${registrationIri}> { <${registrationIri}> <${predicate}> ?value } }
+}`
+  )
+  return [...new Set(bindings.map((binding) => binding.value.value))]
+}
+
+/**
+ * `dataOwner` IRIs of the data grants linked from a registration — one query,
+ * no grant bodies. The link set comes from the registration graph (resource
+ * UNION `meta:` twin), joined with each linked grant's own graph.
+ *
+ * Used by the social-agent list to enumerate "whose data is reachable through
+ * this peer" without framing every grant.
+ * Grants that are linked but not mirrored simply do not contribute.
+ */
+export async function getLinkedGrantOwners(
+  transport: SparqlTransport,
+  registrationIri: string
+): Promise<string[]> {
+  const bindings = await transport.fetchBindings(
+    `SELECT DISTINCT ?owner WHERE {
+  { GRAPH <${registrationIri}> { <${registrationIri}> <${INTEROP.hasDataGrant}> ?grant } }
+  UNION
+  { GRAPH <meta:${registrationIri}> { <${registrationIri}> <${INTEROP.hasDataGrant}> ?grant } }
+  GRAPH ?graph { ?grant <${INTEROP.dataOwner}> ?owner }
+}`
+  )
+  return [...new Set(bindings.map((binding) => binding.owner.value))]
+}
+
+/**
+ * Data grants linked from a registration graph — typically a **mirrored**
+ * reciprocal registration — read in two queries regardless of the link count:
+ *
+ * 1. the `hasDataGrant` link set, from the resource graph UNION its `meta:`
+ *    twin (the same union `graphDoc` frames — CSS keeps registration bodies in
+ *    `meta:`);
+ * 2. the triples of every linked grant graph, in one `VALUES`-driven
+ *    `CONSTRUCT` (resource graphs and their `meta:` twins).
+ *
+ * The grants are then framed from that combined document, so the reverse edges
+ * a grantor writes into a parent's document (`<child> inheritsFromGrant
+ * <parent>`, surfaced as `hasInheritingGrant`) survive. Replaces the 1 + N
+ * pattern (`getSocialAgentRegistration` + one `getDataGrant` per link) that the
+ * grantee-side views used.
+ *
+ * A linked grant with **no** body is skipped rather than throwing: these are
+ * browsing/consent views over a replica. Callers that must fail loudly
+ * (delegated-grant generation) keep using `presentGraphs` + `getDataGrant`.
+ */
+export async function getReciprocalGrants(
+  transport: SparqlTransport,
+  registrationIri: string
+): Promise<GrantData[]> {
+  const linkBindings = await transport.fetchBindings(
+    `SELECT DISTINCT ?grant WHERE {
+  { GRAPH <${registrationIri}> { <${registrationIri}> <${INTEROP.hasDataGrant}> ?grant } }
+  UNION
+  { GRAPH <meta:${registrationIri}> { <${registrationIri}> <${INTEROP.hasDataGrant}> ?grant } }
+}`
+  )
+  const grantIris = [...new Set(linkBindings.map((binding) => binding.grant.value))]
+  if (grantIris.length === 0) return []
+
+  const resourceValues = grantIris.map((iri) => `<${iri}>`).join(' ')
+  const metaValues = grantIris.map((iri) => `<meta:${iri}>`).join(' ')
+  const store = await transport.fetchTriples(
+    `CONSTRUCT { ?s ?p ?o } WHERE {
+  { VALUES ?g { ${resourceValues} } GRAPH ?g { ?s ?p ?o } }
+  UNION
+  { VALUES ?g { ${metaValues} } GRAPH ?g { ?s ?p ?o } }
+}`
+  )
+  const doc = await jsonld.fromRDF(store)
+
+  const grants: GrantData[] = []
+  for (const iri of grantIris) {
+    try {
+      grants.push(await Grant.fromJsonLd(doc, iri))
+    } catch {
+      // the grant's graph is not mirrored (or does not hold a grant) — skip it
+    }
+  }
+  return grants
+}
+
+/**
  * Data grant body from its graph — framed via the data-model's own
  * `Grant.fromJsonLd`, producing the same `GrantData` POJO as
  * `factory.dataGrant`. Grants are immutable, so a present graph is current.

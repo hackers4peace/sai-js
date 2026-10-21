@@ -1,18 +1,21 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
+import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import {
-  type AuthorizationAgent,
-  getSocialAgentRegistration,
-  localSparqlTransport,
-} from '@janeirodigital/interop-authorization-agent'
-import { DataAuthorization, getDataGrantIris } from '@janeirodigital/interop-data-model'
-import { loader } from '@janeirodigital/interop-utils'
+  DataAuthorization,
+  type GrantData,
+  Grant,
+  getDataGrantIris,
+} from '@janeirodigital/interop-data-model'
+import { INTEROP, loader } from '@janeirodigital/interop-utils'
 const loadDataAuthorization = loader(DataAuthorization.fromJsonLd)
+const loadGrant = loader(Grant.fromJsonLd)
 
 import { beforeEach, describe, expect, test } from 'vitest'
 
 import {
   awaitGrantCompletion,
-  dataGrants,
+  rpcCall,
+  rpcPayload,
   waitFor,
   waitForQuiescence,
   waitForRoleCreatedCompletion,
@@ -20,86 +23,78 @@ import {
   waitForRoleMembershipChangedCompletion,
 } from './util'
 
-const rpcEndpoint = 'https://auth/.sai/api'
+/** Seeded account cookies for the grantee-facing RPC assertions. */
+const GRANTEE_COOKIES: Record<string, string> = {
+  'https://id/kim': 'css-account=77b0674a-1f3b-4c78-a7d9-0b2e3f4a5b6c',
+  'https://id/dan': 'css-account=4f8fe6e4-4a5a-4318-93f6-d8645778fc28',
+}
 
+/**
+ * The grant `grantedBy` issued to `grantee` over `dataOwner`'s data.
+ *
+ * Asserted on the authoritative sides plus the public surface:
+ * - the grantor's own registration of the grantee links the grants (local read);
+ * - the grant body carries the expected fields, read with the **data owner's**
+ *   session — the grantor for source grants, the peer owner for delegated ones
+ *   (where the authoritative copy lives);
+ * - the grantee-facing view the UI uses, `ListDataRegistries` with the grantee's
+ *   context ("data of <grantedBy> that I can see"), which the product serves
+ *   from the grantee's replica — polled, because replication is webhook-driven.
+ *
+ * The grantee's mirror is deliberately not read here: the replication contract
+ * is asserted in `federation-mirror.test.ts`.
+ */
 async function verifyAccessGrant(
   granteeId: string,
   grantedById: string,
   dataOwnerId: string,
   shapeTree: string,
   expectGrant: boolean
-) {
+): Promise<void> {
   const manager = buildSessionManager()
-  const granteeSession = await manager.getSession(granteeId)
+  const grantedBySession = await manager.getSession(grantedById)
+  const registration = await grantedBySession.findSocialAgentRegistration(granteeId)
+  expect(registration).toBeDefined()
+  expect(registration!.registeredAgent).toBe(granteeId)
 
-  const granteeRegForGrantedBy = await granteeSession.findSocialAgentRegistration(grantedById)
-  expect(granteeRegForGrantedBy).toBeDefined()
-  expect(granteeRegForGrantedBy!.registeredAgent).toBe(grantedById)
-
-  // reciprocal registration is stored as an IRI — load it on demand (SPARQL plane)
-  expect(granteeRegForGrantedBy!.reciprocalRegistration).toBeDefined()
-
-  const loadMirror = async () => {
-    const grantedByRegForGrantee = await getSocialAgentRegistration(
-      localSparqlTransport(granteeSession.sparqlEndpoint),
-      granteeRegForGrantedBy!.reciprocalRegistration!
-    )
-    const grants = await dataGrants(grantedByRegForGrantee, granteeSession)
-    const dataGrant = grants.find(
-      (grant) =>
-        grant.registeredShapeTree === shapeTree &&
-        grant.grantedBy === grantedById &&
-        grant.dataOwner === dataOwnerId
-    )
-    return { grantedByRegForGrantee, dataGrant }
+  // grant bodies live in the data owner's grant registry
+  const ownerSession = await manager.getSession(dataOwnerId)
+  const grants: GrantData[] = []
+  for (const iri of getDataGrantIris(registration!)) {
+    const grant = await loadGrant(iri, ownerSession.fetch).catch(() => undefined)
+    if (grant) grants.push(grant)
   }
+  const dataGrant = grants.find(
+    (grant) =>
+      grant.registeredShapeTree === shapeTree &&
+      grant.grantedBy === grantedById &&
+      grant.dataOwner === dataOwnerId
+  )
 
-  // the peer mirror is refreshed by a webhook-triggered workflow, so it can
-  // lag the grantor registration update that the test already awaited
-  await waitFor(async () => {
-    const { dataGrant } = await loadMirror()
-    return expectGrant ? dataGrant !== undefined : dataGrant === undefined
-  })
-
-  const { grantedByRegForGrantee, dataGrant } = await loadMirror()
-  expect(grantedByRegForGrantee.registeredAgent).toBe(granteeId)
+  const cookie = GRANTEE_COOKIES[granteeId]
+  expect(cookie, `no seeded cookie for ${granteeId}`).toBeDefined()
+  const seesGrant = async (): Promise<boolean> => {
+    const registries = await rpcCall<{ registrations: { shapeTree: string }[] }[]>(
+      rpcPayload({
+        _tag: 'ListDataRegistries',
+        agentId: grantedById,
+        lang: 'en',
+        context: granteeId,
+      }),
+      cookie
+    )
+    return registries.some((registry) =>
+      registry.registrations.some((entry) => entry.shapeTree === shapeTree)
+    )
+  }
+  await waitFor(async () => (await seesGrant()) === expectGrant, { timeout: 30_000 })
 
   if (expectGrant) {
-    expect((await getDataGrantIris(grantedByRegForGrantee)).length).toBeGreaterThan(0)
     expect(dataGrant).toBeDefined()
-    expect(dataGrant!.scopeOfGrant).toBe('http://www.w3.org/ns/solid/interop#AllFromRegistry')
-    expect(dataGrant!.dataOwner).toBe(dataOwnerId)
+    expect(dataGrant!.scopeOfGrant).toBe(INTEROP.AllFromRegistry)
   } else {
     expect(dataGrant).toBeUndefined()
   }
-}
-
-function rpcPayload(request: unknown) {
-  return [
-    {
-      request,
-      headers: {},
-      traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-      spanId: '685581075752b8a2',
-      sampled: true,
-    },
-  ]
-}
-
-async function rpcCall(payload: unknown, cookie: string) {
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: cookie,
-    },
-    body: JSON.stringify(payload),
-  })
-  expect(response.status).toBe(200)
-  const body = await response.json()
-  const result = body[0]
-  expect(result._tag).toBe('Success')
-  return result.value
 }
 
 /**

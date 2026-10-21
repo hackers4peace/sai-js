@@ -13,6 +13,7 @@ const loadSocialAgentRegistration = loader(SocialAgentRegistration.fromJsonLd)
 
 import {
   ChannelType,
+  HttpStatusError,
   discoverAuthorizationAgent,
   loader,
   subscribeToNotificationChannel,
@@ -141,10 +142,40 @@ export async function reciprocalRegistration(
 }
 
 export interface SyncReciprocalMirrorInput {
-  /** the org whose registration of `peerId` carries the reciprocal link */
+  /** the context whose registration of `peerId` carries the reciprocal link */
   webId: SocialAgentId
   /** the peer whose reciprocal registration (+ data grants) gets mirrored */
   peerId: SocialAgentId
+}
+
+export interface SyncReciprocalMirrorResult {
+  /**
+   * The peer no longer serves its registration of us (`404`/`410`): the local
+   * replica was dropped and there is nothing to regenerate from that peer.
+   * Callers decide the consequence — the delegated-grants consumer completes
+   * the activity without regenerating, the invitation workflows treat it as a
+   * failure (the peer's registration cannot vanish mid-invitation).
+   */
+  peerGone: boolean
+}
+
+/**
+ * A `404`/`410` **on the peer's registration itself** is terminal: a peer that
+ * unregistered us must not block `done` forever by retrying into the mirror
+ * cap. Everything else (`401`/`403`, `5xx`, network) keeps retrying —
+ * regenerating from a stale replica is worse than waiting.
+ *
+ * The IRI check matters: a `404` on one of the *linked grants* is a different
+ * failure — the reciprocal document we just fetched still lists a grant the
+ * peer already replaced, and the next sync reads the updated link set. That one
+ * retries (and the replica stays intact) instead of dropping the whole mirror.
+ */
+function isPeerGone(error: unknown, reciprocalIri: string): boolean {
+  return (
+    error instanceof HttpStatusError &&
+    error.iri === reciprocalIri &&
+    (error.status === 404 || error.status === 410)
+  )
 }
 
 /**
@@ -156,16 +187,37 @@ function ownerEndpoint(session: { sparqlEndpoint: string }): string {
 }
 
 /**
- * Refresh the local read-only mirror of the peer's reciprocal registration
- * and its linked data grants (org-context-sparql.md phase 1). Runs with the
- * org's own session credentials — server-side, where they are legitimate.
+ * Replicate the peer's reciprocal registration and its linked data grants into
+ * the local mirror. Runs with the context's own session credentials —
+ * server-side, where they are legitimate.
+ *
+ * Terminal-error policy: a `404`/`410` on the
+ * peer registration drops the replica and reports `peerGone` instead of
+ * throwing; any other failure propagates so Temporal retries. A grant that
+ * `404`s is *not* terminal — the reciprocal document we fetched still lists a
+ * grant the peer already replaced, and the next sync sees the updated link set;
+ * a `403` on a linked grant is a real access misconfiguration and must fail
+ * loudly. The sync stays all-or-nothing per attempt.
  */
-export async function syncReciprocalMirror(payload: SyncReciprocalMirrorInput): Promise<void> {
+export async function syncReciprocalMirror(
+  payload: SyncReciprocalMirrorInput
+): Promise<SyncReciprocalMirrorResult> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registration = await session.findSocialAgentRegistration(payload.peerId.id)
-  if (!registration?.reciprocalRegistration) return
-  await updateReciprocalMirror(session, registration, ownerEndpoint(session))
+  if (!registration?.reciprocalRegistration) return { peerGone: false }
+  try {
+    await updateReciprocalMirror(session, registration, ownerEndpoint(session))
+    return { peerGone: false }
+  } catch (error) {
+    if (!isPeerGone(error, registration.reciprocalRegistration)) throw error
+    // the peer deleted its registration of us — drop the replica so reads see
+    // the absence, and let the caller complete. The now-dangling reciprocal
+    // link on our own registration is the unregister flow's job
+    // (pod-isolation-followup A2)
+    await deleteMirror(registration, ownerEndpoint(session))
+    return { peerGone: true }
+  }
 }
 
 /**

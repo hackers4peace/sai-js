@@ -1,19 +1,17 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
-import {
-  getSocialAgentRegistration,
-  localSparqlTransport,
-} from '@janeirodigital/interop-authorization-agent'
-import { getDataGrantIris } from '@janeirodigital/interop-data-model'
+import { type GrantData, Grant, getDataGrantIris } from '@janeirodigital/interop-data-model'
+import { INTEROP, loader } from '@janeirodigital/interop-utils'
+const loadGrant = loader(Grant.fromJsonLd)
+
 import { describe, expect, test } from 'vitest'
 
-import { awaitGrantCompletion, dataGrants, waitFor } from './util'
-
-const rpcEndpoint = 'https://auth/.sai/api'
+import { awaitGrantCompletion, rpcCall, rpcPayload, waitFor } from './util'
 
 describe('share resource', () => {
   const aliceId = 'https://id/alice'
   const aliceCookie = 'css-account=8187358a-2072-4dce-9c76-24caffcc84a4'
   const kimId = 'https://id/kim'
+  const kimCookie = 'css-account=77b0674a-1f3b-4c78-a7d9-0b2e3f4a5b6c'
   const applicationId = 'https://data/test-client/public/id'
   const resource = 'https://data/alice-home/x1n3cm/n8k3wp'
   const projectShapeTree = 'https://data/shapetrees/trees/Project'
@@ -24,38 +22,32 @@ describe('share resource', () => {
     const aliceSession = await manager.getSession(aliceId)
 
     // kim has no grants from alice yet — her registration is the outcome signal
-    const regForKim = await aliceSession.findSocialAgentRegistration(kimId)
+    const regForKim = (await aliceSession.findSocialAgentRegistration(kimId))!
     expect(regForKim).toBeDefined()
 
     // trigger the share, await the registration Update AND the chain's
     // completion (shared barrier — the Update fires mid-chain, this also
     // waits for the workflow tail so the next write can't race it)
     await awaitGrantCompletion(aliceSession.fetch, regForKim.id, [aliceId, kimId], async () => {
-      const response = await fetch(rpcEndpoint, {
+      const response = await fetch('https://auth/.sai/api', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Cookie: aliceCookie,
         },
-        body: JSON.stringify([
-          {
-            request: {
-              _tag: 'ShareResource',
-              authorization: {
-                applicationId,
-                resource,
-                agents: [kimId],
-                accessMode: [readMode],
-                children: [],
-              },
-              context: aliceId,
+        body: JSON.stringify(
+          rpcPayload({
+            _tag: 'ShareResource',
+            authorization: {
+              applicationId,
+              resource,
+              agents: [kimId],
+              accessMode: [readMode],
+              children: [],
             },
-            headers: {},
-            traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-            spanId: '685581075752b8a2',
-            sampled: true,
-          },
-        ]),
+            context: aliceId,
+          })
+        ),
       })
       expect(response.status).toBe(200)
       const body = await response.json()
@@ -64,35 +56,47 @@ describe('share resource', () => {
       expect(value).toEqual(expect.objectContaining({ callbackEndpoint: 'https://test-client' }))
     })
 
-    // verify the grant for the shared instance on alice's reciprocal registration for kim
-    const kimSession = await manager.getSession(kimId)
-    const kimRegForAlice = await kimSession.findSocialAgentRegistration(aliceId)
-    const loadMirror = async () => {
-      const aliceRegForKim = await getSocialAgentRegistration(
-        localSparqlTransport(kimSession.sparqlEndpoint),
-        kimRegForAlice.reciprocalRegistration!
-      )
-      const grants = await dataGrants(aliceRegForKim, kimSession)
-      const sharedGrant = grants.find(
-        (grant) =>
-          grant.registeredShapeTree === projectShapeTree &&
-          grant.grantedBy === aliceId &&
-          grant.dataOwner === aliceId &&
-          grant.hasDataInstance?.includes(resource)
-      )
-      return { aliceRegForKim, sharedGrant }
+    // the grant for the shared instance, on the authoritative side: alice's
+    // registration of kim links it and the body sits in alice's own grant
+    // registry (she is the data owner) — re-read after the barrier
+    const linked = (await aliceSession.findSocialAgentRegistration(kimId))!
+    const grants: GrantData[] = []
+    for (const iri of getDataGrantIris(linked)) {
+      const grant = await loadGrant(iri, aliceSession.fetch).catch(() => undefined)
+      if (grant) grants.push(grant)
     }
-
-    // the peer mirror is refreshed by a webhook-triggered workflow, so it can
-    // lag the grantor registration update that the test already awaited
-    await waitFor(async () => (await loadMirror()).sharedGrant !== undefined)
-
-    const { aliceRegForKim, sharedGrant } = await loadMirror()
-    expect((await getDataGrantIris(aliceRegForKim)).length).toBeGreaterThan(0)
-    expect(sharedGrant).toBeDefined()
-    expect(sharedGrant!.scopeOfGrant).toBe(
-      'http://www.w3.org/ns/solid/interop#SelectedFromRegistry'
+    const sharedGrant = grants.find(
+      (grant) =>
+        grant.registeredShapeTree === projectShapeTree &&
+        grant.grantedBy === aliceId &&
+        grant.dataOwner === aliceId &&
+        grant.hasDataInstance?.includes(resource)
     )
+    expect(sharedGrant).toBeDefined()
+    expect(sharedGrant!.scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
     expect(sharedGrant!.accessMode).toEqual([readMode])
+
+    // grantee-facing (public RPC): kim sees the shared project registration in
+    // her own "data of alice" view. The product serves it from kim's replica,
+    // which the delegated-grants consumer refreshes after the grant write — poll
+    // until it converges instead of reading the replica directly (the replica
+    // contract lives in federation-mirror.test.ts).
+    await waitFor(
+      async () => {
+        const registries = await rpcCall<{ registrations: { shapeTree: string }[] }[]>(
+          rpcPayload({
+            _tag: 'ListDataRegistries',
+            agentId: aliceId,
+            lang: 'en',
+            context: kimId,
+          }),
+          kimCookie
+        )
+        return registries.some((registry) =>
+          registry.registrations.some((entry) => entry.shapeTree === projectShapeTree)
+        )
+      },
+      { timeout: 30_000 }
+    )
   })
 })

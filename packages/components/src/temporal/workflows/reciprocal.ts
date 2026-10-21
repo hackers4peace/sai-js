@@ -69,10 +69,18 @@ export async function establishReciprocal(
   // reachable only through this local replica
   // (openwiki/architecture/federation.md 1a); the acceptor leg does the same
   // in `acceptInvitation`
-  await syncMirrorActivity({
+  const mirror = await syncMirrorActivity({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     peerId: { id: registration.registeredAgent, type: [SOCIAL_AGENT_TYPE] },
   })
+  if (mirror.peerGone) {
+    // the peer's registration disappeared mid-invitation — never complete as if
+    // the pair were established and mirrored; leave the activity pending for
+    // the reconciliation sweep
+    throw new Error(
+      `peer ${registration.registeredAgent} deleted its registration during the invitation`
+    )
+  }
   await markActivitiesDone({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     activities: [activity],
@@ -107,10 +115,13 @@ export async function acceptInvitation(
   // without any peer dereference (openwiki/architecture/federation.md).
   // Ordering is safe: the webhook subscription above targets the same
   // registration, so its ACR already admits this session's read.
-  await syncMirrorActivity({
+  const mirror = await syncMirrorActivity({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     peerId: { id: webhook.peerId, type: [SOCIAL_AGENT_TYPE] },
   })
+  if (mirror.peerGone) {
+    throw new Error(`peer ${webhook.peerId} deleted its registration during the invitation`)
+  }
   await markActivitiesDone({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     activities: [activity],
@@ -125,9 +136,14 @@ export async function acceptInvitation(
  * openwiki/architecture/federation.md). Re-fetches the peer's reciprocal
  * registration (+ data grants) with the context's own credentials and
  * rewrites the local mirror graphs.
+ *
+ * Returns `peerGone` for the terminal `404`/`410` case (the replica was dropped
+ * by the activity). The consumer completes such a delivery without
+ * regenerating; the invitation workflows refuse it — a peer registration cannot
+ * legitimately vanish mid-invitation.
  */
 export async function syncReciprocalMirror(
   payload: activities.SyncReciprocalMirrorInput
-): Promise<void> {
-  await syncMirrorActivity(payload)
+): Promise<activities.SyncReciprocalMirrorResult> {
+  return syncMirrorActivity(payload)
 }

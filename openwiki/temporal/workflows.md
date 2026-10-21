@@ -4,8 +4,6 @@ title: Temporal workflows and activities
 description: The Temporal client and worker bootstrap, the four task queues (create-grants, reciprocal-registration, forward-to-push, webhook-delivery), the typed *Id boundary objects, the self-contained createGrantsForAgent regeneration, findRoleUsage routing, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
 tags: [temporal, workflows, activities, worker, architecture]
 sources:
-  - id: openwiki-source-c18acf0c50387f2e5ea026d1
-    resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-06025454564b63e0817ca135
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
@@ -38,10 +36,10 @@ sources:
     resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-21T05:20:05.106Z" }
+generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T05:20:05.106Z
+    at: 2026-10-21T12:54:01.599Z
 ---
 
 # Temporal workflows and activities
@@ -151,7 +149,7 @@ exits — the residual exit-window gap is the reconcile sweep's concern.
 | Consumer | Workflow id | Drained set | Steps |
 | --- | --- | --- | --- |
 | `processGranteeActivities` | `grantee:<webId>:<authorizationGrantee>` | pending `AuthorizationGranted` / `AuthorizationRevoked` for that grantee | resolve grantees → `createGrantsForAgent` per grantee → complete |
-| `processDelegatedGrantsUpdated` | `delegated-grants:<webId>:<peerId>` | pending `DelegatedGrantsUpdated` whose `target` is that peer | `syncReciprocalMirror` child (replication) → `updateDelegatedGrants` **without** `activityId` → complete |
+| `processDelegatedGrantsUpdated` | `delegated-grants:<webId>:<peerId>` | pending `DelegatedGrantsUpdated` whose `target` is that peer | `syncReciprocalMirror` child (replication) → `updateDelegatedGrants` **without** `activityId` → complete; a terminal peer-gone sync skips the regeneration and still completes |
 
 The delegated-grants consumer deliberately passes no `activityId` to
 `updateDelegatedGrants`: with one, that workflow would write the completion by
@@ -166,9 +164,14 @@ consumers (start-or-join) rather than calling the underlying workflows.
   `CreateGrantsInput.authorizationGrantee: AgentOrRoleId`,
   `CreateGrantsForAgentInput.grantee: AgentId`).
 - **Self-contained regeneration** — `createGrantsForAgent` fetches all the
-  grantee's authorizations (including via roles) and existing grants itself,
-  handles the empty/deny case, generates/stores/requests grants, and rewrites
-  the registration links.
+  grantee's authorizations (including via roles) and the **IRIs** of the
+  grantee's existing grants (no grant bodies: the ones we issue as `grantedBy`
+  live in the data owner's registry, and only `checkEquivalence` would need
+  them), handles the empty/deny case, stores the source grants, and requests the
+  delegated ones **batched per data owner** — one `requestDelegations` call and
+  one `interop:AccessRequest` POST per peer, because the issuance endpoint
+  already requires a single `dataOwner` and validates the whole batch before
+  storing any — then rewrites the registration links.
 - **Role routing** — `findRoleUsage` delegates to `session.findRoleUsage`,
   which returns `usedAsGrantee` plus `affectedGrantees`; the membership/deletion
   workflows route role-as-grantee to the changed members and role-as-dataOwner
