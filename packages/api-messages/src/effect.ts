@@ -567,14 +567,32 @@ export const AuthorizationGrantedMessage = S.Struct({
   activityId: IRI,
 })
 
-/** Authorization revoked — `object` = the DataAuthorization live-link set. */
+/** Authorization revoked — `object` = the DataAuthorization refs (selected +
+ * expanded descendants); `grantee` is the routing key that survives deletion. */
+export const DataAuthorizationRef = S.Struct({
+  id: S.String,
+  type: S.Array(S.String),
+})
+
 export const AuthorizationRevoked = S.Struct({
-  ...activityBaseFields,
+  id: S.String,
+  createdAt: S.String,
   type: S.Tuple(S.Literal('Activity'), S.Literal('AuthorizationRevoked')),
   /** as:actor — plain IRI (the registry owner) */
   actor: S.String,
-  /** the DataAuthorizations — live-link set */
-  object: S.Array(S.String),
+  /** the DataAuthorizations — refs (selected + expanded descendants) */
+  object: S.Array(DataAuthorizationRef),
+  /** the revoked authorization's grantee (agent, application, or role) */
+  grantee: S.String,
+})
+
+/** Pending acknowledgment of an authorization revocation (C2): the RPC wrote
+ * the `AuthorizationRevoked` activity and echoes its IRI (the uniform UI claim
+ * anchor) plus the expanded closure it captured at write time. */
+export const AuthorizationRevokedMessage = S.Struct({
+  /** absent when every selected authorization was already removed (no-op) */
+  activityId: S.optional(IRI),
+  authorizations: S.Array(IRI),
 })
 
 /** Authorization denied (decline — silent, forward-only;
@@ -742,9 +760,14 @@ export const RecordedDataAuthorization = S.Struct({
   creatorAccessMode: S.optional(S.Array(IRI)),
   hasDataInstance: S.optional(S.Array(IRI)),
   hasInheritingAuthorization: S.optional(S.Array(IRI)),
+  /** resolved from the shape tree description in the requested language; falls
+   *  back to the shape tree IRI when no description is available */
+  shapeTreeLabel: S.String,
 })
 
 export const AccessAuthorization = S.Array(RecordedDataAuthorization)
+/** The list shape returned by `ListAuthorizations` (same as `AccessAuthorization`). */
+export const AuthorizationList = AccessAuthorization
 
 export class GetWebId extends S.TaggedRequest<GetWebId>()('GetWebId', {
   failure: S.Never,
@@ -802,6 +825,20 @@ export class GetAuthoriaztionData extends S.TaggedRequest<GetAuthoriaztionData>(
       accessRequestIri: S.optional(IRI),
       context: IRI,
     },
+  }
+) {}
+
+/**
+ * The recorded authorizations for a grantee (peer, application, or role).
+ * Read-only: grants are projections, authorizations are the source of truth;
+ * revocation (C2) will target this list.
+ */
+export class ListAuthorizations extends S.TaggedRequest<ListAuthorizations>()(
+  'ListAuthorizations',
+  {
+    failure: S.Never,
+    success: AuthorizationList,
+    payload: { grantee: IRI, lang: S.String, context: IRI },
   }
 ) {}
 
@@ -991,14 +1028,33 @@ export class AuthorizeApp extends S.TaggedRequest<AuthorizeApp>()('AuthorizeApp'
   },
 }) {}
 
-export class RevokeGrants extends S.TaggedRequest<RevokeGrants>()('RevokeGrants', {
-  failure: S.Never,
-  success: S.Array(IRI),
-  payload: {
-    grants: S.Array(IRI),
-    context: IRI,
-  },
-}) {}
+/** Machine-readable authorization-revocation refusals (C4): the producer's
+ *  validation errors, no 500 defects. */
+export const AuthorizationRevocationFailure = S.Union(
+  S.Struct({ code: S.Literal('unauthorized'), authorizations: S.Array(IRI) }),
+  S.Struct({ code: S.Literal('empty-selection') }),
+  S.Struct({ code: S.Literal('not-a-data-authorization'), authorization: IRI }),
+  S.Struct({ code: S.Literal('mixed-grantee'), authorizations: S.Array(IRI) })
+)
+export type AuthorizationRevocationFailure = S.Schema.Type<typeof AuthorizationRevocationFailure>
+
+/**
+ * Revoke authorizations (C2): the UI sends the selected DataAuthorization
+ * IRIs; the service expands the inheritance closure and writes one
+ * `AuthorizationRevoked` activity per grantee. The workflow deletes the DAs and
+ * reconciles the grant projections. Grants are never targeted from the UI.
+ */
+export class RevokeAuthorizations extends S.TaggedRequest<RevokeAuthorizations>()(
+  'RevokeAuthorizations',
+  {
+    failure: AuthorizationRevocationFailure,
+    success: AuthorizationRevokedMessage,
+    payload: {
+      authorizations: S.Array(IRI),
+      context: IRI,
+    },
+  }
+) {}
 
 export class AddAdmin extends S.TaggedRequest<AddAdmin>()('AddAdmin', {
   failure: S.Never,
@@ -1032,6 +1088,11 @@ export class SaiService extends Context.Tag('SaiService')<
       accessRequestIri: IRI | undefined,
       context: IRI
     ) => Effect.Effect<S.Schema.Type<typeof AuthorizationData>>
+    readonly getAuthorizations: (
+      grantee: IRI,
+      lang: string,
+      context: IRI
+    ) => Effect.Effect<S.Schema.Type<typeof AuthorizationList>>
     readonly getResource: (
       id: IRI,
       lang: string,
@@ -1107,10 +1168,13 @@ export class SaiService extends Context.Tag('SaiService')<
       accessRequestIri: IRI | undefined,
       context: IRI
     ) => Effect.Effect<S.Schema.Type<typeof AuthorizationGrantedMessage>>
-    readonly revokeGrants: (
-      grants: readonly S.Schema.Type<typeof IRI>[],
+    readonly revokeAuthorizations: (
+      authorizations: readonly S.Schema.Type<typeof IRI>[],
       context: IRI
-    ) => Effect.Effect<readonly S.Schema.Type<typeof IRI>[]>
+    ) => Effect.Effect<
+      S.Schema.Type<typeof AuthorizationRevokedMessage>,
+      AuthorizationRevocationFailure
+    >
     readonly addAdmin: (
       webId: IRI,
       context: IRI
@@ -1172,6 +1236,12 @@ export const router = RpcRouter.make(
           context
         )
       })
+  ),
+  Rpc.effect(ListAuthorizations, ({ grantee, lang, context }) =>
+    Effect.gen(function* () {
+      const saiService = yield* SaiService
+      return yield* saiService.getAuthorizations(grantee, lang, context)
+    })
   ),
   Rpc.effect(GetResource, ({ id, lang, context }) =>
     Effect.gen(function* () {
@@ -1269,10 +1339,10 @@ export const router = RpcRouter.make(
       return yield* saiService.authorizeApp(authorization, accessRequestIri, context)
     })
   ),
-  Rpc.effect(RevokeGrants, ({ grants, context }) =>
+  Rpc.effect(RevokeAuthorizations, ({ authorizations, context }) =>
     Effect.gen(function* () {
       const saiService = yield* SaiService
-      return yield* saiService.revokeGrants(grants, context)
+      return yield* saiService.revokeAuthorizations(authorizations, context)
     })
   ),
   Rpc.effect(AddAdmin, ({ webId, context }) =>

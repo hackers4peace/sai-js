@@ -1,3 +1,4 @@
+import { WorkflowExecutionAlreadyStartedError } from '@temporalio/common'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // ──────────────────────────
@@ -30,19 +31,41 @@ const h = vi.hoisted(() => {
   const state: {
     batches: PendingActivity[][]
     pending: PendingActivity[]
-    signal?: () => void
+    signals: Record<string, () => void>
     fireSignalOnNextWait: boolean
+    fireReconcileMirrorOnNextWait: boolean
+    /** the workflowId whose consumer already runs (force → signal path) */
+    consumerRunning: boolean
+    signaledWorkflowId?: string
     mirrorOptions?: ChildOptions
     consumerOptions?: ChildOptions
+    consumerCalls: ChildOptions[]
+    /** drift-arm child starts (the per-grantee reconciliation) */
+    driftOptions: ChildOptions[]
     /** what the mirror child reports back (terminal peer-gone case) */
     mirrorResult: { peerGone: boolean }
-  } = { batches: [], pending: [], fireSignalOnNextWait: false, mirrorResult: { peerGone: false } }
+  } = {
+    batches: [],
+    pending: [],
+    signals: {},
+    fireSignalOnNextWait: false,
+    fireReconcileMirrorOnNextWait: false,
+    consumerRunning: false,
+    consumerCalls: [],
+    driftOptions: [],
+    mirrorResult: { peerGone: false },
+  }
 
   const activities = {
     // the per-peer drain
     getPendingDelegatedGrantsUpdates: vi.fn(async () => state.batches.shift() ?? []),
     // the sweep's registry scan
     getPendingActivities: vi.fn(async () => state.pending),
+    // C5 drift arm — the registered grantees the sweep re-derives
+    listGranteeRegistrations: vi.fn(async () => [] as { id: string; type: string[] }[]),
+    // C5 mirror arm — reciprocal pairs and local completeness
+    listReciprocalRegistrations: vi.fn(async () => [] as unknown[]),
+    findIncompleteReciprocalMirrors: vi.fn(async () => [] as unknown[]),
     // `updateDelegatedGrants` runs for real (same module) — its first activity
     // marks the regenerate step in the recorded order
     findAffectedGrantees: vi.fn(async () => {
@@ -63,7 +86,11 @@ vi.mock('@temporalio/workflow', () => ({
   condition: async (predicate: () => boolean) => {
     if (!h.state.fireSignalOnNextWait) return predicate()
     h.state.fireSignalOnNextWait = false
-    h.state.signal?.()
+    const name = h.state.fireReconcileMirrorOnNextWait
+      ? 'reconcileMirrorSignal'
+      : 'delegatedGrantsUpdatedSignal'
+    h.state.fireReconcileMirrorOnNextWait = false
+    h.state.signals[name]?.()
     return predicate()
   },
   defineSignal: (name: string) => name,
@@ -73,15 +100,30 @@ vi.mock('@temporalio/workflow', () => ({
       h.state.mirrorOptions = options
       return h.state.mirrorResult
     } else if (options?.workflowId?.startsWith('delegated-grants:')) {
+      if (h.state.consumerRunning) {
+        throw new WorkflowExecutionAlreadyStartedError(
+          'already started',
+          options.workflowId,
+          'run-id'
+        )
+      }
       h.calls.push('consumer')
       h.state.consumerOptions = options
+      h.state.consumerCalls.push(options)
     } else {
       h.calls.push('grants-child')
+      h.state.driftOptions.push(options ?? {})
     }
   },
+  getExternalWorkflowHandle: (workflowId: string) => ({
+    signal: async () => {
+      h.calls.push('signal')
+      h.state.signaledWorkflowId = workflowId
+    },
+  }),
   proxyActivities: () => h.activities,
-  setHandler: (_signal: unknown, handler: () => void) => {
-    h.state.signal = handler
+  setHandler: (signal: unknown, handler: () => void) => {
+    h.state.signals[String(signal)] = handler
   },
   startChild: async () => {
     h.calls.push('detect-granted')
@@ -92,6 +134,7 @@ vi.mock('@temporalio/workflow', () => ({
 import {
   processDelegatedGrantsUpdated,
   reconcileActivities,
+  reconcilePeerMirrors,
 } from '../src/temporal/workflows/grants.js'
 
 const SOCIAL_AGENT_TYPE = 'http://www.w3.org/ns/solid/interop#SocialAgent'
@@ -112,8 +155,17 @@ beforeEach(() => {
   h.state.batches = []
   h.state.pending = []
   h.state.fireSignalOnNextWait = false
+  h.state.fireReconcileMirrorOnNextWait = false
   h.state.mirrorOptions = undefined
+  h.activities.listGranteeRegistrations.mockResolvedValue([])
+  h.activities.listReciprocalRegistrations.mockResolvedValue([])
+  h.activities.findIncompleteReciprocalMirrors.mockResolvedValue([])
   h.state.consumerOptions = undefined
+  h.state.consumerCalls = []
+  h.state.consumerRunning = false
+  h.state.signaledWorkflowId = undefined
+  h.state.signals = {}
+  h.state.driftOptions = []
   h.state.mirrorResult = { peerGone: false }
   vi.clearAllMocks()
 })
@@ -230,5 +282,88 @@ describe('reconcileActivities — delegatedGrantsUpdated arm', () => {
     })
     expect(h.state.consumerOptions?.taskQueue).toBeUndefined()
     expect(h.activities.markActivitiesDone).not.toHaveBeenCalled()
+  })
+})
+
+describe('reconcileActivities — authorization-vs-projection drift arm (C5)', () => {
+  const aliceId = { id: 'https://id/alice', type: [SOCIAL_AGENT_TYPE] }
+
+  test('re-derives every registered grantee when nothing is pending', async () => {
+    h.state.pending = []
+    h.activities.listGranteeRegistrations.mockResolvedValue([peerId, aliceId])
+
+    await reconcileActivities({ webId })
+
+    expect(h.activities.listGranteeRegistrations).toHaveBeenCalledWith({ webId })
+    // one child reconciliation per registered grantee — no activity needed
+    expect(h.state.driftOptions.map((options) => options.args)).toEqual([
+      [{ webId, grantee: peerId }],
+      [{ webId, grantee: aliceId }],
+    ])
+    expect(h.activities.markActivitiesDone).not.toHaveBeenCalled()
+  })
+})
+
+describe('processDelegatedGrantsUpdated — forced mirror sync (C5)', () => {
+  test('syncs and regenerates once with no pending activity, then idles out', async () => {
+    h.state.batches = [[]]
+
+    await processDelegatedGrantsUpdated({ webId, peerId, forceSync: true })
+
+    expect(h.calls).toEqual(['mirror', 'regenerate', 'detect-granted'])
+    expect(h.activities.markActivitiesDone).not.toHaveBeenCalled()
+  })
+
+  test('a forced signal during an idle wait triggers a sync', async () => {
+    h.state.batches = [[], []]
+    h.state.fireSignalOnNextWait = true
+    h.state.fireReconcileMirrorOnNextWait = true
+
+    await processDelegatedGrantsUpdated({ webId, peerId })
+
+    // first wait: forced signal → sync; second empty drain: idle exit
+    expect(h.calls).toEqual(['mirror', 'regenerate', 'detect-granted'])
+    expect(h.activities.markActivitiesDone).not.toHaveBeenCalled()
+  })
+})
+
+describe('reconcileActivities — mirror repair arm (C5)', () => {
+  test('force-syncs an incomplete reciprocal mirror before the local drift pass', async () => {
+    h.activities.findIncompleteReciprocalMirrors.mockResolvedValue([{ peerId }])
+    h.state.pending = []
+
+    await reconcileActivities({ webId })
+
+    expect(h.activities.findIncompleteReciprocalMirrors).toHaveBeenCalledWith({ webId })
+    expect(h.state.consumerCalls).toHaveLength(1)
+    expect(h.state.consumerCalls[0]).toMatchObject({
+      workflowId: 'delegated-grants:https://id/acme:https://id/bob',
+      args: [{ webId, peerId, forceSync: true }],
+    })
+  })
+
+  test('signals a live consumer instead of starting a second run', async () => {
+    h.activities.findIncompleteReciprocalMirrors.mockResolvedValue([{ peerId }])
+    h.state.consumerRunning = true
+
+    await reconcileActivities({ webId })
+
+    expect(h.calls).toContain('signal')
+    expect(h.state.signaledWorkflowId).toBe('delegated-grants:https://id/acme:https://id/bob')
+  })
+})
+
+describe('reconcilePeerMirrors — peer freshness pass (C5)', () => {
+  const alice = { id: 'https://id/alice', type: [SOCIAL_AGENT_TYPE] }
+
+  test('force-syncs every reciprocal-linked peer', async () => {
+    h.activities.listReciprocalRegistrations.mockResolvedValue([{ peerId }, { peerId: alice }])
+
+    await reconcilePeerMirrors({ webId })
+
+    expect(h.state.consumerCalls.map((options) => options.args)).toEqual([
+      [{ webId, peerId, forceSync: true }],
+      [{ webId, peerId: alice, forceSync: true }],
+    ])
   })
 })

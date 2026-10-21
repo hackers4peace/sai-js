@@ -52,7 +52,7 @@ debt (an admin's UAS cannot PATCH seeded closures; the org session can).
 | session method `recordAuthorizationFromStructure` | ✅ `authorization-agent/src/authorization-agent.ts` |
 | synchronously materialized by services | ❌ `services/Authorization.ts` `recordAuthorization` and `services/ShareResource.ts` `shareResource` call the AA **in the RPC** and write the activity after (thick) |
 | read-side rule `agentsWithAccessMatching` | ⚠️ in `services/ShareResource.ts` (re-exports AA `matchesScope`) — a rule in the wrong layer |
-| activity decode / grantee resolution / completions | ⚠️ `temporal/activities/grants.ts` (`resolveActivityGrantee`, `markActivitiesDone`) — registry CRUD that could be AA methods |
+| activity decode / completions | ⚠️ `temporal/activities/grants.ts` (`markActivitiesDone`) — registry CRUD that could be AA methods |
 | orchestration | ✅ `temporal/workflows/*` dispatching per class |
 
 Target: move the ⚠️ rows to their layer as the activity-first steps land;
@@ -111,18 +111,16 @@ Candidates that would conform better to §1 but are **not** in scope for the
 current steps. Each is discussed and decided when a concrete change arrives;
 no change happens on the basis of this list alone.
 
-1. **Retire the per-grantee consumer** for the authorization pair once the
-   dedicated workflows land (`processGranteeActivities`, `granteeActivitiesSignal`,
-   `GRANTEE_IDLE_TIMEOUT`, `getPendingGranteeActivities` in
-   `temporal/workflows/grants.ts:110-160` + `temporal/activities/grants.ts:588-625`,
-   the start-or-signal branch in `ActivityWebhookHandler.ts:255-305`, and the
-   grantee grouping in `reconcileActivities`). Only if coalescing is not wanted
-   later.
+1. ~~**Retire the per-grantee consumer** for the authorization pair~~ —
+   **done in C2**: `processGranteeActivities`, `granteeActivitiesSignal`,
+   `getPendingGranteeActivities`, `resolveActivityGrantee` and the
+   start-or-signal branch were removed; `AuthorizationRevoked` carries refs +
+   `grantee` and runs the dedicated `processAuthorizationRevoked` workflow.
 2. **Move registry CRUD helpers out of components into `authorization-agent`:**
-   `resolveActivityGrantee` + `granteeFromObject` (`temporal/activities/grants.ts:515-563`),
-   `markActivitiesDone` + the completion partition in `getPendingActivities`
-   (`temporal/activities/grants.ts:657-678`), `replaceDataGrantsOnRegistration`,
-   `storeGrantAndAcr`. (`getGrantees` already delegates to the AA session.)
+   `markActivitiesDone` + the completion partition in `getPendingActivities`,
+   `replaceDataGrantsOnRegistration`, `storeGrantAndAcr`, and the C2/C3 GC
+   activities (`revokeGrantClosure`, `getRegistryGrantsForGrantee`,
+   `dropGrantReplicas`). (`getGrantees` already delegates to the AA session.)
 3. **Move the read-side rule `agentsWithAccessMatching`** from
    `services/ShareResource.ts:40-60` into `authorization-agent` — it is a rule
    (uses AA `matchesScope`), not transport.

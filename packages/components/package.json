@@ -18,6 +18,7 @@
     "build": "npm run build:ts && npm run build:components",
     "build:components": "componentsjs-generator -s dist -c dist/components -r sai -i .componentsignore",
     "build:ts": "tsc",
+    "test": "vitest run",
     "clean": "rm -rf dist/"
   },
   "files": [

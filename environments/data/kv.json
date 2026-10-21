@@ -401,6 +401,16 @@
         "id": "6ab253d7-d4d2-4cc1-ab4f-b7aa253d4853"
       }
     },
+    "**activityWebhook**": {
+      "a11ce001-0000-4000-8000-000000000001": {
+        "webId": "https://id/acme",
+        "topic": "https://registry/acme/activity/",
+        "accountId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "sendTo": "https://auth/.sai/activity-webhook/a11ce002-0000-4000-8000-000000000002",
+        "channel": "{\"id\": \"https://registry/.notifications/WebhookChannel2023/a11ce003-0000-4000-8000-000000000003\", \"type\": \"http://www.w3.org/ns/solid/notifications#WebhookChannel2023\", \"topic\": \"https://registry/acme/activity/\", \"sendTo\": \"https://auth/.sai/activity-webhook/a11ce002-0000-4000-8000-000000000002\"}",
+        "id": "a11ce001-0000-4000-8000-000000000001"
+      }
+    },
     "**password**": {
       "f8a9b1c2-d3e4-4f5a-6b7c-8d9e0f1a2b3c": {
         "accountId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
@@ -1321,5 +1331,26 @@
   ],
   "accounts/index/reciprocalWebhook/sendTo/https%3A%2F%2Fauth%2F.sai%2Freciprocal-webhook%2F0118ba37-e9ca-4bfc-b3f6-f7f0e3564e8b": [
     "9f137c45-2889-430b-8fb0-e1f41312dc09"
-  ]
+  ],
+  "accounts/index/activityWebhook/a11ce001-0000-4000-8000-000000000001": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/activityWebhook/webId/https%3A%2F%2Fid%2Facme": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/activityWebhook/topic/https%3A%2F%2Fregistry%2Facme%2Factivity%2F": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "accounts/index/activityWebhook/sendTo/https%3A%2F%2Fauth%2F.sai%2Factivity-webhook%2Fa11ce002-0000-4000-8000-000000000002": [
+    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+  ],
+  "notifications/https%3A%2F%2Fregistry%2Facme%2Factivity%2F": [
+    "https://registry/.notifications/WebhookChannel2023/a11ce003-0000-4000-8000-000000000003"
+  ],
+  "notifications/https%3A%2F%2Fregistry%2F.notifications%2FWebhookChannel2023%2Fa11ce003-0000-4000-8000-000000000003": {
+    "id": "https://registry/.notifications/WebhookChannel2023/a11ce003-0000-4000-8000-000000000003",
+    "type": "http://www.w3.org/ns/solid/notifications#WebhookChannel2023",
+    "topic": "https://registry/acme/activity/",
+    "sendTo": "https://auth/.sai/activity-webhook/a11ce002-0000-4000-8000-000000000002"
+  }
 }

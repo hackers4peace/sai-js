@@ -2,18 +2,21 @@ import { INTEROP } from '@janeirodigital/interop-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // ──────────────────────────
-// `createGrantsForAgent` is a Temporal workflow function: `proxyActivities`
-// hands back the scripted activity set. This test pins the VALUE-BASED reuse
-// contract — activity results cross Temporal's data converter, so a result
-// keyed on object identity would silently skip nothing (the bug the old
-// `Set<GrantData>` had). It also pins that a reused subtree re-links every
-// existing child IRI: `replaceDataGrantsOnRegistration` writes the FULL set.
+// `reconcileGrantsForGrantee` (the `createGrantsForAgent` body) is a Temporal
+// workflow function: `proxyActivities` hands back the scripted activity set.
+// This test pins the **projection + GC** contract (D13): value-based reuse,
+// `existing − reused` removed before creation, removal grouped by `dataOwner`
+// (own registry → C1 closure delete; peer-owned → boundary request + replica
+// drop), the orphan scan joined with the projection, and the deny case as the
+// empty desired set.
 // ──────────────────────────
 
 const h = vi.hoisted(() => {
   const activities = {
     getAuthorizations: vi.fn(async () => [] as { id: string; type: string[] }[]),
     getExistingGrants: vi.fn(async () => [] as { id: string; type: string[] }[]),
+    getRegistryGrantsForGrantee: vi.fn(async () => [] as { id: string; type: string[] }[]),
+    getExistingGrantBodies: vi.fn(async () => [] as Record<string, unknown>[]),
     generateGrants: vi.fn(async () => ({ sourceGrants: [], delegatedGrants: [] })),
     checkEquivalence: vi.fn(async () => ({
       reusedSourceIds: [],
@@ -23,6 +26,11 @@ const h = vi.hoisted(() => {
     storeDataGrant: vi.fn(async () => {}),
     createAcr: vi.fn(async () => {}),
     requestDelegations: vi.fn(async () => [] as { id: string; type: string[] }[]),
+    requestRevocations: vi.fn(async () => [] as string[]),
+    revokeGrantClosure: vi.fn(async () => [] as string[]),
+    deleteDataGrants: vi.fn(async () => {}),
+    removeGrantsFromRegistrations: vi.fn(async () => {}),
+    dropGrantReplicas: vi.fn(async () => {}),
     replaceDataGrantsOnRegistration: vi.fn(async () => {}),
   }
   return { activities }
@@ -39,7 +47,7 @@ vi.mock('@temporalio/workflow', () => ({
   workflowInfo: () => ({ workflowId: 'create-grants-for-agent-test' }),
 }))
 
-import { createGrantsForAgent } from '../src/temporal/workflows/grants.js'
+import { createGrantsForAgent, revokeGrants } from '../src/temporal/workflows/grants.js'
 
 const SOCIAL_AGENT_TYPE = 'http://www.w3.org/ns/solid/interop#SocialAgent'
 const DATA_GRANT = 'http://www.w3.org/ns/solid/interop#DataGrant'
@@ -88,10 +96,19 @@ const delegatedGrant = (overrides: Record<string, unknown> = {}) => ({
 /** One authorization makes the workflow take the generate path. */
 const authorization = { id: 'https://registry/acme/authorization/da1', type: [DATA_AUTHORIZATION] }
 
+/** The body `getExistingGrantBodies` returns for an existing grant. */
+const body = (id: { id: string; type: string[] }, dataOwner: string) => ({
+  id: id.id,
+  type: id.type,
+  dataOwner,
+})
+
 beforeEach(() => {
   vi.clearAllMocks()
   h.activities.getAuthorizations.mockResolvedValue([authorization])
   h.activities.getExistingGrants.mockResolvedValue([])
+  h.activities.getRegistryGrantsForGrantee.mockResolvedValue([])
+  h.activities.getExistingGrantBodies.mockResolvedValue([])
   h.activities.generateGrants.mockResolvedValue({ sourceGrants: [], delegatedGrants: [] })
   h.activities.checkEquivalence.mockResolvedValue({
     reusedSourceIds: [],
@@ -101,8 +118,8 @@ beforeEach(() => {
   h.activities.requestDelegations.mockResolvedValue([])
 })
 
-describe('createGrantsForAgent — value-based reuse', () => {
-  test('stores and delegates everything when nothing is reused', async () => {
+describe('reconcileGrantsForGrantee — projection + GC', () => {
+  test('stores and delegates everything when nothing is reused, removing the old own grants', async () => {
     const parent = sourceGrant('s-parent', { hasInheritingGrant: [grantIri('s-child')] })
     const child = sourceGrant('s-child', {
       inheritsFromGrant: grantIri('s-parent'),
@@ -112,6 +129,9 @@ describe('createGrantsForAgent — value-based reuse', () => {
     const delegated = delegatedGrant()
     const existing = [grantId('e-parent'), grantId('e-child')]
     h.activities.getExistingGrants.mockResolvedValue(existing)
+    h.activities.getExistingGrantBodies.mockResolvedValue(
+      existing.map((grant) => body(grant, ACME))
+    )
     h.activities.generateGrants.mockResolvedValue({
       sourceGrants: [parent, child],
       delegatedGrants: [delegated],
@@ -126,6 +146,8 @@ describe('createGrantsForAgent — value-based reuse', () => {
       generated: { sourceGrants: [parent, child], delegatedGrants: [delegated] },
       existing,
     })
+    // the GC happens before the creates (delete-before-create)
+    expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({ webId, grants: existing })
     expect(h.activities.storeDataGrant).toHaveBeenCalledTimes(2)
     expect(h.activities.createAcr).toHaveBeenCalledTimes(2)
     expect(h.activities.requestDelegations).toHaveBeenCalledWith({
@@ -166,6 +188,8 @@ describe('createGrantsForAgent — value-based reuse', () => {
 
     await createGrantsForAgent({ webId, grantee })
 
+    expect(h.activities.revokeGrantClosure).not.toHaveBeenCalled()
+    expect(h.activities.requestRevocations).not.toHaveBeenCalled()
     expect(h.activities.storeDataGrant).not.toHaveBeenCalled()
     expect(h.activities.createAcr).not.toHaveBeenCalled()
     expect(h.activities.requestDelegations).not.toHaveBeenCalled()
@@ -182,6 +206,9 @@ describe('createGrantsForAgent — value-based reuse', () => {
     const newSource = sourceGrant('s-new')
     const requestedDelegated = delegatedGrant()
     const reusedDelegated = delegatedGrant()
+    const existing = [grantId('e-reused'), grantId('e-old')]
+    h.activities.getExistingGrants.mockResolvedValue(existing)
+    h.activities.getExistingGrantBodies.mockResolvedValue([body(grantId('e-old'), ACME)])
     // index 1 (the second delegated grant) is the reused one
     h.activities.generateGrants.mockResolvedValue({
       sourceGrants: [reusedSource, newSource],
@@ -196,6 +223,10 @@ describe('createGrantsForAgent — value-based reuse', () => {
 
     await createGrantsForAgent({ webId, grantee })
 
+    expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({
+      webId,
+      grants: [grantId('e-old')],
+    })
     expect(h.activities.storeDataGrant).toHaveBeenCalledTimes(1)
     expect(h.activities.storeDataGrant).toHaveBeenCalledWith(newSource)
     expect(h.activities.createAcr).toHaveBeenCalledTimes(1)
@@ -212,18 +243,135 @@ describe('createGrantsForAgent — value-based reuse', () => {
     })
   })
 
-  test('deny case clears the registration without generating or comparing', async () => {
+  test('deny case is the empty desired set: removes all existing and clears the registration', async () => {
     h.activities.getAuthorizations.mockResolvedValue([])
     h.activities.getExistingGrants.mockResolvedValue([grantId('e-parent')])
+    h.activities.getExistingGrantBodies.mockResolvedValue([body(grantId('e-parent'), ACME)])
 
     await createGrantsForAgent({ webId, grantee })
 
     expect(h.activities.generateGrants).not.toHaveBeenCalled()
-    expect(h.activities.checkEquivalence).not.toHaveBeenCalled()
+    expect(h.activities.checkEquivalence).toHaveBeenCalledWith({
+      webId,
+      grantee,
+      generated: { sourceGrants: [], delegatedGrants: [] },
+      existing: [grantId('e-parent')],
+    })
+    expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({
+      webId,
+      grants: [grantId('e-parent')],
+    })
     expect(h.activities.replaceDataGrantsOnRegistration).toHaveBeenCalledWith({
       webId,
       grantee,
       grants: [],
     })
+  })
+
+  test('peer-owned non-reused grants go through the boundary and drop their replica', async () => {
+    const delegated = delegatedGrant()
+    const existing = [grantId('e-delegated')]
+    h.activities.getExistingGrants.mockResolvedValue(existing)
+    h.activities.getExistingGrantBodies.mockResolvedValue([body(grantId('e-delegated'), ALICE)])
+    h.activities.generateGrants.mockResolvedValue({
+      sourceGrants: [],
+      delegatedGrants: [delegated],
+    })
+
+    await createGrantsForAgent({ webId, grantee })
+
+    expect(h.activities.revokeGrantClosure).not.toHaveBeenCalled()
+    expect(h.activities.requestRevocations).toHaveBeenCalledWith({
+      webId,
+      dataOwner: ALICE,
+      grants: [grantId('e-delegated')],
+    })
+    expect(h.activities.dropGrantReplicas).toHaveBeenCalledWith({
+      webId,
+      grants: [grantIri('e-delegated')],
+    })
+  })
+
+  test('the own-registry orphan scan joins the projection before equivalence', async () => {
+    const orphan = grantId('e-orphan')
+    h.activities.getExistingGrants.mockResolvedValue([])
+    h.activities.getRegistryGrantsForGrantee.mockResolvedValue([orphan])
+    h.activities.getExistingGrantBodies.mockResolvedValue([body(orphan, ACME)])
+
+    await createGrantsForAgent({ webId, grantee })
+
+    expect(h.activities.checkEquivalence).toHaveBeenCalledWith({
+      webId,
+      grantee,
+      generated: { sourceGrants: [], delegatedGrants: [] },
+      existing: [orphan],
+    })
+    expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({
+      webId,
+      grants: [orphan],
+    })
+  })
+
+  test('a peer-owned grant with a missing body is left to the owner sweep', async () => {
+    h.activities.getExistingGrants.mockResolvedValue([grantId('e-parent')])
+    h.activities.getExistingGrantBodies.mockResolvedValue([])
+
+    await createGrantsForAgent({ webId, grantee })
+
+    // no body → cannot owner-group it; nothing is deleted here (the owner's
+    // sweep/closure cleans the orphan)
+    expect(h.activities.revokeGrantClosure).not.toHaveBeenCalled()
+    expect(h.activities.requestRevocations).not.toHaveBeenCalled()
+    expect(h.activities.replaceDataGrantsOnRegistration).toHaveBeenCalledWith({
+      webId,
+      grantee,
+      grants: [],
+    })
+  })
+
+  test('an own-registry grant with a missing body is still removed by IRI', async () => {
+    h.activities.getExistingGrants.mockResolvedValue([grantId('e-parent')])
+    h.activities.getRegistryGrantsForGrantee.mockResolvedValue([grantId('e-parent')])
+    h.activities.getExistingGrantBodies.mockResolvedValue([])
+
+    await createGrantsForAgent({ webId, grantee })
+
+    expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({
+      webId,
+      grants: [grantId('e-parent')],
+    })
+  })
+})
+
+describe('revokeGrants — owner-side delete + projection patch (C4)', () => {
+  const parent = grantId('p-parent')
+  const child = grantId('p-child')
+  const groups = [
+    { grantee: ALICE, grants: [parent.id, child.id] },
+    { grantee: 'https://id/bob', grants: ['https://registry/acme/grant/b-parent'] },
+  ]
+
+  test('deletes the closure first, then clears the registration links per grantee', async () => {
+    await revokeGrants({ webId, grants: [parent, child], projection: groups })
+
+    expect(h.activities.deleteDataGrants).toHaveBeenCalledWith({
+      webId,
+      grants: [parent, child],
+      projection: groups,
+    })
+    expect(h.activities.removeGrantsFromRegistrations).toHaveBeenCalledWith({
+      webId,
+      groups,
+    })
+    const deleteOrder = h.activities.deleteDataGrants.mock.invocationCallOrder[0]
+    const patchOrder = h.activities.removeGrantsFromRegistrations.mock.invocationCallOrder[0]
+    expect(deleteOrder).toBeLessThan(patchOrder)
+  })
+
+  test('a payload without a projection only deletes (older/internal callers)', async () => {
+    await revokeGrants({ webId, grants: [parent] })
+
+    expect(h.activities.deleteDataGrants).toHaveBeenCalledWith({ webId, grants: [parent] })
+    expect(h.activities.removeGrantsFromRegistrations).not.toHaveBeenCalled()
   })
 })

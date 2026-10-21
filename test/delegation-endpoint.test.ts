@@ -1,16 +1,22 @@
 import { buildOidcSession, issuanceUrl } from '@elfpavlik/sai-components'
 import type { IncomingGrantData } from '@janeirodigital/interop-data-model'
 import { ACL, INTEROP, LDP, toStore } from '@janeirodigital/interop-utils'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test } from 'vitest'
 
+import { waitForQuiescence } from './util'
 import { SOLIDTREES } from './vocabularies'
 
 const bobId = 'https://id/bob'
+const aliceId = 'https://id/alice'
 const acmeId = 'https://id/acme'
+const kimId = 'https://id/kim'
 const testClient = 'https://data/test-client/public/id'
 const grantRegistry = 'https://registry/acme/grant/'
 // seeded in environments/data/registry.trig
 const seededGrantCount = 10
+
+const p9m2vr = `${grantRegistry}p9m2vr` // acme → bob (source)
+const bobOwnGrant = 'https://registry/bob/grant/t2v9cd' // a different owner's registry
 
 const commonGrantData = {
   grantedBy: bobId,
@@ -84,6 +90,14 @@ async function issueProjectsGrant(): Promise<string[]> {
 }
 
 describe('DelegationRevocationEndpoint', () => {
+  // A revocation PATCHes the owner's registration, which fires the grantee's
+  // reciprocal webhook and starts a mirror/regeneration workflow. Never let
+  // it outlive the test: the per-test dataset reset would race the still
+  // running workflow (the CSS store 500 seen on `getExistingGrants`).
+  afterEach(async () => {
+    await waitForQuiescence([acmeId, bobId, aliceId, kimId])
+  })
+
   test('revokes a listed grant and its inheriting child', async (): Promise<void> => {
     const ids = await issueProjectsGrant()
     const [parentId, childId] = ids
@@ -148,14 +162,91 @@ describe('DelegationRevocationEndpoint', () => {
     const ids = await issueProjectsGrant()
     const [parentId] = ids
 
-    const kimSession = await buildOidcSession('https://id/kim')
+    const kimSession = await buildOidcSession(kimId)
     const response = await kimSession.authFetch(issuanceUrl(acmeId), {
       method: 'POST',
       headers: { 'Content-Type': 'application/ld+json' },
       body: revocationPayload([parentId]),
     })
     expect(response.status).toBe(403)
+    // typed (C4): the body carries the machine-readable code
+    expect((await response.json()).code).toBe('unauthorized')
     expect(await countGrants()).toBe(seededGrantCount + 2)
+  })
+
+  test('a mixed-owner request fails as a whole on the requested set (B2)', async (): Promise<void> => {
+    const session = await buildOidcSession(acmeId)
+    const response = await session.authFetch(issuanceUrl(acmeId), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/ld+json' },
+      body: revocationPayload([p9m2vr, bobOwnGrant]),
+    })
+    expect(response.status).toBe(400)
+    expect(await response.json()).toMatchObject({
+      code: 'mixed-owner',
+      grants: [p9m2vr, bobOwnGrant],
+    })
+    // no partial apply
+    expect(await countGrants()).toBe(seededGrantCount)
+  })
+
+  test('a grant IRI from no known registry is a typed unknown refusal', async (): Promise<void> => {
+    const session = await buildOidcSession(acmeId)
+    const unknownGrant = 'https://unknown.example/registry/grant/x'
+    const response = await session.authFetch(issuanceUrl(acmeId), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/ld+json' },
+      body: revocationPayload([unknownGrant]),
+    })
+    expect(response.status).toBe(400)
+    expect(await response.json()).toMatchObject({
+      code: 'unknown',
+      grants: [unknownGrant],
+    })
+  })
+
+  test('multi-hop chain: revoking the entry point removes the downstream grant (C1)', async () => {
+    const issueHop = async (grantedBy: string, grantee: string): Promise<string> => {
+      const session = await buildOidcSession(grantedBy)
+      const response = await session.authFetch(issuanceUrl(acmeId), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/ld+json' },
+        body: issuancePayload([
+          {
+            ...commonGrantData,
+            grantedBy,
+            grantee,
+            registeredShapeTree: SOLIDTREES.Project,
+            hasDataRegistration: 'https://data/acme-rnd/reb39k/',
+            accessMode: [ACL.Read, ACL.Update],
+            scopeOfGrant: INTEROP.AllFromRegistry,
+          },
+        ]),
+      })
+      expect(response.status).toBe(200)
+      const granted = (await response.json()) as { id: string }[]
+      expect(granted).toHaveLength(1)
+      return granted[0].id
+    }
+
+    // acme → bob (seeded source) → alice (first hop) → bob (second hop). The
+    // second hop is valid only through the recursive chain predicate; the old
+    // direct-upstream check accepted it too, but the revocation closure is
+    // what C1 changes.
+    const entryPoint = await issueHop(bobId, aliceId)
+    await issueHop(aliceId, bobId)
+    expect(await countGrants()).toBe(seededGrantCount + 2)
+
+    const session = await buildOidcSession(bobId)
+    const response = await session.authFetch(issuanceUrl(acmeId), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/ld+json' },
+      body: revocationPayload([entryPoint]),
+    })
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual([entryPoint])
+    // the entry point and the downstream hop are both gone
+    expect(await countGrants()).toBe(seededGrantCount)
   })
 })
 
@@ -207,6 +298,22 @@ describe('DelegationIssuanceEndpoint', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/ld+json' },
         body: issuancePayload([{ ...projectsGrantData, grantedBy: 'https://id/kim' }]),
+      })
+      expect(response.status).toBe(400)
+      expect(await countGrants()).toBe(seededGrantCount)
+    })
+    test('no covering upstream grant fails and nothing is created (C1)', async (): Promise<void> => {
+      const session = await buildOidcSession(bobId)
+      const response = await session.authFetch(issuanceUrl(acmeId), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/ld+json' },
+        body: issuancePayload([
+          {
+            ...projectsGrantData,
+            hasDataRegistration: 'https://data/acme-rnd/does-not-exist/',
+            hasInheritingGrant: undefined,
+          },
+        ]),
       })
       expect(response.status).toBe(400)
       expect(await countGrants()).toBe(seededGrantCount)

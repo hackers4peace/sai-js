@@ -19,7 +19,12 @@ const sparql = vi.hoisted(() => {
     present: Set<string>
     updates: string[]
     bindingQueries: string[]
-  } = { mirroredLinks: [], present: new Set(), updates: [], bindingQueries: [] }
+  } = {
+    mirroredLinks: [],
+    present: new Set(),
+    updates: [],
+    bindingQueries: [],
+  }
   return state
 })
 
@@ -56,7 +61,7 @@ vi.mock('fetch-sparql-endpoint', async () => {
         throw new Error(`mock: unexpected query\n${query}`)
       }
       async fetchTriples() {
-        throw new Error('mock: unexpected fetchTriples')
+        throw new Error('mock: unexpected fetchTriples (the guard compares links only)')
       }
       async fetchUpdate(_endpoint: string, update: string) {
         sparql.updates.push(update)
@@ -171,5 +176,32 @@ describe('deleteReciprocalMirror', () => {
       expect(update).toContain(`DROP SILENT GRAPH <${iri}>;`)
       expect(update).toContain(`DROP SILENT GRAPH <meta:${iri}>;`)
     }
+  })
+})
+
+describe('updateReciprocalMirror — no-op guard (D20)', () => {
+  test('writes nothing when the hasDataGrant set is unchanged and every body is present', async () => {
+    sparql.mirroredLinks = [G1, G2, G3]
+    sparql.present = new Set([RECIPROCAL, G1, G2, G3])
+
+    await updateReciprocalMirror(session(), registration, 'http://fuseki/sparql')
+
+    expect(sparql.updates).toEqual([])
+    // the grants are immutable and present — only the peer registration is fetched
+    expect(fetched).toEqual([RECIPROCAL])
+  })
+
+  test('inserts a missing registration graph even when the grant set is unchanged', async () => {
+    // the grant links are current, but the mirrored registration body is gone
+    // (a loss the local completeness arm also detects)
+    sparql.mirroredLinks = [G1, G2, G3]
+    sparql.present = new Set([G1, G2, G3])
+
+    await updateReciprocalMirror(session(), registration, 'http://fuseki/sparql')
+
+    expect(fetched).toEqual([RECIPROCAL])
+    const [update] = sparql.updates
+    expect(update).toContain(`DROP SILENT GRAPH <${RECIPROCAL}>;`)
+    expect(update).toContain(`<${G1}>`)
   })
 })

@@ -106,18 +106,30 @@ npx vitest run --project @janeirodigital/interop-authorization-agent
 npx vitest run --project @elfpavlik/sai-components
 ```
 
-- `npm test` runs the turbo `test` scripts. `packages/components` has no `test`
-  script, so **use the `npx vitest --project` form** for its suite.
+- `npm test` runs the turbo `test` scripts. `packages/components` now has a
+  `test` script (`vitest run`); **use the `npx vitest --project` form** for a
+  single suite (`@elfpavlik/sai-components`).
 - Package tests are the agent-runnable gate; they use SPARQL mocks / mocked
   Temporal and need no external services.
+- UI changes: `cd ui/authorization && npx vite build`. **Do not use `vue-tsc`
+  as a gate yet** — the UI baseline is already red because the UI's own
+  `node_modules` and the symlinked packages resolve two different Effect type
+  identities (a separate cleanup).
 - `/test` is the dagger-driven integration suite. **Only the user runs it**
   (the repo-root `.dagger` environment; data comes from
   `/environments/data`). The agent adds or updates the test files in the same
   change set and marks the slice `landed (acceptance user-run)` until the user
   confirms.
-- Baseline at `d7c89f43`: typecheck green; components suite 24 files / 184
-  tests (~4 s); authorization-agent suite 17 files / 111 passed, 20 skipped
-  (~2 s).
+- `/test` resets the dataset per test, but **webhook-triggered workflows can
+  outlive a test** and write into the next test's dataset. When a test asserts
+  on a projection after triggering a regeneration, wait for quiescence
+  (`waitForQuiescence`) and read a stabilized projection (two consecutive equal
+  reads) — see `test/check-equivalence.test.ts`. A slice's `/test` acceptance
+  is not green until these races are handled.
+- Baseline at `2381ecd2` (C0–C4; D17/D18): typecheck green;
+  components suite 27 files / 208 tests (~4 s); authorization-agent suite 18
+  files / 135 passed, 20 skipped (~1.4 s, includes the C0–C4 working-tree
+  tests). The UI builds with `vite build`; `vue-tsc` is red at baseline.
 
 ## 8. Index membership
 

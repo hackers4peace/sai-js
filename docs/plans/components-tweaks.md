@@ -11,7 +11,7 @@
 
 After `reorganize-authz-agent-logic.md` (Phases 1–4, ✅ done) the
 authorization-agent owns the SAI domain layer — `sparql.ts` (registry-plane
-queries incl. `findDelegableGrant`/`getGrantsAuthority`/`findInheritingChildren`),
+queries incl. `grantChainValidity`/`getGrantsAuthority`/`getRegistryGrants`),
 `authorization.ts` (`matchesScope`, `buildNestedDataAuthorizations`),
 `grant-generation.ts` (`dataInstanceIrisForGrant`, the grant-generation chain),
 session methods (`recordAuthorizationFromStructure`, `revokeGrants`,
@@ -61,7 +61,7 @@ collects grants by `INTEROP.hasStorage`):
 - `determineTargetType` — Registry/Registration/Resource classification from
   the storage hierarchy.
 
-The AA owns the sibling rules (`matchesScope`, `findDelegableGrant`,
+The AA owns the sibling rules (`matchesScope`, `grantChainValidity`,
 `dataInstanceIrisForGrant`) but nothing on the **grant-evaluation** side.
 `reorganize-authz-agent-logic` §4 Phase 4's keep-list says the engine
 "stays a server concern" (a policy-engine integration) **but** "grant-matching
@@ -93,7 +93,7 @@ variant as deferred; the re-investigation found the other three.
   `generateDelegatedDataGrants` / `generateChildDelegatedGrantData` produce
   the `Inherited` payload with no id) into `FinalGrantData`, wiring
   `inheritsFromGrant` and the parent's `hasInheritingGrant` list;
-- then validates every grant with `findDelegableGrant` (AA) before the
+- then validates every grant with `grantChainValidity` (AA) before the
   Temporal store.
 
 The IRI-assignment + inheritance wiring is the exact grant-side mirror of
@@ -136,7 +136,7 @@ rewrite in `syncAdminAcr`) is WAC/ACP automation and stays.
 ### 3.1 Extract the policy-engine *predicates* to AA (engine stays a plugin)
 
 Move the pure grant-evaluation semantics out of `SaiPermissionsEngine` into
-AA predicates (siblings of `matchesScope` / `findDelegableGrant` /
+AA predicates (siblings of `matchesScope` / `grantChainValidity` /
 `dataInstanceIrisForGrant`), e.g.:
 
 - a grant→request coverage predicate over the loaded grant dataset
@@ -175,7 +175,8 @@ which context. This removes the four duplicated implementations and gives
 Move the IRI assignment + `hasInheritingGrant`/`inheritsFromGrant` wiring
 (2.3) into an AA session method, e.g. `finalizeIncomingGrants(grants)`:
 assigns IRIs in `registrySet.hasGrantRegistry`, completes embedded child
-grants, and validates each via `findDelegableGrant`. `GrantIssuanceHandler`
+grants, and validates each via `grantChainValidity`/`getRegistryGrants`.
+`GrantIssuanceHandler`
 keeps the HTTP envelope (message dispatch, all-or-nothing dataOwner check is
 arguably part of it — decide when implementing), Temporal scheduling, and
 the response. Complements AA's `generateDelegatedDataGrants`.

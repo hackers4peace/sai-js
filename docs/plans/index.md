@@ -33,7 +33,7 @@ git.
 
 | Status | Count | Plans |
 |---|---|---|
-| 🔶 in progress / design ready | 2 | `revoke-delegation-chain` (workstream), `authorization-revocation` (C0/C2 detail) |
+| 🔶 in progress / design ready | 2 | `revoke-delegation-chain` (workstream — C0–C4 landed, C5 open), `authorization-revocation` (C0/C2 landed; C4/C5 detail lives in the workstream) |
 | ⬜ not started / design only | 10 | `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing` |
 | 🧭 umbrella | 1 | `org-admin-feature` |
 | 📝 design notes | 3 | `architecture`, `fixes`, `improve-fetch-json-ld` |
@@ -56,16 +56,17 @@ Two files, one ladder:
 Ladder (capability slices, not layers):
 
 ```
-C0 authorization view (read-only)
-C1 chain validity + coverage            (parallel with C0)
-C2 authorization revocation end-to-end  (needs C0, C1)
-C3 reconciliation for every trigger     (needs C2)
-C4 grantee self-revocation + typed errors (needs C1)
-C5 sweep backstop                       (needs C1, C2)
+C0 ✅ authorization view (read-only)
+C1 ✅ chain validity + coverage
+C2 ✅ authorization revocation end-to-end
+C3 ✅ reconciliation for every trigger (landed with C2)
+C4 ✅ typed errors + owner projection cleanup (self-revocation removed — D17)
+C5    sweep backstop                       (open)
 ```
 
-**C0/C1 can run in parallel; C2 is the first mutating slice.** Each slice's
-package gate and `/test` acceptance are in the workstream plan. The old
+**C0–C4 are landed** (package-tested; `/test` acceptance confirmed — dagger
+green 2026-10-21); C5 (sweep) is open. Each slice's package gate and `/test` acceptance are in the workstream
+plan. The old
 `revoke-delegation-chain-follow-ups.md` item mapping is in
 `revoke-delegation-chain.md` §14.
 
@@ -101,14 +102,14 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 
 | Plan | Status | What it does | Depends on |
 |---|---|---|---|
-| `revoke-delegation-chain.md` | 🔶 in progress — boundary landed, C0–C5 open | Workstream home for revoking access: authorizations are the source of truth; grants are projections. Landed boundary (AccessRevocation, owner validation/deletion, grant ACRs) + capability ladder C0–C5 | references `authorization-revocation.md` (C0/C2 detail); OpenWiki activity/grant-reuse docs |
-| `authorization-revocation.md` | 🔶 design ready — C0/C2 detail | Authorization read model + UI; `RevokeAuthorizations` RPC; `AuthorizationRevoked` refs+grantee carrier; `processAuthorizationRevoked` (delete DAs, reconcile grants, closure, complete) | C0/C1 of the workstream; landed `AuthorizationRevoked` routing and admin revocation precedent |
+| `revoke-delegation-chain.md` | 🔶 in progress — C0–C4 landed, C5 open | Workstream home for revoking access: authorizations are the source of truth; grants are projections. Landed boundary + C0 view + C1 chain validity/closure + C2 authorization revocation + C3 projection/GC + C4 typed errors/projection cleanup; ladder C5 | references `authorization-revocation.md` (C0/C2 detail); OpenWiki activity/grant-reuse docs |
+| `authorization-revocation.md` | 🔶 C0/C2 landed (C4 typed failures) | Authorization read model + UI; `RevokeAuthorizations` RPC (`AuthorizationRevocationFailure`); `AuthorizationRevoked` refs+grantee carrier; `processAuthorizationRevoked` (delete DAs, reconcile grants, C1 closure, complete) — all landed | landed C0–C4 of the workstream; C5 tracked there |
 | `reconsider-n3-package.md` | ⬜ decision needed — keep vs drop | Reconsider the remaining `n3` dependency: Store/DataFactory footprint, `ReciprocalMirror` N-Quads/GRAPH-block and TriG test/seed sites, options A/B/C, recommended partial drop | completed Turtle-removal work (OpenWiki `data-model/json-ld-layer.md`); `fetch-sparql-endpoint` keeps `n3` transitively |
 | `pod-isolation-followup.md` | ⬜ not started | Remaining per-pod isolation edge cases: mirror backfill/drift scan, unregister mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion cleanup, cross-pod/mirror-freshness tests, named-graph patch guard | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `update-deployment.md` for production |
 | `webhook-subscription-bootstrap.md` | ⬜ not done (design only) | `ensureActivityWebhookChannel` at account creation + startup/periodic healing for real deployments; admin/org channels | — |
 | `registry-set-permissions.md` | ⬜ not started (design) | Scope the blanket `#fullAdminAccess` per structural registry: per-container ACRs, GrantRegistry owner-only (admins never write grants; per-grant ACRs serve reads), ActivityRegistry Read + create/append instead of blanket Write; seed ACR hygiene for the ACR-less yoyo DataGrants | `org-admin-feature` R1 |
 | `components-tweaks.md` | ⬜ design only (investigation write-up) | Residual SAI domain/spec logic still in components after the reorganize phases: extract `SaiPermissionsEngine`'s grant-evaluation predicates and the 4×-duplicated `hasAdminGrant` admin-marker rule to AA session methods/predicates; move the delegation-endpoint inheritance completion and `buildAdminGrants` materialization to AA; plane-based session `findRegistration` | — |
-| `update-deployment.md` | ⬜ not started | Production NixOS/Podman cutover to per-pod Fuseki + Garage, Node 26 source images, env/secrets/volumes, data/account migration, OCI/flake/hosts, deployed smoke test | landed per-pod storage code; `pod-isolation-followup.md` mirror-backfill prerequisite |
+| `update-deployment.md` | ⬜ not started | Production NixOS/Podman cutover to per-pod Fuseki + Garage, Node 26 source images, env/secrets/volumes, data/account migration, OCI/flake/hosts, deployed smoke test; **workstream F**: scheduled reconciliation (C5) + activity-webhook channel healing | landed per-pod storage code; `pod-isolation-followup.md` mirror-backfill prerequisite; `revoke-delegation-chain.md` C5 + `webhook-subscription-bootstrap.md` |
 | `npm-publishing.md` | ⬜ not started (future goal) | Move all packages to the `@hackers4peace` npm org and publish there (rename scopes, published artifact, release workflow); **not** a deployment prerequisite | landed ESM/no-build groundwork; `update-deployment.md` for the source-build path |
 | `extract-temporal-workflows.md` | ⬜ not started — blocked on a cycle decision | Move all Temporal code out of `packages/components` into a private `temporal-workflows` package and shrink `components` to Components.js-only; a `components ↔ temporal` dependency cycle needs option A/B/C resolved first | overlaps `components-tweaks.md` |
 | `specific-instance-access-requests.md` | ⬜ not started (design only) | Access requests targeting specific data instances (`hasDataInstance` on `AccessNeed`); deferred from the granting work — no request-side caller yet | — |
@@ -127,18 +128,22 @@ removed; the surviving plans are the open work items.
 
 ```
 revoke-delegation-chain 🔶 (workstream)
-  ├─ C0 authorization view (read-only)
-  ├─ C1 chain validity + coverage          ─┐ parallel
-  ├─ C2 authorization revocation end-to-end ┘ needs C0 + C1
-  ├─ C3 reconciliation for every trigger    needs C2
-  ├─ C4 self-revocation + typed errors      needs C1
-  └─ C5 sweep backstop                      needs C1 + C2
+  ├─ C0 ✅ authorization view (read-only)
+  ├─ C1 ✅ chain validity + coverage
+  ├─ C2 ✅ authorization revocation end-to-end
+  ├─ C3 ✅ reconciliation for every trigger (landed with C2)
+  ├─ C4 ✅ typed errors + projection cleanup
+  └─ C5    sweep backstop                    (open)
 
-authorization-revocation 🔶 (C0/C2 detailed design; links back to the workstream)
+authorization-revocation 🔶 (C0/C2 landed; links back to the workstream)
 ```
 
-The C2 boundary/owner core is landed; the producer, workflow, carrier, and UI
-are open. `grantsRevoked` / `processGrantsRevocation` stay retired.
+The C2 producer, workflow, carrier, and UI are landed; C4's typed revocation
+failures and owner-projection cleanup are landed. Grantee self-revocation was
+removed by design review (D17 — grants are projections; future options are
+grantee-side shadowing and a need-based-style revocation request). C5 (sweep)
+is the last open slice. `grantsRevoked` / `processGrantsRevocation` stay
+retired.
 
 ### Grant workflows & the activity outbox
 
@@ -188,8 +193,8 @@ The enforcement boundaries themselves are documented in the OpenWiki:
 `/.sai/sparql-admin`), `architecture/storage-isolation.md` (endpoint allowlist,
 fail-closed routing, endpoint-as-capability), and `architecture/federation.md`
 (single-deployment shortcuts). Security-relevant plan work:
-`revoke-delegation-chain.md` (C2 authorization revocation, C4 typed authority
-errors, C5 mirror/write ordering, grant ACRs), `pod-isolation-followup.md`
+`revoke-delegation-chain.md` (C2 authorization revocation, C4 typed errors +
+owner-projection cleanup, C5 mirror/write ordering, grant ACRs), `pod-isolation-followup.md`
 (mirror single-writer, cross-owner isolation tests, named-graph patch guard),
 `update-deployment.md` (Fuseki/Garage internal auth, Garage admin token,
 `findSparqlByIri` scan), and `registry-set-permissions.md` (ACR/ACP scoping per
@@ -214,7 +219,7 @@ override plans remain.
 
 | Plan | Custom components added |
 |---|---|
-| `revoke-delegation-chain.md` 🔶 | `GrantRevocationHandler` + `AccessRevocation` dispatch on the delegation endpoint (`GrantIssuanceHandler`), and the `RevokeGrants` RPC (`services/Revocation.ts` via `ApiHandler`) — the landed boundary. C0/C2 add an authorization RPC + service; no new CSS built-in |
+| `revoke-delegation-chain.md` 🔶 | `GrantRevocationHandler` + `AccessRevocation` dispatch on the delegation endpoint (`GrantIssuanceHandler`) — the projection-transport boundary (the owner `RevokeGrants` RPC was deleted, D18). C0–C4 landed (authorization RPC/view, chain predicate/closure, authorization revocation, projection/GC, typed refusals + owner-projection cleanup); C5 adds no new CSS built-in |
 | `webhook-subscription-bootstrap.md` ⬜ | Reuses the existing `ActivityWebhookStore` + the **stock** CSS notification API (`SubscriptionClient` → `WebhookChannel2023`, kv-backed `KeyValueChannelStorage`) — no new components |
 
 ### No CSS components needed

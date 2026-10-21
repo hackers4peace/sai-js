@@ -43,7 +43,7 @@ Registry container:
 
 | Piece | Where | Notes |
 |---|---|---|
-| Pre-seeded channels (dev/test) | `environments/data/kv.json` — `**activityWebhook**` account entries + `accounts/index/activityWebhook/*` + CSS-side `notifications/<encodeURIComponent(id\|topic)>` keys | alice/bob/kim/yoyo; dan's personal + YoYo-admin channels and bob's YoYo reciprocal channel (Phase 3, §4.6/org-admin §2.5); re-seeded by `beforeEach` |
+| Pre-seeded channels (dev/test) | `environments/data/kv.json` — `**activityWebhook**` account entries + `accounts/index/activityWebhook/*` + CSS-side `notifications/<encodeURIComponent(id\|topic)>` keys | alice/bob/kim/yoyo + acme (added with the C2 authorization-revocation acceptance test — acme's Activity Registry had no channel before); dan's personal + YoYo-admin channels and bob's YoYo reciprocal channel (Phase 3, §4.6/org-admin §2.5); re-seeded by `beforeEach` |
 | App store | `ActivityWebhookStore` (`packages/components/src/ActivityWebhookStore.ts`) over `AccountLoginStorage` — type `activityWebhook`, fields `accountId/webId/topic/sendTo/channel`; methods today: `findBySendTo`, `create`, `delete` | needs `findByWebId`/`findByTopic` for reconciliation |
 | CSS-side channel | created by `SubscriptionClient.subscribe(topic, ChannelType.WebhookChannel2023, sendTo)` → the registry server's `KeyValueChannelStorage` (`notifications/…` keys) | the pattern in `activities/reciprocal.ts` `reciprocalWebhook` |
 | Account creation | `AccountService.bootstrapAccount` (`packages/components/src/services/Account.ts`) — POSTs `registrySetTemplate` (incl. the activity registry) to the quadstore + writes the account to kv | runs on the auth server; no subscription today |
@@ -258,7 +258,9 @@ channels are untouched by the create path (idempotent skip).
 
 ## 7. Out of scope
 
-- The reconciliation sweep for activity **entries** (Phase 4.2) — separate.
+- The reconciliation sweep for activity **entries** (Phase 4.2 / C5) — separate;
+production scheduling of both the sweep and this channel healer is tracked in
+[`update-deployment.md` §F](update-deployment.md#workstream-f--scheduled-reconciliation-c5--channel-healing).
 - Durable webhook delivery is implemented (`DurableWebhookEmitter`); this plan
   covers channel lifecycle only.
 - Unsubscribing channels for deleted accounts (no account-deletion flow today).

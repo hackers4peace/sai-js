@@ -7,6 +7,7 @@ import {
   type DataRegistrationData,
   Grant,
   type GrantData,
+  type RegistrySetData,
   type RoleData,
   SocialAgentInvitation,
   type SocialAgentInvitationData,
@@ -477,6 +478,29 @@ export async function getDataGrant(transport: SparqlTransport, iri: string): Pro
 }
 
 /**
+ * Every grant body in a grant registry — the chain predicate's input
+ * (C1). The listing is `listContained` over the registry container; each body
+ * is one graph read. A contained graph that no longer frames as a grant is
+ * skipped (a broken/orphaned graph must not fail the whole closure).
+ */
+export async function getRegistryGrants(
+  transport: SparqlTransport,
+  grantRegistryIri: string
+): Promise<GrantData[]> {
+  const iris = await listContained(transport, grantRegistryIri)
+  const grants = await Promise.all(
+    iris.map(async (iri) => {
+      try {
+        return await getDataGrant(transport, iri)
+      } catch {
+        return undefined
+      }
+    })
+  )
+  return grants.filter((grant): grant is GrantData => grant !== undefined)
+}
+
+/**
  * Data authorization body from its graph — framed via the data-model's own
  * `DataAuthorization.fromJsonLd`, producing the same
  * `DataAuthorizationData` POJO as `factory.dataAuthorization`. Tolerant of
@@ -522,6 +546,38 @@ export async function findRolesWithMember(
 }`
   )
   return bindings.map((binding) => binding.role.value)
+}
+
+/**
+ * Authorizations for a grantee over an explicit registry set + transport — the
+ * context-aware core of `AuthorizationAgent.findAuthorizationsForAgent`.
+ *
+ * The class method binds the session's own registry (personal context); the
+ * components service binds the **context's** registry set and
+ * `sparqlTransportFor(ctx)`, so an org admin lists the org's authorizations
+ * (the `/sparql-admin` transport) rather than their personal ones.
+ *
+ * Direct authorizations and authorizations granted to a role the grantee
+ * belongs to are both included; non-DataAuthorizations (admin authorizations
+ * share the registry container) are type-filtered out. The returned rows keep
+ * `inheritsFromAuthorization` so callers can build the inheritance tree.
+ */
+export async function findAuthorizationsForGrantee(
+  transport: SparqlTransport,
+  registrySet: RegistrySetData,
+  grantee: string
+): Promise<DataAuthorizationData[]> {
+  const [iris, roleIris] = await Promise.all([
+    listContained(transport, registrySet.hasAuthorizationRegistry.id),
+    findRolesWithMember(transport, registrySet.hasRoleRegistry.id, grantee),
+  ])
+  const roleIriSet = new Set(roleIris)
+  const authorizations = await Promise.all(iris.map((iri) => getDataAuthorization(transport, iri)))
+  return authorizations.filter(
+    (dataAuthorization) =>
+      dataAuthorization.type.includes(INTEROP.DataAuthorization) &&
+      (dataAuthorization.grantee === grantee || roleIriSet.has(dataAuthorization.grantee))
+  )
 }
 
 /**
@@ -618,91 +674,6 @@ export async function getGrantsAuthority(
     })
   }
   return result
-}
-
-/**
- * All grants in the registry whose `inheritsFromGrant` points at any of the
- * given parents.
- */
-export async function findInheritingChildren(
-  transport: SparqlTransport,
-  parents: string[]
-): Promise<string[]> {
-  if (parents.length === 0) return []
-  const values = parents.map((iri) => `<${iri}>`).join(' ')
-  const bindings = await transport.fetchBindings(
-    `SELECT ?child WHERE {
-    GRAPH ?g {
-      ?child <${INTEROP.inheritsFromGrant}> ?parent .
-    }
-    VALUES ?parent { ${values} }
-  }`
-  )
-  return bindings.map((binding) => binding.child.value)
-}
-
-/**
- * Whether an upstream grant covering the given (delegated) grant exists in the
- * data owner's registry — `requester === grantedBy` and the grant's
- * registration/modes/scope/instances are covered by a source grant
- * (moved from GrantIssuanceHandler.validateDelegable).
- */
-export async function findDelegableGrant(
-  transport: SparqlTransport,
-  grant: GrantData
-): Promise<boolean> {
-  const accessModes = (grant.accessMode ?? []).map((m) => `<${m}>`).join(' ')
-
-  const requiredInstances = grant.hasDataInstance?.length
-    ? grant.hasDataInstance.map((i) => `<${i}>`).join(' ')
-    : ''
-
-  const selectedScopeConstraint = requiredInstances
-    ? `
-          FILTER NOT EXISTS {
-            VALUES ?required { ${requiredInstances} }
-            FILTER NOT EXISTS {
-              ?s <${INTEROP.hasDataInstance}> ?required .
-            }
-          }
-      `
-    : ''
-
-  const scopeBlock =
-    grant.scopeOfGrant === INTEROP.SelectedFromRegistry
-      ? `
-        {
-          ?s <${INTEROP.scopeOfGrant}> <${INTEROP.AllFromRegistry}> .
-        }
-        UNION
-        {
-          ?s <${INTEROP.scopeOfGrant}> <${INTEROP.SelectedFromRegistry}> .
-          ${selectedScopeConstraint}
-        }
-      `
-      : `
-        ?s <${INTEROP.scopeOfGrant}> <${grant.scopeOfGrant}> .
-      `
-
-  const query = `
-  SELECT * WHERE {
-    GRAPH ?g {
-      ?s
-        <${INTEROP.dataOwner}> <${grant.dataOwner}>;
-        <${INTEROP.grantee}> <${grant.grantedBy}>;
-        <${INTEROP.registeredShapeTree}> <${grant.registeredShapeTree}>;
-        <${INTEROP.hasStorage}> <${grant.hasStorage}>;
-        <${INTEROP.hasDataRegistration}> <${grant.hasDataRegistration}>;
-        <${INTEROP.accessMode}> ?mode .
-
-      VALUES ?mode { ${accessModes} }
-
-      ${scopeBlock}
-    }
-  }
-  `
-  const bindings = await transport.fetchBindings(query)
-  return bindings.length > 0
 }
 
 /**

@@ -7,8 +7,12 @@ import {
   AccessNeed as AccessNeedModule,
   ActivityRegistry,
   buildNestedDataAuthorizations,
+  findAuthorizationsForGrantee,
+  findInheritingAuthorizations,
   generateDataAuthorizations,
+  getDataAuthorization as getDataAuthorizationFromSparql,
   getOpenSentAccessRequests,
+  listContained,
   accessNeedGroup as resolveAccessNeedGroup,
 } from '@janeirodigital/interop-authorization-agent'
 import {
@@ -18,7 +22,9 @@ import {
   type AccessRequestArchived,
   type AuthorizationDenied,
   type AuthorizationGranted,
+  type AuthorizationRevoked,
   ClientIdDocument,
+  type DataAuthorizationRef,
   type EmbeddedAuthorization,
   type GrantData,
   type NeedBasedAccessRequestGroup,
@@ -34,13 +40,16 @@ import {
   AccessRequestArchivedMessage,
   type Authorization,
   type AuthorizationData,
+  type AuthorizationRevocationFailure,
   AuthorizationGrantedMessage,
+  AuthorizationList,
   IRI,
 } from '@janeirodigital/sai-api-messages'
 import type { Brand } from 'effect/Brand'
 import type * as S from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
+import { ContextError } from './Context.js'
 import { dataRegistrationContains } from './peerProxy.js'
 import {
   getDataRegistration as getDataRegistrationFromSparql,
@@ -313,6 +322,214 @@ export const getDescriptions = async (
     },
     dataOwners,
   }
+}
+
+/**
+ * The recorded authorizations for a grantee (peer, application, or role) —
+ * read-only C0 of the revocation workstream. Reuses the AA's registry-plane
+ * `findAuthorizationsForAgent` reader (direct + via-role authorizations) and
+ * resolves shape-tree labels for the requested language. Labels fall back to
+ * the shape-tree IRI when the description is unavailable, so a missing shape
+ * tree document never breaks the view.
+ */
+export const listAuthorizations = async (
+  ctx: ResolvedContext,
+  grantee: string,
+  lang: string
+): Promise<S.Schema.Type<typeof AuthorizationList>> => {
+  // The context's registry set + transport: personal reads the session's own
+  // endpoint, org context reads the org's registry through `/sparql-admin`
+  // (`sparqlTransportFor`). Do NOT use the session's own registry here — in an
+  // org context the session belongs to the signed-in admin, not the org.
+  const dataAuthorizations = await findAuthorizationsForGrantee(
+    sparqlTransportFor(ctx),
+    ctx.registrySet,
+    grantee
+  )
+
+  const labels = new Map<string, string>()
+  await Promise.all(
+    [
+      ...new Set(
+        dataAuthorizations.map((dataAuthorization) => dataAuthorization.registeredShapeTree)
+      ),
+    ].map(async (shapeTreeIri) => {
+      try {
+        const shapeTree = await loadShapeTree(shapeTreeIri, ctx.session.fetch)
+        const description = await ShapeTree.getDescription(shapeTree, lang, ctx.session.fetch)
+        labels.set(shapeTreeIri, pickLanguage(description?.label, lang) ?? shapeTreeIri)
+      } catch {
+        labels.set(shapeTreeIri, shapeTreeIri)
+      }
+    })
+  )
+
+  return dataAuthorizations
+    .map((dataAuthorization) => ({
+      id: IRI.make(dataAuthorization.id!),
+      grantee: IRI.make(dataAuthorization.grantee),
+      grantedBy: IRI.make(dataAuthorization.grantedBy),
+      registeredShapeTree: IRI.make(dataAuthorization.registeredShapeTree),
+      scopeOfAuthorization: IRI.make(dataAuthorization.scopeOfAuthorization),
+      ...(dataAuthorization.dataOwner ? { dataOwner: IRI.make(dataAuthorization.dataOwner) } : {}),
+      ...(dataAuthorization.hasDataRegistration
+        ? { hasDataRegistration: IRI.make(dataAuthorization.hasDataRegistration) }
+        : {}),
+      ...(dataAuthorization.satisfiesAccessNeed
+        ? { satisfiesAccessNeed: IRI.make(dataAuthorization.satisfiesAccessNeed) }
+        : {}),
+      ...(dataAuthorization.inheritsFromAuthorization
+        ? { inheritsFromAuthorization: IRI.make(dataAuthorization.inheritsFromAuthorization) }
+        : {}),
+      accessMode: dataAuthorization.accessMode.map((mode) => IRI.make(mode)),
+      ...(dataAuthorization.creatorAccessMode
+        ? { creatorAccessMode: dataAuthorization.creatorAccessMode.map((mode) => IRI.make(mode)) }
+        : {}),
+      ...(dataAuthorization.hasDataInstance
+        ? {
+            hasDataInstance: dataAuthorization.hasDataInstance.map((instance) =>
+              IRI.make(instance)
+            ),
+          }
+        : {}),
+      ...(dataAuthorization.hasInheritingAuthorization
+        ? {
+            hasInheritingAuthorization: dataAuthorization.hasInheritingAuthorization.map((child) =>
+              IRI.make(child)
+            ),
+          }
+        : {}),
+      shapeTreeLabel:
+        labels.get(dataAuthorization.registeredShapeTree) ?? dataAuthorization.registeredShapeTree,
+    }))
+    .toSorted(
+      (a, b) =>
+        (a.dataOwner ?? '\uffff').localeCompare(b.dataOwner ?? '\uffff') ||
+        a.registeredShapeTree.localeCompare(b.registeredShapeTree) ||
+        a.id.localeCompare(b.id)
+    )
+}
+
+/**
+ * Typed authorization-revocation refusals (C4 / D11) — the producer's
+ * validation failures, mapped to `AuthorizationRevocationFailure` at the RPC
+ * instead of surfacing as 500 defects.
+ */
+export class AuthorizationRevocationError extends Error {
+  readonly code: 'unauthorized' | 'empty-selection' | 'not-a-data-authorization' | 'mixed-grantee'
+  readonly authorizations: string[]
+
+  constructor(
+    code: AuthorizationRevocationError['code'],
+    authorizations: readonly string[],
+    message: string
+  ) {
+    super(message)
+    this.name = 'AuthorizationRevocationError'
+    this.code = code
+    this.authorizations = [...authorizations]
+  }
+}
+
+/** Map the producer errors to the RPC failure schema; unknown errors stay defects. */
+export function toAuthorizationRevocationFailure(err: unknown): AuthorizationRevocationFailure {
+  if (err instanceof AuthorizationRevocationError) {
+    switch (err.code) {
+      case 'empty-selection':
+        return { code: 'empty-selection' }
+      case 'not-a-data-authorization':
+        return {
+          code: 'not-a-data-authorization',
+          authorization: err.authorizations[0] as IRI,
+        }
+      case 'mixed-grantee':
+      case 'unauthorized':
+        return { code: err.code, authorizations: err.authorizations as IRI[] }
+    }
+  }
+  if (err instanceof ContextError) return { code: 'unauthorized', authorizations: [] }
+  throw err
+}
+
+/**
+ * The authorization-revocation producer (C2): the UI selected
+ * DataAuthorization IRIs; this service loads them from the actor's
+ * authorization registry, expands the `inheritsFromAuthorization` closure,
+ * and writes ONE `AuthorizationRevoked` activity per grantee. The activity
+ * carries refs (`{ id, type }`) + `grantee` — `target` is dropped, and the
+ * grantee survives deletion of the referenced resources (retry/sweep safe).
+ * The workflow `processAuthorizationRevoked` deletes the DAs and reconciles
+ * the grant projections.
+ */
+export const revokeAuthorizations = async (
+  ctx: ResolvedContext,
+  authorizations: readonly string[]
+): Promise<{ activityId?: string; authorizations: string[] }> => {
+  if (authorizations.length === 0) {
+    throw new AuthorizationRevocationError(
+      'empty-selection',
+      [],
+      'RevokeAuthorizations requires at least one authorization'
+    )
+  }
+  const registry = ctx.registrySet.hasAuthorizationRegistry
+  if (!registry) throw new Error('authorization registry not found in registry set')
+  const activityRegistry = ctx.registrySet.hasActivityRegistry
+  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+
+  const transport = sparqlTransportFor(ctx)
+  // membership is checked against the context's authorization registry; an IRI
+  // that is no longer contained is treated as already removed (idempotent
+  // no-op — a re-revoke must not fail), and an IRI from another registry is
+  // silently ignored (nothing is mutated)
+  const contained = new Set(await listContained(transport, registry.id))
+  const refs = new Map<string, DataAuthorizationRef>()
+  let grantee: string | undefined
+
+  const queue = [...authorizations]
+  while (queue.length > 0) {
+    const iri = queue.shift()!
+    if (refs.has(iri) || !contained.has(iri)) continue
+    const dataAuthorization = await getDataAuthorizationFromSparql(transport, iri)
+    if (!dataAuthorization.type.includes(INTEROP.DataAuthorization)) {
+      throw new AuthorizationRevocationError(
+        'not-a-data-authorization',
+        [iri],
+        `resource ${iri} is not a DataAuthorization`
+      )
+    }
+    if (grantee === undefined) grantee = dataAuthorization.grantee
+    if (dataAuthorization.grantee !== grantee) {
+      throw new AuthorizationRevocationError(
+        'mixed-grantee',
+        [...refs.keys(), iri],
+        'all authorizations must have the same grantee'
+      )
+    }
+    refs.set(iri, { id: iri, type: dataAuthorization.type })
+    // the inheritance closure is expanded at write time — after the workflow
+    // deletes the DAs the tree is gone
+    for (const child of await findInheritingAuthorizations(transport, iri)) {
+      if (!refs.has(child)) queue.push(child)
+    }
+  }
+
+  // all selected authorizations already removed → no-op success
+  if (refs.size === 0) return { authorizations: [] }
+
+  const activity: Omit<AuthorizationRevoked, 'id'> = {
+    type: ['Activity', 'AuthorizationRevoked'],
+    actor: ctx.webId,
+    object: [...refs.values()],
+    grantee: grantee!,
+    createdAt: new Date().toISOString(),
+  }
+  const created = await ActivityRegistry.createActivity(
+    activityRegistry,
+    { fetch: ctx.session.fetch, randomUUID: ctx.session.randomUUID },
+    activity
+  )
+  return { activityId: created.id, authorizations: [...refs.keys()] }
 }
 
 export const recordAuthorization = async (

@@ -2,10 +2,8 @@ import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-a
 import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
 import type { EmbeddedNeedBasedAccessRequest } from '@janeirodigital/interop-data-model'
 import type { ActivityCompleted, ActivityData } from '@janeirodigital/interop-data-model'
-import { DataAuthorization, isActivityClass } from '@janeirodigital/interop-data-model'
-const loadDataAuthorization = loader(DataAuthorization.fromJsonLd)
-
-import { INTEROP, loader } from '@janeirodigital/interop-utils'
+import { isActivityClass } from '@janeirodigital/interop-data-model'
+import { INTEROP } from '@janeirodigital/interop-utils'
 import {
   AdminAuthorizationGranted,
   AdminAuthorizationRevoked,
@@ -36,10 +34,7 @@ import { getLoggerFor } from 'global-logger-factory'
 import type { ActivityEvents } from './ActivityEvents.js'
 import type { ActivityWebhookStore } from './ActivityWebhookStore.js'
 import type { SessionManager } from './SessionManager'
-import type {
-  CreateGrantsInput,
-  DelegatedGrantsConsumerInput,
-} from './temporal/activities/grants.js'
+import type { DelegatedGrantsConsumerInput } from './temporal/activities/grants.js'
 import { Temporal } from './temporal/client.js'
 import {
   processNeedBasedAccessRequest,
@@ -52,10 +47,9 @@ import {
 import {
   createRole,
   delegatedGrantsUpdatedSignal,
-  granteeActivitiesSignal,
   processAuthorizationGranted,
+  processAuthorizationRevoked,
   processDelegatedGrantsUpdated,
-  processGranteeActivities,
   processRoleDeletion,
   processRoleMembershipChange,
 } from './temporal/workflows/grants.js'
@@ -135,22 +129,6 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       await this.dispatch(activity, channel, session, temporal)
     }
     return new ResponseDescription(200)
-  }
-
-  /** The grantee of a live-link DataAuthorization object (kind via the store).
-   *  404-tolerant — an intervening deny may have deleted the DA before the
-   *  webhook dispatched the granted activity. */
-  private async granteeFromDataAuthorization(
-    id: string | undefined,
-    session: AuthorizationAgent
-  ): Promise<Awaited<ReturnType<AuthorizationAgent['typeGrantee']>> | undefined> {
-    if (!id) return undefined
-    try {
-      const authorization = await loadDataAuthorization(id, session.fetch)
-      return session.typeGrantee(authorization.grantee)
-    } catch {
-      return undefined
-    }
   }
 
   /** Route one activity to its workflow(s) — one branch per activity class. */
@@ -290,31 +268,20 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     }
 
     if (isActivityClass(activity, 'AuthorizationRevoked')) {
-      // per-target consumer (no producer today — revocation plan): deterministic
-      // workflowId per (webId, grantee); start-or-signal-or-restart. The grantee
-      // is read from the object (the live-link set; kind via the store).
+      // C2: the carrier is self-contained (refs + grantee) — the dedicated
+      // workflow deletes the DAs and reconciles the grant projections. One
+      // run per activity (no consumer, no deterministic workflowId).
       const decoded = S.decodeUnknownSync(AuthorizationRevoked)(activity as never)
-      // the revoked object is always the live-link set — grantee via the
-      // first DataAuthorization (kind resolved in the store)
-      const authorizationGrantee = await this.granteeFromDataAuthorization(
-        decoded.object[0],
-        session
-      )
-      if (!authorizationGrantee) return
-      const workflowId = `grantee:${channel.webId}:${authorizationGrantee.id}`
-      const args: [CreateGrantsInput] = [
-        { webId: socialAgentRef(channel.webId), authorizationGrantee },
-      ]
-      await this.startOrSignal(
-        workflowId,
-        () =>
-          client.workflow.start(processGranteeActivities, {
-            taskQueue: 'create-grants',
-            args,
-            workflowId,
-          }),
-        () => client.workflow.getHandle(workflowId).signal(granteeActivitiesSignal)
-      )
+      await client.workflow.start(processAuthorizationRevoked, {
+        taskQueue: 'create-grants',
+        args: [
+          socialAgentRef(channel.webId),
+          decoded.object.map((ref) => ({ id: ref.id, type: [...ref.type] })),
+          decoded.grantee,
+          { id: activity.id, type: [...decoded.type] },
+        ],
+        workflowId: crypto.randomUUID(),
+      })
       return
     }
 

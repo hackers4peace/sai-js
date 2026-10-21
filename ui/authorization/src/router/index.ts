@@ -43,6 +43,12 @@ const routes = [
               import(/* webpackChunkName: "data-registry-list" */ '@/views/DataRegistryList.vue'),
           },
           {
+            path: '/authorizations',
+            name: 'authorizations',
+            component: () =>
+              import(/* webpackChunkName: "authorizations" */ '@/views/Authorizations.vue'),
+          },
+          {
             path: '/settings',
             name: 'settings',
             component: () => import(/* webpackChunkName: "settings" */ '@/views/Settings.vue'),

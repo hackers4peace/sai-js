@@ -425,13 +425,25 @@ export async function loadActivity(id: string, fetch: WhatwgFetch): Promise<Acti
         },
       }
     }
-    case 'AuthorizationRevoked':
+    case 'AuthorizationRevoked': {
+      // refs + routing key (C2): the producer expands the inheritance closure
+      // at write time; the DA resources may already be gone when the activity
+      // is read, so the grantee is a flat field, not dereferenced
+      const refs = (Array.isArray(node.object) ? node.object : [node.object])
+        .map((ref) => ({
+          id: asString(ref),
+          type: asStringArray((ref as { type?: unknown })?.type),
+        }))
+        .filter((ref) => ref.id)
       return {
-        ...base,
+        id,
+        createdAt: asString(node.createdAt),
         type: canonicalType as ['Activity', 'AuthorizationRevoked'],
         actor,
-        object: asStringArray(node.object),
+        object: refs,
+        grantee: asString(node.grantee),
       }
+    }
     case 'RoleCreated':
       // target dropped (step 9) — the role-to-be (real-id embedded
       // projection at the PRE-MINTED id) rides the object; the workflow

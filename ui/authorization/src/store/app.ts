@@ -2,6 +2,7 @@ import type {
   ApplicationList,
   Authorization,
   AuthorizationData,
+  AuthorizationList,
   DataInstanceList,
   DataRegistryList,
   InvitationAcceptedMessage,
@@ -37,6 +38,8 @@ export const useAppStore = defineStore('app', () => {
     typeof ShareAuthorizationConfirmation
   > | null>(null)
   const authorizationData = ref<S.Schema.Type<typeof AuthorizationData> | null>(null)
+  /** the read-only authorization list for the grantee on the C0 view */
+  const authorizationList = ref<S.Schema.Type<typeof AuthorizationList>>([])
   const accessRequestIriRef = ref<string | undefined>()
   const socialAgentList = ref<S.Schema.Type<typeof SocialAgentList>>([])
   const roleList = ref<S.Schema.Type<typeof RoleList>>([])
@@ -185,6 +188,7 @@ export const useAppStore = defineStore('app', () => {
   async function switchContext(webId: string) {
     const previous = context.value
     setContext(webId)
+    authorizationList.value = []
     try {
       await listSocialAgents(true)
       await listApplications(true)
@@ -239,6 +243,14 @@ export const useAppStore = defineStore('app', () => {
     if (!applicationList.value.length || force) {
       applicationList.value = await effect.listApplications(currentContext())
     }
+  }
+
+  async function listAuthorizations(grantee: string) {
+    authorizationList.value = await effect.listAuthorizations(
+      grantee,
+      coreStore.lang,
+      currentContext()
+    )
   }
 
   async function listRoles(force = false) {
@@ -313,8 +325,14 @@ export const useAppStore = defineStore('app', () => {
     listRoles(true)
   }
 
-  async function revokeGrants(grants: readonly S.Schema.Type<typeof IRI>[]) {
-    await effect.revokeGrants(grants, currentContext())
+  async function revokeAuthorizations(grantee: string, authorizations: readonly string[]) {
+    const { activityId } = await effect.revokeAuthorizations(authorizations, currentContext())
+    if (activityId) {
+      claimActivity({ context: currentContext(), type: 'AuthorizationRevoked', activityId })
+    }
+    // eager refresh (the workflow deletes the DAs asynchronously; the done
+    // event in events.ts refreshes again once the activity completes)
+    await listAuthorizations(grantee)
     listSocialAgents(true)
     listApplications(true)
   }
@@ -419,6 +437,7 @@ export const useAppStore = defineStore('app', () => {
     contexts,
     resource,
     authorizationData,
+    authorizationList,
     loadedDataInstances,
     socialAgentList,
     roleList,
@@ -437,9 +456,10 @@ export const useAppStore = defineStore('app', () => {
     getResource,
     shareResource,
     getAuthoriaztion,
+    listAuthorizations,
     listDataInstances,
     authorizeApp,
-    revokeGrants,
+    revokeAuthorizations,
     requestAccess,
     archiveAccessRequest,
     listSocialAgents,

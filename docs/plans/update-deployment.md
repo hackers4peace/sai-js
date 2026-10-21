@@ -114,8 +114,8 @@ Production NixOS/Podman matches the dev/test storage model:
   bucket/endpoint env: the routed accessor reads the per-pod record. Keep
   `TEMPORAL_ADDRESS` for durable webhook delivery.
 - [ ] **webhook retries**. `reconcileActivities` is the backstop for deliveries
-  that exhaust their retries. It has no scheduler yet; scheduling stays
-  separate from this cutover.
+  that exhaust their retries. It has no scheduler yet — **workstream F** adds
+  one; the split is deliberate (env vs. operational scheduling).
 - [ ] **mirror-sync retry cap — reconsider before cutover.** With the
   replicate-before-regenerate flow landed (`openwiki/architecture/federation.md`),
   the mirror step of the `DelegatedGrantsUpdated` flow keeps today's 5-attempt cap
@@ -123,9 +123,10 @@ Production NixOS/Podman matches the dev/test storage model:
   `syncReciprocalMirror` proxy) and `done` on that activity means "the peer
   mirror is current". A peer that stays unreachable or keeps answering 403/5xx
   therefore leaves the activity **pending indefinitely** — the sweep that would
-  eventually re-drive it still has no schedule. Revisit once scheduling exists:
-  either unbounded retries with terminal 404/410, or a scheduled reconciliation
-  arm. Until then, pending (not stale `done`) is the accepted failure mode.
+  eventually re-drive it still has no schedule. Revisit once workstream F's
+  schedule is live: either unbounded retries with terminal 404/410, or a
+  scheduled reconciliation arm. Until then, pending (not stale `done`) is the
+  accepted failure mode.
 - [ ] **worker** — add `CSS_FUSEKI_BASE_URL`, `CSS_FUSEKI_ADMIN`,
   `CSS_GARAGE_ADMIN_ENDPOINT`, `CSS_GARAGE_ADMIN_TOKEN`, `CSS_S3_ENDPOINT`.
   Keep `CSS_POSTGRES_CONNECTION_STRING`, `TEMPORAL_ADDRESS`, origins.
@@ -189,13 +190,77 @@ path now; [`npm-publishing.md`](npm-publishing.md) is the later alternative.
 - [ ] Rollout order: `lima-local` → `demo` → `h4p`; document rollback to the
   Oxigraph stack.
 
+## Workstream F — scheduled reconciliation (C5) + channel healing
+
+The runtime workflows exist (`reconcileActivities` for entries + local drift +
+mirror completeness, and `reconcilePeerMirrors` for peer freshness;
+`packages/components/src/temporal/workflows/grants.ts`) and are registered on
+the `create-grants` queue, but nothing schedules them. **This workstream owns
+only the schedules/cadence/config**; the workflow logic is C5 code. Real
+deployments also have **no dev `kv.json` pre-seed**: without the activity-webhook
+channels, producers write activities that no handler ever sees, so the sweep
+would be the only dispatcher and the UI would receive no pending/done events.
+C5 design: [`revoke-delegation-chain.md` §10](revoke-delegation-chain.md#10-c5--sweep-backstop);
+channel lifecycle: [`webhook-subscription-bootstrap.md`](webhook-subscription-bootstrap.md).
+
+- [ ] **Sweep schedule.** Create a Temporal Schedule per account
+  (`reconcileActivities`, `create-grants` queue, deterministic
+  `reconcile:<accountId>`), idempotent create-if-missing, jittered interval from
+  a config knob; or the single `fanOutReconciliation` schedule (pin in C5).
+  Create for **existing accounts at cutover** and for every new
+  `bootstrapAccount`; pause/delete on account deletion (no deletion flow today —
+  document the gap).
+- [ ] **Mirror-freshness schedule (peer-facing, slower).** A second cadence for
+  reciprocal-mirror freshness: re-fetch each peer's registration + linked
+  grants (`syncReciprocalMirror`) and re-derive delegated grants
+  (`updateDelegatedGrants`). Never on the sweep interval — peer fetches are the
+  expensive signal; use a longer interval/every-N-sweeps knob, per-peer jitter,
+  and backoff. Trigger only through the per-peer consumer's deterministic
+  workflowId (forced-sync signal) so it serializes with webhook-driven syncs.
+  `404`/`410` on the peer registration = terminal (drop replica, no
+  regeneration); `401`/`403`/`5xx`/network = retry, never revocation. The local
+  mirror-completeness check (missing graph/body) stays in the short sweep and
+  can trigger an immediate forced sync; the cutover backfill is
+  [`pod-isolation-followup.md` A1](pod-isolation-followup.md).
+- [ ] **Channel bootstrap + healing.** Implement the create-if-missing
+  `ensureActivityWebhookChannel` on account creation plus the startup/periodic
+  healer from [`webhook-subscription-bootstrap.md`](webhook-subscription-bootstrap.md)
+  (activity-registry and org-admin channels). Without it a fresh account
+  produces `pending` activities until the next scheduled sweep, and the UI
+  stream is empty.
+- [ ] **Config / env.** Worker env for **both** intervals (sweep and
+  mirror-freshness), jitter, and enabled/disabled (nix option + `nix/podman.nix`);
+  dev/test either pre-seed the schedules or keep invoking the workflows manually
+  (the tests do).
+- [ ] **Worker / ops.** Multiple worker replicas must not create duplicate
+  schedules (idempotent create) and must not overlap runs (schedule overlap
+  policy); schedule-run failures must be visible (Temporal UI, metrics, traces)
+  with an alert on repeated failures.
+- [ ] **C5 code prerequisites before enabling the schedule.** Batch boundary
+  validation (`valid` / `invalid` / `unknown`, read-only, rate-limited; peers
+  must support the message), the peer-side orphan scan, and stranded
+  `AuthorizationRevoked` completion. `unknown`/owner-unreachable is a retry,
+  never a revocation.
+- [ ] **Mirror-sync retry cap.** Revisit the `syncReciprocalMirror` 5-attempt cap
+  once the schedule is live (workstream B): unbounded retries with terminal
+  404/410, or a scheduled reconciliation arm, so a stuck peer cannot leave a
+  `DelegatedGrantsUpdated` pending forever.
+- [ ] **Smoke / acceptance.** On a deployed account: both schedules exist; the
+  sweep processes a never-delivered pending activity; the freshness run picks up
+  a peer-side registration change (mirror refreshed, delegated grants
+  re-derived); a removed app-store channel is healed and delivery resumes; an
+  unreachable owner yields retries, not revocation.
+
 ## Sequencing
 
 1. **A + B** (services + env) with a fresh database and no data migration — get
    a green signup on `lima-local`.
 2. **C** (image/package rework) so the images actually run the new env/source.
-3. **D** (migration/backfill) on `demo`.
-4. **E** (hardening + smoke + rollout) on `h4p`.
+3. **F** (scheduled sweep + channel healing) before calling the deployment
+   operationally complete; it can land after A+B/C and in parallel with D, but
+   must precede the production cutover.
+4. **D** (migration/backfill) on `demo`.
+5. **E** (hardening + smoke + rollout) on `h4p`.
 
 ## Gate
 
@@ -207,6 +272,8 @@ path now; [`npm-publishing.md`](npm-publishing.md) is the later alternative.
   reciprocal mirrors) and the org-context flows work.
 - `.github/workflows/oci.yml` publishes the new image set; `flake.nix` evaluates
   for all hosts.
+- A fresh account gets a scheduled reconciliation run and a healed activity
+  webhook channel; a never-delivered activity is processed by the sweep.
 
 ## Cross-references / reconciliation
 
@@ -221,6 +288,11 @@ path now; [`npm-publishing.md`](npm-publishing.md) is the later alternative.
   layout.
 - **[`extract-temporal-workflows.md`](extract-temporal-workflows.md)** may move
   the worker entrypoint; coordinate the worker image path with that plan.
+- **Scheduling (F)** is the C5 workstream slice
+  ([`revoke-delegation-chain.md` §10](revoke-delegation-chain.md#10-c5--sweep-backstop));
+  channel lifecycle is [`webhook-subscription-bootstrap.md`](webhook-subscription-bootstrap.md).
+  The sweep (activity entries) and channel healing (subscriptions) are separate
+  workflows and both are needed in production.
 
 ## Files
 
@@ -232,6 +304,7 @@ path now; [`npm-publishing.md`](npm-publishing.md) is the later alternative.
 | OCI | `.github/workflows/oci.yml` |
 | Secrets | `nix/h4p.nix`, `nix/hosts/*/secrets.nix` + ragenix files (Garage admin token, Fuseki admin) |
 | Migration | new export/split/backfill script or Temporal activity; `packages/test-utils/src/fuseki.ts` splitter |
+| Scheduling | `packages/components/src/temporal/workflows/grants.ts` (`reconcileActivities`), `workers/main.ts`, `services/Account.ts`, `ActivityWebhookStore.ts`, `temporal/activities/reciprocal.ts`; `nix/podman.nix` / `nix/hosts/*` worker env |
 | Docs | `README.md`, OpenWiki `operations/deployment.md` |
 
 ## Open decisions
@@ -243,3 +316,9 @@ path now; [`npm-publishing.md`](npm-publishing.md) is the later alternative.
   is treated as demo data and wiped/reseeded.
 - Mirror backfill tool: reuse the fixture splitter or wait for the
   `isolated-datasets` drift-scan workflow.
+- Sweep scheduling: per-account Temporal Schedule vs a single
+  `fanOutReconciliation` schedule (C5 must pin one); interval/jitter defaults,
+  the mirror-freshness cadence (separate schedule vs every N sweeps), and the
+  batch-validation rate limit.
+- Channel healing: land `webhook-subscription-bootstrap.md` before the cutover
+  (recommended) or fold its minimal create-if-missing path into workstream F.

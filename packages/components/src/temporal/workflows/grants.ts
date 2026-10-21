@@ -5,10 +5,13 @@ import type {
   AgentId,
   AuthorizationGranted,
   AuthorizationGrantedId,
+  AuthorizationRevoked,
   DataAuthorizationData,
+  DataAuthorizationRef,
   DelegatedGrantsUpdated,
   FinalDataAuthorizationData,
   FinalGrantData,
+  GeneratedGrants,
   GrantData,
   GrantId,
   InvitationCreated,
@@ -29,6 +32,7 @@ import {
   condition,
   defineSignal,
   executeChild,
+  getExternalWorkflowHandle,
   proxyActivities,
   setHandler,
   startChild,
@@ -53,6 +57,7 @@ import { syncReciprocalMirror } from './reciprocal.js'
 // built-ins). The values must match what producers put in the refs they build.
 const ROLE_TYPE = 'http://www.w3.org/ns/solid/interop#Role'
 const SOCIAL_AGENT_TYPE = 'http://www.w3.org/ns/solid/interop#SocialAgent'
+const DATA_GRANT_TYPE = 'http://www.w3.org/ns/solid/interop#DataGrant'
 
 /** Sandbox-safe discriminant check (the data-model `isActivityClass` helper
  * is a runtime import — not allowed here; the tuples are read as string[]). */
@@ -63,22 +68,30 @@ function isActivityClass(activity: ActivityData, cls: string): boolean {
 const {
   findAffectedGrantees,
   getGrantees,
+  listGranteeRegistrations,
+  listReciprocalRegistrations,
+  findIncompleteReciprocalMirrors,
   getAuthorizations,
   getExistingGrants,
+  getExistingGrantBodies,
+  getRegistryGrantsForGrantee,
   generateGrants,
   checkEquivalence,
   deleteDataGrants,
   deleteAuthorizations,
+  revokeGrantClosure,
+  requestRevocations,
+  removeGrantsFromRegistrations,
+  dropGrantReplicas,
+  resolveGranteeKind,
   findRoleUsage,
   createRoleAtId,
   storeDataGrant,
   createAcr,
   requestDelegations,
   replaceDataGrantsOnRegistration,
-  getPendingGranteeActivities,
   getPendingDelegatedGrantsUpdates,
   getPendingActivities,
-  resolveActivityGrantee,
   resolveAuthorizationGrantee,
   storeAuthorizationGranted,
   updateRoleInRegistry,
@@ -104,72 +117,28 @@ export async function storeGrant(payload: FinalGrantData[]): Promise<void> {
 /**
  * Revoke grants in the data owner's registry: delete the given grant resources
  * (the listed grants plus their inheriting children — the dependent closure is
- * computed by the revocation handler) with the data owner's own session.
+ * computed by the revocation handler) with the data owner's own session, then
+ * clear the owner's registration projection for the removed grants (grouped by
+ * grantee). The registration PATCH is last: a crash before it leaves a stale
+ * projection (enforcement is already correct, the next reconciliation/sweep
+ * heals it) and, because the registration is what the grantee mirrors, the
+ * peer's reciprocal webhook finally drops the revoked grants from its mirror.
  * Mirrors `storeGrant`: the worker performs the writes, so the deletes get
- * Temporal activity-retry semantics. Idempotent — 404 is tolerated.
+ * Temporal activity-retry semantics. Idempotent — 404/link-removal are
+ * tolerated.
  */
 export async function revokeGrants(payload: {
   webId: SocialAgentId
   grants: GrantId[]
+  /** removed grants grouped by grantee for the owner's projection patch */
+  projection?: { grantee: string; grants: string[] }[]
 }): Promise<void> {
   await deleteDataGrants(payload)
-}
-
-/**
- * Signal a running per-grantee consumer to wake up and drain new activities
- * (start-or-signal pattern — the handler signals on AlreadyStarted).
- */
-export const granteeActivitiesSignal = defineSignal<[]>('granteeActivitiesSignal')
-
-/** How long an idle consumer waits for a signal before exiting. */
-const CONSUMER_IDLE_TIMEOUT = '3 seconds'
-
-/**
- * Per-target consumer (Phase 4.1): started by the webhook handler with a
- * deterministic workflowId per (webId, authorizationGrantee). Drains the
- * pending authorizationRecorded/authorizationRevoked activities for that
- * grantee, coalescing bursts into a single regeneration (full regeneration is
- * idempotent), and marks them done. After an empty drain it waits for a signal
- * (new activity) before exiting, so an activity arriving while the consumer
- * is running is never lost (start-or-signal; residual exit-window gaps are the
- * reconciliation sweep's backstop, §6.11 / Phase 4.2).
- */
-export async function processGranteeActivities(
-  payload: activities.CreateGrantsInput
-): Promise<void> {
-  let idle = false
-  setHandler(granteeActivitiesSignal, () => {
-    idle = false
-  })
-  while (true) {
-    const pending = await getPendingGranteeActivities({
+  if (payload.projection?.length) {
+    await removeGrantsFromRegistrations({
       webId: payload.webId,
-      authorizationGrantee: payload.authorizationGrantee,
+      groups: payload.projection,
     })
-    if (pending.length === 0) {
-      // wait for a signal (a new activity was routed to this consumer) or exit idle
-      idle = true
-      const signaled = await condition(() => !idle, CONSUMER_IDLE_TIMEOUT)
-      if (!signaled) break
-      continue
-    }
-    const grantees = await getGrantees({
-      webId: payload.webId,
-      grantee: payload.authorizationGrantee,
-    })
-    await Promise.all(
-      grantees.map((grantee) =>
-        executeChild(createGrantsForAgent, {
-          args: [
-            {
-              webId: payload.webId,
-              grantee,
-            },
-          ],
-        })
-      )
-    )
-    await markActivitiesDone({ webId: payload.webId, activities: pending })
   }
 }
 
@@ -178,6 +147,12 @@ export async function processGranteeActivities(
  * activities (start-or-signal pattern — the handler signals on AlreadyStarted).
  */
 export const delegatedGrantsUpdatedSignal = defineSignal<[]>('delegatedGrantsUpdatedSignal')
+
+/** Force one mirror-sync + regeneration without a pending activity (C5). */
+export const reconcileMirrorSignal = defineSignal<[]>('reconcileMirrorSignal')
+
+/** How long an idle consumer waits for a signal before exiting. */
+const CONSUMER_IDLE_TIMEOUT = '3 seconds'
 
 /**
  * Per-peer consumer for `delegatedGrantsUpdated`
@@ -205,29 +180,43 @@ export const delegatedGrantsUpdatedSignal = defineSignal<[]>('delegatedGrantsUpd
  * would not be enough — it may have started before the newer peer update.
  * After an empty drain the consumer waits for a signal before exiting; the
  * residual exit-window gap is the reconciliation sweep's backstop.
+ *
+ * Forced sync (C5 / D20): `forceSync` on the input, or `reconcileMirrorSignal`
+ * on a live consumer, runs one sync + regeneration even with **no** pending
+ * activity — the scheduled mirror-freshness pass and the local completeness
+ * repair use it, serialized by the same deterministic workflowId.
  */
 export async function processDelegatedGrantsUpdated(
   payload: activities.DelegatedGrantsConsumerInput
 ): Promise<void> {
   let idle = false
+  let forceSync = payload.forceSync === true
   setHandler(delegatedGrantsUpdatedSignal, () => {
     idle = false
+  })
+  setHandler(reconcileMirrorSignal, () => {
+    idle = false
+    forceSync = true
   })
   while (true) {
     const pending = await getPendingDelegatedGrantsUpdates(payload)
     if (pending.length === 0) {
-      // wait for a signal (a new activity was routed to this consumer) or exit idle
-      idle = true
-      const signaled = await condition(() => !idle, CONSUMER_IDLE_TIMEOUT)
-      if (!signaled) break
-      continue
+      if (!forceSync) {
+        // wait for a signal (a new activity was routed to this consumer) or exit idle
+        idle = true
+        const signaled = await condition(() => !idle, CONSUMER_IDLE_TIMEOUT)
+        if (!signaled) break
+        continue
+      }
+      // forced run: sync + regenerate once even with nothing pending
+      forceSync = false
     }
     // no explicit workflowId on the child: the consumer already serializes per
     // (webId, peerId), and a deterministic id would collide with an in-flight
     // sync started by the previous parallel-start path during a rollout
     const mirror = await executeChild(syncReciprocalMirror, {
       taskQueue: 'reciprocal-registration',
-      args: [payload],
+      args: [{ webId: payload.webId, peerId: payload.peerId }],
     })
     if (!mirror.peerGone) {
       await updateDelegatedGrants({ webId: payload.webId, peerId: payload.peerId })
@@ -237,8 +226,67 @@ export async function processDelegatedGrantsUpdated(
     // the mirror cap forever. The dangling reciprocal link on our registration
     // is cleaned up by the unregister flow (pod-isolation-followup A2), which
     // is also when the delegated grants sourced from that peer go away.
-    await markActivitiesDone({ webId: payload.webId, activities: pending })
+    if (pending.length > 0) {
+      await markActivitiesDone({ webId: payload.webId, activities: pending })
+    }
+    forceSync = false
   }
+}
+
+/**
+ * Start-or-signal the per-peer consumer for one forced mirror sync. Uses the
+ * same deterministic workflowId as the webhook handler and the pending-activity
+ * arm, so the sync serializes with webhook-driven runs; if a consumer is
+ * already live it is signalled instead of started twice. C5 (D20): the local
+ * completeness repair (`reconcileActivities`) and the peer-freshness pass
+ * (`reconcilePeerMirrors`) both go through here.
+ */
+async function forceMirrorSync(webId: SocialAgentId, peerId: SocialAgentId): Promise<void> {
+  const workflowId = `delegated-grants:${webId.id}:${peerId.id}`
+  const start = (): Promise<void> =>
+    executeChild(processDelegatedGrantsUpdated, {
+      workflowId,
+      args: [{ webId, peerId, forceSync: true }],
+    }).then(() => undefined)
+  const signal = (): Promise<void> =>
+    getExternalWorkflowHandle(workflowId).signal(reconcileMirrorSignal)
+  // start-or-signal with the same closed-run race handling as the webhook
+  // handler: an AlreadyStarted start means a live consumer; a failed signal
+  // means that run closed in between — retry the pair.
+  try {
+    await start()
+    return
+  } catch (err) {
+    if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+  }
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await signal()
+      return
+    } catch {
+      try {
+        await start()
+        return
+      } catch (err) {
+        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+      }
+    }
+  }
+  // exhausted — the next scheduled sweep/freshness run retries the pair
+}
+
+/**
+ * Mirror-freshness pass (C5): re-fetch every reciprocal-linked peer's
+ * registration + linked grants and re-derive the delegated grants — the only
+ * way to see an upstream grant replaced/revoked when the peer's webhook was
+ * missed. It is a separate workflow because peer fetches are the expensive
+ * signal; the schedule/cadence is a deployment concern
+ * (`update-deployment.md` §F). The local completeness repair runs inside
+ * `reconcileActivities`.
+ */
+export async function reconcilePeerMirrors(payload: { webId: SocialAgentId }): Promise<void> {
+  const pairs = await listReciprocalRegistrations({ webId: payload.webId })
+  await Promise.all(pairs.map((pair) => forceMirrorSync(payload.webId, pair.peerId)))
 }
 
 export async function createGrantsForAuthorization(
@@ -489,12 +537,17 @@ export async function processRoleDeletion(
 }
 
 /**
- * Reconciliation sweep (Phase 4.2): reprocess every pending activity — a
+ * Reconciliation sweep (Phase 4.2 / C5): reprocess every pending activity — a
  * non-completion with no `activityCompleted` referencing it — in the webId's
- * Activity Registry; the correctness backstop for missed deliveries, handler
- * crashes and consumer failures (§6.11). Reuses the same routing as the
- * webhook handler: grantee activities join the per-grantee consumer
- * (deterministic workflowId — a running consumer absorbs them),
+ * Activity Registry, repair any missing/incomplete reciprocal mirror (C5
+ * mirror arm), then re-derive every registered grantee's projection from the
+ * authorization state (the C5 drift arm; a pending-activity drain alone cannot
+ * see a change whose activity row is gone). The mirror repair is a forced sync
+ * for locally incomplete pairs; the drift pass reuses unchanged trees and
+ * `replaceDataGrants` is a no-op when the link set is unchanged, so a no-op
+ * sweep writes nothing. Reuses the same routing as the webhook handler:
+ * grantee activities join the per-grantee consumer (deterministic workflowId —
+ * a running consumer absorbs them),
  * `delegatedGrantsUpdated` joins the per-peer delegated-grants consumer (same
  * start-or-join contract: the consumer replicates the mirror, regenerates and
  * marks the drained activities done itself), role
@@ -506,7 +559,6 @@ export async function processRoleDeletion(
  */
 export async function reconcileActivities(payload: { webId: SocialAgentId }): Promise<void> {
   const pending = await getPendingActivities({ webId: payload.webId })
-  const granteeGroups = new Map<string, ActivityData[]>()
   const roleActivities: ActivityData[] = []
   for (const activity of pending) {
     if (isActivityClass(activity, 'AuthorizationGranted')) {
@@ -525,13 +577,19 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
       // outbox row (UI sees a done event — silent, no claim/refresh)
       await markActivitiesDone({ webId: payload.webId, activities: [activity] })
     } else if (isActivityClass(activity, 'AuthorizationRevoked')) {
-      // no producer today (revocation plan) — keep the per-grantee consumer
-      // grouping; the grantee is resolved from the object (kind via the store)
-      const grantee = await resolveActivityGrantee({ activity })
-      if (!grantee) continue
-      const group = granteeGroups.get(grantee.id) ?? []
-      group.push(activity)
-      granteeGroups.set(grantee.id, group)
+      // C2: the carrier is self-contained (refs + grantee), so the sweep runs
+      // the dedicated workflow directly (self-completing; the outer
+      // markActivitiesDone is the accepted duplicate for a reconcile re-run)
+      const revoked = activity as AuthorizationRevoked
+      await executeChild(processAuthorizationRevoked, {
+        args: [
+          payload.webId,
+          revoked.object,
+          revoked.grantee,
+          { id: activity.id, type: [...revoked.type] },
+        ],
+      })
+      await markActivitiesDone({ webId: payload.webId, activities: [activity] })
     } else if (
       isActivityClass(activity, 'RoleMembershipChanged') ||
       isActivityClass(activity, 'RoleDeleted')
@@ -621,19 +679,6 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
       await markActivitiesDone({ webId: payload.webId, activities: [activity] })
     }
   }
-  for (const [granteeId, group] of granteeGroups) {
-    const authorizationGrantee = await resolveActivityGrantee({ activity: group[0] })
-    if (!authorizationGrantee) continue
-    try {
-      await executeChild(processGranteeActivities, {
-        workflowId: `grantee:${payload.webId.id}:${granteeId}`,
-        args: [{ webId: payload.webId, authorizationGrantee }],
-      })
-    } catch (err) {
-      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
-      // a consumer is already draining for this grantee — it picks up the activities
-    }
-  }
   for (const activity of roleActivities) {
     // steps 2–3: both role classes carry the role-to-be as a real-id
     // embedded object (`target` dropped) — same multi-param signature
@@ -658,9 +703,41 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
     }
     await markActivitiesDone({ webId: payload.webId, activities: [activity] })
   }
+
+  // C5 mirror arm — repair a missing/incomplete local mirror first: delegated
+  // grant generation reads the mirror, so a stale run must not precede the
+  // repair. The sync itself is idempotent (immutable grants + no-op guard).
+  const incompleteMirrors = await findIncompleteReciprocalMirrors({ webId: payload.webId })
+  for (const pair of incompleteMirrors) {
+    await forceMirrorSync(payload.webId, pair.peerId)
+  }
+
+  // C5 drift arm — authorization state vs grant projection. No separate
+  // desired-vs-existing comparison: `reconcileGrantsForGrantee` is idempotent,
+  // `checkEquivalence` reuses every unchanged tree, and the registration PATCH
+  // is skipped when the link set is unchanged. This catches a missed
+  // authorization/role/delegated delivery even when no activity is pending.
+  const grantees = await listGranteeRegistrations({ webId: payload.webId })
+  for (const grantee of grantees) {
+    await executeChild(reconcileGrantsForGrantee, {
+      args: [{ webId: payload.webId, grantee }],
+    })
+  }
 }
 
-export async function createGrantsForAgent(
+/**
+ * Projection + garbage collection for one grantee (D13): the desired grants
+ * are generated from the authorization registry state; `checkEquivalence`
+ * decides reuse; `existing − reused` is the GC set, removed **before** the new
+ * trees are created (fail closed). "Existing" is the registration projection
+ * union the own-registry orphan scan (recovery after a crash between delete
+ * and PATCH). Removal is grouped by `dataOwner`: own registry → C1 closure
+ * delete (`revokeGrantClosure`); peer-owned → the `AccessRevocation` boundary
+ * (`requestRevocations`, which also runs the owner's C1 closure). The removed
+ * delegated trees' issuer-side replicas are dropped; the registration
+ * projection is PATCHed last.
+ */
+export async function reconcileGrantsForGrantee(
   payload: activities.CreateGrantsForAgentInput
 ): Promise<void> {
   // SELF-CONTAINED: fetch ALL of the grantee's authorizations (incl. via roles)
@@ -668,27 +745,29 @@ export async function createGrantsForAgent(
     webId: payload.webId,
     peerId: payload.grantee,
   })
-  const existing = await getExistingGrants({ webId: payload.webId, peerId: payload.grantee })
-
-  // deny case — no authorizations: clear all existing grants + registration
-  if (authorizations.length === 0) {
-    // await deleteDataGrants({ webId: payload.webId, grants: existing })
-    await replaceDataGrantsOnRegistration({
-      webId: payload.webId,
-      grantee: payload.grantee,
-      grants: [],
-    })
-    return
-  }
-
-  const generated = await generateGrants({
+  const projected = await getExistingGrants({ webId: payload.webId, peerId: payload.grantee })
+  const orphans = await getRegistryGrantsForGrantee({
     webId: payload.webId,
     grantee: payload.grantee,
-    dataAuthorizations: authorizations,
   })
+  const existingById = new Map<string, GrantId>()
+  for (const grant of [...projected, ...orphans]) {
+    if (grant.id) existingById.set(grant.id, grant)
+  }
+  const existing = [...existingById.values()]
+
+  // the deny case is just the empty desired set — no special short-circuit
+  const generated: GeneratedGrants =
+    authorizations.length === 0
+      ? { sourceGrants: [], delegatedGrants: [] }
+      : await generateGrants({
+          webId: payload.webId,
+          grantee: payload.grantee,
+          dataAuthorizations: authorizations,
+        })
+
   // value-based sets: activity results cross Temporal's data converter, so
-  // object identity never survives (the previous `Set<GrantData>` never
-  // matched and silently disabled reuse)
+  // object identity never survives
   const { reusedSourceIds, reusedDelegatedIndexes, reusedExisting } = await checkEquivalence({
     webId: payload.webId,
     grantee: payload.grantee,
@@ -697,11 +776,44 @@ export async function createGrantsForAgent(
   })
   const reusedSource = new Set(reusedSourceIds)
   const reusedDelegated = new Set(reusedDelegatedIndexes)
+  const reusedExistingIds = new Set(reusedExisting.map((grant) => grant.id))
+  const removeIds = existing.filter((grant) => !grant.id || !reusedExistingIds.has(grant.id))
 
-  // TODO CSS SPARQL backend has a race condition on dcterms:modified when
-  // multiple resources are PUT concurrently in the same container,
-  // causing "Multiple results for http://purl.org/dc/terms/modified".
-  // Change back to Promise.all after the CSS bug is fixed.
+  if (removeIds.length > 0) {
+    const bodies = await getExistingGrantBodies({ webId: payload.webId, grants: removeIds })
+    const bodyById = new Map(bodies.map((body) => [body.id, body]))
+    // own-registry grants are removable by IRI even without a body (the
+    // owner-session closure loads the registry itself); peer-owned grants
+    // without a replica body cannot be owner-grouped — they are left to the
+    // data owner's sweep/closure (fail-closed reuse already kept them out of
+    // the projection)
+    const ownIds = new Set(orphans.map((grant) => grant.id))
+    const byOwner = new Map<string, GrantId[]>()
+    for (const grant of removeIds) {
+      if (!grant.id) continue
+      const body = bodyById.get(grant.id)
+      const owner = body?.dataOwner ?? (ownIds.has(grant.id) ? payload.webId.id : undefined)
+      if (!owner) continue
+      const group = byOwner.get(owner) ?? []
+      group.push({ id: grant.id, type: body?.type ?? [DATA_GRANT_TYPE] })
+      byOwner.set(owner, group)
+    }
+    for (const [owner, grants] of byOwner) {
+      if (owner === payload.webId.id) {
+        // own registry: the owner session deletes the C1 closure
+        await revokeGrantClosure({ webId: payload.webId, grants })
+      } else {
+        // peer-owned: the data owner deletes the closure at its boundary
+        await requestRevocations({ webId: payload.webId, dataOwner: owner, grants })
+        await dropGrantReplicas({
+          webId: payload.webId,
+          grants: grants.map((grant) => grant.id!),
+        })
+      }
+    }
+  }
+
+  // create the unmatched desired trees (after the GC — delete-before-create)
   const newGrantIds: GrantId[] = []
   for (const grant of generated.sourceGrants) {
     if (reusedSource.has(grant.id)) continue
@@ -709,10 +821,8 @@ export async function createGrantsForAgent(
     newGrantIds.push({ id: grant.id, type: grant.type })
   }
 
-  // one delegation request per data owner: the issuance endpoint accepts a
-  // batch (it already requires a single dataOwner), so each peer sees one POST
-  // instead of one per grant. Serialized between owners — the CSS
-  // `dcterms:modified` race keeps the writes sequential.
+  // one delegation request per data owner (the issuance endpoint accepts a
+  // single dataOwner batch)
   const delegatedByOwner = new Map<string, GrantData[]>()
   for (const [index, grant] of generated.delegatedGrants.entries()) {
     if (reusedDelegated.has(index)) continue
@@ -724,18 +834,40 @@ export async function createGrantsForAgent(
     newGrantIds.push(...(await requestDelegations({ webId: payload.webId, grants })))
   }
 
-  // delete the old grant resources that are not reused
-  // const reusedExistingIds = new Set(reusedExisting.map((grant) => grant.id))
-  // await deleteDataGrants({
-  //   webId: payload.webId,
-  //   grants: existing
-  //     .filter((grant) => !reusedExistingIds.has(grant.id))
-  //     .map((grant) => ({ id: grant.id!, type: grant.type })),
-  // })
-
   await replaceDataGrantsOnRegistration({
     webId: payload.webId,
     grantee: payload.grantee,
     grants: [...newGrantIds, ...reusedExisting],
   })
+}
+
+export async function createGrantsForAgent(
+  payload: activities.CreateGrantsForAgentInput
+): Promise<void> {
+  return reconcileGrantsForGrantee(payload)
+}
+
+/**
+ * C2 authorization-revocation leg: delete the selected DataAuthorizations
+ * (source-of-truth mutation), expand the grantee's kind (role → members), run
+ * the projection + GC reconciliation per affected grantee (the chain closure
+ * is applied at each data owner inside `reconcileGrantsForGrantee`), then
+ * complete. Idempotent: DA deletes are 404-tolerant, the reconciliation
+ * re-derives from registry state, and completion is an accepted duplicate.
+ */
+export async function processAuthorizationRevoked(
+  webId: SocialAgentId,
+  authorizations: DataAuthorizationRef[],
+  grantee: string,
+  activity: { id: string; type: string[] }
+): Promise<void> {
+  await deleteAuthorizations({ webId, authorizations })
+  const granteeKind = await resolveGranteeKind({ webId, grantee })
+  const grantees = await getGrantees({ webId, grantee: granteeKind })
+  for (const affected of grantees) {
+    await executeChild(reconcileGrantsForGrantee, {
+      args: [{ webId, grantee: affected }],
+    })
+  }
+  await markActivitiesDone({ webId, activities: [activity] })
 }

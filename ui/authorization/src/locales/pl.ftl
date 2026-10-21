@@ -34,6 +34,30 @@ access = Dostęp
 authorize = Zautoryzuj
 deny = Odmów
 
+# Authorization records (read-only access view)
+manage-access = Zarządzaj dostępem
+authorizations = Autoryzacje
+no-authorizations = Brak autoryzacji
+via-role = przez rolę
+scope-All = Wszystkie dane
+scope-AllFromAgent = Wszystkie dane agenta
+scope-AllFromRole = Wszystkie dane roli
+scope-AllFromRegistry = Wszystkie dane z rejestru
+scope-SelectedFromRegistry = Wybrane dane
+scope-Inherited = Odziedziczone
+mode-Read = Odczyt
+mode-Update = Edycja
+mode-Create = Tworzenie
+mode-Delete = Usuwanie
+revoke = Odwołaj
+select-all = Zaznacz wszystko
+revoke-confirm-title = Odwołać dostęp?
+revoke-confirm-text = To usunie wybrane autoryzacje i zrekoncyliuje wynikające z nich granty. Tej operacji nie można cofnąć.
+revoke-access = Odwoływanie dostępu
+revocation-failed = Nie udało się odwołać dostępu. Spróbuj ponownie.
+revocation-failed-code = Odmówiono odwołania dostępu ({ $code }).
+
+
 all-data = Wszystkie dane
 selected-data = Wybrane dane
 

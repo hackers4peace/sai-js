@@ -1,9 +1,17 @@
 # Authorization revocation — detailed design (workstream C0/C2)
 
-> **Status:** 🔶 design ready — C0 (read-only view) and C2 (revocation
-> end-to-end) of [`revoke-delegation-chain.md`](revoke-delegation-chain.md).
-> **Last verified:** `d7c89f43` (2026-10-21) — the typed activity, routing, and
-> consumer gaps checked against the tree.
+> **Status:** ✅ C0 and C2 landed (package-tested; `/test` acceptance confirmed —
+> dagger green 2026-10-21);
+> the C3 projection + GC landed with C2 (`reconcileGrantsForGrantee` is the
+> `createGrantsForAgent` body). C4 (typed revocation failures + the
+> boundary-path owner projection cleanup) landed; grantee self-revocation was
+> **removed by design review** (D17) and the owner `RevokeGrants` RPC was
+> **deleted** (D18) — grants are projections, so revocation is only the
+> authorization leg. The C4/C5 design lives in
+> [`revoke-delegation-chain.md`](revoke-delegation-chain.md).
+> **Last verified:** `2381ecd2` (2026-10-21) — C0–C4 landed and committed,
+> package-tested, and `/test`-accepted (dagger green); D17/D18 removals
+> included.
 > **Green gate:** [§8](#8-green-gate--acceptance). **Absorbs:** the former
 > `authorization-revoked.md` (deleted; its deny-as-revoke premise is
 > superseded). **Workstream home:** [`revoke-delegation-chain.md`](revoke-delegation-chain.md).
@@ -21,8 +29,9 @@ This file covers:
 - **C2** — the authorization-level revoke RPC, the `AuthorizationRevoked`
   carrier, the `processAuthorizationRevoked` workflow, and the UI action.
 
-The chain predicate (C1), reconciliation for every trigger (C3), self-revocation
-and typed errors (C4), and the sweep (C5) live in the workstream plan. C2
+The chain predicate (C1), reconciliation for every trigger (C3), typed errors +
+owner projection cleanup (C4; grantee self-revocation removed — D17), and the
+sweep (C5) live in the workstream plan. C2
 consumes C1's closure and introduces P3/P4 (the first callers).
 
 **Not in scope:** deny. `AuthorizeApp(granted: false)` writes
@@ -35,44 +44,48 @@ Do not reintroduce revoke-on-deny.
 | Piece | Status | Where |
 |---|---|---|
 | `AuthorizationRevoked` type | ✅ exists | `packages/data-model/src/activities.ts` (`object: string[]`, `target` retained) |
-| RPC schema | ✅ exists | `packages/api-messages/src/effect.ts` (`AuthorizationRevoked`, unused by a producer) |
-| Webhook routing | ✅ exists (replaced by C2) | `ActivityWebhookHandler.ts` starts the per-grantee consumer |
+| RPC schema | ✅ exists | `packages/api-messages/src/effect.ts` (`AuthorizationRevoked`; `failure: AuthorizationRevocationFailure` — C4) |
+| Webhook routing | ✅ landed | `ActivityWebhookHandler.ts` + `reconcileActivities` start `processAuthorizationRevoked`; the per-grantee consumer/signal was removed |
 | Sweep grouping | ✅ exists | `workflows/grants.ts` (`reconcileActivities`) |
 | UI done-row refresh | ✅ exists | `ui/authorization/src/events.ts` |
-| Producer | ⬜ missing | no RPC/service writes the activity |
-| DA deletion | ⬜ missing | the consumer only regenerates; no workflow deletes the DAs |
-| Retry-safe carrier | ⬜ broken | live-link refs; after deletion the grantee is unresolvable |
-| Authorization reader / UI | ⬜ missing | `RecordedDataAuthorization` schema is defined but unused |
-| UI revoke action | ⬜ dead | `store/app.ts` `revokeGrants` is not called by any view; it targets grants |
+| Producer | ✅ landed | `revokeAuthorizations` (`services/Authorization.ts`); `RevokeAuthorizations` RPC |
+| DA deletion | ✅ landed | `deleteAuthorizations` in `processAuthorizationRevoked` |
+| Retry-safe carrier | ✅ landed | refs `{ id, type }` + `grantee` (no deref after deletion) |
+| Authorization reader / UI | ✅ C0 landed (acceptance confirmed 2026-10-21) | `findAuthorizationsForGrantee` (`authorization-agent/src/sparql.ts`, context-aware); `listAuthorizations` (`services/Authorization.ts`); `ListAuthorizations` (`api-messages`); `ui/.../views/Authorizations.vue` |
+| UI revoke action | ✅ landed | `Authorizations.vue` selection/select-all → `RevokeAuthorizations`; the old `revokeGrants` UI binding was removed |
 
-The landed `RevokeGrants` RPC (owner boundary, grant IRIs) remains an internal
-owner escape hatch at most; it is **not** the UI path and it has the org-context
-gap described in the workstream §11/B1.
+The `RevokeGrants` RPC was **deleted** (D18): it was an internal owner escape
+hatch with no UI caller and let the owner delete grants without an authorization
+change. The grant boundary stays as the projection transport used by the
+workstream's GC (`requestRevocations`).
 
 ## 3. C0 — authorization read model and view
 
+**Status:** ✅ landed (package-tested; `/test` acceptance confirmed 2026-10-21).
+
 ### 3.1 RPC
 
-Add `ListAuthorizations` (name open; keep the request/response shapes stable):
+`ListAuthorizations` (landed):
 
 ```ts
 export const ListAuthorizations = S.TaggedRequest<ListAuthorizations>()(
   'ListAuthorizations',
   {
-    failure: S.Never, // or a typed read error
-    success: S.Array(RecordedDataAuthorization), // existing schema
-    payload: { grantee: IRI, context: IRI },
+    failure: S.Never,
+    success: AuthorizationList,
+    payload: { grantee: IRI, lang: S.String, context: IRI },
   }
 )
 ```
 
-`RecordedDataAuthorization` already carries `id`, `grantee`, `grantedBy`,
+`RecordedDataAuthorization` already carried `id`, `grantee`, `grantedBy`,
 `registeredShapeTree`, `scopeOfAuthorization`, `dataOwner`,
 `hasDataRegistration`, `accessMode`, `creatorAccessMode`, `hasDataInstance`,
 `inheritsFromAuthorization`, `hasInheritingAuthorization`,
-`satisfiesAccessNeed`. Extend it only with display labels (e.g.
-`shapeTreeLabel: S.String` or a `shapeTree: { id, label }` struct), resolved by
-the service like `getDescriptions` resolves access-need shape trees.
+`satisfiesAccessNeed`; C0 added the resolved `shapeTreeLabel: S.String` and
+`AuthorizationList = S.Array(RecordedDataAuthorization)`. The service resolves
+the label like `getDescriptions` does and falls back to the shape-tree IRI when
+the description is unavailable.
 
 Rules:
 
@@ -87,36 +100,44 @@ Rules:
 - Roles: the same reader works with a role IRI as `grantee`; the UI can add the
   role entry later.
 
-### 3.2 AA reader
+### 3.2 AA reader (context-aware)
 
-Add `authorizationsForGrantee(grantee)` to the AA (domain logic belongs in
-`packages/authorization-agent`), over the registry plane:
+The registry-plane read is the exported
+`findAuthorizationsForGrantee(transport, registrySet, grantee)` in
+`packages/authorization-agent/src/sparql.ts`:
 
-- list the authorization registry container;
-- load each `DataAuthorization` (reuse `getDataAuthorizationFromSparql`);
-- filter by `grantee` and `type.includes(INTEROP.DataAuthorization)`;
-- optionally load `findInheritingAuthorizations` to guarantee children are
-  present even if a parent's reverse list is stale (the forward
-  `inheritsFromAuthorization` always survives; union both, as grant generation
-  does).
+- lists the authorization registry container (`listContained`);
+- loads each `DataAuthorization` (`getDataAuthorization`);
+- includes direct authorizations **and** authorizations granted to a role the
+  grantee belongs to (`findRolesWithMember`), type-filtered to
+  `interop:DataAuthorization`;
+- returns `inheritsFromAuthorization` on the child rows, which the UI uses to
+  nest.
 
-### 3.3 UI
+The existing class method `AuthorizationAgent.findAuthorizationsForAgent`
+delegates to it with the session's own endpoint/registry (personal context).
+The service calls the function with `sparqlTransportFor(ctx)` and
+`ctx.registrySet`, so an **org context** reads the org's registry through
+`/sparql-admin` instead of the signed-in admin's personal registry. C0
+deliberately did not add a second reader method.
 
-- Entry points: a **"Manage access"** action on `SocialAgentList` and
-  `ApplicationList` rows (peer/application first; roles later).
-- New view/dialog: group by `dataOwner`; nest inherited authorizations under
-  their parent; per item show shape tree label, registration, scope, and access
-  modes. Reuse the nested `v-list` + `v-checkbox-btn` + expansion-panel patterns
-  from `AuthorizeApp.vue`; extract a small `AuthorizationTree.vue` if the
-  duplication grows. The access-need/scope/registration/instance selection
-  machinery is not reused — this view selects whole authorizations.
-- Selection semantics (C2, but design them now): parent toggles descendants;
-  indeterminate when partial; **select all** at the top; Revoke disabled when
-  empty; confirmation dialog that states access will be removed and the grants
-  will be reconciled.
-- C0 ships the view with the Revoke action disabled (or absent). No writes.
+### 3.3 UI (landed)
+
+- Entry points: a **“Manage access”** icon button on `SocialAgentList` and
+  `ApplicationList` rows; both route to `authorizations` with
+  `grantee`, `label`, and `kind` query params.
+- `ui/authorization/src/views/Authorizations.vue`: cards grouped by data owner,
+  a globally built tree from `inheritsFromAuthorization` (children stay under
+  their parent even when the child omits `dataOwner`), depth indentation,
+  shape-tree label, scope/registration subtitle, access-mode chips, and a
+  `via role` note when the authorization is granted to a role.
+- Selection semantics remain C2: parent toggles descendants; indeterminate when
+  partial; **select all** at the top; Revoke disabled when empty; confirmation
+  dialog. C0 is read-only — no checkboxes and no writes.
 
 ## 4. C2 — producer and carrier
+
+**Status:** ✅ landed (package-tested; `/test` acceptance confirmed 2026-10-21).
 
 ### 4.1 RPC
 
@@ -124,7 +145,7 @@ Add `authorizationsForGrantee(grantee)` to the AA (domain logic belongs in
 export class RevokeAuthorizations extends S.TaggedRequest<RevokeAuthorizations>()(
   'RevokeAuthorizations',
   {
-    failure: RevocationFailure, // typed, C4; not S.Never
+    failure: AuthorizationRevocationFailure, // typed (C4) — not S.Never
     success: S.Struct({
       activityId: IRI,
       authorizations: S.Array(IRI), // the expanded closure
@@ -189,6 +210,8 @@ never produced by the new code.
 
 ## 5. C2 — workflow `processAuthorizationRevoked`
 
+**Status:** ✅ landed (package-tested; `/test` acceptance confirmed 2026-10-21).
+
 Task queue `create-grants`; mirrors `processAuthorizationGranted` and
 `processAdminAuthorizationRevoked`. No per-grantee coalescing — revocation is
 rare and the parent owns completion.
@@ -229,26 +252,52 @@ Order matters:
   grants are reconciled, and the invalid downstream grants are gone. Children
   never mark the activity done.
 
-`reconcileGrantsForGrantee` (P4, introduced here; reused by C3):
+`reconcileGrantsForGrantee` (P4, introduced here; reused by C3) is the
+**projection + garbage collection** model (D13), not a revocation-specific
+path:
 
-1. Load existing grants (`getExistingGrants`) and bodies (own registry +
-   issuer-side replica, `getExistingGrantBodies`).
-2. Generate the desired set from the remaining authorizations for the grantee
-   (`getAuthorizations` → `generateGrants`).
-3. `checkEquivalence` → reused trees vs non-reused.
-4. Remove the non-reused set, grouped by `dataOwner`:
-   - `dataOwner == webId`: delete locally with the owner session (Temporal);
+1. **Desired** = generate from the remaining authorizations for the grantee
+   (`getAuthorizations` → `generateGrants`). An empty authorization set is just
+   an empty desired set — the deny case uses the same path (no short-circuit).
+2. **Existing** = the grantee's grant resources: the registration projection
+   (`getExistingGrants`) **plus an own-registry orphan scan** for grants whose
+   `grantee` matches but are no longer linked (bodies from the own registry /
+   issuer-side replica, `getExistingGrantBodies`). The orphan scan recovers
+   after a crash between delete and projection PATCH. A peer-side orphan scan
+   remains a C5 follow-up.
+3. **Equivalence** (`checkEquivalence`): generated trees pair with existing
+   trees as whole subtrees (value-based; ids/structural links not compared).
+   `reusedExisting` is the keep set; an identical replacement reuses the same
+   IRIs (no churn).
+4. **GC** = `existing − reusedExisting`, grouped by `dataOwner`:
+   - `dataOwner == webId`: delete locally with the owner session (Temporal,
+     404-tolerant);
    - otherwise: `requestRevocations` (P3 — POST `AccessRevocation` to that
      owner, await the echo).
-5. Issue the new generated trees (source grants locally, delegated via
+   Delete each removed grant **and its ACR**; drop the issuer-side replica
+   graphs for removed delegated trees (parent + children, `meta:` twins).
+   A peer-owned grant with **no replica body** cannot be owner-grouped: it is
+   skipped here and left to the data owner's sweep/closure (already excluded
+   from the projection). Own-registry grants are removed by IRI even without a
+   body — `revokeGrantClosure` loads the registry itself.
+5. **Create** the unmatched desired trees (source grants locally, delegated via
    `requestDelegations`).
-6. PATCH the registration projection to `[...reusedExisting, ...new]`.
-7. Drop the issuer-side replica graphs for the removed delegated trees.
+6. **PATCH the registration projection** to `[...reusedExisting, ...new]` last;
+   a crash before it leaves a stale projection that the next reconciliation /
+   sweep heals (enforcement is already correct).
 
-The full C3 section covers replacement ordering, the requester hop, and why the
-old `deleteDataGrants` calls cannot simply be uncommented.
+**Ordering:** delete the GC set before creating the new set. Enforcement
+collects every grant with `hasStorage`; create-first leaves a fail-open window
+where the old (possibly broader) grant still confers access, delete-first
+leaves a short fail-closed window that Temporal retries.
+
+The full C3 section covers the two-pass model (projection GC here, C1 chain GC
+for other grantees), replacement ordering, the requester hop, and why the old
+`deleteDataGrants` calls cannot simply be uncommented.
 
 ## 6. C2 — UI action
+
+**Status:** ✅ landed (package-tested; UI `vite build` green).
 
 1. The user selects authorizations (parent = descendants; select all).
 2. `effect.revokeAuthorizations(selectedIds, context)` calls the RPC and gets
@@ -259,7 +308,8 @@ old `deleteDataGrants` calls cannot simply be uncommented.
    `AuthorizationRevoked` done-row in `events.ts` refreshes both lists again
    (cheap, idempotent).
 5. Remove `revokeGrants` from `ui/authorization/src/store/app.ts` and
-   `effect.ts`; the UI no longer imports `RevokeGrants`.
+   `effect.ts`; the UI never imports `RevokeGrants` (the RPC was later deleted —
+   D18).
 
 The destructive action gets a confirmation dialog (the activity is async; the
 snackbar shows pending → done). No grant IRIs are shown or sent.
@@ -271,6 +321,12 @@ snackbar shows pending → done). No grant IRIs are shown or sent.
   { method: 'DELETE' })`, 404-tolerant, with the owner/actor session. The worker
   mints the session via `buildSessionManager().getSession(actor)`; the API
   process does not mint an org session (`services/Context.ts`).
+- **Typed failures (C4).** The producer throws `AuthorizationRevocationError`
+  (`empty-selection`, `not-a-data-authorization`, `mixed-grantee`) plus the
+  context refusal; the `RevokeAuthorizations` RPC declares
+  `failure: AuthorizationRevocationFailure` and the UI shows the code instead
+  of a defect/500. The grant boundary returns the AA's `RevocationError` codes
+  as an HTTP status + JSON body (workstream §9); it has no RPC.
 - **Authority** for the authorization leg is the context owner: the actor is
   the registry owner (`ctx.webId`), gated by `resolveContext` (personal or org
   admin). A grantor revoking authorizations it recorded for a peer's data uses
@@ -293,12 +349,16 @@ npx vitest run --project @janeirodigital/interop-authorization-agent
 npx vitest run --project @elfpavlik/sai-components
 ```
 
-C0 tests:
+C0 tests (landed):
 
-- AA reader: SPARQL mock, a parent + child, a role grantee, an
-  `AdminAuthorization` excluded, missing parent tolerated.
-- components service: RPC shape, label resolution, context gating.
-- UI typecheck.
+- `packages/components/test/authorizations.test.ts`: mapping to the RPC shape,
+  shape-tree label resolution and IRI fallback, optional-field omission, empty
+  list. The AA reader's direct/via-role and inherited-child cases are covered by
+  the existing `findAuthorizationsForAgent` tests.
+- `npx tsc -p packages/components/tsconfig.json --noEmit`.
+- UI: `cd ui/authorization && npx vite build`. **Do not use `vue-tsc` as a gate
+  yet** — the UI baseline is already red because the UI's own `node_modules`
+  and the symlinked packages resolve two different Effect type identities.
 
 C2 tests:
 
@@ -311,22 +371,36 @@ C2 tests:
 - AA: reconciliation/closure behavior (with C1); no mutation for unrelated
   grantees.
 
-`/test` acceptance (user):
+C4 additions (landed; see the workstream plan §9 for the full gate):
 
-- `test/authorization-revocation.test.ts` (new): approve → revoke selected
-  authorization(s) → authorizations gone, grants gone, registration projection
-  clean, done event; a later approve/regenerate does not resurrect access.
+- `packages/components/test/revocation-errors.test.ts`: the authorization-leg
+  RPC failure schema + the grant-boundary HTTP status/body per code.
+- `packages/components/test/grants-workflow.test.ts`: `revokeGrants` deletes the
+  closure before the owner-side registration PATCH (D14).
+- AA `revokeGrants core`: grantor/owner authority only (a grantee request is
+  rejected), mixed-owner on the requested set, wrong-data-owner, idempotent
+  echo.
+
+`/test` acceptance (confirmed green 2026-10-21):
+
+- `test/delegation-endpoint.test.ts` (C4): mixed-owner typed failure with no
+  partial apply, unknown-grant refusal, 403 body code. (Grantee self-revocation
+  and the owner `RevokeGrants` RPC suite were removed — D17/D18.)
+- `test/authorizations.test.ts` (new, C0): read-only listing for a seeded
+  grantee (parent + inherited child) and the empty case.
+- `test/authorization-revocation.test.ts` (new, C2): revoke the seeded
+  authorizations for bob → DAs gone, the four derived grants gone, the
+  registration projection empty, done event; re-revoking is a no-op success.
 - parent+child selection: revoking the parent removes both.
 - `test/authorization.test.ts` stays green (deny remains a pure decline).
-- `test/revocation-rpc.test.ts` stays green if the internal RPC survives; update
-  it if the RPC is deleted.
 
 ## 9. Out of scope
 
 - **C1** chain predicate and closure — [`revoke-delegation-chain.md` §6].
 - **C3** reconciliation for every trigger, replacement ordering, requester hop,
   replica cleanup — [`revoke-delegation-chain.md` §8].
-- **C4** self-revocation and typed errors — [`revoke-delegation-chain.md` §9].
+- **C4** typed errors + owner projection cleanup (grantee self-revocation
+  removed — D17) — [`revoke-delegation-chain.md` §9].
 - **C5** sweep scheduling/validation — [`revoke-delegation-chain.md` §10].
 - Org-admin authorization revocation (`AdminAuthorizationRevoked`) is a
   separate, landed path; do not reuse `DataAuthorization` deletion for it.

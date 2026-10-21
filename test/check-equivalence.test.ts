@@ -11,6 +11,8 @@ import { INTEROP } from '@janeirodigital/interop-utils'
 import { Client, Connection } from '@temporalio/client'
 import { describe, expect, test } from 'vitest'
 
+import { waitFor, waitForQuiescence } from './util'
+
 /**
  * The black-box property this plan is about: an unchanged authorization state
  * regenerates to the SAME grant IRIs (source and delegated trees), so a re-run
@@ -44,6 +46,11 @@ async function regenerate(webId: string, grantee: AgentId): Promise<void> {
   } finally {
     await connection.close()
   }
+  // the registration PATCH fires a reciprocal webhook that starts a second
+  // regeneration (the delegated-grants consumer); wait for it to settle before
+  // the test reads the projection, otherwise the two runs race and the read
+  // sees an intermediate set
+  await waitForQuiescence([acmeId, aliceId])
 }
 
 /** Fresh read of acme's registration of alice (the reused source tree). */
@@ -68,6 +75,24 @@ async function applicationRegistrationIris(): Promise<string[]> {
   return getDataGrantIris(registration).toSorted()
 }
 
+/**
+ * The projection after a regeneration can still move: the registration PATCH
+ * fires a reciprocal webhook that starts a second (consumer) regeneration.
+ * Wait until two consecutive reads agree before asserting on it.
+ */
+async function stableApplicationRegistrationIris(): Promise<string[]> {
+  let previous: string | undefined
+  const result = await waitFor<string[] | false>(async () => {
+    const current = await applicationRegistrationIris()
+    const key = current.join(',')
+    if (previous !== undefined && key === previous) return current
+    previous = key
+    return false
+  })
+  if (result === false) throw new Error('registration projection never stabilized')
+  return result
+}
+
 describe('checkEquivalence — unchanged regeneration keeps the same IRIs', () => {
   test('source grants: the seeded subtree survives and children are re-linked', async () => {
     await regenerate(acmeId, agent(aliceId, INTEROP.SocialAgent))
@@ -79,18 +104,18 @@ describe('checkEquivalence — unchanged regeneration keeps the same IRIs', () =
     await regenerate(acmeId, agent(aliceId, INTEROP.SocialAgent))
     const second = await acmeRegistrationIris()
     expect(second).toEqual(first)
-  })
+  }, 40_000)
 
   test('delegated grants: the subtree issued on the first run is reused', async () => {
     // first run replaces the pre-replica delegated grants (their bodies do not
     // exist locally yet) and writes the replica for what it issued; the second
     // run must reuse those delegated grants instead of issuing again
     await regenerate(aliceId, agent(testClientId, INTEROP.Application))
-    const first = await applicationRegistrationIris()
+    const first = await stableApplicationRegistrationIris()
     expect(first.length).toBeGreaterThan(0)
 
     await regenerate(aliceId, agent(testClientId, INTEROP.Application))
-    const second = await applicationRegistrationIris()
+    const second = await stableApplicationRegistrationIris()
     expect(second).toEqual(first)
-  })
+  }, 40_000)
 })

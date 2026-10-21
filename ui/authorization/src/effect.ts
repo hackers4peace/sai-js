@@ -18,6 +18,7 @@ import {
   GetWebId,
   IRI,
   ListApplications,
+  ListAuthorizations,
   ListDataInstances,
   ListDataRegistries,
   ListRoles,
@@ -26,7 +27,7 @@ import {
   RegisterPushSubscription,
   RemoveAdmin,
   RequestAccessUsingApplicationNeeds,
-  RevokeGrants,
+  RevokeAuthorizations,
   type ShareAuthorization,
   ShareResource,
   type UiRpcRouter,
@@ -114,6 +115,16 @@ export async function listApplications(context: string) {
   const program = Effect.gen(function* () {
     const client = yield* makeClient
     return yield* client(new ListApplications({ context: IRI.make(context) }))
+  }).pipe(Effect.provide(AuthLayer))
+  return Effect.runPromise(program)
+}
+
+export async function listAuthorizations(grantee: string, lang: string, context: string) {
+  const program = Effect.gen(function* () {
+    const client = yield* makeClient
+    return yield* client(
+      new ListAuthorizations({ grantee: IRI.make(grantee), lang, context: IRI.make(context) })
+    )
   }).pipe(Effect.provide(AuthLayer))
   return Effect.runPromise(program)
 }
@@ -297,10 +308,15 @@ export async function authorizeApp(
   return Effect.runPromise(program)
 }
 
-export async function revokeGrants(grants: readonly S.Schema.Type<typeof IRI>[], context: string) {
+export async function revokeAuthorizations(authorizations: readonly string[], context: string) {
   const program = Effect.gen(function* () {
     const client = yield* makeClient
-    return yield* client(new RevokeGrants({ grants, context: IRI.make(context) }))
+    return yield* client(
+      new RevokeAuthorizations({
+        authorizations: authorizations.map((id) => IRI.make(id)),
+        context: IRI.make(context),
+      })
+    )
   }).pipe(Effect.provide(AuthLayer))
   return Effect.runPromise(program)
 }

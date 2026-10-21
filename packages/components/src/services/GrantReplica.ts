@@ -19,9 +19,10 @@ const fetcher = new SparqlEndpointFetcher()
  * bodies are written as their own graphs. Grants are immutable — re-writing an
  * already-present body is a no-op.
  *
- * No drops: stale replica graphs are invisible to reads (only current
- * registration links are read) and are cleaned up together with the orphaned
- * grant resources (`revoke-delegation-chain` follow-up 10).
+ * No automatic drops on replacement: stale replica graphs are invisible to
+ * reads (only current registration links are read) and are cleaned up by
+ * `dropGrantReplicas` together with the orphaned grant resources
+ * (`revoke-delegation-chain` C3).
  */
 export async function storeGrantReplica(
   sparqlEndpoint: string,
@@ -34,4 +35,22 @@ export async function storeGrantReplica(
     blocks.push(await toGraphBlocks(await toNQuads({ '@id': grant.id, '@graph': expanded })))
   }
   await fetcher.fetchUpdate(sparqlEndpoint, `INSERT DATA {\n${blocks.join('\n')}\n}`)
+}
+
+/**
+ * Drop the issuer-side replica graphs of the given grant IRIs — the resource
+ * graph and its `meta:` twin. `DROP SILENT GRAPH` is idempotent, so a
+ * re-run/retry is safe. Only the grantor's local replica is touched; own
+ * grant-registry graphs are never named here.
+ */
+export async function dropGrantReplicas(
+  sparqlEndpoint: string,
+  grantIris: string[]
+): Promise<void> {
+  if (grantIris.length === 0) return
+  const drops = grantIris.flatMap((iri) => [
+    `DROP SILENT GRAPH <${iri}>`,
+    `DROP SILENT GRAPH <meta:${iri}>`,
+  ])
+  await fetcher.fetchUpdate(sparqlEndpoint, drops.join(';\n'))
 }

@@ -402,15 +402,27 @@ export type AuthorizationDenied = Omit<ActivityBase, 'target'> & {
   object: EmbeddedAuthorization
 }
 
-/** Authorization revoked (grantee kind resolved in the store). */
-export type AuthorizationRevoked = ActivityBase & {
+/** A DataAuthorization reference (id + type) carried by `AuthorizationRevoked`. */
+export type DataAuthorizationRef = {
+  id: string
+  type: string[]
+}
+
+/**
+ * Authorization revoked — `target` dropped (the AdminAuthorizationRevoked
+ * precedent). `object` is the revoked DataAuthorization set as refs (the
+ * producer expands the inheritance closure at write time); `grantee` is the
+ * routing key that survives deletion of the referenced resources, so a
+ * retry/sweep can still resolve the consumer after the DAs are gone.
+ */
+export type AuthorizationRevoked = Omit<ActivityBase, 'target'> & {
   type: ['Activity', 'AuthorizationRevoked']
   /** as:actor — plain IRI (the registry owner) */
   actor: string
-  /** the AuthorizationRegistry */
-  target: string
-  /** the DataAuthorizations — live-link set (the workflow DELETEs them) */
-  object: string[]
+  /** the DataAuthorizations — refs (selected + expanded descendants) */
+  object: DataAuthorizationRef[]
+  /** the revoked authorization's grantee (agent, application, or role) */
+  grantee: string
 }
 
 /**

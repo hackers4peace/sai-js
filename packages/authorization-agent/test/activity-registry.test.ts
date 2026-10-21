@@ -121,6 +121,46 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
     expect((activity as { object: { grantee: string } }).object.grantee).toBe('https://id/bob')
   })
 
+  test('normalizes the revoked-authorization refs + grantee (C2 carrier)', async () => {
+    const doc = {
+      '@context': dataModelContext,
+      '@id': 'https://registry/acme/activity/revoke',
+      '@type': ['Activity', 'AuthorizationRevoked'],
+      actor: 'https://id/acme',
+      object: [
+        {
+          '@id': 'https://registry/acme/authorization/parent',
+          '@type': ['http://www.w3.org/ns/solid/interop#DataAuthorization'],
+        },
+        {
+          '@id': 'https://registry/acme/authorization/child',
+          '@type': ['http://www.w3.org/ns/solid/interop#DataAuthorization'],
+        },
+      ],
+      grantee: 'https://data/test-client/public/id',
+      createdAt: '2024-01-01T00:00:00.000Z',
+    }
+    const activity = await ActivityRegistry.loadActivity(
+      'https://registry/acme/activity/revoke',
+      mockFetch(doc)
+    )
+    expect(activity.type).toEqual(['Activity', 'AuthorizationRevoked'])
+    expect(activity).toMatchObject({
+      grantee: 'https://data/test-client/public/id',
+      object: [
+        {
+          id: 'https://registry/acme/authorization/parent',
+          type: ['http://www.w3.org/ns/solid/interop#DataAuthorization'],
+        },
+        {
+          id: 'https://registry/acme/authorization/child',
+          type: ['http://www.w3.org/ns/solid/interop#DataAuthorization'],
+        },
+      ],
+    })
+    expect(activity).not.toHaveProperty('target')
+  })
+
   test('embeds the denied-authorization structure snapshot (AuthorizationDenied — Step 4)', async () => {
     const doc = {
       '@context': dataModelContext,

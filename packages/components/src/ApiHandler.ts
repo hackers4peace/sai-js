@@ -1,6 +1,6 @@
 import { RpcRouter } from '@effect/rpc'
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
-import { SaiService, router } from '@janeirodigital/sai-api-messages'
+import { IRI, SaiService, router } from '@janeirodigital/sai-api-messages'
 import {
   SpanStatusCode,
   context as otelContext,
@@ -29,12 +29,14 @@ import { getApplications, getUnregisteredApplication } from './services/Applicat
 import {
   archiveAccessRequest,
   getDescriptions,
+  listAuthorizations,
   recordAuthorization,
+  revokeAuthorizations,
+  toAuthorizationRevocationFailure,
 } from './services/Authorization.js'
 import { resolveContext } from './services/Context.js'
 import { getDataRegistries, listDataInstances } from './services/DataRegistry.js'
 import { createInvitation, getSocialAgentInvitations } from './services/InvitationRegistry.js'
-import { revokeGrants } from './services/Revocation.js'
 import { createRole, deleteRole, getRoles, updateRole } from './services/RoleRegistry.js'
 import {
   getResource,
@@ -175,15 +177,27 @@ export class ApiHandler extends OperationHttpHandler {
                 const ctx = await resolveContext(session, context, this.endpointStore)
                 return getDescriptions(ctx, agentId, lang, accessNeedGroupIri, accessRequestIri)
               }),
+            getAuthorizations: (grantee, lang, context) =>
+              Effect.promise(async () => {
+                const ctx = await resolveContext(session, context, this.endpointStore)
+                return listAuthorizations(ctx, grantee, lang)
+              }),
             authorizeApp: (authorization, accessRequestIri, context) =>
               Effect.promise(async () => {
                 const ctx = await resolveContext(session, context, this.endpointStore)
                 return recordAuthorization(ctx, authorization, accessRequestIri)
               }),
-            revokeGrants: (grants, context) =>
-              Effect.promise(async () => {
-                const ctx = await resolveContext(session, context, this.endpointStore)
-                return revokeGrants(ctx, this.endpointStore, grants)
+            revokeAuthorizations: (authorizations, context) =>
+              Effect.tryPromise({
+                try: async () => {
+                  const ctx = await resolveContext(session, context, this.endpointStore)
+                  const result = await revokeAuthorizations(ctx, authorizations)
+                  return {
+                    ...(result.activityId ? { activityId: IRI.make(result.activityId) } : {}),
+                    authorizations: result.authorizations.map((id) => IRI.make(id)),
+                  }
+                },
+                catch: toAuthorizationRevocationFailure,
               }),
             addAdmin: (agentWebId, context) =>
               Effect.promise(async () => {

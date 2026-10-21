@@ -1,5 +1,7 @@
 export * from './authorization-agent.ts'
 export * from './grant-generation.ts'
+export * from './grant-chain.ts'
+export * from './revocation.ts'
 export * from './authorization.ts'
 export * from './sparql.ts'
 // domain behaviors relocated from data-model (components consume via this package)

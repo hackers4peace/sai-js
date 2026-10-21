@@ -36,6 +36,30 @@ access = Access
 authorize = Authorize
 deny = Deny
 
+# Authorization records (read-only access view)
+manage-access = Manage access
+authorizations = Authorizations
+no-authorizations = No authorizations
+via-role = via role
+scope-All = All data
+scope-AllFromAgent = All from agent
+scope-AllFromRole = All from role
+scope-AllFromRegistry = All from registry
+scope-SelectedFromRegistry = Selected data
+scope-Inherited = Inherited
+mode-Read = Read
+mode-Update = Update
+mode-Create = Create
+mode-Delete = Delete
+revoke = Revoke
+select-all = Select all
+revoke-confirm-title = Revoke access?
+revoke-confirm-text = This removes the selected authorizations and reconciles the grants derived from them. This cannot be undone.
+revoke-access = Revoking access
+revocation-failed = The revocation failed. Please try again.
+revocation-failed-code = The revocation was refused ({ $code }).
+
+
 all-data = All data
 selected-data = Selected data
 

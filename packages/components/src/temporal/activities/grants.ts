@@ -1,27 +1,29 @@
-import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import type { RoleUsage } from '@janeirodigital/interop-authorization-agent'
 import {
   ActivityRegistry,
   AgentRegistry,
   RoleRegistry,
   ensureApplicationRegistration,
+  getApplicationRegistration,
   getDataGrant,
+  getRegistryGrants,
+  getSocialAgentRegistration,
+  invalidGrantsAfterRemoval,
+  listContained,
   localSparqlTransport,
+  presentGraphs,
   replaceDataGrants,
   storeDataAuthorizations,
 } from '@janeirodigital/interop-authorization-agent'
 import {
   type AccessRequestMessage,
+  type AccessRevocationMessage,
   type ActivityCompleted,
   type ActivityData,
-  type AdminAuthorizationGranted,
-  type AdminAuthorizationRevoked,
   type AgentId,
   type AgentOrRoleId,
   type AuthorizationGranted,
-  type AuthorizationRevoked,
   ClientIdDocument,
-  DataAuthorization,
   type DataAuthorizationData,
   type DataAuthorizationId,
   type DelegatedGrantsUpdated,
@@ -42,7 +44,6 @@ import {
   toJsonLd,
 } from '@janeirodigital/interop-data-model'
 const loadRole = loader(Role.fromJsonLd)
-const loadDataAuthorization = loader(DataAuthorization.fromJsonLd)
 const loadClientIdDocument = loader(ClientIdDocument.fromJsonLd)
 
 import {
@@ -57,7 +58,11 @@ import {
 } from '@janeirodigital/interop-utils'
 
 import { buildSessionManager } from '../../builders/sessionManager.js'
-import { storeGrantReplica } from '../../services/GrantReplica.js'
+import {
+  dropGrantReplicas as dropReplicas,
+  storeGrantReplica,
+} from '../../services/GrantReplica.js'
+import { mirroredGrants } from '../../services/ReciprocalMirror.js'
 import { delegatedGrantTrees, grantTrees, pairTrees } from './check-equivalence.js'
 
 export interface FindAffectedAuthorizationsInput {
@@ -149,6 +154,102 @@ export async function getGrantees(payload: {
   const session = await manager.getSession(payload.webId.id)
   // role → members routing lives in the AA session method (relocated Phase 4)
   return session.getGrantees(payload.grantee)
+}
+
+export interface ListGranteeRegistrationsInput {
+  webId: SocialAgentId
+}
+
+/**
+ * Every grantee the owner can project grants to: the social-agent and
+ * application registrations (the agent universe; role members are registered
+ * agents, so role-granted authorizations are covered).
+ *
+ * C5 drift arm (authorization state vs grant projection): the sweep re-runs
+ * the idempotent `reconcileGrantsForGrantee` for each of these, so a missed
+ * authorization/grant/role delivery is corrected even when no activity remains
+ * pending. A grant whose grantee has no registration has no projection to heal
+ * (the owner's registry orphan/closure path owns the grant resource).
+ */
+export async function listGranteeRegistrations(
+  payload: ListGranteeRegistrationsInput
+): Promise<AgentId[]> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  const grantees = new Map<string, AgentId>()
+  const add = (registration: { registeredAgent: string; type: string[] }) => {
+    const agent = registration.registeredAgent
+    if (!agent || grantees.has(agent)) return
+    const type = registration.type.includes(INTEROP.ApplicationRegistration)
+      ? INTEROP.Application
+      : INTEROP.SocialAgent
+    grantees.set(agent, { id: agent, type: [type] })
+  }
+  for (const iri of await listContained(transport, session.registrySet.hasSocialAgentRegistry.id)) {
+    const registration = await getSocialAgentRegistration(transport, iri).catch(() => undefined)
+    if (registration) add(registration)
+  }
+  for (const iri of await listContained(transport, session.registrySet.hasApplicationRegistry.id)) {
+    const registration = await getApplicationRegistration(transport, iri).catch(() => undefined)
+    if (registration) add(registration)
+  }
+  return [...grantees.values()]
+}
+
+export interface ReciprocalPair {
+  peerId: AgentId
+  registrationId: string
+  reciprocalIri: string
+}
+
+/**
+ * The reciprocal-linked social-agent registrations of the context: our
+ * registration of the peer plus the peer's registration of us (the mirror).
+ * Application registrations carry no `reciprocalRegistration`; they are not
+ * mirrored.
+ */
+export async function listReciprocalRegistrations(payload: {
+  webId: SocialAgentId
+}): Promise<ReciprocalPair[]> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  const pairs: ReciprocalPair[] = []
+  for (const iri of await listContained(transport, session.registrySet.hasSocialAgentRegistry.id)) {
+    const registration = await getSocialAgentRegistration(transport, iri).catch(() => undefined)
+    if (!registration?.reciprocalRegistration) continue
+    pairs.push({
+      peerId: { id: registration.registeredAgent, type: [INTEROP.SocialAgent] },
+      registrationId: registration.id,
+      reciprocalIri: registration.reciprocalRegistration,
+    })
+  }
+  return pairs
+}
+
+/**
+ * Reciprocal-linked pairs whose local mirror is **missing or incomplete**:
+ * the mirrored peer-registration graph is absent, or a grant still linked from
+ * it has no body (resource or `meta:` twin). This is the local, no-peer-fetch
+ * completeness check — the only signal for a mirror that was never written or
+ * lost a graph when no `DelegatedGrantsUpdated` activity exists (D20).
+ */
+export async function findIncompleteReciprocalMirrors(payload: {
+  webId: SocialAgentId
+}): Promise<ReciprocalPair[]> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  const incomplete: ReciprocalPair[] = []
+  for (const pair of await listReciprocalRegistrations(payload)) {
+    const linked = await mirroredGrants(session.sparqlEndpoint, pair.reciprocalIri)
+    const present = await presentGraphs(transport, [pair.reciprocalIri, ...linked])
+    if (!present.has(pair.reciprocalIri) || linked.some((iri) => !present.has(iri))) {
+      incomplete.push(pair)
+    }
+  }
+  return incomplete
 }
 
 // ---------------------------------------------------------------------------
@@ -362,11 +463,130 @@ export async function deleteDataGrants(payload: {
   // causing "Multiple results for http://purl.org/dc/terms/modified".
   // Change back to Promise.all after the CSS bug is fixed.
   for (const grant of payload.grants) {
+    // the grant's own ACR is part of its lifecycle — delete it with the
+    // resource (a deleted resource leaves the ACR orphaned otherwise)
+    const head = await session.fetch(grant.id!, { method: 'HEAD' })
+    const acrId = head.ok ? getAcl(head.headers.get('link')) : undefined
+    if (acrId) {
+      const acrResponse = await session.fetch(acrId, { method: 'DELETE' })
+      if (!acrResponse.ok && acrResponse.status !== 404) {
+        throw new Error(`failed to delete grant ACR: ${acrResponse.status}`)
+      }
+    }
     const response = await session.fetch(grant.id!, { method: 'DELETE' })
     if (!response.ok && response.status !== 404) {
       throw new Error(`failed to delete grant: ${response.status}`)
     }
   }
+}
+
+/**
+ * C1 revocation closure for the actor's own grant registry (C2/C3): load the
+ * registry, compute every grant that becomes invalid once `grants` are treated
+ * as absent (plus inheriting children), delete the whole closure (resource +
+ * ACR), and return the removed IRIs. Idempotent (404-tolerant deletes).
+ */
+export async function revokeGrantClosure(payload: {
+  webId: SocialAgentId
+  grants: GrantId[]
+}): Promise<string[]> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  const registryGrants = await getRegistryGrants(transport, session.registrySet.hasGrantRegistry.id)
+  const closure = invalidGrantsAfterRemoval(
+    registryGrants,
+    payload.grants.map((grant) => grant.id!)
+  )
+  await deleteDataGrants({
+    webId: payload.webId,
+    grants: closure.map((grant) => ({ id: grant.id!, type: grant.type ?? [INTEROP.DataGrant] })),
+  })
+  return closure.map((grant) => grant.id!)
+}
+
+/**
+ * Grantor-side revocation request at the data owner's delegation boundary
+ * (C2/C3, the `requestDelegations` mirror): POST `AccessRevocation` with the
+ * listed grant IRIs and return the owner's echo. The owner deletes the whole
+ * C1 closure with its own session; the echo is the listed set (the requester
+ * only cleans up its own projection/replicas for those).
+ */
+export async function requestRevocations(payload: {
+  webId: SocialAgentId
+  dataOwner: string
+  grants: GrantId[]
+}): Promise<string[]> {
+  if (payload.grants.length === 0) return []
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const endpoint = await discoverDelegationIssuanceEndpoint(payload.dataOwner, session.fetch)
+  const message: AccessRevocationMessage = {
+    type: [INTEROP.AccessRevocation],
+    grants: payload.grants.map((grant) => grant.id!),
+  }
+  const response = await session.fetch(endpoint, {
+    method: 'POST',
+    headers: { 'content-type': 'application/ld+json' },
+    body: JSON.stringify(message),
+  })
+  if (!response.ok) {
+    throw new Error(
+      `revocation request failed: ${response.status} ${await response.text().catch(() => '')}`
+    )
+  }
+  const removed = (await response.json()) as unknown
+  if (!Array.isArray(removed) || !removed.every((id) => typeof id === 'string')) {
+    throw new Error('invalid revocation response: expected the removed grant IRIs')
+  }
+  return removed as string[]
+}
+
+/**
+ * Drop the issuer-side replica graphs of the given delegated grants (the
+ * grantor's local copy used by `checkEquivalence`). Never touches own
+ * grant-registry graphs.
+ */
+export async function dropGrantReplicas(payload: {
+  webId: SocialAgentId
+  grants: string[]
+}): Promise<void> {
+  if (payload.grants.length === 0) return
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  await dropReplicas(session.sparqlEndpoint, payload.grants)
+}
+
+/**
+ * Orphan scan for the actor's own grant registry: grants whose `grantee`
+ * matches, including ones no longer linked from the registration projection.
+ * Unioned with the projection in `reconcileGrantsForGrantee` so a crash
+ * between delete and PATCH cannot hide collectable grants.
+ */
+export async function getRegistryGrantsForGrantee(payload: {
+  webId: SocialAgentId
+  grantee: AgentId
+}): Promise<GrantId[]> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  const grants = await getRegistryGrants(transport, session.registrySet.hasGrantRegistry.id)
+  return grants
+    .filter((grant) => grant.grantee === payload.grantee.id)
+    .map((grant) => ({ id: grant.id!, type: grant.type ?? [INTEROP.DataGrant] }))
+}
+
+/**
+ * Resolve a plain-IRI grantee to its store kind (role vs social agent vs
+ * application) — the authorization-revocation workflow's role expansion.
+ */
+export async function resolveGranteeKind(payload: {
+  webId: SocialAgentId
+  grantee: string
+}): Promise<AgentOrRoleId> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  return session.typeGrantee(payload.grantee)
 }
 
 // ---------------------------------------------------------------------------
@@ -651,6 +871,9 @@ export async function replaceDataGrantsOnRegistration(
   if (!agentRegistration) {
     throw new Error('agent registration for the grantee does not exist')
   }
+  // `replaceDataGrants` is a no-op when the link set is unchanged (no PATCH,
+  // no reciprocal webhook), so an unchanged projection from the sweep writes
+  // nothing.
   await replaceDataGrants(
     agentRegistration,
     session.fetch,
@@ -658,75 +881,28 @@ export async function replaceDataGrantsOnRegistration(
   )
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// Grantor-side grantee of an authorization/admin activity — read from the object
-// ---------------------------------------------------------------------------
-
 /**
- * The grantee of an `authorizationRecorded`/`authorizationRevoked` or
- * `adminAuthorizationGranted`/`adminAuthorizationRevoked` activity, read
- * from the `as:object` (parties ride the object). Authorizations: the first
- * object DataAuthorization's `grantee`, its kind resolved in the store
- * (`session.typeGrantee` — role vs social agent vs application). Admin
- * authorizations: the object's `grantee` (always a social agent). Returns
- * undefined when the activity is not an authorization/admin activity or its
- * object is unresolvable.
+ * Owner-side projection cleanup after a boundary/owner revocation (C4):
+ * remove the removed grant IRIs from the data owner's registration of each
+ * grantee (`hasDataGrant`). The owner's registration is the document the
+ * grantee mirrors, so this PATCH is what makes the peer's reciprocal webhook
+ * drop the grants from its mirror. A role grantee has no agent registration
+ * and is skipped (its members' links are healed by the next reconciliation /
+ * sweep). Idempotent — removing an absent link is a no-op PATCH.
  */
-export async function resolveActivityGrantee(payload: {
-  activity: ActivityData
-}): Promise<AgentOrRoleId | undefined> {
+export async function removeGrantsFromRegistrations(payload: {
+  webId: SocialAgentId
+  groups: { grantee: string; grants: string[] }[]
+}): Promise<void> {
+  if (payload.groups.length === 0) return
   const manager = buildSessionManager()
-  const actor = (payload.activity as { actor: string }).actor
-  const session = await manager.getSession(actor)
-  if (
-    isActivityClass(payload.activity, 'AuthorizationGranted') ||
-    isActivityClass(payload.activity, 'AuthorizationRevoked')
-  ) {
-    const authorizationActivity = payload.activity as AuthorizationGranted | AuthorizationRevoked
-    // granted → the first embedded DataAuthorization POJO (no deref — the
-    // resource does not exist until the workflow PUTs it); revoked → the
-    // first live-link DataAuthorization (deref). `granteeFromObject` handles
-    // both. (Declines are `AuthorizationDenied` — forward-only, no dispatch.)
-    const grantee = await granteeFromObject(
-      (authorizationActivity.object as (string | DataAuthorizationData)[])[0],
-      session
-    )
-    if (!grantee) return undefined
-    return session.typeGrantee(grantee)
+  const session = await manager.getSession(payload.webId.id)
+  for (const group of payload.groups) {
+    await session.removeGrantsFromRegistration(group.grantee, group.grants)
   }
-  if (
-    isActivityClass(payload.activity, 'AdminAuthorizationGranted') ||
-    isActivityClass(payload.activity, 'AdminAuthorizationRevoked')
-  ) {
-    // both admin forms embed the AdminAuthorization snapshot — the RPC
-    // records/deletes the resource synchronously, so nothing is dereferenced
-    const adminActivity = payload.activity as AdminAuthorizationGranted | AdminAuthorizationRevoked
-    return { id: adminActivity.object.grantee, type: [INTEROP.SocialAgent] }
-  }
-  return undefined
 }
 
-/** The grantee of an object's first DataAuthorization — live link (404
- * tolerant: the DA may already be gone — a later deny deleted the grantee's
- * authorizations) or embedded POJO (granted form reads the grantee directly).
- * A lost object must skip the activity, never fail the sweep. */
-async function granteeFromObject(
-  idOrNode: string | DataAuthorizationData | undefined,
-  session: AuthorizationAgent
-): Promise<string | undefined> {
-  if (!idOrNode) return undefined
-  if (typeof idOrNode === 'string') {
-    try {
-      const authorization = await loadDataAuthorization(idOrNode, session.fetch)
-      return authorization.grantee
-    } catch {
-      return undefined
-    }
-  }
-  return idOrNode.grantee
-}
-
+// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // Authorization granted (activity-first step 2 — the dedicated workflow)
 // ---------------------------------------------------------------------------
@@ -832,59 +1008,6 @@ export async function resolveAuthorizationGrantee(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Per-target consumer (Phase 4.1): drain + coalesce authorization activities
-// ---------------------------------------------------------------------------
-
-export interface GetPendingGranteeActivitiesInput {
-  webId: SocialAgentId
-  authorizationGrantee: AgentOrRoleId
-}
-
-/**
- * The pending authorizationRecorded/authorizationRevoked activities targeting
- * the given grantee in the activity registry (not yet completed). The grantee
- * is read from each activity's `as:object` (parties ride the object).
- */
-export async function getPendingGranteeActivities(
-  payload: GetPendingGranteeActivitiesInput
-): Promise<ActivityData[]> {
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.webId.id)
-  const registry = session.registrySet.hasActivityRegistry
-  if (!registry) return []
-  const iris = await ActivityRegistry.getActivityIris(registry, session.fetch)
-  // pass 1 — partition completions into a completed-set, keep the work items
-  // (NO grantee resolution yet: completed activities may reference deleted
-  // DataAuthorizations — e.g. a later deny removed them — and must never be
-  // dereferenced)
-  const workItems: ActivityData[] = []
-  const completed = new Set<string>()
-  for (const iri of iris) {
-    const activity = await ActivityRegistry.loadActivity(iri, session.fetch)
-    if (isActivityClass(activity, 'ActivityCompleted')) {
-      completed.add((activity as ActivityCompleted).target)
-      continue
-    }
-    if (
-      !isActivityClass(activity, 'AuthorizationGranted') &&
-      !isActivityClass(activity, 'AuthorizationRevoked')
-    )
-      continue
-    workItems.push(activity)
-  }
-  // pass 2 — the grantee is read from each PENDING activity's `as:object`
-  // (parties ride the object); activities already completed are skipped
-  const pending: ActivityData[] = []
-  for (const activity of workItems) {
-    if (completed.has(activity.id)) continue
-    const grantee = await resolveActivityGrantee({ activity })
-    if (!grantee || grantee.id !== payload.authorizationGrantee.id) continue
-    pending.push(activity)
-  }
-  return pending
-}
-
 export interface GetPendingActivitiesInput {
   webId: SocialAgentId
 }
@@ -920,6 +1043,12 @@ export interface DelegatedGrantsConsumerInput {
   webId: SocialAgentId
   /** the peer whose reciprocal registration changed (`activity.target`) */
   peerId: SocialAgentId
+  /**
+   * Run one mirror-sync + delegated-grant regeneration even when no
+   * `DelegatedGrantsUpdated` activity is pending (the scheduled mirror-freshness
+   * / local completeness repair path, D20).
+   */
+  forceSync?: boolean
 }
 
 /**

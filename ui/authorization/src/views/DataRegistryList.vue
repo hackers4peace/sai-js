@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card v-if="appStore.socialAgentList">
-      <v-card-title>
+      <v-card-title class="d-flex align-center">
         <template v-if="route.query.agent === coreStore.userId">
           <v-icon color="agent" icon="mdi-account-circle" />
           <span class="label flex-grow-1">{{ $t('me') }}</span>

@@ -25,6 +25,15 @@
           {{ agent.admin ? $t('remove-admin') : $t('add-admin') }}
         </v-btn>
         <v-btn
+          icon="mdi-shield-key-outline"
+          :title="$t('manage-access')"
+          :aria-label="$t('manage-access')"
+          :to="{
+            name: 'authorizations',
+            query: { grantee: agent.id, label: agent.label, kind: 'agent' },
+          }"
+        />
+        <v-btn
           prepend-icon="mdi-hexagon-multiple-outline"
           :to="{ name: 'data-registry-list', query: { agent: agent.id } }"
         >

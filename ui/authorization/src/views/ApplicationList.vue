@@ -7,8 +7,21 @@
         :prepend-avatar="application.logo"
         :title="application.name"
       >
-        <template v-if="application.callbackEndpoint" #append>
-          <a :href="application.callbackEndpoint" target="_blank">
+        <template #append>
+          <v-btn
+            icon="mdi-shield-key-outline"
+            :title="$t('manage-access')"
+            :aria-label="$t('manage-access')"
+            :to="{
+              name: 'authorizations',
+              query: { grantee: application.id, label: application.name, kind: 'application' },
+            }"
+          />
+          <a
+            v-if="application.callbackEndpoint"
+            :href="application.callbackEndpoint"
+            target="_blank"
+          >
             <v-icon icon="mdi-open-in-new" />
           </a>
         </template>

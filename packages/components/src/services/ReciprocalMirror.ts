@@ -94,13 +94,16 @@ async function fetchDoc(iri: string, fetch: WhatwgFetch): Promise<unknown> {
  * the current content fetched from the peer (using the session's
  * credentials — the org's own session when called from server-side flows).
  *
- * One SPARQL UPDATE per call: the reciprocal registration graph is always
- * DROPped and re-inserted — its body mutates (label, access-need links) and
- * its grant links are the drift signal. Grant graphs already present in the
- * mirror are neither re-fetched nor re-inserted: grants are immutable
- * (minted with a fresh IRI on change, unlinked on replace, DELETEd on
- * revocation), so "already mirrored" means "still current". Newly linked
- * grants are fetched and inserted; no-longer-linked ones are DROPped.
+ * One SPARQL UPDATE per call, and only when something moved: the
+ * `hasDataGrant` set is authoritative (the same rule as the registration
+ * projection). Grant graphs already present in the mirror are neither
+ * re-fetched nor re-inserted: grants are immutable (minted with a fresh IRI on
+ * change, unlinked on replace, DELETEd on revocation), so "already mirrored"
+ * means "still current". Newly linked grants are fetched and inserted;
+ * no-longer-linked ones are DROPped; the reciprocal registration graph is
+ * rewritten with the fresh body on any such change (so non-grant fields ride
+ * along opportunistically). When the link set is unchanged and every body is
+ * present — including the registration graph itself — the call writes nothing.
  * Idempotent — re-running produces the same store content.
  *
  * Presence, not content: immutability makes a
@@ -143,9 +146,10 @@ export async function updateReciprocalMirror(
 
   // Existence oracle: the mirror's reciprocal graph lists the grants the last
   // sync wrote, and reciprocal + grants are written in one atomic UPDATE — so
-  // a grant already listed there is still current and can be skipped (the
-  // reciprocal graph is re-inserted with the full current link set every run,
-  // keeping the oracle valid). Only newly linked grants need a peer fetch.
+  // a grant already listed there is still current and can be skipped. When the
+  // link set does change the graph is rewritten with the current links; an
+  // unchanged set leaves it in place, so the oracle stays valid either way.
+  // Only newly linked grants need a peer fetch.
   const mirroredGrantIris = await mirroredGrants(sparqlEndpoint, reciprocalIri)
   const mirroredGrantSet = new Set(mirroredGrantIris)
 
@@ -172,6 +176,19 @@ export async function updateReciprocalMirror(
   const grantDocs = new Map<string, unknown>()
   for (const grantIri of toInsert) {
     grantDocs.set(grantIri, await fetchDoc(grantIri, saiSession.fetch))
+  }
+
+  // No-op guard: only the `hasDataGrant` link set is authoritative — the same
+  // rule as the registration projection (`replaceDataGrants`). Grants are
+  // immutable (the oracle above skips present bodies); if no grant was added
+  // or removed and the mirrored registration graph is present, nothing needs
+  // writing. Non-grant registration fields (label/note) ride along whenever a
+  // grant changes and do not trigger a write on their own.
+  if (toInsert.length === 0 && staleGraphs.length === 0) {
+    const registrationPresent = (
+      await presentGraphs(localSparqlTransport(sparqlEndpoint), [reciprocalIri])
+    ).has(reciprocalIri)
+    if (registrationPresent) return
   }
 
   const drops = [reciprocalIri, ...staleGraphs]
@@ -201,7 +218,10 @@ export async function updateReciprocalMirror(
  * reports "nothing mirrored": every sync would re-fetch the whole grant list
  * and stale grants would never be dropped.
  */
-async function mirroredGrants(sparqlEndpoint: string, reciprocalIri: string): Promise<string[]> {
+export async function mirroredGrants(
+  sparqlEndpoint: string,
+  reciprocalIri: string
+): Promise<string[]> {
   const bindingsStream = await fetcher.fetchBindings(
     sparqlEndpoint,
     `SELECT DISTINCT ?grant WHERE {

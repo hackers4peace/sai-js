@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import {
   type CRUDDataRegistry,
   CRUDRegistrySet,
+  type GrantData,
   ReadableAccessAuthorization,
   type ReadableDataAuthorization,
   type ReadableDataInstance,
@@ -33,6 +34,7 @@ vi.mock('@janeirodigital/interop-utils', async (importOriginal) => {
 import {
   type AccessAuthorizationStructure,
   AuthorizationAgent,
+  RevocationError,
   type ShareDataInstanceStructure,
   dataInstanceIrisForGrant,
   localSparqlTransport,
@@ -715,6 +717,54 @@ describe('findAuthorizationsForAgent', () => {
     ])
     expect(authorizations.map((authorization) => authorization.grantee)).toEqual([BOB, ROLE_ADMIN])
   })
+
+  test('includes inherited children with their parent link', async () => {
+    const PARENT = 'https://auth.alice.example/authz-parent'
+    const CHILD = 'https://auth.alice.example/authz-child'
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
+      fetch: createStatefulFetch(),
+      randomUUID,
+      sparqlEndpoint: 'http://example.test/sparql',
+    })
+    agent.registrySet.hasRoleRegistry = { id: ROLE_REGISTRY }
+
+    sparqlMock.handlers.bindings = (query) => {
+      if (query.includes('SELECT DISTINCT ?child')) {
+        return [PARENT, CHILD].map((iri) => ({
+          child: { termType: 'NamedNode', value: iri },
+        }))
+      }
+      // role-membership SELECT — BOB is not a role member here
+      expect(query).toContain('hasMember')
+      return []
+    }
+    sparqlMock.handlers.triples = (query) => {
+      if (query.includes(`GRAPH <${PARENT}>`)) {
+        return authzGraph(PARENT, INTEROP.DataAuthorization, BOB)
+      }
+      if (query.includes(`GRAPH <${CHILD}>`)) {
+        return [
+          ...authzGraph(CHILD, INTEROP.DataAuthorization, BOB),
+          DataFactory.quad(
+            DataFactory.namedNode(CHILD),
+            DataFactory.namedNode(INTEROP.inheritsFromAuthorization),
+            DataFactory.namedNode(PARENT)
+          ),
+        ]
+      }
+      throw new Error(`unexpected CONSTRUCT: ${query}`)
+    }
+
+    const authorizations = await agent.findAuthorizationsForAgent(BOB)
+
+    expect(authorizations.map((authorization) => authorization.id).toSorted()).toEqual(
+      [PARENT, CHILD].toSorted()
+    )
+    expect(authorizations.find((authorization) => authorization.id === CHILD)).toMatchObject({
+      inheritsFromAuthorization: PARENT,
+      grantee: BOB,
+    })
+  })
 })
 
 describe('findApplicationRegistration', () => {
@@ -1040,58 +1090,204 @@ describe('reciprocal discovery session methods', () => {
 
 // ──────────────────────────
 
-describe('revokeGrants core (Phase 4)', () => {
+describe('revokeGrants core (C1)', () => {
   const ALICE = 'https://alice.example/#id'
-  const GRANT_1 = 'https://auth.alice.example/grant/1'
-  const CHILD_1 = 'https://auth.alice.example/grant/1/child'
+  const BOB = 'https://bob.example/#id'
+  const KIM = 'https://kim.example/#id'
+  const DAN = 'https://dan.example/#id'
+  const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+  const GRANT_REGISTRY = 'https://auth.alice.example/grant/'
+  const ROOT = `${GRANT_REGISTRY}root`
+  const AB = `${GRANT_REGISTRY}ab`
+  const BC = `${GRANT_REGISTRY}bc`
+  const CHILD_SOURCE = `${GRANT_REGISTRY}child-source`
+  const CHILD = `${GRANT_REGISTRY}child`
+  const PROJECT_TREE = 'https://shapetrees.example/trees/Project'
+  const TASK_TREE = 'https://shapetrees.example/trees/Task'
+  const PROJECT_REG = 'https://data.alice.example/projects/'
+  const TASK_REG = 'https://data.alice.example/tasks/'
+  const STORAGE = 'https://data.alice.example/'
 
-  const authorityBindings = (iris: string[]) =>
-    iris.map((grant) => ({
-      grant: { termType: 'NamedNode', value: grant },
-      dataOwner: { termType: 'NamedNode', value: ALICE },
-      grantedBy: { termType: 'NamedNode', value: ALICE },
-      grantee: { termType: 'NamedNode', value: 'https://bob.example/#id' },
-    }))
+  const grantFixture = (id: string, overrides: Partial<GrantData> = {}): GrantData => ({
+    id,
+    type: [INTEROP.DataGrant],
+    dataOwner: ALICE,
+    grantedBy: ALICE,
+    grantee: BOB,
+    registeredShapeTree: PROJECT_TREE,
+    hasDataRegistration: PROJECT_REG,
+    hasStorage: STORAGE,
+    scopeOfGrant: INTEROP.AllFromRegistry,
+    accessMode: [ACL.Read, ACL.Update],
+    ...overrides,
+  })
 
-  const buildAgent = async () =>
-    AuthorizationAgent.build(webId, agentId, registryId, {
+  // source D→A; delegated A→B; delegated B→C; the source child D→A for the
+  // Task shape and the delegated child A→B inheriting from A→B Project
+  const root = grantFixture(ROOT)
+  const ab = grantFixture(AB, { grantedBy: BOB, grantee: KIM, accessMode: [ACL.Read] })
+  const bc = grantFixture(BC, { grantedBy: KIM, grantee: DAN, accessMode: [ACL.Read] })
+  const childSource = grantFixture(CHILD_SOURCE, {
+    registeredShapeTree: TASK_TREE,
+    hasDataRegistration: TASK_REG,
+    scopeOfGrant: INTEROP.Inherited,
+    inheritsFromGrant: ROOT,
+    accessMode: [ACL.Read],
+  })
+  const child = grantFixture(CHILD, {
+    grantedBy: BOB,
+    grantee: KIM,
+    registeredShapeTree: TASK_TREE,
+    hasDataRegistration: TASK_REG,
+    scopeOfGrant: INTEROP.Inherited,
+    inheritsFromGrant: AB,
+    accessMode: [ACL.Read],
+  })
+
+  const grantQuads = (grant: GrantData) => {
+    const node = DataFactory.namedNode(grant.id!)
+    const q = (predicate: string, object: string) =>
+      DataFactory.quad(node, DataFactory.namedNode(predicate), DataFactory.namedNode(object))
+    const quads = [
+      q(RDF_TYPE, INTEROP.DataGrant),
+      q(INTEROP.grantee, grant.grantee),
+      q(INTEROP.grantedBy, grant.grantedBy),
+      q(INTEROP.dataOwner, grant.dataOwner),
+      q(INTEROP.registeredShapeTree, grant.registeredShapeTree),
+      q(INTEROP.hasDataRegistration, grant.hasDataRegistration),
+      q(INTEROP.hasStorage, grant.hasStorage),
+      q(INTEROP.scopeOfGrant, grant.scopeOfGrant),
+      ...grant.accessMode.map((mode) => q(INTEROP.accessMode, mode)),
+    ]
+    if (grant.inheritsFromGrant) quads.push(q(INTEROP.inheritsFromGrant, grant.inheritsFromGrant))
+    return quads
+  }
+
+  /** Serve the grant registry listing and every grant graph from `existing`. */
+  const installRegistry = (existing: GrantData[] = [root, ab, bc, childSource, child]) => {
+    sparqlMock.handlers.bindings = (query) => {
+      if (query.includes('ldp#contains')) {
+        return existing.map((grant) => ({
+          child: { termType: 'NamedNode', value: grant.id },
+        }))
+      }
+      if (query.includes('?dataOwner')) {
+        // the authority read filters with VALUES ?grant { … }
+        const requested = new Set([...query.matchAll(/<([^>]+)>/g)].map((match) => match[1]))
+        return existing
+          .filter((grant) => requested.has(grant.id!))
+          .map((grant) => ({
+            grant: { termType: 'NamedNode', value: grant.id },
+            dataOwner: { termType: 'NamedNode', value: grant.dataOwner },
+            grantedBy: { termType: 'NamedNode', value: grant.grantedBy },
+            grantee: { termType: 'NamedNode', value: grant.grantee },
+          }))
+      }
+      throw new Error(`unexpected SELECT: ${query}`)
+    }
+    sparqlMock.handlers.triples = (query) => {
+      for (const grant of existing) {
+        if (query.includes(`GRAPH <${grant.id}>`)) return grantQuads(grant)
+      }
+      throw new Error(`unexpected CONSTRUCT: ${query}`)
+    }
+  }
+
+  const buildAgent = async () => {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
       fetch: statelessFetch,
       randomUUID,
       sparqlEndpoint: 'http://example.test/sparql',
     })
+    agent.registrySet.hasGrantRegistry = { id: GRANT_REGISTRY }
+    return agent
+  }
 
-  test('computes the inheriting-children closure', async () => {
+  test('removes the entry point, its downstream chain and its inheriting child', async () => {
+    installRegistry()
     const agent = await buildAgent()
 
-    let first = true
-    sparqlMock.handlers.bindings = (query) => {
-      if (query.includes('inheritsFromGrant')) {
-        return [{ child: { termType: 'NamedNode', value: CHILD_1 } }]
-      }
-      const iris = first ? [GRANT_1] : [GRANT_1, CHILD_1]
-      first = false
-      return authorityBindings(iris)
-    }
+    const revoked = await agent.revokeGrants([AB], ALICE)
 
-    const revoked = await agent.revokeGrants([GRANT_1], ALICE)
-
-    expect(revoked.map((grant) => grant.iri).toSorted()).toEqual([CHILD_1, GRANT_1].toSorted())
+    expect(revoked.map((grant) => grant.iri).toSorted()).toEqual([AB, BC, CHILD].toSorted())
     for (const grant of revoked) {
       expect(grant.dataOwner).toBe(ALICE)
     }
   })
 
-  test('rejects a requester that is neither grantor nor the data owner', async () => {
+  test('removing the source root invalidates the whole dependent chain', async () => {
+    installRegistry()
     const agent = await buildAgent()
 
-    sparqlMock.handlers.bindings = (query) => {
-      if (query.includes('inheritsFromGrant')) return []
-      return authorityBindings([GRANT_1])
-    }
+    const revoked = await agent.revokeGrants([ROOT], ALICE)
 
-    await expect(agent.revokeGrants([GRANT_1], 'https://stranger.example/#id')).rejects.toThrow(
-      'neither grantor nor the data owner'
+    expect(revoked.map((grant) => grant.iri).toSorted()).toEqual(
+      [ROOT, AB, BC, CHILD_SOURCE, CHILD].toSorted()
     )
+  })
+
+  test('rejects a requester that is neither grantor nor the data owner', async () => {
+    installRegistry()
+    const agent = await buildAgent()
+
+    // BOB is not BC's grantor (KIM) or owner (ALICE)
+    await expect(agent.revokeGrants([BC], BOB)).rejects.toMatchObject({
+      name: 'RevocationError',
+      code: 'unauthorized',
+      grants: [BC],
+    })
+  })
+
+  test('grantee self-revocation is not an authority branch (D17)', async () => {
+    installRegistry()
+    const agent = await buildAgent()
+
+    // KIM holds AB, but the grant boundary is grantor/owner only
+    await expect(agent.revokeGrants([AB], KIM)).rejects.toMatchObject({
+      name: 'RevocationError',
+      code: 'unauthorized',
+      grants: [AB],
+    })
+  })
+
+  test('a mixed-owner request fails as a whole on the requested set (B2)', async () => {
+    installRegistry()
+    const agent = await buildAgent()
+    const foreign = 'https://auth.kim.example/grant/foreign'
+
+    // `foreign` does not even exist in either store — the container check runs
+    // on the request, not on whatever happened to load
+    await expect(agent.revokeGrants([AB, foreign], ALICE)).rejects.toMatchObject({
+      name: 'RevocationError',
+      code: 'mixed-owner',
+      grants: [AB, foreign],
+    })
+  })
+
+  test('grants outside the session registry are a typed wrong-data-owner refusal', async () => {
+    installRegistry()
+    const agent = await buildAgent()
+    const foreign = 'https://auth.kim.example/grant/foreign'
+
+    await expect(agent.revokeGrants([foreign], ALICE)).rejects.toMatchObject({
+      name: 'RevocationError',
+      code: 'wrong-data-owner',
+      grants: [foreign],
+    })
+  })
+
+  test('an already-removed grant is an empty closure (idempotent no-op)', async () => {
+    installRegistry([])
+    const agent = await buildAgent()
+
+    await expect(agent.revokeGrants([AB], ALICE)).resolves.toEqual([])
+  })
+
+  test('RevocationError is exported for callers that map it', () => {
+    const error = new RevocationError('unauthorized', [AB], 'no authority')
+    expect(error).toBeInstanceOf(Error)
+    expect(error.code).toBe('unauthorized')
+    expect(error.grants).toEqual([AB])
   })
 })
 

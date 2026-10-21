@@ -1,12 +1,14 @@
 import {
   ActivityRegistry,
-  findDelegableGrant,
+  getRegistryGrants,
+  grantChainValidity,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import type {
   AccessRequestMessage,
   EmbeddedNeedBasedAccessRequest,
   FinalGrantData,
+  GrantData,
   IncomingGrantData,
   NeedBasedAccessRequestMessage,
   NeedBasedAccessRequestReceived,
@@ -78,11 +80,7 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
     // the delegation endpoint dispatches on the message `type`
     const message = await this.parseMessage(operation)
     if (isAccessRevocationMessage(message)) {
-      return new GrantRevocationHandler(this.endpointStore, this.sessionManager).revoke(
-        message,
-        credentials,
-        operation
-      )
+      return new GrantRevocationHandler(this.endpointStore).revoke(message, credentials, operation)
     }
     if (isNeedBasedAccessRequestMessage(message)) {
       return this.acceptNeedBasedAccessRequest(message, credentials)
@@ -180,10 +178,11 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
       )
     }
 
-    // all-or-nothing: validate every grant in the request before any is stored
-    for (const grant of finalGrants) {
-      await this.validateDelegable(grant, credentials.agent.webId)
-    }
+    // all-or-nothing: validate every grant in the request before any is stored.
+    // The whole request is validated against the data owner's registry plus
+    // the request's own grants (the parent/child tree is not stored yet), using
+    // the same chain predicate as revocation closure.
+    await this.validateDelegable(finalGrants, credentials.agent.webId, sai)
 
     const temporal = new Temporal()
     await temporal.init()
@@ -238,22 +237,40 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
   }
 
   /**
-   * Validate that one grant can be delegated: the requester is its
-   * `grantedBy`, and an upstream grant covering it exists in the data owner's
-   * registry (the query lives in the AA's `sparql.ts`).
+   * Validate the whole request with the C1 chain predicate: every grant's
+   * requester must be its `grantedBy`, and the grant must be valid in the
+   * data owner's registry once the request's grants are added (so the
+   * parent/child request validates as the post-issuance tree). Source grants
+   * are not delegated through this endpoint — they are stored by the owner.
    */
-  private async validateDelegable(grant: FinalGrantData, requesterWebId: string): Promise<void> {
-    if (requesterWebId !== grant.grantedBy) {
-      // TODO: change to UnprocessableEntityHttpError
-      throw new BadRequestHttpError('invalid grantedBy')
+  private async validateDelegable(
+    grants: FinalGrantData[],
+    requesterWebId: string,
+    sai: Awaited<ReturnType<SessionManager['getSession']>>
+  ): Promise<void> {
+    for (const grant of grants) {
+      if (requesterWebId !== grant.grantedBy) {
+        // TODO: change to UnprocessableEntityHttpError
+        throw new BadRequestHttpError('invalid grantedBy')
+      }
+      if (grant.grantedBy === grant.dataOwner) {
+        // TODO: change to UnprocessableEntityHttpError
+        throw new BadRequestHttpError('source grants are not delegated')
+      }
     }
-    // the delegable grant lives in the data owner's registry pod — resolve it
-    // from the grant IRI (fail closed when there is no record)
-    const record = await this.endpointStore.findSparqlByIri(grant.id!)
-    if (!record) throw new Error(`no SPARQL endpoint for grant ${grant.id}`)
-    if (!(await findDelegableGrant(localSparqlTransport(record.endpoint), grant))) {
-      // TODO: change to UnprocessableEntityHttpError
-      throw new BadRequestHttpError('no grant available for delegation')
+
+    const transport = localSparqlTransport(sai.sparqlEndpoint)
+    const existing = await getRegistryGrants(transport, sai.registrySet.hasGrantRegistry.id)
+    const byId = new Map<string, GrantData>()
+    for (const grant of existing) byId.set(grant.id!, grant)
+    for (const grant of grants) byId.set(grant.id!, grant)
+
+    const validity = grantChainValidity([...byId.values()])
+    for (const grant of grants) {
+      if (validity.get(grant.id!) !== true) {
+        // TODO: change to UnprocessableEntityHttpError
+        throw new BadRequestHttpError('no grant available for delegation')
+      }
     }
   }
 }

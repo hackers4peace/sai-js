@@ -57,17 +57,19 @@ import {
   matchesScope,
 } from './authorization.ts'
 import { loadDataInstance } from './data-instance.ts'
+import { invalidGrantsAfterRemoval } from './grant-chain.ts'
 import { generateGrantsForAuthorization } from './grant-generation.ts'
+import { RevocationError, grantRegistryOf, normalizeRegistryIri } from './revocation.ts'
 import {
   findApplicationRegistration as findApplicationRegistrationFromSparql,
-  findInheritingChildren,
+  findAuthorizationsForGrantee,
   findSocialAgentInvitation as findInvitationFromSparql,
   findSocialAgentRegistration as findRegistrationFromSparql,
-  findRolesWithMember,
   getApplicationRegistration,
   getDataAuthorization as getDataAuthorizationFromSparql,
   getDataRegistration as getDataRegistrationFromSparql,
   getGrantsAuthority,
+  getRegistryGrants,
   getSocialAgentRegistration as getRegistrationFromSparql,
   getRole as getRoleFromSparql,
   listContained,
@@ -106,6 +108,102 @@ export interface RevokedGrant {
   dataOwner: string
   grantedBy: string
   grantee: string
+}
+
+/**
+ * Validate and compute the revocation closure over an explicit transport +
+ * grant registry — the context-aware core of `AuthorizationAgent.revokeGrants`
+ * and the components handler. The class method binds the session's own
+ * registry; `GrantRevocationHandler` binds the **owner's** endpoint (resolved
+ * from the grant IRI), so an org admin revokes in the org's registry instead of
+ * their personal one (B1). Returns the listed grants plus the C1 dependent
+ * closure; already-removed grants are absent (idempotent tolerance).
+ *
+ * Authority is per grant, checked before any mutation (C4): the grantor
+ * (`grantedBy`) or the data owner. Grantee self-revocation is deliberately not
+ * offered (D17): grants are projections of authorizations, so the grantee's
+ * way out is a future shadowing / need-based revocation request, never a
+ * direct grant delete. Refusals are typed `RevocationError`s (D11).
+ *
+ * The owner/registry check runs on the **requested** IRIs (B2): a request that
+ * mixes registries must fail as a whole; grants that merely are not in this
+ * registry must not be silently echoed as if they were already removed.
+ */
+export async function revokeGrantsClosure(
+  transport: SparqlTransport,
+  grantRegistryIri: string,
+  grants: string[],
+  requesterWebId?: string
+): Promise<RevokedGrant[]> {
+  // B2: group by the requested set, before loading anything. A grant whose
+  // container differs from the target registry cannot be revoked here — it
+  // belongs to another data owner (a backlog/UI bug, never a partial apply).
+  const requestedRegistries = new Set(grants.map(grantRegistryOf))
+  if (requestedRegistries.size > 1) {
+    throw new RevocationError(
+      'mixed-owner',
+      grants,
+      'all grants must belong to the same data owner registry'
+    )
+  }
+  const target = normalizeRegistryIri(grantRegistryIri)
+  const [requestedRegistry] = requestedRegistries
+  if (requestedRegistry && normalizeRegistryIri(requestedRegistry) !== target) {
+    throw new RevocationError(
+      'wrong-data-owner',
+      grants,
+      `grants do not belong to the targeted grant registry ${grantRegistryIri}`
+    )
+  }
+
+  const loaded = await getGrantsAuthority(transport, grants)
+  // already removed → idempotent no-op (the endpoint echoes the request)
+  if (loaded.size === 0) return []
+
+  // defensive: the registry metadata itself disagrees on the owner
+  const dataOwners = new Set([...loaded.values()].map((grant) => grant.dataOwner))
+  if (dataOwners.size > 1) {
+    throw new RevocationError('mixed-owner', grants, 'all grants must have the same dataOwner')
+  }
+
+  // authority per grant, before any deletion: grantor (grantedBy) or data owner
+  for (const [iri, grant] of loaded) {
+    const isGrantor = requesterWebId === grant.grantedBy
+    const isDataOwner = requesterWebId === grant.dataOwner
+    if (!isGrantor && !isDataOwner) {
+      throw new RevocationError(
+        'unauthorized',
+        [iri],
+        'requester is neither grantor nor the data owner'
+      )
+    }
+  }
+
+  // C1 dependent closure: load the whole registry and remove every grant that
+  // was valid before the operation and fails the rooted-validity predicate
+  // once the listed grants are treated as absent, plus the same-request
+  // inheriting children. Grants already invalid before the operation are not
+  // swept (they belong to the sweep).
+  const registryGrants = await getRegistryGrants(transport, grantRegistryIri)
+  const invalid = invalidGrantsAfterRemoval(registryGrants, [...loaded.keys()])
+
+  const closure = new Map<string, RevokedGrant>()
+  for (const grant of invalid) {
+    if (!grant.id) continue
+    closure.set(grant.id, {
+      iri: grant.id,
+      dataOwner: grant.dataOwner,
+      grantedBy: grant.grantedBy,
+      grantee: grant.grantee,
+    })
+  }
+  // a listed grant that raced out of the registry between the authority read
+  // and the bulk load is already gone; keep the authority echo for the
+  // caller's projection cleanup
+  for (const [iri, grant] of loaded) {
+    if (!closure.has(iri)) closure.set(iri, { iri, ...grant })
+  }
+  return [...closure.values()]
 }
 
 // TODO: adjust if registrations are not / nested in the registry
@@ -464,42 +562,19 @@ export class AuthorizationAgent {
 
   /**
    * Validate and compute the revocation closure for the given grants: all must
-   * share one data owner, the requester must be each grant's grantor
-   * (`grantedBy`) or the data owner, and the listed grants plus their
-   * inheriting children (fixpoint over `inheritsFromGrant`) are returned.
-   * Already-removed grants are absent (idempotent tolerance).
+   * belong to this session's grant registry (one data owner), the requester
+   * must be each grant's grantor (`grantedBy`) or the data owner, and the
+   * listed grants plus their C1 dependent closure are returned.
+   * Already-removed grants are absent (idempotent tolerance). Refusals are
+   * typed `RevocationError`s. Grantee self-revocation is not offered (D17).
    */
   public async revokeGrants(grants: string[], requesterWebId?: string): Promise<RevokedGrant[]> {
-    const transport = localSparqlTransport(this.sparqlEndpoint)
-    const loaded = await getGrantsAuthority(transport, grants)
-
-    const dataOwners = new Set([...loaded.values()].map((grant) => grant.dataOwner))
-    if (dataOwners.size > 1) {
-      throw new Error('all grants must have the same dataOwner')
-    }
-
-    // authority per grant, before any deletion: grantor (grantedBy) or owner
-    for (const grant of loaded.values()) {
-      const isGrantor = requesterWebId === grant.grantedBy
-      const isDataOwner = requesterWebId === grant.dataOwner
-      if (!isGrantor && !isDataOwner) {
-        throw new Error('requester is neither grantor nor the data owner')
-      }
-    }
-
-    // dependent closure: the listed grants plus their inheriting children
-    // (fixpoint over inheritsFromGrant — one level today, recursive-ready)
-    const closure = new Map<string, RevokedGrant>()
-    for (const [iri, grant] of loaded) closure.set(iri, { iri, ...grant })
-    while (true) {
-      const children = await findInheritingChildren(transport, [...closure.keys()])
-      const fresh = children.filter((child) => !closure.has(child))
-      if (fresh.length === 0) break
-      for (const [iri, grant] of await getGrantsAuthority(transport, fresh)) {
-        closure.set(iri, { iri, ...grant })
-      }
-    }
-    return [...closure.values()]
+    return revokeGrantsClosure(
+      localSparqlTransport(this.sparqlEndpoint),
+      this.registrySet.hasGrantRegistry.id,
+      grants,
+      requesterWebId
+    )
   }
 
   /**
@@ -645,26 +720,14 @@ export class AuthorizationAgent {
   }
 
   public async findAuthorizationsForAgent(peerId: string): Promise<DataAuthorizationData[]> {
-    // Registry plane (docs/sparql.md step 2): the authorization listing
-    // reuses the same `listContained` + `getDataAuthorization` read
-    // `findAgentsWithAccess` performs; role membership is one SELECT
-    // (`findRolesWithMember`) — the former HTTP O(N×M) authorizations ×
-    // roles sweep is gone. Non-DataAuthorizations (e.g. AdminAuthorizations
-    // share the registry container) are type-filtered like the HTTP
-    // `dataAuthorizations` iterator did.
-    const transport = localSparqlTransport(this.sparqlEndpoint)
-    const [iris, roleIris] = await Promise.all([
-      listContained(transport, this.registrySet.hasAuthorizationRegistry.id),
-      findRolesWithMember(transport, this.registrySet.hasRoleRegistry.id, peerId),
-    ])
-    const roleIriSet = new Set(roleIris)
-    const authorizations = await Promise.all(
-      iris.map((iri) => getDataAuthorizationFromSparql(transport, iri))
-    )
-    return authorizations.filter(
-      (dataAuthorization) =>
-        dataAuthorization.type.includes(INTEROP.DataAuthorization) &&
-        (dataAuthorization.grantee === peerId || roleIriSet.has(dataAuthorization.grantee))
+    // The session's own registry (personal context). The exported
+    // `findAuthorizationsForGrantee` is the same read with an explicit
+    // registry set + transport — the components service uses the context's
+    // registry and `/sparql-admin` transport for org contexts.
+    return findAuthorizationsForGrantee(
+      localSparqlTransport(this.sparqlEndpoint),
+      this.registrySet,
+      peerId
     )
   }
 
