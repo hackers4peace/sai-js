@@ -42,6 +42,10 @@ import {
 } from './access-request.js'
 import { processAdminAuthorizationGranted, processAdminAuthorizationRevoked } from './admin.js'
 import { createInvitation } from './invitation.js'
+// the mirror child is scheduled on the reciprocal queue (explicit `taskQueue`
+// below). Importing it also pulls the reciprocal workflows into this bundle —
+// harmless: Temporal routes a run by its start-queue, not by registration.
+import { syncReciprocalMirror } from './reciprocal.js'
 
 // NOTE: workflow code runs inside the Temporal sandbox — no runtime imports
 // beyond @temporalio/workflow (utils' INTEROP would pull in disallowed Node
@@ -71,6 +75,7 @@ const {
   requestDelegation,
   replaceDataGrantsOnRegistration,
   getPendingGranteeActivities,
+  getPendingDelegatedGrantsUpdates,
   getPendingActivities,
   resolveActivityGrantee,
   resolveAuthorizationGrantee,
@@ -116,7 +121,7 @@ export async function revokeGrants(payload: {
 export const granteeActivitiesSignal = defineSignal<[]>('granteeActivitiesSignal')
 
 /** How long an idle consumer waits for a signal before exiting. */
-const GRANTEE_IDLE_TIMEOUT = '3 seconds'
+const CONSUMER_IDLE_TIMEOUT = '3 seconds'
 
 /**
  * Per-target consumer (Phase 4.1): started by the webhook handler with a
@@ -143,7 +148,7 @@ export async function processGranteeActivities(
     if (pending.length === 0) {
       // wait for a signal (a new activity was routed to this consumer) or exit idle
       idle = true
-      const signaled = await condition(() => !idle, GRANTEE_IDLE_TIMEOUT)
+      const signaled = await condition(() => !idle, CONSUMER_IDLE_TIMEOUT)
       if (!signaled) break
       continue
     }
@@ -163,6 +168,62 @@ export async function processGranteeActivities(
         })
       )
     )
+    await markActivitiesDone({ webId: payload.webId, activities: pending })
+  }
+}
+
+/**
+ * Signal a running per-peer delegated-grants consumer to wake up and drain new
+ * activities (start-or-signal pattern — the handler signals on AlreadyStarted).
+ */
+export const delegatedGrantsUpdatedSignal = defineSignal<[]>('delegatedGrantsUpdatedSignal')
+
+/**
+ * Per-peer consumer for `delegatedGrantsUpdated`
+ * (improve-grant-replication.md §3.3): started by the webhook handler and by
+ * the reconciliation sweep with a deterministic workflowId per
+ * `(webId, peerId)`. Each drain runs the same three ordered steps:
+ *
+ * 1. **replicate** — child `syncReciprocalMirror` on the
+ *    `reciprocal-registration` queue (its own worker and retry policy; the
+ *    only bulk peer fetch in this flow);
+ * 2. **regenerate** — `updateDelegatedGrants` WITHOUT `activityId` (with one it
+ *    would self-complete; this workflow owns completion, after both steps
+ *    succeeded);
+ * 3. **complete** — `markActivitiesDone` for the drained batch, so `done`
+ *    always means "mirror and delegated grants are current".
+ *
+ * Re-draining after every signal is what prevents a lost update: a delivery
+ * that lands while a run is in flight is picked up by the next drain, whose
+ * mirror sync starts AFTER that delivery. Joining an already-running sync
+ * would not be enough — it may have started before the newer peer update.
+ * After an empty drain the consumer waits for a signal before exiting; the
+ * residual exit-window gap is the reconciliation sweep's backstop.
+ */
+export async function processDelegatedGrantsUpdated(
+  payload: activities.DelegatedGrantsConsumerInput
+): Promise<void> {
+  let idle = false
+  setHandler(delegatedGrantsUpdatedSignal, () => {
+    idle = false
+  })
+  while (true) {
+    const pending = await getPendingDelegatedGrantsUpdates(payload)
+    if (pending.length === 0) {
+      // wait for a signal (a new activity was routed to this consumer) or exit idle
+      idle = true
+      const signaled = await condition(() => !idle, CONSUMER_IDLE_TIMEOUT)
+      if (!signaled) break
+      continue
+    }
+    // no explicit workflowId on the child: the consumer already serializes per
+    // (webId, peerId), and a deterministic id would collide with an in-flight
+    // sync started by the previous parallel-start path during a rollout
+    await executeChild(syncReciprocalMirror, {
+      taskQueue: 'reciprocal-registration',
+      args: [payload],
+    })
+    await updateDelegatedGrants({ webId: payload.webId, peerId: payload.peerId })
     await markActivitiesDone({ webId: payload.webId, activities: pending })
   }
 }
@@ -420,7 +481,10 @@ export async function processRoleDeletion(
  * Activity Registry; the correctness backstop for missed deliveries, handler
  * crashes and consumer failures (§6.11). Reuses the same routing as the
  * webhook handler: grantee activities join the per-grantee consumer
- * (deterministic workflowId — a running consumer absorbs them), role
+ * (deterministic workflowId — a running consumer absorbs them),
+ * `delegatedGrantsUpdated` joins the per-peer delegated-grants consumer (same
+ * start-or-join contract: the consumer replicates the mirror, regenerates and
+ * marks the drained activities done itself), role
  * activities run their workflow and are marked done (one completion activity
  * per entry; duplicate completions are accepted — completion is a container
  * `Add`, so reprocessing an already-done activity is harmless). Idempotent by
@@ -461,17 +525,28 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
     ) {
       roleActivities.push(activity)
     } else if (isActivityClass(activity, 'DelegatedGrantsUpdated')) {
+      // the same per-peer consumer as the webhook path
+      // (improve-grant-replication.md §3.3): replicate the mirror, regenerate
+      // from it, then complete the activity. Start-or-join — a run that is
+      // already live picks the activity up in one of its drains; a closed one
+      // is restarted here. The consumer owns completion, so the sweep must not
+      // also mark it done (a second completion would be accepted but points at
+      // a possibly pre-mirror regeneration).
       const decoded = activity as DelegatedGrantsUpdated
-      await executeChild(updateDelegatedGrants, {
-        args: [
-          {
-            webId: payload.webId,
-            peerId: { id: decoded.target, type: [SOCIAL_AGENT_TYPE] },
-            activityId: activity.id,
-          },
-        ],
-      })
-      await markActivitiesDone({ webId: payload.webId, activities: [activity] })
+      try {
+        await executeChild(processDelegatedGrantsUpdated, {
+          workflowId: `delegated-grants:${payload.webId.id}:${decoded.target}`,
+          args: [
+            {
+              webId: payload.webId,
+              peerId: { id: decoded.target, type: [SOCIAL_AGENT_TYPE] },
+            },
+          ],
+        })
+      } catch (err) {
+        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+        // a consumer is already draining for this peer — it holds the delivery
+      }
     } else if (isActivityClass(activity, 'NeedBasedAccessRequestReceived')) {
       // the owner-side leg (authorization-granting.md §6.2) — same routing as
       // the webhook handler: the workflow PUTs the immutable AccessRequest at

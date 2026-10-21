@@ -324,6 +324,45 @@ export async function getDataRegistration(
 }
 
 /**
+ * The subset of `iris` whose body is present — the mirror presence probe. One
+ * query, so callers can classify a whole registration/grant list as
+ * present/absent without a framing attempt (and without one round-trip per
+ * IRI).
+ *
+ * A body counts as present when it is in the resource graph **or** in its
+ * `meta:` graph, exactly like `graphDoc`: CSS keeps container/registration
+ * bodies in `meta:<iri>` ("where data and metadata overlap",
+ * DataAccessorBasedStore) and leaves `GRAPH <iri>` empty. Checking only
+ * `GRAPH <iri>` reports false gaps — the failure mode that produced a wrong
+ * `MirrorIncompleteError` for a seeded registration.
+ *
+ * Used by delegated-grant generation: the local reciprocal mirror is the only
+ * peer source there (improve-grant-replication.md §2), so a linked-but-absent
+ * graph must surface as a mirror gap rather than as a generic framing error.
+ */
+export async function presentGraphs(
+  transport: SparqlTransport,
+  iris: string[]
+): Promise<Set<string>> {
+  if (iris.length === 0) return new Set()
+  const resourceValues = iris.map((iri) => `<${iri}>`).join(' ')
+  const metaValues = iris.map((iri) => `<meta:${iri}>`).join(' ')
+  const bindings = await transport.fetchBindings(
+    `SELECT DISTINCT ?g WHERE {
+  { VALUES ?g { ${resourceValues} } GRAPH ?g { ?s ?p ?o } }
+  UNION
+  { VALUES ?g { ${metaValues} } GRAPH ?g { ?s ?p ?o } }
+}`
+  )
+  const present = new Set<string>()
+  for (const binding of bindings) {
+    const graph = binding.g.value
+    present.add(graph.startsWith('meta:') ? graph.slice('meta:'.length) : graph)
+  }
+  return present
+}
+
+/**
  * Data grant body from its graph — framed via the data-model's own
  * `Grant.fromJsonLd`, producing the same `GrantData` POJO as
  * `factory.dataGrant`. Grants are immutable, so a present graph is current.

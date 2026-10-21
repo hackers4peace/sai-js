@@ -116,6 +116,16 @@ Production NixOS/Podman matches the dev/test storage model:
 - [ ] **webhook retries**. `reconcileActivities` is the backstop for deliveries
   that exhaust their retries. It has no scheduler yet; scheduling stays
   separate from this cutover.
+- [ ] **mirror-sync retry cap — reconsider before cutover.** After
+  [`improve-grant-replication.md`](improve-grant-replication.md) lands, the
+  mirror step of the `DelegatedGrantsUpdated` flow keeps today's 5-attempt cap
+  (`packages/components/src/temporal/workflows/reciprocal.ts`, the
+  `syncReciprocalMirror` proxy) and `done` on that activity means "the peer
+  mirror is current". A peer that stays unreachable or keeps answering 403/5xx
+  therefore leaves the activity **pending indefinitely** — the sweep that would
+  eventually re-drive it still has no schedule. Revisit once scheduling exists:
+  either unbounded retries with terminal 404/410, or a scheduled reconciliation
+  arm. Until then, pending (not stale `done`) is the accepted failure mode.
 - [ ] **worker** — add `CSS_FUSEKI_BASE_URL`, `CSS_FUSEKI_ADMIN`,
   `CSS_GARAGE_ADMIN_ENDPOINT`, `CSS_GARAGE_ADMIN_TOKEN`, `CSS_S3_ENDPOINT`.
   Keep `CSS_POSTGRES_CONNECTION_STRING`, `TEMPORAL_ADDRESS`, origins.

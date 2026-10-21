@@ -5,6 +5,7 @@ import {
   type GeneratedGrants,
   type GrantData,
   type RegistrySetData,
+  type SocialAgentRegistrationData,
   ShapeTree,
   childIris,
   frameDataInstance,
@@ -29,6 +30,7 @@ import {
   getSocialAgentRegistration,
   listContained,
   localSparqlTransport,
+  presentGraphs,
 } from './sparql.ts'
 import type { DataModelDependencies } from './types.ts'
 
@@ -163,9 +165,105 @@ async function generateChildDelegatedGrantData(
   return result
 }
 
+/**
+ * Raised when the local reciprocal mirror does not hold a graph the delegation
+ * path needs. Delegated-grant generation may only read replicated peer data
+ * (improve-grant-replication.md §2/§5) — a missing graph means the mirror sync
+ * has not landed yet, and generating without it would silently produce fewer
+ * (or wrong) delegated grants. The workflow retries; the delegated-grants
+ * consumer replicates before every regeneration.
+ */
+export class MirrorIncompleteError extends Error {
+  public readonly iri: string
+  public readonly kind: 'registration' | 'grant'
+
+  public constructor(iri: string, kind: 'registration' | 'grant') {
+    super(
+      `reciprocal mirror is missing the ${kind} graph <${iri}> — replicate the peer side before generating delegated grants`
+    )
+    this.name = 'MirrorIncompleteError'
+    this.iri = iri
+    this.kind = kind
+  }
+}
+
+interface MirroredPeer {
+  /** the peer's registration of us (the mirrored reciprocal) */
+  reciprocal: SocialAgentRegistrationData
+  /** the grants the peer issued to us — the delegation sources */
+  grants: GrantData[]
+}
+
+/**
+ * Per-regeneration cache over the mirrored peer side.
+ *
+ * `generateDelegatedDataGrants` runs once per data authorization (and once per
+ * role member for `AllFromRole`), and it used to re-read the whole social-agent
+ * registry plus every reciprocal registration and grant body on each pass —
+ * A × (1 + 2P + PG) graph reads. This index reads the registry listing once and
+ * each peer's mirrored side once on first use, so the cost is (1 + 2P + PG)
+ * per regeneration and only for the peers the filters actually reach.
+ *
+ * Presence is checked before framing: a reciprocal-linked registration or a
+ * linked grant with no local graph is a mirror gap, not a data-model problem, so
+ * it surfaces as `MirrorIncompleteError` naming the IRI instead of the generic
+ * framing error. Grants are immutable (a change mints a fresh IRI), so a graph
+ * that is present is also current — nothing is compared or re-fetched.
+ */
+class MirroredPeerIndex {
+  private readonly transport: SparqlTransport
+  private readonly registrySet: RegistrySetData
+  private registrations?: Promise<SocialAgentRegistrationData[]>
+  private readonly peers = new Map<string, Promise<MirroredPeer>>()
+
+  public constructor(transport: SparqlTransport, registrySet: RegistrySetData) {
+    this.transport = transport
+    this.registrySet = registrySet
+  }
+
+  /** Our registrations that carry a reciprocal link — the delegation candidates. */
+  public async socialAgents(): Promise<SocialAgentRegistrationData[]> {
+    this.registrations ??= listContained(
+      this.transport,
+      this.registrySet.hasSocialAgentRegistry.id
+    ).then((iris) =>
+      Promise.all(iris.map((iri) => getSocialAgentRegistration(this.transport, iri)))
+    )
+    return (await this.registrations).filter((registration) => registration.reciprocalRegistration)
+  }
+
+  /** The mirrored peer side for one of our registrations (cached per reciprocal IRI). */
+  public async for(registration: SocialAgentRegistrationData): Promise<MirroredPeer | undefined> {
+    const reciprocalIri = registration.reciprocalRegistration
+    if (!reciprocalIri) return undefined
+    let peer = this.peers.get(reciprocalIri)
+    if (!peer) {
+      peer = this.load(reciprocalIri)
+      this.peers.set(reciprocalIri, peer)
+    }
+    return peer
+  }
+
+  private async load(reciprocalIri: string): Promise<MirroredPeer> {
+    const presentReciprocals = await presentGraphs(this.transport, [reciprocalIri])
+    if (!presentReciprocals.has(reciprocalIri)) {
+      throw new MirrorIncompleteError(reciprocalIri, 'registration')
+    }
+    const reciprocal = await getSocialAgentRegistration(this.transport, reciprocalIri)
+    const grantIris = reciprocal.hasDataGrant ?? []
+    if (grantIris.length === 0) return { reciprocal, grants: [] }
+    const presentGrants = await presentGraphs(this.transport, grantIris)
+    const missing = grantIris.find((iri) => !presentGrants.has(iri))
+    if (missing) throw new MirrorIncompleteError(missing, 'grant')
+    const grants = await Promise.all(grantIris.map((iri) => getDataGrant(this.transport, iri)))
+    return { reciprocal, grants }
+  }
+}
+
 async function generateDelegatedDataGrants(
   data: DataAuthorizationData,
   registrySet: RegistrySetData,
+  peers: MirroredPeerIndex,
   grantee: string,
   deps: DataModelDependencies,
   transport: SparqlTransport,
@@ -176,17 +274,7 @@ async function generateDelegatedDataGrants(
   }
   const result: GrantData[] = []
 
-  // the social-agent registry listing + bodies via the registry plane
-  // (replaces the HTTP `AgentRegistry.socialAgentRegistrations` sweep)
-  const agentRegistrationIris = await listContained(
-    transport,
-    registrySet.hasSocialAgentRegistry.id
-  )
-  const agentRegistrations = await Promise.all(
-    agentRegistrationIris.map((iri) => getSocialAgentRegistration(transport, iri))
-  )
-
-  for (const agentRegistration of agentRegistrations) {
+  for (const agentRegistration of await peers.socialAgents()) {
     // data onwer is specified but it is not their registration
     if (dataOwner && dataOwner !== agentRegistration.registeredAgent) {
       continue
@@ -195,20 +283,12 @@ async function generateDelegatedDataGrants(
     if (grantee === agentRegistration.registeredAgent) {
       continue
     }
-    // only inspect registrations that have a reciprocal registration
-    if (!agentRegistration.reciprocalRegistration) continue
-    const reciprocalReg = await getSocialAgentRegistration(
-      transport,
-      agentRegistration.reciprocalRegistration
-    )
+    // the mirrored reciprocal registration + the grants it links (the source
+    // grants); throws MirrorIncompleteError when the mirror has a gap
+    const peer = await peers.for(agentRegistration)
+    if (!peer || peer.grants.length === 0) continue
 
-    if ((reciprocalReg.hasDataGrant ?? []).length === 0) continue
-
-    const reciprocalDataGrants = await Promise.all(
-      (reciprocalReg.hasDataGrant ?? []).map((grantIri) => getDataGrant(transport, grantIri))
-    )
-
-    let matchingDataGrants = reciprocalDataGrants.filter(
+    let matchingDataGrants = peer.grants.filter(
       (grant) => grant.registeredShapeTree === data.registeredShapeTree
     )
     if (data.hasDataRegistration) {
@@ -395,9 +475,35 @@ async function generateSourceDataGrants(
  * Source grants are only created if the data authorization is registered by the
  * data owner; otherwise only delegated data grants are created. Handles the
  * AllFromRole scope by iterating over role members.
+ *
+ * Kept as the public single-authorization entry point: it builds a fresh
+ * `MirroredPeerIndex`, so a caller that generates for several authorizations
+ * should go through `generateGrantsForAuthorization`, which shares one index
+ * across them (the peer side is then read once per regeneration, not once per
+ * authorization).
  */
 export async function generateDataGrants(
   data: DataAuthorizationData,
+  registrySet: RegistrySetData,
+  grantee: string,
+  deps: DataModelDependencies,
+  transport: SparqlTransport,
+  endpoints?: Map<string, string>
+): Promise<SourceAndDelegatedGrants> {
+  return generateDataGrantsWithPeers(
+    data,
+    new MirroredPeerIndex(transport, registrySet),
+    registrySet,
+    grantee,
+    deps,
+    transport,
+    endpoints
+  )
+}
+
+async function generateDataGrantsWithPeers(
+  data: DataAuthorizationData,
+  peers: MirroredPeerIndex,
   registrySet: RegistrySetData,
   grantee: string,
   deps: DataModelDependencies,
@@ -427,6 +533,7 @@ export async function generateDataGrants(
         const delegatedGrants = await generateDelegatedDataGrants(
           data,
           registrySet,
+          peers,
           grantee,
           deps,
           transport,
@@ -468,6 +575,7 @@ export async function generateDataGrants(
     dataGrantData.delegated = await generateDelegatedDataGrants(
       data,
       registrySet,
+      peers,
       grantee,
       deps,
       transport,
@@ -495,13 +603,17 @@ export async function generateGrantsForAuthorization(
 ): Promise<GeneratedGrants> {
   const sourceGrants: FinalGrantData[] = []
   const delegatedGrants: GrantData[] = []
+  // one peer index for the whole regeneration: the mirrored peer side is read
+  // once, no matter how many authorizations (or role members) delegate from it
+  const peers = new MirroredPeerIndex(transport, registrySet)
 
   for (const dataAuthorization of dataAuthorizations) {
     if (dataAuthorization.scopeOfAuthorization === INTEROP.Inherited) {
       continue
     }
-    const grants = await generateDataGrants(
+    const grants = await generateDataGrantsWithPeers(
       dataAuthorization,
+      peers,
       registrySet,
       grantee,
       deps,

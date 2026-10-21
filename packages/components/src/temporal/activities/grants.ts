@@ -22,6 +22,7 @@ import {
   DataAuthorization,
   type DataAuthorizationData,
   type DataAuthorizationId,
+  type DelegatedGrantsUpdated,
   type FinalDataAuthorizationData,
   type FinalGrantData,
   type GeneratedGrants,
@@ -764,6 +765,32 @@ export async function getPendingActivities(
     }
   }
   return workItems.filter((activity) => !completed.has(activity.id))
+}
+
+export interface DelegatedGrantsConsumerInput {
+  /** the context whose registry set is being regenerated */
+  webId: SocialAgentId
+  /** the peer whose reciprocal registration changed (`activity.target`) */
+  peerId: SocialAgentId
+}
+
+/**
+ * Pending `delegatedGrantsUpdated` activities **for one peer** — the
+ * delegated-grants consumer's drain (improve-grant-replication.md §3.3).
+ * `getPendingActivities` lists everything pending in the registry; this
+ * narrows it to the class and to the peer in `target` (the consumer is
+ * per-`(webId, peerId)`, so unrelated activities stay with their own
+ * workflows).
+ */
+export async function getPendingDelegatedGrantsUpdates(
+  payload: DelegatedGrantsConsumerInput
+): Promise<ActivityData[]> {
+  const pending = await getPendingActivities({ webId: payload.webId })
+  return pending.filter(
+    (activity) =>
+      isActivityClass(activity, 'DelegatedGrantsUpdated') &&
+      (activity as DelegatedGrantsUpdated).target === payload.peerId.id
+  )
 }
 
 export interface MarkActivitiesDoneInput {

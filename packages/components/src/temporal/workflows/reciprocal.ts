@@ -26,9 +26,11 @@ const { invitationAcceptance, reciprocalRegistration, reciprocalWebhook } = prox
 // mirror maintenance gets its own policy: the sync re-fetches the peer's
 // reciprocal doc + linked grant docs (N round-trips) and rewrites the local
 // mirror graphs, so it needs a longer startToClose budget than the
-// registration probes. Fewer retries than reciprocalRegistration — a failed
-// sync is eventually recovered by the reconcile-sweep mirror arm (plan
-// phase 4.2).
+// registration probes. Fewer retries than reciprocalRegistration — a save
+// from the cap comes from the delegated-grants consumer (its next drain syncs
+// again) or the reconcile sweep, which restarts that consumer
+// (improve-grant-replication.md §3.3/S4); a permanent 403 stays pending, see
+// docs/plans/update-deployment.md.
 const { syncReciprocalMirror: syncMirrorActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
   retry: {
@@ -63,8 +65,10 @@ export async function establishReciprocal(
 ): Promise<void> {
   const result = await reciprocalRegistration(webId, registration, accountId)
   await reciprocalWebhook(result)
-  // phase 4b: stores are per-pod, so mirror the peer's reciprocal registration
-  // (openwiki/architecture/federation.md 1a — the mirror is the only source for peer data now)
+  // the initial mirror — per-pod stores mean the peer's registration of us is
+  // reachable only through this local replica
+  // (openwiki/architecture/federation.md 1a); the acceptor leg does the same
+  // in `acceptInvitation`
   await syncMirrorActivity({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     peerId: { id: registration.registeredAgent, type: [SOCIAL_AGENT_TYPE] },
@@ -80,12 +84,12 @@ export async function establishReciprocal(
  * AA (personal or org). Mirrors `establishReciprocal` on the acceptor side:
  * POST the opaque capabilityUrl (the inviter's AA creates its registration of
  * us and returns the inviter's webId), build our registration of the inviter,
- * discover the reciprocal and subscribe the reciprocal webhook on the
- * inviter's registration of us (each side of the pair watches the other's
- * registration — inviter via `establishReciprocal`, acceptor here), and only
- * then mark the activity done. The decoded activity object (the urn:uuid
- * snapshot) passes verbatim; the completion rides the `InvitationAcceptedId`
- * ref.
+ * discover the reciprocal, subscribe the reciprocal webhook on the inviter's
+ * registration of us (each side of the pair watches the other's registration
+ * — inviter via `establishReciprocal`, acceptor here), seed the local mirror
+ * of that reciprocal registration, and only then mark the activity done. The
+ * decoded activity object (the urn:uuid snapshot) passes verbatim; the
+ * completion rides the `InvitationAcceptedId` ref.
  */
 export async function acceptInvitation(
   webId: string,
@@ -96,6 +100,17 @@ export async function acceptInvitation(
   const { registration } = await invitationAcceptance(webId, object)
   const webhook = await reciprocalRegistration(webId, registration, accountId)
   await reciprocalWebhook(webhook)
+  // initial mirror, acceptor side — the inviter-side counterpart is in
+  // `establishReciprocal`. Both legs must seed it: it is the ONLY local copy
+  // of the peer's registration of us and of the grants the peer issued to us,
+  // and delegated-grant generation reads those graphs from the local store
+  // without any peer dereference (improve-grant-replication.md §2/§3.1).
+  // Ordering is safe: the webhook subscription above targets the same
+  // registration, so its ACR already admits this session's read.
+  await syncMirrorActivity({
+    webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
+    peerId: { id: webhook.peerId, type: [SOCIAL_AGENT_TYPE] },
+  })
   await markActivitiesDone({
     webId: { id: webId, type: [SOCIAL_AGENT_TYPE] },
     activities: [activity],
@@ -103,10 +118,13 @@ export async function acceptInvitation(
 }
 
 /**
- * Mirror-sync workflow — started by ActivityWebhookHandler in parallel with
- * updateDelegatedGrants whenever a `delegatedGrantsUpdated` activity arrives:
- * re-fetches the peer's reciprocal registration (+ data grants) with the
- * org's credentials and rewrites the local mirror graphs.
+ * Mirror-sync workflow — the replication step. Started by the invitation
+ * workflows (initial mirror, one per leg) and, per `delegatedGrantsUpdated`
+ * activity, by the delegated-grants consumer (which serializes it per
+ * `(webId, peerId)` and runs it BEFORE regenerating grants —
+ * improve-grant-replication.md §3). Re-fetches the peer's reciprocal
+ * registration (+ data grants) with the context's own credentials and
+ * rewrites the local mirror graphs.
  */
 export async function syncReciprocalMirror(
   payload: activities.SyncReciprocalMirrorInput

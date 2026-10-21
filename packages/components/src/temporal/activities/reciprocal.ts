@@ -128,9 +128,10 @@ export async function reciprocalRegistration(
     throw new Error(`reciprocal registration from ${registration.registeredAgent} was not found`)
   }
   // NOTE: the initial reciprocal-mirror write is deliberately NOT here — it
-  // is orchestrated by the establishReciprocal workflow (its own activity,
-  // own retry policy), currently disabled until phase 4b
-  // (org-context-sparql.md / openwiki/architecture/federation.md 1a)
+  // is orchestrated by the calling workflow as its own activity with its own
+  // retry policy (`establishReciprocal` and, since improve-grant-replication.md
+  // S1, `acceptInvitation`), so the activity completion means "mirror written"
+  // (openwiki/architecture/federation.md 1a)
   return {
     accountId,
     webId,

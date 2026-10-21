@@ -51,8 +51,10 @@ export class ReciprocalWebhookHandler extends OperationHttpHandler {
     }
     if (requestBody.type === 'Update') {
       // mirror maintenance is NOT done here — this handler only records the
-      // `delegatedGrantsUpdated` activity (the outbox pattern); the mirror
-      // sync runs as a Temporal workflow started by ActivityWebhookHandler
+      // `delegatedGrantsUpdated` activity (the outbox pattern); the per-peer
+      // delegated-grants consumer (started by ActivityWebhookHandler)
+      // replicates the mirror FIRST, then regenerates the delegated grants and
+      // finally completes the activity (improve-grant-replication.md §3)
       const session = await this.sessionManager.getSession(channel.webId)
       const activityRegistry = session.registrySet.hasActivityRegistry
       if (!activityRegistry) throw new Error('activity registry not found in registry set')

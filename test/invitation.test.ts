@@ -7,6 +7,7 @@ const loadSocialAgentInvitation = loader(SocialAgentInvitation.fromJsonLd)
 import { describe, expect, test } from 'vitest'
 
 import {
+  localMirror,
   rpcPayload,
   waitFor,
   waitForAgentRegistrationAddedCompletion,
@@ -122,6 +123,13 @@ describe('personal invitation', () => {
     // both sides marked their activity done
     await waitForInvitationAcceptedCompletion(kimSession)
     await waitForAgentRegistrationAddedCompletion(danSession)
+
+    // `done` now implies the initial mirror exists on BOTH legs, with no
+    // fixture help (dan↔kim is not a seeded pair): each side resolves the
+    // peer's registration of it from its own store — a missing mirror throws
+    // (`Node <iri> not found in framed output`)
+    expect((await localMirror(kimSession, danId)).registeredAgent).toBe(kimId)
+    expect((await localMirror(danSession, kimId)).registeredAgent).toBe(danId)
   })
 })
 
@@ -204,6 +212,12 @@ describe('admin invitation send', () => {
     // both sides marked their activity done
     await waitForInvitationAcceptedCompletion(kimSession)
     await waitForAgentRegistrationAddedCompletion(yoyoSession)
+
+    // the acceptor's mirror of the org (kim's side) and the org's mirror of
+    // the acceptor (yoyo's side) — the former is what backs the personal
+    // `adminOf` marker, the latter what the org reads when delegating
+    expect((await localMirror(kimSession, yoyoId)).registeredAgent).toBe(kimId)
+    expect((await localMirror(yoyoSession, kimId)).registeredAgent).toBe(yoyoId)
   })
 })
 
@@ -290,6 +304,10 @@ describe('admin invitation receive', () => {
     // both sides marked their activity done
     await waitForInvitationAcceptedCompletion(yoyoSession)
     await waitForAgentRegistrationAddedCompletion(kimSession)
+
+    // org acceptor (yoyo's side) and personal inviter (kim's side) both mirror
+    expect((await localMirror(yoyoSession, kimId)).registeredAgent).toBe(yoyoId)
+    expect((await localMirror(kimSession, yoyoId)).registeredAgent).toBe(kimId)
 
     // regression guard — the old bug created a spurious kim → dan pair
     expect(await kimSession.findSocialAgentRegistration(danId)).toBeUndefined()

@@ -3,6 +3,7 @@ import {
   ActivityRegistry,
   type AuthorizationAgent,
   getDataGrant,
+  getSocialAgentRegistration,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import type {
@@ -53,6 +54,32 @@ export async function dataGrants(
 ): Promise<GrantData[]> {
   const transport = localSparqlTransport(session.sparqlEndpoint)
   return Promise.all((registration.hasDataGrant ?? []).map((iri) => getDataGrant(transport, iri)))
+}
+
+/**
+ * The locally **mirrored** copy of `peerId`'s registration of `session.webId`
+ * (the peer's reciprocal registration), read through the reading side's own
+ * SPARQL plane — a replica read, never a peer dereference.
+ *
+ * Throws `Node <iri> not found in framed output` when the mirror graph has not
+ * been written, which is exactly the invariant the replication steps must
+ * satisfy (improve-grant-replication.md §2): the invitation workflows seed it
+ * per leg, the delegated-grants consumer refreshes it before regenerating.
+ */
+export async function localMirror(
+  session: AuthorizationAgent,
+  peerId: string
+): Promise<SocialAgentRegistrationData> {
+  const registration = await session.findSocialAgentRegistration(peerId)
+  if (!registration?.reciprocalRegistration) {
+    throw new Error(
+      `${session.webId} has no registration of ${peerId} with a reciprocal link (nothing to mirror)`
+    )
+  }
+  return getSocialAgentRegistration(
+    localSparqlTransport(session.sparqlEndpoint),
+    registration.reciprocalRegistration
+  )
 }
 
 /**

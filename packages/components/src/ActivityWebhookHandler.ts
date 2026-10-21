@@ -36,7 +36,10 @@ import { getLoggerFor } from 'global-logger-factory'
 import type { ActivityEvents } from './ActivityEvents.js'
 import type { ActivityWebhookStore } from './ActivityWebhookStore.js'
 import type { SessionManager } from './SessionManager'
-import type { CreateGrantsInput } from './temporal/activities/grants.js'
+import type {
+  CreateGrantsInput,
+  DelegatedGrantsConsumerInput,
+} from './temporal/activities/grants.js'
 import { Temporal } from './temporal/client.js'
 import {
   processNeedBasedAccessRequest,
@@ -48,19 +51,16 @@ import {
 } from './temporal/workflows/admin.js'
 import {
   createRole,
+  delegatedGrantsUpdatedSignal,
   granteeActivitiesSignal,
   processAuthorizationGranted,
+  processDelegatedGrantsUpdated,
   processGranteeActivities,
   processRoleDeletion,
   processRoleMembershipChange,
-  updateDelegatedGrants,
 } from './temporal/workflows/grants.js'
 import { createInvitation } from './temporal/workflows/invitation.js'
-import {
-  acceptInvitation,
-  establishReciprocal,
-  syncReciprocalMirror,
-} from './temporal/workflows/reciprocal.js'
+import { acceptInvitation, establishReciprocal } from './temporal/workflows/reciprocal.js'
 
 /** The webhook channel (owner or admin subscription) for the current topic. */
 type ActivityChannel = NonNullable<Awaited<ReturnType<ActivityWebhookStore['findBySendTo']>>>
@@ -305,31 +305,16 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       const args: [CreateGrantsInput] = [
         { webId: socialAgentRef(channel.webId), authorizationGrantee },
       ]
-      const start = (): Promise<unknown> =>
-        client.workflow.start(processGranteeActivities, {
-          taskQueue: 'create-grants',
-          args,
-          workflowId,
-        })
-      try {
-        await start()
-      } catch (err) {
-        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
-        for (let attempt = 0; attempt < 3; attempt++) {
-          try {
-            await client.workflow.getHandle(workflowId).signal(granteeActivitiesSignal)
-            break
-          } catch {
-            // consumer closed between the failed start and the signal — restart it
-            try {
-              await start()
-              break
-            } catch (err2) {
-              if (!(err2 instanceof WorkflowExecutionAlreadyStartedError)) throw err2
-            }
-          }
-        }
-      }
+      await this.startOrSignal(
+        workflowId,
+        () =>
+          client.workflow.start(processGranteeActivities, {
+            taskQueue: 'create-grants',
+            args,
+            workflowId,
+          }),
+        () => client.workflow.getHandle(workflowId).signal(granteeActivitiesSignal)
+      )
       return
     }
 
@@ -442,36 +427,65 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
 
     if (isActivityClass(activity, 'DelegatedGrantsUpdated')) {
       const decoded = S.decodeUnknownSync(DelegatedGrantsUpdated)(activity)
-      await client.workflow.start(updateDelegatedGrants, {
-        taskQueue: 'create-grants',
-        args: [
-          {
-            webId: socialAgentRef(channel.webId),
-            peerId: socialAgentRef(decoded.target),
-            activityId: activity.id,
-          },
-        ],
-        workflowId: crypto.randomUUID(),
-      })
-      // mirror sync in parallel (phase 4b), serialized per (webId, peerId):
-      // a running sync re-fetches the latest peer state, so a concurrent
-      // update is absorbed by the deterministic workflowId
-      try {
-        await client.workflow.start(syncReciprocalMirror, {
-          taskQueue: 'reciprocal-registration',
-          args: [
-            {
-              webId: socialAgentRef(channel.webId),
-              peerId: socialAgentRef(decoded.target),
-            },
-          ],
-          workflowId: `mirror:${channel.webId}:${decoded.target}`,
-        })
-      } catch (err) {
-        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
-      }
+      // per-peer consumer (improve-grant-replication.md §3.3): replicate the
+      // peer's reciprocal registration (+ its grants) into the local mirror
+      // FIRST, then regenerate the delegated grants from it, then mark the
+      // activity done. The previous shape started the mirror sync and
+      // `updateDelegatedGrants` in parallel, so generation could read a stale
+      // mirror. `decoded.object` (the reciprocal registration IRI) is
+      // informational only — the consumer derives the peer from `target`.
+      const workflowId = `delegated-grants:${channel.webId}:${decoded.target}`
+      const args: [DelegatedGrantsConsumerInput] = [
+        { webId: socialAgentRef(channel.webId), peerId: socialAgentRef(decoded.target) },
+      ]
+      await this.startOrSignal(
+        workflowId,
+        () =>
+          client.workflow.start(processDelegatedGrantsUpdated, {
+            taskQueue: 'create-grants',
+            args,
+            workflowId,
+          }),
+        () => client.workflow.getHandle(workflowId).signal(delegatedGrantsUpdatedSignal)
+      )
       return
     }
+  }
+
+  /**
+   * Start a deterministic per-target consumer, or signal the running one
+   * (start-or-signal). A failed start can mean “already running”, and the
+   * signal can then fail because that run closed in the window between the two
+   * calls — retry the pair a few times; a second `AlreadyStarted` means another
+   * run is live and holds the delivery.
+   */
+  private async startOrSignal(
+    workflowId: string,
+    start: () => Promise<unknown>,
+    signal: () => Promise<unknown>
+  ): Promise<void> {
+    try {
+      await start()
+      return
+    } catch (err) {
+      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+    }
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await signal()
+        return
+      } catch {
+        try {
+          await start()
+          return
+        } catch (err2) {
+          if (!(err2 instanceof WorkflowExecutionAlreadyStartedError)) throw err2
+        }
+      }
+    }
+    // exhausted both paths — the delivery is still recorded in the outbox, so
+    // the reconciliation sweep re-drives it (once a schedule exists)
+    this.logger.warn(`could not start or signal ${workflowId}; leaving it to the sweep`)
   }
 
   /**
