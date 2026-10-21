@@ -11,6 +11,8 @@ import * as forwardActivities from '../temporal/activities/forward-to-push.js'
 import * as grantsActivities from '../temporal/activities/grants.js'
 import * as invitationActivities from '../temporal/activities/invitation.js'
 import * as reciprocalActivities from '../temporal/activities/reciprocal.js'
+import * as webhookActivities from '../temporal/activities/webhook-delivery.js'
+import { WEBHOOK_DELIVERY_TASK_QUEUE } from '../temporal/queues.js'
 import { initNodeTracing } from '../tracing/bootstrap.js'
 import { temporalPluginConfig } from '../tracing/otel-state.js'
 
@@ -54,6 +56,16 @@ async function run() {
       plugins,
     })
 
+    const webhook = await Worker.create({
+      connection,
+      taskQueue: WEBHOOK_DELIVERY_TASK_QUEUE,
+      workflowsPath: fileURLToPath(
+        new URL('../temporal/workflows/webhook-delivery.js', import.meta.url)
+      ),
+      activities: webhookActivities,
+      plugins,
+    })
+
     const grants = await Worker.create({
       connection,
       taskQueue: 'create-grants',
@@ -74,7 +86,7 @@ async function run() {
     })
 
     // Run all workers simultaneously
-    await Promise.all([forward.run(), reciprocal.run(), grants.run()])
+    await Promise.all([forward.run(), reciprocal.run(), grants.run(), webhook.run()])
   } finally {
     // flush pending spans before the process exits (dagger kills the service
     // right after the test exec)

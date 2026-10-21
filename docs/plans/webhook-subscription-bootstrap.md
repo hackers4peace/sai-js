@@ -188,9 +188,9 @@ admin channels never take over workflow dispatch.
   logic. The *deletion* direction for stale admin channels (entry present but
   no matching `AdminAuthorization` in the org's registry) is optional and
   deferred (§7).
-- **Expiry.** CSS `WebhookChannel2023` channels do not expire — the
-  `WebhookEmitter` `expiration` (durable-webhook-delivery.md §3) is the signed
-  message's PoP validity, not the channel's lifetime. Lifecycle is explicit
+- **Expiry.** CSS `WebhookChannel2023` channels do not expire. The stock
+  emitter's `expiration` is the signed message's PoP validity, not the channel's
+  lifetime. The durable emitter sends no token, so channel lifetime is explicit
   create/delete: main-agent channel on account creation, admin channels on
   `AddAdmin`/`RemoveAdmin`.
 
@@ -259,7 +259,8 @@ channels are untouched by the create path (idempotent skip).
 ## 7. Out of scope
 
 - The reconciliation sweep for activity **entries** (Phase 4.2) — separate.
-- Durable webhook **delivery** (`durable-webhook-delivery.md`) — separate.
+- Durable webhook delivery is implemented (`DurableWebhookEmitter`); this plan
+  covers channel lifecycle only.
 - Unsubscribing channels for deleted accounts (no account-deletion flow today).
 - **Sweeping stale admin channels** on demotion-failure leftovers (no
   reconciled delete direction yet — the explicit `RemoveAdmin` path covers the

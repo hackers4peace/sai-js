@@ -1,0 +1,18 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "Durable webhook delivery. The handlers use sendTo as a capability URL and do not verify the stock emitter's DPoP token, so this emitter has no JWK or base URL inputs.",
+      "@id": "urn:sai:default:OverrideDurableWebhookEmitter",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:WebhookEmitter" },
+      "overrideParameters": {
+        "@type": "DurableWebhookEmitter"
+      }
+    }
+  ]
+}

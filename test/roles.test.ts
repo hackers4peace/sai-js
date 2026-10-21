@@ -38,20 +38,31 @@ async function verifyAccessGrant(
 
   // reciprocal registration is stored as an IRI — load it on demand (SPARQL plane)
   expect(granteeRegForGrantedBy!.reciprocalRegistration).toBeDefined()
-  const grantedByRegForGrantee = await getSocialAgentRegistration(
-    localSparqlTransport(granteeSession.sparqlEndpoint),
-    granteeRegForGrantedBy!.reciprocalRegistration!
-  )
+
+  const loadMirror = async () => {
+    const grantedByRegForGrantee = await getSocialAgentRegistration(
+      localSparqlTransport(granteeSession.sparqlEndpoint),
+      granteeRegForGrantedBy!.reciprocalRegistration!
+    )
+    const grants = await dataGrants(grantedByRegForGrantee, granteeSession)
+    const dataGrant = grants.find(
+      (grant) =>
+        grant.registeredShapeTree === shapeTree &&
+        grant.grantedBy === grantedById &&
+        grant.dataOwner === dataOwnerId
+    )
+    return { grantedByRegForGrantee, dataGrant }
+  }
+
+  // the peer mirror is refreshed by a webhook-triggered workflow, so it can
+  // lag the grantor registration update that the test already awaited
+  await waitFor(async () => {
+    const { dataGrant } = await loadMirror()
+    return expectGrant ? dataGrant !== undefined : dataGrant === undefined
+  })
+
+  const { grantedByRegForGrantee, dataGrant } = await loadMirror()
   expect(grantedByRegForGrantee.registeredAgent).toBe(granteeId)
-
-  const grants = await dataGrants(grantedByRegForGrantee, granteeSession)
-
-  const dataGrant = grants.find(
-    (grant) =>
-      grant.registeredShapeTree === shapeTree &&
-      grant.grantedBy === grantedById &&
-      grant.dataOwner === dataOwnerId
-  )
 
   if (expectGrant) {
     expect((await getDataGrantIris(grantedByRegForGrantee)).length).toBeGreaterThan(0)

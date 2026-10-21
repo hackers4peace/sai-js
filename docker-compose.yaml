@@ -99,7 +99,7 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      <<: [*postgres-env, *certs-env]
+      <<: [*postgres-env, *certs-env, *temporal-env]
       CSS_CONFIG: /sai/environments/css/registry.json
       CSS_LOGGING_LEVEL: info
       CSS_BASE_URL: https://reg.docker/
@@ -137,7 +137,7 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      <<: [*postgres-env, *s3-region-env, *certs-env, *origin-env]
+      <<: [*postgres-env, *s3-region-env, *certs-env, *origin-env, *temporal-env]
       CSS_CONFIG: /sai/environments/css/data.json
       CSS_LOGGING_LEVEL: info
       CSS_BASE_URL: https://data.docker/

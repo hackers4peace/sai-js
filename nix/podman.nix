@@ -314,6 +314,7 @@ let
         CSS_CONFIG = "/config/registry.json";
         CSS_BASE_URL = cfg.registry.baseUrl;
         CSS_PORT = "4600";
+        TEMPORAL_ADDRESS = "temporal:7233";
         SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
       };
       volumes = [
@@ -332,6 +333,7 @@ let
         CSS_ROOT_FILE_PATH = "/data";
         CSS_BASE_URL = cfg.data.baseUrl;
         CSS_PORT = "4700";
+        TEMPORAL_ADDRESS = "temporal:7233";
         SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
       };
       volumes = [

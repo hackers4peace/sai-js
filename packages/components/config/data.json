@@ -44,6 +44,7 @@
     "css:config/storage/backend/data-accessors/sparql-endpoint.json",
     "sai:config/policy/engine.json",
     "sai:config/overrides/base-http-handler.json",
+    "sai:config/overrides/emitter.json",
     "sai:config/overrides/disable-v6-migration.json",
     "sai:config/overrides/disable-ui.json"
   ]

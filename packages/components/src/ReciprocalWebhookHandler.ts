@@ -2,7 +2,7 @@ import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
 import type { DelegatedGrantsUpdated } from '@janeirodigital/interop-data-model'
 import {
   BadRequestHttpError,
-  NotFoundHttpError,
+  HttpError,
   OperationHttpHandler,
   ResponseDescription,
   readableToString,
@@ -13,6 +13,12 @@ import { getLoggerFor } from 'global-logger-factory'
 import type { ReciprocalWebhookStore } from './ReciprocalWebhookStore.js'
 import type { SessionManager } from './SessionManager'
 
+/**
+ * Receives webhook notifications from reciprocal registrations.
+ *
+ * Delivery is at-least-once. A future `Idempotency-Key` header would let the
+ * handler dedupe repeated `Update` notifications.
+ */
 export class ReciprocalWebhookHandler extends OperationHttpHandler {
   protected readonly logger = getLoggerFor(this)
   public constructor(
@@ -26,10 +32,11 @@ export class ReciprocalWebhookHandler extends OperationHttpHandler {
     const channel = await this.reciprocalWebhookStore.findBySendTo(operation.target.path)
     if (!channel) {
       // TODO: unsubscribe
-      throw new NotFoundHttpError()
+      throw new HttpError(410, 'GoneHttpError', `Unknown webhook channel: ${operation.target.path}`)
     }
 
-    // TODO: check if sender matches one from the channel
+    // TODO: check if sender matches one from the channel. The stock emitter's
+    // DPoP token is not verified today; sendTo is the capability URL.
     //
     // const credentials = await this.credentialsExtractor.handleSafe(request)
 

@@ -39,6 +39,7 @@
     "css:config/util/representation-conversion/default.json",
     "css:config/util/resource-locker/memory.json",
     "css:config/util/variables/default.json",
+    "sai:config/overrides/emitter.json",
     "sai:config/overrides/disable-v6-migration.json",
     "sai:config/overrides/disable-ui.json"
   ]

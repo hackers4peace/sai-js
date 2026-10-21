@@ -23,7 +23,7 @@ import {
 } from '@janeirodigital/sai-api-messages'
 import {
   BadRequestHttpError,
-  NotFoundHttpError,
+  HttpError,
   OperationHttpHandler,
   ResponseDescription,
   readableToString,
@@ -80,6 +80,10 @@ const socialAgentRef = (id: string): { id: string; type: string[] } => ({
  * authorizationRevoked) join the per-target consumer; admin activities
  * (adminAuthorizationGranted/adminAuthorizationRevoked) run the sequential
  * orchestrator (grants → ACR rewrite → mark done).
+ *
+ * Delivery is at-least-once. A retry can repeat an `Add` after this handler
+ * processed it, so the dispatched workflows must tolerate duplicates. A future
+ * `Idempotency-Key` header would let the handler dedupe.
  */
 export class ActivityWebhookHandler extends OperationHttpHandler {
   protected readonly logger = getLoggerFor(this)
@@ -94,10 +98,11 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     const channel = await this.activityWebhookStore.findBySendTo(operation.target.path)
     if (!channel) {
       // TODO: unsubscribe
-      throw new NotFoundHttpError()
+      throw new HttpError(410, 'GoneHttpError', `Unknown webhook channel: ${operation.target.path}`)
     }
 
-    // TODO: check if sender matches one from the channel
+    // TODO: check if sender matches one from the channel. The stock emitter's
+    // DPoP token is not verified today; sendTo is the capability URL.
     let requestBody: { type: string; object?: string }
     try {
       requestBody = JSON.parse(await readableToString(operation.body.data))

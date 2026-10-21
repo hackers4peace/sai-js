@@ -182,7 +182,7 @@ export class SaiJs {
   async temporalService(): Promise<Service> {
     const scripts = this.source.directory('temporal/scripts')
     const dynamicConfig = this.source.directory('temporal/dynamicconfig')
-    const pgData = dag.cacheVolume('temporal-pg-data-384468468468454684684')
+    const pgData = dag.cacheVolume('temporal-pg-data-186464168168168161618')
 
     const pg = dag
       .container()
@@ -353,8 +353,8 @@ export class SaiJs {
       .withServiceBinding('postgresql', this.postgresService())
       .withServiceBinding('temporal', temporal)
       .withServiceBinding('id', this.idService())
-      .withServiceBinding('registry', this.registryService())
-      .withServiceBinding('data', this.dataService())
+      .withServiceBinding('registry', await this.registryService())
+      .withServiceBinding('data', await this.dataService())
       .withServiceBinding('fuseki', this.fusekiService())
       .withServiceBinding('garage', this.garageService())
       .withExposedPort(443)
@@ -373,7 +373,8 @@ export class SaiJs {
   }
 
   @func()
-  registryService(): Service {
+  async registryService(): Promise<Service> {
+    const temporal = await this.temporalService()
     return this.withTracing(dag.container().from(NODE_IMAGE), 'sai-registry')
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_CONFIG', '/sai/environments/css/https/registry.json')
@@ -386,9 +387,11 @@ export class SaiJs {
         'CSS_POSTGRES_CONNECTION_STRING',
         'postgres://temporal:temporal@postgresql:5432/auth'
       )
+      .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withExposedPort(443)
       .withServiceBinding('postgresql', this.postgresService())
+      .withServiceBinding('temporal', temporal)
       .withServiceBinding('fuseki', this.fusekiService())
       .withExposedPort(9230)
       .asService({
@@ -403,7 +406,8 @@ export class SaiJs {
   }
 
   @func()
-  dataService(): Service {
+  async dataService(): Promise<Service> {
+    const temporal = await this.temporalService()
     return this.withTracing(dag.container().from(NODE_IMAGE), 'sai-data')
       .withMountedDirectory('/sai', this.source)
       .withEnvVariable('CSS_CONFIG', '/sai/environments/css/https/data.json')
@@ -420,10 +424,12 @@ export class SaiJs {
         'CSS_POSTGRES_CONNECTION_STRING',
         'postgres://temporal:temporal@postgresql:5432/auth'
       )
+      .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
       .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
       .withEnvVariable('CSS_S3_REGION', CSS_S3_REGION)
       .withExposedPort(443)
       .withServiceBinding('postgresql', this.postgresService())
+      .withServiceBinding('temporal', temporal)
       .withServiceBinding('fuseki', this.fusekiService())
       .withServiceBinding('garage', this.garageService())
       .withExposedPort(9231)
@@ -461,8 +467,8 @@ export class SaiJs {
         .withEnvVariable('CSS_GARAGE_ADMIN_ENDPOINT', CSS_GARAGE_ADMIN_ENDPOINT)
         .withEnvVariable('CSS_GARAGE_ADMIN_TOKEN', CSS_GARAGE_ADMIN_TOKEN)
         .withServiceBinding('auth', auth)
-        .withServiceBinding('registry', this.registryService())
-        .withServiceBinding('data', this.dataService())
+        .withServiceBinding('registry', await this.registryService())
+        .withServiceBinding('data', await this.dataService())
         .withServiceBinding('worker', worker)
         .withServiceBinding('temporal', temporal)
         .withServiceBinding('fuseki', this.fusekiService())
@@ -502,7 +508,26 @@ export class SaiJs {
     // forward everything after the separator verbatim (npm passes `--`-suffixed
     // args straight through to the script)
     if (filter.length) args.push('--', ...filter)
-    return (await this.testBase()).withExec(args).stdout()
+    const temporalReady = `
+      import { Connection } from '@temporalio/client'
+      for (let attempt = 0; attempt < 60; attempt++) {
+        try {
+          await Connection.connect({
+            address: process.env.TEMPORAL_ADDRESS,
+            connectTimeout: 1000,
+          })
+          process.exit(0)
+        } catch {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+        }
+      }
+      console.error('Temporal is not reachable')
+      process.exit(1)
+    `
+    return (await this.testBase())
+      .withExec(['node', '--input-type=module', '-e', temporalReady])
+      .withExec(args)
+      .stdout()
   }
 
   async debugService(
@@ -532,8 +557,8 @@ export class SaiJs {
       .from(NODE_IMAGE)
       .withServiceBinding('debug', debug)
       .withServiceBinding('auth', auth)
-      .withServiceBinding('registry', this.registryService())
-      .withServiceBinding('data', this.dataService())
+      .withServiceBinding('registry', await this.registryService())
+      .withServiceBinding('data', await this.dataService())
       .withServiceBinding('worker', worker)
       .withMountedFile('/proxy.js', this.source.file('test/proxy.js'))
       .withExposedPort(9240)

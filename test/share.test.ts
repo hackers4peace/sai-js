@@ -6,7 +6,7 @@ import {
 import { getDataGrantIris } from '@janeirodigital/interop-data-model'
 import { describe, expect, test } from 'vitest'
 
-import { awaitGrantCompletion, dataGrants } from './util'
+import { awaitGrantCompletion, dataGrants, waitFor } from './util'
 
 const rpcEndpoint = 'https://auth/.sai/api'
 
@@ -67,18 +67,27 @@ describe('share resource', () => {
     // verify the grant for the shared instance on alice's reciprocal registration for kim
     const kimSession = await manager.getSession(kimId)
     const kimRegForAlice = await kimSession.findSocialAgentRegistration(aliceId)
-    const aliceRegForKim = await getSocialAgentRegistration(
-      localSparqlTransport(kimSession.sparqlEndpoint),
-      kimRegForAlice.reciprocalRegistration!
-    )
-    const grants = await dataGrants(aliceRegForKim, kimSession)
-    const sharedGrant = grants.find(
-      (grant) =>
-        grant.registeredShapeTree === projectShapeTree &&
-        grant.grantedBy === aliceId &&
-        grant.dataOwner === aliceId &&
-        grant.hasDataInstance?.includes(resource)
-    )
+    const loadMirror = async () => {
+      const aliceRegForKim = await getSocialAgentRegistration(
+        localSparqlTransport(kimSession.sparqlEndpoint),
+        kimRegForAlice.reciprocalRegistration!
+      )
+      const grants = await dataGrants(aliceRegForKim, kimSession)
+      const sharedGrant = grants.find(
+        (grant) =>
+          grant.registeredShapeTree === projectShapeTree &&
+          grant.grantedBy === aliceId &&
+          grant.dataOwner === aliceId &&
+          grant.hasDataInstance?.includes(resource)
+      )
+      return { aliceRegForKim, sharedGrant }
+    }
+
+    // the peer mirror is refreshed by a webhook-triggered workflow, so it can
+    // lag the grantor registration update that the test already awaited
+    await waitFor(async () => (await loadMirror()).sharedGrant !== undefined)
+
+    const { aliceRegForKim, sharedGrant } = await loadMirror()
     expect((await getDataGrantIris(aliceRegForKim)).length).toBeGreaterThan(0)
     expect(sharedGrant).toBeDefined()
     expect(sharedGrant!.scopeOfGrant).toBe(

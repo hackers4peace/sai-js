@@ -109,9 +109,13 @@ Production NixOS/Podman matches the dev/test storage model:
   optional on auth; the worker requires it for dataset creation. Keep Postgres,
   Temporal, origins, VAPID.
 - [ ] **registry** — remove `CSS_SPARQL_ENDPOINT`; reads resolve through the
-  endpoint store.
+  endpoint store. Keep `TEMPORAL_ADDRESS` for durable webhook delivery.
 - [ ] **data** — remove `CSS_SPARQL_ENDPOINT`; add `CSS_S3_REGION=garage`. No
-  bucket/endpoint env: the routed accessor reads the per-pod record.
+  bucket/endpoint env: the routed accessor reads the per-pod record. Keep
+  `TEMPORAL_ADDRESS` for durable webhook delivery.
+- [ ] **webhook retries**. `reconcileActivities` is the backstop for deliveries
+  that exhaust their retries. It has no scheduler yet; scheduling stays
+  separate from this cutover.
 - [ ] **worker** — add `CSS_FUSEKI_BASE_URL`, `CSS_FUSEKI_ADMIN`,
   `CSS_GARAGE_ADMIN_ENDPOINT`, `CSS_GARAGE_ADMIN_TOKEN`, `CSS_S3_ENDPOINT`.
   Keep `CSS_POSTGRES_CONNECTION_STRING`, `TEMPORAL_ADDRESS`, origins.
