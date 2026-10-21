@@ -39,8 +39,8 @@ and access-mode coverage per-mode vs. per-grant — currently asserted informall
 in `validateDelegable`'s SPARQL (scope block + `VALUES ?mode`).
 
 **Scope.** Formalize the ordering in one module consulted by the predicate (1),
-semantic-delta derivation (4), and `check-equivalence` reuse; replace the
-SPARQL scope/mode blocks with the formalized check.
+semantic-delta derivation (4), and grant reuse; replace the SPARQL scope/mode
+blocks with the formalized check.
 
 **Green.** Unit tests for the ordering lattice and mode semantics;
 issuance/revocation behavior unchanged on today's cases.
@@ -116,31 +116,18 @@ errors).
 **Green.** Client-parseable failure details for each all-or-nothing failure
 case, asserted in endpoint and RPC tests.
 
-## 7. Drop the vestigial `delegationOfGrant`
+## 7. Drop the vestigial `delegationOfGrant` ✅ done
 
-**Context (DD3).** The data model, generation, and context were supposed to
-**drop `delegationOfGrant`**; chain validity is match-based and nothing
-consumes the link anymore — issuance (`validateDelegable`) and revocation
-validation are both match-based SPARQL. The link survives as data: `grant.ts`
-(field + framing), `data-authorization.ts` (sets it on delegated grants and
-children), `context.ts`, `GrantIssuanceHandler.buildInheritingGrant` (copies
-it), the issued grant resources, and the seed (`environments/data/registry.trig`).
+**Context (DD3).** Chain validity is match-based, so the link was vestigial.
 
-**Scope.** Remove the field from generation/framing/context and the
-`delegationOfGrant` copy in the issuance handler; drop the triple from the
-seed and from newly issued grants; update `data-model` framing tests
-(`grant.test.ts`, `regressions.test.ts`), the `authorization-agent` generation
-tests (`grant-generation.test.ts` asserts the field), and the components
-`delegation-request.test.ts` fixture. The vocab term stays in both
-`namespaces.ts` / `vocabularies.ts` (it remains a valid INTEROP term).
-
-**Green.** No `delegationOfGrant` triple is written by issuance; framing tests
-updated; revocation/issuance tests still green (behavior never depended on it).
-
-**Coordination.** Executed as **step 0 of
-[`check-equivalence.md`](check-equivalence.md)** (§2.0) — small enough not to
-need a standalone plan; land it before any equivalence code so the compared
-field set is stable.
+**Landed.** `delegationOfGrant` was removed from `GrantData`/`GRANT_TERMS`, the
+shared `dataModelContext`, delegated-grant generation (parent and child), and
+the issuance handler's child-grant copy; the seed triples and the tests that
+asserted the field were updated. The vocab term stays in `namespaces.ts` /
+`vocabularies.ts` (it remains a valid INTEROP term), and existing resources
+that still carry the triple are inert because framing no longer selects it.
+This landed together with the grant-reuse work
+(OpenWiki `architecture/grant-reuse.md`).
 
 ## 8. Validate-request shape/rate for the System-2 sweep
 
@@ -174,12 +161,13 @@ revocations.
 
 ## 10. Drop the issuer-side grant replica graphs on unlink
 
-**Context (§8 DD5, [`check-equivalence.md`](check-equivalence.md) §2.1).** The
-grantor-side replica created for grant reuse (`GRAPH <grantIri>` for delegated
-grants) outlives grants that leave the registration (replaced by a
-regeneration, unlinked, or revoked). The same lifecycle already leaves the
-grant resources themselves orphaned because the cross-peer DELETE is off (DD2),
-so the replica cleanup rides that work rather than shipping alone.
+**Context (§8 DD5, the grant-reuse work).** The grantor-side replica created
+for grant reuse (`GRAPH <grantIri>` for delegated grants, written by
+`storeGrantReplica` at issuance; see OpenWiki `architecture/grant-reuse.md`)
+outlives grants that leave the registration (replaced by a regeneration,
+unlinked, or revoked). The same lifecycle already leaves the grant resources
+themselves orphaned because the cross-peer DELETE is off (DD2), so the replica
+cleanup rides that work rather than shipping alone.
 
 **Scope.** When the grant-resource cleanup lands, drop the replica graphs of
 the then-unlinked grants (parent and children, each with its `meta:` twin) as

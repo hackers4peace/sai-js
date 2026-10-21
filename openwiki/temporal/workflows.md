@@ -8,6 +8,8 @@ sources:
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
+  - id: openwiki-source-9e7488ce272b5af0500c0557
+    resource: repo://packages/components/src/services/GrantReplica.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
     resource: repo://packages/components/src/services/ShareResource.ts
   - id: openwiki-source-b3f53b3cc2943909883f8582
@@ -36,10 +38,10 @@ sources:
     resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
+generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T12:54:01.599Z
+    at: 2026-10-21T17:33:35.590Z
 ---
 
 # Temporal workflows and activities
@@ -164,14 +166,27 @@ consumers (start-or-join) rather than calling the underlying workflows.
   `CreateGrantsInput.authorizationGrantee: AgentOrRoleId`,
   `CreateGrantsForAgentInput.grantee: AgentId`).
 - **Self-contained regeneration** — `createGrantsForAgent` fetches all the
-  grantee's authorizations (including via roles) and the **IRIs** of the
-  grantee's existing grants (no grant bodies: the ones we issue as `grantedBy`
-  live in the data owner's registry, and only `checkEquivalence` would need
-  them), handles the empty/deny case, stores the source grants, and requests the
-  delegated ones **batched per data owner** — one `requestDelegations` call and
-  one `interop:AccessRequest` POST per peer, because the issuance endpoint
-  already requires a single `dataOwner` and validates the whole batch before
-  storing any — then rewrites the registration links.
+  grantee's authorizations (including via roles) and the **IRIs** of its
+  existing grants (`getExistingGrants` stays IRI-only; `checkEquivalence` loads
+  the bodies lazily from the local plane), handles the empty/deny case, and
+  generates fresh grant data. `checkEquivalence` then returns a **value-based**
+  result — `reusedSourceIds`, `reusedDelegatedIndexes`, `reusedExisting` —
+  because activity results cross Temporal's data converter: ids and array
+  positions survive, object identity does not. The workflow stores only the
+  non-reused source grants, requests only the non-reused delegated grants
+  **batched per data owner** (one `requestDelegations` POST per peer, because
+  the issuance endpoint requires a single `dataOwner` and validates the batch),
+  and rewrites the registration as `[...newGrantIds, ...reusedExisting]` —
+  parents **and** children, since the PATCH replaces the full link set. See
+  [Grant equivalence and reuse](../architecture/grant-reuse.md).
+- **Issuance echo and the issuer-side replica** — the issuance endpoint echoes
+  the finalised grants (parents and children). `requestDelegations` writes each
+  echoed body into the context's own SPARQL endpoint (`storeGrantReplica`, one
+  `GRAPH <grantIri>` per grant; parent documents keep the reverse
+  `inheritsFromGrant` edges) and returns the ids. The write is best effort: the
+  grants are already issued, so failing the activity would retry the POST and
+  mint duplicates; a missing body only disables reuse (fail closed) until the
+  next issuance or regeneration repopulates it.
 - **Role routing** — `findRoleUsage` delegates to `session.findRoleUsage`,
   which returns `usedAsGrantee` plus `affectedGrantees`; the membership/deletion
   workflows route role-as-grantee to the changed members and role-as-dataOwner

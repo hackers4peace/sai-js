@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:2f251cae16d163441112cdfb41821dfb4e8e66ba61867b5ea44b34bb6ca41c55",
+  "claims": [
+    {
+      "id": "claim_de90dafba2794452afd037605ec9fa0e",
+      "statement": "Grant field equivalence compares grantee, grantedBy, dataOwner, registeredShapeTree, hasDataRegistration, hasStorage, scopeOfGrant, and the sets accessMode, creatorAccessMode and hasDataInstance; it ignores id, type, inheritsFromGrant and hasInheritingGrant because those are derived or structural.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/check-equivalence.ts#L19-L80",
+          "version": "repo-lines-v1:sha256:1aa19a3913212fbbb027f2d0e850d5003da3adc7e4867a98ca6a855024f023d4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwMDBkNDIzM2ZlNTYzMjNhNTE4OTQ2NjkwZTcxOWQyYjUxN2JjMjFhMDk3MjI2MWVkMDVjMTkwMTJmZjVmYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlZGQ3MGZiNGJkYmI0YjkwOTgwNTMyZjhjMzc1ZWM1NzBlODJlZTBhZGQ4YWRhMzhhNWExNTgyZjUzN2E2YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5MDNjNmRlZDc2YjNmOGM3OGQ5Nzg0ZTg3MjI4MDNhNzEyMTMzMTMyMTYwNDhhMTRmMjU2OTI1MmMxNzNhY2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MTc1ODM4ZmJkNDI1MWY3Zjg4ZTdkMDljYmZjNTViYTY2NzBiODE4MjdmYWUyN2M5OWRiOWJmODUwNmEwNWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ed92348337824b379d7f17107d3f7b05",
+      "statement": "Grant equivalence is evaluated over whole subtrees: source grants form a flat tree via id/inheritsFromGrant, delegated grants form a tree from embedded child objects, and an existing flat tree whose declared child body is missing is dropped rather than treated as childless (fail closed).",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/check-equivalence.ts#L84-L140",
+          "version": "repo-lines-v1:sha256:0695f59521eef9b4d3c5aa9516ee1c8ccee81d24133d697a71e41ab0773aa54a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2OWI4ZTJhZjFlZjc3Y2IwZmYwYTQ0NWI4ZWJmMGM2NDRhMmQxYjVkNTE1NDg5YTUxOTkzMDQ1Y2EyZWNjMWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3YjBjMzVlMjdiZjg5ZjVjODljOTFkOGY5NWNlMTY2M2QyN2ZlNWM4YThkMDllZWM5Zjc0MDQwMDE0YjJmYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4MTc1ODM4ZmJkNDI1MWY3Zjg4ZTdkMDljYmZjNTViYTY2NzBiODE4MjdmYWUyN2M5OWRiOWJmODUwNmEwNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMDYzNjE2OGY2ZjVkMjU1MmZjODFiMzk5ZjdjZWM4NWUyYTI5NGM4MTZjZTYyMTUzM2E3ODk1Zjg5MzMxZWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e92b2ea555f240a2bc25d498b52d984b",
+      "statement": "Tree matching is recursive and greedy one-to-one: a parent matches only when the whole subtree matches, children are matched as a multiset, each existing tree is claimed at most once, and the result carries the flattened node correspondence (parent first).",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/check-equivalence.ts#L142-L186",
+          "version": "repo-lines-v1:sha256:33b89a6b147a661659ea7b7f22dbbbe16a965abf1239ae07b658d50e309e19ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZjVmNzY0MWU2NjgzNmQ5NjhlMjhjZjc4YjViMDMyNzY1M2MwZjAwZGYxYTgzZTFhZWJjYWUxMzExYjBiZDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhYmMxMjE1NjVmYjJmMGRhOWQ3MDA2OWE0ZjRkNTRkZTgxYWQwMTdhZDgxMTFiNmFlYTZiNTRjNDRlMjg4M2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxN2FmM2M1MzdlNWQxODMyMTkxOTE4YjQ2NjUxOWRiNTFjMGQxODE0NjNjNzA4NGFiMTU2YzUwOGM0Y2E2NzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fa3ef4b729fa460cbad482da62d13f2a",
+      "statement": "checkEquivalence splits existing trees by root dataOwner: our-owned trees pair with generated source trees and peer-owned trees pair with generated delegated trees; delegated matches are reported by their position in the delegatedGrants array because those grants have no ids yet.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L388-L437",
+          "version": "repo-lines-v1:sha256:9a7f0941df19584da02af16c1b68fe95b33e0f3e17fcffed3069e2d957eff2c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTI3ODNjOTI1YjA3OTJiMzFkMzMxMDlkZDIxYzQzYTYxYTE0ZDYwNzQzNjM1OTQ0YmExOTU2YjAyNmU3NjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNDk5YTJlMDJiMGY4MDU5MTAwYmI0NWQ2Yjg0ZGJhYmRmZDhkNDZlNWIwNmJlY2VkNDcwOGJmMzYzNmVjYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlMjk3YTcwOGZkN2NmYWFhYTA0OTE4ZGRhYjY0MGU0NTRhOTg1ZDkyOGIzMmZjMWY1MGE3MTY4ZGQ1YTFkOTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4388455b6f3045268cb1008bf6ddefc6",
+      "statement": "The value-based EquivalenceResult (reusedSourceIds, reusedDelegatedIndexes, reusedExisting) is required because activity results cross Temporal's data converter: the workflow skips source grants by id and delegated requests by index, and re-links every reused existing IRI — parents and children — in the full-set registration rewrite.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L92-L106",
+          "version": "repo-lines-v1:sha256:f59285ad0e9cefbc0c75e291092f556ff885296d692338c3a96e3c71ee8e93c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxZDZhOWU1MmEyOGRmYTgwZWE5YzIwNTllYzFlZTRkMWE3Y2QzZGIzZDUyYWY1ZjYzN2NhZmY0ZWE3YmE1OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MzNkYjRlMzg2NTA3NjZjMTc3NWNkMDhjMWJmYzczNzJkNGM1MTYzYTg0M2Q2MjJjYTAxNDRkZjE4YzE0YWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlOWY2N2M4ODAwODUyNjY3ODMzODQ1ZjIzMmFhNjQzYmM1NTM3NTEzNWUxYjU1YjIxYTVhNjYxYzM3OTZiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L692-L739",
+          "version": "repo-lines-v1:sha256:d9571bf0a92d56c7412fef6d839a1beef6a76b0a3729a79b0a898711ac69214c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ODJhYjc5OTIwNWVlYjgwZjgxNjJjOGZiM2VhYjBkOTUwNGM4Y2I0Nzg4Y2JjNmNiOGY4YTRkYmRkNDk3NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZDA3MmI1MDY1M2U5ZGViMmYzODJjNWVhMjYzMTg1ZjBjYjNhNWIxYmNhMThjYTc1ZjQ1NTExMTIzZTFlOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMTlmMGJhMDM1MWJjZTI5MTZiYjZhYjYxZTVlZTEzOWY2NmJkZTI4Zjc3ZDkzMWVmNWZlY2E5ZTI3YjkxZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ZTBhMGEyOTdiNmRlYzljZjdjMzRiZTJlMzgwMDdmN2RmYjMwODdjMzZkYjIxOTg0MTkzMTI3NTFhZmM0YTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_af36e22c71be4dfeac9d84d167de6f93",
+      "statement": "getExistingGrantBodies loads grant bodies only from the session's own SPARQL endpoint (own grant registry for source grants, the issuer-side replica for delegated ones), follows hasInheritingGrant recursively, and skips a missing or unframable body so its tree fails the completeness check and is regenerated instead of reused.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L313-L348",
+          "version": "repo-lines-v1:sha256:5f496aaf7332aec5723319fad4c4a34508eb103f5e4a83a2f6e71853d8b58938:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5NzUzNGZiODQ3NmNhMzY4ZDU0MDRlMzZjMTc0MGJlMjU5ZGQyYjliN2U5MDkwZmQwNmNlODMyN2Y2YTQ5NDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyOTc2ZTYxOTNjNTlmYzhlMGYyNTExYzYyMmNjNWQ4ZTc4YmMzNWJjYzBhNzNmOGFkN2E5YTIzODM0ZGY1NDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4OTQ0ZTVkZDMyYTVkNjhlMTBlMGFmYzY0OWEzYjgxYzRjY2RmMzkzOGVlODA5Nzc3ODRiNzVkMWU5YzJmNjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9decb8c77cbd496ab5f70ac7b475f76f",
+      "statement": "The delegation issuance endpoint echoes the finalised grants (parents and children); requestDelegations writes each echoed body into the context's own SPARQL endpoint as GRAPH <grantIri>, creating the issuer-side replica, and the write is best effort so a replica failure never retries the delegation POST.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L196-L199",
+          "version": "repo-lines-v1:sha256:138cab84387d49c893c6ba654a24f4833d38789cd297934786e8daa252c35d52:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzkwN2VkNzZhNWRjNDljYWZiNDYxYTE0M2ZkZTJjN2U5MmJjYjA2NjEwNDU4MzY4OTU3YmI0NThiZDcxY2RiZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY1NDRlYWMzMTk2YTIyYWZkZjZjYjNmODhjNTM2NWVkMGJkYjEzMDBhMTQ2Mzk4YmQzZmU0YTAxMGViYzhkOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGQwMzA4NzRhNTM5ODEzNDY1MmMwMTY1OWY2NmQzZmZiNzhjOGM0NjgxNDgyYmQ5ODNjOTI5NTg2ZmIyMDAxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDlhNjAwYmNmYmEyN2RlZDYzMTM3MmUxNGJkOTkwYzRhMGYxYzUzMWYzZTUxYzc5ZTAyNTI0YmZjMDNlYzU5YiJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/services/GrantReplica.ts#L26-L36",
+          "version": "repo-lines-v1:sha256:6a236e1bb3d79a61fb312ccc1f56c915b498274e98915b1781c68ecbb43e804a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5Nzk1MDQ1ZmUyYjhmM2Y1YmUzYzNmOGVjZDg5NDBjZWFmZjI1NWNiZjVjZjBhZjg0ZGZkYzM5NDc2ZDIxNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MmE2OTI4NTMyNWNhOTBhYjFhZjk1YjFmNmNiNzk3NWVhOGRjOTYxNmNjMWEyYmM5Mzg2ZDc4Yjk1OGI3YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkOGI1ZGU1N2Q4ZGUwYmFiMTBkNGQyN2IwNjNkZThmOGNmNDViMzY3YTE1NzEyNmQ4MTJlY2I3ZTRhNzgyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L604-L622",
+          "version": "repo-lines-v1:sha256:df9ab8161a45a4ee548acf8c95196a64b26fbec8bb9fdb3290dc0ace93b128ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmMzc2NmRiNGY2MWFlN2E4MDcyMGJlODU1ZDNkNGYwOGVkN2Q1ODViZGQ0YzAxM2M2YTM5NDQ3OWYwNzQzNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiYzBmNjJiNjg0Y2FlMTk2ZGJmYmY2OTEzOWMzNTFjY2Y5NmUzYTk0MzczMDgzM2Q0MmMwOGM2NWQ4OTQ3NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlNjNmYjVhNmY3ZjI5YzMwN2M3N2QxZDFkZGFhZmMxNDQxOGRhYTM3NGM3ZjI2ZjNlNTYyZTE5YmVhNDc4ZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fbd02d6399784726a8a94d796bc481af",
+      "statement": "The issuer-side replica keeps each parent's reverse inheritsFromGrant edges so framing the parent surfaces its children, and the writer only inserts: it never drops graphs for grants that leave a registration, leaving that cleanup to the grant-resource lifecycle.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/GrantReplica.ts#L10-L36",
+          "version": "repo-lines-v1:sha256:caf24b45258fb3225624911f4aff890f84746d0aa949243cd4bc6e5667369a64:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MmE2OTI4NTMyNWNhOTBhYjFhZjk1YjFmNmNiNzk3NWVhOGRjOTYxNmNjMWEyYmM5Mzg2ZDc4Yjk1OGI3YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5YWFmZGRkMDg3MmRkMzE5MDhjZjQxMmM0NmM1YzMwZjNkYjEzZTI4Zjk3YzE0MDQ2Mjk1NWMxOTdlMzRlZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-21T17:33:35.590Z"
+  }
+}

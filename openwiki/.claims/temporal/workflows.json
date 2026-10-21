@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:488b34f5a97886130b992ac5584af49782de53cb4205f110f1d34472d426ca5a",
+  "pageVersion": "sha256:6e583947607a70813b33c20f57875250f6212ad2f738c3e496191c22e6f920e4",
   "claims": [
     {
       "id": "claim_1750ced8cbb445bf8b3bec11cce51086",
@@ -69,11 +69,11 @@
       "statement": "Activities lazily resolve a session via buildSessionManager().getSession(webId) and then call the authorization-agent/service APIs, using find-first idempotent PUTs and 404-tolerant deletes so retries and reconciliation are safe.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L114-L125",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L123-L134",
           "version": "repo-lines-v1:sha256:0b4ca2e1e9f695178d586b04ca0284c9a97c271b96e52a9927c9c65d809c4903:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2OTYxYWIwM2I2MzY0Mjg4OGVmZDU0NDYzMWJlOWI3MWYyNjcyYzg5MjdlNmY0NTVmNWM5NGNiOWM5ZDdkNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhNWFkMTU4MDZlNmYzZWMwYTUzZWFmODU2OThkZDU4ZDA3ZDc2YzY0ZmI3ZWRkODVjZTRmN2Y1NjcxOWM5MzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2ZjE4ZjhiMzJhY2E5ODc0MWNmMTU2NDVkNWUxYjM3ZWY1NzNhMDIwNmZjN2I5MDJhZjUzNDVhNzYzMDI1MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1ZTliYmQwOGMzYmQyYmFkNGVjZWMzYmFkNjk2YmYxOTNmZDYyNzM0OTZiYjNlYjA4NTg0ZjQzN2UwNDY0MWIifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L815-L827",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L951-L963",
           "version": "repo-lines-v1:sha256:8d38244f2719252534effc10e1afd3c1268d51c71db020705dff5659a793d346:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMGFhMTdjODgzODlhMmQxM2U1MmJlNDljY2E1YjA3OTU1YWIxNDNkMGM1Y2FiZjkyYmJkYzljNDE2Njc5MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmOWU5ZWViMGYyNDdhNGNkYzdlODE5NDUxMGNlOGM4Nzg3OGI3OGZjYzQ1YzMwMDBjZTlhNTIyMGY2MjVjZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
@@ -83,7 +83,7 @@
       "statement": "AgentId (SocialAgentId | ApplicationId) and AgentOrRoleId (AgentId | RoleId) are the typed {id, type} boundary objects passed across workflow and activity payloads.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L67-L93",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L71-L97",
           "version": "repo-lines-v1:sha256:1db69c052a672b977f64d1180b031691e6695775821588880b94483bdea4dd42:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNjkwOGUyYjg1ZGQ3ZjU1MjI0ZDFiY2FkMzZmYWNjMWExZTVjYmQ3NTQ2ODU3M2RlOTFkMDJmZmFkOTAyNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZGIwYTIyNjAyN2RmOWMyOTI4M2RlNzU1NTIwNjkwZGYxZjQ1ODdmMjAzMjA3ZjZjODI5Yzk4YjdmMzEwZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI4OTE1NzBmYzE1ZjMxNGU4ZThmMWYyZjI1OWE4MTY1ZGYxNzViMGZlMzlkMDVhNWMxZTg0ZjYyMWFmYWUwODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4OTAxNDU3ZTZkZDRhZGM4YTExNjFkMWQ1MmFjZTZlYmNlMGVmMjllOGQwY2RlODM2YTRhNzhkNTJhMDI0NmIifQ"
         },
         {
@@ -94,11 +94,11 @@
     },
     {
       "id": "claim_02df3824436d47d6a945959ad0641d4c",
-      "statement": "createGrantsForAgent is a self-contained full regeneration: it fetches all the grantee's authorizations (including via roles) and the IRIs of the existing grants, handles the empty/deny case, generates and stores the source grants, requests the delegated ones batched per data owner, and rewrites the registration links.",
+      "statement": "createGrantsForAgent is a self-contained full regeneration: it fetches all the grantee's authorizations (including via roles) and the IRIs of the existing grants, handles the empty/deny case, generates fresh grant data, keeps equivalent trees via checkEquivalence, stores only the non-reused source grants, requests only the non-reused delegated grants batched per data owner, and rewrites the registration links with new and reused IRIs.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L663-L737",
-          "version": "repo-lines-v1:sha256:895790d5db1c9a1cd113c43620c9c40306e56f8dcc068e08c788596b49acdcee:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhODI3ZmE0ZGE1ZDBkN2NhMjMzZTJkNDZmZGRmOWI5M2U5MzJkMjljNDBkYjMxODI3ZTI2YTBmOGQ4NzJkYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L663-L739",
+          "version": "repo-lines-v1:sha256:5297ba37609feb4acb2f1794c2f06d9196c91aaede71eef041427b4afca39d26:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhODI3ZmE0ZGE1ZDBkN2NhMjMzZTJkNDZmZGRmOWI5M2U5MzJkMjljNDBkYjMxODI3ZTI2YTBmOGQ4NzJkYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZDA3MmI1MDY1M2U5ZGViMmYzODJjNWVhMjYzMTg1ZjBjYjNhNWIxYmNhMThjYTc1ZjQ1NTExMTIzZTFlOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ZTBhMGEyOTdiNmRlYzljZjdjMzRiZTJlMzgwMDdmN2RmYjMwODdjMzZkYjIxOTg0MTkzMTI3NTFhZmM0YTQifQ"
         }
       ]
     },
@@ -107,7 +107,7 @@
       "statement": "findRoleUsage delegates to session.findRoleUsage, and the membership/deletion workflows route role-as-grantee to the changed members versus role-as-dataOwner to the affected grantees.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L120-L128",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L129-L137",
           "version": "repo-lines-v1:sha256:4bae9b3bd30e31645227a8c721c832b84784d235d377b2d8b7e7fbd31355f9c7:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDM0ZTg3ZmY1N2NmYzI2YzdhNmRhNDE3OWFiNDcyNTNhZWNkMWJkNmNlNTgzMzM4YzQyMzE2YTJkMjc2MmE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmU1NDY3NGY4N2ViNzk4NmU4MjA0MWQyY2I3NzY5YjI3ZGYxMDEyYjVlZDljYzNkNDQwMWVmNDE2MTgzYTc2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzNkYjQzYjc0MzFhOTkxZGJiYmZhM2NjYTZiNzMzZmQ0YTI5ZTA1ZTE0Yjk2Mzk2MzdkMzEyMmU0YTIxZDY2NCJ9"
         },
         {
@@ -121,11 +121,11 @@
       "statement": "Grant generation relies on grantees always being registered, and replaceDataGrantsOnRegistration throws when no registration is found.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L504-L530",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L640-L666",
           "version": "repo-lines-v1:sha256:78764ed36d8c3e4a8bc29bb059926e0b4490fe9f22fd101e17f743f719b87150:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczOGJlMjAwMjFhNDA3MjI3MmM3OTQ2NGU5NmRiMmEzZWY1OThiZGFhZWJiYTFlMDVlOGFkY2MyYjM3NDczMjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZGI3MDg1Yjg2YWM3ZjBlNmQ4ZTI1Y2FkMGRhOTRlNjM5OWYyODdiZGEwZGEyZGMzMjEzNjVlMzI3ZWYxOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiYzhiMmVmMDMzZWQ2MTc5MmU2MzIyYzk1YTU3ZWQzOWZiYTQxODQ4ODM3NzUyZGFiZjNmYmMwYTM1MTRkM2MifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L85-L95",
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L89-L99",
           "version": "repo-lines-v1:sha256:bcb3a59a3ea706d83c4ad679564cc0b60c0484c1dd6bb9b7ec14de624f8c6537:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjMTYwZDQxNGUzNjU5ZmE1MzQwNTQ0NDFmMDcwOTYzMjY1Y2U5YjI5YTJkNTNkNWMzNWY4MmM0MTE1YjA3MmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyNzRmZDE3ZmE0MzJkNzFjYjQ5ZWRhODM2YWY3OWNjZTVmOTg4ZTUyYmE1NDM0NDE5ZDNmNGQzMjg5ZjRlYWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5OTczNDk0Mzg1ZmFiMjE2NTliOWIzNTNmMDIwMDBhOGZkN2YwNzE5MjY3NDA5MDI2NTRlZGE0MzQzOWYzMTIifQ"
         }
       ]
@@ -278,31 +278,63 @@
     },
     {
       "id": "claim_e95a475b612845a4b7cd6dd16c25a713",
-      "statement": "Delegated grants are requested in batches per data owner: createGrantsForAgent groups the generated delegated grants by dataOwner and calls requestDelegations once per group, so each peer receives a single AccessRequest instead of one POST per grant.",
+      "statement": "Delegated grants are requested in batches per data owner: createGrantsForAgent groups the non-reused generated delegated grants by dataOwner and calls requestDelegations once per group, so each peer receives a single AccessRequest instead of one POST per grant.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L455-L500",
-          "version": "repo-lines-v1:sha256:14f6b8ed5e88af3b6a335e2ec6b99e50cd424b86ccf3cae2f5b4e5b1465f23c7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZWNiMWI1ZWYxMWJmYmNiMTRhNjAzYzQ0MzA4MjQyNTk5OGVkOTVkMWM0NGQ5MzFlM2YwMzNjNGYwYjFmOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4MDVmNjExNzgxZjc3ODI4MTBmZjAyYTE5NDcwMDIzZTc4MTZmY2I0MDVkYzM3YmY4MDU1NDRlZmFlYzczMDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1MThhZDQxYWFlY2E4N2JlZDBkNGZiYjI0YjMzMmNlYjYzMzkxOGE1NDUzNWE5NDA5ZWU2Nzk3MzM2ZTRhYjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3ZGI3MDg1Yjg2YWM3ZjBlNmQ4ZTI1Y2FkMGRhOTRlNjM5OWYyODdiZGEwZGEyZGMzMjEzNjVlMzI3ZWYxOGUifQ"
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L567-L622",
+          "version": "repo-lines-v1:sha256:dd42e26d03e0b159790c06e79bf5158cb34f37837a2142e6ae93a214d5cb9b00:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjN2M5MWU5YTg0NTY4OGRlYzFkYjFiNjBkNGQzYzNjNDJlNmVlNjdjNmQ5M2E1Y2MzYWI0N2QwMjczNGMwYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiYzBmNjJiNjg0Y2FlMTk2ZGJmYmY2OTEzOWMzNTFjY2Y5NmUzYTk0MzczMDgzM2Q0MmMwOGM2NWQ4OTQ3NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzZDkwZmZhZmMyN2QzYmQ3YjRjYzgwN2NkYTVhMjA1N2JhODQwZTJmM2JlZTlkMDUxZThkYzIyMjJmOTgzM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L700-L737",
-          "version": "repo-lines-v1:sha256:0c14d1723363145b53e938163d6131c5a72694b2ccc1d47e74dcde5c041cfb9e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5YmU4OTJmYzhlNTkxNjk5NDYxNzNjMWYwOWI2MTAxOWQyOTk2MzcxMWFhNjMzY2E0YWExMzBiZWFlZGZjODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlOWE0MDJhMDcyYTNhYmM1MTRlMDY3N2Y1MGU4MjYxZDcyMjA3NGZmZjRkZWVhOGRmZmQwZWU3NzYyNjgyNmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L700-L739",
+          "version": "repo-lines-v1:sha256:738b27fe044b6a967bf06c2ed1a284c9b4bc58dcd725d2ae9e56fdaf481e51ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZDA3MmI1MDY1M2U5ZGViMmYzODJjNWVhMjYzMTg1ZjBjYjNhNWIxYmNhMThjYTc1ZjQ1NTExMTIzZTFlOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlYzQxY2Y4MGFmZDNmOGJmMmM2NjJiYmM5YzM5NjI2ZjZmMDY4MGIxNzQxYTFiMDQ5ZmM5N2RiMWViYWE3NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ZTBhMGEyOTdiNmRlYzljZjdjMzRiZTJlMzgwMDdmN2RmYjMwODdjMzZkYjIxOTg0MTkzMTI3NTFhZmM0YTQifQ"
         }
       ]
     },
     {
       "id": "claim_a708f390bc184d5fac3e39bf05822c55",
-      "statement": "getExistingGrants returns the grantee's current grant IRIs from the grantor's registration only, without fetching grant bodies, because the bodies of onward delegated grants live in the data owner's registry and only checkEquivalence would need them.",
+      "statement": "getExistingGrants returns the grantee's current grant IRIs from the grantor's registration only, without fetching grant bodies; checkEquivalence loads the bodies lazily from the local plane (own grant registry and issuer-side replica), so the deny path never pays for them.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L259-L290",
-          "version": "repo-lines-v1:sha256:69ae030f9c65749f592fef3ca17e2442621034577f8c8e3db012b29bf61b8331:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2Zjk3OGVlOTgyNGM2ODk1NGNjZjI3MGFmMGFmMGY3MGY3MTM2MDBmYTEwODFkMzkyNzlhNjJhYTgxMDhmYWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMDNiZWE3NjVhOWU4NTJiOGY3MjNjYzRiNzVjOTFiNTI4MmQzOWRlMmI3NGRhZDcxZGUzZDkwYTM0MTlmYTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwMTkxOWJlMmY1NjI4MjgwYjg1Y2I2NDlmOWNiNDQwNjFlMzU1NDM0ZDM3YTA2MDQyODZkMmUwYWNhYmU0MWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2YWUwY2VhMjllY2E3OWFkYWVhNTdkNDQ0MGExNzBiOWE3YjZlZmE3NDczZDA4YzVlZDA0OTQ1MmNiZTY1NjEifQ"
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L276-L292",
+          "version": "repo-lines-v1:sha256:0f6cc7feee6fb966e9699c73378019169fc7106ba8a8ca1e012391761ff85f72:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzNGU5OGFjMWQxYzNiOWUzYWYxYmNlMDVlNTRiYjkyYzY1OGQ0NWUyMGY5MDkxZDFkYTA3YzNkY2UwZjc2OWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwZTg2ZjcwNWRhZGFmNWM5MmY5ODUwYmI1MTZmMDA4MGM4Y2VjMGI0NDMyN2E0OWQ1NjhiMzFlMWFlNGM1MGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyMzM2NmUxNzZiYjZhZTc5ZjE3NjAxYzg2NDQ0MDA3NjhhMTAzODkxOTA4MjE4NzU1NzFlZjg3M2U2YzhmZDQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L313-L348",
+          "version": "repo-lines-v1:sha256:5f496aaf7332aec5723319fad4c4a34508eb103f5e4a83a2f6e71853d8b58938:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5NzUzNGZiODQ3NmNhMzY4ZDU0MDRlMzZjMTc0MGJlMjU5ZGQyYjliN2U5MDkwZmQwNmNlODMyN2Y2YTQ5NDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyOTc2ZTYxOTNjNTlmYzhlMGYyNTExYzYyMmNjNWQ4ZTc4YmMzNWJjYzBhNzNmOGFkN2E5YTIzODM0ZGY1NDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4OTQ0ZTVkZDMyYTVkNjhlMTBlMGFmYzY0OWEzYjgxYzRjY2RmMzkzOGVlODA5Nzc3ODRiNzVkMWU5YzJmNjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9e74483506d54e0eb6ab26aeffa11cd1",
+      "statement": "The equivalence result is value-based (reusedSourceIds, reusedDelegatedIndexes, reusedExisting) because activity results cross Temporal's data converter; the workflow skips source grants by id and delegated requests by array index, and re-links every reused existing IRI — parents and children — in the full-set registration PATCH.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L100-L106",
+          "version": "repo-lines-v1:sha256:4ceafc92bed8230468fc545462fc04a5a6f1b4985ca67e6e91f9923d58e21f17:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2YwMWIwMjcwN2MyNzcwODZiNDU3YzJjNjEzNjNkMmMzMmEzN2NmNTRkZTIzNmIyYzM1Y2FjNzJkMzFlNmViZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDYzM2RiNGUzODY1MDc2NmMxNzc1Y2QwOGMxYmZjNzM3MmQ0YzUxNjNhODQzZDYyMmNhMDE0NGRmMThjMTRhZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWE5Mjk2MWNmOTZkZGQ0YzhlMGVmNDBkZmYxODJkZGFkNzM1MDhmY2ExMTQ5YjIyNjljMDNlOWU4MGI3Y2I0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyYmY0ODAyNTUzZmZiZTZlM2NkOWE5ODFhN2RjZjQyMzY4MTU3NmU1M2U3NjUwMGMxODE3ZTgyZmVkMzMwZSJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L692-L739",
+          "version": "repo-lines-v1:sha256:d9571bf0a92d56c7412fef6d839a1beef6a76b0a3729a79b0a898711ac69214c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ODJhYjc5OTIwNWVlYjgwZjgxNjJjOGZiM2VhYjBkOTUwNGM4Y2I0Nzg4Y2JjNmNiOGY4YTRkYmRkNDk3NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZDA3MmI1MDY1M2U5ZGViMmYzODJjNWVhMjYzMTg1ZjBjYjNhNWIxYmNhMThjYTc1ZjQ1NTExMTIzZTFlOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMTlmMGJhMDM1MWJjZTI5MTZiYjZhYjYxZTVlZTEzOWY2NmJkZTI4Zjc3ZDkzMWVmNWZlY2E5ZTI3YjkxZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ZTBhMGEyOTdiNmRlYzljZjdjMzRiZTJlMzgwMDdmN2RmYjMwODdjMzZkYjIxOTg0MTkzMTI3NTFhZmM0YTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_517dc2cf324b40d78afb9842f106143c",
+      "statement": "requestDelegations posts one AccessRequest per data owner; the endpoint echoes the finalised grants, the activity writes each body into the context's own SPARQL endpoint as an issuer-side replica graph (best effort, so a write failure never retries the POST), and it returns the assigned GrantIds to the workflow.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/GrantReplica.ts#L26-L36",
+          "version": "repo-lines-v1:sha256:6a236e1bb3d79a61fb312ccc1f56c915b498274e98915b1781c68ecbb43e804a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5Nzk1MDQ1ZmUyYjhmM2Y1YmUzYzNmOGVjZDg5NDBjZWFmZjI1NWNiZjVjZjBhZjg0ZGZkYzM5NDc2ZDIxNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MmE2OTI4NTMyNWNhOTBhYjFhZjk1YjFmNmNiNzk3NWVhOGRjOTYxNmNjMWEyYmM5Mzg2ZDc4Yjk1OGI3YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkOGI1ZGU1N2Q4ZGUwYmFiMTBkNGQyN2IwNjNkZThmOGNmNDViMzY3YTE1NzEyNmQ4MTJlY2I3ZTRhNzgyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L567-L622",
+          "version": "repo-lines-v1:sha256:dd42e26d03e0b159790c06e79bf5158cb34f37837a2142e6ae93a214d5cb9b00:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjN2M5MWU5YTg0NTY4OGRlYzFkYjFiNjBkNGQzYzNjNDJlNmVlNjdjNmQ5M2E1Y2MzYWI0N2QwMjczNGMwYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiYzBmNjJiNjg0Y2FlMTk2ZGJmYmY2OTEzOWMzNTFjY2Y5NmUzYTk0MzczMDgzM2Q0MmMwOGM2NWQ4OTQ3NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzZDkwZmZhZmMyN2QzYmQ3YjRjYzgwN2NkYTVhMjA1N2JhODQwZTJmM2JlZTlkMDUxZThkYzIyMjJmOTgzM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T12:54:01.599Z"
+    "at": "2026-10-21T17:33:35.590Z"
   }
 }

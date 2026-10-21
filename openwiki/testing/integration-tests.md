@@ -18,12 +18,18 @@ sources:
     resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
+  - id: openwiki-source-7ec61beaaf8b2a6cc1791916
+    resource: repo://packages/components/test/check-equivalence-activity.test.ts
+  - id: openwiki-source-88e59fc8baf4f02379e91f1d
+    resource: repo://packages/components/test/check-equivalence.test.ts
   - id: openwiki-source-9b409abe21ade962fb73ed30
     resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-7cee32971e9a12bcc4227ff9
     resource: repo://packages/components/test/delegation-request.test.ts
   - id: openwiki-source-23684c4afa0b096bb7c0aa5d
     resource: repo://packages/components/test/durable-webhook-emitter.test.ts
+  - id: openwiki-source-d86eb75db262e88d8237c824
+    resource: repo://packages/components/test/grants-workflow.test.ts
   - id: openwiki-source-015d2f3faf2ecfac16eafb8e
     resource: repo://packages/components/test/reciprocal-mirror.test.ts
   - id: openwiki-source-c4ce6c0448c661ad179c011a
@@ -32,6 +38,8 @@ sources:
     resource: repo://packages/test-utils/src/fuseki.ts
   - id: openwiki-source-900a2d8c960b090aaf5dc614
     resource: repo://temporal/dynamicconfig/development-sql.yaml
+  - id: openwiki-source-825c895ab72bea7eb33edb2e
+    resource: repo://test/check-equivalence.test.ts
   - id: openwiki-source-72256836fb28a2c54e04cb89
     resource: repo://test/federation-mirror.test.ts
   - id: openwiki-source-1bc7541f22daab19be8ab8ba
@@ -46,10 +54,10 @@ sources:
     resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
+generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T12:54:01.599Z
+    at: 2026-10-21T17:33:35.590Z
 ---
 
 # Integration test suite
@@ -98,9 +106,12 @@ removing the backfill would make every reciprocal read fail for fixture
 reasons. It is fixture state, not a runtime replication path: runtime initial
 replication is asserted separately by the invitation tests (see
 [`architecture/federation.md`](../architecture/federation.md#the-reciprocal-mirror-in-detail)).
-Note that it copies only `hasDataGrant` targets (which include children) and
-no parent-side `hasInheritingGrant`, so child delegation cannot be exercised
-from seeded data.
+Note that it copies only `hasDataGrant` targets — children only when the
+registration links them (the seed's acme → alice registration links only the
+parent) — and does not synthesise parent links; a parent body may still carry
+reverse `inheritsFromGrant` edges. Seeded **delegated child** generation is
+therefore not exercised; source-tree reuse reads the grantor's own registry,
+where the child body is present.
 
 ## Race prevention
 
@@ -155,6 +166,11 @@ The invitation suite additionally asserts both legs of a **runtime-created** pai
 (no seeded relationship) are mirrored once their completion activity is done —
 the runtime counterpart to the fixture backfill.
 
+No test writes the reciprocal mirror. The grant-reuse end-to-end test does
+trigger the real issuance path, which writes the separate **issuer-side grant
+replica**; that replica is read only through the equivalence activity and is
+not asserted directly.
+
 The Temporal default activity retry policy is `maximumAttempts: 1`, but the
 webhook-delivery and reciprocal workflows set explicit retry policies. The
 webhook path retries transient failures up to 10 attempts and stops on
@@ -189,9 +205,24 @@ the black-box `/test` suite may not.
   `401`/`403`/`500`/network reject; a registration without a reciprocal link is
   a no-op.
 - `packages/components/test/delegation-request.test.ts` asserts that
-  `requestDelegations` sends one `interop:AccessRequest` POST for the whole group
-  (returning every assigned IRI), no-ops on an empty group, rejects a mixed
-  `dataOwner` batch, and surfaces a non-200 from the issuance endpoint.
+  `requestDelegations` sends one `interop:AccessRequest` POST per data-owner
+  group, parses the echoed finalised grants, writes the issuer-side replica
+  (one named graph per grant, parent reverse child edge, best effort on
+  failure) and returns every assigned IRI; it also no-ops on an empty group,
+  rejects a mixed `dataOwner` batch, surfaces a non-200, and rejects a
+  malformed response without writing a partial replica.
+- `packages/components/test/check-equivalence.test.ts` covers the pure
+  comparison: field equality and set normalization, ignored ids/derived links,
+  flat and embedded tree builders (order, n-depth, missing child, orphan,
+  mismatched parent), subtree equality, and greedy one-to-one pairing with the
+  child correspondence.
+- `packages/components/test/check-equivalence-activity.test.ts` covers the
+  activity's local-only body loading, source and delegated subtree reuse,
+  missing delegated child → fail closed, source/delegated pools paired
+  independently, and delegated index addressing.
+- `packages/components/test/grants-workflow.test.ts` pins the value-based
+  workflow contract: a non-empty result skips storing/requesting and re-links
+  every reused IRI (parents + children) in the full-set registration PATCH.
 - `packages/authorization-agent/test/registration-links.test.ts` covers the
   one-query link reads: `hasAdminGrant` presence from the resource graph and its
   `meta:` twin, and `getLinkedGrantOwners` returning the distinct owners behind
@@ -223,14 +254,15 @@ requests), `account-creation.test.ts` (bootstrap workflow provisioning),
 `admin-events.test.ts` (org-admin activity forwarding),
 `agent-discovery.test.ts` / `discovery.test.ts` (Link-header discovery),
 `agents.test.ts`, `authorization.test.ts` (authorization + approval),
-`delegation-endpoint.test.ts` (issuance/revocation), `federation-mirror.test.ts`
-(replica contents, the only replica-reading file), `invitation.test.ts`
-(personal + org invitation), `key-scoping.test.ts`,
+`check-equivalence.test.ts` (two-run identical IRIs for source and delegated
+grants), `delegation-endpoint.test.ts` (issuance echo/revocation),
+`federation-mirror.test.ts` (replica contents, the only replica-reading file),
+`invitation.test.ts` (personal + org invitation), `key-scoping.test.ts`,
 `org-context.test.ts` (admin org context + proxy/sparql-admin),
 `personal-admin.test.ts` (AddAdmin/RemoveAdmin + ACR),
 `policy-engine.test.ts` (WAC/ACP matrix), `reciprocal-webhook.test.ts`,
-`reconciliation.test.ts` (sweep), `revocation-rpc.test.ts`, `roles.test.ts`,
-`services.test.ts` (reachability smoke), and `share.test.ts`.
+`reconciliation.test.ts` (sweep + seed subtree reuse), `revocation-rpc.test.ts`,
+`roles.test.ts`, `services.test.ts` (reachability smoke), and `share.test.ts`.
 
 ## Residual limits
 

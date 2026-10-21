@@ -1,7 +1,7 @@
 ---
 type: index
 title: Quickstart
-description: Task-routing map of the sai-js wiki — architecture, data model, service layer, activity pipeline, Temporal workflows, UI, testing, and operations pages at a glance.
+description: Task-routing map of the sai-js wiki — architecture, data model, service layer, activity pipeline, Temporal workflows, grant reuse, UI, testing, and operations pages at a glance.
 tags: [quickstart, index, navigation]
 sources:
   - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
@@ -12,10 +12,10 @@ sources:
     resource: repo://packages/components/src/services/Account.ts
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
     resource: repo://README.md
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T17:33:35.590Z
 ---
 
 # Quickstart
@@ -32,6 +32,7 @@ Use this map to find the page for the topic you need.
 | See the production landscape | [Deployment landscape](architecture/deployment-landscape.md) |
 | Understand per-pod storage and isolation | [Per-pod storage and isolation](architecture/storage-isolation.md) |
 | Understand cross-server/federation assumptions | [Federation constraints](architecture/federation.md) |
+| Understand grant reuse and equivalence | [Grant equivalence and reuse](architecture/grant-reuse.md) |
 | See the inter-peer topology | [Social graph](architecture/social-graph.md) |
 | Learn the JSON-LD entities | [Data model entities](data-model/entities.md) |
 | Learn the JSON-LD read/write helpers | [JSON-LD read/write layer](data-model/json-ld-layer.md) |

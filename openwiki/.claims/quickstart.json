@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0a6ad53d9d6addfe1e9fbeee44c755a334423c8e78b4ce1a685a849c8fd72623",
+  "pageVersion": "sha256:b2c41eef2bdbf3a5d2c47fed341260ff4a746e8b0d0048d0f1d82d957a306fad",
   "claims": [
     {
       "id": "claim_128945ceebdb43de9c58258b39f648ac",
@@ -27,7 +27,7 @@
       "statement": "Dev/test storage is per pod (one Fuseki dataset per registry/data pod and one Garage bucket per data pod, resolved through the endpoint store) and new accounts are provisioned asynchronously by the bootstrapAccount Temporal workflow started by startBootstrapAccount.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L383-L396",
+          "resource": "repo://docker-compose.yaml#L374-L387",
           "version": "repo-lines-v1:sha256:f3eba9a52354fb1eed866c547f648b31a21bf4f0670e325a2cd2366ec5a14bc0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiOWI5ZTQ4NWFkMTExNTFjNjQxZWY5OTg5ZDVmMDIwYTI3Y2UzNTQwMTc1ZjE0OTQxYzY0ZTFjYTM1ZDE2NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMTZlZDIzOWEzNjUxYjUwNzljMGU0ZTdmMDc4NDRlYTMyOWM4NzYyOGJmOWZjYzQ2MzY3NzMzZjVlMWU5M2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkNzQwNmM4MWQwM2Q3YjcyZWUxYzMxYmIwYTFlOTQyYTllOTI2YmFjNTE5YWYwODBhOTI5ZTNmNTBlMDI1MWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5MDU5MGU1NDhkZDA4Mzg5Y2E3ZGU3NTgwODc0ZjNjYmQ1NzVkNjdjNWJlNzRiZjM4YjMyMjkyMjhjNzkyM2IifQ"
         },
         {
@@ -39,6 +39,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "at": "2026-10-21T17:33:35.590Z"
   }
 }

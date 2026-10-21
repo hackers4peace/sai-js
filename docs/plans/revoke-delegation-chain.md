@@ -74,10 +74,11 @@ Delegated grants **drop `delegationOfGrant`**. Instead, chain validity is a
   **kept**: they are created atomically in the same delegation request as
   their parent and replaced/die with it — same-request siblings, no
   cross-request churn.
-- Synergy with `check-equivalence.md`: reuse becomes natural. Regeneration
-  issues a new grant only when coverage actually changes; an existing grant
-  that still matches is kept, so the semantic delta (not IRI churn) drives
-  issuance and revocation.
+- Synergy with grant reuse (landed; OpenWiki
+  `architecture/grant-reuse.md`): reuse becomes natural. Regeneration issues a
+  new grant only when coverage actually changes; an existing grant that still
+  matches is kept, so the semantic delta (not IRI churn) drives issuance and
+  revocation.
 
 ## 3. Boundary operation — revocation at the delegation endpoint
 
@@ -322,17 +323,18 @@ signal, and writing the activity would re-trigger D's own
    affordance.
 6. Revocation error-detail schema for the all-or-nothing failure response.
 7. Drop the vestigial `delegationOfGrant` (DD3): model, generation, context,
-   framing tests, and persisted/seed triples.
+   framing tests, and persisted/seed triples — ✅ landed with the grant-reuse
+   work.
 8. Validate-request shape/rate for the System 2 sweep (per-grant validation
    against D vs. pure projection re-derivation).
 9. `reconcileActivities` scheduling (interval, backoff on D-unreachable,
    per-account fan-out) — assumed by System 2, out of scope here.
 10. Drop the issuer-side grant **replica** graphs when grants leave a
     grantor's registration (replaced, unlinked, or revoked). The replica is
-    written by [`check-equivalence.md`](check-equivalence.md) §2.1; its cleanup
-    belongs with the grant-resource cleanup in DD5 (same lifecycle, same orphan
-    class). Orphan replica graphs are invisible to reads, so this waits for the
-    DELETE-403 work.
+    written by `storeGrantReplica` at issuance (OpenWiki
+    `architecture/grant-reuse.md`); its cleanup belongs with the grant-resource
+    cleanup in DD5 (same lifecycle, same orphan class). Orphan replica graphs
+    are invisible to reads, so this waits for the DELETE-403 work.
 
 ## 10. Execution steps — each step leaves the repo green
 

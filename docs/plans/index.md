@@ -13,17 +13,22 @@ also removed; its remaining `n3` phase is now `reconsider-n3-package.md`. The
 three per-pod storage plans are **done and removed**; their landed design is in
 `openwiki/architecture/storage-isolation.md` and
 `openwiki/architecture/federation.md`, with remaining follow-ups in
-`pod-isolation-followup.md`.
+`pod-isolation-followup.md`. The grant-reuse work is **done and removed**; its
+landed design (tree equivalence, the issuer-side grant replica, the value-based
+workflow result) is in `openwiki/architecture/grant-reuse.md`, with the
+remaining replica-cleanup/backfill follow-ups tracked in
+`revoke-delegation-chain-follow-ups.md` item 10 and `pod-isolation-followup.md`
+A1.
 
 ## Summary
 
 | Status | Count | Plans |
 |---|---|---|
 | 🔶 partial | 1 | `revoke-delegation-chain` |
-| ⬜ not started / design only | 13 | `authorization-revoked`, `authorization-revocation`, `check-equivalence`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing` |
+| ⬜ not started / design only | 12 | `authorization-revoked`, `authorization-revocation`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing` |
 | ⬜ follow-up backlog | 1 | `revoke-delegation-chain-follow-ups` |
 
-**15 plans total.**
+**14 plans total.**
 
 ## Full table
 
@@ -32,11 +37,10 @@ three per-pod storage plans are **done and removed**; their landed design is in
 | `revoke-delegation-chain.md` | 🔶 partial — first cut (steps 1–5) landed | Revocation as a boundary operation at the delegation endpoint (`AccessRevocation`, all-or-nothing validation, requester hop, `RevokeGrants` RPC); replaces direct cross-peer DELETE | references `authorization-revoked` (deny-RPC precedent) |
 | `authorization-revoked.md` | ⬜ not done (design only) | Producer writes the typed `authorizationRevoked` activity for deny; routing/consumer/sweep already handle the type | — |
 | `authorization-revocation.md` | ⬜ not done (design only — deferred) | The authorization-revocation leg, extracted from the landed activity-first design (OpenWiki `services/activity-lifecycle.md`): UI revokes an **authorization** (never grants directly) → the `authorizationRevoked` producer → a workflow revokes the derived grants at the **issuance boundary with the org session** (fixes seeded-ACR 403) + clears the grantor's projection; decides whether the retired `grantsRevoked`/`processGrantsRevocation` wiring is revived | `authorization-revoked` (the typed producer); `revoke-delegation-chain` (+ its follow-ups — the boundary + `grantsRevoked` observability item) |
-| `check-equivalence.md` | ⬜ not done (design only) | Real `checkEquivalence`: reuse an equivalent existing **grant tree** (parent + all children as one unit; recursive, so n-depth needs no rewrite). Wiring correction: `createGrantsForAgent` is NOT ready — its reuse set keys on object identity across the Temporal activity boundary and the result cannot re-link children; the result becomes value-based (`reusedSourceIds` / `reusedDelegatedIndexes` / `reusedExisting`). **Step 0:** drop the vestigial `delegationOfGrant` (revocation follow-ups item 7). **Prerequisite:** an issuer-side grant-body replica for delegated grants, written from the issuance echo (`hasDataGrant` links parents and children directly; missing body ⇒ not reusable, fail-closed) | `revoke-delegation-chain-follow-ups.md` items 7 + 10 (replica cleanup) |
 | `reconsider-n3-package.md` | ⬜ decision needed — keep vs drop | Reconsider the remaining `n3` dependency: current Store/DataFactory footprint, the `ReciprocalMirror` N-Quads/GRAPH-block and TriG test/seed sites, options A/B/C, and a recommended partial drop | completed Turtle-removal work (OpenWiki `data-model/json-ld-layer.md`); `fetch-sparql-endpoint` keeps `n3` transitively |
 | `pod-isolation-followup.md` | ⬜ not started | Remaining per-pod isolation edge cases: mirror backfill/drift scan, unregister mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion cleanup, cross-pod/mirror-freshness tests, and the named-graph patch guard | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `update-deployment.md` for production |
 | `webhook-subscription-bootstrap.md` | ⬜ not done (design only) | `ensureActivityWebhookChannel` at account creation + startup/periodic healing for real deployments (dev/test are pre-seeded) | — |
-| `revoke-delegation-chain-follow-ups.md` | ⬜ all 10 items open | Items 1–10 of the revocation follow-up: full chain calculation, scope/mode-coverage ordering, replace-vs-delete race, grantor trigger integration (`grantsRevoked` producer), grantee self-revocation, error-detail schema, drop vestigial `delegationOfGrant` (step 0 of `check-equivalence`), sweep validation, `reconcileActivities` scheduling, issuer-side replica cleanup on unlink | `revoke-delegation-chain` (first cut) |
+| `revoke-delegation-chain-follow-ups.md` | ⬜ 9 open, 1 done (item 7) | Items 1–10 of the revocation follow-up: full chain calculation, scope/mode-coverage ordering, replace-vs-delete race, grantor trigger integration (`grantsRevoked` producer), grantee self-revocation, error-detail schema, drop vestigial `delegationOfGrant` (✅ landed with grant reuse), sweep validation, `reconcileActivities` scheduling, issuer-side replica cleanup on unlink | `revoke-delegation-chain` (first cut) |
 | `registry-set-permissions.md` | ⬜ not started (design) | Scope the blanket `#fullAdminAccess` per structural registry: per-container ACRs, GrantRegistry owner-only (admins never write grants; per-grant ACRs serve reads), ActivityRegistry Read + create/append (append-only immutable log) instead of blanket Write; seed ACR hygiene for the ACR-less yoyo DataGrants | `org-admin-feature` R1 |
 | `components-tweaks.md` | ⬜ design only (investigation write-up) | Residual SAI domain/spec logic still in components after the reorganize phases: extract `SaiPermissionsEngine`'s grant-evaluation predicates (grant→request coverage, Inherited-chain resolution, admin modes) and the 4×-duplicated `hasAdminGrant` admin-marker rule to AA session methods/predicates; move the delegation-endpoint inheritance completion (`GrantIssuanceHandler`) and `buildAdminGrants` materialization to AA; plane-based session `findRegistration` | — |
 | `update-deployment.md` | ⬜ not started | Production NixOS/Podman cutover to per-pod Fuseki + Garage, Node 26 source images, env/secrets/volumes, data/account migration, OCI/flake/hosts, deployed smoke test (folds in the former `production-consumer-cleanup` workstream) | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `pod-isolation-followup.md` mirror-backfill prerequisite |
@@ -54,11 +58,10 @@ removed; the surviving plans are the open work items.
 
 ```
 revoke-delegation-chain 🔶 (403 → boundary revocation)
-  └─ revoke-delegation-chain-follow-ups ⬜ (items 1–9)
+  └─ revoke-delegation-chain-follow-ups ⬜ (items 1–10; 7 done)
 
 authorization-revoked ⬜        (deny activity producer)
 authorization-revocation ⬜     (depends on authorization-revoked + revoke-delegation-chain)
-check-equivalence ⬜            (replaces the shipped checkEquivalence dummy)
 webhook-subscription-bootstrap ⬜
 ```
 
@@ -95,11 +98,6 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
   internal ordering: 1 (chain calc) → 2 (coverage ordering) → 4 (trigger
   integration); 3 (replace-vs-delete race) is orthogonal; 8 → 9 (sweep
   validation then scheduling).
-- `check-equivalence` — **step 0 is unblocked**: drop `delegationOfGrant`
-  (item 7, executed as step 0 of this plan); the remaining prerequisite is the
-  issuer-side grant replica (issuance echo). The workflow also needs a
-  serialization-safe (value-based) result and child re-links, so "only the
-  activity" is not enough.
 - `authorization-revoked` — **unblocked**: routing, per-target consumer and
   sweep already support the type; only `recordAuthorization` needs to write it.
 - `webhook-subscription-bootstrap` — **unblocked**: builds on the landed
@@ -157,7 +155,7 @@ override plans remain.
 
 ### No CSS components needed
 
-Everything else — `authorization-revoked`, `check-equivalence`,
+Everything else — `authorization-revoked`,
 `revoke-delegation-chain-follow-ups`, `components-tweaks`,
 `specific-instance-access-requests`, `generic-auditing` — runs in the Temporal
 worker, the services layer, or data-model; they neither override nor extend the

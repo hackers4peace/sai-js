@@ -257,7 +257,7 @@ is worth confirming deliberately; it is **not** a candidate for the AA.
 - Temporal workflow orchestration, storage accessors, OIDC session,
   `AccountService` bootstrap, `SaiAuthorizationManager` (engine data source)
   — stays.
-- `checkEquivalence` (real equivalence comparison) — tracked by
-  `check-equivalence.md`, unrelated to boundaries.
+- `checkEquivalence` (real equivalence comparison) — landed
+  (OpenWiki `architecture/grant-reuse.md`), unrelated to boundaries.
 - Repo-wide biome baseline (~208 pre-existing diagnostics) — gate is
   build + tests; changed files should be biome-clean.

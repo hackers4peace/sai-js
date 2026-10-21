@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:2ccd6e97ca1a88bed1d8c53bc5267bbd2c0fe802cecf9bf62ec5c3af2a9f936c",
+  "pageVersion": "sha256:0bbb422e37bcff3de06a90b7acec2a273f489c4fde2537974b6533e1bb038912",
   "claims": [
     {
       "id": "claim_8c7199519a8143bcb06e138d401a49f2",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://docker-compose.yaml",
-          "version": "repo-file-v1:sha256:45be2b6cfdd4be5699cc2e844da15aa0edc1ab46d3218d9a0eccfb4e21c7fa44"
+          "version": "repo-file-v1:sha256:2ceeb4c6c7ffa0fe6b1f9948a631c40f28417addc9f5966f6f58b09d1b14a111"
         }
       ]
     },
@@ -65,12 +65,16 @@
       "statement": "In dev the worker alone holds the Garage admin endpoint and token plus the bucket-less S3 endpoint, while the data server receives only CSS_S3_REGION and resolves each pod's bucket and credentials from its objectEndpoint record.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L183-L190",
-          "version": "repo-lines-v1:sha256:09c02b52ed6fd6ee14f673d0c874356df73fc164412f9c8398224414dc8488ee:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmFhZThhMGNhNzZmOThmN2I3ZGM3OTg0OTUxZDYzZTU3ZGIzYzY0NTU3OWNhNTFiYWQ2YTUzOWQ2MTRlZGJiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkxOGNiM2JmMTE0ODBiYjkzNjgxY2Q0MWU0NTZhMzNjMzk5MjhiOWY4YjgwMWExYzU1NTg4MTdiZGRhZjRmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTA3ZmFhOTRlNDhmNDNiM2QyOGVjMzhjOGY2N2VjMjEzMDRkNWJmNTllOWUyNmFhZTk4Zjg4MjM2MTRlZmQ1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQxMzBjYjljODczN2M2NTliNDgwYmNkZDI1MmMxNzM3YTMzMjYwZWMzNWVlMGZjYWQ4MzVjZTgwNGEzZWQ1YyJ9"
+          "resource": "repo://docker-compose.yaml#L139-L141",
+          "version": "repo-lines-v1:sha256:25c1b0f7693b71aac6142b3623a81d09f028231f439f76c7eaff1a7cbee267e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JiNDI3OTM3N2FkZTI2NmU2Yjk4ODIwZWEzOWU3OTA4MjhmMjEyOGExYWU0MjQ4NDRkN2M2OGYxMzI1MGRiYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU3NzhhOTFjYzk4YjhhYjA0Mjg3YzE2MzAzZTcxZjgwN2FjM2FlZjA2NDczYzFjY2Y3NTE2NDc4ODI2N2ZiNCJ9"
         },
         {
-          "resource": "repo://docker-compose.yaml#L7-L10",
-          "version": "repo-lines-v1:sha256:f6f0df4d1ea338b3a87e2e4bc797fbf07a6b3b74855bfaa871a06a88da2fb330:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYTJiMDRmODYwMGM2OGZjZjFlODU3YWJhNTAwNmRiOWRkOTAyNGM1OTBjNWNkNGQyN2U1OWNlYTcxOTA1OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGQyYTA2ZTkxYWQ4MmU1NzEyYWNiMDcxYjc3YzJmNjNkNGU0ZDVmNjcwNjI3OGRhMmVkNjY5ZDYxYzRjYjEwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzQ1ZTgzNWRhMDUzYjE1YzQ1N2EzMzQxM2ZkZDMwODE4N2NiNzFkZTQzMDBhYTEwYzcxZGVkZjQ3ZjE4MWI1MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWM2YmY5ODM2ZWJiZTkyMmNlOWVmYTY4Y2EyMDczNWEzYTA5ODI4NmU1YmRkM2NhMDk1YzRjMmE5NGNjNzVjMyJ9"
+          "resource": "repo://docker-compose.yaml#L173-L183",
+          "version": "repo-lines-v1:sha256:e9e9305110df9251aea52f0e514f82844362c050f4ca15c48f0b2019be12c4b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNzQ2MzM0ZmRiZDY1MTMyMzlmMTMyNmRiOGI2MTI3NTdiNWIzMmMwODA4YjUwODFhOTkzN2Y2NTMzYjhkYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiMGUyMGNlMmYxYzYwNWRhZWJkOWU4ODFmMTJiODc4ZTA2NzkxM2M3NTFiZjY0OTYyMGFlOTc4ODkzY2VjMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNjAyNTA4NmFhZDU5ZTk4MTY3NTM5NWVhMzJiOWM4MzIyMzJjNjRiYWZkYTEzNDE1Y2RkNzdkZjlmOTViMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxZmVlNzYyNDIwYTkzZGUwNmUwMjc1M2U2Y2ZiZGU1NmEzYzQxZWI3Y2U5NDg2NDMyNDhjNTc0YzI2M2FjNDEifQ"
+        },
+        {
+          "resource": "repo://docker-compose.yaml#L6-L7",
+          "version": "repo-lines-v1:sha256:437a9a8d197b0efda5184e6d35cd76b08e5f3e60edb7fc5fb188ba1c9d7d15e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGEzZWMxZTczYjY1YjlkYTExYWFiN2YwNDA4ZDdjODE5NzFlNjYwZDA1Mjk2N2QwOWVkNDcwMGY3ZTQ2YTY0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzYTJiMDRmODYwMGM2OGZjZjFlODU3YWJhNTAwNmRiOWRkOTAyNGM1OTBjNWNkNGQyN2U1OWNlYTcxOTA1OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmIyYmFhZjk2Zjc2NTlhNThmY2FkOThjNWYyMmUwY2RlODZlNWQxOGQxYmI4M2RhZTYzYjIyNWYzMmRjMTg0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmE0YjNkNzc1ZjJjN2FlMTc4MDcxMjUyMzI5MWQ3ZGM1MmU3MzczZWExYzJlYWFiMDE5NTM0ZjEzNmMzYjQxNyJ9"
         }
       ]
     },
@@ -139,6 +143,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T01:32:20.770Z"
+    "at": "2026-10-21T17:33:35.590Z"
   }
 }

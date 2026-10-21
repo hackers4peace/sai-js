@@ -10,14 +10,18 @@ sources:
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-b51f04210bf90c2ec8824400
     resource: repo://packages/components/src/ReciprocalWebhookHandler.ts
+  - id: openwiki-source-9e7488ce272b5af0500c0557
+    resource: repo://packages/components/src/services/GrantReplica.ts
+  - id: openwiki-source-a3ebe61b7dbf9a95d1051312
+    resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-fabda8691f79a477b70b0c57
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
-generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
+generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T12:54:01.599Z
+    at: 2026-10-21T17:33:35.590Z
 ---
 
 # Sequence and discovery flows
@@ -82,7 +86,11 @@ The dynamic views follow a fixed set of authoring conventions:
   `syncReciprocalMirror` child workflow on `reciprocal-registration` **first**,
   then `updateDelegatedGrants` (finding the affected authorizations, fanning out
   grant updates and a **batched** delegation request per data owner), then
-  writes the completion — so `done` means the mirror is current. If the peer
+  writes the completion — so `done` means the mirror is current. The
+  regeneration reuses an equivalent delegated subtree and only requests
+  delegation for what changed; newly issued grants are echoed back and stored
+  as the issuer-side replica (see
+  [Grant equivalence and reuse](../architecture/grant-reuse.md)). If the peer
   deleted its registration of us (`404`/`410`), the drain skips the regeneration
   and completes anyway (terminal).
   **Model drift:** `docs/temporal.c4` still draws the previous shape (a direct

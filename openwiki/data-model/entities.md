@@ -10,6 +10,10 @@ sources:
     resource: repo://packages/authorization-agent/src/access-description-set.ts
   - id: openwiki-source-a53c5361cefa789231b20bc0
     resource: repo://packages/authorization-agent/src/authorization.ts
+  - id: openwiki-source-0531e8ebff475ca0a556fc29
+    resource: repo://packages/authorization-agent/src/grant-generation.ts
+  - id: openwiki-source-81f61b66ae2ead4432d4358a
+    resource: repo://packages/authorization-agent/src/sparql.ts
   - id: openwiki-source-8b149b790c910713311c36a2
     resource: repo://packages/data-model/src/acr.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
@@ -34,10 +38,10 @@ sources:
     resource: repo://packages/data-model/src/registry-set.ts
   - id: openwiki-source-12dd5601be4d1b21ac977892
     resource: repo://packages/data-model/src/templates/index.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+    at: 2026-10-21T17:33:35.590Z
 ---
 
 # Data model entities
@@ -64,8 +68,9 @@ type and its helpers.
   `SocialAgentRegistrationData` / `ApplicationRegistrationData` /
   `SocialAgentInvitationData` shapes.
 - **Authorization and grants** — `DataAuthorizationData`, `AdminAuthorizationData`,
-  `GrantData` (with scope fields `inheritsFromGrant`, `delegationOfGrant`,
-  `hasInheritingGrant`), and the authorization/grant registry shapes.
+  `GrantData` (with the tree fields `inheritsFromGrant` on the child and the
+  framed reverse `hasInheritingGrant`), `FinalGrantData` once an id is assigned,
+  and the authorization/grant registry shapes.
 - **Data** — `DataRegistryData`, `DataRegistrationData`, and the read-only
   `DataInstanceData` (with `isBlob` and `frameDataInstance` helpers; there is no
   write-side `DataInstance` class).
@@ -111,6 +116,18 @@ container:
 - Most resource POJOs require `id: string`. The exceptions are `GrantData.id?`
   and `DataAuthorizationData.id?`, whose "final" forms
   (`FinalGrantData`, `FinalDataAuthorizationData`) add the required `id` back.
+- `GrantData` has **no `delegationOfGrant`**: delegated-chain validity is a
+  match-based predicate (a root grant with `grantedBy == dataOwner`, or an
+  upstream grant covering grantee, dataOwner, shape tree, registration, scope
+  and access modes), not a stored pointer. `inheritsFromGrant` is written on
+  the child; `hasInheritingGrant` is a `@reverse` framing term (the shared
+  context maps it to the reverse of `inheritsFromGrant`) and is never written
+  as its own triple. Grant equivalence treats both as tree structure, not
+  semantic fields (see [Grant equivalence and reuse](../architecture/grant-reuse.md)).
+- `GeneratedGrants` separates the two generation shapes: `sourceGrants` are
+  `FinalGrantData` (ids already minted; parents link children by IRI) while
+  `delegatedGrants` are `GrantData` (no ids yet; children are embedded objects
+  in `hasInheritingGrant`).
 - `type` is always `string[]` (the shared `dataModelContext` maps `@type` to a
   set container, and the POJO types declare `type: string[]`).
 - The access-description set is a **derived, read-only split**: there is no

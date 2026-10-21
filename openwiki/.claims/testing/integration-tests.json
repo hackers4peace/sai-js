@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b6f6df8dbb0ad5edaf55791c3aeb3174f7d5243e3e94a24727d9e63a2035c6d1",
+  "pageVersion": "sha256:480e338248cf0c389ff206ea5df7b7539c4ea90954512be26d3b0ef4fb489f75",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
@@ -146,7 +146,7 @@
     },
     {
       "id": "claim_a5d1443c44f14552afc85beb76f69704",
-      "statement": "The fixture splitter backfills reciprocal mirrors at seed time for every pod whose registration graph carries a reciprocalRegistration link, modelling a federation that already exists rather than exercising runtime replication; it copies only hasDataGrant targets and no parent-side hasInheritingGrant.",
+      "statement": "The fixture splitter backfills reciprocal mirrors at seed time for every pod whose registration graph carries a reciprocalRegistration link, modelling a federation that already exists rather than exercising runtime replication; it copies only hasDataGrant targets (children only when the registration links them) and does not synthesise parent-side links.",
       "evidence": [
         {
           "resource": "repo://packages/test-utils/src/fuseki.ts#L95-L134",
@@ -237,18 +237,18 @@
       "statement": "reciprocal-sync.test.ts pins the mirror sync's failure classification: 404/410 on the reciprocal drops the replica and reports peerGone, a 404 on a linked grant stays retryable and keeps the replica, 401/403/500 and network errors reject, and a registration without a reciprocal link is a no-op.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/reciprocal-sync.test.ts#L1-L116",
-          "version": "repo-lines-v1:sha256:81487d2ca4c4132e1bea570b198d61eddfd2bb5de3be0d068d9637dd4568a2c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjEwM2U1NDIxMDYyOTRkMmNjZDA1NmFhYzRjZDhjMmVmZGQ4M2IwNzdhMzllYzViNWI0M2U4MzA5ZTE0ODEwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/reciprocal-sync.test.ts#L1-L115",
+          "version": "repo-lines-v1:sha256:e95853bba648f3e56cd6f958b18bfe82d93679b0b937ae3af094eb25321b2db3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjEwM2U1NDIxMDYyOTRkMmNjZDA1NmFhYzRjZDhjMmVmZGQ4M2IwNzdhMzllYzViNWI0M2U4MzA5ZTE0ODEwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_127d143ace2e45c1af219cc30d403ec0",
-      "statement": "delegation-request.test.ts asserts requestDelegations sends one AccessRequest POST for the whole group and returns every assigned IRI, no-ops on an empty group, rejects a mixed dataOwner batch, and surfaces a non-200 response.",
+      "statement": "delegation-request.test.ts asserts that requestDelegations sends one AccessRequest POST per data-owner group, parses the echoed finalised grants, writes the issuer-side replica (one named graph per grant with the parent reverse child edge, best effort on failure) and returns every assigned IRI; it also no-ops on an empty group, rejects a mixed dataOwner batch, surfaces a non-200, and rejects a malformed response without writing a partial replica.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/delegation-request.test.ts#L1-L99",
-          "version": "repo-lines-v1:sha256:0657e4e1a85a8f8913ab36f82cac3f423b068ef24f9e181534d7c161409f0117:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4YzlkNjhjODY3ODE1MWRlODQ4NTIzZmU3MDVlMzZlMTcwN2Y3NTlkMTJhMDIxMTlkY2QzMzkwOWQ2MTk4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/test/delegation-request.test.ts#L1-L173",
+          "version": "repo-lines-v1:sha256:be8c0feb40ce6ad2b6c266f3957d97338eb38794b2b17be8ac93c1d35925f4d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTczLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyOGM5ZDY4Yzg2NzgxNTFkZTg0ODUyM2ZlNzA1ZTM2ZTE3MDdmNzU5ZDEyYTAyMTE5ZGNkMzM5MDlkNjE5ODE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -258,17 +258,45 @@
       "evidence": [
         {
           "resource": "repo://packages/authorization-agent/test/get-reciprocal-grants.test.ts#L1-L152",
-          "version": "repo-lines-v1:sha256:7afe596b4afb3246a710c0801fa2cd7f85f9f26213672c387da00004d99faac3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmN2I1NjViZjQ2NjY1ZWVmZWJhYmZlNDUzZGU3OGFiNTJiYjViM2IzOGY4OWJjZDhiOTBjNjE5MjEwNzliYTM3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "version": "repo-lines-v1:sha256:1173d2c32e5b8fe8ed1b578a5cab63e31a5aeb775d08fe5c4a6d472be1875b08:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmN2I1NjViZjQ2NjY1ZWVmZWJhYmZlNDUzZGU3OGFiNTJiYjViM2IzOGY4OWJjZDhiOTBjNjE5MjEwNzliYTM3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         },
         {
           "resource": "repo://packages/authorization-agent/test/registration-links.test.ts#L1-L124",
           "version": "repo-lines-v1:sha256:3d2ac1d7b277122c3dfd3ba6d0cada1c66199dfd39e8e30d3611ada4c9b1387c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyOGM5ZDY4Yzg2NzgxNTFkZTg0ODUyM2ZlNzA1ZTM2ZTE3MDdmNzU5ZDEyYTAyMTE5ZGNkMzM5MDlkNjE5ODE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
+    },
+    {
+      "id": "claim_158569c4c6d2415fa55482e1db75fe21",
+      "statement": "The black-box check-equivalence suite runs createGrantsForAgent twice — once for a source pair (seeded acme → alice, which keeps g4yhtm and re-links its child wpqyds) and once for a delegated pair (alice → test client, where the first run issues and the second reuses) — asserting identical registration IRIs.",
+      "evidence": [
+        {
+          "resource": "repo://test/check-equivalence.test.ts#L72-L96",
+          "version": "repo-lines-v1:sha256:3cdc51010d3116c9ebd886cc23c0547a28764f842b1538a805da157326a6520a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZjQ0MGY0YTFkNmUyMzk4MmNjZjE1MzYzMGVjM2YxMWEzZjYzMDM2MDQ5M2QzYzM3NGYwMGMyNGEyMDhjZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhNDMxZTliOGQ4YjI2MmJlZGU5MmQzODc0MDhkNjFjMmRiN2Y0NzM3MzYzOTYxYzI0ZDhmZTM4NTE4YjgxOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_67b36959111e427c888a7d261c186a7e",
+      "statement": "Package-level tests pin the reuse contract: pure field/tree/pairing comparison, the activity's local-only body loading with fail-closed missing children and delegated index addressing, and the workflow's value-based skip plus full-set re-link of reused parents and children.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/check-equivalence-activity.test.ts#L153-L341",
+          "version": "repo-lines-v1:sha256:0e000802ae504bbfe2ef50501d10bff06e45235421e6547ea0a75243693ad9df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTg5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2NjFkZmI3OWMzZDI4MGUxMDg0ZTVlYWJhOTQ2MWRlZDJlZDg3ODVkNDk4ZGY5OTJkMmRiZGJjOTI1ODEyOThhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjYzMxMDUzOTg2YTllNDJlY2VhODE4Y2QxYjc1OTcwYjUxNjQwZTk3OTEzOTNhMDY0MWY1ODdmMGU2ZWZlYjBiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://packages/components/test/check-equivalence.test.ts#L69-L186",
+          "version": "repo-lines-v1:sha256:7797f22f0dad211e867be20af4d98e41068b8f6b8d5377d70a2d3a606b5bc4a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NGJlN2FhMGY3N2U1MzdmMDBiZjU3YmNjMGU4ZmUzMjY2MzAxNGE1MGJlYWI5OWMzOWY4NWI0NGM3MzVkMTFmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJiMjM1MjU4OWMzNGQzYzYwNjg1OTMxYjZlY2M0ZDUwOTkxYTdjNTZjOGZiYTI4OTQxMTQ2NTc2OTAyNzJjYWMzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzYjEwNWU0NmY0Nzk1Njc4MmVmMjM3YmViOWI4NWQ5ZjUzNGU4NzRmOWZjNWE3ZTAxZjc5ODNmZGU4ZjkxNzVhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzYzI0NDM4MThhZTA0NWM3OTE4NTFmNjQwYWQ0NmIzZmM5ZTAxMWQ5MDA4NjY3NzJlYjQ0ZmYzYTFhZmZmMTUwIn0"
+        },
+        {
+          "resource": "repo://packages/components/test/grants-workflow.test.ts#L100-L229",
+          "version": "repo-lines-v1:sha256:ab6a0de9fc033f1ae5be6479922459ab698c6d2da0bda33f40b6edf9ed01f5aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiMjM1MjU4OWMzNGQzYzYwNjg1OTMxYjZlY2M0ZDUwOTkxYTdjNTZjOGZiYTI4OTQxMTQ2NTc2OTAyNzJjYWMzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyOThiNjJmMzE4NGFkN2FhOWQ4MTI0MTM1ZDQwZTg2N2M5ZDgzNGY4MTJiMzA0ZDNiZjI3YjNkMjhlMDNjMmE2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T12:54:01.599Z"
+    "at": "2026-10-21T17:33:35.590Z"
   }
 }
