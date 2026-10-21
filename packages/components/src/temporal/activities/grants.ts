@@ -5,6 +5,8 @@ import {
   AgentRegistry,
   RoleRegistry,
   ensureApplicationRegistration,
+  getDataGrant,
+  localSparqlTransport,
   replaceDataGrants,
   storeDataAuthorizations,
 } from '@janeirodigital/interop-authorization-agent'
@@ -55,6 +57,8 @@ import {
 } from '@janeirodigital/interop-utils'
 
 import { buildSessionManager } from '../../builders/sessionManager.js'
+import { storeGrantReplica } from '../../services/GrantReplica.js'
+import { delegatedGrantTrees, grantTrees, pairTrees } from './check-equivalence.js'
 
 export interface FindAffectedAuthorizationsInput {
   webId: SocialAgentId
@@ -94,7 +98,12 @@ export interface CheckEquivalenceInput {
 }
 
 export interface EquivalenceResult {
-  reused: { existing: GrantId; generated: GrantData }[]
+  /** `generated.sourceGrants` ids to keep (parents AND children of matched trees) */
+  reusedSourceIds: string[]
+  /** indexes into `generated.delegatedGrants` (top-level only) to keep */
+  reusedDelegatedIndexes: number[]
+  /** every existing grant IRI in matched trees — parents AND children */
+  reusedExisting: GrantId[]
 }
 
 // ---------------------------------------------------------------------------
@@ -282,6 +291,58 @@ export async function getExistingGrants(payload: {
   return getDataGrantIris(agentRegistration).map((id) => ({ id, type: [INTEROP.DataGrant] }))
 }
 
+export interface GetExistingGrantBodiesInput {
+  webId: SocialAgentId
+  /** grant IRIs from `getExistingGrants` (the registration projection) */
+  grants: GrantId[]
+}
+
+/**
+ * Load existing grant **bodies** from the local plane only — the grantor's own
+ * grant registry for source grants and (once replicated) the issuer-side grant
+ * replica for delegated grants. Never dereferences a peer resource: one graph
+ * read per IRI through the session's own SPARQL endpoint.
+ *
+ * Declared children (`hasInheritingGrant`) are followed recursively, so a
+ * child that is not linked from the registration projection still joins its
+ * parent's tree. A missing or unframable body is skipped — the tree it belongs
+ * to then fails `grantTrees`' completeness check and is never reused (fail
+ * closed; the regeneration replaces the old subtree and, in a later step, the
+ * replica write repopulates the body).
+ */
+export async function getExistingGrantBodies(
+  payload: GetExistingGrantBodiesInput
+): Promise<GrantData[]> {
+  const manager = buildSessionManager()
+  const session = await manager.getSession(payload.webId.id)
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  const bodies = new Map<string, GrantData>()
+  const attempted = new Set<string>()
+  const queue = [
+    ...new Set(
+      payload.grants
+        .map((grant) => grant.id)
+        .filter((id): id is string => typeof id === 'string' && id.length > 0)
+    ),
+  ]
+  while (queue.length > 0) {
+    const iri = queue.shift()!
+    if (attempted.has(iri)) continue
+    attempted.add(iri)
+    let grant: GrantData
+    try {
+      grant = await getDataGrant(transport, iri)
+    } catch {
+      continue // missing/unframable body → fail closed (not reusable)
+    }
+    bodies.set(iri, grant)
+    for (const child of grant.hasInheritingGrant ?? []) {
+      if (typeof child === 'string' && !attempted.has(child)) queue.push(child)
+    }
+  }
+  return [...bodies.values()]
+}
+
 /**
  * HTTP-DELETE grant resources using the webId's session.
  *
@@ -309,17 +370,72 @@ export async function deleteDataGrants(payload: {
 }
 
 // ---------------------------------------------------------------------------
-// Equivalence (dummy for now)
+// Equivalence (wired; dummy until the real comparison lands)
 // ---------------------------------------------------------------------------
 
 /**
- * DUMMY for now: always returns { reused: [] } (pretend nothing is equivalent).
- * Interface ready for the real comparison (see plan "Future step").
+ * Real comparison: **both** generated tree kinds are paired as whole subtrees
+ * against existing bodies loaded from the local plane.
+ *
+ * - Source trees (we are the `dataOwner`) pair with existing trees owned by us
+ *   (own grant registry).
+ * - Delegated trees (a peer is the `dataOwner`) pair with existing trees owned
+ *   by a peer — the issuer-side replica written at issuance time.
+ *
+ * Missing bodies fail closed (`getExistingGrantBodies` skips them), so a
+ * pre-replica grant simply gets regenerated and repopulates the replica.
  */
-export async function checkEquivalence(
-  _payload: CheckEquivalenceInput
-): Promise<EquivalenceResult> {
-  return { reused: [] }
+export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<EquivalenceResult> {
+  const existingGrants = await getExistingGrantBodies({
+    webId: payload.webId,
+    grants: payload.existing,
+  })
+  const existingTrees = grantTrees(existingGrants)
+  const sourceExisting = existingTrees.filter((tree) => tree.grant.dataOwner === payload.webId.id)
+  const delegatedExisting = existingTrees.filter(
+    (tree) => tree.grant.dataOwner !== payload.webId.id
+  )
+
+  const reusedSourceIds: string[] = []
+  const reusedDelegatedIndexes: number[] = []
+  const reusedExisting = new Map<string, GrantId>()
+  const rememberExisting = (pairs: ReturnType<typeof pairTrees>) => {
+    for (const pair of pairs) {
+      for (const node of pair.nodes) {
+        if (node.existing.id) {
+          reusedExisting.set(node.existing.id, {
+            id: node.existing.id,
+            type: node.existing.type,
+          })
+        }
+      }
+    }
+  }
+
+  const sourcePairs = pairTrees(grantTrees(payload.generated.sourceGrants), sourceExisting)
+  for (const pair of sourcePairs) {
+    for (const node of pair.nodes) {
+      if (node.generated.id) reusedSourceIds.push(node.generated.id)
+    }
+  }
+  rememberExisting(sourcePairs)
+
+  // delegated generated grants carry no ids yet — the result addresses them by
+  // their position in the workflow's `delegatedGrants` array
+  const delegatedTrees = delegatedGrantTrees(payload.generated.delegatedGrants)
+  const delegatedIndexByTree = new Map(delegatedTrees.map((tree, index) => [tree, index] as const))
+  const delegatedPairs = pairTrees(delegatedTrees, delegatedExisting)
+  for (const pair of delegatedPairs) {
+    const index = delegatedIndexByTree.get(pair.generated)
+    if (index !== undefined) reusedDelegatedIndexes.push(index)
+  }
+  rememberExisting(delegatedPairs)
+
+  return {
+    reusedSourceIds,
+    reusedDelegatedIndexes,
+    reusedExisting: [...reusedExisting.values()],
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -482,8 +598,28 @@ export async function requestDelegations(payload: RequestDelegationsInput): Prom
   if (response.status !== 200) {
     throw new Error(`expected 200 but received ${response.status}`)
   }
-  const iris = (await response.json()) as string[]
-  return iris.map((id) => ({ id, type: [INTEROP.DataGrant] }))
+  const issued = (await response.json()) as unknown
+  if (
+    !Array.isArray(issued) ||
+    !issued.every(
+      (grant) =>
+        typeof grant === 'object' &&
+        grant !== null &&
+        typeof (grant as FinalGrantData).id === 'string'
+    )
+  ) {
+    throw new Error('invalid delegation response: expected the finalised grants')
+  }
+  const finalGrants = issued as FinalGrantData[]
+  // Best-effort replica write: the grants are already issued, so failing here
+  // would retry the POST and mint duplicates. A missing replica body only
+  // disables reuse (fail closed); the next issuance repopulates it.
+  try {
+    await storeGrantReplica(session.sparqlEndpoint, finalGrants)
+  } catch {
+    // intentionally swallowed — see the comment above
+  }
+  return finalGrants.map((grant) => ({ id: grant.id, type: grant.type }))
 }
 
 // ---------------------------------------------------------------------------

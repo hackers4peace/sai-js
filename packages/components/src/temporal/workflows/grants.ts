@@ -686,14 +686,17 @@ export async function createGrantsForAgent(
     grantee: payload.grantee,
     dataAuthorizations: authorizations,
   })
-  // DUMMY for now → { reused: [] }; the workflow is fully wired for the real check
-  const { reused } = await checkEquivalence({
+  // value-based sets: activity results cross Temporal's data converter, so
+  // object identity never survives (the previous `Set<GrantData>` never
+  // matched and silently disabled reuse)
+  const { reusedSourceIds, reusedDelegatedIndexes, reusedExisting } = await checkEquivalence({
     webId: payload.webId,
     grantee: payload.grantee,
     generated,
     existing,
   })
-  const reusedGenerated = new Set(reused.map((entry) => entry.generated))
+  const reusedSource = new Set(reusedSourceIds)
+  const reusedDelegated = new Set(reusedDelegatedIndexes)
 
   // TODO CSS SPARQL backend has a race condition on dcterms:modified when
   // multiple resources are PUT concurrently in the same container,
@@ -701,7 +704,7 @@ export async function createGrantsForAgent(
   // Change back to Promise.all after the CSS bug is fixed.
   const newGrantIds: GrantId[] = []
   for (const grant of generated.sourceGrants) {
-    if (reusedGenerated.has(grant)) continue
+    if (reusedSource.has(grant.id)) continue
     await storeGrantAndAcr(grant)
     newGrantIds.push({ id: grant.id, type: grant.type })
   }
@@ -711,8 +714,8 @@ export async function createGrantsForAgent(
   // instead of one per grant. Serialized between owners — the CSS
   // `dcterms:modified` race keeps the writes sequential.
   const delegatedByOwner = new Map<string, GrantData[]>()
-  for (const grant of generated.delegatedGrants) {
-    if (reusedGenerated.has(grant)) continue
+  for (const [index, grant] of generated.delegatedGrants.entries()) {
+    if (reusedDelegated.has(index)) continue
     const group = delegatedByOwner.get(grant.dataOwner) ?? []
     group.push(grant)
     delegatedByOwner.set(grant.dataOwner, group)
@@ -722,6 +725,7 @@ export async function createGrantsForAgent(
   }
 
   // delete the old grant resources that are not reused
+  // const reusedExistingIds = new Set(reusedExisting.map((grant) => grant.id))
   // await deleteDataGrants({
   //   webId: payload.webId,
   //   grants: existing
@@ -732,6 +736,6 @@ export async function createGrantsForAgent(
   await replaceDataGrantsOnRegistration({
     webId: payload.webId,
     grantee: payload.grantee,
-    grants: [...newGrantIds, ...reused.map((entry) => entry.existing)],
+    grants: [...newGrantIds, ...reusedExisting],
   })
 }

@@ -69,7 +69,6 @@ export const dataModelContext: JsonLdContext = {
   satisfiesAccessNeed: iriTermDef(INTEROP, 'satisfiesAccessNeed'),
   satisfiesAccessRequest: iriTermDef(INTEROP, 'satisfiesAccessRequest'),
   inheritsFromGrant: iriTermDef(INTEROP, 'inheritsFromGrant'),
-  delegationOfGrant: iriTermDef(INTEROP, 'delegationOfGrant'),
   inheritsFromAuthorization: iriTermDef(INTEROP, 'inheritsFromAuthorization'),
   inheritsFromNeed: iriTermDef(INTEROP, 'inheritsFromNeed'),
   required: iriTermDef(INTEROP, 'accessNecessity'),

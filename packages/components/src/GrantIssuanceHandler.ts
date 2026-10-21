@@ -193,7 +193,10 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
       args: [finalGrants],
       workflowId: crypto.randomUUID(),
     })
-    const doc = JSON.stringify(finalGrants.map((grant) => grant.id))
+    // echo the finalised grants (not just their ids): the grantor stores them
+    // as the issuer-side replica `checkEquivalence` reads
+    // (docs/plans/check-equivalence.md §2.1)
+    const doc = JSON.stringify(finalGrants)
     const representation = new BasicRepresentation(doc, operation.target, APPLICATION_JSON)
     return new OkResponseDescription(representation.metadata, representation.data)
   }
@@ -229,7 +232,6 @@ export class GrantIssuanceHandler extends OperationHttpHandler {
       accessMode: childData.accessMode,
       creatorAccessMode: childData.creatorAccessMode,
       hasDataInstance: childData.hasDataInstance,
-      delegationOfGrant: childData.delegationOfGrant,
       id: iriForContained(sai.registrySet.hasGrantRegistry, sai.randomUUID),
       inheritsFromGrant,
     }

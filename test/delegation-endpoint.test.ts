@@ -78,7 +78,9 @@ async function issueProjectsGrant(): Promise<string[]> {
     body: issuancePayload([projectsGrantData]),
   })
   expect(response.status).toBe(200)
-  return (await response.json()) as string[]
+  // the endpoint echoes the finalised grants (step 4 of check-equivalence)
+  const granted = (await response.json()) as { id: string }[]
+  return granted.map((grant) => grant.id)
 }
 
 describe('DelegationRevocationEndpoint', () => {
@@ -167,11 +169,17 @@ describe('DelegationIssuanceEndpoint', () => {
         body: issuancePayload([projectsGrantData]),
       })
       expect(response.status).toBe(200)
-      const ids = await response.json()
-      expect(ids).toHaveLength(2) // parent + inheriting child
-      ids.forEach((id: string) => {
-        expect(id).toMatch(grantRegistry)
-      })
+      expect(response.headers.get('content-type')).toContain('application/json')
+      // the echo carries the finalised grants: parent + inheriting child, linked
+      const granted = (await response.json()) as {
+        id: string
+        hasInheritingGrant?: string[]
+        inheritsFromGrant?: string
+      }[]
+      expect(granted).toHaveLength(2) // parent + inheriting child
+      for (const grant of granted) expect(grant.id).toMatch(grantRegistry)
+      expect(granted[0].hasInheritingGrant).toEqual([granted[1].id])
+      expect(granted[1].inheritsFromGrant).toBe(granted[0].id)
       expect(await countGrants()).toBe(seededGrantCount + 2)
     })
     test('multiple grants are issued all-or-nothing', async (): Promise<void> => {
@@ -182,11 +190,15 @@ describe('DelegationIssuanceEndpoint', () => {
         body: issuancePayload([projectsGrantData, hrProjectsGrantData]),
       })
       expect(response.status).toBe(200)
-      const ids = await response.json()
-      expect(ids).toHaveLength(4) // two parents + two inheriting children
-      ids.forEach((id: string) => {
-        expect(id).toMatch(grantRegistry)
-      })
+      const granted = (await response.json()) as {
+        id: string
+        hasInheritingGrant?: string[]
+      }[]
+      expect(granted).toHaveLength(4) // two parents + two inheriting children
+      for (const grant of granted) expect(grant.id).toMatch(grantRegistry)
+      // response order: parent, its children, next parent, its children
+      expect(granted[0].hasInheritingGrant).toEqual([granted[1].id])
+      expect(granted[2].hasInheritingGrant).toEqual([granted[3].id])
       expect(await countGrants()).toBe(seededGrantCount + 4)
     })
     test('invalid grantedBy fails and nothing is created', async (): Promise<void> => {

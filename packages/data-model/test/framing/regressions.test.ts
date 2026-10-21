@@ -18,10 +18,9 @@ describe('framing regressions', () => {
   test('framed output omits absent properties instead of emitting null', async () => {
     const doc = await docFromGraphs([GRANT_IRI])
     const framed = (await frameDoc(doc, dataModelContext, GRANT_IRI)) as any
-    // this grant has no inheritsFromGrant / delegationOfGrant — with
-    // @omitDefault they must be omitted, not `null`
+    // this grant has no inheritsFromGrant — with @omitDefault absent
+    // properties must be omitted, not `null`
     expect(framed.inheritsFromGrant).toBeUndefined()
-    expect(framed.delegationOfGrant).toBeUndefined()
     expect(Object.values(framed).some((value) => value === null)).toBe(false)
   })
 

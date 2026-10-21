@@ -285,13 +285,16 @@ describe('delegated-grant generation — mirror only', () => {
       transport
     )
 
-    // one delegated grant per authorization, all delegated from the mirrored source
+    // one delegated grant per authorization, all derived from the mirrored source
     expect(generated.delegatedGrants).toHaveLength(3)
-    expect(generated.delegatedGrants.map((grant) => grant.delegationOfGrant)).toEqual([
-      PROJECT_GRANT,
-      PROJECT_GRANT,
-      PROJECT_GRANT,
-    ])
+    for (const delegated of generated.delegatedGrants) {
+      expect(delegated).toMatchObject({
+        dataOwner: ALICE,
+        registeredShapeTree: PROJECT_TREE,
+        hasDataRegistration: PROJECT_REGISTRATION,
+        hasStorage: PROJECT_STORAGE,
+      })
+    }
     // …and the peer side was read ONCE, not once per authorization
     expect(transport.queries.filter((query) => query.includes(LDP.contains))).toHaveLength(1)
     // two presence probes (reciprocal, then its grants) — cached afterwards
@@ -327,13 +330,12 @@ describe('delegated-grant generation — mirror only', () => {
       hasDataRegistration: PROJECT_REGISTRATION,
       hasStorage: PROJECT_STORAGE,
       scopeOfGrant: INTEROP.AllFromRegistry,
-      delegationOfGrant: PROJECT_GRANT,
       // the source allows Read+Write, the authorization asks for Read only
       accessMode: [INTEROP.Read],
     })
   })
 
-  test('matches by shape tree — only the Project grant delegates', async () => {
+  test('matches by shape tree — only the Task grant delegates', async () => {
     const transport = mirrorTransport(mirroredPeerGraphs())
     const { deps: dataModelDeps } = deps()
 
@@ -345,7 +347,11 @@ describe('delegated-grant generation — mirror only', () => {
       transport
     )
 
-    expect(generated.delegatedGrants.map((grant) => grant.delegationOfGrant)).toEqual([TASK_GRANT])
+    expect(generated.delegatedGrants).toHaveLength(1)
+    expect(generated.delegatedGrants[0]).toMatchObject({
+      registeredShapeTree: TASK_TREE,
+      hasDataRegistration: TASK_REGISTRATION,
+    })
   })
 
   test('MirrorIncompleteError when the reciprocal registration is not mirrored', async () => {
@@ -401,19 +407,22 @@ describe('delegated-grant generation — mirror only', () => {
 
     expect(generated.delegatedGrants).toHaveLength(1)
     const [parent] = generated.delegatedGrants
-    expect(parent.delegationOfGrant).toBe(PROJECT_GRANT)
+    expect(parent).toMatchObject({
+      dataOwner: ALICE,
+      hasDataRegistration: PROJECT_REGISTRATION,
+    })
     // the child rides the parent as embedded data (the issuance endpoint assigns
-    // IRIs) and delegates from the peer's mirrored child grant
+    // IRIs); chain validity is match-based, so no source pointer is stored
     const [child] = parent.hasInheritingGrant as unknown as {
       registeredShapeTree: string
       scopeOfGrant: string
-      delegationOfGrant: string
+      hasDataRegistration: string
       dataOwner: string
     }[]
     expect(child).toMatchObject({
       registeredShapeTree: TASK_TREE,
       scopeOfGrant: INTEROP.Inherited,
-      delegationOfGrant: CHILD_GRANT,
+      hasDataRegistration: TASK_REGISTRATION,
       dataOwner: ALICE,
     })
     expect(fetchStub).not.toHaveBeenCalled()

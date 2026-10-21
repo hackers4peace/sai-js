@@ -1,9 +1,21 @@
 # Real `checkEquivalence` — reuse equivalent grants
 
-> **Status:** design only. The dummy (`{ reused: [] }`) shipped in
-> `refactor-grants-workflows.md`; the real implementation was that plan's
-> "Future step" and is **Phase 4.5** of `workflow-temporal-decupling.md`. This
-> standalone plan is now where the real `checkEquivalence` is tracked.
+> **Status:** design (revised 2026-10-21). The dummy (`{ reused: [] }`) shipped
+> with the grant-workflow refactor; this plan is where the real implementation
+> is tracked.
+>
+> **Prerequisites:**
+>
+> 1. **Drop `delegationOfGrant`** — step 0 (§2.0); small enough to land as the
+>    first step of this plan (currently item 7 of
+>    `revoke-delegation-chain-follow-ups.md`).
+> 2. **Issuer-side grant replica** (§2.1) — the comparison needs grant bodies
+>    where we are `grantedBy` and a peer is `dataOwner`.
+>
+> **Wiring note (corrects an earlier assumption):** `createGrantsForAgent` is
+> **not** ready for real results. Its reuse set keys on object identity across a
+> Temporal activity boundary and its result shape cannot re-link children — see
+> §2.2. The workflow changes in §5 step 2 are required.
 
 ## 1. Problem
 
@@ -21,8 +33,9 @@ Today every regeneration is "generate everything, store everything":
   while the old resources stay behind as orphans (the HTTP-DELETE of old
   grants is commented out, see §6).
 
-Reuse is the fix: when a generated grant is **equivalent** to an existing one,
-keep the existing resource + ACR and re-link its id on the registration.
+Reuse is the fix: when a generated grant **tree** is equivalent to an existing
+one, keep the existing resources + ACRs and re-link their ids on the
+registration.
 
 ## 2. Current wiring (as-is)
 
@@ -32,8 +45,8 @@ keep the existing resource + ACR and re-link its id on the registration.
 export interface CheckEquivalenceInput {
   webId: SocialAgentId
   grantee: AgentId
-  generated: GeneratedGrants      // { sourceGrants: GrantData[], delegatedGrants: GrantData[] }
-  existing: GrantData[]           // the grantee's current grants (from getExistingGrants)
+  generated: GeneratedGrants      // { sourceGrants: FinalGrantData[], delegatedGrants: GrantData[] }
+  existing: GrantId[]             // the grantee's current grant IRIs (from getExistingGrants)
 }
 export interface EquivalenceResult {
   reused: { existing: GrantId; generated: GrantData }[]   // existing = { id, type }
@@ -43,81 +56,126 @@ export async function checkEquivalence(_payload: CheckEquivalenceInput): Promise
 }
 ```
 
-**Workflow** (`temporal/workflows/grants.ts`, `createGrantsForAgent`) — already
-fully wired for reuse:
+`getExistingGrants` returns **IRIs only** (one `AgentRegistry.findRegistration`
+read; no grant bodies — this is the current state, not a `loadGrant` loop).
+
+**Workflow** (`temporal/workflows/grants.ts`, `createGrantsForAgent`):
 
 ```ts
 const { reused } = await checkEquivalence({ webId, grantee, generated, existing })
 const reusedGenerated = new Set(reused.map((e) => e.generated))
-const reusedExistingIds = new Set(reused.map((e) => e.existing.id))
 // store:        for grant of generated.sourceGrants      → skip if reusedGenerated.has(grant)
 // delegation:   for grant of generated.delegatedGrants   → skip if reusedGenerated.has(grant)
 // delete (⚠️ commented out — §6): existing not in reusedExistingIds
 // registration: replaceDataGrantsOnRegistration({ grants: [...newGrantIds, ...reused.map((e) => e.existing)] })
 ```
 
-So the workflow needs **no changes** — only `checkEquivalence` returns real
-results.
+Note that `reusedExistingIds` exists **only inside the commented-out delete
+block** — it is not a live local.
+
+### 2.0 Prerequisite: drop `delegationOfGrant`
+
+`delegationOfGrant` is vestigial: nothing reads it (issuance and revocation
+chain validation are both match-based SPARQL — `findDelegableGrant`,
+`revoke-delegation-chain.md` §2/DD3), and it is the only field whose comparison
+would need a special case in §3. **Drop it before implementing equivalence**:
+remove it from `GrantData`/`GRANT_TERMS` (`data-model/src/grant.ts`), the
+context (`context.ts`), generation (`grant-generation.ts` parent and child
+delegated grants), the issuance copy (`GrantIssuanceHandler.buildInheritingGrant`),
+the seed triples, and the tests that assert it
+(`authorization-agent/test/grant-generation.test.ts`) plus the components
+fixture (`components/test/delegation-request.test.ts`). `data-model/test/
+framing/regressions.test.ts` already asserts the field is absent — it stays
+green unchanged. The vocabulary term stays in
+`namespaces.ts`/`vocabularies.ts` (it remains a valid INTEROP term, like other
+terms we no longer write). Existing resources that still carry the triple are
+inert — framing no longer selects it — so no data migration is required.
+
+This is small (a handful of source lines, the seed, and the tests that assert
+the field), so it is **step 0 of this plan** rather than a separate plan; it
+lands green on its own before any comparison code.
 
 ### 2.1 Prerequisite: the `existing` bodies must be replicated locally
 
-`existing` reaches the activity through `getExistingGrants`
-(`activities/grants.ts:261-289`), which takes the IRIs off **our registration of
-the grantee** (`hasDataGrant`, already local and authoritative) and then
-`loadGrant`s each one with our session. That is fine for grants we own, but
-**every grant where we are `grantedBy` and a peer is `dataOwner` lives on that
-peer's registry** — `GrantIssuanceHandler.issue` writes the finalised grant
-there (`getSession(dataOwner)`), and our side keeps only the IRIs it gets back.
-For those, `loadGrant` is an HTTP dereference of the peer's pod (permitted: the
-grant ACR gives the `grantor` `acl:Read`), which makes the comparison depend on
-peer availability and on the grantor-read policy staying in place.
+`existing` reaches the activity as IRIs. The comparison (§3.1) is **body-only**
+(`dataOwner`, `registeredShapeTree`, `hasDataRegistration`, `hasStorage`,
+`scopeOfGrant`, `accessMode`, `creatorAccessMode`, `hasDataInstance`), so the
+IRIs alone cannot answer "is this the same grant".
 
-That is not acceptable for this plan, because §3.1/§3.2 compare **body-only**
-fields (`dataOwner`, `registeredShapeTree`, `hasDataRegistration`, `hasStorage`,
-`scopeOfGrant`, `accessMode`, `creatorAccessMode`, `hasDataInstance`, and the
-child tree via `inheritsFromGrant`) — the IRIs alone cannot answer "is this the
-same grant".
+- **Source grants** (we are `dataOwner`) live in our own grant registry — their
+  bodies are already local (read via `getDataGrant(localSparqlTransport(
+  session.sparqlEndpoint), iri)`).
+- **Delegated grants** (we are `grantedBy`, a peer is `dataOwner`) live on the
+  peer's registry; our side keeps only the IRIs. `loadGrant`-ing them would be
+  one HTTP dereference per grant and would make regeneration depend on peer
+  availability and on the grantor-read ACR policy — not acceptable for reuse.
 
-**Requirement: replicate the grants where we are `grantedBy`.** Call it the
+**Requirement: replicate the delegated grant bodies locally** — the
 *issuer-side* mirror (the reciprocal mirror is grantee-side and covers the
-opposite direction):
+opposite direction).
 
-- **Link source:** our own registration of the grantee — `hasDataGrant` is
-  written by `replaceDataGrantsOnRegistration` on every regeneration, so it is
-  the authoritative, local, complete list. No peer read is needed to know *which*
-  grants must be present.
-- **Bodies:** the grant documents. For source grants they are already in our
-  grant registry; for delegated ones they are on the data owner's registry.
+- **Link source:** our own registration of the grantee. `getExistingGrants`
+  reads `hasDataGrant`, and the registration links **every parent and child
+  directly**: the issuance endpoint returns `finalGrants.map((g) => g.id)` for
+  parents *and* inheriting children, so `newGrantIds` (and the registration)
+  include both; source children are separate `sourceGrants` entries and are
+  linked the same way. The replica therefore has a complete link set for
+  runtime-generated data. (One seed pair is stale — see §7.)
+- **Bodies:** the grant documents. The data owner already holds `finalGrants`
+  (parents and children), so the issuance response is extended to **echo the
+  finalised grants** instead of bare IRIs (decided — no cross-pod read, no
+  grantor-read ACR dependency). `requestDelegations` stores each echoed body as
+  a replica graph and returns the ids exactly as today, so the workflow
+  contract is unchanged. The replica must include **child bodies**, not only
+  top-level parents: a parent body carries the child IRIs (reverse
+  `inheritsFromGrant` triples) but not the child fields.
 - **Freshness: none needed.** Grants are immutable (a change mints a fresh IRI —
-  `openwiki/architecture/federation.md`), so a replicated body is either current or
-  absent. Replicate once when the link is written, drop the graphs whose link
-  left the registration, and the mirror is correct by construction; only drift
-  repair (a graph-at-a-time writer or a single-graph restore) needs a scan.
-- **Write point:** the cheapest is the issuance path itself — `requestDelegation`
-  already holds the response, and the server already holds `finalGrants`, so
-  either (a) have the issuance endpoint **echo the finalised grants** and store
-  them, or (b) store the IRIs' documents right after the call. Both satisfy the
-  requirement with one round-trip; neither needs a periodic sync workflow.
-- **Graph shape:** same convention as the reciprocal mirror — one named graph
-  per grant IRI (`GRAPH <grantIri>`), read through the same `graphDoc` union.
+  `openwiki/architecture/federation.md`), so a replicated body is either current
+  or absent. Replicate when the link is written; no periodic sync workflow.
+- **Graph shape:** one named graph per grant IRI (`GRAPH <grantIri>`), same
+  convention as the reciprocal mirror, read through the same `graphDoc` union
+  (resource graph + `meta:` twin). Written to the org's own SPARQL endpoint
+  (`session.sparqlEndpoint`), like `updateReciprocalMirror`.
+- **Missing body ⇒ not reusable (fail-closed).** Do **not** raise
+  `MirrorIncompleteError` here: on the first run after this plan lands no
+  delegated grant has a replica body, so failing loud would never heal. A
+  missing/unframable body simply makes that existing tree a non-match; the
+  regeneration replaces it (as today) and populates the replica, so the second
+  run reuses.
+- **Drop-on-unlink (deferred).** Orphan replica graphs are invisible
+  (`getExistingGrants` only reads current links) and are the same class as the
+  orphaned grant resources whose DELETE is already off (§6). Their cleanup
+  rides the grant-resource cleanup lifecycle in `revoke-delegation-chain.md`
+  (follow-up 10), not this plan.
+
+**Bodies are loaded lazily:** `getExistingGrants` stays IRI-only (decided);
+`checkEquivalence` loads the bodies it needs from the local endpoint and skips
+unreadable ones (fail-closed). The deny path never pays for bodies.
 
 Deliberately **not** proposed: on-demand caching inside `checkEquivalence`.
 Reuse decisions must be a pure function of replicated state, otherwise the
 "same input → same grants" property this plan is about cannot be tested.
 
-> Coordination: the replication side already stopped fetching grant bodies
-> (`getExistingGrants` returns IRIs only), so this plan owns the replica itself.
-> If an issuance echo lands, this plan only needs to consume the replicated
-> bodies.
+### 2.2 The workflow is not serialization-safe
+
+`checkEquivalence` is a Temporal activity: its arguments and result cross the
+data converter (JSON). The `generated` objects returned in
+`reused[].generated` are **fresh copies**, never identical to the workflow's
+`generated.sourceGrants`/`delegatedGrants` entries, so
+`reusedGenerated.has(grant)` is always false — the dummy hid this. The result
+shape also cannot express the child re-links required by §3.2/§4.
+
+The result must therefore be **value-based** (§3.4), and
+`createGrantsForAgent` must consume it by ids/indexes (§4, §5 step 2).
 
 ## 3. Target: the real comparison
 
-For each generated grant (source and delegated, **including child grants**),
-find an existing grant whose **semantic fields are equal**; pair them.
+Equivalence is evaluated over a **grant tree** — a parent grant and all of its
+descendants — not over independent grants.
 
 ### 3.1 Compared fields
 
-Equal iff all of the following match (`GrantData` / `FinalGrantData`):
+Equal iff all of the following match (`GrantData`):
 
 - `grantee`
 - `grantedBy`
@@ -129,113 +187,202 @@ Equal iff all of the following match (`GrantData` / `FinalGrantData`):
 - `accessMode` (as a set)
 - `creatorAccessMode` (as a set, when present)
 - `hasDataInstance` (as a set, when present)
-- `delegationOfGrant` — **excluded for delegated grants** (§3.4)
+
+**Not compared:** `id` (minted per run), `type` (always
+`[INTEROP.DataGrant]`), `inheritsFromGrant` (derived parent IRI — points at a
+fresh/minted parent), `delegationOfGrant` (gone, §2.0), and
+`hasInheritingGrant` (structural — compared by the tree walk in §3.2).
+
+Set-valued fields are normalized before comparing.
 
 ### 3.2 Child grant trees
 
-A parent grant's equivalence includes its children (`hasInheritingGrant` /
-`inheritsFromGrant`): match the **parent and its children as a unit** — the
-generated parent matches an existing parent only if the existing parent's
-children are equivalent (by the same field comparison, on the child's
-`registeredShapeTree`, `accessMode`, `creatorAccessMode`, `hasDataInstance`,
-`hasDataRegistration`) and the child sets have the same shape-tree composition.
-Child IRIs are not compared (they are derived, like the parent's).
+A parent and its descendants are one unit: **the parent is equivalent only if
+the whole subtree is equivalent, and no descendant is reused unless its
+parent is reused**. If any member differs, the whole subtree is regenerated
+(new parent + all new descendants); reusing a child under a new parent would
+leave two parents claiming it (`inheritsFromGrant` on the reused child points
+at the old parent, while the new parent's document links it).
+
+- Equality is recursive: `treeEqual(g, e)` = `fieldsEqual(g, e) ∧` the child
+  sets are equal as a multiset by `treeEqual` (same cardinality; a bijection
+  exists). Matching children are therefore a set comparison, not just a
+  "shape-tree composition" check.
+- Child IRIs are not compared (they are derived). The **tree links** are used
+  to reconstruct each side: generated source children are separate
+  `sourceGrants` entries referenced by the parent's `hasInheritingGrant` IRIs;
+  generated delegated children are **embedded objects** in the parent's
+  `hasInheritingGrant` (no top-level entry); existing children are separate
+  resources referenced by the existing parent's `hasInheritingGrant`, with
+  bodies loaded from the replica/our registry.
+- Today generation creates **one level** of inheritance; the comparison is
+  written recursively so an n-depth generalization needs no change here.
 
 ### 3.3 Matching algorithm
 
-- Normalize sets (`accessMode`, `creatorAccessMode`, `hasDataInstance`) before
-  comparing.
-- Match **one-to-one, greedily**: iterate generated grants, find the first
-  unclaimed existing grant with equal fields. (O(n·m) is fine — grant sets are
-  small.)
-- `type` is not compared (always `[INTEROP.DataGrant]`).
+- Iterate generated trees (source trees and delegated trees), greedily find the
+  first unclaimed existing tree with `treeEqual`.
+- One-to-one: a matched existing tree is claimed, so duplicates cannot reuse the
+  same existing grants.
+- O(n·m) is fine — grant sets are small.
+- The result enumerates every member of each matched pair (see §3.4): the
+  generated source ids to skip storing, the delegated top-level index to skip
+  requesting, and **every existing IRI in the tree** (parents *and* children) to
+  keep linked.
 
-### 3.4 Delegated grants — the `delegationOfGrant` wrinkle
+### 3.4 Result shape (serialization-safe)
 
-`generateDelegatedDataGrants` sets `delegationOfGrant: sourceGrant.id!` — the
-**freshly generated** source grant's IRI. On a re-run that id never equals the
-existing delegated grant's `delegationOfGrant` (which points to the *old*
-source grant). Therefore:
+```ts
+export interface EquivalenceResult {
+  /** generated.sourceGrants ids to keep (parents AND children of matched trees) */
+  reusedSourceIds: string[]
+  /** indexes into generated.delegatedGrants (top-level only) to keep */
+  reusedDelegatedIndexes: number[]
+  /** every existing grant IRI in matched trees — parents AND children */
+  reusedExisting: GrantId[]
+}
+```
 
-- **Exclude `delegationOfGrant` from the comparison** for delegated grants;
-  match on the other fields only.
-- **Linkage caveat (documented):** if a source grant is *reused* while its
-  delegated grants are *not* (or vice versa), a reused delegated grant's
-  `delegationOfGrant` can point at the old source grant. In the common case
-  (nothing changed) the whole chain is reused coherently, so the link stays
-  valid. A follow-up could match **chains** (a delegated grant is reused only
-  if its delegation source is also reused) — not needed for the first cut.
+Strings and indexes survive the activity boundary; object identity does not.
+`reusedExisting` is what makes the full-set registration PATCH keep the child
+links — `replaceDataGrantsOnRegistration` removes every link not in the target
+set (`authorization-agent/src/agent-registration.ts`), so a reused delegated
+parent with un-listed children would otherwise silently drop them.
 
-## 4. What reuse means downstream (already wired)
+### 3.5 Delegated grants
 
-For every `{ existing, generated }` pair:
+After §2.0 there is no `delegationOfGrant` to exclude: delegated trees are
+compared with the same `fieldsEqual`/`treeEqual` as source trees. Chain
+validity is match-based (`revoke-delegation-chain.md` §2), so a reused
+delegated grant does not need a source-grant pointer.
 
-- **Store**: the generated counterpart is skipped — no new resource, no new ACR
-  (`createAcr` not called for it).
-- **Delete**: the existing grant is skipped by `reusedExistingIds` — its
-  resource and ACR stay in place.
-- **Registration**: `replaceDataGrantsOnRegistration` re-links the **existing**
-  id (`[...newGrantIds, ...reused.map((e) => e.existing)]`).
+## 4. What reuse means downstream (after the §5 step 2 wiring)
+
+- **Store:** skip every `generated.sourceGrants` entry whose id is in
+  `reusedSourceIds` — no new resource, no new ACR (`createAcr` not called).
+- **Delegation:** skip `generated.delegatedGrants` whose index is in
+  `reusedDelegatedIndexes` — no new delegation request (embedded children ride
+  the parent, so they are skipped too).
+- **Registration:** `replaceDataGrantsOnRegistration` re-links
+  `[...newGrantIds, ...reusedExisting]` — the whole reused subtree, parents and
+  children.
+- **Delete:** non-reused existing grants remain (see §6).
 
 Net effect on an unchanged re-run: **zero new grant resources, zero new ACRs,
 zero delegation requests** — the registration's `hasDataGrant` set is unchanged
-(after the single-PATCH diff, the PATCH is even a no-op).
+and the single-PATCH diff is a no-op.
 
-## 5. Implementation steps
+## 5. Implementation steps (each green-to-green)
 
-0. **Prerequisite (§2.1):** make the grant bodies where we are `grantedBy`
-   available locally. Minimal cut: extend the issuance response with the
-   finalised grants (or replicate the IRIs' documents in the same step) and
-   store them as `GRAPH <grantIri>`; refresh nothing (immutability), drop on
-   unlink. `getExistingGrants` then reads those graphs instead of `loadGrant`ing
-   peer resources — assert it with a `fetch` stub that throws.
-1. **`checkEquivalence` activity** (`activities/grants.ts`): implement the field
-   comparison (§3) — a helper `grantsEqual(a, b, { includeDelegationOfGrant })`
-   plus the child-tree matching (§3.2), and the greedy one-to-one pairing
-   (§3.3). Return `{ reused }`.
-2. **No workflow changes** — `createGrantsForAgent` already consumes `reused`.
-3. **No data-model changes** — the comparison reads `GrantData` fields directly.
+0. **Drop `delegationOfGrant`** (§2.0) — first, independently green step.
+1. **Pure comparison helper, unwired** (`activities/grants.ts` or a small
+   sibling module): `grantFieldsEqual(g, e)` + recursive `treeEqual` +
+   tree reconstruction from `hasInheritingGrant`/`inheritsFromGrant`. Unit
+   tests in `packages/components/test/check-equivalence.test.ts`; no behavior
+   change.
+2. **Result interface + workflow consumption** (§3.4): replace
+   `EquivalenceResult`, update `createGrantsForAgent` to consume
+   `reusedSourceIds` / `reusedDelegatedIndexes` / `reusedExisting`. The dummy
+   returns empty sets → **behavior identical**. Add a workflow-level test with
+   mocked activities (a non-empty result must skip storing/requesting and must
+   re-link every reused child IRI); that is the test that catches §2.2.
+3. **Source-grant reuse**: `checkEquivalence` loads the existing bodies for our
+   own grants from the local endpoint, pairs source trees, returns the result.
+   Delegated grants stay unmatched until step 5. Behavior changes here (source
+   grants start being reused); update the `/test` assertion that pins the old
+   behavior (§7).
+4. **Issuer-side replica write**: the issuance endpoint echoes the finalised
+   grants; `requestDelegations` stores every echoed body — parent **and
+   children** — as `GRAPH <grantIri>` in the org's endpoint and returns the
+   ids as today. No drops here (deferred to `revoke-delegation-chain.md`
+   follow-up 10). Tests: issuance response, replica content, and the updated
+   `/test` / `delegation-request` response-shape assertions.
+5. **Delegated-tree reuse**: read replica bodies for existing delegated grants;
+   fail-closed on missing/unframable bodies; pair delegated trees. Add the
+   `/test` cases: unchanged re-run keeps the same IRIs (source + delegated),
+   partial change replaces only the changed subtree.
+6. **Follow-ups** (§8): replica drops/backfill, drift repair.
+
+No data-model changes beyond §2.0 (the comparison reads `GrantData` fields
+directly).
 
 ## 6. Interaction with the commented-out grant deletion
 
 The old-resource HTTP-DELETE in `createGrantsForAgent` is **commented out**
-(CSS 403 on grantor-side DELETE of delegated grants — see
-`refactor-grants-workflows.md` design decision 3). Reuse does **not** fix that:
-non-equivalent old grants remain orphaned. What reuse changes:
+(CSS 403 on grantor-side DELETE of delegated grants — the ACR analysis is in
+`revoke-delegation-chain.md` §1/DD2). Reuse does **not** fix that:
+non-equivalent old subtrees remain orphaned. What reuse changes:
 
 - an unchanged re-run produces **no new orphans** (nothing is replaced);
-- when grants actually change, the replaced ones still orphan (unchanged
-  behavior until the DELETE 403 is resolved).
+- when grants actually change, the replaced subtrees still orphan (unchanged
+  behavior until the DELETE 403 is resolved by the boundary-revocation work).
 
 ## 7. Testing
 
-- **Replica-only comparison (§2.1)**: `getExistingGrants` resolves every grant —
-  including delegated ones whose `dataOwner` is a peer — from the local store; a
-  `fetch` stub that throws on any IRI proves no peer dereference happens during
-  a regeneration.
-- **No-new-IRI-on-rerun**: run a regeneration twice with an unchanged
-  authorization state and assert the registration's `hasDataGrant` set is
-  **identical** (same IRIs) after the second run. Natural triggers: two
-  identical `authorizationRecorded` activities (consumer coalesces, but a
-  manual re-run via the reconciliation sweep reproduces it), or re-running the
-  sweep on a `done`… no — on a **pending** activity after an unchanged
-  regeneration.
-- **Change → replace**: change one authorization and assert the changed grant
-  is new while the unaffected grants keep their IRIs (partial reuse).
-- **Delegated reuse**: a yoyo-delegated grant survives a re-run with the same
-  IRI (covers §3.4).
-- Extend `roles.test.ts` or a new `check-equivalence.test.ts`; the existing
-  suite stays green (dummy → real is outcome-neutral when nothing is asserted
-  about IRIs).
+- **Unit (`packages/components/test/`, agent-runnable via the root vitest):**
+  `grantFieldsEqual` (set normalization, optional fields, ids/derived fields
+  ignored), `treeEqual` (parent-only, one-level child, differing child set,
+  n-depth shape), greedy one-to-one pairing, and the child re-link enumeration.
+- **Workflow-level (mocked activities, `packages/components/test/`):** a
+  non-empty `EquivalenceResult` actually skips `storeGrantAndAcr` /
+  `requestDelegations` and re-links **all** reused IRIs (parents + children).
+  This is the regression test for the §2.2 serialization bug.
+- **No-peer-read oracle:** mock `fetch-sparql-endpoint` and assert every body
+  read targets `session.sparqlEndpoint`; `session.fetch` is allowed only for
+  local registration/agent reads (a blanket "throws on any IRI" stub is wrong —
+  `getExistingGrants` fetches the registration through `session.fetch`, and
+  grant bodies are read through SPARQL, not HTTP).
+- **`/test` (dagger, user-run):**
+  - `test/reconciliation.test.ts` currently asserts the seed grant `g4yhtm` is
+    **not** in the registration after regeneration (`expect(iris).not.toContain
+    (seedGrant)`). With real reuse it **will** be; the assertion changes to
+    assert the same IRIs (approved). This is the only `/test` assertion I found
+    that pins grant IRIs; `authorization`, `roles`, `share` assert
+    shapes/semantics and stay green.
+  - **No-new-IRI-on-rerun**: regeneration twice with an unchanged state keeps
+    the registration's `hasDataGrant` set identical (parents and children).
+    Trigger: the reconciliation sweep on a pending activity, or two drain
+    cycles of the consumer.
+  - **Change → replace**: change one authorization and assert the changed
+    subtree is new while the unaffected subtrees keep their IRIs (partial
+    reuse).
+  - **Delegated reuse**: a delegated tree (e.g. the `wwp4j6` → `qwvbcu` pair on
+    alice's application registration) survives a re-run with the same IRIs.
+  - **Seed fix:** `https://registry/acme/social-agent/je0s7n/` links only
+    `g4yhtm` and omits its child `wpqyds`; runtime links every parent and
+    child. Add the missing `hasDataGrant` link so fixtures match runtime and
+    the mirror/replica assumption holds. (The child stays reachable through the
+    parent's reverse link either way, so this is a fixture correction, not a
+    code requirement.)
 
 ## 8. Out of scope / follow-ups
 
-- Resolving the DELETE 403 (old-resource cleanup) — `refactor-grants-workflows.md`
-  design decision 3.
-- Chain-consistent reuse (delegated grant reused only with its source) — §3.4.
+- Resolving the DELETE 403 (old-subtree cleanup) — `revoke-delegation-chain.md`.
+- Replica drops on unlink — rides the grant-resource cleanup lifecycle in
+  `revoke-delegation-chain.md` (follow-up 10): same orphan class as the grant
+  resources whose DELETE is off.
+- Initial replica backfill / drift scan for existing deployments —
+  `pod-isolation-followup.md` A1; reuse the mirror's presence check
+  (`presentGraphs`) rather than a second implementation.
+- n-depth inheritance: generation is one level today; §3.2 is written
+  recursively so this plan does not need to change.
 - Whole-registry regeneration (recovery scenarios only).
-- Drift repair for the issuer-side mirror (§2.1): a graph-at-a-time backfill or
-  single-graph restore can leave a linked grant without a body. Same class as
-  the reciprocal mirror's `MirrorIncompleteError` / presence check
-  (`openwiki/architecture/federation.md`) — reuse that primitive rather than a
-  second implementation.
+
+## 9. Decisions (approved 2026-10-21)
+
+- **Replica write point:** the issuance endpoint **echoes the finalised
+  grants**; no post-issuance peer fetch (§2.1, §5 step 4). This changes the
+  response contract from `string[]` to grant objects — update
+  `test/delegation-endpoint.test.ts` and
+  `packages/components/test/delegation-request.test.ts` with it.
+- **Replica drops:** deferred to the grant-resource cleanup lifecycle
+  (`revoke-delegation-chain.md` follow-up 10); this plan writes replicas and
+  never drops them.
+- **Missing replica body:** fail-closed — not reusable; the regeneration
+  replaces it and repopulates the replica (§2.1).
+- **`getExistingGrants`:** stays IRI-only; `checkEquivalence` loads bodies
+  lazily from the local endpoint (§2.1).
+- **`/test/reconciliation.test.ts`:** the "seed grant replaced" assertion
+  changes to "seed grant reused" (§7).
+- **`delegationOfGrant` drop:** step 0 of this plan, not a separate plan
+  (§2.0).

@@ -129,11 +129,18 @@ it), the issued grant resources, and the seed (`environments/data/registry.trig`
 **Scope.** Remove the field from generation/framing/context and the
 `delegationOfGrant` copy in the issuance handler; drop the triple from the
 seed and from newly issued grants; update `data-model` framing tests
-(`grant.test.ts`, `regressions.test.ts`). The vocab term stays in both
+(`grant.test.ts`, `regressions.test.ts`), the `authorization-agent` generation
+tests (`grant-generation.test.ts` asserts the field), and the components
+`delegation-request.test.ts` fixture. The vocab term stays in both
 `namespaces.ts` / `vocabularies.ts` (it remains a valid INTEROP term).
 
 **Green.** No `delegationOfGrant` triple is written by issuance; framing tests
 updated; revocation/issuance tests still green (behavior never depended on it).
+
+**Coordination.** Executed as **step 0 of
+[`check-equivalence.md`](check-equivalence.md)** (§2.0) — small enough not to
+need a standalone plan; land it before any equivalence code so the compared
+field set is stable.
 
 ## 8. Validate-request shape/rate for the System-2 sweep
 
@@ -164,3 +171,19 @@ fan-out), wiring `reconcileActivities` to it.
 **Green.** A missed webhook delivery is corrected by the scheduled run within
 the configured interval; D-unreachable periods retry without false
 revocations.
+
+## 10. Drop the issuer-side grant replica graphs on unlink
+
+**Context (§8 DD5, [`check-equivalence.md`](check-equivalence.md) §2.1).** The
+grantor-side replica created for grant reuse (`GRAPH <grantIri>` for delegated
+grants) outlives grants that leave the registration (replaced by a
+regeneration, unlinked, or revoked). The same lifecycle already leaves the
+grant resources themselves orphaned because the cross-peer DELETE is off (DD2),
+so the replica cleanup rides that work rather than shipping alone.
+
+**Scope.** When the grant-resource cleanup lands, drop the replica graphs of
+the then-unlinked grants (parent and children, each with its `meta:` twin) as
+part of the same step — never touching our own grant-registry graphs.
+
+**Green.** A replaced/revoked subtree leaves no local replica graphs behind;
+re-running the cleanup is idempotent.

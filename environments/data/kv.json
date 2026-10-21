@@ -114,9 +114,7 @@
   "accounts/index/password/d7c9cb32-9e18-4c9d-8998-491a22edd3f7": [
     "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
   ],
-  "accounts/index/password/email/alice%40acme.example": [
-    "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
-  ],
+  "accounts/index/password/email/alice%40acme.example": ["e4fcefdc-5251-4e7c-9374-93ae71f188e3"],
   "accounts/index/webIdLink/823e97fa-7436-4cf7-8e84-72aa2ba56f68": [
     "e4fcefdc-5251-4e7c-9374-93ae71f188e3"
   ],
@@ -247,15 +245,11 @@
   "accounts/index/password/958d5f04-57df-4cff-a848-06efab13a2b0": [
     "281efdff-8a0a-4f57-b058-250717899fae"
   ],
-  "accounts/index/password/email/bob%40yoyodyne.example": [
-    "281efdff-8a0a-4f57-b058-250717899fae"
-  ],
+  "accounts/index/password/email/bob%40yoyodyne.example": ["281efdff-8a0a-4f57-b058-250717899fae"],
   "accounts/index/webIdLink/fcc56d5b-599f-495a-ba09-d23db6c711d2": [
     "281efdff-8a0a-4f57-b058-250717899fae"
   ],
-  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fbob": [
-    "281efdff-8a0a-4f57-b058-250717899fae"
-  ],
+  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fbob": ["281efdff-8a0a-4f57-b058-250717899fae"],
   "accounts/index/owner/2897ea7d-ede2-4cd2-ac98-a3f1467c09a1": [
     "281efdff-8a0a-4f57-b058-250717899fae"
   ],
@@ -362,15 +356,11 @@
   "accounts/index/password/fe116276-ed94-4e87-8917-70b7985244b4": [
     "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
-  "accounts/index/password/email/kim%40encom.example": [
-    "9f942f30-2631-4403-9a1a-300f8faae267"
-  ],
+  "accounts/index/password/email/kim%40encom.example": ["9f942f30-2631-4403-9a1a-300f8faae267"],
   "accounts/index/webIdLink/678b68db-3d29-428a-b339-6e3f8b285de9": [
     "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
-  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fkim": [
-    "9f942f30-2631-4403-9a1a-300f8faae267"
-  ],
+  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fkim": ["9f942f30-2631-4403-9a1a-300f8faae267"],
   "accounts/index/owner/bec41854-497d-4b12-a7fb-1904c8831f32": [
     "9f942f30-2631-4403-9a1a-300f8faae267"
   ],
@@ -524,9 +514,7 @@
   "accounts/index/password/f8a9b1c2-d3e4-4f5a-6b7c-8d9e0f1a2b3c": [
     "f47ac10b-58cc-4372-a567-0e02b2c3d479"
   ],
-  "accounts/index/password/email/acme%40acme.example": [
-    "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-  ],
+  "accounts/index/password/email/acme%40acme.example": ["f47ac10b-58cc-4372-a567-0e02b2c3d479"],
   "accounts/index/owner/c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f": [
     "f47ac10b-58cc-4372-a567-0e02b2c3d479"
   ],
@@ -646,9 +634,7 @@
   "accounts/index/password/e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b": [
     "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
   ],
-  "accounts/index/password/email/yoyo%40yoyodyne.example": [
-    "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
-  ],
+  "accounts/index/password/email/yoyo%40yoyodyne.example": ["d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"],
   "accounts/index/webIdLink/d7e8f9a0-b1c2-4d3e-4f5a-6b7c8d9e0f1a": [
     "d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a"
   ],
@@ -676,9 +662,7 @@
   "accounts/index/password/4fbb04ad-5455-46c0-a7a1-7fcf765332db": [
     "9f137c45-2889-430b-8fb0-e1f41312dc09"
   ],
-  "accounts/index/password/email/dan%40yoyodyne.example": [
-    "9f137c45-2889-430b-8fb0-e1f41312dc09"
-  ],
+  "accounts/index/password/email/dan%40yoyodyne.example": ["9f137c45-2889-430b-8fb0-e1f41312dc09"],
   "accounts/data/9f137c45-2889-430b-8fb0-e1f41312dc09": {
     "linkedLoginsCount": 1,
     "id": "9f137c45-2889-430b-8fb0-e1f41312dc09",
@@ -788,9 +772,7 @@
   "accounts/index/webIdLink/d4f7120b-f3ec-4b53-b695-93509282dd39": [
     "9f137c45-2889-430b-8fb0-e1f41312dc09"
   ],
-  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fdan": [
-    "9f137c45-2889-430b-8fb0-e1f41312dc09"
-  ],
+  "accounts/index/webIdLink/webId/https%3A%2F%2Fid%2Fdan": ["9f137c45-2889-430b-8fb0-e1f41312dc09"],
   "accounts/index/activityWebhook/1d8a4a41-7cf3-4d97-bbb0-cc962c3fd853": [
     "9f137c45-2889-430b-8fb0-e1f41312dc09"
   ],

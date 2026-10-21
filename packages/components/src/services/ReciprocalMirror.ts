@@ -60,7 +60,7 @@ const fetcher = new SparqlEndpointFetcher()
  * only accepts triples or `GRAPH` blocks — 4-term N-Quads lines are invalid
  * (Fuseki rejects them with 400; Oxigraph happened to accept them).
  */
-async function toGraphBlocks(nquads: string): Promise<string> {
+export async function toGraphBlocks(nquads: string): Promise<string> {
   const quads = new Parser({ format: 'N-Quads' }).parse(nquads)
   const byGraph = new Map<string, Quad[]>()
   for (const quad of quads) {

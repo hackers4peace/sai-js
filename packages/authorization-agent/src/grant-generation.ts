@@ -158,7 +158,6 @@ async function generateChildDelegatedGrantData(
         childSourceGrant.accessMode.includes(mode)
       ),
       inheritsFromGrant: parentGrantIri,
-      delegationOfGrant: childSourceGrant.id!,
     }
     result.push(childData)
   }
@@ -323,7 +322,6 @@ async function generateDelegatedDataGrants(
         hasDataRegistration: sourceGrant.hasDataRegistration,
         hasStorage: sourceGrant.hasStorage,
         scopeOfGrant: scope,
-        delegationOfGrant: sourceGrant.id!,
         accessMode: data.accessMode.filter((mode) => sourceGrant.accessMode.includes(mode)),
       }
       if (grant.scopeOfGrant === INTEROP.SelectedFromRegistry) {

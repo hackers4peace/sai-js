@@ -415,7 +415,6 @@ GRAPH <meta:https://registry/acme/grant/wpqyds> {
 GRAPH <https://registry/acme/grant/wwp4j6> {
   <https://registry/acme/grant/wwp4j6>
     a interop:DataGrant;
-    interop:delegationOfGrant <https://registry/acme/grant/g4yhtm>;
     interop:grantee <https://data/test-client/public/id>;
     interop:grantedBy <https://id/alice>;
     interop:dataOwner <https://id/acme>;
@@ -436,7 +435,6 @@ GRAPH <meta:https://registry/acme/grant/wwp4j6> {
 GRAPH <https://registry/acme/grant/qwvbcu> {
   <https://registry/acme/grant/qwvbcu>
     a interop:DataGrant;
-    interop:delegationOfGrant <https://registry/acme/grant/wpqyds>;
     interop:grantee <https://data/test-client/public/id>;
     interop:grantedBy <https://id/alice>;
     interop:dataOwner <https://id/acme>;

@@ -171,16 +171,7 @@ services:
       - ./:/sai
       - ${CAROOT}:/mkcert
     environment:
-      <<:
-        [
-          *postgres-env,
-          *vapid-env,
-          *idp-env,
-          *certs-env,
-          *temporal-env,
-          *origin-env,
-          *fuseki-env,
-        ]
+      <<: [*postgres-env, *vapid-env, *idp-env, *certs-env, *temporal-env, *origin-env, *fuseki-env]
       CSS_BASE_URL: https://auth.docker/
       # account-bootstrap activities provision Garage buckets/keys — the worker
       # (never auth) holds the admin token, and knows the bucket-less S3 endpoint

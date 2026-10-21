@@ -15,6 +15,7 @@ const acmeId = 'https://id/acme'
 const aliceId = 'https://id/alice'
 const acmeRegForAlice = 'https://registry/acme/social-agent/je0s7n/'
 const seedGrant = 'https://registry/acme/grant/g4yhtm'
+const seedChildGrant = 'https://registry/acme/grant/wpqyds'
 
 describe('reconciliation sweep', () => {
   test('processes a pending activity that was never delivered', async () => {
@@ -89,7 +90,10 @@ describe('reconciliation sweep', () => {
     )
     const iris = await getDataGrantIris(regForAlice)
     expect(iris.length).toBeGreaterThan(0)
-    // full regeneration replaced the seed grant with freshly generated ones
-    expect(iris).not.toContain(seedGrant)
+    // real equivalence (source trees): the unchanged seed subtree is REUSED —
+    // same IRIs after the regeneration. The seed links only the parent; the
+    // reused child is re-linked from the parent's `hasInheritingGrant`.
+    expect(iris).toContain(seedGrant)
+    expect(iris).toContain(seedChildGrant)
   })
 })
