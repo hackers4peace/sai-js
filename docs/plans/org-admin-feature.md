@@ -47,10 +47,10 @@ single-store assumptions the engine path relies on):
   create/delete the `AdminAuthorization` in the org's AuthorizationRegistry
   (erroring on already-admin / non-admin — decided) and write a domain activity
   to the org's Activity
-  Registry — **distinct shapes**: `adminAuthorizationGranted` on add,
-  `adminAuthorizationRevoked` on remove (mirroring the
-  `authorizationRecorded`/`authorizationRevoked` precedent — no `granted: false`
-  reuse). `ActivityWebhookHandler` starts **parallel workflows** from the
+  Registry — **distinct shapes**: `AdminAuthorizationGranted` on add,
+  `AdminAuthorizationRevoked` on remove (mirroring the typed activity
+  precedent — `AuthorizationGranted`/`AuthorizationDenied`, with revocation as
+  `AuthorizationRevoked`; no `granted: false` reuse). `ActivityWebhookHandler` starts **parallel workflows** from the
   trigger — on add `createAdminGrants` (generate the RegistrySet +
   per-data-registry grants) / on remove `revokeAdminGrants` (drop grants, link,
   ACRs), plus `syncAdminAcr` (rewrite `#fullAdminAccess`) on both — diverging
@@ -338,9 +338,10 @@ Added Dan as an admin of YoYo (IDs generated with `npx @paralleldrive/cuid2 --le
 data-authorization and `deleteRole` paths — then write a domain activity to the
 org's Activity Registry (`openwiki/services/activity-lifecycle.md`) — **distinct shapes** for add and remove,
 no `granted: false` reuse:
-`adminAuthorizationGranted` on `AddAdmin`, `adminAuthorizationRevoked` on
-`RemoveAdmin` (mirroring the `authorizationRecorded`/`authorizationRevoked`
-precedent). `ActivityWebhookHandler` starts **parallel workflows** from the
+`AdminAuthorizationGranted` on `AddAdmin`, `AdminAuthorizationRevoked` on
+`RemoveAdmin` (mirroring the typed activity precedent —
+`AuthorizationGranted`/`AuthorizationDenied`, with revocation as
+`AuthorizationRevoked`). `ActivityWebhookHandler` starts **parallel workflows** from the
 trigger, diverging on the activity type:
 
 **Add — `adminAuthorizationGranted`:**

@@ -2,10 +2,10 @@
 
 > **Status: design — decided (2026-09).** The architectural principle the
 > activity-first refactors (now documented in the OpenWiki
-> `services/activity-lifecycle.md` and `services/rpc-and-services.md`, with the
-> granting work in [`authorization-granting.md`](authorization-granting.md))
-> follow. Companion to [`features.md`](../features.md) (the activity catalogue)
-> and the OpenWiki `services/activity-lifecycle.md` (the wire contract).
+> `services/activity-lifecycle.md` and `services/rpc-and-services.md`; the
+> former `authorization-granting.md` was removed once its design landed there)
+> follow. Companion to the OpenWiki `services/activity-lifecycle.md` (the
+> activity catalogue and wire contract).
 
 ## 1. Principle (decided)
 
@@ -89,7 +89,7 @@ For every activity-first step (from the design now documented in the OpenWiki
 - [ ] **handler** — one dispatch branch per class (schema-decode +
   `client.workflow.start`); forward-before-dispatch unchanged.
 - [ ] **UI** — activity label + done-row refresh.
-- [ ] **docs** — `openwiki/services/activity-lifecycle.md`/`features.md` rows, c4 view.
+- [ ] **docs** — OpenWiki `services/activity-lifecycle.md` rows, c4 view.
 - [ ] **tests** — packages vitest (agent-run) + `/test` wait-for (user-run).
 
 ## 6. Open items (current-plan scope)
@@ -101,8 +101,9 @@ For every activity-first step (from the design now documented in the OpenWiki
    `granted:false` becomes a pure `AuthorizationDenied` (the delete was
    accidental); no revoke producer in the granting plan; a temporary
    regression window is accepted until
-   [`authorization-revocation.md`](authorization-revocation.md) (the revoke
-   action's designated home) lands.
+   [`revoke-delegation-chain.md`](revoke-delegation-chain.md) C2 (the revoke
+   action's designated home, with the detailed design in
+   [`authorization-revocation.md`](authorization-revocation.md)) lands.
 
 ## 7. Follow-ups — principle conformance (decide per case, as we reach them)
 
