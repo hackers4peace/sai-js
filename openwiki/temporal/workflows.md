@@ -1,7 +1,7 @@
 ---
 type: architecture
 title: Temporal workflows and activities
-description: The Temporal client and worker bootstrap, the four task queues (create-grants, reciprocal-registration, forward-to-push, webhook-delivery), the typed *Id boundary objects, the self-contained createGrantsForAgent regeneration, findRoleUsage routing, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
+description: The Temporal client and worker bootstrap, the four task queues (create-grants, reciprocal-registration, forward-to-push, webhook-delivery), the typed *Id boundary objects, the reconcileGrantsForGrantee projection + garbage-collection model, the authorization-revocation workflow, the per-peer delegated-grants consumer, the single-activity share with per-grantee fan-out, and how activities call back into the service layer.
 tags: [temporal, workflows, activities, worker, architecture]
 sources:
   - id: openwiki-source-06025454564b63e0817ca135
@@ -34,14 +34,16 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
   - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
     resource: repo://packages/components/src/workers/main.ts
+  - id: openwiki-source-ab1ddd2d1ab0804acc7807d2
+    resource: repo://packages/components/test/authorization-revocation-workflow.test.ts
   - id: openwiki-source-9b409abe21ade962fb73ed30
     resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Temporal workflows and activities
@@ -94,12 +96,14 @@ exception: the emitter and worker share the exported
 
 ## Workflow catalog
 
-- `grants.ts` — `storeGrant`, `revokeGrants`, `processGranteeActivities` and
-  `processDelegatedGrantsUpdated` (the two start-or-signal consumers),
-  `createGrantsForAuthorization`, `processAuthorizationGranted`,
-  `processGranteeAuthorization`, `updateDelegatedGrants`, `createRole`,
-  `processRoleMembershipChange`, `processRoleDeletion`, `reconcileActivities`,
-  and `createGrantsForAgent`.
+- `grants.ts` — `storeGrant`, `revokeGrants` (owner-side delete + registration
+  projection patch), `processDelegatedGrantsUpdated` (the per-peer
+  start-or-signal consumer), `createGrantsForAuthorization`,
+  `processAuthorizationGranted`, `processGranteeAuthorization`,
+  `updateDelegatedGrants`, `createRole`, `processRoleMembershipChange`,
+  `processRoleDeletion`, `reconcileActivities`, `reconcilePeerMirrors`,
+  `reconcileGrantsForGrantee` (with the `createGrantsForAgent` delegate), and
+  `processAuthorizationRevoked`.
 - `admin.ts` — `createAdminGrants`, `revokeAdminGrants`, `syncAdminAcr`, and
   the `processAdminAuthorizationGranted/Revoked` orchestrators.
 - `invitation.ts` — `createInvitation`.
@@ -139,24 +143,28 @@ The terminal resolution classes `AccessRequestGranted`, `AccessRequestArchived`,
 and `AuthorizationDenied` never start a workflow and never get a completion;
 `reconcileActivities` closes their outbox rows instead.
 
-## The two consumers
+## The delegated-grants consumer
 
-Two long-lived workflows coalesce bursts per target instead of running one
-workflow per activity. Both are started with a deterministic id and
-start-or-signal (a failed start means a run is live, so the handler signals it;
-a closed run is restarted), drain their pending set in a loop, and write the
-completions themselves. After an empty drain each waits ~3s for a signal, then
-exits — the residual exit-window gap is the reconcile sweep's concern.
+One long-lived workflow coalesces bursts per peer instead of running one
+workflow per activity. It is started with a deterministic id and start-or-signal
+(a failed start means a run is live, so the handler signals it; a closed run is
+restarted), drains its pending set in a loop, and writes the completions itself.
+After an empty drain it waits ~3s for a signal, then exits — the residual
+exit-window gap is the reconcile sweep's concern.
 
 | Consumer | Workflow id | Drained set | Steps |
 | --- | --- | --- | --- |
-| `processGranteeActivities` | `grantee:<webId>:<authorizationGrantee>` | pending `AuthorizationGranted` / `AuthorizationRevoked` for that grantee | resolve grantees → `createGrantsForAgent` per grantee → complete |
 | `processDelegatedGrantsUpdated` | `delegated-grants:<webId>:<peerId>` | pending `DelegatedGrantsUpdated` whose `target` is that peer | `syncReciprocalMirror` child (replication) → `updateDelegatedGrants` **without** `activityId` → complete; a terminal peer-gone sync skips the regeneration and still completes |
 
 The delegated-grants consumer deliberately passes no `activityId` to
 `updateDelegatedGrants`: with one, that workflow would write the completion by
-itself, before the consumer owns the barrier. `reconcileActivities` reuses both
-consumers (start-or-join) rather than calling the underlying workflows.
+itself, before the consumer owns the barrier. `reconcileActivities` reuses the
+same consumer (start-or-join) rather than calling the underlying workflow.
+
+Revocation does **not** use a consumer: `processAuthorizationRevoked` runs once
+per `AuthorizationRevoked` activity (random workflow id), so two revocations for
+the same grantee can reconcile concurrently — the reconciliation itself is
+idempotent, and the activity's own completion is the barrier.
 
 ## Boundary objects and routing
 
@@ -165,20 +173,24 @@ consumers (start-or-join) rather than calling the underlying workflows.
   passed across workflow/activity payloads (e.g.
   `CreateGrantsInput.authorizationGrantee: AgentOrRoleId`,
   `CreateGrantsForAgentInput.grantee: AgentId`).
-- **Self-contained regeneration** — `createGrantsForAgent` fetches all the
-  grantee's authorizations (including via roles) and the **IRIs** of its
-  existing grants (`getExistingGrants` stays IRI-only; `checkEquivalence` loads
-  the bodies lazily from the local plane), handles the empty/deny case, and
+- **Projection + GC regeneration** — `createGrantsForAgent` is a delegate to
+  `reconcileGrantsForGrantee`, which fetches all the grantee's authorizations
+  (including via roles) and its current grant IRIs (the registration projection
+  unioned with an own-registry orphan scan), handles the empty/deny case, and
   generates fresh grant data. `checkEquivalence` then returns a **value-based**
   result — `reusedSourceIds`, `reusedDelegatedIndexes`, `reusedExisting` —
   because activity results cross Temporal's data converter: ids and array
-  positions survive, object identity does not. The workflow stores only the
-  non-reused source grants, requests only the non-reused delegated grants
-  **batched per data owner** (one `requestDelegations` POST per peer, because
-  the issuance endpoint requires a single `dataOwner` and validates the batch),
-  and rewrites the registration as `[...newGrantIds, ...reusedExisting]` —
-  parents **and** children, since the PATCH replaces the full link set. See
-  [Grant equivalence and reuse](../architecture/grant-reuse.md).
+  positions survive, object identity does not. The workflow deletes the
+  non-reused grants **before** creating anything (own registry through the C1
+  closure, peer-owned through the `AccessRevocation` boundary plus the replica
+  drop), stores only the non-reused source grants, requests only the non-reused
+  delegated grants **batched per data owner** (one `requestDelegations` POST per
+  peer, because the issuance endpoint requires a single `dataOwner` and
+  validates the batch), and rewrites the registration as
+  `[...newGrantIds, ...reusedExisting]` — parents **and** children, since the
+  PATCH replaces the full link set. See
+  [Grant equivalence and reuse](../architecture/grant-reuse.md) and
+  [Authorization revocation and grant projections](../architecture/authorization-revocation.md).
 - **Issuance echo and the issuer-side replica** — the issuance endpoint echoes
   the finalised grants (parents and children). `requestDelegations` writes each
   echoed body into the context's own SPARQL endpoint (`storeGrantReplica`, one
@@ -198,6 +210,28 @@ consumers (start-or-join) rather than calling the underlying workflows.
 - **Sandbox rule** — workflow modules run in the Temporal sandbox and avoid
   runtime imports; `grants.ts` defines local IRI constants and a sandbox-safe
   `isActivityClass` instead of importing them.
+
+## Revocation and the sweep
+
+`processAuthorizationRevoked(webId, authorizations, grantee, activity)` is the
+source-of-truth mutation: it deletes the carried DataAuthorizations (404
+tolerant), resolves the grantee kind and expands a role to its members, runs
+`reconcileGrantsForGrantee` for each affected grantee, and completes last. The
+chain closure for downstream delegated grants happens at each data owner inside
+that reconciliation (own registry) or at the peer boundary. The webhook handler
+starts it once per activity; the sweep re-drives stranded activities through the
+same workflow.
+
+`reconcileActivities(webId)` is the backstop for missed deliveries. It drains
+every pending activity by class (re-running `processAuthorizationRevoked` for
+`AuthorizationRevoked`, starting the per-peer consumer for
+`DelegatedGrantsUpdated`, and so on), repairs locally incomplete reciprocal
+mirrors, then re-derives every registered grantee's projection with
+`reconcileGrantsForGrantee`. There is no separate desired-vs-existing
+comparison: unchanged trees are reused and `replaceDataGrants` is a no-op when
+the link set is unchanged, so a no-op sweep writes nothing. `reconcilePeerMirrors`
+is the slower peer-freshness pass over reciprocal-linked pairs; both paths go
+through the per-peer consumer so they serialize with webhook-driven syncs.
 
 ## Granting fan-out
 

@@ -6,10 +6,12 @@ tags: [likec4, sequences, flows, temporal, discovery]
 sources:
   - id: openwiki-source-f94e6df9b22c5d9088de9576
     resource: repo://docs/temporal.c4
+  - id: openwiki-source-c18acf0c50387f2e5ea026d1
+    resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-06025454564b63e0817ca135
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
-  - id: openwiki-source-b51f04210bf90c2ec8824400
-    resource: repo://packages/components/src/ReciprocalWebhookHandler.ts
+  - id: openwiki-source-9f9c5f051cdee5032dfd735b
+    resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-9e7488ce272b5af0500c0557
     resource: repo://packages/components/src/services/GrantReplica.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
@@ -18,10 +20,10 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-fabda8691f79a477b70b0c57
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Sequence and discovery flows
@@ -135,6 +137,21 @@ side each run `syncReciprocalMirror` as their last step before
 - `request-access` — a requester sends a need-based access request.
 - `approve-access-request` / `deny-access-request` — the owner approves or
   (silently) declines a need-based access request.
+- `authorization-revocation` — the UI selects authorizations and calls
+  `RevokeAuthorizations`; the service validates the selection, expands the
+  `inheritsFromAuthorization` closure at write time, and writes one
+  `AuthorizationRevoked` activity (refs + grantee). The webhook starts
+  `processAuthorizationRevoked`, which deletes the DataAuthorizations, expands
+  a role grantee to its members, and runs `reconcileGrantsForGrantee` per
+  affected grantee — the projection GC removes the now-undesired grants
+  (own-registry C1 closure, or the `AccessRevocation` boundary for peer-owned
+  grants plus the replica drop) — then completes. Re-revoking an already
+  removed selection is a no-op success. See
+  [Authorization revocation and grant projections](../architecture/authorization-revocation.md).
+- `authorization-revocation-sweep` — the scheduled `reconcileActivities`
+  drain re-runs a pending `AuthorizationRevoked` activity through the same
+  workflow, repairs locally incomplete reciprocal mirrors, and re-derives every
+  registered grantee's projection; a no-op sweep writes nothing.
 
 The activity→workflow mapping is documented in
 [Activity outbox and events pipeline](../services/activity-lifecycle.md); the

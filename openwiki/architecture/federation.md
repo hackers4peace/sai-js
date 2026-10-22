@@ -3,12 +3,7 @@ type: architecture
 title: Federation constraints
 description: The single-deployment shortcuts the SAI implementation still relies on — shared storage, global-fetch discovery, local pod ownership, the org AA's registry-set link, and one notification path — the per-pod replacements that have landed (including the reciprocal mirror and the issuer-side grant replica), and what must keep working when the auth, registry, and data servers split.
 tags: [architecture, federation, storage, discovery, org-context, webhooks, mirror, grants]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
 sources:
-  - id: openwiki-source-ab7b36e81b6383f76d2ccee3
-    resource: repo://docs/plans/revoke-delegation-chain.md
   - id: openwiki-source-0531e8ebff475ca0a556fc29
     resource: repo://packages/authorization-agent/src/grant-generation.ts
   - id: openwiki-source-81f61b66ae2ead4432d4358a
@@ -35,7 +30,10 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-22T04:54:18.757Z
 ---
 
 # Federation constraints
@@ -53,7 +51,7 @@ must keep working when real federation lands.
 | # | Shortcut | Today | What breaks when servers/stores split |
 | --- | --- | --- | --- |
 | 1 | One shared SPARQL store | Dev/test uses one Fuseki dataset per pod (registry/data) plus a dedicated `id` dataset, resolved through `PodEndpointStore` with **no default fallback**; production Nix still runs one Oxigraph (see [Deployment landscape](deployment-landscape.md) and [Per-pod storage and isolation](storage-isolation.md)). | The old cross-graph grant query (`GRAPH ?g {?s interop:hasStorage <storage>}` over every graph) no longer sees other owners' grants. The per-pod replacement is two lookups: the resource's data-pod dataset for the resource graph (`SaiPermissionsEngine`), and the storage owner's registry-pod dataset for grants (`SaiAuthorizationManager` via `podStore.getOwners` → `registryId(owner)`). |
-| 1a | Reciprocal mirrors | `updateReciprocalMirror` writes the peer's reciprocal registration and the grants it links into the context's own registry-pod dataset. The mirror is **seeded on both invitation legs** — `establishReciprocal` (inviter) and `acceptInvitation` (acceptor) — before their activity completes, and afterwards refreshed **only** by the per-peer delegated-grants consumer (`processDelegatedGrantsUpdated`, workflow id `delegated-grants:<webId>:<peerId>`): each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration`, then regenerates the delegated grants from the fresh mirror, then completes the activity. The mirror is the input to `generateDelegatedDataGrants`, not a UI cache. | The mirror is the **only** source for grants the peer issued to us once stores are split; freshness is eventually consistent and depends on webhook delivery. A delivery that never arrives, or a pair whose mirror was never written, is repaired only by the drift scan/backfill in [`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md) A1 — the reconcile sweep has no schedule yet. A `404`/`410` on the peer's registration is terminal (the replica is dropped and the activity completes without regenerating); every other failure keeps retrying, and after the 5-attempt cap a permanently unreadable peer leaves the activity `pending` (documented in [`update-deployment.md`](../../docs/plans/update-deployment.md)). Unregister propagation (`deleteReciprocalMirror`) is implemented but still has no caller. |
+| 1a | Reciprocal mirrors | `updateReciprocalMirror` writes the peer's reciprocal registration and the grants it links into the context's own registry-pod dataset. The mirror is **seeded on both invitation legs** — `establishReciprocal` (inviter) and `acceptInvitation` (acceptor) — before their activity completes, and afterwards refreshed **only** by the per-peer delegated-grants consumer (`processDelegatedGrantsUpdated`, workflow id `delegated-grants:<webId>:<peerId>`): each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration`, then regenerates the delegated grants from the fresh mirror, then completes the activity. The mirror is the input to `generateDelegatedDataGrants`, not a UI cache. | The mirror is the **only** source for grants the peer issued to us once stores are split; freshness is eventually consistent and depends on webhook delivery. A delivery that never arrives, or a pair whose mirror was never written, is repaired by the reconciliation sweep's local completeness arm (see [Authorization revocation and grant projections](authorization-revocation.md)) and by the cutover backfill in [`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md) A1; the production cadence is a deployment concern (`update-deployment.md`). A `404`/`410` on the peer's registration is terminal (the replica is dropped and the activity completes without regenerating); every other failure keeps retrying, and after the 5-attempt cap a permanently unreadable peer leaves the activity `pending` (documented in [`update-deployment.md`](../../docs/plans/update-deployment.md)). Unregister propagation (`deleteReciprocalMirror`) is implemented but still has no caller. |
 | 1b | Issuer-side grant replica | Delegated grants live in the **data owner's** registry; the grantor keeps only the IRIs. The issuance endpoint echoes the finalised grants, and `requestDelegations` writes each body into the context's own registry-pod dataset (`storeGrantReplica`, `GRAPH <grantIri>`), so grant reuse can compare delegated trees without a peer read. | Reuse no longer depends on peer availability or on the grantor-read ACR policy. A missing body fails closed — the subtree is regenerated once and the echo repopulates it. Grants issued before the echo existed have no body until that first regeneration; replica graphs of unlinked grants are not dropped yet (see below). |
 | 2 | UAS/storage discovery uses the global `fetch` | `SaiPermissionsEngine` and `AdminPermissionReader` call `discoverAuthorizationAgent(agent, fetch)` with the global fetch; storage-description discovery does the same. | Peers' WebID profiles and storage descriptions must be reachable and DNS-resolvable. Revisit when servers are actually split across hosts. |
 | 3 | Pod/storage ownership is local | `AdminPermissionReader.requestFromAdmin` decides "owner of this storage" via the local `podStore.getOwners(storage.id)`. | A data server must mirror remote org ownership or resolve it on the wire (e.g. via the org's agent-id document / registry set). |
@@ -129,11 +127,13 @@ time.
   follows `hasInheritingGrant` recursively. A missing or unframable body is
   skipped, so the tree it belongs to fails the completeness check and is
   regenerated instead of reused.
-- **Lifetime.** `storeGrantReplica` only inserts; it does not drop graphs for
-  grants that leave a registration. Stale replica graphs are invisible to
-  reuse (only current registration links are read) and are cleaned up together
-  with the orphaned grant resources; grants issued before the echo existed are
-  regenerated once, which then populates the replica.
+- **Lifetime.** `storeGrantReplica` only inserts; dropping is a separate
+  operation. `dropGrantReplicas` removes the replica graph and its `meta:` twin
+  when the reconciliation removes the delegated tree (revocation or
+  replacement), and it never names own grant-registry graphs. Stale graphs that
+  survive a crash are invisible to reuse (only current registration links are
+  read) and are removed by the next reconciliation; grants issued before the
+  echo existed are regenerated once, which then populates the replica.
 
 See [Grant equivalence and reuse](grant-reuse.md) for the comparison itself and
 the workflow result contract.
@@ -176,24 +176,30 @@ the workflow result contract.
   dropped from the data model, generation, issuance, and seed; delegated-chain
   validity is match-based.
 - Durable webhook delivery: `DurableWebhookEmitter` on registry/data, the `deliverWebhook` workflow and `postWebhook` activity on the `webhook-delivery` queue, at-least-once retries, and the direct-POST fallback when enqueueing fails.
+- Revocation-driven cleanup: the projection GC deletes non-reused grants through
+  the owner's C1 closure, requests peer-owned removals at the
+  `AccessRevocation` boundary, drops the removed delegated trees' issuer-side
+  replicas, and PATCHes the registration last — see
+  [Authorization revocation and grant projections](authorization-revocation.md).
 - The owner-registry-pod grant lookup and the data-pod resource lookup in the
   permission engine.
 - The admin-only `hasRegistrySet` link and the forward-only admin channel.
 
 Open work remains tracked in
 [`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md)
-(mirror backfill/drift scan, unregister deletion — including the dangling
-reciprocal link a terminal `404`/`410` leaves behind — external admin-endpoint
-discovery, cross-pod tests),
-[`revoke-delegation-chain-follow-ups.md`](../../docs/plans/revoke-delegation-chain-follow-ups.md)
-(item 10: dropping the issuer-side replica graphs together with the orphaned
-grant resources), and
-[`webhook-subscription-bootstrap.md`](../../docs/plans/webhook-subscription-bootstrap.md)
-(real-deployment channel provisioning). The production cutover is in
+(mirror backfill, unregister deletion — including the dangling reciprocal link a
+terminal `404`/`410` leaves behind — external admin-endpoint discovery,
+cross-pod tests), [`grants-replication-polish.md`](../../docs/plans/grants-replication-polish.md)
+(peer-side orphan scan, stranded revocation end-state, role-grantee verification,
+remaining tests), and [`webhook-subscription-bootstrap.md`](../../docs/plans/webhook-subscription-bootstrap.md)
+(real-deployment channel provisioning). Issuer-side replica cleanup with the
+orphaned grants has landed in the revocation GC. The production cutover is in
 [`update-deployment.md`](../../docs/plans/update-deployment.md).
 
 ## Related pages
 
+- [Authorization revocation and grant projections](authorization-revocation.md)
+  — the projection GC, chain closure, boundary, and sweep backstop.
 - [Grant equivalence and reuse](grant-reuse.md) — the tree comparison and the
   value-based regeneration result.
 - [Per-pod storage and isolation](storage-isolation.md) — the store split and

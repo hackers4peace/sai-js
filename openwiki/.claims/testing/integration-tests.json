@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:480e338248cf0c389ff206ea5df7b7539c4ea90954512be26d3b0ef4fb489f75",
+  "pageVersion": "sha256:7f48f0fa19b416eb2f73a6dcb06198a7c05c4659f2ff5c50a0d04d1a9264fb1a",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
@@ -180,21 +180,21 @@
     },
     {
       "id": "claim_d224d55d644143959a789c767f2649c0",
-      "statement": "delegated-grants.test.ts mocks @temporalio/workflow and asserts the consumer's ordered contract (replicate, regenerate, complete), burst coalescing, mid-flight re-drain with a fresh mirror, the idle no-op, the peer-gone case completing without regeneration, and the reconcile arm starting the same consumer without completing the activity itself.",
+      "statement": "delegated-grants.test.ts mocks @temporalio/workflow and asserts the consumer's ordered contract (replicate, regenerate, complete), burst coalescing, mid-flight re-drain with a fresh mirror, the idle no-op, the peer-gone case completing without regeneration, the sweep's drift arm re-deriving every registered grantee, the mirror-completeness repair running before the drift pass, and the forced start-or-signal used by reconcilePeerMirrors.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/delegated-grants.test.ts#L20-L234",
-          "version": "repo-lines-v1:sha256:24dd9a65c1ccc834dd7cb1931100a2e27a5e3c0f2e8346858bd060a68c184b02:eyJzZWxlY3RlZExpbmVDb3VudCI6MjE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTUwZjZlZjkxOTM1OTgyMzg2M2U4NzVkN2Q0YmM4Zjc1MWQxZDFkNmZlOWExZDRjOTA0YzFkMmYwNjM4YmQ1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5YzFlNGNiMTZmYjAxYTBlNWFjMGNjZDhhYjU1YWUzOWI5M2JmY2IzOTBhYWQ5ZjY4ZTEzZmUxNDZkZTE3MjI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/delegated-grants.test.ts#L174-L369",
+          "version": "repo-lines-v1:sha256:9d5f0904cf7178f2ba459d2ee0b42d44452db8273d49c00869a213ec9c20539a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4Y2I1Njc4NTY0MDM3MGU4NmU2MzBlY2QyYTliZjM2ZGM3NmY4NTA5OGM2NzQzYWRmYWM2NjdjZjQ2OTIyOTZmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MTFiMzc0YWM0NTA4MTQwOGI5YjgzMzFiYjliYjE3MzhiYzNjYzEwM2YxYWYyMTFkNjY1MmI3OGRhMTczNDUxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
     {
       "id": "claim_790c689978c044d78f47c58bbd619e06",
-      "statement": "reciprocal-mirror.test.ts drives the mirror writer against a scripted mirror: the oracle reads the resource graph and its meta: twin, an absent-but-linked grant is re-fetched while present ones are skipped, and drops cover the meta: twins.",
+      "statement": "reciprocal-mirror.test.ts drives the mirror writer against a scripted mirror: the oracle reads the resource graph and its meta: twin, an absent-but-linked grant is re-fetched while present ones are skipped, drops cover the meta: twins, and the no-op guard writes nothing when the link set and bodies are unchanged.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/reciprocal-mirror.test.ts#L1-L175",
-          "version": "repo-lines-v1:sha256:a826be321b6b2f212f292b64725f57097a7aded36ca493d9be9ddface140a2b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTc1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NzExMGMyY2YyYjBlNmZhNjAzNTg4NGEyMWFhY2Y2YWMyOTRhYmU4OTkzNzlkMTNiYTkzYWNiNTU3ZTI2ZDNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/reciprocal-mirror.test.ts#L122-L205",
+          "version": "repo-lines-v1:sha256:649d5691a89ad724171063ebb0d1d251b47828e08039591cc457e14725f4220e:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlZGE1MDA4MzNiMjg5MTEyOWJlYWI4MDIyMWY1YjBhZWMzNmE1NWM4NjFhNDYwNjFjMzljMzkyZTdhZTk0ZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlOTFiMTA1MmE2YTIzMGVkMWJkYzk1ZmVhNjY3MDBjMThhYjlkNTk0OGEwOWZjOGUyZThjMThlY2I0NzM4NTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZjkzZWMwYWRjOWE4N2E5NWVlMGVhODgwODIyZmU5MzM0NTdkNjU1ZGIyZTY2OWUyZGE4NzczYmU0M2EzZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
         }
       ]
     },
@@ -268,17 +268,17 @@
     },
     {
       "id": "claim_158569c4c6d2415fa55482e1db75fe21",
-      "statement": "The black-box check-equivalence suite runs createGrantsForAgent twice — once for a source pair (seeded acme → alice, which keeps g4yhtm and re-links its child wpqyds) and once for a delegated pair (alice → test client, where the first run issues and the second reuses) — asserting identical registration IRIs.",
+      "statement": "The black-box check-equivalence suite runs regeneration twice — once for a source pair (seeded acme → alice, which keeps g4yhtm and re-links its child wpqyds) and once for a delegated pair (alice → test client, where the first run issues and the second reuses) — asserting identical registration IRIs.",
       "evidence": [
         {
-          "resource": "repo://test/check-equivalence.test.ts#L72-L96",
-          "version": "repo-lines-v1:sha256:3cdc51010d3116c9ebd886cc23c0547a28764f842b1538a805da157326a6520a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZjQ0MGY0YTFkNmUyMzk4MmNjZjE1MzYzMGVjM2YxMWEzZjYzMDM2MDQ5M2QzYzM3NGYwMGMyNGEyMDhjZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhNDMxZTliOGQ4YjI2MmJlZGU5MmQzODc0MDhkNjFjMmRiN2Y0NzM3MzYzOTYxYzI0ZDhmZTM4NTE4YjgxOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://test/check-equivalence.test.ts#L96-L121",
+          "version": "repo-lines-v1:sha256:b6d584b58bd9d923a4d9f53c555b469dbaaa4309c14d38b55e5ae8bffbb1d378:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZjNkNjJmZTljNzQ4NmM1MDZmNzRhYWIwNjI3ZmM5MDhkN2ZhNDQzNGMxYmQwZWFkMDEyMmIwNjU3ODcyNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2YTY3Y2NmOGYwYjZhODZlMDdmMGUyMjVkMzY3NjlmYjNiOWM2OGFmMjEyMTAwYzgzODdkOGI5M2EwODYwMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_67b36959111e427c888a7d261c186a7e",
-      "statement": "Package-level tests pin the reuse contract: pure field/tree/pairing comparison, the activity's local-only body loading with fail-closed missing children and delegated index addressing, and the workflow's value-based skip plus full-set re-link of reused parents and children.",
+      "statement": "Package-level tests pin the reuse and GC contract: pure field/tree/pairing comparison, the activity's local-only body loading with fail-closed missing children and delegated index addressing, the workflow's value-based skip plus full-set re-link of reused parents and children, the projection GC cases (replace, deny, orphan scan, peer-owned boundary removal, missing bodies), and revokeGrants' closure-before-projection ordering.",
       "evidence": [
         {
           "resource": "repo://packages/components/test/check-equivalence-activity.test.ts#L153-L341",
@@ -289,14 +289,54 @@
           "version": "repo-lines-v1:sha256:7797f22f0dad211e867be20af4d98e41068b8f6b8d5377d70a2d3a606b5bc4a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NGJlN2FhMGY3N2U1MzdmMDBiZjU3YmNjMGU4ZmUzMjY2MzAxNGE1MGJlYWI5OWMzOWY4NWI0NGM3MzVkMTFmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJiMjM1MjU4OWMzNGQzYzYwNjg1OTMxYjZlY2M0ZDUwOTkxYTdjNTZjOGZiYTI4OTQxMTQ2NTc2OTAyNzJjYWMzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzYjEwNWU0NmY0Nzk1Njc4MmVmMjM3YmViOWI4NWQ5ZjUzNGU4NzRmOWZjNWE3ZTAxZjc5ODNmZGU4ZjkxNzVhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzYzI0NDM4MThhZTA0NWM3OTE4NTFmNjQwYWQ0NmIzZmM5ZTAxMWQ5MDA4NjY3NzJlYjQ0ZmYzYTFhZmZmMTUwIn0"
         },
         {
-          "resource": "repo://packages/components/test/grants-workflow.test.ts#L100-L229",
-          "version": "repo-lines-v1:sha256:ab6a0de9fc033f1ae5be6479922459ab698c6d2da0bda33f40b6edf9ed01f5aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiMjM1MjU4OWMzNGQzYzYwNjg1OTMxYjZlY2M0ZDUwOTkxYTdjNTZjOGZiYTI4OTQxMTQ2NTc2OTAyNzJjYWMzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyOThiNjJmMzE4NGFkN2FhOWQ4MTI0MTM1ZDQwZTg2N2M5ZDgzNGY4MTJiMzA0ZDNiZjI3YjNkMjhlMDNjMmE2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/grants-workflow.test.ts#L121-L377",
+          "version": "repo-lines-v1:sha256:4f6b0f52ae60dc218edd5f3de20326dda55b9bc92938840ba39c3d292fe4677c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjU3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0MTYwZTllZmY4NWEyNzIzMDkwOGJhZGQwYzU1ZjFjMWRhNzUwYzhkOTk2YTY1Y2UzNmZjYWY0MDY1M2U2ZjhkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkOTUxYjcxYjA1ZTE5N2RlYmMwNDcwNjAwM2E3YjlkZDY4YTEzMjRmNWNhN2VhNzAyN2Q3NTBlNDk4MjU5OTQ2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_ad1f1f85b0934c45bdeeffc62ab6d3e9",
+      "statement": "The authorization-revocation workflow test asserts the order delete authorizations → resolve grantee kind → reconcile each expanded grantee → complete, including role-member fan-out.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/authorization-revocation-workflow.test.ts#L79-L127",
+          "version": "repo-lines-v1:sha256:0705f8203365e80a041999c7dfc20318db07f522460d7a19d9fd43cf9fdaeb10:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZjYwNDg0YjVlYTYwNzNmMTA4YzI4NWM2OTMzMzQxMzZhMWI3OTE5ZmY4YTU5ODgwNDc1ZWIwZDdmZjRlMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ZDNjZjFjMDJiYjVhNmU1OGQzYTA4OGVmMTMxNzI0YzRiMDY0ODU0MDY3N2U5YjI4Njc1YzBjOWE1NmVjZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0fb01418dc71427f8b6156582fbc9c1c",
+      "statement": "revocation-errors.test.ts covers the AuthorizationRevocationFailure RPC schema and the HTTP status and JSON body for each typed revocation error code.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/revocation-errors.test.ts#L1-L59",
+          "version": "repo-lines-v1:sha256:0a2f6e51854feb669b9b2c97c9d71b57ac971862e0e90dcb15b8442a9e9aebf9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3MTBiODk0N2M0N2VjNjA3OGJkOWM5NTBhNzczMGY3MDQ5NGZiNGEyOTg3NDQ5NTBlMmQzMzA3OWQxODA3YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eb411add4e4241d6bffd0c41f8225143",
+      "statement": "The black-box revocation suite revokes the seeded parent and child, waits for the AuthorizationRevoked completion, then asserts the DataAuthorizations, derived grants, and registration projection are gone; a second revoke returns an empty authorization list with no activityId.",
+      "evidence": [
+        {
+          "resource": "repo://test/authorization-revocation.test.ts#L42-L74",
+          "version": "repo-lines-v1:sha256:ba9101538fa06df49b1c22574b8a6bb50f3691d4ab972e5aad4f516ed601fd8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhMjk1ODgyNDZlOWFiOWRiZjIxODRlYmQ1MWM4YWQ4YzczZjNkMzA4NjZjZGJjNzRiOTMxMzNkM2UwZjEzNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxZmRhNzQ2ODRkYjU4MDhkMTZkODQ4MDFmOGI5MDYyNzYzZmQ0NDBhNWM4NmRhNDYzMjA1ZWY0MWJhZmJiYmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzYjYyNzlhOTU2NjcwMzBiYjEwZjNjOGYyNzQ0NzVkM2YyMTUwMzk3MzA5ZWIxYjBiZDgwMjczYzQwMDdhYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6cad03e64eed43219151514bbfcfdf02",
+      "statement": "The black-box authorization listing suite returns the seeded parent and inherited child with resolved shape-tree labels, and an empty list for a grantee without authorizations.",
+      "evidence": [
+        {
+          "resource": "repo://test/authorizations.test.ts#L42-L64",
+          "version": "repo-lines-v1:sha256:f0d235e2b50a4fd660e584438c765b13aecb6a5920016aed39d9fdcc29e6c879:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NWZjZDRlMGU1OWY4YzJmOWVmY2VjNDQ1ZjFhODhiYzZjMjU3N2IxMGNhNDM0ZDc4MTAzOTljNDcyOTk5M2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MGM1ZDNkYzNhNzczMDc5M2M4OTI3OTQ4YjU1OTY2NDIwN2Y3OWJhODc3NzNjMjE1MDA0NDMxOTYyZmQ0ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T17:33:35.590Z"
+    "at": "2026-10-22T04:35:20.186Z"
   }
 }

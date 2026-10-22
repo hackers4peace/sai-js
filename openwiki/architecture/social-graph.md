@@ -3,12 +3,9 @@ type: architecture
 title: Social graph
 description: How systems of different peers connect — the reciprocal webhook and mirror, request/response endpoints (invitation, delegation issuance, agent-id), authenticated pod accesses, the delegation chain with match-based validity and grant reuse, and the org↔admin edges.
 tags: [architecture, social-graph, federation, invitations, delegation, webhooks, grants]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
 sources:
-  - id: openwiki-source-81f61b66ae2ead4432d4358a
-    resource: repo://packages/authorization-agent/src/sparql.ts
+  - id: openwiki-source-91b9eb868de58a18862849c3
+    resource: repo://packages/authorization-agent/src/grant-chain.ts
   - id: openwiki-source-7b94b7d1bbbc76b34b554505
     resource: repo://packages/components/src/AgentIdHandler.ts
   - id: openwiki-source-99a0f343f48d54d1c1e98086
@@ -21,17 +18,20 @@ sources:
     resource: repo://packages/components/src/ReciprocalWebhookStore.ts
   - id: openwiki-source-9e7488ce272b5af0500c0557
     resource: repo://packages/components/src/services/GrantReplica.ts
-  - id: openwiki-source-a3ebe61b7dbf9a95d1051312
-    resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-b407f45a278715ed33b367aa
     resource: repo://packages/components/src/temporal/activities/reciprocal.ts
+  - id: openwiki-source-03c71d0f7eed5c1f113d08e3
+    resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-fabda8691f79a477b70b0c57
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-6b6976370d0cdcf6bd57cad3
     resource: repo://packages/data-model/src/grant.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Social graph
@@ -128,7 +128,8 @@ match-based predicate over the data owner's registry: a root grant is valid when
 `grantedBy == dataOwner`, and a delegated grant is valid when an upstream grant
 exists with `grantee == g.grantedBy`, the same `dataOwner`, shape tree and
 registration, and scope/access-mode coverage. Issuance and revocation validation
-use the same predicate.
+use the same predicate (see
+[Authorization revocation and grant projections](authorization-revocation.md)).
 
 Regeneration reuses an equivalent delegated subtree from the **issuer-side
 replica** (the grant bodies the issuance endpoint echoed and the grantor stored

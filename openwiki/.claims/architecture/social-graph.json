@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a0fcb025ce7e4e547afd1263be87d88f78fb7ccaaf40a0746e08c5373807ac13",
+  "pageVersion": "sha256:3ca63e5c3a70c5bf79fa24bfcd9da0fa106251f98c9073e1e48dc6293974e255",
   "claims": [
     {
       "id": "claim_b084119345de4585950b672b287c836c",
@@ -41,7 +41,7 @@
       "statement": "GrantIssuanceHandler executes the storeGrant workflow directly (awaiting completion), bypassing the activity outbox on the data-owner side of delegated-grant issuance.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L191-L191",
+          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L190-L190",
           "version": "repo-lines-v1:sha256:f9d04b8bec0fe6288bf8290e2ed07c5a4c1c043f70da3b179cdcc48b0c2f81c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjlkMDRiOGJlYzBmZTYyODhiZjgyOTBlMmVkMDdjNWE0YzFjMDQzZjcwZGEzYjE3OWNkY2M0OGIwYzJmODFjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjlkMDRiOGJlYzBmZTYyODhiZjgyOTBlMmVkMDdjNWE0YzFjMDQzZjcwZGEzYjE3OWNkY2M0OGIwYzJmODFjOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE0MGE3ZWViNjlmNjZiYTYyNzQ5Y2FhMmRjYzc0ODU3MmM4NTFhNDdmMjU4MmQ5ZmUxZDA2NWU0NGRkNzVmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNlM2M2MzhkODQyOTBhM2FiNThjN2IxNDdhZjQwOTQxZmI3YjQ3ZGJkNWQwY2JmNWUyOTRlZTQyYmY1Y2RlOCJ9"
         }
       ]
@@ -103,16 +103,16 @@
       "statement": "Delegated grants no longer store delegationOfGrant: chain validity is a match-based predicate (root grant with grantedBy == dataOwner, or an upstream grant matching grantee/dataOwner/shape tree/registration/scope and mode coverage), and regeneration reuses an equivalent delegated subtree from the issuer-side replica instead of re-requesting it.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L650-L707",
-          "version": "repo-lines-v1:sha256:89b4797802a20ed18ced24622d9532ad7cfa660fcf36b432fdec166bc2a6c929:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3OWFlNjllZjg1NjZhMmI1MGNhMDFkODRiODRmM2FlMzBiOGE1ODYzZDIyYzkzY2IyNmQxNGEwMTAwZjM2YzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyOTRiMmNmNWI4OTRkNGQ2ZmQwNjQxNWRiOGM2OTc1ZTM4NTQwZWUwNzI0ODc3ZjhkMzk1YmU1YzZhZGVkOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwMzU5MjRmZmMxMjZjN2FiYTg2YTVhODE3N2ZiYzg4MzM1OGQwZDU4MDdhNTMzMTRkNWFmOWE2MWRmOGRkNTAifQ"
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L163-L255",
+          "version": "repo-lines-v1:sha256:fa7331d4935efd37b912056e240efaa6e4af59d1fd07f78058039554e0d8a854:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0YTgxMDNjNTRjZDY1ZjJiNzZhYjkwMDRhN2NjZjNkY2NjZTA2N2ZhNmJkNjEyMjk1NjY5NzQyYjA2Y2NjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxNzAzOTU4MjRjOGY2MTVhYjhlYzJjNWJlZTI3MDczYjgxYWQzZDk0NTUzNWRiZjgzNDU2NWYxMzkxOTIyNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZThlNWRkNjgwMGYwMmJjYmI2MjczYzBiMDg5NjM3YTg3NTk1OGNkZGMzNmYxYzc5OWQ2MzBjMmE4NDYxYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NmMxYmVmZWE2NmQyOGVhODk0NDQyYzkwOTgwMGNiNGIxNTY5ZDdkNjZiMGQyMzRlMjViNDVlYTU2OGY1OTkifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L388-L437",
-          "version": "repo-lines-v1:sha256:9a7f0941df19584da02af16c1b68fe95b33e0f3e17fcffed3069e2d957eff2c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTI3ODNjOTI1YjA3OTJiMzFkMzMxMDlkZDIxYzQzYTYxYTE0ZDYwNzQzNjM1OTQ0YmExOTU2YjAyNmU3NjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNDk5YTJlMDJiMGY4MDU5MTAwYmI0NWQ2Yjg0ZGJhYmRmZDhkNDZlNWIwNmJlY2VkNDcwOGJmMzYzNmVjYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlMjk3YTcwOGZkN2NmYWFhYTA0OTE4ZGRhYjY0MGU0NTRhOTg1ZDkyOGIzMmZjMWY1MGE3MTY4ZGQ1YTFkOTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L771-L779",
+          "version": "repo-lines-v1:sha256:4b4998a1ddc181d9ad075d3d1f278bf92bd130fa8f0f5ef947d5a630d60c3fc6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTg4MmFiNzk5MjA1ZWViODBmODE2MmM4ZmIzZWFiMGQ5NTA0YzhjYjQ3ODhjYmM2Y2I4ZjhhNGRiZGQ0OTc2MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk2NzQ5MmZhNDQwNDI1MjRkMjgwOTBjOGZjNDgxZjMwZTkwZjNkNmM3Mjc5MWJlYjgxNzJmNDE5YWNiYTk3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjNmNmM2YWY5M2MyYmU3YTViZWNmMjQ1NTIzNDYzZTdhMDIyZmU4ZDdlMmE1ZmE3YTUzNDI4ZmFiNjlhY2U0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjVkN2VkZjI0MDQ1MGEwMjEyYzYzNTMxMDRiMGM2YzU5NmQwMGQyMTNjYTI4MGEzY2E1NWNjOTNlZjU1MjBjYyJ9"
         },
         {
-          "resource": "repo://packages/data-model/src/grant.ts#L10-L25",
-          "version": "repo-lines-v1:sha256:4b4dccc756ef7986e3e77483bc828bc38201dbcad3c2499a3c8f6d7978a40cef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5ZjI3Y2EzZGI3ODg2NzZjMzcyNTAwZmQ0YTBiN2RhMmFjNzk3NTY0MGU3OGQzYTFjYWZjMTZhNzRiYWM2NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlZTVjYjNmZTc0NmE3M2E4YmRjNzFjNzZiZmFkNjIzMDQzNDJkMGU3MmRiMDU2YTMwNjQxNDEyM2YxYjc3NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYTM0M2Y5MjZiNmVhYjQxNTY4YTg1MzQ3M2E1ZTgyY2E1OTFkM2IxOGFjZTkxOGY0ODllZThkNGQwYjNmYTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmYzA4ZDJjNWRlOGJhZjNkNTY1OTcwNzFmMjIxNmJlYTk2ZTU2N2NhYzFjMWI5MzBhN2IyNDNkNTY3MDZlNjcifQ"
+          "resource": "repo://packages/data-model/src/grant.ts#L9-L25",
+          "version": "repo-lines-v1:sha256:8e4cc7d25d75b3f3d8f363df63f7e6964059dd52973a743cc39e513fea295d03:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlZTVjYjNmZTc0NmE3M2E4YmRjNzFjNzZiZmFkNjIzMDQzNDJkMGU3MmRiMDU2YTMwNjQxNDEyM2YxYjc3NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhYjUzYTA2Y2U2YTI2Y2UwNzQ3MGFjZTNlY2VjYzg4NzBmZmM2OGQ1M2YyZGVhZDZlM2I4NjBhMmVkMmQzOWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmYzA4ZDJjNWRlOGJhZjNkNTY1OTcwNzFmMjIxNmJlYTk2ZTU2N2NhYzFjMWI5MzBhN2IyNDNkNTY3MDZlNjcifQ"
         }
       ]
     },
@@ -121,11 +121,11 @@
       "statement": "The delegation issuance endpoint echoes the finalised grants (parents and children) in its response, which lets the grantor store them as the local issuer-side replica.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L196-L199",
+          "resource": "repo://packages/components/src/GrantIssuanceHandler.ts#L195-L198",
           "version": "repo-lines-v1:sha256:138cab84387d49c893c6ba654a24f4833d38789cd297934786e8daa252c35d52:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzkwN2VkNzZhNWRjNDljYWZiNDYxYTE0M2ZkZTJjN2U5MmJjYjA2NjEwNDU4MzY4OTU3YmI0NThiZDcxY2RiZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY1NDRlYWMzMTk2YTIyYWZkZjZjYjNmODhjNTM2NWVkMGJkYjEzMDBhMTQ2Mzk4YmQzZmU0YTAxMGViYzhkOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGQwMzA4NzRhNTM5ODEzNDY1MmMwMTY1OWY2NmQzZmZiNzhjOGM0NjgxNDgyYmQ5ODNjOTI5NTg2ZmIyMDAxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDlhNjAwYmNmYmEyN2RlZDYzMTM3MmUxNGJkOTkwYzRhMGYxYzUzMWYzZTUxYzc5ZTAyNTI0YmZjMDNlYzU5YiJ9"
         },
         {
-          "resource": "repo://packages/components/src/services/GrantReplica.ts#L26-L36",
+          "resource": "repo://packages/components/src/services/GrantReplica.ts#L27-L37",
           "version": "repo-lines-v1:sha256:6a236e1bb3d79a61fb312ccc1f56c915b498274e98915b1781c68ecbb43e804a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5Nzk1MDQ1ZmUyYjhmM2Y1YmUzYzNmOGVjZDg5NDBjZWFmZjI1NWNiZjVjZjBhZjg0ZGZkYzM5NDc2ZDIxNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MmE2OTI4NTMyNWNhOTBhYjFhZjk1YjFmNmNiNzk3NWVhOGRjOTYxNmNjMWEyYmM5Mzg2ZDc4Yjk1OGI3YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkOGI1ZGU1N2Q4ZGUwYmFiMTBkNGQyN2IwNjNkZThmOGNmNDViMzY3YTE1NzEyNmQ4MTJlY2I3ZTRhNzgyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
@@ -133,6 +133,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T17:33:35.590Z"
+    "at": "2026-10-22T04:35:20.186Z"
   }
 }

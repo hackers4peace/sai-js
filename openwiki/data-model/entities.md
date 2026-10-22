@@ -10,10 +10,14 @@ sources:
     resource: repo://packages/authorization-agent/src/access-description-set.ts
   - id: openwiki-source-a53c5361cefa789231b20bc0
     resource: repo://packages/authorization-agent/src/authorization.ts
+  - id: openwiki-source-91b9eb868de58a18862849c3
+    resource: repo://packages/authorization-agent/src/grant-chain.ts
   - id: openwiki-source-0531e8ebff475ca0a556fc29
     resource: repo://packages/authorization-agent/src/grant-generation.ts
-  - id: openwiki-source-81f61b66ae2ead4432d4358a
-    resource: repo://packages/authorization-agent/src/sparql.ts
+  - id: openwiki-source-a3ebe61b7dbf9a95d1051312
+    resource: repo://packages/components/src/temporal/activities/grants.ts
+  - id: openwiki-source-03c71d0f7eed5c1f113d08e3
+    resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-8b149b790c910713311c36a2
     resource: repo://packages/data-model/src/acr.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
@@ -38,10 +42,10 @@ sources:
     resource: repo://packages/data-model/src/registry-set.ts
   - id: openwiki-source-12dd5601be4d1b21ac977892
     resource: repo://packages/data-model/src/templates/index.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Data model entities
@@ -107,9 +111,12 @@ container:
   is no `AccessAuthorization` wrapper resource. Containment is
   **server-managed `ldp:contains`**: no client-managed
   `interop:hasDataAuthorization` writes.
-- Deny/revoke/replace **physically DELETE** data-authorization resources via
-  `replaceDataAuthorizationsForGrantee` (which computes the IRIs to delete and
-  issues `DELETE` requests), rather than orphaning them.
+- Deny/replace **physically DELETE** the grantee's non-reused data-authorization
+  resources via `replaceDataAuthorizationsForGrantee` (which computes the IRIs to
+  delete and issues `DELETE` requests), rather than orphaning them. Explicit
+  revocation (the `RevokeAuthorizations` leg) deletes the selected resources
+  through the revocation workflow's `deleteAuthorizations` activity — see
+  [Authorization revocation and grant projections](../architecture/authorization-revocation.md).
 
 ## POJO invariants
 

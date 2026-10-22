@@ -12,14 +12,16 @@ sources:
     resource: repo://packages/components/src/ApiHandler.ts
   - id: openwiki-source-3e8f48f62968e08a27cd3572
     resource: repo://packages/components/src/services/Account.ts
+  - id: openwiki-source-9f9c5f051cdee5032dfd735b
+    resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-452244fad48fe4fdb39195dd
     resource: repo://packages/components/src/services/Context.ts
   - id: openwiki-source-20e9ce588a1e0e4469c2c993
     resource: repo://packages/components/src/services/RoleRegistry.ts
-generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # RPC contract and service layer
@@ -60,8 +62,13 @@ router against the service layer through a `SaiService` context.
 
 `packages/api-messages/src/effect.ts` declares every operation as an
 `S.TaggedRequest` (`GetWebId`, `CheckHandle`, `BootstrapAccount`,
-`AuthorizeApp`, `ShareResource`, `AddAdmin`, …) with effect Schema payload and
-success types, and `failure: S.Never`. The service surface is the `SaiService`
+`AuthorizeApp`, `ShareResource`, `AddAdmin`, `ListAuthorizations`,
+`RevokeAuthorizations`, …) with effect Schema payload and
+success types. Most declare `failure: S.Never`; `RevokeAuthorizations` declares
+the typed `AuthorizationRevocationFailure` union (`empty-selection`,
+`not-a-data-authorization`, `mixed-grantee`, `unauthorized`) and returns an
+optional `activityId` plus the expanded authorization IRIs. The service surface
+is the `SaiService`
 `Context.Tag` interface, and the exported `router` is
 `RpcRouter.make(...)` mapping each tagged request to a method that pulls
 `SaiService` from the Effect context. Output IRIs are unbranded `S.String` on
@@ -82,10 +89,14 @@ the request context and delegates to a service function, and finally runs
 `RpcRouter.toHandlerNoStream(router)` inside `Effect.provide`.
 
 Its constructor now takes a **`PodEndpointStore`** (not a raw SPARQL endpoint):
-every `resolveContext` call receives it, and `revokeGrants` gets it too, so the
-service layer resolves per-pod endpoints rather than a single shared store (see
+every `resolveContext` call receives it, so the service layer resolves per-pod
+endpoints rather than a single shared store (see
 [Per-pod storage and isolation](../architecture/storage-isolation.md)). The
-account paths were renamed accordingly: `bootstrapAccount` calls
+authorization RPCs follow the same path: `getAuthorizations` calls
+`listAuthorizations(ctx, grantee, lang)`, and `revokeAuthorizations` wraps
+`revokeAuthorizations(ctx, authorizations)` in `Effect.tryPromise` with
+`toAuthorizationRevocationFailure` as the typed catch. The account paths were
+renamed accordingly: `bootstrapAccount` calls
 `accountService.startBootstrapAccount`, and `addAdmin`/`removeAdmin` take an
 `agentWebId`.
 
@@ -139,13 +150,14 @@ Each file under `packages/components/src/services/` owns one domain:
 - `RoleRegistry` — role CRUD (`createRole`, `updateRole`, `deleteRole`).
 - `InvitationRegistry` — invitation listing and `createInvitation`.
 - `DataRegistry` — data registries and data-instance listing.
-- `Authorization` — descriptions, `recordAuthorization` (writes the activity
-  with the `satisfiesAccessRequest` back-link that closes the owner-side request
-  span), and `archiveAccessRequest` (writes a terminal `AccessRequestArchived`;
-  an unknown or already-resolved snapshot is a no-op returning
-  `archived: false`).
+- `Authorization` — descriptions, `listAuthorizations` (context-scoped read of
+the grantee's authorizations with shape-tree labels), `recordAuthorization`
+(writes the activity with the `satisfiesAccessRequest` back-link that closes the
+owner-side request span), `revokeAuthorizations` (validates the selection,
+expands the inheritance closure, writes one `AuthorizationRevoked` activity),
+and `archiveAccessRequest` (writes a terminal `AccessRequestArchived`; an
+unknown or already-resolved snapshot is a no-op returning `archived: false`).
 - `ShareResource` — `shareResource`, `requestAccessUsing*`, access matching.
-- `Revocation` — `revokeGrants` (delegates to `GrantRevocationHandler`).
 - `Admin` — `addAdmin`/`removeAdmin` with a last-admin guard.
 - `peerProxy`/`peerFetch`/`ReciprocalMirror` — org-context peer reads and the
   server-side reciprocal mirror.
@@ -157,3 +169,8 @@ materializes the resource and completes it (see
 [Activity outbox and events pipeline](../services/activity-lifecycle.md)).
 Activity-first acks echo the triggering activity IRI as `activityId`; the UI
 stores it and binds the stream event by exact id (the uniform claim anchor).
+
+## Related pages
+
+- [Authorization revocation and grant projections](../architecture/authorization-revocation.md)
+  — the producer, carrier, workflow, and boundary behind the authorization RPCs.

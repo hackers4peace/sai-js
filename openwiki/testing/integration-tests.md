@@ -18,6 +18,8 @@ sources:
     resource: repo://packages/components/src/temporal/activities/webhook-delivery.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
+  - id: openwiki-source-ab1ddd2d1ab0804acc7807d2
+    resource: repo://packages/components/test/authorization-revocation-workflow.test.ts
   - id: openwiki-source-7ec61beaaf8b2a6cc1791916
     resource: repo://packages/components/test/check-equivalence-activity.test.ts
   - id: openwiki-source-88e59fc8baf4f02379e91f1d
@@ -34,10 +36,16 @@ sources:
     resource: repo://packages/components/test/reciprocal-mirror.test.ts
   - id: openwiki-source-c4ce6c0448c661ad179c011a
     resource: repo://packages/components/test/reciprocal-sync.test.ts
+  - id: openwiki-source-d77d926740b2005b17a2a4e1
+    resource: repo://packages/components/test/revocation-errors.test.ts
   - id: openwiki-source-81028398d49b5413dde247f1
     resource: repo://packages/test-utils/src/fuseki.ts
   - id: openwiki-source-900a2d8c960b090aaf5dc614
     resource: repo://temporal/dynamicconfig/development-sql.yaml
+  - id: openwiki-source-ddee6cdb17da2778a3b56d4c
+    resource: repo://test/authorization-revocation.test.ts
+  - id: openwiki-source-212161fae9d7487f1c2449de
+    resource: repo://test/authorizations.test.ts
   - id: openwiki-source-825c895ab72bea7eb33edb2e
     resource: repo://test/check-equivalence.test.ts
   - id: openwiki-source-72256836fb28a2c54e04cb89
@@ -54,10 +62,10 @@ sources:
     resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Integration test suite
@@ -195,9 +203,11 @@ the black-box `/test` suite may not.
   `reciprocal-registration` task queue and the consumer payload,
   `updateDelegatedGrants` receiving no `activityId`, burst coalescing into one
   pass, a mid-flight signal re-draining with a fresh mirror, the idle no-op, the
-  reconcile arm starting the same consumer without completing the activity
-  itself, and the **terminal** case (a `peerGone` mirror result completes the
-  batch with no regeneration).
+  **terminal** case (a `peerGone` mirror result completes the batch with no
+  regeneration), the sweep's drift arm (re-derive every registered grantee with
+  nothing pending), the mirror-completeness arm repairing an incomplete mirror
+  before the drift pass, and the forced sync (start-or-signal) used by
+  `reconcilePeerMirrors`.
 - `packages/components/test/reciprocal-sync.test.ts` pins the failure
   classification of `syncReciprocalMirror` against a stubbed session and service:
   `404`/`410` **on the reciprocal** drops the replica and returns `peerGone`;
@@ -222,7 +232,21 @@ the black-box `/test` suite may not.
   independently, and delegated index addressing.
 - `packages/components/test/grants-workflow.test.ts` pins the value-based
   workflow contract: a non-empty result skips storing/requesting and re-links
-  every reused IRI (parents + children) in the full-set registration PATCH.
+  every reused IRI (parents + children) in the full-set registration PATCH; the
+  projection GC (partial replacement, deny as the empty desired set, own-registry
+  orphan scan, peer-owned removal through the boundary plus replica drop,
+  missing bodies), and `revokeGrants` deleting the closure before the
+  owner-side registration PATCH.
+- `packages/components/test/authorization-revocation-workflow.test.ts` asserts
+  the revocation workflow's order — delete the DataAuthorizations, resolve the
+  grantee kind, reconcile each expanded grantee, complete — including role-member
+  fan-out.
+- `packages/components/test/revocation-errors.test.ts` covers the
+  `AuthorizationRevocationFailure` RPC schema and the HTTP status/JSON body per
+  typed revocation code.
+- `packages/authorization-agent/test/grant-chain.test.ts` covers the chain
+  predicate and closure: scope/mode/instance coverage, multi-hop chains, cycle
+  rejection, replacement re-anchoring, and `invalidGrantsAfterRemoval`.
 - `packages/authorization-agent/test/registration-links.test.ts` covers the
   one-query link reads: `hasAdminGrant` presence from the resource graph and its
   `meta:` twin, and `getLinkedGrantOwners` returning the distinct owners behind
@@ -254,15 +278,29 @@ requests), `account-creation.test.ts` (bootstrap workflow provisioning),
 `admin-events.test.ts` (org-admin activity forwarding),
 `agent-discovery.test.ts` / `discovery.test.ts` (Link-header discovery),
 `agents.test.ts`, `authorization.test.ts` (authorization + approval),
+`authorizations.test.ts` (read-only authorization listing for a seeded grantee,
+including the inherited child, plus the empty case),
+`authorization-revocation.test.ts` (revoke the seeded parent + child → the
+DataAuthorizations, the derived grants, and the registration projection are
+gone; a re-revoke is a no-op success),
 `check-equivalence.test.ts` (two-run identical IRIs for source and delegated
-grants), `delegation-endpoint.test.ts` (issuance echo/revocation),
+grants), `delegation-endpoint.test.ts` (issuance echo; revocation idempotency,
+mixed-owner refusal, unknown-grant refusal, and multi-hop closure),
 `federation-mirror.test.ts` (replica contents, the only replica-reading file),
 `invitation.test.ts` (personal + org invitation), `key-scoping.test.ts`,
 `org-context.test.ts` (admin org context + proxy/sparql-admin),
 `personal-admin.test.ts` (AddAdmin/RemoveAdmin + ACR),
 `policy-engine.test.ts` (WAC/ACP matrix), `reciprocal-webhook.test.ts`,
-`reconciliation.test.ts` (sweep + seed subtree reuse), `revocation-rpc.test.ts`,
-`roles.test.ts`, `services.test.ts` (reachability smoke), and `share.test.ts`.
+`reconciliation.test.ts` (sweep arms + seed subtree reuse), `roles.test.ts`,
+`services.test.ts` (reachability smoke), and `share.test.ts`. The owner
+`RevokeGrants` RPC suite (`revocation-rpc.test.ts`) was removed together with
+that RPC; revocation is exercised through `authorization-revocation.test.ts` and
+the boundary cases.
+
+Revocation assertions wait on `waitForActivityCompletion(acme,
+'AuthorizationRevoked')` before reading the registries: the workflow deletes the
+DataAuthorizations, reconciles the projections, and only then completes, so an
+earlier read can observe a half-finished revocation.
 
 ## Residual limits
 

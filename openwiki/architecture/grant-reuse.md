@@ -3,9 +3,6 @@ type: architecture
 title: Grant equivalence and reuse
 description: How an unchanged authorization state regenerates to the same grant resources — whole-subtree equivalence over GrantData fields, source vs delegated tree matching, the issuer-side grant replica written from the issuance echo, fail-closed missing bodies, and the value-based result the grant workflow consumes.
 tags: [architecture, grants, equivalence, delegation, temporal, replica]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
 sources:
   - id: openwiki-source-99a0f343f48d54d1c1e98086
     resource: repo://packages/components/src/GrantIssuanceHandler.ts
@@ -17,26 +14,34 @@ sources:
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
-generated: { by: "pi", at: "2026-10-21T17:33:35.590Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-22T04:54:18.757Z
 ---
 
 # Grant equivalence and reuse
 
-Every grant regeneration (`createGrantsForAgent`) normally mints fresh IRIs and
-re-writes the registration, so an unchanged authorization state would replace
-the whole grant set on every re-run — new grant resources, new ACRs, new
-delegation requests — while the old resources become orphans. Grant reuse
-removes that churn: when a generated grant **tree** is equivalent to an
-existing one, the existing resources and ACRs stay and only their IRIs are
-re-linked.
+Every grant regeneration (`reconcileGrantsForGrantee`, to which
+`createGrantsForAgent` delegates) normally mints fresh IRIs and re-writes the
+registration, so an unchanged authorization state would replace the whole grant
+set on every re-run — new grant resources, new ACRs, new delegation requests —
+while the old resources become orphans. Grant reuse removes that churn: when a
+generated grant **tree** is equivalent to an existing one, the existing
+resources and ACRs stay and only their IRIs are re-linked. Non-reused trees are
+collected (delete-before-create) before any replacement is written.
 
 ## The regeneration contract
 
-`createGrantsForAgent` fetches the grantee's authorizations and the **IRIs** of
-its current grants, handles the deny case, generates fresh grant data, and asks
-`checkEquivalence` what can be kept. It then stores only the non-reused source
-grants, requests only the non-reused delegated grants, and rewrites the
-registration as `[...newGrantIds, ...reusedExisting]`.
+`createGrantsForAgent` is a thin delegate to `reconcileGrantsForGrantee`,
+which fetches the grantee's authorizations and its current grants (the
+registration projection unioned with an own-registry orphan scan), handles the
+deny case, generates fresh grant data, and asks `checkEquivalence` what can be
+kept. It deletes the non-reused existing grants first (own registry through the
+owner's closure, peer-owned through the `AccessRevocation` boundary, with the
+issuer-side replica dropped), stores only the non-reused source grants,
+requests only the non-reused delegated grants, and rewrites the registration as
+`[...newGrantIds, ...reusedExisting]` last.
 
 The equivalence result is **value-based**, not object-based:
 
@@ -132,10 +137,12 @@ in the context's own registry-pod dataset via `storeGrantReplica`.
 - The write is **best effort**: the grants are already issued, so failing the
   activity would retry the POST and mint duplicates. A missing body only
   disables reuse until the next issuance or regeneration repopulates it.
-- The writer only inserts. Replica graphs of grants that leave a registration
-  are not dropped here; they are invisible to reuse (only current registration
-  links are read) and are cleaned up together with the orphaned grant
-  resources.
+- The writer only inserts. Replica graphs of removed delegated trees are
+dropped by `dropGrantReplicas`, which the reconciliation GC runs right after a
+peer-owned boundary revocation; it drops both the grant graph and its `meta:`
+twin and never touches own grant-registry graphs. A stale graph that survives a
+crash is invisible to reuse (only current registration links are read) and is
+removed by the next reconciliation.
 - Grants issued before the echo existed have no replica body. They fail closed
   once (regenerated), which populates the replica for later runs.
 
@@ -145,8 +152,9 @@ in the context's own registry-pod dataset via `storeGrantReplica`.
   delegation request, and the registration PATCH is a no-op — the same
   `hasDataGrant` set.
 - **Partial change:** only the affected subtree gets new IRIs; unaffected
-  subtrees keep theirs. Replaced old subtrees still orphan because the
-  grantor-side DELETE is ACR-blocked.
+  subtrees keep theirs. The non-reused old subtree is deleted by the projection
+  GC before the replacement is created (own registry locally, peer-owned at the
+  owner's revocation boundary).
 - **Deny case:** no authorizations means no generation/equivalence; the
   registration is cleared as before.
 
@@ -176,14 +184,16 @@ in the context's own registry-pod dataset via `storeGrantReplica`.
 
 ## Limits and follow-ups
 
-- Replica drops on unlink ride the grant-resource cleanup lifecycle rather than
-  this mechanism.
+- Replica drops ride the revocation GC (`dropGrantReplicas`), not the replica
+  writer itself.
 - Backfill/drift for pre-echo grants is natural (one regeneration) but there is
   no drift scan for replica bodies.
 - Whole-registry regeneration is a recovery scenario, not part of reuse.
 
 ## Related pages
 
+- [Authorization revocation and grant projections](authorization-revocation.md)
+  — the projection GC, delete-before-create ordering, and replica drops.
 - [Federation constraints](federation.md) — the reciprocal mirror, the
   issuer-side replica, and the per-pod store split.
 - [Temporal workflows and activities](../temporal/workflows.md) — the

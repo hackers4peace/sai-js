@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b2c41eef2bdbf3a5d2c47fed341260ff4a746e8b0d0048d0f1d82d957a306fad",
+  "pageVersion": "sha256:19b7d3348424fa8ddd76a14bf75f4bd458f3cf6decd664c7d19d087cb9ec603c",
   "claims": [
     {
       "id": "claim_128945ceebdb43de9c58258b39f648ac",
@@ -35,10 +35,28 @@
           "version": "repo-lines-v1:sha256:69880899e1040e8e9289b8420b178c78877ea9165b379130769b94c9721ce2ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_0be37002068f44c08f84863ca0deccdb",
+      "statement": "A UI action posts an RPC to ApiHandler, whose service layer appends an Activity; the owner-channel ActivityWebhookHandler then starts the matching Temporal workflow, which writes an ActivityCompleted when the derived work succeeds.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L68-L120",
+          "version": "repo-lines-v1:sha256:ff85a235695ce0dcd886b37fa15ba7b0bad8afe7c7e342cdac36cdace8d0c85f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2MDA4NzdiOTU3NmE3YjQ0YzUzNTA5ZGE2ZWYyZjI2OGZkYzIyOTg4YjUyNDVmZGIwOTNiMmNhOTdiMzMxYjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViMDQxODM5MGI1ODliYmMxODJjYjMyMTFjNTg4MzU1OWQ0NGE1OGVjOTA4ZTA3OTIxMDk5Y2I3NjlhMjFmNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0YjA2NzI4M2EzZmMxMDc4NmU1Y2EzM2M1ZmI2OTdjYjA5NTExYjY2ZTk3ODliMmE0MGMwNTQ1MGViMWZhZjcifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ApiHandler.ts#L119-L130",
+          "version": "repo-lines-v1:sha256:cdb64d083e5b3738d60bb8d6f818cc456eca73ebf624831a103b6e7d8124e0ae:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxYWFmZWQ0ZWFjN2YxNjlmZjBlM2I1NGFkNjBjMmM0OTVhZDk5Yjk4MzZlOGUwZmZkZmRmOWI5MmExYmNmZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkNTFmMTFhNGYwZjUxODJlZTc3YjBmNjNjNGM0ZTVkNTM1M2VkMWFmMzU3ZDM4NGRmNTM2ODgyYWFiYjAwZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmYTkzYjc0NmFmZmY0OGJmYzk5NGUzN2QxYzhkOTg4M2RhYjhmMDY3NWZhNjMzNzAzNmIxNzU1YjI3ZjAzMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlODI0YzYwMDA0ZTVmMTNjMTlhYzBiZjM5Mzk2MmNlNWU4OWU5M2QxMjNhZmY5MzA3Yzg5ZDQ4ODU2MTM5NmQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L1073-L1090",
+          "version": "repo-lines-v1:sha256:17c40ffaa5b257f769ea1e651e54386810e019f31d7b6410b855c856697077e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyMTMxZTM4ZjZkNjI4YTQ5NDU3NDQ3MjMxNWM4NGM3ZDFhYjQ1NjUxM2ZlNGYwNDM0ZmI0NDliYTRjMTY5MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MGM1ZDNkYzNhNzczMDc5M2M4OTI3OTQ4YjU1OTY2NDIwN2Y3OWJhODc3NzNjMjE1MDA0NDMxOTYyZmQ0ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T17:33:35.590Z"
+    "at": "2026-10-22T04:35:20.186Z"
   }
 }

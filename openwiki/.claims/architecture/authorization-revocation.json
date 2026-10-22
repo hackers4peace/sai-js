@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:e046c247c4dd00f90d14fdef0cb1eac9a5090e7310d78fe29d413b29e0db9920",
+  "claims": [
+    {
+      "id": "claim_c55129069ec1448bae5d78111b8133f9",
+      "statement": "Grant enforcement reads every grant graph in the storage owner's registry whose hasStorage matches the requested storage path, so a grant that still exists confers access even when no registration links it.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiAuthorizationManager.ts#L52-L94",
+          "version": "repo-lines-v1:sha256:c7b97ca37be9aedd88a8c77f0c0b4a81084b5b516a91b7fd5e8f5a20dd0defa5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1Y2VkOTVmZGE2YTY3ODVjYjE5ZWE4ODY0YTY3OGQ5NTUxZmQwZGNhMTBmY2FjNmUyMmE2YWQyYjhmMDIyN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NjJjYzczMDE2Y2QzODQ3OTBkZTY3NjljNzhmMjMyYzBlNGI0ZTE0MmRiNTI5NGI0YmViOTlkMjQ4MmVjZjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxYTRmOWVlMTUwNWE3NGUyNDg1MTU2ZjA5OTM4NWQ4NTk5NGQ2OWFhYmFhYjI0ZjAyNjNhMzYzNWViNDE3YWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI2ZWU2YjE3NTc5MTJlYzZiZWEzMzdmNTkxN2Q4MjZhODFjZTVjMjcyMmVhMjIxY2ZmNTkyN2Y2NjdkZjE2ZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4d6d8a32ae36406eb94419cbf581bac7",
+      "statement": "Revocation is authored as DataAuthorization deletion: the RevokeAuthorizations producer validates the selected authorizations and writes an AuthorizationRevoked activity, and the UI claims that activity instead of ever sending grant IRIs.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/Authorization.ts#L464-L532",
+          "version": "repo-lines-v1:sha256:b63345270140f99dd38cb83e134e72eaf05d8b070112d89199b5cc69f0c2968f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2YmFmYmEzOTZmZDZiNGI5NTYwYzhmNTViOWJhYzcxODQ4YzNiYzc4YjJkODU2NTUyZTQ4OWU0MDlkZTYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2ZmJkYmMzYTA3Yjc4YWM2MjU0NGE3NDYyOGQ4MDliZjk1MDdiNGIxODQ1ZjY5MjExMGU2Mjc4ZjNjODYwOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTNjMjg1NzQ3N2E1MGQ5YWE0YmYzNTFhOTExZTljYTA0YmU2NmJiYzY2ZWQ4ODRiYTFlNWJiYzJhMjg1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NjE5ZGIxNWFmNjBlYTMyNGNiYTJmM2Q2NTczNzNkYTIxODVkOGMxMjUyM2FjOGEyMDU3M2FiZWVlNzllODAifQ"
+        },
+        {
+          "resource": "repo://ui/authorization/src/store/app.ts#L328-L338",
+          "version": "repo-lines-v1:sha256:0a5675281d7a244fc85d53a84b01f5214d56d76816d5e1fa3452a094e7c2598c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZTU3OTZkZDZkYzM0MWY1YzZjMGNjYTA2ZmZlNTQxMTIwOTQxYjJiNGIzYTk1NTI1NjQxODM1Y2FjYjA0NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0NjRiZTRjYzgzMTFmNDAyNGRjNTRkOWIxMWRhMDE5ZTg5MDIwOTgwNDRkOGZhNjA5NDI1YjE2ODFlMmY0ODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2N2ZkZDk5NGI0NTc3OGM5Y2E5YjQ0N2U0N2MyMTM5YTAxMTc1MWI5ZmNiZTY0OTFhNzE5NzFkNWMyM2Q2MjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_73f2fd4f395b424681bcd4797f677ad4",
+      "statement": "The authorization reader lists the context's authorization registry, includes DataAuthorizations granted directly or through a role the grantee belongs to, and the list service resolves shape-tree labels with an IRI fallback and sorts the rows by data owner, shape tree, and id.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/sparql.ts#L565-L581",
+          "version": "repo-lines-v1:sha256:c3fc53bdb8e5bf5a6f57cc3f49594bdbade0ac1fd4dde10114d4c2fa31395391:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MGIyZjYxODA3MzMxNWMxYWYwMmFmOGIzZDFjZmY5OGRiZTFkY2Y4MDE4M2I4NjkzN2ZiMjUxYWFkOTFmNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4ZDc1Y2ZlZGI4OWZjYzhmYTc4MDUzMDBjNjhkYmZmZDg1MmYzYzc5Mjc4ODkyOTgyNThiZWEzYjU1MzAyNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwMGYxZjdkMWM3ZTkyMTZmMjkyZTA3NjhmY2QwYTdmMTY0MjY5YTJmNTM3ZmU1MzFjZDAzZWJlYzI4MDEzOGMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/Authorization.ts#L335-L415",
+          "version": "repo-lines-v1:sha256:c9a9633fb963b4d7d975f2ed61e1a71f0d9972e2542f4b2f16059c5bca502833:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NmQzZmE1MTg3MzFhZmVkZDE3MzEyMGNkN2YwMTNiZmExNTI1YjE0YmYxY2E1ZWMzMWEwZTliM2YzMTI5ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwNTFhYTI2YzA2NmQyZDU0YWFkZjE2MmE0MDliZDAwODU2YjE2MGMzZjQxOTQxOThjODUxNDFhMWQwNTMxMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlZjg1ZWZkOWRlZGM1Zjk4NTEyNzdkY2ZjN2RjMGVjZWNmMTY3OTBkMTFkMmI1YTJkZGE4MTMyNDg5OTg5ZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyNTAzYzVmM2U5ZTA3NzQzYTIxYWZiNjQxYWM3YzJmMzhiYTZmNDYyMmE1NmY1YjRmYTcwY2MzOTJlY2IyMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c3ff130992f245adb3c760181a431ecf",
+      "statement": "ListAuthorizations has failure S.Never and returns an AuthorizationList of RecordedDataAuthorization rows carrying the resolved shapeTreeLabel; RevokeAuthorizations declares the typed AuthorizationRevocationFailure union (unauthorized, empty-selection, not-a-data-authorization, mixed-grantee) and returns an optional activityId plus the expanded authorization IRIs.",
+      "evidence": [
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L1033-L1057",
+          "version": "repo-lines-v1:sha256:6ffc5ccf32c8ed19605ec0864389d9687cc0b50bfdc04b80af96a7d1ae7107d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxMDFlMjQ5MjhkMDQwODg3ODcyNWJkY2I0ZTZlYTRjNjRjZTMwY2Y4YWQ3MTJiMmZiNmZjNzUyODcyZDI2MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0ODJjNWM1MmUzODEyMWE1ZTg2MWUxOTVhMGE5ODFkYTc4N2ZjODcxMDEyMGNiMzJhNzI0ZTkxYzhkYzNjOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYjMzZjBjYmRmMTI4YzBjOWIyZThmY2VhMzE0NjA5OGE5NTM2NzQ1YzkzMDFiMGI4NTA4ZDJlMWZiY2IxOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2ODQ2OWY5YzE0NGI4ZmEwZWRhZTliNmUwZTAwZmNkNGY3ZThlYTc3YmY0Yjc5N2I0ZDFjOGFmYjA2Nzc0NzYifQ"
+        },
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L749-L770",
+          "version": "repo-lines-v1:sha256:232f8f4d0f700999f6a97f37b5857af9a359d7763f3a5a2b14d6b75c03bb543d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkZWEyYTQyN2IwOGI5NzJkNTBiYzAyOGRhNmE4YTZhM2MyNjU5ZThhM2QxZGIzYjcwNTcwYTE0YzRiNTRhYzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0ZmViYTg5YTEwMDRmYTAwZjQ3YzU2NTE4MDUyYTIyZGNmZjhhMjJjMWI2ZjFkYjFmNDZiNGM1NDAzNDhmODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNjY3ZTY4MWZkMjVmODE3ODA5NDE3N2Q4YWU2MjM2N2M2NDU4MTk5ZWMxOTExYmEwNTVhODJkMjA3YzI3ZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNTI2NGYxYWI1ODc1Njc5ZWM2M2YxY2E0MTM4MDc2ZTk2Y2MyZWFjNzIwNzEwNjg2NWIyMjMyMjE0NDZlMTQifQ"
+        },
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L836-L843",
+          "version": "repo-lines-v1:sha256:09f0b567e3e6d3fe8e58bdf6a67c08bd79e182e97d6335e7edbc4631143d14ff:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjY0MmNkZTUxY2ZmNjk0MTdlNTg1YWUzN2E5OGI3NDU4ZGI5ZTZlYjc3OTg4YzEwMTNmZTlhYzJiNWIyMTg1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ4MmM1YzUyZTM4MTIxYTVlODYxZTE5NWEwYTk4MWRhNzg3ZmM4NzEwMTIwY2IzMmE3MjRlOTFjOGRjM2M5NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2I1OWQ2NjU3ZDk0OTI0MmQwMzcxZjVhYTE2NzAyNGU3ZGU4YmFlMjVlYmU0ZWY2MzE1OGY2OGVjOGU0MDRhNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWMzOTQzODMwZWE4ZDViNTZiOWI5M2U5ZDM4MDMwYzc0N2I2N2NlZGQ3NjQ3OTlkYzkzMDQ2Yjc2MjU3NGJmNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a83d5aac13054be79a2efb6d52ae709e",
+      "statement": "The revocation producer rejects an empty selection, a non-DataAuthorization, and a mixed-grantee selection; treats an IRI no longer contained in the context's authorization registry as already removed; expands inheritsFromAuthorization descendants at write time; and returns a no-op success when nothing remains to revoke.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/Authorization.ts#L464-L532",
+          "version": "repo-lines-v1:sha256:b63345270140f99dd38cb83e134e72eaf05d8b070112d89199b5cc69f0c2968f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2YmFmYmEzOTZmZDZiNGI5NTYwYzhmNTViOWJhYzcxODQ4YzNiYzc4YjJkODU2NTUyZTQ4OWU0MDlkZTYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2ZmJkYmMzYTA3Yjc4YWM2MjU0NGE3NDYyOGQ4MDliZjk1MDdiNGIxODQ1ZjY5MjExMGU2Mjc4ZjNjODYwOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTNjMjg1NzQ3N2E1MGQ5YWE0YmYzNTFhOTExZTljYTA0YmU2NmJiYzY2ZWQ4ODRiYTFlNWJiYzJhMjg1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NjE5ZGIxNWFmNjBlYTMyNGNiYTJmM2Q2NTczNzNkYTIxODVkOGMxMjUyM2FjOGEyMDU3M2FiZWVlNzllODAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1aec56e915a7442793038b0e7f7c647f",
+      "statement": "AuthorizationRevoked carries {id, type} DataAuthorization references plus a plain-IRI grantee and drops target, so a retry or the sweep retains the routing key after the referenced authorizations are deleted.",
+      "evidence": [
+        {
+          "resource": "repo://packages/data-model/src/activities.ts#L405-L425",
+          "version": "repo-lines-v1:sha256:452bb3574b100b098f847e465395911b6bbea944ac5e46242b3f0e9d0a7b3246:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1NmNhMmEwMzVkMzY1ZTY1MzhjMThkZjU4YWYyNzcxODk2MTJjZjdhZDliYTk2NmJjNmUyNWIyNjg0MGNiMTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlNzU2MWExOWM2NGU0ZGQzNzE0YTQwOTMzMmU5M2Y2MjRjYjczMDVmNDlkNDdkY2U4MGRiYjg5YmFjZDRhOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBkZDc2ZjQ4ODMzMDU5MmQ0NzIxNDZjMjFjZTZkZjI2MTk1YzI3YTFkODE4NmQ1ZTliOTE2MmU2ZmViZWQ3NzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_79603153e48c4f6eaf6ef8dac00146f1",
+      "statement": "processAuthorizationRevoked deletes the carried authorizations first, resolves the grantee kind and expands a role to its members, reconciles each affected grantee through reconcileGrantsForGrantee, and only then marks the activity done.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L858-L873",
+          "version": "repo-lines-v1:sha256:9874d324ba28368c4b9f193e541a55e9b0f268473c120f3d23cce4e756c7b8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhY2M0NTg4ZjQyMzA4MTYyZGExMmE3YThmNWVhZWFlMjA5YWY2OWMzYjM3ZGU3MDQyNjA2MjcxYzRiOWU2YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDczNjU1N2RmZjcwZmMxYzcyMjUwZjFiY2UzY2M1ZTA1NzQ5ZjI0OTAxYjFlOTI1MmIxYzNkYTIzOTdiNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/test/authorization-revocation-workflow.test.ts#L79-L127",
+          "version": "repo-lines-v1:sha256:0705f8203365e80a041999c7dfc20318db07f522460d7a19d9fd43cf9fdaeb10:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZjYwNDg0YjVlYTYwNzNmMTA4YzI4NWM2OTMzMzQxMzZhMWI3OTE5ZmY4YTU5ODgwNDc1ZWIwZDdmZjRlMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ZDNjZjFjMDJiYjVhNmU1OGQzYTA4OGVmMTMxNzI0YzRiMDY0ODU0MDY3N2U5YjI4Njc1YzBjOWE1NmVjZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_33e0799d35044b4f8c92a6a7ebce3933",
+      "statement": "reconcileGrantsForGrantee derives the desired grants from the remaining authorizations, unions the registration projection with an own-registry orphan scan, reuses equivalent trees, deletes the non-reused set before creating replacements, groups removals by dataOwner (local closure delete or peer AccessRevocation plus replica drop), and PATCHes the registration projection last.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L740-L842",
+          "version": "repo-lines-v1:sha256:28fed3a5b3952c1ffff89d3279de510fb151d275a9a2ad821a95585c41d6ce48:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1MTAyZTRhMWJjZDIyYjI3YmVlMWM2NzZlZDgyMjIwMWIxNWVjMDJmZWJhZjI3MjhiMThkMjY5NzA0M2NjYzU3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjNzhkODE3MmYwMGIzY2VjZWIwOGQxNjI3MDZmMmYzZDBjYzVjYjk2M2Y1NzExNDkxZWQ1OGU0MzY4OGU1NTIxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyZWM4NWM3NTNhMTNjMDk3MjY2MWFiNzljNGFkOGI1OThlMzc2N2IzMDU4YmIwNzZiMzUxMjg0ZTU5MzliMmQxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_0ac80f2d5683453693137040d0a848f4",
+      "statement": "Grant validity is a monotonic fixed point over match-based upstream coverage — same dataOwner, upstream grantee equal to the downstream grantedBy, same shape tree, registration and storage, plus scope, access-mode, creator-mode and instance coverage — so chains without a source grant stay invalid and mutual delegations cannot bootstrap a cycle.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L163-L255",
+          "version": "repo-lines-v1:sha256:fa7331d4935efd37b912056e240efaa6e4af59d1fd07f78058039554e0d8a854:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0YTgxMDNjNTRjZDY1ZjJiNzZhYjkwMDRhN2NjZjNkY2NjZTA2N2ZhNmJkNjEyMjk1NjY5NzQyYjA2Y2NjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxNzAzOTU4MjRjOGY2MTVhYjhlYzJjNWJlZTI3MDczYjgxYWQzZDk0NTUzNWRiZjgzNDU2NWYxMzkxOTIyNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZThlNWRkNjgwMGYwMmJjYmI2MjczYzBiMDg5NjM3YTg3NTk1OGNkZGMzNmYxYzc5OWQ2MzBjMmE4NDYxYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NmMxYmVmZWE2NmQyOGVhODk0NDQyYzkwOTgwMGNiNGIxNTY5ZDdkNjZiMGQyMzRlMjViNDVlYTU2OGY1OTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_facfcb0b042a49b7a9c45dae265ecfd4",
+      "statement": "invalidGrantsAfterRemoval returns the removed grants plus every grant that was valid before and invalid after the removal plus their inheritsFromGrant descendants, while leaving already-invalid grants and grants with an alternative valid upstream untouched.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L258-L295",
+          "version": "repo-lines-v1:sha256:f28c1bb92833dc0b929dd8945c42917805cf15233427e2eafe03b2536045fcdf:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjJjMDA0ZTYzNTU4NmUxZDYzMzM1ODJiM2VmM2Q2MTZmMDBkMGFmMjdlYTBlODA1MGVjMDc1OTVhYjNlMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkNWJlMTU5YWUzZDY0NDlmNGExNmQ1ZDMxMWIyOTczMGM4YTlkYzA3ZTRhOGM0MDYwNWRhYjlhZTY0YjZjZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ODEyZTJlMzIxNWNjNjY5NzVmOTkwZDA4ZGUwNjRjOGY4Y2FmMTQ4N2Q3YjZiODk1N2E5MjY1MDhkZDkzOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5NmEyNmU3NjcxNzY5YjE3ZTQ4NjliNzU2YmZlODJmZjI1MGI0OTZhYjNiOWY3ZGYwNjgwNzU4Y2ExZmM1MmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_312dc47143bc40dea2ea1cc1c6865069",
+      "statement": "The authorization agent's revokeGrantsClosure checks mixed-owner on the requested grant set before loading, refuses a request outside the targeted registry as wrong-data-owner, validates grantor-or-owner authority per grant before any deletion, and derives the deletion set with invalidGrantsAfterRemoval over the whole registry.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/authorization-agent.ts#L132-L199",
+          "version": "repo-lines-v1:sha256:5a6d77858757d5b4c606c8503f3b8f38c21cfcb82b568d2d6085a43a26014fdc:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NzUyOTYxMmQ3NzQ1NDkwZGVjMmE3ZWIxMGY1NDkzNTc3M2M0YTU4ZDM0NzQ2OTIxZDZlYTQxNzJkZjhhZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1MmY5NDk4NzYzMjFlYmNiMDU5NWY1ZjQ2NmQyY2ZjYmJkOGQxYTg3NTExYzhlNDkyN2QwMTMxZjA4YjFiYzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5ZjEzNmM3Y2IyY2UyMmZjYzg1NGRlNjAwMTk5YWRlOTE2Y2FjNGM2NzQ1MjljYzVkZTQwM2UzODA5NGQ0ZmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_78086d56268a42a6a94ed577d5261d47",
+      "statement": "The revocation boundary allocates HTTP 400 to unknown, wrong-data-owner and mixed-owner, 403 to unauthorized, and 409 to not-delegable, returning a JSON {code, grants, message} body; it resolves every requested grant IRI to one registry pod before loading anything and echoes the requested IRIs on success or for already-removed grants.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/GrantRevocationHandler.ts#L24-L197",
+          "version": "repo-lines-v1:sha256:18f646120861db84e2010e5f6a8fbcc3abd84c6430e5672662ceed3b3dce28de:eyJzZWxlY3RlZExpbmVDb3VudCI6MTc0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4MTQ1OTk5MzBhOGUxOTNhZmUxMTFiODVkMzM1NTQ0YmViMmE2YmY2ZWNkMDI4MmMyYjZmYjUyMmEyYjJmY2Q2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjZDA1NDA1MjUxYTE5OGFjN2VjNjY3Y2M4OWI1YmVkZjIyYWQ2NTg3MTVkMWIzODJkNzQ1MzVhZGY5NzE4N2E2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_a7404f9cf81c40b186a11ecadbde4c77",
+      "statement": "The owner-side revokeGrants workflow deletes each grant together with its ACR using the data owner's session and then clears the owner's registration hasDataGrant links per grantee after the deletes, so the registration PATCH is the last step and also signals the peer's mirror refresh.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L455-L488",
+          "version": "repo-lines-v1:sha256:d95827d90bab84eecfaf634f6f08214db39b5d9d1456cf6f83717b3a5bf7c892:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmNjJjMmFmOTc0NzVjYjg1OTkwMDZlYmNhNDRmNmZmZTgxMThhZDEyYjc3ZjU4ZWJmNTY0ZWQ1MGNhNmQwMTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxZTFmMGU1ODM3NGVjZjU2ZTEzYWZjYmMxYTFkMmUwYTEyOTZkNGM5MzkyYWY4OWVhOGJjNDQxYWU5YWM5ZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2NjVhY2IwN2Q5NDc0MTBjZDUxOGMzMDk0NDk2Y2I4OTU2NjU5ZGNmNjI5NDE1YzUzMTM5YTZiZWIxNDVhM2QifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L893-L905",
+          "version": "repo-lines-v1:sha256:9eea42d38a4a4c1dcf049b83db803c970c33437b36660bdb397bfc9379866546:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjYTFlNGJmMGY0MTZhZjY2YzNlOTQ0NjIxMjhhZjZmMTNkZWE0MTdkYjAzYWQzNzBkNWU4YzFhNjc5Y2Q5MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YmEyYjU5OTY3MzJlNzEzOTBkM2UwY2M1YjliZmRmZTU4YWUzZDZkMzgzY2VhYTMyNzRiMzc1OTY1NWRlYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4NjM5NDE2OTFmY2I4ZTc4MzY5MGYzYmE0YWI0M2ZmZDczNjM4OWM5N2VlZjZjZGYxZjY2NDY5ZmVlZTRlZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViMDE4ODZhMWFhNzQwM2QxOWEzODRlMzE0NTc3NmU2ZWNiYWM4NTBkYjM3ZGE0ZGQ1MzQ1YjAxMWIyMGI1YWIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L130-L147",
+          "version": "repo-lines-v1:sha256:9be3fc5f6c1320b29ac95fbf74dfe2cd597636ab41a3bb86b1e3ecd14809678a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkYzk1ZmE2YjNmNWQ1NTliMTY4NGJkODgyNDYzNzA3NWZkYjdmYjk1NTc2ZWQ3ZGVhOWVkNTBmNmViNDM4ZjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MzU0OWUxNzhlOGQwZDFiYjZlNGRiNzY4NTEwYWVmY2RkZmEwY2YxZGRmODhmYTM5MDQ2ODViZmQwMzhkMGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwZDEwNjMzODhkMGU4YjY0MmFhNTNkYTA4ZTcxMTA4ZmY1YjhiYWY1ZDc4MzI5MDMzMDYwMTU4OGY3ZmQzYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlM2ZlOWY4MzhiYjQ4MzA5MGU0NzZiNDRkMDkyZmQ0NDgyYzA4NzcxMDQ5ZmE5OTgyOGY5Nzk3M2RjMmY1MGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_01a9e9c59c5d459e8bd7d6379ec53bc2",
+      "statement": "reconcileActivities drains pending activities by class — re-running processAuthorizationRevoked for AuthorizationRevoked — then repairs locally incomplete reciprocal mirrors and re-derives every registered grantee's projection; a sweep with no differences writes nothing because replaceDataGrants returns early when the hasDataGrant set is unchanged.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/agent-registration.ts#L79-L89",
+          "version": "repo-lines-v1:sha256:60cbcffbede77393ec21d23f1f62ff3c6550137deb60322ed8b1700ede80036a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjY2I0NTA4NzZiYzk4MDc4YzliODA1MDI4ZDg4MTRiNzA1YzM2NWJlNGM0MzZiZDFkMTRiMTE2N2ZlM2ExOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjMWFjMjc5YmI2NTQyYzQ1YjRkNzAzOGIxZjYyNDI2MmMxMjEzYmM3YWZmYzg3NzAxNDc0MDE0YzFhNDg4NGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5NTY1ZTczNGUyNTA5OTU1NGFjNTc2ZDRjNDM1MTU2ZGU5M2Y4MTZjYTI4NGQ0ZTFkNTMyNDA2MmNmYWFmYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhNGZiYjUwOGRmOGM0ZDU4ZWU0NmUyNjZlMTQzNGUxN2VkOWM4OWU5NWMxNGQ2MmIwMGJiY2Y1NmFiNTAyY2QifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L560-L737",
+          "version": "repo-lines-v1:sha256:f9c5bacf55a584c61f259daf839e5d47c65545774b35d4506e5a834eec7c92f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTc4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0ZTMzYWE3Mjc5NmQzOWRkZTE2MTk5NGM2YTlmZjNlNzQ5NmU0OWI4NTFlZTNjM2FmYTk0NWY3NjMxMjMzZmEwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyYzU3NTNmZDk5MWRiMjc2ZWFkZjY4ZjMxODEzOTAwMDNjN2QzMDMyOTkxMTk0NmZlYTFjNGY0ZDAzYTE0OTcxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmNjI1MDAxM2ZkYzI5ZTBkZGVkZDFiZmM4ODRjOGNjMTk4ZGY5NzU2ZjMzYmEwNzk4N2UzN2Q4MGNjYzUwNzJjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5MzYyMmE2MzJjYWZkODJkZjkzYTI2OWQ1ZWY4NDc1NWVlZDEwNzhiNWFhYTMyMGU1N2MwZTM0YjNlYzAxNjM0In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_71885688cf6d4db4872469f5d1e9f4c8",
+      "statement": "Delegated-grant mirror freshness runs through the per-peer consumer: it replicates the mirror, regenerates delegated grants, and completes drained activities in that order; a peerGone result from the mirror sync skips regeneration and completes the batch, while other failures propagate for Temporal retries instead of revoking access.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L189-L243",
+          "version": "repo-lines-v1:sha256:d1953e46b0cd697f4e8745692ab7a4deccdcb2f50de0e9f7473d25d660b385be:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4N2ZlNGJhOGU0OTQ5MTU2MGI4MmM0MmEzNTlkMGI1M2ZkYTZiNGE5OTYxZmI2NmJkNmUxZWY2NGEwNjllZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmNDdiYjk5MGEyN2MzNmNmOGU1MzM0NGZmZWY3MzAyMWM4MGJjMjBiODUwNzcxNjg1ZWZmMDdiODE2ZjcwZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxN2E3ZmQwOTAwNWIwOTYyYWIyMGE4ZDAyYTA0NGMyMzhhYWE1OWRlNWU3NTEyZWRmMGEzMWZlYmUxZWRlNjkifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/reciprocal.ts#L136-L148",
+          "version": "repo-lines-v1:sha256:3a180463f5e8ef245d57f2531d5f1fd40e34372780720ba902261ad495b1b302:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0ZWFjMTQ3YWVmNzA2YzdlYTQxM2RhYTJiNDU4YzRmNDIyZmY1Mjc3MjJiYWMzNjBlYWE2MDhmYTBkMjNlOTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5OTZmZjVlZGFkMzhlNTJhZjQ3ZDIzYWFhNTFkNzA5MjlkNDUyYmI3MTdhZDJjZmJjZjZiYTYwOTJiYmRmNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4ODZhNGQxZWI1OTI2ZWE4ODQ0NzY0OWZjYjZlMDIzOTdjMWViYTk4YWFmMTdkNGIyMGIyNmEyZDNiOTIxZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-22T04:35:20.186Z"
+  }
+}

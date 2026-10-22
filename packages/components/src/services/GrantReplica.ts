@@ -20,9 +20,9 @@ const fetcher = new SparqlEndpointFetcher()
  * already-present body is a no-op.
  *
  * No automatic drops on replacement: stale replica graphs are invisible to
- * reads (only current registration links are read) and are cleaned up by
- * `dropGrantReplicas` together with the orphaned grant resources
- * (`revoke-delegation-chain` C3).
+ * reads (only current registration links are read) and are removed by
+ * `dropGrantReplicas` in the revocation GC (see
+ * `openwiki/architecture/authorization-revocation.md`).
  */
 export async function storeGrantReplica(
   sparqlEndpoint: string,

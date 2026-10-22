@@ -14,12 +14,18 @@ sources:
     resource: repo://ui/authorization/src/router/index.ts
   - id: openwiki-source-1de1cb7b4e5904caddca9b5c
     resource: repo://ui/authorization/src/store/app.ts
+  - id: openwiki-source-115b92ff88e5a5db36bb3b82
+    resource: repo://ui/authorization/src/views/ApplicationList.vue
+  - id: openwiki-source-eb958bdbb71f90b66e02abb5
+    resource: repo://ui/authorization/src/views/Authorizations.vue
+  - id: openwiki-source-40f13cc3d1f38241edefd8a7
+    resource: repo://ui/authorization/src/views/SocialAgentList.vue
   - id: openwiki-source-1f2b0c598f24062f7708088d
     resource: repo://ui/authorization/vite.config.ts
-generated: { by: "pi", at: "2026-10-09T21:04:39.559Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-09T21:04:39.559Z
+  - by: openwiki/0.7.2
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Authorization UI
@@ -33,9 +39,10 @@ served by Vite and reverse-proxied at `ui.auth.docker`.
 mounting: on success it creates the app and `registerPlugins()` (Vuetify MD3,
 fluent-vue, router, Pinia); on failure it renders a static error page. The
 router (`src/router/index.ts`) has `/` (a default layout with `applications`,
-`social-agents`, `roles`, `role`, `data-registries`, `settings`, `invitation`
-children), `/authorize` (the OIDC interaction resolver), and `/login`. A global
-guard calls `getWebId()` and redirects to `login` on failure.
+`social-agents`, `roles`, `role`, `data-registries`, `authorizations`,
+`settings`, `invitation` children), `/authorize` (the OIDC interaction
+resolver), and `/login`. A global guard calls `getWebId()` and redirects to
+`login` on failure.
 
 ## Pinia stores
 
@@ -43,7 +50,8 @@ guard calls `getWebId()` and redirects to `login` on failure.
   with dynamic `.ftl` import), push subscription, and the cookie-based account
   lifecycle (`signIn/signUp/signOut`) against the `.account` endpoints.
 - `app` (`store/app.ts`) — the registry cache (`socialAgentList`, `roleList`,
-  `applicationList`, `invitationList`, `dataRegistryList`), `currentContext()`
+  `applicationList`, `invitationList`, `dataRegistryList`), plus the per-grantee
+  `authorizationList` loaded by `listAuthorizations(grantee)`, `currentContext()`
   (org context or own webId), `switchContext` with revert-on-error, and the
   activity snackbar/claim tracker. Most actions pass `currentContext()` as the
   RPC `context` argument.
@@ -54,7 +62,8 @@ guard calls `getWebId()` and redirects to `login` on failure.
 are prefixed with `${backendBaseUrl}/.sai/api` and send
 `credentials: 'include'` (cookie auth), wrapped in `UiTracingLive` so browser
 OTLP spans supply the `traceparent` the server reads. Every exported function
-(`getWebId`, `authorizeApp`, `shareResource`, …) builds a typed `@effect/rpc`
+(`getWebId`, `authorizeApp`, `listAuthorizations`, `revokeAuthorizations`,
+`shareResource`, …) builds a typed `@effect/rpc`
 request and `Effect.runPromise`s it. Activity-first RPCs echo the triggering
 activity IRI as `activityId`; the app store records it as the claim anchor and
 the stream handler matches the incoming row by exact id (no cross-binding).
@@ -81,6 +90,40 @@ matching authorization screen. An owner can archive a still-open request from
 the list (`archiveAccessRequest`); `AccessRequestGranted` and
 `AccessRequestArchived` are terminal resolutions, so the events stream clears
 the indicator without a follow-up workflow.
+
+## Authorization view and revoke flow
+
+The **“Manage access”** icon on `SocialAgentList` and `ApplicationList` rows
+routes to the `authorizations` view with `grantee`, `label`, and `kind` query
+parameters. `Authorizations.vue` loads `listAuthorizations(grantee)` into
+`appStore.authorizationList` and renders one card per data owner, with the
+inheritance tree built globally from `inheritsFromAuthorization` (children stay
+under their parent even when the child omits `dataOwner`), depth indentation,
+the resolved shape-tree label, scope/registration subtitle, access-mode chips,
+and a `via role` note when the row's grantee is a role rather than the selected
+agent.
+
+Selection and revocation are authorization-level only — the UI never sees or
+sends grant IRIs:
+
+- A parent checkbox toggles all its descendants; a partially selected parent is
+  indeterminate. **Select all** toggles the whole list, and the Revoke button is
+  disabled while nothing is selected.
+- Revoke opens a confirmation dialog. On confirm, `appStore.revokeAuthorizations`
+  calls the `RevokeAuthorizations` RPC, claims the returned `activityId` as an
+  `AuthorizationRevoked` activity (the uniform claim anchor), and eagerly
+  refreshes the list and the peer/app lists while the workflow runs.
+- A typed `AuthorizationRevocationFailure` is shown as its machine-readable code
+  (`revocation-failed-code`) instead of a generic defect.
+- The `AuthorizationRevoked` done-row in `events.ts` refreshes both the
+  social-agent and application lists again (cheap and idempotent), so badges and
+  generated-authorization state catch up even if the eager refresh raced the
+  workflow.
+
+The view is read-only apart from revoke: it shows the recorded authorizations
+(the source of truth) and the deletion is projected onto grants by the Temporal
+workflow — see
+[Authorization revocation and grant projections](../architecture/authorization-revocation.md).
 
 ## Localization and PWA
 

@@ -99,11 +99,9 @@ For every activity-first step (from the design now documented in the OpenWiki
    materialize-only + signal the consumer. Lean: self-contained.
 2. ~~Deny/revoke sequencing~~ — **DECIDED (c)**: decline only. The UI's
    `granted:false` becomes a pure `AuthorizationDenied` (the delete was
-   accidental); no revoke producer in the granting plan; a temporary
-   regression window is accepted until
-   [`revoke-delegation-chain.md`](revoke-delegation-chain.md) C2 (the revoke
-   action's designated home, with the detailed design in
-   [`authorization-revocation.md`](authorization-revocation.md)) lands.
+   accidental); no revoke producer in the granting plan. The revocation leg
+   landed separately with C2 — see
+   [`architecture/authorization-revocation.md`](../../openwiki/architecture/authorization-revocation.md).
 
 ## 7. Follow-ups — principle conformance (decide per case, as we reach them)
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b134e8849ee8d78c4cea6c451e78251ccf8fb7084f0ab4c0f2fa72826bed6876",
+  "pageVersion": "sha256:108ad0fb3b5920b6b121d01b460dabe834a8b4848d1656f5c5a01f6f62f22bd6",
   "claims": [
     {
       "id": "claim_0a654c6996364fdfbb807d9a29b08709",
@@ -31,7 +31,7 @@
       "statement": "ActivityData is a discriminated union of one member per RDF activity class, with an isActivityClass(activity, cls) membership check.",
       "evidence": [
         {
-          "resource": "repo://packages/data-model/src/activities.ts#L507-L532",
+          "resource": "repo://packages/data-model/src/activities.ts#L519-L544",
           "version": "repo-lines-v1:sha256:caf34e49d44751f0b8df74b0b6c15c50fbbae9562db679a1987c09a2ffeb7acd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNjAyOWM3YjEyMmM1MmJlYzhkYzQxNTAyNjVlYzc0NjU4OWZhM2ZjNDQ0ZDdiZTU0NWI5YWQ0YTlmZmM5NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxNDI1MmFhZGIyMzNjNzFhNmEyYzFmYjhkODJlNmU4ZDk3YjAzMDA4MWY1M2QzMTI4N2U2OGMzZGUwNmQ1NjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljOGJjNjg3NmRmY2RmODc3ZmIwOGM4ODc3NWI5Nzc3MDI3ODlmM2E0ZjY0NjY4YjIzZDMzOGE3NTRkNTQ3NDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhMDgzMDc0MTAyMjk3MWU0MzAwNTFlYTU0MDgxNThhYzdlMGY2OTA3OThhYjEyYWFhZWYwZWQyNDFlOWEwMTMifQ"
         }
       ]
@@ -51,8 +51,8 @@
       "statement": "GrantData carries the tree fields inheritsFromGrant (written on the child) and the framed reverse hasInheritingGrant; delegationOfGrant was removed, and delegated-chain validity is a match-based predicate rather than a stored pointer.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/sparql.ts#L650-L707",
-          "version": "repo-lines-v1:sha256:89b4797802a20ed18ced24622d9532ad7cfa660fcf36b432fdec166bc2a6c929:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3OWFlNjllZjg1NjZhMmI1MGNhMDFkODRiODRmM2FlMzBiOGE1ODYzZDIyYzkzY2IyNmQxNGEwMTAwZjM2YzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyOTRiMmNmNWI4OTRkNGQ2ZmQwNjQxNWRiOGM2OTc1ZTM4NTQwZWUwNzI0ODc3ZjhkMzk1YmU1YzZhZGVkOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwMzU5MjRmZmMxMjZjN2FiYTg2YTVhODE3N2ZiYzg4MzM1OGQwZDU4MDdhNTMzMTRkNWFmOWE2MWRmOGRkNTAifQ"
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L163-L255",
+          "version": "repo-lines-v1:sha256:fa7331d4935efd37b912056e240efaa6e4af59d1fd07f78058039554e0d8a854:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0YTgxMDNjNTRjZDY1ZjJiNzZhYjkwMDRhN2NjZjNkY2NjZTA2N2ZhNmJkNjEyMjk1NjY5NzQyYjA2Y2NjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxNzAzOTU4MjRjOGY2MTVhYjhlYzJjNWJlZTI3MDczYjgxYWQzZDk0NTUzNWRiZjgzNDU2NWYxMzkxOTIyNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZThlNWRkNjgwMGYwMmJjYmI2MjczYzBiMDg5NjM3YTg3NTk1OGNkZGMzNmYxYzc5OWQ2MzBjMmE4NDYxYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NmMxYmVmZWE2NmQyOGVhODk0NDQyYzkwOTgwMGNiNGIxNTY5ZDdkNjZiMGQyMzRlMjViNDVlYTU2OGY1OTkifQ"
         },
         {
           "resource": "repo://packages/data-model/src/context.ts#L134-L138",
@@ -109,16 +109,6 @@
         {
           "resource": "repo://packages/data-model/src/authorization-registry.ts#L1-L3",
           "version": "repo-lines-v1:sha256:eea0dde9f1f1f8372294815848d17b8bb37b6bf4ba41c73b422bb8378cddd50f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzM1Yjc5MTNhZWFjOTRkNjE1YTgyMGJhYzAyM2E4MWE4Y2I3YjhhMDM1NmIxOWI4ZWYyODQzOWJhMGU1ZDM4MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
-        }
-      ]
-    },
-    {
-      "id": "claim_2bf49e118f414e8dbe8756c3213764f5",
-      "statement": "Deny/revoke/replace physically DELETE data-authorization resources: replaceDataAuthorizationsForGrantee computes the IRIs to delete and issues DELETE requests rather than orphaning them.",
-      "evidence": [
-        {
-          "resource": "repo://packages/authorization-agent/src/authorization.ts#L206-L229",
-          "version": "repo-lines-v1:sha256:3d069758ab6dc4ab1ff4f98a16add33cf750fb98a211e70d07ed85282e18e023:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNTE0M2EwMGMyNmM5Y2JjN2YxNGU3MjgzMTdmZjY5ZDFjNzZhM2E3ZDk1YWY4NWQ3Y2JkOGY0YWY1Zjg3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhN2RjZjk0YjY4YjNkMmU1MmVlYzRkMmViY2I4ODY3Mzk4ZTE5MDQzODc1ZjUzZjk2ZGE0NzNlN2EzOTJkZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2N2I1MmZkOWE4OTk1ODlmMGEzMjExOGMzZDkwZjQ1NzIwZTI1ZmQyNDkwNWZkMTdhNTJjOGE3MzhjMDVkMTQifQ"
         }
       ]
     },
@@ -217,10 +207,38 @@
           "version": "repo-lines-v1:sha256:b2a2e721793c6359098f50b1303dd04022b3749463fa546a1d3afb3a103d43a1:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNmZDBhZjNhNmNiYzhjZjk1ODYyYmJkNzkzN2M3YjQ5MWQ0NTZmZjdiNWM0Y2VlZmJlMzgyNzdmMmQ1OTZjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTc0YTU4ODRmMTIzOWUxZWNkZjJkYzcxZjQxZjQxZGRjNWFkZTRhY2M4MWI5Mzk5M2Y4YTU0ZTVkYzQ1YjIzYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2RiYTQ4NWVhYzY5NDZlMjM4YWZhOGI5NzVhMThmYjlmYzZhYTdlNzE1MjUyOThkY2RjNTRmNzUyMGQwZGYxOSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_7e06746c371e47e3967a171b1f4e9855",
+      "statement": "Deny and authorization replacement delete the grantee's non-reused data-authorization resources through replaceDataAuthorizationsForGrantee, which computes the IRI difference and issues DELETE requests instead of orphaning them.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/authorization.ts#L202-L229",
+          "version": "repo-lines-v1:sha256:27d551a9e34cd5ed5f592004b06e21c51834c5122759b5a0c861280ecf5e1412:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjMDBhMDgyMmQxMmE1NTNhZDlmYzkwN2VjNjJmMzk1MDk1OTg3NWRhNzhjMmFiZTQxZTNmM2Y3ZGRhNGMxMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2MTRkYTdjMzllZWMwYWFhZjI3NjBhNzQzZDIwZTVjOGI4ZTI0NWRhMDVkMTMxNWJjM2JjODk3NDQyZDE1NTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2N2I1MmZkOWE4OTk1ODlmMGEzMjExOGMzZDkwZjQ1NzIwZTI1ZmQyNDkwNWZkMTdhNTJjOGE3MzhjMDVkMTQifQ"
+        },
+        {
+          "resource": "repo://packages/authorization-agent/src/authorization.ts#L355-L383",
+          "version": "repo-lines-v1:sha256:66c9dabc80c91836dbb1d14d08dd1908e0a9b53db066847143b49a1d8045886c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNjEyM2Y3ZTAzNTQ2NDgyZjBiNTg1ODg0M2E1Y2RkY2ExNzYzMDQ0NGM0ZjczNjA3ZDFjYjFlYTRiZDU4NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0Yjk3Njk2YTk1MWVlNjM2MzdmNGY5YWQyZWRkNjIxNDg3MTkxNjdhYzVkNjM1NTdkMGY4YWEwMmQzM2EyZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5YmZmNWM0OTQ2NWYxZTkyODExYzRhZTJlOTRhYzYyYmNiMTllMWVjNzMzY2E4ZTNmYmE3MWE3OWFhMjEwNGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c812676c7ff45789ceb94590c199d03",
+      "statement": "Explicit revocation deletes the selected data-authorization resources through the revocation workflow's deleteAuthorizations activity, which DELETEs each carried IRI with the owner session and tolerates 404 for idempotent retries.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L665-L687",
+          "version": "repo-lines-v1:sha256:786e3ea43ac33b4b4ab954148b33e696528f4b10dd5b2d95488e2b51162597e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiMzc5ZjFhOTYwN2EzMjNiZDAxY2Q4ODE1Zjc5ZTczMGM5ZDUxM2NlNTRjOTZmZDg0ZWZhZWRmYmI2NGZlZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiYmJmMGQ0NWUwN2JkMWJkNjM2ZTFkNjk1OGZlZDhhMTJiMTg1ZjQwYzJhZjcxMGY4OTZjMTBhZmVhMGQ4MjMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L858-L873",
+          "version": "repo-lines-v1:sha256:9874d324ba28368c4b9f193e541a55e9b0f268473c120f3d23cce4e756c7b8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhY2M0NTg4ZjQyMzA4MTYyZGExMmE3YThmNWVhZWFlMjA5YWY2OWMzYjM3ZGU3MDQyNjA2MjcxYzRiOWU2YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDczNjU1N2RmZjcwZmMxYzcyMjUwZjFiY2UzY2M1ZTA1NzQ5ZjI0OTAxYjFlOTI1MmIxYzNkYTIzOTdiNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T17:33:35.590Z"
+    "at": "2026-10-22T04:35:20.186Z"
   }
 }

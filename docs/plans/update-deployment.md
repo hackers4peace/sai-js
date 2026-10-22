@@ -200,7 +200,8 @@ only the schedules/cadence/config**; the workflow logic is C5 code. Real
 deployments also have **no dev `kv.json` pre-seed**: without the activity-webhook
 channels, producers write activities that no handler ever sees, so the sweep
 would be the only dispatcher and the UI would receive no pending/done events.
-C5 design: [`revoke-delegation-chain.md` §10](revoke-delegation-chain.md#10-c5--sweep-backstop);
+C5 runtime design: [`architecture/authorization-revocation.md`](../../openwiki/architecture/authorization-revocation.md);
+remaining C5 polish: [`grants-replication-polish.md`](grants-replication-polish.md);
 channel lifecycle: [`webhook-subscription-bootstrap.md`](webhook-subscription-bootstrap.md).
 
 - [ ] **Sweep schedule.** Create a Temporal Schedule per account
@@ -236,11 +237,11 @@ channel lifecycle: [`webhook-subscription-bootstrap.md`](webhook-subscription-bo
   schedules (idempotent create) and must not overlap runs (schedule overlap
   policy); schedule-run failures must be visible (Temporal UI, metrics, traces)
   with an alert on repeated failures.
-- [ ] **C5 code prerequisites before enabling the schedule.** Batch boundary
-  validation (`valid` / `invalid` / `unknown`, read-only, rate-limited; peers
-  must support the message), the peer-side orphan scan, and stranded
-  `AuthorizationRevoked` completion. `unknown`/owner-unreachable is a retry,
-  never a revocation.
+- [ ] **C5 code prerequisites before enabling the schedule.** The peer-side
+  orphan scan and stranded `AuthorizationRevoked` completion
+  ([`grants-replication-polish.md`](grants-replication-polish.md)).
+  Owner-unreachable is a retry, never a revocation. (Batch boundary validation
+  is **out of scope** — D21.)
 - [ ] **Mirror-sync retry cap.** Revisit the `syncReciprocalMirror` 5-attempt cap
   once the schedule is live (workstream B): unbounded retries with terminal
   404/410, or a scheduled reconciliation arm, so a stuck peer cannot leave a
@@ -288,8 +289,9 @@ channel lifecycle: [`webhook-subscription-bootstrap.md`](webhook-subscription-bo
   layout.
 - **[`extract-temporal-workflows.md`](extract-temporal-workflows.md)** may move
   the worker entrypoint; coordinate the worker image path with that plan.
-- **Scheduling (F)** is the C5 workstream slice
-  ([`revoke-delegation-chain.md` §10](revoke-delegation-chain.md#10-c5--sweep-backstop));
+- **Scheduling (F)** is the production arm of the landed C5 sweep runtime
+  ([`architecture/authorization-revocation.md`](../../openwiki/architecture/authorization-revocation.md));
+  remaining C5 polish is [`grants-replication-polish.md`](grants-replication-polish.md);
   channel lifecycle is [`webhook-subscription-bootstrap.md`](webhook-subscription-bootstrap.md).
   The sweep (activity entries) and channel healing (subscriptions) are separate
   workflows and both are needed in production.
@@ -318,7 +320,6 @@ channel lifecycle: [`webhook-subscription-bootstrap.md`](webhook-subscription-bo
   `isolated-datasets` drift-scan workflow.
 - Sweep scheduling: per-account Temporal Schedule vs a single
   `fanOutReconciliation` schedule (C5 must pin one); interval/jitter defaults,
-  the mirror-freshness cadence (separate schedule vs every N sweeps), and the
-  batch-validation rate limit.
+  and the mirror-freshness cadence (separate schedule vs every N sweeps).
 - Channel healing: land `webhook-subscription-bootstrap.md` before the cutover
   (recommended) or fold its minimal create-if-missing path into workstream F.

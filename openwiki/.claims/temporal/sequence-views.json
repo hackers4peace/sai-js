@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:cb9c2f8afccec19d409a36dae1dff749bb080584d344a74cdd29fb71733a6a51",
+  "pageVersion": "sha256:c100efbb4351188837a7508053af121c49c5e8d68ce79aa80f6011fc3fc48583",
   "claims": [
     {
       "id": "claim_c0d040529023490a8a016339ae020d13",
@@ -75,16 +75,16 @@
       "statement": "The reciprocal-registration-update runtime path writes a DelegatedGrantsUpdated activity, delivers its Add through the durable webhook path, then start-or-signals the per-peer processDelegatedGrantsUpdated consumer, whose drain runs syncReciprocalMirror before updateDelegatedGrants and only then completes the activity (a terminal peer-gone sync skips the regeneration and still completes).",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L38-L62",
-          "version": "repo-lines-v1:sha256:315819fc7ec4f56ac90fe0fe40448e262fed1f74eb13028041110e843d7d6263:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxYTQyMWYwMjBhNDUxYmIyYThhYzY4OTM5MzNhNDAzOTQ1N2UyMmM1YzAzNzljOTUwZTUxN2JhNmIzZDUxNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4NzQ2ZDZhZTEyNjEyMWQ4NzE3MDNmYWU1MzYwMGZiZTZhNjg5MzlkOTcyMzlkYzZhMmYxZWY2OWNhN2YzOWMifQ"
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L395-L420",
+          "version": "repo-lines-v1:sha256:e5017fe6ca77827d4da9b1dfa3a010e8e67c67b21ab214201a8a56728738646f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlY2UyNmFkOWUwYmRlOWU5ZjdkMzE4ZGNjOGMzNDQzMGNlZjllOTc1M2YwM2ZhN2NiMmJlYTY5MWI0YTg4MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4NTU3MWM1Mzk4MTYxODA2MGZhYzJhNWYwZWU5OGE5MzVjYmMzOGZlMzM5NTY4ZjdmNTdiMjk0ZGZkNTJhNmIifQ"
         },
         {
-          "resource": "repo://packages/components/src/ReciprocalWebhookHandler.ts#L55-L82",
-          "version": "repo-lines-v1:sha256:a834d0da96491b1747a116b0323dfee8f15a60a0c8c5801ce2eaa832bd3b64f9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhZjJkNWQ4NTllMjQwZmE2ZjMzMTMxZGNmNjE4MmI2MGMzMmM2ZDA2YmVhNGVmNjNlMGVjMzZlMTM3Y2Y5ODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExN2NmMmZhOTBlZTM4OGM1ODVkOGJiZTU3MzQ5OTZkMmY0NGQ4NDFiMjdjZmUyZmI1MjY3ZDQ3ZDNjYzQ5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNmY1NGQ2MTZlM2UxYTEwMzRjMDI1MmE0MDc5ZWI1YWEzZDNiMTIxNmY3MDJlYTk0ODBlZTJiMDgwNTU5NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
+          "resource": "repo://packages/components/src/DurableWebhookEmitter.ts#L45-L58",
+          "version": "repo-lines-v1:sha256:232496ea5ef23fdbd74587474445f06edfd8109cd78b3c006d96771eabf81b6e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNmM4Nzc3OTQ4ZmZhZjJlMWQ0NDE2YmI5MGYxYjdlOTM5Yjk5MWE4YmM4OWVmNzRjNGQ4MzkwYzg4MzY5ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiNzA1MDUxZjdmYTNkYzU0ODc3ZDNhYjg2ZDdmYTcxN2RhNjJkOGRiNGQzODAyODcyYjM5MDNiZmFjYzQ5MjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNDJhYzlmMzZjYmU3ZmUzNmZkZGU5ZjVjM2Q5NjY5NWRlODEzNWZhMDZlNTdkNzg0YzUyNDkzZjIwOWJhYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyMWRkZDg5ODcwNDhkNDQ1MDE0OTU1OWE1Njc4ZDU0OTg2ZTdkNDc1Mjg0Yzc4NzVlMDY1MWIzOWJhYWQwZjAifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L209-L246",
-          "version": "repo-lines-v1:sha256:4d3c80889cce174ac0ec5a1a99d1cbe092e44520d023ad35a309a06ab8a980f1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4N2ZlNGJhOGU0OTQ5MTU2MGI4MmM0MmEzNTlkMGI1M2ZkYTZiNGE5OTYxZmI2NmJkNmUxZWY2NGEwNjllZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTQxZTQ2NzNlZTMzZmJlZTUxOGJiYTA5Y2NhMTNiZjY1YzBkYzJmYzEyZDJjOTg2NzZiNmM2MmQ0YzBjOWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMTFkM2NkNDRiN2M2MDhjMzRhNjIwY2IwNGFkNWQxMzZiMjUwOGNkYWNlMTZkNjVlMzY0NzdiZTQ3ZjE1MzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwZDA5MjI4ODBjZmI1MjMxNTBiMzU0NzA1YjM5YjdhMzQ0MjFiY2UwYTgyZWFlZjIwYzBhMmYwYTg0MzU5Y2EifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L189-L233",
+          "version": "repo-lines-v1:sha256:b91a875c8771437aa57f24b966f1d8b56658b4595221dbcaf523600258c3f075:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4N2ZlNGJhOGU0OTQ5MTU2MGI4MmM0MmEzNTlkMGI1M2ZkYTZiNGE5OTYxZmI2NmJkNmUxZWY2NGEwNjllZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmNDdiYjk5MGEyN2MzNmNmOGU1MzM0NGZmZWY3MzAyMWM4MGJjMjBiODUwNzcxNjg1ZWZmMDdiODE2ZjcwZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
         },
         {
           "resource": "repo://packages/components/src/temporal/workflows/reciprocal.ts#L145-L149",
@@ -117,22 +117,44 @@
       "statement": "In the delegated-grants flow, regeneration reuses an equivalent delegated subtree from the local replica and only requests delegation for what changed; newly issued grants are echoed back and stored as the issuer-side replica.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/GrantReplica.ts#L26-L36",
-          "version": "repo-lines-v1:sha256:6a236e1bb3d79a61fb312ccc1f56c915b498274e98915b1781c68ecbb43e804a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5Nzk1MDQ1ZmUyYjhmM2Y1YmUzYzNmOGVjZDg5NDBjZWFmZjI1NWNiZjVjZjBhZjg0ZGZkYzM5NDc2ZDIxNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MmE2OTI4NTMyNWNhOTBhYjFhZjk1YjFmNmNiNzk3NWVhOGRjOTYxNmNjMWEyYmM5Mzg2ZDc4Yjk1OGI3YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkOGI1ZGU1N2Q4ZGUwYmFiMTBkNGQyN2IwNjNkZThmOGNmNDViMzY3YTE1NzEyNmQ4MTJlY2I3ZTRhNzgyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "resource": "repo://packages/components/src/services/GrantReplica.ts#L26-L44",
+          "version": "repo-lines-v1:sha256:3d155fe63b89f89c2fc9872c64d4702d8a0a66ec9f674d6125a28bfc2e7704b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxODExMDBiZDc1MWVhMDJiMzRiYTdmODdkODllNjZjMWQ1MTY3YWI1MWZlMTc3OTM5ZTcyMmVlYjQyMzJjZWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNTJiZWJmMzZkZWQ5ZjRkMjc4NDE0OGVmOWUxZjBhYWU4ZDJmYzI5N2Q1ODRmNWY2MzAxYWUxY2ZkY2RlNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlM2VkMTQ4NTNlMmMwZDE5NTZkNzg3MDhhNzMyYWE3MjBkNDM3NjZhZDA4NGJhZTQxMjhjZGY2NTM5Y2Q5M2EifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L388-L437",
-          "version": "repo-lines-v1:sha256:9a7f0941df19584da02af16c1b68fe95b33e0f3e17fcffed3069e2d957eff2c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOTI3ODNjOTI1YjA3OTJiMzFkMzMxMDlkZDIxYzQzYTYxYTE0ZDYwNzQzNjM1OTQ0YmExOTU2YjAyNmU3NjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNDk5YTJlMDJiMGY4MDU5MTAwYmI0NWQ2Yjg0ZGJhYmRmZDhkNDZlNWIwNmJlY2VkNDcwOGJmMzYzNmVjYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlMjk3YTcwOGZkN2NmYWFhYTA0OTE4ZGRhYjY0MGU0NTRhOTg1ZDkyOGIzMmZjMWY1MGE3MTY4ZGQ1YTFkOTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEifQ"
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L395-L437",
+          "version": "repo-lines-v1:sha256:3e9c37aa7eeb62901bdfd3c24c1198632a94629a0d9bfce8d8a12a155f85088b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1OGU4MzY5NTM2NGRmYmJlMzFiNzhiZWI2YzllMWNlNDBiNDU1YjMyNTUwZmFhN2ZmM2FiNGVmNDg0MDBjMWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4YmYxMjI4Y2VlNmNiYTM1MmJjOTZmN2Q1OGU0ZTNmZmUxOWE4ZTNmNzFhNzAzNWMxMjBmNDNhOGIwMjEwOTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5MDFkMTZiN2Q2N2M1M2ZjMWVjZTQxYzBlZTQ0NDc2NmQyOGFlMTkwZTNmMGMxODdlYjMxMDA1OTgyMDU2NzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI0ZTJmNzBlNjEyNDljZWZhYmRkYTU4NmM4N2NlZjE4ZmU0MzU5NzY5NmFlZWJjZmVlYmIxNjE1ODcyMTQxYjQifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L692-L739",
-          "version": "repo-lines-v1:sha256:d9571bf0a92d56c7412fef6d839a1beef6a76b0a3729a79b0a898711ac69214c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ODJhYjc5OTIwNWVlYjgwZjgxNjJjOGZiM2VhYjBkOTUwNGM4Y2I0Nzg4Y2JjNmNiOGY4YTRkYmRkNDk3NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZDA3MmI1MDY1M2U5ZGViMmYzODJjNWVhMjYzMTg1ZjBjYjNhNWIxYmNhMThjYTc1ZjQ1NTExMTIzZTFlOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMTlmMGJhMDM1MWJjZTI5MTZiYjZhYjYxZTVlZTEzOWY2NmJkZTI4Zjc3ZDkzMWVmNWZlY2E5ZTI3YjkxZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ZTBhMGEyOTdiNmRlYzljZjdjMzRiZTJlMzgwMDdmN2RmYjMwODdjMzZkYjIxOTg0MTkzMTI3NTFhZmM0YTQifQ"
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L771-L779",
+          "version": "repo-lines-v1:sha256:4b4998a1ddc181d9ad075d3d1f278bf92bd130fa8f0f5ef947d5a630d60c3fc6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTg4MmFiNzk5MjA1ZWViODBmODE2MmM4ZmIzZWFiMGQ5NTA0YzhjYjQ3ODhjYmM2Y2I4ZjhhNGRiZGQ0OTc2MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk2NzQ5MmZhNDQwNDI1MjRkMjgwOTBjOGZjNDgxZjMwZTkwZjNkNmM3Mjc5MWJlYjgxNzJmNDE5YWNiYTk3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjNmNmM2YWY5M2MyYmU3YTViZWNmMjQ1NTIzNDYzZTdhMDIyZmU4ZDdlMmE1ZmE3YTUzNDI4ZmFiNjlhY2U0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjVkN2VkZjI0MDQ1MGEwMjEyYzYzNTMxMDRiMGM2YzU5NmQwMGQyMTNjYTI4MGEzY2E1NWNjOTNlZjU1MjBjYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5ad8568b70af4c35aa64d460bd5de5ea",
+      "statement": "The authorization-revocation sequence writes one AuthorizationRevoked activity after expanding the inheritance closure, then processAuthorizationRevoked deletes the DataAuthorizations, reconciles each expanded grantee's projection through the GC (local closure or peer boundary plus replica drop), and completes.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L270-L286",
+          "version": "repo-lines-v1:sha256:84434643b1e1b20a6417b9c2c91d6aaa9988b902d6aa0a6aa324e3e692e1bbd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwNDE5NTQ2YzRkMTdhZGY1NGY4NDc4OTczZjEwMzg2NDVmYzBiMTk1Zjk5MzNiNjg3OWJkMjY4ZmRmODEwY2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5MDBjN2ZjNDQwMGY2MmUyOWQ3NjVkM2NiMjA4ZjUyOGJhMTJiYjdjYmZhM2Q2ZTkxY2YyNzY2ZjNjYTNiN2EifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/Authorization.ts#L464-L532",
+          "version": "repo-lines-v1:sha256:b63345270140f99dd38cb83e134e72eaf05d8b070112d89199b5cc69f0c2968f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2YmFmYmEzOTZmZDZiNGI5NTYwYzhmNTViOWJhYzcxODQ4YzNiYzc4YjJkODU2NTUyZTQ4OWU0MDlkZTYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2ZmJkYmMzYTA3Yjc4YWM2MjU0NGE3NDYyOGQ4MDliZjk1MDdiNGIxODQ1ZjY5MjExMGU2Mjc4ZjNjODYwOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTNjMjg1NzQ3N2E1MGQ5YWE0YmYzNTFhOTExZTljYTA0YmU2NmJiYzY2ZWQ4ODRiYTFlNWJiYzJhMjg1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NjE5ZGIxNWFmNjBlYTMyNGNiYTJmM2Q2NTczNzNkYTIxODVkOGMxMjUyM2FjOGEyMDU3M2FiZWVlNzllODAifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L780-L841",
+          "version": "repo-lines-v1:sha256:16cdffb0b1abe82dd4dddcfca5c716c15db0b456b6156648e374fa0ab0ea9c34:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmM2Q3YjgzMjYyMzk4ZjliZWE4ZjQ2ZDA5N2ZiNDVmZmVjNDE1ZTE3YWE2MDgxY2VkMzE1Y2Q3YjA5NzIzNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzYmZiNjJiNDJlMTcwODczMTVlYTExYTIzZWY3Y2U0NTc5NWQ4OWNlYzIyZjU0ODQzNzk2YzI4MGM0MjBmNzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3Y2I3YjkxMTFiNGJlOWFkYmY1MzgwYjU3NDg2ZTRiNDFlNDZmN2E0M2E1MTZjMmZiYjhlNzAyMDhkODg3MzEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L858-L873",
+          "version": "repo-lines-v1:sha256:9874d324ba28368c4b9f193e541a55e9b0f268473c120f3d23cce4e756c7b8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhY2M0NTg4ZjQyMzA4MTYyZGExMmE3YThmNWVhZWFlMjA5YWY2OWMzYjM3ZGU3MDQyNjA2MjcxYzRiOWU2YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDczNjU1N2RmZjcwZmMxYzcyMjUwZjFiY2UzY2M1ZTA1NzQ5ZjI0OTAxYjFlOTI1MmIxYzNkYTIzOTdiNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-21T17:33:35.590Z"
+    "at": "2026-10-22T04:35:20.186Z"
   }
 }

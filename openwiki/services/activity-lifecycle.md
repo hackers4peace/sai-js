@@ -4,8 +4,6 @@ title: Activity outbox and events pipeline
 description: The append-only Activity Registry outbox and its pending/done state machine, the producer and consumer (workflow) tables, the Solid Notifications webhook delivery, ActivityWebhookHandler routing, the ActivityEvents bus, the embedded DataAuthorizationData POJO carrier, and the reconcileActivities backstop.
 tags: [activities, webhook, events, solid-notifications, architecture]
 sources:
-  - id: openwiki-source-df278cf0a9970a69b70cfc00
-    resource: repo://docs/plans/update-deployment.md
   - id: openwiki-source-82daddf07d8ad3efedbe52d2
     resource: repo://packages/authorization-agent/src/activity-registry.ts
   - id: openwiki-source-c154d0515a7154469b1f503c
@@ -40,10 +38,10 @@ sources:
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
+generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-21T12:54:01.599Z
+    at: 2026-10-22T04:35:20.186Z
 ---
 
 # Activity outbox and events pipeline
@@ -137,7 +135,7 @@ dispatches on the class:
 | `AgentRegistrationAdded` | `InvitationHandler` (inviter's registry) | `establishReciprocal` on `reciprocal-registration` — builds both registrations/reciprocals, subscribes the reciprocal webhook, completes |
 | `AuthorizationGranted` | `Authorization.recordAuthorization` (grant), `ShareResource.shareResource` | `processAuthorizationGranted` parent → per-grantee `processGranteeAuthorization` children on `create-grants` (one activity for all grantees) |
 | `AuthorizationDenied` | `Authorization.recordAuthorization` (decline) | **terminal / forward-only** — no workflow; the reconcile sweep closes the row |
-| `AuthorizationRevoked` | none yet (see [`authorization-revocation.md`](../../docs/plans/authorization-revocation.md)) | per-grantee `processGranteeActivities` consumer (start-or-signal) |
+| `AuthorizationRevoked` | `Authorization.revokeAuthorizations` (the `RevokeAuthorizations` RPC) | `processAuthorizationRevoked` on `create-grants` — one run per activity (no consumer): deletes the carried DataAuthorizations, expands a role grantee, reconciles each affected grantee's grant projections, completes. See [Authorization revocation and grant projections](../architecture/authorization-revocation.md) |
 | `RoleCreated` | `RoleRegistry.createRole` (activity-only) | `createRole` on `create-grants` — PUTs the role at the minted id, completes |
 | `RoleMembershipChanged` | `RoleRegistry.updateRole` | `processRoleMembershipChange` on `create-grants` |
 | `RoleDeleted` | `RoleRegistry.deleteRole` | `processRoleDeletion` on `create-grants` |
@@ -170,7 +168,8 @@ a new `DataRegistry`-scope admin grant when the org gains a data registry; no
 `dataRegistryAdded`-style producer exists yet. A public
 `adminAuthorizations()` iteration API is deferred — the workflows read the
 AuthorizationRegistry directly, type-filtered. `grantsRevoked` remains retired;
-the authorization-revocation leg has no producer yet.
+the revocation leg is the `AuthorizationRevoked` carrier plus the
+`processAuthorizationRevoked` workflow.
 
 ## Full arc (AuthorizeApp)
 
@@ -225,8 +224,9 @@ deleted its registration of us (`404`/`410`), the consumer completes the batch
 retrying into the cap would leave the activity `pending` forever. Every other
 failure retries, and the mirror step keeps `syncReciprocalMirror`'s five-attempt
 retry cap (a permanently unreadable or `403` peer therefore stays `pending`,
-visible rather than stale-done; only the reconcile sweep — still unscheduled —
-would re-drive it). Grants where the context is the `grantedBy` rather than the
+visible rather than stale-done; the reconcile sweep re-drives it, and the
+sweep's production cadence is a deployment concern). Grants where the context is
+the `grantedBy` rather than the
 grantee are not part of this mirror (the data owner holds the authoritative
 copies); see
 [Federation constraints](../architecture/federation.md#the-reciprocal-mirror-in-detail).
