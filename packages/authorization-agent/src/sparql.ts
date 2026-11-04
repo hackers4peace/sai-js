@@ -517,6 +517,24 @@ export async function getDataAuthorization(
 }
 
 /**
+ * `getDataAuthorization` for LISTING callers: container membership and the
+ * per-resource graph read are separate queries, so a concurrent revocation can
+ * delete a DataAuthorization between `listContained` and this read. The graph
+ * then CONSTRUCTs empty and framing would throw (`Node ... not found`) — a
+ * listing must skip the vanished row instead of failing the whole response.
+ * (A UI ListAuthorizations right after a revoke raced the workflow's delete
+ * and surfaced as "The revocation failed".)
+ */
+async function getDataAuthorizationIfPresent(
+  transport: SparqlTransport,
+  iri: string
+): Promise<DataAuthorizationData | undefined> {
+  const doc = await graphDoc(transport, iri)
+  if (Array.isArray(doc) && doc.length === 0) return undefined
+  return DataAuthorization.fromJsonLd(doc, iri)
+}
+
+/**
  * Role IRIs in the given role registry whose membership includes `member`
  * (`interop:hasMember`). One SELECT (docs/sparql.md step 2): the container
  * membership — `ldp:contains` in the container's REGULAR graph (the single
@@ -572,7 +590,12 @@ export async function findAuthorizationsForGrantee(
     findRolesWithMember(transport, registrySet.hasRoleRegistry.id, grantee),
   ])
   const roleIriSet = new Set(roleIris)
-  const authorizations = await Promise.all(iris.map((iri) => getDataAuthorization(transport, iri)))
+  const authorizations = (
+    await Promise.all(iris.map((iri) => getDataAuthorizationIfPresent(transport, iri)))
+  ).filter(
+    (dataAuthorization): dataAuthorization is DataAuthorizationData =>
+      dataAuthorization !== undefined
+  )
   return authorizations.filter(
     (dataAuthorization) =>
       dataAuthorization.type.includes(INTEROP.DataAuthorization) &&

@@ -51,6 +51,9 @@ function fullRefresh() {
   appStore.listApplications(true)
   appStore.listRoles(true)
   appStore.listSocialAgentInvitations(true)
+  // recover a done-row missed while the stream was disconnected (the C0
+  // authorization view may still show revoked rows)
+  void appStore.refreshAuthorizations()
 }
 
 /** The registry owner an activity was written to — `actor` (as:actor, plain
@@ -91,13 +94,19 @@ function handleActivity(activity: ActivityEvent) {
   // contexts already performs a full refresh (switchContext)
   if (owner && appStore.currentContext() !== owner) return
   // dispatch on the type discriminant — the grantee kind is resolved in the
-  // store, so authorization done-rows refresh both lists (cheap, idempotent)
+  // store, so authorization done-rows refresh the agent/application lists; a
+  // revocation additionally re-reads the C0 authorization list
   if (
     activity.type.includes('AuthorizationGranted') ||
     activity.type.includes('AuthorizationRevoked')
   ) {
     appStore.listApplications(true)
     appStore.listSocialAgents(true)
+    if (activity.type.includes('AuthorizationRevoked')) {
+      // the workflow deletes the selected DAs asynchronously — only now is the
+      // C0 list authoritative; re-read the grantee the view last loaded
+      void appStore.refreshAuthorizations()
+    }
   } else if (
     activity.type.includes('RoleMembershipChanged') ||
     activity.type.includes('RoleDeleted') ||

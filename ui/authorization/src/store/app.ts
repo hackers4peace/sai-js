@@ -40,6 +40,13 @@ export const useAppStore = defineStore('app', () => {
   const authorizationData = ref<S.Schema.Type<typeof AuthorizationData> | null>(null)
   /** the read-only authorization list for the grantee on the C0 view */
   const authorizationList = ref<S.Schema.Type<typeof AuthorizationList>>([])
+  /** grantee of the loaded C0 list — the AuthorizationRevoked done-row
+   *  re-reads it after the workflow has deleted the selected DAs */
+  let authorizationsGrantee: string | undefined
+  /** monotonically increasing request id — a slower stale response (context
+   *  switch, grantee switch, eager refresh vs done-row refresh) must not
+   *  overwrite the newest list */
+  let authorizationsRequest = 0
   const accessRequestIriRef = ref<string | undefined>()
   const socialAgentList = ref<S.Schema.Type<typeof SocialAgentList>>([])
   const roleList = ref<S.Schema.Type<typeof RoleList>>([])
@@ -188,7 +195,7 @@ export const useAppStore = defineStore('app', () => {
   async function switchContext(webId: string) {
     const previous = context.value
     setContext(webId)
-    authorizationList.value = []
+    clearAuthorizations()
     try {
       await listSocialAgents(true)
       await listApplications(true)
@@ -245,12 +252,27 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  function clearAuthorizations() {
+    authorizationsGrantee = undefined
+    authorizationsRequest++
+    authorizationList.value = []
+  }
+
   async function listAuthorizations(grantee: string) {
-    authorizationList.value = await effect.listAuthorizations(
-      grantee,
-      coreStore.lang,
-      currentContext()
-    )
+    const request = ++authorizationsRequest
+    authorizationsGrantee = grantee
+    const list = await effect.listAuthorizations(grantee, coreStore.lang, currentContext())
+    // a newer request (grantee/context switch, done-row refresh) wins
+    if (request !== authorizationsRequest) return
+    authorizationList.value = list
+  }
+
+  /** Re-read the grantee list the C0 view last loaded. The RPC's eager
+   *  refresh runs before the asynchronous workflow deletes the DAs, so only
+   *  the AuthorizationRevoked done-row sees the post-revocation state. */
+  async function refreshAuthorizations() {
+    if (!authorizationsGrantee) return
+    await listAuthorizations(authorizationsGrantee)
   }
 
   async function listRoles(force = false) {
@@ -325,14 +347,20 @@ export const useAppStore = defineStore('app', () => {
     listRoles(true)
   }
 
-  async function revokeAuthorizations(grantee: string, authorizations: readonly string[]) {
+  async function revokeAuthorizations(authorizations: readonly string[]) {
     const { activityId } = await effect.revokeAuthorizations(authorizations, currentContext())
     if (activityId) {
       claimActivity({ context: currentContext(), type: 'AuthorizationRevoked', activityId })
+    } else {
+      // all selected DAs were already gone — no workflow and no done-row, so
+      // re-read the list here (a refresh failure must not read as a revoke
+      // failure; the RPC already succeeded)
+      void refreshAuthorizations()
     }
-    // eager refresh (the workflow deletes the DAs asynchronously; the done
-    // event in events.ts refreshes again once the activity completes)
-    await listAuthorizations(grantee)
+    // No eager C0 refresh: the workflow deletes the DAs asynchronously, so it
+    // would still list them — and can even race a per-DA read with the
+    // deletion. The AuthorizationRevoked done-row re-reads the list through
+    // refreshAuthorizations; the RPC ack alone decides the dialog outcome.
     listSocialAgents(true)
     listApplications(true)
   }
@@ -456,7 +484,9 @@ export const useAppStore = defineStore('app', () => {
     getResource,
     shareResource,
     getAuthoriaztion,
+    clearAuthorizations,
     listAuthorizations,
+    refreshAuthorizations,
     listDataInstances,
     authorizeApp,
     revokeAuthorizations,

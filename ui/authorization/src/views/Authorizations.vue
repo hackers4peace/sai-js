@@ -212,7 +212,7 @@ async function revoke() {
   revokeError.value = undefined
   revoking.value = true
   try {
-    await appStore.revokeAuthorizations(id, [...selection])
+    await appStore.revokeAuthorizations([...selection])
     selection.clear()
     confirmRevoke.value = false
   } catch (err) {
@@ -358,7 +358,7 @@ watch(
     if (id) {
       void appStore.listAuthorizations(id)
     } else {
-      appStore.authorizationList = []
+      appStore.clearAuthorizations()
     }
   },
   { immediate: true }
