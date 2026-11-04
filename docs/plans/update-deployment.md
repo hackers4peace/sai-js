@@ -1,6 +1,11 @@
 # Update deployment — NixOS/Podman for per-pod Fuseki + Garage
 
-> **Status:** 📋 not started. This is the single home for the remaining
+> **Status:** 🚧 in progress (2026-11-04): workstreams A/B/C core are implemented
+> for `lima-local` (Fuseki + Garage, env contract, repo-built runtime, Postgres
+> 18/Temporal 1.31). OCI publishing, the demo/h4p rollout, and workstream F
+> remain.
+>
+> This is the single home for the remaining
 > **production deployment and hardening** work for the per-pod storage stack.
 > The code-level per-pod isolation is landed and documented in the OpenWiki
 > (`architecture/storage-isolation.md`, `architecture/federation.md`,

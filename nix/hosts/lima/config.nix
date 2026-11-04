@@ -1,6 +1,7 @@
 {
   services.sai.containers = {
-    sparql.resolver = "127.0.0.11";
+    fuseki.env = ../../../environments/dev/fuseki.env;
+    garage.env = ../../../environments/dev/garage.env;
     id.idOrigin = "id";
     id.docOrigin = "id";
     data.baseUrl = "https://data/";

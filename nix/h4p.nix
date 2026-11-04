@@ -37,8 +37,24 @@ in
     mode = "0400";
   };
 
+  age.secrets.fuseki = {
+    file = ./secrets/fuseki.age;
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
+  age.secrets.garage = {
+    file = ./secrets/garage.age;
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
   services.sai.containers = {
     auth.env = config.age.secrets.auth.path;
+    fuseki.env = config.age.secrets.fuseki.path;
+    garage.env = config.age.secrets.garage.path;
     ui.caddyConfig = ''
       tls {
         dns gandi {env.GANDI_BEARER_TOKEN}
@@ -63,7 +79,7 @@ in
   services.caddy = {
     package = pkgs.caddy.withPlugins {
       plugins = [ "github.com/caddy-dns/gandi@v1.1.0" ];
-      hash = "sha256-5mjD0CY7f5+sRtV1rXysj8PvId2gQaWiXlIaTg2Lv8A";
+      hash = "sha256-e2pxVxVoyrjk3F05lv3ZODSG+wegl6kY4TbqvV8n5vM=";
     };
   };
 

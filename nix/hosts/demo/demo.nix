@@ -4,6 +4,7 @@
   ...
 }:
 let
+  # Update after publishing the new OCI images.
   tag = "0fbde45c230c416c8619086098650e663c022e7c";
   vapidPublicKey = "BEuveySWp1pRLWZ-Jn9j_46lAY69hmonzX8RS9O84TPzRT65pUDr3k4YA5Xyr6Zqw86o-bsDihoUWJWw8_yswG4";
   domain = "fed.quest";
@@ -49,6 +50,20 @@ in
     mode = "0400";
   };
 
+  age.secrets.fuseki = {
+    file = ./secrets/fuseki.age;
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
+  age.secrets.garage = {
+    file = ./secrets/garage.age;
+    owner = "root";
+    group = "root";
+    mode = "0400";
+  };
+
   systemd.services.caddy.serviceConfig.EnvironmentFile = [
     config.age.secrets.cloudflare.path
   ];
@@ -56,19 +71,17 @@ in
   services.caddy = {
     package = pkgs.caddy.withPlugins {
       plugins = [ "github.com/caddy-dns/cloudflare@v0.2.3" ];
-      hash = "sha256-bJO2RIa6hYsoVl3y2L86EM34Dfkm2tlcEsXn2+COgzo";
+      hash = "sha256-weP1HzwGvPlLqiAViJus1GN74bps3bI179gomTCb6N4=";
     };
   };
 
   services.sai.containers = {
-    sparql.resolver = "127.0.0.11";
     id.idOrigin = domain;
     id.docOrigin = "id.${domain}";
     data.origin = "data.${domain}";
     registry.origin = "reg.${domain}";
     auth.origin = "auth.${domain}";
     ui.origin = "app.auth.${domain}";
-    sparql.tag = tag;
     id.tag = tag;
     data.tag = tag;
     registry.tag = tag;
@@ -111,6 +124,8 @@ in
     auth.regOrigin = "reg.${domain}";
     registry.baseUrl = "https://reg.${domain}/";
     auth.env = config.age.secrets.auth.path;
+    fuseki.env = config.age.secrets.fuseki.path;
+    garage.env = config.age.secrets.garage.path;
     auth.cookieDomain = ".auth.${domain}";
     ui.caddyConfig = ''
       ${tls}

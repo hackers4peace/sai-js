@@ -1,12 +1,17 @@
-{ pkgs, ... }:
+{ pkgs }:
 
+let
+  version = (builtins.fromJSON (builtins.readFile ../../services/id/package.json)).version;
+in
 pkgs.buildNpmPackage {
   pname = "sai-id";
-  version = "0.3.3";
+  inherit version;
 
-  src = pkgs.lib.cleanSource ../../services/id;
+  src = pkgs.nix-gitignore.gitignoreSource [ ] ../../services/id;
 
-  npmDepsHash = "sha256-5GPdkah7ATlmqtrwtIQN6bkpKK9raJYbx+hOFb3KGrg=";
+  nodejs = pkgs.nodejs_26;
+
+  npmDepsHash = "sha256-jukN5OpuWNnfQAYnt6LarMh4UDcbfX82FprGogOvBEU=";
 
   dontNpmBuild = true;
 

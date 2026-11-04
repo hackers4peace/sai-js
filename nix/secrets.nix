@@ -4,4 +4,6 @@ in
 {
   "secrets/gandi.age".publicKeys = [ h4p ];
   "secrets/auth.age".publicKeys = [ h4p ];
+  "secrets/fuseki.age".publicKeys = [ h4p ];
+  "secrets/garage.age".publicKeys = [ h4p ];
 }

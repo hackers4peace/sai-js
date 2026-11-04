@@ -120,24 +120,28 @@ let
   authConfigFile = jsonFormat.generate "auth.json" authConfig;
 
   containers = {
-    oxigraph = {
-      image = "docker.io/oxigraph/oxigraph:latest";
+    fuseki = {
+      image = cfg.fuseki.image;
       autoStart = true;
-      cmd = [
-        "serve"
-        "--location"
-        "/data"
-        "--bind"
-        "0.0.0.0:7878"
+      environmentFiles = [ cfg.fuseki.env ];
+      volumes = [ "${cfg.fuseki.dataVolume}:/fuseki-base" ]
+        ++ lib.optionals (cfg.fuseki.config != null) [
+          "${cfg.fuseki.config}:/etc/fuseki/config.ttl:ro"
+        ];
+      cmd = lib.optionals (cfg.fuseki.config != null) [
+        "--conf"
+        "/etc/fuseki/config.ttl"
       ];
     };
-    sparql = {
-      image = "quay.io/hackers4peace/sai-oxigraph:${cfg.sparql.tag}";
+    garage = {
+      image = cfg.garage.image;
       autoStart = true;
-      ports = [ "7878:80" ];
-      environment = {
-        NGINX_RESOLVER = cfg.sparql.resolver;
-      };
+      environmentFiles = [ cfg.garage.env ];
+      volumes = [
+        "${cfg.garage.config}:/etc/garage.toml:ro"
+        "${cfg.garage.metaVolume}:/var/lib/garage/meta"
+        "${cfg.garage.dataVolume}:/var/lib/garage/data"
+      ];
     };
     id = {
       image = "quay.io/hackers4peace/sai-id:${cfg.id.tag}";
@@ -146,7 +150,7 @@ let
       environment = {
         ID_ORIGIN = cfg.id.idOrigin;
         DOC_ORIGIN = cfg.id.docOrigin;
-        CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
+        CSS_ID_SPARQL_ENDPOINT = "http://fuseki:3030/id/sparql";
       };
     };
 
@@ -162,7 +166,7 @@ let
       };
 
       volumes = [
-        "postgresql-data:/var/lib/postgresql/data"
+        "postgresql-data:/var/lib/postgresql"
       ];
     };
 
@@ -265,7 +269,7 @@ let
       autoStart = true;
       ports = [ "4800:4800" ];
       environment = {
-        CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
+        CSS_FUSEKI_BASE_URL = "http://fuseki:3030";
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
         CSS_CONFIG = "/config/auth.json";
         CSS_BASE_URL = cfg.auth.baseUrl;
@@ -297,10 +301,17 @@ let
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
         TEMPORAL_ADDRESS = "temporal:7233";
         CSS_VAPID_PUBLIC_KEY = cfg.auth.vapidPublicKey;
+        CSS_DOC_ORIGIN = cfg.auth.docOrigin;
+        CSS_DATA_ORIGIN = cfg.auth.dataOrigin;
+        CSS_FUSEKI_BASE_URL = "http://fuseki:3030";
+        CSS_GARAGE_ADMIN_ENDPOINT = "http://garage:3903";
+        CSS_S3_ENDPOINT = "http://garage:3900";
         SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
       };
       environmentFiles = [
         cfg.auth.env
+        cfg.fuseki.env
+        cfg.garage.env
       ];
     };
 
@@ -309,7 +320,6 @@ let
       autoStart = true;
       ports = [ "4600:4600" ];
       environment = {
-        CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
         CSS_CONFIG = "/config/registry.json";
         CSS_BASE_URL = cfg.registry.baseUrl;
@@ -327,18 +337,20 @@ let
       autoStart = true;
       ports = [ "4700:4700" ];
       environment = {
-        CSS_SPARQL_ENDPOINT = "http://sparql/sparql";
         CSS_POSTGRES_CONNECTION_STRING = "postgres://temporal:temporal@postgresql:5432/auth";
         CSS_CONFIG = "/config/data.json";
-        CSS_ROOT_FILE_PATH = "/data";
         CSS_BASE_URL = cfg.data.baseUrl;
         CSS_PORT = "4700";
         TEMPORAL_ADDRESS = "temporal:7233";
+        CSS_ID_ORIGIN = cfg.auth.idOrigin;
+        CSS_DOC_ORIGIN = cfg.auth.docOrigin;
+        CSS_DATA_ORIGIN = cfg.auth.dataOrigin;
+        CSS_REG_ORIGIN = cfg.auth.regOrigin;
+        CSS_S3_REGION = "garage";
         SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
       };
       volumes = [
         "${cfg.data.config}:/config/data.json:ro"
-        "css-data:/data"
       ];
     };
   };
@@ -356,14 +368,14 @@ in
     postgres = {
       version = lib.mkOption {
         type = lib.types.str;
-        default = "16";
+        default = "18";
         description = "postgres image version";
       };
     };
     temporal = {
       version = lib.mkOption {
         type = lib.types.str;
-        default = "1.29.1";
+        default = "1.31.0";
         description = "temporal image version";
       };
       uiVersion = lib.mkOption {
@@ -373,22 +385,22 @@ in
       };
       adminToolsVersion = lib.mkOption {
         type = lib.types.str;
-        default = "1.29.1-tctl-1.18.4-cli-1.5.0";
+        default = "1.31.0";
         description = "temporal-admin-tools image version";
       };
       dynamicConfig = lib.mkOption {
         type = lib.types.path;
-        default = ../temporal/development.yaml;
+        default = ../temporal/dynamicconfig/development-sql.yaml;
         description = "temporal config";
       };
       setupPostgresScript = lib.mkOption {
         type = lib.types.path;
-        default = ../temporal/setup-postgres.sh;
+        default = ../temporal/scripts/setup-postgres.sh;
         description = "temporal postgres setup";
       };
       createNamespaceScript = lib.mkOption {
         type = lib.types.path;
-        default = ../temporal/create-namespace.sh;
+        default = ../temporal/scripts/create-namespace.sh;
         description = "temporal namespace setup";
       };
     };
@@ -400,15 +412,56 @@ in
         description = "sai-id image tag";
       };
     };
-    sparql = {
-      tag = lib.mkOption {
+    fuseki = {
+      image = lib.mkOption {
         type = lib.types.str;
-        default = "latest";
-        description = "sai-oxigraph image tag";
+        default = "docker.io/secoresearch/fuseki:5.6.0";
+        description = "Fuseki image";
       };
-      resolver = lib.mkOption {
+      env = lib.mkOption {
+        type = lib.types.path;
+        description = "env file with ADMIN_PASSWORD and CSS_FUSEKI_ADMIN";
+      };
+      config = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = "optional Fuseki config file (production starts empty)";
+      };
+      dataVolume = lib.mkOption {
         type = lib.types.str;
-        default = "127.0.0.11";
+        default = "sai-fuseki-base";
+        description = "volume for Fuseki dataset storage";
+      };
+    };
+    garage = {
+      image = lib.mkOption {
+        type = lib.types.str;
+        default = "docker.io/dxflrs/garage:v2.2.0";
+        description = "Garage image";
+      };
+      env = lib.mkOption {
+        type = lib.types.path;
+        description = "env file with GARAGE_RPC_SECRET, GARAGE_ADMIN_TOKEN and CSS_GARAGE_ADMIN_TOKEN";
+      };
+      config = lib.mkOption {
+        type = lib.types.path;
+        default = ./garage/garage.toml;
+        description = "Garage config (secrets come from env)";
+      };
+      metaVolume = lib.mkOption {
+        type = lib.types.str;
+        default = "sai-garage-meta";
+        description = "volume for Garage metadata";
+      };
+      dataVolume = lib.mkOption {
+        type = lib.types.str;
+        default = "sai-garage-data";
+        description = "volume for Garage object data";
+      };
+      capacity = lib.mkOption {
+        type = lib.types.str;
+        default = "10G";
+        description = "capacity assigned to the single Garage node";
       };
     };
     auth = {
@@ -520,6 +573,26 @@ in
           serviceConfig = {
             Restart = lib.mkForce "no";
           };
+        };
+        "garage-layout" = {
+          description = "Apply the initial Garage cluster layout";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "podman-garage.service" ];
+          requires = [ "podman-garage.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            set -eu
+            for _ in $(seq 60); do
+              ${pkgs.podman}/bin/podman exec garage garage status >/dev/null 2>&1 && break
+              sleep 2
+            done
+            node_id="$(${pkgs.podman}/bin/podman exec garage garage node id -q)"
+            ${pkgs.podman}/bin/podman exec garage garage layout assign "$node_id" -z dc1 -c ${cfg.garage.capacity} || true
+            ${pkgs.podman}/bin/podman exec garage garage layout apply --version 1 || true
+          '';
         };
       };
   };

@@ -4,4 +4,6 @@ in
 {
   "secrets/cloudflare.age".publicKeys = [ demo ];
   "secrets/auth.age".publicKeys = [ demo ];
+  "secrets/fuseki.age".publicKeys = [ demo ];
+  "secrets/garage.age".publicKeys = [ demo ];
 }

@@ -14,7 +14,6 @@ env:
 
   # Space-separated list of flake image attributes
   IMAGE_ATTRS: |
-    sai-oxigraph-image
     sai-id-image
     sai-css-image
     sai-worker-image

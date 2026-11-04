@@ -3,10 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    ragenix = {
-      url = "github:yaxitech/ragenix";
-      inputs.darwin.follows = "";
-    };
+    ragenix.url = "github:yaxitech/ragenix";
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     nixos-lima = {
@@ -22,7 +19,6 @@
       ragenix,
       disko,
       nixos-lima,
-      home-manager,
       ...
     }@inputs:
     let
@@ -31,6 +27,8 @@
         "aarch64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+      # Update after publishing the new OCI images (this SHA predates the
+      # Fuseki/Garage stack and the repo-built runtime).
       latestRelease = "0fbde45c230c416c8619086098650e663c022e7c";
     in
     {
@@ -55,14 +53,13 @@
           ./nix/podman.nix
           {
             services.sai.containers = {
-              sparql.resolver = "127.0.0.11";
               id.idOrigin = "hackers4peace.net";
               id.docOrigin = "id.hackers4peace.net";
               data.origin = "data.hackers4peace.net";
               registry.origin = "reg.hackers4peace.net";
               auth.origin = "auth.hackers4peace.net";
               ui.origin = "app.auth.hackers4peace.net";
-              sparql.tag = latestRelease;
+              auth.cookieDomain = ".auth.hackers4peace.net";
               id.tag = latestRelease;
               data.tag = latestRelease;
               registry.tag = latestRelease;
@@ -150,7 +147,6 @@
           ./nix/podman.nix
           {
             services.sai.containers = {
-              sparql.tag = latestRelease;
               id.tag = latestRelease;
               data.tag = latestRelease;
               registry.tag = latestRelease;
@@ -176,7 +172,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          sai-oxigraph-image = pkgs.callPackage ./nix/images/sai-oxigraph.nix { };
+          sai-runtime = pkgs.callPackage ./nix/packages/sai-runtime.nix { };
 
           sai-id = pkgs.callPackage ./nix/packages/sai-id.nix { };
           sai-id-image = pkgs.callPackage ./nix/images/sai-id.nix { };
