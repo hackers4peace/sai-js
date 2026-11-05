@@ -1,0 +1,1 @@
+{"version":3,"file":"SolidDpopBoundAccessTokenPayload.js","sourceRoot":"","sources":["../../src/type/SolidDpopBoundAccessTokenPayload.ts"],"names":[],"mappings":"","sourcesContent":["import type { SolidAccessTokenPayload } from \"./SolidAccessTokenPayload\";\n\nexport interface SolidDpopBoundAccessTokenPayload\n  extends SolidAccessTokenPayload {\n  cnf: { jkt: string };\n}\n"]}

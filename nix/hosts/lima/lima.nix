@@ -47,8 +47,14 @@
     # misc
     boot.kernelPackages = pkgs.linuxPackages_latest;
 
-    networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    # Lima's image leaves /etc/resolv.conf alone; make the guest use public
+    # resolvers deterministically instead of relying on the image default.
     networking.resolvconf.enable = false;
+    environment.etc."resolv.conf".text = ''
+      nameserver 1.1.1.1
+      nameserver 8.8.8.8
+      options edns0
+    '';
 
     # The usual warnings about changing `stateVersion` apply. Make sure to find and read them
     # before changing this value.

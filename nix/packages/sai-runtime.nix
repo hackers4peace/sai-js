@@ -49,10 +49,14 @@ pkgs.buildNpmPackage {
   installPhase = ''
     runHook preInstall
 
-    # Drop development-only dependencies after the components build (the CSS
-    # server itself is a production dependency of @elfpavlik/sai-components).
-    npm prune --omit=dev --no-save || true
+    # `npm ci --ignore-scripts` skips the git dependency's `prepare` build, so
+    # overlay the pinned, prebuilt dist for @solid/access-token-verifier.
+    rm -rf node_modules/@solid/access-token-verifier/dist
+    cp -r ${../vendor/access-token-verifier/dist} node_modules/@solid/access-token-verifier/dist
 
+    # Keep the full workspace node_modules: npm prune --omit=dev currently
+    # drops some production transitive packages (e.g. `process`) in this
+    # workspace layout. Optimize this once the runtime is stable.
     mkdir -p $out/app
     cp -r node_modules $out/app/
     cp -r packages $out/app/

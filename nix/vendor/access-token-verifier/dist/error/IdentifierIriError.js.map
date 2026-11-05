@@ -1,0 +1,1 @@
+{"version":3,"file":"IdentifierIriError.js","sourceRoot":"","sources":["../../src/error/IdentifierIriError.ts"],"names":[],"mappings":";;;AAAA,iDAAsE;AAA7D,mHAAA,aAAa,OAAsB","sourcesContent":["export { WebidIriError as IdentifierIriError } from \"./WebidIriError\";\n"]}

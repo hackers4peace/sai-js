@@ -1,0 +1,1 @@
+{"version":3,"file":"SolidAccessTokenHeader.js","sourceRoot":"","sources":["../../src/type/SolidAccessTokenHeader.ts"],"names":[],"mappings":"","sourcesContent":["import type { AsymetricCryptographicAlgorithm } from \"./AsymetricCryptographicAlgorithm\";\n\nexport interface SolidAccessTokenHeader {\n  kid: string;\n  alg: AsymetricCryptographicAlgorithm;\n}\n"]}

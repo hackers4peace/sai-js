@@ -12,9 +12,14 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.8",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.26",
     "@jeswr/pretty-turtle": "^1.8.2",
+    "@opentelemetry/api": "^1.10.0",
     "fetch-sparql-endpoint": "^6.2.0",
+    "http-link-header": "^1.1.4",
     "jsonld": "^9.0.0",
-    "n3": "^1.23.1"
+    "n3": "^1.23.1",
+    "postgres": "^3.4.9",
+    "rdf-vocabulary": "^1.0.1"
   }
 }

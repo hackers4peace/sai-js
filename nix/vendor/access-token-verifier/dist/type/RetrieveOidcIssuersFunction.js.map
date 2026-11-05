@@ -1,0 +1,1 @@
+{"version":3,"file":"RetrieveOidcIssuersFunction.js","sourceRoot":"","sources":["../../src/type/RetrieveOidcIssuersFunction.ts"],"names":[],"mappings":"","sourcesContent":["export interface RetrieveOidcIssuersFunction {\n  (identifier: string): Promise<Array<string>>;\n}\n"]}

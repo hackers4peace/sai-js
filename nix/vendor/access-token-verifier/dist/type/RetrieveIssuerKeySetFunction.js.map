@@ -1,0 +1,1 @@
+{"version":3,"file":"RetrieveIssuerKeySetFunction.js","sourceRoot":"","sources":["../../src/type/RetrieveIssuerKeySetFunction.ts"],"names":[],"mappings":"","sourcesContent":["import type { createRemoteJWKSet } from \"jose\";\n\nexport interface RetrieveIssuerKeySetFunction {\n  (iss: string): Promise<ReturnType<typeof createRemoteJWKSet>>;\n}\n"]}

@@ -180,13 +180,7 @@ let
 
       cmd = [
         "-c"
-        ''
-          set -e
-          until pg_isready -h postgresql -U temporal; do
-            sleep 2
-          done
-          sh /etc/temporal/setup-postgres.sh
-        ''
+        "set -e; sh /etc/temporal/setup-postgres.sh"
       ];
 
       environment = {
@@ -586,12 +580,12 @@ in
           script = ''
             set -eu
             for _ in $(seq 60); do
-              ${pkgs.podman}/bin/podman exec garage garage status >/dev/null 2>&1 && break
+              ${pkgs.podman}/bin/podman exec garage /garage status >/dev/null 2>&1 && break
               sleep 2
             done
-            node_id="$(${pkgs.podman}/bin/podman exec garage garage node id -q)"
-            ${pkgs.podman}/bin/podman exec garage garage layout assign "$node_id" -z dc1 -c ${cfg.garage.capacity} || true
-            ${pkgs.podman}/bin/podman exec garage garage layout apply --version 1 || true
+            node_id="$(${pkgs.podman}/bin/podman exec garage /garage node id -q | ${pkgs.coreutils}/bin/cut -d@ -f1)"
+            ${pkgs.podman}/bin/podman exec garage /garage layout assign "$node_id" -z dc1 -c ${cfg.garage.capacity} || true
+            ${pkgs.podman}/bin/podman exec garage /garage layout apply --version 1 || true
           '';
         };
       };

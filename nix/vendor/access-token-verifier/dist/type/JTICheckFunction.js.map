@@ -1,0 +1,1 @@
+{"version":3,"file":"JTICheckFunction.js","sourceRoot":"","sources":["../../src/type/JTICheckFunction.ts"],"names":[],"mappings":"","sourcesContent":["export interface JTICheckFunction {\n  (jti: string): boolean;\n}\n"]}

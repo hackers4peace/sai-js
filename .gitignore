@@ -40,3 +40,8 @@ tsconfig.tsbuildinfo
 .turbo
 
 traefik/certs/*
+
+# Prebuilt dist for the pinned @solid/access-token-verifier git dependency.
+# npm ci --ignore-scripts cannot run its prepare/build step.
+!nix/vendor/access-token-verifier/dist/
+!nix/vendor/access-token-verifier/dist/**

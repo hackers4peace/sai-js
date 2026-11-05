@@ -45,11 +45,16 @@ in
         type = lib.types.str;
         default = "app.auth";
       };
+      root = lib.mkOption {
+        type = lib.types.path;
+        default = sai-ui;
+        description = "UI build to serve (must contain config.json)";
+      };
       caddyConfig = lib.mkOption {
         type = lib.types.str;
         default = ''
           tls internal
-          root * ${sai-ui}
+          root * ${cfg.ui.root}
           encode zstd gzip
           # history fallback
           try_files {path} {path}/ /index.html

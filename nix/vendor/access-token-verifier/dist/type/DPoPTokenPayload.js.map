@@ -1,0 +1,1 @@
+{"version":3,"file":"DPoPTokenPayload.js","sourceRoot":"","sources":["../../src/type/DPoPTokenPayload.ts"],"names":[],"mappings":"","sourcesContent":["import type { RequestMethod } from \"./RequestMethod\";\n\n// TODO: Phased-in ath becomes enforced\nexport interface DPoPTokenPayload {\n  htm: RequestMethod;\n  htu: string;\n  iat: number;\n  jti: string;\n  ath?: string;\n}\n"]}
