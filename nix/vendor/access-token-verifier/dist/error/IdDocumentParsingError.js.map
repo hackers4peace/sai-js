@@ -1,1 +1,0 @@
-{"version":3,"file":"IdDocumentParsingError.js","sourceRoot":"","sources":["../../src/error/IdDocumentParsingError.ts"],"names":[],"mappings":";;;AAAA,yDAAkF;AAAzE,2HAAA,iBAAiB,OAA0B","sourcesContent":["export { WebidParsingError as IdDocumentParsingError } from \"./WebidParsingError\";\n"]}

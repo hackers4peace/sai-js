@@ -1,1 +1,0 @@
-{"version":3,"file":"WebIDIssuersCache.js","sourceRoot":"","sources":["../../src/class/WebIDIssuersCache.ts"],"names":[],"mappings":";;;AAAA,mEAAuF;AAA9E,2HAAA,sBAAsB,OAAqB","sourcesContent":["export { IdDocumentIssuersCache as WebIDIssuersCache } from \"./IdDocumentIssuersCache\";\n"]}

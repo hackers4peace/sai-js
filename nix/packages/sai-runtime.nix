@@ -36,7 +36,7 @@ pkgs.buildNpmPackage {
 
   nodejs = pkgs.nodejs_26;
 
-  npmDepsHash = "sha256-ndTH96ZoHG03GxAV+gVBMA1pZoj/g+g12blWlzaiEvo=";
+  npmDepsHash = "sha256-KqESb+oeZnNF0AIAPcToK2UNBP2ePC5M15QE+7cmFUs=";
   makeCacheWritable = true;
 
   npmWorkspace = "packages/components";
@@ -49,11 +49,9 @@ pkgs.buildNpmPackage {
   installPhase = ''
     runHook preInstall
 
-    # `npm ci --ignore-scripts` skips the git dependency's `prepare` build, so
-    # overlay the prebuilt dist for the pinned fork commit (20af2b8) declared in
-    # the root package.json overrides.
-    rm -rf node_modules/@solid/access-token-verifier/dist
-    cp -r ${../vendor/access-token-verifier/dist} node_modules/@solid/access-token-verifier/dist
+    # `@solid/access-token-verifier` is pinned to a fork commit that commits
+    # dist, so `npm ci --ignore-scripts` installs a runnable package without
+    # running the git dependency's prepare script.
 
     # Keep the full workspace node_modules: npm prune --omit=dev currently
     # drops some production transitive packages (e.g. `process`) in this

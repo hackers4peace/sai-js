@@ -46,6 +46,6 @@
     ]
   },
   "overrides": {
-    "@solid/access-token-verifier": "github:elf-pavlik/access-token-verifier#20af2b8f4e230a166a979c3eb3bceb715be42158"
+    "@solid/access-token-verifier": "github:elf-pavlik/access-token-verifier#6640d34d4446a3b2c1c5d94cefca019f53332b15"
   }
 }
