@@ -21,7 +21,7 @@
     "publish:npm": {
       "dependsOn": ["^publish:npm"],
       "cache": false,
-      "env": ["NODE_AUTH_TOKEN", "NPM_TAG"]
+      "env": ["NODE_AUTH_TOKEN", "NPM_TAG", "NPM_CONFIG_USERCONFIG"]
     }
   }
 }

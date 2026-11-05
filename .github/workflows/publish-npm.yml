@@ -37,6 +37,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify npm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_AUTH_TOKEN_NPM || secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM token secret is not available to this job"
+            exit 1
+          fi
+          npm whoami
+
       - name: Publish packages (Turbo, dependency order)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_AUTH_TOKEN_NPM || secrets.NPM_TOKEN }}
@@ -44,4 +54,6 @@ jobs:
         # `publish:npm` depends on `^publish:npm`, so Turbo publishes each
         # workspace dependency before the package that depends on it. The
         # per-package script is idempotent and skips versions already on npm.
+        # turbo.json forwards NPM_CONFIG_USERCONFIG so tasks see setup-node's
+        # generated .npmrc (which contains the NODE_AUTH_TOKEN auth line).
         run: npm run publish:npm
