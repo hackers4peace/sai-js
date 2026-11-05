@@ -21,9 +21,9 @@ pkgs.buildNpmPackage {
     mkdir -p $out/app
     cp -r node_modules *.ts package.json $out/app/
 
-    # services/id uses the workspace rc.27 documentLoader export; the
-    # published rc.26 package does not export it. Keep the workspace source
-    # outside node_modules so Node 26 can strip its TypeScript.
+    # The interop packages are published as TypeScript source, and Node 26
+    # refuses to strip .ts files inside node_modules. Keep the workspace source
+    # outside node_modules so Node can load (and strip) it.
     mkdir -p $out/app/packages
     cp -r ${../../packages/utils} $out/app/packages/interop-utils
     rm -rf $out/app/node_modules/@janeirodigital/interop-utils

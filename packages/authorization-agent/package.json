@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/interop-authorization-agent",
-  "version": "1.0.0-rc.26",
+  "version": "1.0.0-rc.27",
   "description": "Top level module for authorization agents confirming to Solid Application Interoperability specification",
   "contributors": [
     {
@@ -39,18 +39,19 @@
   },
   "scripts": {
     "test": "vitest run",
-    "test:debug": "NODE_ENV=vitest vitest --run --inspect-brk --no-file-parallelism"
+    "test:debug": "NODE_ENV=vitest vitest --run --inspect-brk --no-file-parallelism",
+    "publish:npm": "../../scripts/publish-npm.sh"
   },
   "dependencies": {
-    "@janeirodigital/interop-data-model": "^1.0.0-rc.26",
-    "@janeirodigital/interop-utils": "^1.0.0-rc.26",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.27",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.27",
     "fetch-sparql-endpoint": "^6.2.0",
     "jsonld": "^9.0.0",
     "n3": "^1.23.1",
     "@opentelemetry/api": "^1.9.0"
   },
   "devDependencies": {
-    "@janeirodigital/interop-test-utils": "^1.0.0-rc.26",
+    "@janeirodigital/interop-test-utils": "^1.0.0-rc.27",
     "@rdfjs/types": "^1.1.0",
     "@types/n3": "^1.21.1"
   }

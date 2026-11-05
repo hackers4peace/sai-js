@@ -17,6 +17,11 @@
     },
     "clean": {
       "cache": false
+    },
+    "publish:npm": {
+      "dependsOn": ["^publish:npm"],
+      "cache": false,
+      "env": ["NODE_AUTH_TOKEN", "NPM_TAG"]
     }
   }
 }

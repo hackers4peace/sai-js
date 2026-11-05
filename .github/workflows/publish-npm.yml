@@ -1,0 +1,47 @@
+# Publishes the current package versions to npm.
+#
+# The release event is intentionally idempotent: a version that is already on
+# npm is skipped, so a manual dispatch can publish first and the later release
+# (which also triggers the OCI workflow) does not fail on duplicates.
+name: Publish npm packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 26.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26.x
+          registry-url: https://registry.npmjs.org/
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish packages (Turbo, dependency order)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.DEPLOYMENT_AUTH_TOKEN_NPM || secrets.NPM_TOKEN }}
+          NPM_TAG: rc
+        # `publish:npm` depends on `^publish:npm`, so Turbo publishes each
+        # workspace dependency before the package that depends on it. The
+        # per-package script is idempotent and skips versions already on npm.
+        run: npm run publish:npm

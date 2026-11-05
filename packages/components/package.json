@@ -1,6 +1,6 @@
 {
   "name": "@elfpavlik/sai-components",
-  "version": "1.0.0-rc.29",
+  "version": "1.0.0-rc.30",
   "description": "",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components",
   "lsd:components": "dist/components/components.jsonld",
@@ -19,7 +19,9 @@
     "build:components": "componentsjs-generator -s dist -c dist/components -r sai -i .componentsignore",
     "build:ts": "tsc",
     "test": "vitest run",
-    "clean": "rm -rf dist/"
+    "clean": "rm -rf dist/",
+    "publish:npm": "../../scripts/publish-npm.sh",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "dist/",
@@ -33,10 +35,10 @@
     "@comunica/query-sparql-rdfjs": "^4.5.0",
     "@effect/rpc": "^0.44.13",
     "@effect/opentelemetry": "^0.60.0",
-    "@janeirodigital/interop-authorization-agent": "1.0.0-rc.26",
-    "@janeirodigital/interop-data-model": "^1.0.0-rc.26",
-    "@janeirodigital/interop-utils": "^1.0.0-rc.26",
-    "@janeirodigital/sai-api-messages": "^1.0.0-rc.26",
+    "@janeirodigital/interop-authorization-agent": "1.0.0-rc.27",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.27",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.27",
+    "@janeirodigital/sai-api-messages": "^1.0.0-rc.27",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^2.11.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.222.0",
