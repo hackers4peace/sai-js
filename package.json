@@ -3,7 +3,7 @@
   "private": true,
   "devDependencies": {
     "@dagger.io/dagger": "^0.19.10",
-    "@solid/community-server": "8.0.0-alpha.2",
+    "@solid/community-server": "git+https://github.com/elf-pavlik/CommunitySolidServer.git#lws-sai",
     "@types/node": "^22.10.10",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "husky": "^9.1.7",

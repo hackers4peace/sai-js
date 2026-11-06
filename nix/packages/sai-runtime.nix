@@ -36,8 +36,16 @@ pkgs.buildNpmPackage {
 
   nodejs = pkgs.nodejs_26;
 
-  npmDepsHash = "sha256-KqESb+oeZnNF0AIAPcToK2UNBP2ePC5M15QE+7cmFUs=";
+  npmDepsHash = "sha256-Wvh7Kz2i3jKn6+YAMefz0URsRG4t9tVa1zyS2G6NIC4=";
   makeCacheWritable = true;
+
+  # NOTE: `@solid/community-server` is now a git dependency whose `prepare`
+  # builds `dist/`, and `dist/` is not committed. `npm ci` here runs with
+  # `--ignore-scripts`, so the fork installs without `dist/` and the build
+  # below fails. Image builds need one of:
+  #   - a prebuilt CSS tarball (`file:vendor/...tgz`, see lws/fork-setup.md §10)
+  #   - a separate `buildNpmPackage` for the CSS fork, copied into
+  #     `node_modules/@solid/community-server/dist` in `preBuild`
 
   npmWorkspace = "packages/components";
   npmBuildScript = "build";
@@ -50,8 +58,7 @@ pkgs.buildNpmPackage {
     runHook preInstall
 
     # `@solid/access-token-verifier` is pinned to a fork commit that commits
-    # dist, so `npm ci --ignore-scripts` installs a runnable package without
-    # running the git dependency's prepare script.
+    # dist, so it needs no prepare.
 
     # Keep the full workspace node_modules: npm prune --omit=dev currently
     # drops some production transitive packages (e.g. `process`) in this
