@@ -34,21 +34,27 @@
               :error-messages="errors"
               required
             />
-            <v-btn type="submit" block class="mt-2" :loading="checking" :disabled="!!errors">
+            <v-btn
+              type="submit"
+              block
+              class="mt-2"
+              :loading="checking"
+              :disabled="!handleAvailable"
+            >
               {{ $t('create') }}
             </v-btn>
           </v-form>
           <dl>
             <dt>ID</dt>
             <dd>
-              <v-chip :color="handleAvailable ? 'green' : 'red'" variant="flat"
+              <v-chip :color="chipColor" variant="flat"
                 >https://<span class="handle">{{ handle }}</span
                 >.{{ config.idOrigin }}</v-chip
               >
             </dd>
             <dt>Pod</dt>
             <dd>
-              <v-chip :color="handleAvailable ? 'green' : 'red'" variant="flat"
+              <v-chip :color="chipColor" variant="flat"
                 >https://<span class="handle">{{ handle }}</span
                 >.{{ config.dataOrigin }}</v-chip
               >
@@ -80,8 +86,8 @@ dd {
 </style>
 
 <script lang="ts" setup>
-import { computedAsync } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { refDebounced } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
 import { bootstrapAccount, checkHandle } from '@/effect'
 import { getRuntimeConfig } from '@/runtime-config'
@@ -94,14 +100,62 @@ const password = ref('')
 const showPassword = ref(false)
 const handle = ref('')
 const step = ref('signIn')
+
+// The answer belongs to `checkedHandle`, not to `handle`: a pending check must
+// not reuse the previous answer (that rendered every unchecked handle as "is
+// already taken") and `undefined`/rejected checks must not be read as "taken".
+const checkedHandle = ref<string>()
+const checkedAvailable = ref(false)
+const checkFailed = ref(false)
 const checking = ref(false)
-const handleAvailable = computedAsync(async () => {
-  if (handle.value.length < 3) return false
-  return checkHandle(handle.value)
+
+const debouncedHandle = refDebounced(handle, 300)
+watch(
+  debouncedHandle,
+  async (value, _previous, onCleanup) => {
+    if (value.length < 3) {
+      checkedHandle.value = undefined
+      checking.value = false
+      return
+    }
+    let cancelled = false
+    onCleanup(() => {
+      cancelled = true
+    })
+    checking.value = true
+    try {
+      const available = await checkHandle(value)
+      if (cancelled) return
+      checkedHandle.value = value
+      checkedAvailable.value = available
+    } catch (error) {
+      if (cancelled) return
+      checkedHandle.value = undefined
+      checkFailed.value = true
+      console.error('failed to check handle availability', error)
+    } finally {
+      if (!cancelled) checking.value = false
+    }
+  },
+  { immediate: true }
+)
+// a new input invalidates the previous failure, not just the previous answer
+watch(handle, () => {
+  checkFailed.value = false
 })
+
+const handleChecked = computed(
+  () => handle.value.length >= 3 && checkedHandle.value === handle.value
+)
+const handleAvailable = computed(() => handleChecked.value && checkedAvailable.value)
+const handleTaken = computed(() => handleChecked.value && !checkedAvailable.value)
+const chipColor = computed(() =>
+  handleAvailable.value ? 'green' : handleTaken.value ? 'red' : undefined
+)
 const errors = computed(() => {
   if (handle.value.length < 3) return 'must be at least 3 characters'
-  if (!handleAvailable.value) return 'is already taken'
+  if (handleTaken.value) return 'is already taken'
+  if (checkFailed.value) return 'could not check handle availability'
 })
 
 async function signIn() {
