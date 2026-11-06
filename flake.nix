@@ -6,6 +6,11 @@
     ragenix.url = "github:yaxitech/ragenix";
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixos-stable.follows = "nixpkgs";
+    };
     nixos-lima = {
       url = "github:nixos-lima/nixos-lima/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,6 +23,7 @@
       nixpkgs,
       ragenix,
       disko,
+      nixos-anywhere,
       nixos-lima,
       ...
     }@inputs:
@@ -27,9 +33,96 @@
         "aarch64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      # Update after publishing the new OCI images (this SHA predates the
-      # Fuseki/Garage stack and the repo-built runtime).
-      latestRelease = "0fbde45c230c416c8619086098650e663c022e7c";
+      # Quay image tags are the commit SHA of the release.
+      latestRelease = "4db779a50ecc820892d6dc3c040d440c312bd246";
+
+      # Deployment wrappers. Build on the VPS (aarch64), not locally.
+      buildSystem = "x86_64-linux";
+      deployPkgs = nixpkgs.legacyPackages.${buildSystem};
+      repoCheck = ''
+        repo_root="''${REPO_ROOT:-$PWD}"
+        if [ ! -f "$repo_root/flake.nix" ]; then
+          echo "error: run this from the repository root, or set REPO_ROOT" >&2
+          exit 2
+        fi
+      '';
+      targetArg = ''
+        target="''${1:-}"
+        if [ -z "$target" ]; then
+          echo "usage: $0 root@<ip> [options...]" >&2
+          exit 2
+        fi
+        shift
+      '';
+      installDemo = deployPkgs.writeShellApplication {
+        name = "install-demo";
+        runtimeInputs = [ nixos-anywhere.packages.${buildSystem}.default ];
+        text = ''
+          ${repoCheck}
+          ${targetArg}
+          # -c forces the legacy kexec_load syscall. Hetzner CAX / Ubuntu 26.04
+          # rejects kexec_file_load with EADDRNOTAVAIL.
+          exec nixos-anywhere \
+            --flake "path:$repo_root#demo" \
+            --target-host "$target" \
+            --build-on remote \
+            --copy-host-keys \
+            --kexec-extra-flags "-c" \
+            "$@"
+        '';
+      };
+      installDemoBase = deployPkgs.writeShellApplication {
+        name = "install-demo-base";
+        runtimeInputs = [ nixos-anywhere.packages.${buildSystem}.default ];
+        text = ''
+          ${repoCheck}
+          ${targetArg}
+          # Base install: no demo services, secrets, or ragenix. The host key
+          # is regenerated, so update nix/hosts/demo/secrets.nix afterwards.
+          exec nixos-anywhere \
+            --flake "path:$repo_root#hetzner-cloud-aarch64" \
+            --target-host "$target" \
+            --build-on remote \
+            --kexec-extra-flags "-c" \
+            "$@"
+        '';
+      };
+      deployDemo = deployPkgs.writeShellApplication {
+        name = "deploy-demo";
+        runtimeInputs = [
+          deployPkgs.nixos-rebuild
+          deployPkgs.openssh
+          deployPkgs.nix
+          deployPkgs.gitMinimal
+        ];
+        text = ''
+          ${repoCheck}
+          ${targetArg}
+          exec nixos-rebuild switch \
+            --no-reexec \
+            --flake "path:$repo_root#demo" \
+            --target-host "$target" \
+            --build-host "$target" \
+            "$@"
+        '';
+      };
+      rollbackDemo = deployPkgs.writeShellApplication {
+        name = "rollback-demo";
+        runtimeInputs = [
+          deployPkgs.nixos-rebuild
+          deployPkgs.openssh
+          deployPkgs.nix
+        ];
+        text = ''
+          ${repoCheck}
+          ${targetArg}
+          exec nixos-rebuild switch \
+            --no-reexec \
+            --rollback \
+            --target-host "$target" \
+            "$@"
+        '';
+      };
     in
     {
       nixosConfigurations.hetzner-cloud-aarch64 = nixpkgs.lib.nixosSystem {
@@ -164,6 +257,30 @@
           ./nix/caddy.nix
           ./nix/hosts/lima/podman-local.nix
         ];
+      };
+
+      apps.${buildSystem} = {
+        "install-demo" = {
+          type = "app";
+          program = "${installDemo}/bin/install-demo";
+          meta.description = "Install NixOS on the demo VPS with nixos-anywhere";
+        };
+        "install-demo-base" = {
+          type = "app";
+          program = "${installDemoBase}/bin/install-demo-base";
+          meta.description = "Install the base NixOS system on the demo VPS";
+        };
+        "deploy-demo" = {
+          type = "app";
+          program = "${deployDemo}/bin/deploy-demo";
+          meta.description = "Build and switch the demo host over SSH";
+        };
+        "rollback-demo" = {
+          type = "app";
+          program = "${rollbackDemo}/bin/rollback-demo";
+          meta.description = "Roll the demo host back one generation";
+        };
+        default = self.apps.${buildSystem}."install-demo";
       };
 
       packages = forAllSystems (

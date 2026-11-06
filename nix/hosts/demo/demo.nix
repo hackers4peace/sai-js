@@ -4,9 +4,9 @@
   ...
 }:
 let
-  # Update after publishing the new OCI images.
-  tag = "0fbde45c230c416c8619086098650e663c022e7c";
-  vapidPublicKey = "BEuveySWp1pRLWZ-Jn9j_46lAY69hmonzX8RS9O84TPzRT65pUDr3k4YA5Xyr6Zqw86o-bsDihoUWJWw8_yswG4";
+  # Quay image tags are the commit SHA of the release.
+  tag = "4db779a50ecc820892d6dc3c040d440c312bd246";
+  vapidPublicKey = "BDtZZfJveRXEVyBuOMHXldpziUh5SPuOew1msARfr3WQvMAcY4Mh9oadl8-plOXJExIMtl07VzpBuoOoNSRfvmo";
   domain = "fed.quest";
   tls = ''
     tls {
@@ -70,8 +70,8 @@ in
 
   services.caddy = {
     package = pkgs.caddy.withPlugins {
-      plugins = [ "github.com/caddy-dns/cloudflare@v0.2.3" ];
-      hash = "sha256-weP1HzwGvPlLqiAViJus1GN74bps3bI179gomTCb6N4=";
+      plugins = [ "github.com/caddy-dns/cloudflare@v0.2.4" ];
+      hash = "sha256-tubXIDCJnO2mvdnPlZclwDhNGaeeYLSt7lnni3+pXDo=";
     };
   };
 
@@ -144,7 +144,7 @@ in
   networking.firewall = {
     enable = true;
     trustedInterfaces = [ "podman0" ];
-    interfaces.enp1s0.allowedTCPPorts = [
+    allowedTCPPorts = [
       22
       80
       443
@@ -152,7 +152,7 @@ in
     logRefusedConnections = false;
     checkReversePath = "loose";
     extraCommands = ''
-      iptables -A FORWARD -i enp1s0 -o podman0 -j DROP
+      iptables -A FORWARD -i eth0 -o podman0 -j DROP
     '';
   };
 }

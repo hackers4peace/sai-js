@@ -100,126 +100,169 @@ The translation project for all relevant components is hosted thanks to the cour
 
 ### VPS
 
-Create VPS, you can use any Linux distribution, we are going to use [NixOS anywhere](https://nix-community.github.io/nixos-anywhere/) to replace it in next step.
-
-Let's use [Hetzner CAX21](https://www.hetzner.com/cloud/#pricing) as an example. We need to add our public SSH key when we create it.
+Create a VPS and add your public SSH key. The examples below use a Hetzner
+CAX21 (aarch64); adjust the flake host if you use another architecture.
 
 ### DNS
 
-Configure DNS for your domain, for example `A` records for `me.example` :
+Configure DNS for your domain. For `me.example`:
 
 ```txt
-me.example.
-*.me.example.
-auth.me.example.
-app.auth.me.example.
-data.me.example
-*.data.me.example.
+me.example.            A  <VPS IP>
+*.me.example.          A  <VPS IP>
+app.auth.me.example.   A  <VPS IP>
+data.me.example.       A  <VPS IP>
+*.data.me.example.     A  <VPS IP>
 ```
 
-Use IP of your VPS. To avoid having to change in case you want to destroy your VPS and create a different one, you can configure that IP to stay rented independently from specific VPS.
+`*.me.example` covers `auth`, `reg`, `id`, and user WebIDs. Keep these records
+DNS-only (Cloudflare proxy off): Caddy terminates TLS and the WebID/SPARQL
+endpoints are addressed by their public origin. If you replace the VPS, update
+every A record that points to the old IP.
 
 ### NixOS
 
-Use [NixOS anywhere](https://nix-community.github.io/nixos-anywhere/) to install it on your VPS. Flake in this repo includes config for `hetzner-cloud-aarch64` so you can simply run
+`nixos-anywhere` replaces the VPS disk. Make sure the target has no data you
+need before continuing.
+
+For the demo host, the flake provides wrappers:
 
 ```bash
-nixos-anywhere --flake .#hetzner-cloud-aarch64 --build-on remote root@me.example
+# Fresh install of the base system. The host key is regenerated.
+nix run .#install-demo-base -- root@<demo-host>
+
+# Full install preserving the current host key (use when secrets already
+# match that key).
+nix run .#install-demo -- root@<demo-host>
+
+# Subsequent configuration changes.
+nix run .#deploy-demo -- root@<demo-host>
+
+# Roll back one generation.
+nix run .#rollback-demo -- root@<demo-host>
 ```
 
-We build on remote to use its architecture.
+The raw base install equivalent is:
+
+```bash
+nixos-anywhere \
+  --flake .#hetzner-cloud-aarch64 \
+  --target-host root@me.example \
+  --build-on remote \
+  --kexec-extra-flags "-c"
+```
+
+`--kexec-extra-flags "-c"` forces the legacy `kexec_load` syscall. Hetzner
+CAX / Ubuntu 26.04 rejects `kexec_file_load` with `EADDRNOTAVAIL`, leaving the
+machine unreachable after kexec. The full-install wrapper additionally passes
+`--copy-host-keys` so existing ragenix secrets remain decryptable.
+
+If you use `--copy-host-keys`, add that host key to
+`nix/hosts/me/secrets.nix` before encrypting the secrets. Without it, read the
+new host key after the first boot and update the recipients before deploying.
 
 ### Nix config
 
-You can start by making a copy of the demo config:
+Start from the demo host:
 
 ```bash
 cp -r nix/hosts/demo nix/hosts/me
 ```
 
-And following `#demo` config create `#me` config in `flake.nix`
+Add a matching `nixosConfigurations.me` in `flake.nix`, and set the image tag to
+the release commit whose OCI images were published to Quay:
+
+```nix
+tag = "<release-commit-sha>";
+```
+
+The demo config uses `https://auth.<domain>`, `https://app.auth.<domain>`,
+`https://reg.<domain>`, and `https://data.<domain>`; keep the flake host's
+origins and Caddy virtual hosts consistent.
 
 #### Secrets
 
-We will use [ragenix](https://github.com/yaxitech/ragenix) to encrypt two env files:
+All secret files are encrypted with ragenix. Add the target host's ed25519 key
+to `nix/hosts/me/secrets.nix`:
 
-- DNS API Key - which is used by [Caddy](https://caddyserver.com/) plugin to issue [Let's encrypt](https://letsencrypt.org/) certificates
-- Auth service secrets - Web Push [VAPID](https://www.rfc-editor.org/rfc/rfc8292.html) keys and JSON Web Key for signing tokens.
+```nix
+let
+  me = "ssh-ed25519 AAAA...";
+in
+{
+  "secrets/cloudflare.age".publicKeys = [ me ];
+  "secrets/auth.age".publicKeys = [ me ];
+  "secrets/fuseki.age".publicKeys = [ me ];
+  "secrets/garage.age".publicKeys = [ me ];
+}
+```
 
-First we need to add VPS public key to `nix/hosts/me/secrets.nix`. To do it we can first `ssh root@me.example` and accept server fingerprint. Now we can `cat ~/.ssh/known_hosts | grep me.example` and use the `ssh-ed25519` key.
-
-##### DNS API
-
-In our example we will use Cloudflare and [Cloudflare module for Caddy](https://github.com/caddy-dns/cloudflare). Following instructions we create [Account API Token](https://dash.cloudflare.com/1f3f4037f2cee649a505f427550473dc/api-tokens) (custom token) with `Zone.Zone Read` and `Zone.DNS Edit`, we can also set Client IP Address Filtering to IP we have assigned to our VPS.
-
-We can encrypt that by running following command in `nix/hosts/me`
+Encrypt or edit each file from `nix/hosts/me`:
 
 ```bash
 RULES=./secrets.nix ragenix -e ./secrets/cloudflare.age
+RULES=./secrets.nix ragenix -e ./secrets/auth.age
+RULES=./secrets.nix ragenix -e ./secrets/fuseki.age
+RULES=./secrets.nix ragenix -e ./secrets/garage.age
 ```
 
-And following Cloudflare module for Caddy set it as:
+- `cloudflare.age` — `CF_API_TOKEN=...`, a Cloudflare token with `Zone:Zone:Read`
+  and `Zone:DNS:Edit` for the zone. Caddy uses it for ACME DNS-01. If the token
+  has IP filtering, allow both the VPS IPv4 and IPv6 addresses; Caddy may reach
+  the Cloudflare API over IPv6.
+- `auth.age` — `CSS_VAPID_PRIVATE_KEY=...`, `CSS_PUSH_SENDER=mailto:...`, and
+  `CSS_ENCODED_PRIVATE_JWK=...`. The public VAPID key in the host config must
+  match the private key.
+- `fuseki.age` — `ADMIN_PASSWORD=...` and `CSS_FUSEKI_ADMIN=admin:...` with the
+  same password. Fuseki uses the first; the worker uses the second to create
+  per-account datasets.
+- `garage.age` — `GARAGE_RPC_SECRET=...`, `GARAGE_ADMIN_TOKEN=...`, and
+  `CSS_GARAGE_ADMIN_TOKEN=...` with the same admin token. The worker uses the
+  admin token to create per-data-pod buckets and keys.
 
-```env
-CF_API_TOKEN=
-```
-
-nix config will set it as an env file so Caddy can access it.
-
-##### VAPID
-
-You can generate a pair by running
+Generate the VAPID pair with:
 
 ```bash
 npx web-push generate-vapid-keys
 ```
 
-You can replace `vapidPublicKey` in your config with generated public key. Private key will be used when we encrypt `auth.age` file.
-
-##### JWK
-
-You can generate base64url encoded JWK, including a private key, by running:
+Generate the base64url-encoded private JWK with:
 
 ```bash
 node packages/repl/cmd.ts -- gen-jwk -b
 ```
 
-It will be used when we encrypt `auth.age` file.
-
-##### Auth
-
-We can encrypt that file by running following command in `nix/hosts/me`
-
-```bash
-RULES=./secrets.nix ragenix -e ./secrets/auth.age
-```
-
-And set
-
-```env
-
-CSS_VAPID_PRIVATE_KEY=
-CSS_PUSH_SENDER=
-CSS_ENCODED_PRIVATE_JWK=
-```
-
-[Application Server Contact Information](https://datatracker.ietf.org/doc/html/draft-thomson-webpush-vapid#section-2.1) is required by the VAPID spec and must be a `mailto:` or an `https:` contact URI.
+`CSS_PUSH_SENDER` must be a `mailto:` or `https:` contact URI.
 
 #### Applying config
 
-Now we can apply our configuration by running
+For a fresh install, `nixos-anywhere` installs the base system first; then deploy
+the demo host:
+
+```bash
+nix run .#deploy-demo -- root@<demo-host>
+```
+
+The raw command is:
 
 ```bash
 nixos-rebuild switch \
+  --no-reexec \
   --flake .#me \
   --target-host root@me.example \
   --build-host root@me.example
 ```
 
-> [!TIP]
-> In case starting some systemd service errors, you can simply re-run this command.
+`--no-reexec` is needed so `nixos-rebuild` does not try to execute the target's
+aarch64 `nixos-rebuild` on the local build machine.
 
-Now Caddy will request certificates from Let's encrypt and after short moment you should be able to access account management application on `https://app.auth.me.example` (if you further customized your config it will be at that address)
+> [!TIP]
+> If a one-shot service such as the Temporal schema/namespace setup fails
+> because Postgres was not ready, re-run the command.
+
+Caddy requests certificates through the Cloudflare DNS-01 challenge. Once the
+containers are healthy, the account management UI is at
+`https://app.auth.me.example`.
 
 ## Funding
 

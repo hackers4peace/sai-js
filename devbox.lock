@@ -461,8 +461,8 @@
       }
     },
     "nixos-anywhere@latest": {
-      "last_modified": "2026-10-08T19:21:32Z",
-      "resolved": "github:NixOS/nixpkgs/8edc0c72e3a38faf5434e40d1f19431125fe4b30#nixos-anywhere",
+      "last_modified": "2026-11-04T12:32:54Z",
+      "resolved": "github:NixOS/nixpkgs/13e53762c5afaf384d4614e94527a9ccfafe41d0#nixos-anywhere",
       "source": "devbox-search",
       "version": "1.13.0",
       "systems": {
@@ -470,21 +470,21 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/lwqj2nfk9hrljad837sm9bdnvagmpmfd-nixos-anywhere-1.13.0",
+              "path": "/nix/store/cx4kx36cr0yzs3hqqi7y0p0v6l6xfr2l-nixos-anywhere-1.13.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/lwqj2nfk9hrljad837sm9bdnvagmpmfd-nixos-anywhere-1.13.0"
+          "store_path": "/nix/store/cx4kx36cr0yzs3hqqi7y0p0v6l6xfr2l-nixos-anywhere-1.13.0"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/rw3z182z04wa0zdmg0vhqvxbz7cd2ajj-nixos-anywhere-1.13.0",
+              "path": "/nix/store/w26vpi9fvvcl75nsvalby94fp77k4q67-nixos-anywhere-1.13.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/rw3z182z04wa0zdmg0vhqvxbz7cd2ajj-nixos-anywhere-1.13.0"
+          "store_path": "/nix/store/w26vpi9fvvcl75nsvalby94fp77k4q67-nixos-anywhere-1.13.0"
         },
         "x86_64-darwin": {
           "outputs": [
@@ -500,11 +500,11 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/l7kj33vx5vbm225vxfkmv59xhsfa4hl3-nixos-anywhere-1.13.0",
+              "path": "/nix/store/7z2pkahwk4wxqyj5v9pm6irn9svgzblm-nixos-anywhere-1.13.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/l7kj33vx5vbm225vxfkmv59xhsfa4hl3-nixos-anywhere-1.13.0"
+          "store_path": "/nix/store/7z2pkahwk4wxqyj5v9pm6irn9svgzblm-nixos-anywhere-1.13.0"
         }
       }
     },

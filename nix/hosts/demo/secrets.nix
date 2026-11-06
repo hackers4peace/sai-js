@@ -1,5 +1,5 @@
 let
-  demo = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPlY5y8MjRNNiKWwx9zByLgWcnS6BXh46eIwLFe4mdnR";
+  demo = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJJ4OjexI3eBRGftybywXGxL8erIU5KiwfGoZBEKu/Pe";
 in
 {
   "secrets/cloudflare.age".publicKeys = [ demo ];
