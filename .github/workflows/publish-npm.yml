@@ -54,6 +54,7 @@ jobs:
         # `publish:npm` depends on `^publish:npm`, so Turbo publishes each
         # workspace dependency before the package that depends on it. The
         # per-package script is idempotent and skips versions already on npm.
+        # `@elfpavlik/sai-components` is excluded here and published separately.
         # turbo.json forwards NPM_CONFIG_USERCONFIG so tasks see setup-node's
         # generated .npmrc (which contains the NODE_AUTH_TOKEN auth line).
-        run: npm run publish:npm
+        run: npm run publish:npm -- --filter='!@elfpavlik/sai-components'

@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@inrupt/solid-client-authn-browser": "^2.0.0",
-    "@janeirodigital/interop-application": "file:../../packages/application",
-    "@janeirodigital/interop-data-model": "file:../../packages/data-model",
-    "@janeirodigital/interop-utils": "file:../../packages/utils",
+    "@janeirodigital/interop-application": "^1.0.0-rc.31",
+    "@janeirodigital/interop-data-model": "^1.0.0-rc.31",
+    "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "@ldo/ldo": "1.0.0-alpha.32",
     "@ldo/connected": "1.0.0-alpha.32",
     "@ldo/connected-solid": "1.0.0-alpha.32",
@@ -29,10 +29,10 @@
   },
   "overrides": {
     "@solid-notifications/subscription": {
-      "@janeirodigital/interop-utils": "1.0.0-rc.26"
+      "@janeirodigital/interop-utils": "^1.0.0-rc.31"
     },
     "@solid-notifications/discovery": {
-      "@janeirodigital/interop-utils": "1.0.0-rc.26"
+      "@janeirodigital/interop-utils": "^1.0.0-rc.31"
     }
   },
   "devDependencies": {

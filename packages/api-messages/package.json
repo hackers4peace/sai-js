@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/sai-api-messages",
-  "version": "1.0.0-rc.27",
+  "version": "1.0.0-rc.31",
   "description": "",
   "license": "MIT",
   "type": "module",
@@ -13,11 +13,12 @@
     }
   },
   "scripts": {
+    "prepublishOnly": "node ../../scripts/prepublish-build.mjs",
     "publish:npm": "../../scripts/publish-npm.sh"
   },
   "dependencies": {
     "@effect/rpc": "^0.44.13",
-    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.27",
+    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.31",
     "effect": "^3.10.8"
   },
   "devDependencies": {

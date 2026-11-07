@@ -1,6 +1,6 @@
 {
   "name": "@janeirodigital/interop-utils",
-  "version": "1.0.0-rc.27",
+  "version": "1.0.0-rc.31",
   "description": "Internal utilities intended to be used by other modules implementing Solid Application Interoperability specification",
   "contributors": [
     {
@@ -39,6 +39,7 @@
   },
   "scripts": {
     "test": "vitest run",
+    "prepublishOnly": "node ../../scripts/prepublish-build.mjs",
     "publish:npm": "../../scripts/publish-npm.sh"
   },
   "dependencies": {

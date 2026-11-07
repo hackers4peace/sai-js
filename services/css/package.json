@@ -9,6 +9,6 @@
   "license": "MIT",
   "dependencies": {
     "@solid/community-server": "8.0.0-alpha.2",
-    "@elfpavlik/sai-components": "1.0.0-rc.29"
+    "@elfpavlik/sai-components": "1.0.0-rc.31"
   }
 }
