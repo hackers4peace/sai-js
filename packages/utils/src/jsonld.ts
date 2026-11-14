@@ -1,4 +1,3 @@
-import { SpanStatusCode, trace } from '@opentelemetry/api'
 import type { DatasetCore, Quad } from '@rdfjs/types'
 import { Parser, Store } from 'n3'
 
@@ -6,6 +5,7 @@ import { isAuxiliaryResource } from './container.ts'
 import { jsonld } from './jsonld-lib.ts'
 import { localDocumentLoader } from './jsonld-parser.ts'
 import { LDP, LWS } from './namespaces.ts'
+import { withSpan } from './tracing/shared.ts'
 import type { WhatwgFetch } from './whatwg-fetch.ts'
 export { localDocumentLoader }
 
@@ -145,34 +145,26 @@ export async function frameDoc(
   iri: string,
   overrides: Record<string, Record<string, unknown>> = {}
 ): Promise<Record<string, unknown>> {
-  return trace.getTracer('sai-jsonld').startActiveSpan('frameDoc', async (span) => {
-    try {
-      span.setAttribute('sai.jsonld.uri', iri)
-      // `@types/jsonld` types the third `frame` argument as `Frame` instead of
-      // `Options`, so cast the options to satisfy overload resolution.
-      const framed = (await jsonld.frame(
-        doc as any,
-        buildFrame(context, iri, overrides) as any,
-        {
-          documentLoader,
-        } as any
-      )) as unknown as Record<string, unknown>
-      if (!(framed as any).id && !(framed as any)['@id']) {
-        throw new Error(`Node ${iri} not found in framed output`)
-      }
-      // the framed node — @context stripped for the payload (frameNode does
-      // the same for the model POJOs); the span attribute set before end()
-      if (span.isRecording()) {
-        span.setAttribute('sai.jsonld.framed', JSON.stringify(withoutContext(framed)))
-      }
-      span.end()
-      return framed
-    } catch (err) {
-      span.recordException(err as Error)
-      span.setStatus({ code: SpanStatusCode.ERROR })
-      span.end()
-      throw err
+  return withSpan('sai-jsonld', 'frameDoc', async (span) => {
+    span.setAttribute('sai.jsonld.uri', iri)
+    // `@types/jsonld` types the third `frame` argument as `Frame` instead of
+    // `Options`, so cast the options to satisfy overload resolution.
+    const framed = (await jsonld.frame(
+      doc as any,
+      buildFrame(context, iri, overrides) as any,
+      {
+        documentLoader,
+      } as any
+    )) as unknown as Record<string, unknown>
+    if (!(framed as any).id && !(framed as any)['@id']) {
+      throw new Error(`Node ${iri} not found in framed output`)
     }
+    // the framed node — @context stripped for the payload (frameNode does
+    // the same for the model POJOs); the span attribute set before end()
+    if (span.isRecording()) {
+      span.setAttribute('sai.jsonld.framed', JSON.stringify(withoutContext(framed)))
+    }
+    return framed
   })
 }
 
@@ -458,31 +450,23 @@ async function fetchContainerRdf(iri: string, fetch: WhatwgFetch): Promise<unkno
  * instrumentation) nests inside as the actual GET. Recording-only.
  */
 export async function fetchJsonLd(iri: string, fetch: WhatwgFetch): Promise<unknown> {
-  return trace.getTracer('sai-jsonld').startActiveSpan('fetchJsonLd', async (span) => {
-    try {
-      span.setAttribute('sai.jsonld.uri', iri)
-      let response = await fetch(iri, {
-        headers: { Accept: LWS_JSON_LD_ACCEPT },
-      })
-      if (response.status === 406 || response.status === 415) {
-        response = await fetch(iri, { headers: { Accept: JSON_LD_ACCEPT } })
-      }
-      if (!response.ok) {
-        throw new HttpStatusError(iri, response.status)
-      }
-      let doc: unknown = await response.json()
-      if (isLwsContainerDocument(doc)) {
-        doc = await fetchContainerRdf(iri, fetch)
-      }
-      if (span.isRecording()) span.setAttribute('sai.jsonld.raw', JSON.stringify(doc))
-      span.end()
-      return doc
-    } catch (err) {
-      span.recordException(err as Error)
-      span.setStatus({ code: SpanStatusCode.ERROR })
-      span.end()
-      throw err
+  return withSpan('sai-jsonld', 'fetchJsonLd', async (span) => {
+    span.setAttribute('sai.jsonld.uri', iri)
+    let response = await fetch(iri, {
+      headers: { Accept: LWS_JSON_LD_ACCEPT },
+    })
+    if (response.status === 406 || response.status === 415) {
+      response = await fetch(iri, { headers: { Accept: JSON_LD_ACCEPT } })
     }
+    if (!response.ok) {
+      throw new HttpStatusError(iri, response.status)
+    }
+    let doc: unknown = await response.json()
+    if (isLwsContainerDocument(doc)) {
+      doc = await fetchContainerRdf(iri, fetch)
+    }
+    if (span.isRecording()) span.setAttribute('sai.jsonld.raw', JSON.stringify(doc))
+    return doc
   })
 }
 
@@ -528,29 +512,21 @@ export async function putJsonLd(
   doc: Record<string, unknown>,
   headers?: Record<string, string>
 ): Promise<void> {
-  await trace.getTracer('sai-jsonld').startActiveSpan('putJsonLd', async (span) => {
-    try {
-      span.setAttribute('sai.jsonld.uri', iri)
-      const expanded = await expandedJsonLd(doc)
-      const body = JSON.stringify(expanded)
-      if (span.isRecording()) {
-        span.setAttribute('sai.jsonld.framed', JSON.stringify(withoutContext(doc)))
-        span.setAttribute('sai.jsonld.expanded', body)
-      }
-      const response = await fetch(iri, {
-        method: 'PUT',
-        body,
-        headers: { 'Content-Type': 'application/ld+json', ...headers },
-      })
-      if (!response.ok) {
-        throw new Error(`failed to put ${iri}: ${response.status}`)
-      }
-      span.end()
-    } catch (err) {
-      span.recordException(err as Error)
-      span.setStatus({ code: SpanStatusCode.ERROR })
-      span.end()
-      throw err
+  await withSpan('sai-jsonld', 'putJsonLd', async (span) => {
+    span.setAttribute('sai.jsonld.uri', iri)
+    const expanded = await expandedJsonLd(doc)
+    const body = JSON.stringify(expanded)
+    if (span.isRecording()) {
+      span.setAttribute('sai.jsonld.framed', JSON.stringify(withoutContext(doc)))
+      span.setAttribute('sai.jsonld.expanded', body)
+    }
+    const response = await fetch(iri, {
+      method: 'PUT',
+      body,
+      headers: { 'Content-Type': 'application/ld+json', ...headers },
+    })
+    if (!response.ok) {
+      throw new Error(`failed to put ${iri}: ${response.status}`)
     }
   })
 }

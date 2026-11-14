@@ -26,3 +26,8 @@ export function temporalPluginConfig(): TemporalPluginConfig | undefined {
 export function setTemporalPluginConfig(config: TemporalPluginConfig | undefined): void {
   ;(globalThis as Record<symbol, unknown>)[KEY] = config
 }
+
+// The tracer plumbing lives in `@janeirodigital/interop-utils` so the ESM
+// components of both packages share one bridge; re-exported here for the
+// modules that already import it from this path.
+export { setSharedTracerProvider, sharedTracer, withSpan } from '@janeirodigital/interop-utils'

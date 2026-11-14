@@ -96,6 +96,19 @@ if (!hardDisabled && (saiEndpoint || otlpEndpoint)) {
       ],
     })
     sdk.start()
+
+    // CSS loads the components of this package as ESM, and the provider lookup
+    // through `@opentelemetry/api`'s global registry does not reliably reach the
+    // SDK registered here — spans created through that proxy were never passed to
+    // the span processor (observed on the `sai.lws.issue-id-jag` span while the
+    // HTTP instrumentation spans, which get the provider directly, did export).
+    // Publish this SDK's own provider on the bridge `otel-state.ts` reads, so
+    // `sharedTracer(name)` always returns a tracer whose spans flow through the
+    // processor/exporter configured above. The provider is read off the SDK
+    // (it is set by `NodeSDK.start()` whenever span processors are configured,
+    // which ours always are); the API lookup is only a fallback.
+    globalThis[Symbol.for('sai.otel.tracerProvider')] =
+      Reflect.get(sdk, '_tracerProvider') ?? require('@opentelemetry/api').trace.getTracerProvider()
   } catch (err) {
     // fail-soft: telemetry must never break the application
     console.warn(
