@@ -1,0 +1,753 @@
+/*
+ * LWS authorization — the spec flow, the decentralized variant, and what the
+ * CSS fork in this repo actually does.
+ *
+ * Sources
+ * - lws10-core §Authorization: https://w3c.github.io/lws-protocol/lws10-core/#authorization
+ * - lws-auth/oidc.c4 — Identity Assertion JWT Authorization Grant variant
+ * - CommunitySolidServer@lws-sai (99c208447)
+ *     config/identity/lws/default.json            (AS endpoints, issuer = baseUrl)
+ *     config/ldp/authentication/lws.json          (LwsAccessTokenExtractor)
+ *     config/ldp/metadata-writer/writers/www-auth-lws.json  (challenge)
+ *     config/ldp/metadata-writer/writers/lws-link.json      (Link: rel=lws#storage)
+ * - SAI
+ *     packages/components/config/{data,registry}.json import css:config/identity/lws/default.json
+ *     packages/components/config/auth.json does NOT (auth is only the OIDC provider)
+ *     packages/utils/src/lws-auth.ts        (client-side discovery + exchange)
+ *     packages/components/src/SelfIssuedSession.ts, builders/sessionManager.ts
+ *
+ * The landscape lives in architecture.c4 (h4p.*), the per-user stacks in
+ * temporal.c4 (Alice, Bob, App); this file only adds the LWS-specific parts.
+ */
+
+model {
+  /*
+   * A storage server MAY be its own authorization server
+   * ("the authorization server may be the same server as the storage server").
+   * SAI takes that single-entity case: every storage hosts the AS that issues
+   * access tokens for *itself*, so RAS and RS collapse into one process.
+   */
+  extend h4p.Data {
+    component LwsProtectedResourceMetadata 'Protected Resource Metadata' 'RFC 9728' {
+      description '''
+        `/.well-known/oauth-protected-resource/<storage path>`
+
+        - `resource` — the *requested resource* URI, not the storage
+        - `authorization_servers` — REQUIRED by LWS, here `["https://data/"]`
+
+        `LwsProtectedResourceMetadataHttpHandler`
+      '''
+    }
+
+    component LwsAuthorizationServer 'LWS authorization server' 'RFC 8693 token exchange' {
+      description '''
+        `css:config/identity/lws/default.json`, `issuer` = the server base URL.
+
+        - `/.well-known/lws-configuration` → `LwsAuthorizationServerMetadataHttpHandler`
+        - `/.well-known/lws/jwks` → `LwsJwkGenerator` (ES256, `CachedJwkGenerator`)
+        - `/.well-known/lws/token` → `LwsTokenHttpHandler`
+
+        `verifyStorage` rejects a `resource` that is not a storage hosted by this
+        server (`invalid_target`) — the spec's "unknown or untrusted storage".
+        A `DPoP` proof, when present, is verified (`htu`/`htm`) and its key
+        thumbprint is forwarded to the verifier as `proofKeyThumbprint`.
+      '''
+    }
+
+    component LwsAccessTokenValidation 'LWS access-token validation' 'LwsAccessTokenExtractor' {
+      description '''
+        `css:config/ldp/authentication/lws.json` — first handler of the
+        `WaterfallCredentialsExtractor`, so an `Authorization: Bearer` token is
+        never downgraded to an anonymous request.
+
+        Checks: signature via the issuer's `jwks_uri` (cached), `iss`, `aud`
+        exactly one value = the storage holding the target resource,
+        `exp`/`nbf`/`iat` (±60 s). Failure → 401 `invalid_token`.
+      '''
+    }
+  }
+
+  extend h4p.Registry {
+    component LwsAuthorizationServer 'LWS authorization server' 'registry' {
+      description '''
+        The registry server is the LWS authorization server of its own storages
+        (`https://registry/alice/`), exactly as `h4p.Data` is for `https://data/<pod>/`:
+        same `css:config/identity/lws/default.json`, plus the SAI override
+        (`config/identity/id-jag-accept.json`) that adds the `id-jag` subject-token type.
+      '''
+    }
+  }
+
+  extend h4p.Auth {
+    component SelfIssuedCredential 'Self-issued credential' 'at+jwt' {
+      description '''
+        `SelfIssuedSession` (`packages/components/src/SelfIssuedSession.ts`) with
+        `EnvJwkGenerator(CSS_ENCODED_PRIVATE_JWK)`.
+
+        `typ: at+jwt`, `iss: https://auth/`, `aud: "solid"`, `sub`/`webid` = agent,
+        `client_id`/`azp` = client, `cnf.jkt` = DPoP key thumbprint.
+
+        This — not an OpenID Connect ID Token — is what the suite presents as
+        `subject_token` (with `subject_token_type=…:id_token`). In tests it is
+        signed in-process; for the UI, `LwsTokenHandler` (`/.sai/lws-token`)
+        mints the same token on the caller's behalf.
+      '''
+    }
+  }
+
+  extend h4p.WebID {
+    component WebIdDocument 'WebID / CID document' 'id' {
+      description '''
+        `https://id/alice` — the dereferenceable `sub` of the subject token. It
+        carries `solid:oidcIssuer <https://auth/>`
+        (`packages/data-model/src/templates/WebId.ts`), which is how the storage
+        learns which OpenID Provider to trust. LWS's own
+        `lws:OpenIdProvider` service link is not used by SAI fixtures.
+      '''
+    }
+  }
+
+  extend Bob {
+    component RAS 'Resource Authorization Server' 'ras.bob.example' {
+      description '''
+        Role from `lws-auth/oidc.c4` (a separate AS next to the storage). **Not
+        deployed by SAI** — `h4p.Data.LwsAuthorizationServer` fills this role.
+      '''
+    }
+  }
+
+  // Subject-token validation hops (SAI's flavour of "validate all presented tokens")
+  h4p.Data.LwsAuthorizationServer -> h4p.WebID.WebIdDocument 'dereference subject_token.sub' {
+    technology 'HTTPS'
+  }
+  h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'OIDC discovery + JWKS' {
+    technology 'HTTPS'
+  }
+  h4p.Data.LwsProtectedResourceMetadata -> h4p.Data.LwsAuthorizationServer 'advertises' {
+    technology 'authorization_servers: ["https://data/"]'
+  }
+  h4p.Data.LwsAccessTokenValidation -> h4p.Data.LwsAuthorizationServer 'jwks_uri (cached key set)' {
+    technology 'HTTPS'
+  }
+  App.UI -> h4p.Data.LwsAccessTokenValidation 'LWS requests'
+  h4p.Data.LwsAccessTokenValidation -> h4p.Data.SaiPolicyEngine 'credentials {agent, client}'
+}
+
+views {
+  /*
+   * 1. The generic flow. SAI implements every numbered hop, but with the AS and
+   *    the storage in one process, and with a self-issued subject token.
+   */
+  dynamic view lws-authorization-spec {
+    title: 'LWS authorization (spec)'
+
+    include App
+    include App.UI
+    include h4p.Data, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
+    include h4p.Auth, h4p.Auth.OP, h4p.WebID.WebIdDocument
+
+    style App {
+      color: gray
+    }
+    style h4p.Data {
+      color: sky
+    }
+
+    App.UI -> h4p.Data 'GET /storage_1/photos/img.jpg' {
+      notes'''
+        #### Unauthorized request
+
+        Any protected resource needs an access token generated by a trusted
+        authorization server; a client finds it by *failing first*.
+
+        >[!NOTE]
+        > Who the client is (`client_id`) is not part of this exchange — it
+        > arrives later, inside the subject token.
+      '''
+    }
+
+    h4p.Data -> App.UI '401 Unauthorized' {
+      notes'''
+        #### The 401 carries the discovery values
+
+        ```http
+        HTTP/2 401 Unauthorized
+        Link: <https://storage.example/storage_1>; rel="https://www.w3.org/ns/lws#storage"
+        WWW-Authenticate: Bearer resource_metadata="https://storage.example/.well-known/oauth-protected-resource/storage_1/photos/img.jpg",
+                          error="invalid_token"
+        ```
+
+        >[!IMPORTANT]
+        > Both headers are MUSTs: `resource_metadata` (RFC 9728 §5.1) **and** a
+        > `Link` identifying the storage that contains the resource.
+
+        SAI emits both: `LwsWwwAuthMetadataWriter` adds
+        `resource_metadata`, `as_uri`, `realm`, `error`;
+        `LwsLinkMetadataWriter` adds the `rel="…lws#storage"` link.
+
+        >[!TIP]
+        > `as_uri` and `realm` are earlier-draft parameters, kept for older
+        > clients. SAI's own client reads `realm` — the spec wants the `Link`
+        > header (see the last note of this view).
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsProtectedResourceMetadata 'GET resource_metadata URL' {
+      notes'''
+        #### Protected resource metadata
+
+        ```json
+        {
+          "resource": "https://storage.example/storage_1/photos/img.jpg",
+          "authorization_servers": ["https://authorization.example"]
+        }
+        ```
+
+        >[!IMPORTANT]
+        > `resource` identifies the *requested resource*, not the storage;
+        > `authorization_servers` is REQUIRED and holds issuer identifiers.
+      '''
+    }
+
+    h4p.Data.LwsProtectedResourceMetadata -> App.UI '200 application/json' {
+      notes'''
+        #### Discovery validation (client side)
+
+        Before requesting a token the client MUST verify, all against the URI
+        that produced the 401:
+
+        1. `resource_metadata` has the same scheme + authority as the request
+        2. `resource` in the document is *identical* to the requested URI
+        3. the `Link` storage description's `StorageRoot` `serviceEndpoint` has
+           the same scheme + authority
+
+        >[!WARNING]
+        > `packages/utils/src/lws-auth.ts` implements 1–3 only partially: it
+        > fetches `authorization_servers` from `resource_metadata` but never
+        > compares `resource`, never dereferences the storage description, and
+        > takes the storage from the challenge `realm` instead of the `Link`
+        > header.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'GET /.well-known/lws-configuration' {
+      notes'''
+        #### Authorization server metadata (RFC 8414)
+
+        LWS requires this exact path, and adds
+        `subject_token_types_supported` / `subject_identifier_types_supported`.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> App.UI '200 AS metadata' {
+      notes'''
+        ```json
+        {
+          "issuer": "https://authorization.example",
+          "token_endpoint": "https://authorization.example/token",
+          "jwks_uri": "https://authorization.example/jwks",
+          "grant_types_supported": ["urn:ietf:params:oauth:grant-type:token-exchange"],
+          "subject_token_types_supported": [
+            "urn:ietf:params:oauth:token-type:jwt",
+            "urn:ietf:params:oauth:token-type:id_token"
+          ],
+          "subject_identifier_types_supported": ["did:web", "did:key", "https"]
+        }
+        ```
+
+        CSS emits the same shape, with `token_endpoint`/`jwks_uri` joined onto
+        the issuer (`…/.well-known/lws/token`, `…/.well-known/lws/jwks`).
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'POST token_endpoint (token exchange)' {
+      notes'''
+        #### OAuth 2.0 Token Exchange — the only grant LWS uses
+
+        ```http
+        POST /token HTTP/1.1
+        Content-Type: application/x-www-form-urlencoded
+
+        grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+        &resource=https%3A%2F%2Fstorage.example%2Fstorage_1
+        &subject_token=eyJ0eXAiOiJhcytqd3QiLCJhbGciO...
+        &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+        ```
+
+        >[!IMPORTANT]
+        > `resource` is REQUIRED and must be the **storage** URI from the `Link`
+        > header — it becomes the `aud` of the access token. Unknown or
+        > untrusted storage → reject.
+
+        Optional extras in CSS: a `DPoP` proof, whose key thumbprint is checked
+        against the subject token's `cnf.jkt`.
+      '''
+    }
+
+    parallel 'authorization server validates the subject token' {
+      h4p.Data.LwsAuthorizationServer -> h4p.WebID.WebIdDocument 'dereference sub (CID / WebID)' {
+        notes'''
+          [LWS OIDC — Authentication Credential Validation](https://w3c.github.io/lws-protocol/lws10-authn-openid/#validation):
+          the document's `id` MUST equal `sub` and name the issuer as its
+          `OpenIdProvider` (or, for Solid-OIDC tokens, `solid:oidcIssuer`).
+        '''
+      }
+      h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'fetch server metadata + JWKS' {
+        notes'''
+          The issuer named by the credential document is then discovered and its
+          keys fetched to verify the subject token's signature.
+
+          >[!NOTE]
+          > This is the part `oidc.c4` draws as `RAS -> CID` and
+          > `RAS -> EU.UAS`; the spec leaves the verification method to the
+          > `subject_token_type` verifier.
+        '''
+      }
+    }
+
+    h4p.Data.LwsAuthorizationServer -> App.UI '200 {access_token, token_type, expires_in}' {
+      notes'''
+        ```json
+        { "access_token": "eyJ0eXAiOiJhcytqd3QiLCJhbGciOiJFUzI1NiIs...", "token_type": "Bearer", "expires_in": 300 }
+        ```
+
+        #### RFC 9068 `at+jwt`
+
+        REQUIRED claims: `sub` (agent URI), `iss` (the AS), `client_id` (URI),
+        `aud` (must include the `resource` value — a storage), `exp`, `iat`,
+        `jti`. Lifetimes SHOULD be ≤ 300 s (CSS: `lifetime: 300`).
+
+        Errors follow RFC 6749 §5.2 (`invalid_request`, `invalid_target`, …).
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAccessTokenValidation 'GET /storage_1/photos/img.jpg + Bearer' {
+      notes'''
+        #### Presentation
+
+        `Authorization: Bearer <at+jwt>` (RFC 6750). One token per storage, not
+        per resource.
+      '''
+    }
+
+    h4p.Data.LwsAccessTokenValidation -> h4p.Data.SaiPolicyEngine 'authenticated {agent, client}' {
+      notes'''
+        #### Validation, then authorization
+
+        Signature (`jwks_uri`), `iss`, `aud` = the storage of the target, and the
+        temporal claims are checked first; an invalid token is a 401 with
+        `resource_metadata` + `error="invalid_token"`.
+
+        >[!IMPORTANT]
+        > A valid token only proves identity — it never bypasses the policy
+        > engine (WAC/ACP/grant evaluation happens after this hop).
+      '''
+    }
+
+    h4p.Data.SaiPolicyEngine -> h4p.Data.LwsAccessTokenValidation 'decision' {
+      notes'''
+        allow → the operation proceeds; deny → `403` (a policy decision is not a
+        credential problem, so it must not be a 401).
+      '''
+    }
+
+    h4p.Data.LwsAccessTokenValidation -> App.UI '200 / 403'
+  }
+
+  /*
+   * 2a. What SAI runs by default, read off trace 72728215… (2026-11-13): one
+   *     exchange with the storage's own authorization server (RAS == RS, no
+   *     ID-JAG). Payload and token attributes quoted below come from that trace
+   *     with OTEL_CAPTURE_HEADERS + OTEL_CAPTURE_TOKENS + OTEL_CAPTURE_BODIES.
+   */
+  dynamic view lws-authorization {
+    title: 'LWS authorization (implemented, single exchange)'
+
+    description '''
+      Trace `7272821567363e13efe9f1e8cb17857a` — `policy-engine.test.ts` ›
+      `protected resources (scope all, modes all)` ›
+      `authenticated request (authorized agent / authorized client)` › `can Read`.
+    '''
+
+    include App
+    include App.UI
+    include h4p.Data, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine, h4p.Data.SPARQLEndpoint
+    include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
+    include h4p.WebID, h4p.WebID.WebIdDocument
+
+    style App {
+      color: gray
+    }
+    style h4p.Data {
+      color: sky
+    }
+    style h4p.Auth {
+      color: green
+    }
+
+    App.UI -> h4p.Data 'GET /alice-work/k3pqsb (no credential)' {
+      notes'''
+        #### Unauthenticated probe
+
+        `createLwsFetch` sends the first request without `Authorization`; the
+        transport span carries `http.request.header.accept: text/turtle` and an
+        empty `http.request.body` (`OTEL_CAPTURE_HEADERS` / `OTEL_CAPTURE_BODIES`).
+      '''
+    }
+
+    h4p.Data -> App.UI '401 Unauthorized' {
+      notes'''
+        ```http
+        HTTP/2 401 Unauthorized
+        Link: <https://data/alice-work/>; rel="https://www.w3.org/ns/lws#storage"
+        WWW-Authenticate: Bearer resource_metadata="https://data/.well-known/oauth-protected-resource/alice-work/k3pqsb",
+                          as_uri="https://data/", realm="https://data/alice-work/", error="invalid_token"
+        ```
+
+        The body is captured (`http.response.body`). Note the 401 already ran the
+        policy engine: **3 × `POST /reg-alice/sparql` + 6 ×
+        `POST /data-alice-work/sparql`** — the challenge needs the storage
+        (`realm`), which the engine resolves.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsProtectedResourceMetadata 'GET /.well-known/oauth-protected-resource/alice-work/k3pqsb' {
+      notes'''
+        200; `http.response.body` =
+        `{"resource": "…/alice-work/k3pqsb", "authorization_servers": ["https://data/"]}`.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'GET /.well-known/lws-configuration'
+
+    h4p.Data.LwsAuthorizationServer -> App.UI '200 {issuer, token_endpoint, jwks_uri}' {
+      notes'''
+        `token_endpoint` = `https://data/.well-known/lws/token`,
+        `jwks_uri` = `https://data/.well-known/lws/jwks`,
+        `subject_token_types_supported` = [`jwt`, `id_token`, `id-jag`] (C2).
+      '''
+    }
+
+    h4p.Auth.SelfIssuedCredential -> App.UI 'self-issued at+jwt' {
+      notes'''
+        `iss: https://auth/`, `aud: "solid"`, `webid`, `azp`, `cnf.jkt` — signed
+        with the UAS key. Recorded as `sai.token.subject.*` on the client span.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'POST /.well-known/lws/token' {
+      notes'''
+        ```http
+        grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+        &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+        &subject_token=<at+jwt>
+        &resource=https://data/alice-work/
+        ```
+
+        `sai.lws.request.body` (tokens redacted as `<jwt:…>`) and
+        `sai.lws.response.body` on the server span.
+      '''
+    }
+
+    parallel 'subject-token verification (inside the exchange)' {
+      h4p.Data.LwsAuthorizationServer -> h4p.Data.SPARQLEndpoint 'POST /data-alice-work/sparql (verifyStorage)'
+      h4p.Data.LwsAuthorizationServer -> h4p.WebID.WebIdDocument 'GET https://id/alice (deref sub)' {
+        notes'''
+          `sub` is not in `trustedIssuers` of the storage → the document is
+          dereferenced and `solid:oidcIssuer` must name the token's `iss`.
+        '''
+      }
+      h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'GET /.well-known/openid-configuration'
+      h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'GET /.oidc/jwks' {
+        notes'''
+          ```json
+          sai.jwks.url   = "/.oidc/jwks"
+          sai.jwks.count = 1
+          sai.jwks.keys  = [{ "kty": "EC", "crv": "P-256", "alg": "ES256", "kid": "5Q5ZOPHv…", "use": "sig" }]
+          ```
+
+          Parsed from the served document (the key set is public material); the
+          raw body is in `http.response.body`.
+        '''
+      }
+    }
+
+    h4p.Data.LwsAuthorizationServer -> App.UI '200 {access_token: at+jwt, token_type: Bearer, expires_in: 300}' {
+      notes'''
+        `iss: https://data/`, `aud: https://data/alice-work/`, `sub: https://id/alice`,
+        `client_id: https://data/test-client/public/id`.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAccessTokenValidation 'GET /alice-work/k3pqsb + Bearer'
+
+    h4p.Data.LwsAccessTokenValidation -> h4p.Data.SaiPolicyEngine 'credentials {agent, client}'
+
+    parallel 'policy engine (unchanged by LWS)' {
+      h4p.Data.SaiPolicyEngine -> h4p.WebID.WebIdDocument 'fetchJsonLd https://id/alice ×3' {
+        notes'''
+          Each lookup is a `sai-jsonld` span with `sai.jsonld.raw` and
+          `sai.jsonld.framed` (payload capture, OTEL_CAPTURE_BODIES).
+        '''
+      }
+      h4p.Data.SaiPolicyEngine -> h4p.Data.SPARQLEndpoint '~20 SPARQL queries (registrations, grants, modes)'
+    }
+
+    h4p.Data.SaiPolicyEngine -> h4p.Data.LwsAccessTokenValidation 'allow (Read)'
+    h4p.Data.LwsAccessTokenValidation -> App.UI '200 text/turtle'
+  }
+
+  /*
+   * 2b. The two-step chain (C1–C4), read off trace 48e23f27… (2026-11-13): the
+   *     credential is exchanged at the **user's** authorization server for one
+   *     ID-JAG per storage AS (`aud`), and each storage trades its grant for a
+   *     bearer access token. Opt-in today via
+   *     `buildLwsFetch(webid, clientId, { idJag: true })`.
+   */
+  dynamic view lws-authorization-id-jag {
+    title: 'LWS authorization (implemented, ID-JAG)'
+
+    description '''
+      Trace `48e23f2782273bc80811a099f444dee2` — `/test` `lws-auth.test.ts` with
+      two storages (`data` and `registry`): the four `sai.lws.*` spans appear
+      twice, once per resource authorization server.
+    '''
+
+    include App
+    include App.UI
+    include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
+    include h4p.Registry, h4p.Registry.SPARQLEndpoint
+    include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
+
+    style App {
+      color: gray
+    }
+    style h4p.Auth {
+      color: green
+    }
+    style h4p.Data {
+      color: sky
+    }
+    style h4p.Registry {
+      color: red
+    }
+
+    h4p.Auth.SelfIssuedCredential -> App.UI 'self-issued at+jwt (cnf.jkt)' {
+      notes'''
+        Same credential as in 2a; `@elfpavlik/lws-auth` caches it only as an input
+        — it is never sent to a storage.
+      '''
+    }
+
+    App.UI -> h4p.Auth 'POST /.well-known/lws/token (requested_token_type=id-jag)' {
+      notes'''
+        #### Span `sai.lws.request-id-jag` (client)
+
+        ```http
+        grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+        &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
+        &audience=https://data/
+        &subject_token=<at+jwt>
+        &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+        DPoP: <proof for cnf.jkt>
+        ```
+
+        Attributes: `sai.lws.audience`, `sai.lws.client_auth_method: none`,
+        `sai.token.subject.*`, `sai.lws.request.body`, `sai.lws.response.body`.
+      '''
+    }
+
+    h4p.Auth -> App.UI '200 {issued_token_type: id-jag, token_type: N_A, expires_in: 300}' {
+      notes'''
+        #### Span `sai.lws.issue-id-jag` (auth)
+
+        DPoP proof verified (`sai.lws.dpop_proof: true`), subject token validated
+        against this server (`trustedIssuers`), grant signed with the Solid-OIDC
+        key (`/.oidc/jwks`). `sai.token.id-jag.*` carries
+        `typ=oauth-id-jag+jwt`, `aud=https://data/`, `client_id`, `jti`, `exp`.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'POST /.well-known/lws/token (subject_token_type=id-jag)' {
+      notes'''
+        #### Span `sai.lws.exchange-access-token` (client)
+
+        `resource=https://data/alice-work/`, `subject_token=<ID-JAG>`. The ID-JAG
+        is cached per **authorization server**, the access token per **storage**
+        (`createLwsFetch`), so a second request to this storage costs one round
+        trip and nothing else.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'discovery + JWKS' {
+      notes'''
+        #### Span `sai.lws.verify-id-jag` (storage)
+
+        `typ` pinned to `oauth-id-jag+jwt`, `aud` must name this AS, signature
+        verified via the issuer's JWKS (`sai.jwks.*` on the serving span),
+        `jti`/`exp` checked. Rejections carry `sai.lws.error`.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> App.UI '200 {access_token: at+jwt, aud=storage}'
+
+    App.UI -> h4p.Data.LwsAccessTokenValidation 'GET /alice-work/k3pqsb + Bearer'
+
+    parallel 'second storage, second authorization server' {
+      App.UI -> h4p.Auth 'POST /.well-known/lws/token (audience=https://registry/)' {
+        notes'''
+          A **separate** grant: a grant minted for `https://data/` is refused by
+          the registry's token endpoint (`invalid_request`).
+        '''
+      }
+      App.UI -> h4p.Registry.LwsAuthorizationServer 'POST /.well-known/lws/token (resource=https://registry/alice/)' {
+        notes'''
+          The same four-span chain repeats with `aud=https://registry/` — one
+          chain per resource authorization server, visible side by side in the trace.
+        '''
+      }
+    }
+
+    App.UI -> h4p.Registry 'GET /alice/vzp6ky + Bearer' {
+      notes'''
+        403, not 401: the grant and the access token were accepted; the
+        structural registry then denies this client by policy.
+      '''
+    }
+  }
+
+  /*
+   * 3. The decentralized variant lws-auth/oidc.c4 draws: a separate UAS and
+   *    RAS, and an ID-JAG in between — NOT what SAI implements (2b is the
+   *    in-repo ID-JAG, with the storage as its own RAS).
+   */
+  dynamic view lws-id-jag {
+    title: 'Identity Assertion JWT Authorization Grant (not implemented)'
+
+    description '''
+      `lws-auth/oidc.c4` builds on LWS core §Authorization but keeps the
+      authorization server **separate** from the resource server and adds an
+      Identity Assertion JWT Authorization Grant
+      ([draft-ietf-oauth-identity-assertion-authz-grant](https://www.ietf.org/archive/id/draft-ietf-oauth-identity-assertion-authz-grant-01.html)):
+      the user's own UAS exchanges its ID Token for an ID-JAG scoped to a peer's
+      RAS, and the RAS trades that ID-JAG for a storage access token. Two
+      exchanges, two servers.
+    '''
+
+    include Alice, Bob, App
+    include App.UI, App.CID, Alice.UAS, Bob.RAS, Bob.Data
+    include h4p.WebID.WebIdDocument
+
+    style Alice {
+      color: green
+    }
+    style Bob {
+      color: blue
+    }
+    style App {
+      color: gray
+    }
+
+    App.UI -> Alice.UAS 'GET /authorize?response_type=code&client_id=…&redirect_uri=…' {
+      notes'''
+        SSO at the user's own UAS. The UAS fetches the client metadata from
+        `client_id` and checks `redirect_uris` contains `redirect_uri`.
+      '''
+    }
+    Alice.UAS -> App.CID 'GET /id (client metadata)'
+    App.CID -> Alice.UAS '200 {client_id, client_name, redirect_uris, scope, grant_types}'
+    Alice.UAS -> App.UI '302 redirect_uri?code=…'
+    App.UI -> Alice.UAS 'POST /token (authorization_code)' {
+      notes'''
+        ID Token for the client:
+
+        ```json
+        { "sub": "https://id.alice.example", "aud": ["https://uas.alice.example", "https://decentphotos.example/id"],
+          "azp": "https://decentphotos.example/id", "iss": "https://uas.alice.example", "jti": "…", "iat": …, "exp": … }
+        ```
+
+        >[!IMPORTANT]
+        > `aud` lists **both** the OP and the client, and `azp` is present —
+        > validation rules `oidc.c4` reuses from LWS OIDC.
+      '''
+    }
+    Alice.UAS -> App.UI '200 ID Token (+ refresh token)'
+
+    App.UI -> Bob.Data 'GET /garfield.png' {
+      notes'''
+        No credential yet — the request exists to discover the storage's
+        authorization server.
+      '''
+    }
+    Bob.Data -> App.UI '401 WWW-Authenticate: Bearer as_uri="https://ras.bob.example", realm="https://pod.bob.example"'
+
+    App.UI -> Alice.UAS 'POST /token (token-exchange → ID-JAG)' {
+      notes'''
+        ```http
+        grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+        &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
+        &resource=https://ras.bob.example
+        &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+        &subject_token=<ID Token>
+        &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+        &client_assertion=<private_key_jwt>
+        ```
+
+        `resource` sets the ID-JAG's `aud`; the client authenticates with
+        `private_key_jwt`.
+      '''
+    }
+    Alice.UAS -> App.UI '200 ID-JAG (typ=oauth-id-jag+jwt, aud=https://ras.bob.example)' {
+      notes'''
+        Carries `sub` (the user's WebID), `client_id`, `auth_time`, `amr` —
+        identity asserted by the user's own UAS, for one specific RAS.
+      '''
+    }
+
+    App.UI -> Bob.RAS 'POST /token (token-exchange → access token)' {
+      notes'''
+        ```http
+        grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+        &resource=https://pod.bob.example
+        &subject_token=<ID-JAG>
+        &subject_token_type=urn:ietf:params:oauth:token-type:id-jag
+        ```
+
+        The RAS must resolve the ID-JAG's `iss` to a trusted OpenID Provider
+        before issuing anything.
+      '''
+    }
+    parallel 'RAS establishes trust in the ID-JAG issuer' {
+      Bob.RAS -> h4p.WebID.WebIdDocument 'GET https://id.alice.example (CID)'
+      Bob.RAS -> Alice.UAS 'GET /.well-known/oauth-authorization-server → jwks_uri'
+    }
+    Bob.RAS -> App.UI '200 at+jwt {sub, iss: https://ras.bob.example, client_id, aud: https://pod.bob.example}'
+    App.UI -> Bob.Data 'GET /garfield.png (Authorization: Bearer)'
+    Bob.Data -> App.UI '200 image/png'
+
+    opt 'what SAI does instead' {
+      App.UI -> Bob.Data 'POST /.well-known/lws/token' {
+        notes'''
+          One exchange, straight to the storage that hosts the resource:
+          `subject_token` = the self-issued credential, `resource` = that same
+          storage, and `Bob.Data` is also the issuer of the access token
+          (`Bob.RAS` does not exist). No `id-jag` string appears anywhere in
+          `sai-js` or the CSS fork.
+        '''
+      }
+      Bob.Data -> App.UI '200 at+jwt {iss: https://data/, aud: https://data/}'
+    }
+  }
+
+  view lws of h4p.Data {
+    title: 'LWS endpoints on a storage server'
+
+    include h4p.Data, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
+    include h4p.Auth.OP, h4p.WebID.WebIdDocument
+    include App.UI
+
+    style h4p.Data {
+      color: sky
+    }
+  }
+}

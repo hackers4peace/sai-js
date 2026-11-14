@@ -48,6 +48,7 @@
     "sai:config/overrides/disable-v6-migration.json",
     "sai:config/overrides/disable-ui.json",
     "css:config/identity/lws/default.json",
+    "sai:config/identity/id-jag-accept.json",
     "sai:config/overrides/lws-subscription-storage.json",
     "sai:config/overrides/lws-notification-service-paths.json",
     "sai:config/storage/no-cache.json"

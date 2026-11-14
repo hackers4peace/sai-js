@@ -1,0 +1,66 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "Accepts an ID-JAG as the subject token of the token exchange, next to the ID token of the OIDC suite. The grant is `aud`-restricted to this authorization server, so an ID-JAG minted for another storage is useless here. See docs/plans/lws-auth.md C2.",
+      "@id": "urn:sai:default:IdJagSubjectTokenVerifier",
+      "@type": "IdJagSubjectTokenVerifier",
+      "converter": { "@id": "urn:solid-server:default:RepresentationConverter" },
+      "trustedIssuers": [{ "@id": "urn:solid-server:default:variable:baseUrl" }],
+      "acceptSolidOidcIssuer": true,
+      "clockTolerance": 60
+    },
+    {
+      "comment": "Put the ID-JAG verifier first: its `canHandle` declines every other token type, so an `id_token` exchange falls through to the OIDC suite unchanged.",
+      "@id": "urn:sai:default:OverrideSubjectTokenVerifier",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:SubjectTokenVerifier" },
+      "overrideSteps": [
+        {
+          "@type": "OverrideListInsertAt",
+          "overrideParameter": { "@id": "StatusWaterfallHandler:_handlers" },
+          "overrideTarget": { "@value": "0" },
+          "overrideValue": { "@id": "urn:sai:default:IdJagSubjectTokenVerifier" }
+        }
+      ]
+    },
+    {
+      "comment": "Advertises the accepted subject token types, including the ID-JAG. Replacing the metadata route (first match wins) avoids duplicating the whole authorization server handler list from CSS.",
+      "@id": "urn:sai:default:OverrideLwsAuthorizationServerMetadata",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:LwsAuthorizationServerHandler" },
+      "overrideSteps": [
+        {
+          "@type": "OverrideListInsertAt",
+          "overrideParameter": { "@id": "StatusWaterfallHandler:_handlers" },
+          "overrideTarget": { "@value": "0" },
+          "overrideValue": { "@id": "urn:sai:default:LwsMetadataRouter" }
+        }
+      ]
+    },
+    {
+      "@id": "urn:sai:default:LwsMetadataRouter",
+      "@type": "RouterHandler",
+      "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "targetExtractor": { "@id": "urn:solid-server:default:TargetExtractor" },
+      "allowedMethods": ["GET", "HEAD"],
+      "allowedPathNames": ["^/\\.well-known/lws-configuration$"],
+      "handler": {
+        "@type": "LwsAuthorizationServerMetadataHttpHandler",
+        "issuer": { "@id": "urn:solid-server:default:LwsAccessTokenIssuer" },
+        "tokenPath": ".well-known/lws/token",
+        "jwksPath": ".well-known/lws/jwks",
+        "subjectTokenTypes": [
+          "urn:ietf:params:oauth:token-type:jwt",
+          "urn:ietf:params:oauth:token-type:id_token",
+          "urn:ietf:params:oauth:token-type:id-jag"
+        ]
+      }
+    }
+  ]
+}

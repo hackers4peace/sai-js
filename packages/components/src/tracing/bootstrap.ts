@@ -1,3 +1,5 @@
+import { createRequire } from 'node:module'
+
 import type { NodeSDK } from '@opentelemetry/sdk-node'
 
 import { setTemporalPluginConfig } from './otel-state.js'
@@ -106,6 +108,11 @@ export async function initNodeTracing(serviceName: string): Promise<NodeSDK | un
       ],
     })
     sdk.start()
+    // Payload capture (bodies + parsed JWKS): a no-op unless
+    // `OTEL_CAPTURE_BODIES=true`. Resolved through `src/` because `.cjs` files
+    // are not emitted into `dist`, and this path resolves to the same file from
+    // both `dist/tracing/` and `src/tracing/`.
+    createRequire(import.meta.url)('../../src/tracing/http-capture.cjs').installHttpCapture()
     return sdk
   } catch (err) {
     // fail-soft: telemetry must never break the application

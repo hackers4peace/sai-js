@@ -140,6 +140,10 @@ export class SaiJs {
         .withEnvVariable('OTEL_SERVICE_NAME', serviceName)
         // headers carry real session tokens — only ever send them to our Tempo
         .withEnvVariable('OTEL_CAPTURE_HEADERS', 'true')
+        // decoded JWT headers/claims of the LWS token chain (never the raw token)
+        .withEnvVariable('OTEL_CAPTURE_TOKENS', 'true')
+        // token request/response payloads (form body, JSON body)
+        .withEnvVariable('OTEL_CAPTURE_BODIES', 'true')
     )
   }
 

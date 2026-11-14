@@ -38,12 +38,12 @@ file was deleted. The post-workstream follow-ups are in
 
 | Status | Count | Plans |
 |---|---|---|
-| 🔶 in progress / design ready | 0 | — |
+| 🔶 in progress | 1 | `lws-auth` (C1–C4 landed: ID-JAG issuance, storage acceptance, client package, token-aware tracing) |
 | ⬜ not started / design only | 12 | `grants-replication-polish`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing`, `lws-followup` |
 | 🧭 umbrella | 1 | `org-admin-feature` |
 | 📝 design notes | 3 | `architecture`, `fixes`, `improve-fetch-json-ld` |
 
-**16 plan files** (+ `index.md` and `CONVENTIONS.md`).
+**17 plan files** (+ `index.md` and `CONVENTIONS.md`).
 
 ## Workstreams
 
@@ -101,6 +101,16 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 - `pod-isolation-followup.md` — ⬜ not started; mirrors/object lifecycle and
   cross-pod tests.
 
+### LWS authorization
+
+- `lws-auth.md` — 🔶 in progress (C1–C4 landed 2026-11-13); move the token flow to
+  ID token → **ID-JAG** (per resource authorization server) → access token, add the
+  `packages/lws-auth` client, and make the token chain readable from Tempo
+  (decoded claims + opt-in request/response bodies). DPoP stays only on the first leg;
+  `data`/`registry` keep their landed exchange as the RAS leg.
+- `lws-followup.md` — ⬜ not started; remaining LWS alignment follow-ups (grant view,
+  needs/grants profile, flat storage, docs).
+
 ## Full table
 
 | Plan | Status | What it does | Depends on |
@@ -120,6 +130,7 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 | `architecture.md` | 📝 design note — decided | The architectural principle: thin services/handlers, workflow-orchestrated, domain logic in `authorization-agent` | OpenWiki `services/activity-lifecycle.md`, `services/rpc-and-services.md` |
 | `fixes.md` | 📝 design note — not implemented | Remove the HTTP list-and-scan invitation lookup in `agent-registry.ts`; route the duplicate check through the SPARQL `fetchSocialAgentInvitation` | — |
 | `improve-fetch-json-ld.md` | 📝 design note — decision deferred | `fetchJsonLd` status-carrying error instead of regex-matching the message; options evaluated, not implemented | — |
+| `lws-auth.md` | 🔶 in progress — C1–C4 landed (ID-JAG issuance, storage acceptance, `packages/lws-auth`, token-aware tracing); C5 open | ID-JAG exchange: `auth` mints audience-restricted ID-JAGs from DPoP-bound ID tokens, storages accept `id-jag` and exchange it for an access token, new `packages/lws-auth` client (one ID-JAG per RAS), token-aware tracing + opt-in body capture, vuejectron redirect flow with a DPoP-bound ID token | landed CSS LWS exchange (CommunitySolidServer `lws-sai`); `packages/utils/src/lws-auth.ts` `tokenSource` seam; `lws-followup.md` |
 
 ## Dependency graph
 

@@ -1,0 +1,31 @@
+{
+  "name": "@elfpavlik/lws-auth",
+  "version": "0.1.0",
+  "description": "LWS authorization client: ID token -> ID-JAG -> storage access token (docs/plans/lws-auth.md)",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "directories": {
+    "lib": "src",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "prepublishOnly": "node ../../scripts/prepublish-build.mjs",
+    "publish:npm": "../../scripts/publish-npm.sh"
+  },
+  "dependencies": {
+    "@janeirodigital/interop-utils": "1.0.0-rc.31",
+    "oauth4webapi": "^3.8.8"
+  }
+}

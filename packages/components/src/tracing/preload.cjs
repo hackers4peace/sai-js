@@ -109,6 +109,10 @@ if (!hardDisabled && (saiEndpoint || otlpEndpoint)) {
     // which ours always are); the API lookup is only a fallback.
     globalThis[Symbol.for('sai.otel.tracerProvider')] =
       Reflect.get(sdk, '_tracerProvider') ?? require('@opentelemetry/api').trace.getTracerProvider()
+
+    // Payload capture (bodies + parsed JWKS) for this CJS process; a no-op
+    // unless `OTEL_CAPTURE_BODIES=true`.
+    require('./http-capture.cjs').installHttpCapture()
   } catch (err) {
     // fail-soft: telemetry must never break the application
     console.warn(

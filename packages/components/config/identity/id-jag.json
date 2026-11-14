@@ -1,0 +1,46 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "Mints the ID-JAGs (Identity Assertion JWT Authorization Grants) the storages' authorization servers trade for access tokens. Signed with the Solid-OIDC key, so the existing `/.oidc/jwks` publishes the verification key. See docs/plans/lws-auth.md C1.",
+      "@id": "urn:sai:default:IdJagIssuer",
+      "@type": "IdJagIssuer",
+      "issuer": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "jwkGenerator": { "@id": "urn:solid-server:default:JwkGenerator" },
+      "lifetime": 300
+    },
+    {
+      "comment": "Verifies the authentication credential presented at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced; `solid` stays accepted as audience because the suite's self-issued credential uses it. A token with `cnf.jkt` is only accepted together with a DPoP proof for that key.",
+      "@id": "urn:sai:default:IdTokenVerifier",
+      "@type": "OidcSubjectTokenVerifier",
+      "converter": { "@id": "urn:solid-server:default:RepresentationConverter" },
+      "trustedIssuers": [{ "@id": "urn:solid-server:default:variable:baseUrl" }],
+      "additionalAudiences": ["solid"],
+      "acceptSolidOidcIssuer": false,
+      "requireRestrictedTokens": false
+    },
+    {
+      "comment": "LWS token endpoint of the UAS: exchanges an ID token (optionally DPoP-bound) for an ID-JAG restricted to one storage's authorization server.",
+      "@id": "urn:sai:default:IdJagRouter",
+      "@type": "RouterHandler",
+      "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "targetExtractor": { "@id": "urn:solid-server:default:TargetExtractor" },
+      "allowedPathNames": ["^/\\.well-known/lws/token$"],
+      "allowedMethods": ["POST"],
+      "handler": {
+        "@id": "urn:sai:default:IdJagTokenHandler",
+        "@type": "IdJagTokenHandler",
+        "issuer": { "@id": "urn:sai:default:IdJagIssuer" },
+        "verifier": { "@id": "urn:sai:default:IdTokenVerifier" },
+        "storageOrigins": [
+          { "@id": "urn:sai:default:variable:dataOrigin" },
+          { "@id": "urn:sai:default:variable:regOrigin" }
+        ]
+      }
+    }
+  ]
+}

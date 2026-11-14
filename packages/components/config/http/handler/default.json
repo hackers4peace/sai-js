@@ -17,6 +17,10 @@
           "@type": "StatusWaterfallHandler",
           "handlers": [
             { "@id": "urn:sai:default:AuthorizationAgentHandler" },
+            {
+              "comment": "The UAS token endpoint (`.well-known/lws/token`): ID token → ID-JAG, one per storage's authorization server. Imported from `sai:config/identity/id-jag.json`.",
+              "@id": "urn:sai:default:IdJagRouter"
+            },
             { "@id": "urn:solid-server:default:StaticAssetHandler" },
             { "@id": "urn:solid-server:default:OidcHandler" },
             { "@id": "urn:solid-server:default:NotificationHttpHandler" },
