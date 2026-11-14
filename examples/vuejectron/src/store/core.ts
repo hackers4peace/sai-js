@@ -1,55 +1,42 @@
-import {
-  type ISessionInfo,
-  getDefaultSession,
-  handleIncomingRedirect,
-  login as oidcLogin,
-} from '@inrupt/solid-client-authn-browser'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { RouteLocationNormalized } from 'vue-router'
 
-import { getRuntimeConfig } from '@/runtime-config'
-
-class OidcError extends Error {
-  constructor(private oidcInfo?: ISessionInfo) {
-    super('oidcInfo')
-  }
-}
+import { browserSession } from '@/session'
 
 export const useCoreStore = defineStore('core', () => {
-  const config = getRuntimeConfig()
   const userId = ref<string | null>(null)
 
-  async function login(oidcIssuer: string) {
-    const options = {
-      clientId: config.clientId,
-      oidcIssuer,
-      redirectUrl: `${config.baseUrl}/redirect`,
-    }
-    await oidcLogin(options)
+  async function login(issuer: string) {
+    // Starts the authorization code flow (PKCE + DPoP, one client key pair)
+    // and navigates to the provider; the provider returns to /redirect.
+    const authorizationUrl = await browserSession().login(issuer)
+    window.location.assign(authorizationUrl)
   }
 
   async function handleRedirect(url: string) {
-    const oidcInfo = await handleIncomingRedirect(url)
-    if (!oidcInfo?.webId) {
-      throw new OidcError(oidcInfo)
-    }
-    userId.value = oidcInfo.webId
+    const info = await browserSession().handleRedirect(url)
+    userId.value = info.webId
   }
 
   async function restoreOidcSession(to: RouteLocationNormalized): Promise<void> {
-    const oidcSession = getDefaultSession()
+    const session = browserSession()
 
-    if (!oidcSession.info.isLoggedIn) {
+    if (!session.isLoggedIn) {
       const restoreUrl = localStorage.getItem('restorePath')
       if (to.name !== 'login' && !restoreUrl) {
         localStorage.setItem('restorePath', to.fullPath)
       }
-      const oidcInfo = await oidcSession.handleIncomingRedirect({ restorePreviousSession: true })
-      if (oidcInfo?.webId) {
-        userId.value = oidcInfo.webId
+      const info = await session.restore()
+      if (info) {
+        userId.value = info.webId
       }
     }
+  }
+
+  function logout() {
+    userId.value = null
+    return browserSession().logout()
   }
 
   return {
@@ -57,5 +44,6 @@ export const useCoreStore = defineStore('core', () => {
     login,
     handleRedirect,
     restoreOidcSession,
+    logout,
   }
 })

@@ -9,7 +9,7 @@ import {
 import { fetchJsonLd, putJsonLd } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
-import { buildOidcSession, buildSessionManager } from '../src/builders/sessionManager.js'
+import { buildSessionManager } from '../src/builders/sessionManager.js'
 
 // Live check against the compose stack (skipped in CI/unit runs).
 describe.skipIf(!process.env.LWS_LIVE)('LWS session (live)', () => {
@@ -21,17 +21,6 @@ describe.skipIf(!process.env.LWS_LIVE)('LWS session (live)', () => {
       'https://dan-east.data.docker/',
       'https://dan-west.data.docker/',
     ])
-  }, 60_000)
-
-  test('the UAS mints an LWS token for the UI', async () => {
-    const oidc = await buildOidcSession('https://bob.id.docker')
-    const response = await oidc.authFetch(
-      'https://auth.docker/.sai/lws-token?resource=https%3A%2F%2Fbob.data.docker%2F'
-    )
-    expect(response.status).toBe(200)
-    const token = (await response.json()) as { access_token: string; expires_in: number }
-    expect(token.access_token).toBeTruthy()
-    expect(token.expires_in).toBeGreaterThan(0)
   }, 60_000)
 
   test('creates a data instance in a registration with POST and writes it with PUT', async () => {

@@ -14,6 +14,14 @@
       "lifetime": 300
     },
     {
+      "comment": "Issues the DPoP-bound self-issued credential the UI exchanges for ID-JAGs (`.sai/id-token`). Same key as `/.oidc/jwks`.",
+      "@id": "urn:sai:default:IdTokenIssuer",
+      "@type": "IdTokenIssuer",
+      "issuer": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "jwkGenerator": { "@id": "urn:solid-server:default:JwkGenerator" },
+      "lifetime": 300
+    },
+    {
       "comment": "Verifies the authentication credential presented at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced; `solid` stays accepted as audience because the suite's self-issued credential uses it. A token with `cnf.jkt` is only accepted together with a DPoP proof for that key.",
       "@id": "urn:sai:default:IdTokenVerifier",
       "@type": "OidcSubjectTokenVerifier",

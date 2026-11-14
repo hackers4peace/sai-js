@@ -1,5 +1,15 @@
 {
   "defaultOidcIssuer": "https://auth.docker",
   "clientId": "https://vuejectron.docker/id",
-  "baseUrl": "https://vuejectron.docker"
+  "baseUrl": "https://vuejectron.docker",
+  "tracing": {
+    "enabled": true,
+    "otlpBaseUrl": "/otlp",
+    "serviceName": "sai-vuejectron",
+    "propagateTo": [
+      "^https://[^/]*\\.docker/"
+    ],
+    "captureBodies": true,
+    "captureTokens": true
+  }
 }

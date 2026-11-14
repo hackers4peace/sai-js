@@ -14,6 +14,7 @@ import { Console, Effect, Option } from 'effect'
 import { exportJWK, generateKeyPair } from 'jose'
 
 import { addUserCommand } from './add-user.ts'
+import { podDatasetsFromKeyValue, rewriteFixture } from './generate.ts'
 
 const datasetSourcePath = fileURLToPath(
   new URL('../../environments/data/registry.trig', import.meta.url)
@@ -36,9 +37,6 @@ const mapPaths = {
   dev: fileURLToPath(new URL('../../environments/dev/map.json', import.meta.url)),
   demo: fileURLToPath(new URL('../../environments/demo/map.json', import.meta.url)),
 }
-
-const encode = (str: string): string => Buffer.from(str).toString('base64url')
-const graphRegExp = /GRAPH <((?:meta:)?https?:\/\/[^>]+)> \{/
 
 const algorithmArg = Args.text({ name: 'algorithm' }).pipe(
   Args.withDescription(
@@ -134,41 +132,7 @@ const generateRegistry = (path: string, env: string): Effect.Effect<string, Erro
         prefixes: Record<string, string>
       }
 
-      const urlMap = {
-        ...Object.fromEntries(Object.entries(map.agents).map(([k, v]) => [encode(k), encode(v)])),
-        ...map.agents,
-        ...map.prefixes,
-      }
-
-      const lines = content.split(/\r?\n/)
-      // for graph IRIs the `meta:`-prefixed mappings must win: a graph
-      // `<meta:X>` is the data-server metadata of X, and X may also map
-      // separately (e.g. the test-client document maps to the app origin while
-      // its `meta:` graph maps to the data pod). Non-meta mappings would
-      // otherwise rewrite the inner X first and leave the graph outside any pod.
-      const graphPrefixes = [
-        ...Object.entries(map.prefixes).filter(([key]) => key.startsWith('meta:')),
-        ...Object.entries(map.prefixes).filter(([key]) => !key.startsWith('meta:')),
-      ]
-      const result = lines
-        .map((line) => {
-          let updated = line
-          if (line.match(graphRegExp)) {
-            for (const [oldUrl, newUrl] of graphPrefixes) {
-              updated = updated.split(oldUrl).join(newUrl)
-            }
-          } else {
-            for (const [oldUrl, newUrl] of Object.entries(urlMap)) {
-              updated = updated.split(oldUrl).join(newUrl)
-              // for segments in indexes in kv.json
-              updated = updated.split(encodeURIComponent(oldUrl)).join(encodeURIComponent(newUrl))
-            }
-          }
-          return updated
-        })
-        .join('\n')
-
-      return result
+      return rewriteFixture(content, map)
     },
     catch: (error) => new Error(`Failed to generate data: ${error}`),
   })
@@ -230,13 +194,7 @@ const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
     const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf-8')) as {
       prefixes: Record<string, string>
     }
-    const podDatasets = new Map<string, string>()
-    for (const value of Object.values(kvData) as any[]) {
-      for (const record of Object.values<any>(value?.['**sparqlEndpoint**'] ?? {})) {
-        const [datasetName] = new URL(record.endpoint).pathname.split('/').filter(Boolean)
-        podDatasets.set(record.podUrl, datasetName)
-      }
-    }
+    const podDatasets = podDatasetsFromKeyValue(kvData)
     const datasets = yield* Effect.promise(() =>
       splitFixtureByPod(dataset, { podDatasets, idOrigin: map.prefixes['https://id/'] })
     )

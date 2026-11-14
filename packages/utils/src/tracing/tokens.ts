@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto'
-
 import type { Span } from '@opentelemetry/api'
 import { decodeJwt, decodeProtectedHeader } from 'jose'
 
@@ -25,22 +23,63 @@ export interface TokenCaptureOptions {
   raw?: boolean
 }
 
+/**
+ * Node's `createHash`, resolved lazily through `process.getBuiltinModule` so the
+ * module stays bundleable for browsers: a static `node:crypto` import is
+ * externalized there and breaks the build. Without it the digest attributes are
+ * simply omitted (browser runtimes never enable tracing).
+ */
+function sha256(value: string): string | undefined {
+  try {
+    const proc = (globalThis as { process?: { getBuiltinModule?: (id: string) => unknown } })
+      .process
+    const crypto = proc?.getBuiltinModule?.('node:crypto') as
+      | typeof import('node:crypto')
+      | undefined
+    return crypto?.createHash('sha256').update(value).digest('base64url')
+  } catch {
+    return undefined
+  }
+}
+
 const STRING_CLAIMS = ['iss', 'sub', 'client_id', 'azp', 'jti', 'scope'] as const
 const NUMERIC_CLAIMS = ['exp', 'iat', 'nbf'] as const
 const HEADER_FIELDS = ['typ', 'alg', 'kid'] as const
 
 /**
+ * Runtime override of the capture flags, for browser deployments that configure
+ * tracing in `config.json` instead of env (the server preload keeps using env).
+ * Set once from the tracing initializer before any span is created.
+ */
+const CAPTURE_CONFIG_KEY: symbol = Symbol.for('sai.otel.capture')
+
+export interface CaptureConfig {
+  tokens?: boolean
+  bodies?: boolean
+  rawTokens?: boolean
+}
+
+/** Configure capture at runtime (browser deployments). */
+export function configureTokenCapture(config: CaptureConfig | undefined): void {
+  ;(globalThis as Record<symbol, unknown>)[CAPTURE_CONFIG_KEY] = config
+}
+
+function captureConfig(): CaptureConfig | undefined {
+  return (globalThis as Record<symbol, unknown>)[CAPTURE_CONFIG_KEY] as CaptureConfig | undefined
+}
+
+/**
  * Whether decoded credentials may be attached to spans. Explicit opt-in: the
  * Dagger suite sets `OTEL_CAPTURE_TOKENS=true` next to `OTEL_CAPTURE_HEADERS`,
- * compose leaves it unset.
+ * compose leaves it unset. A runtime configuration (browser) wins.
  */
 export function isTokenCaptureEnabled(): boolean {
-  return process.env.OTEL_CAPTURE_TOKENS === 'true'
+  return captureConfig()?.tokens ?? process.env.OTEL_CAPTURE_TOKENS === 'true'
 }
 
 /** Whether the serialized JWT may be attached too. Never enable on a shared collector. */
 export function isRawTokenCaptureEnabled(): boolean {
-  return process.env.OTEL_CAPTURE_RAW_TOKENS === 'true'
+  return captureConfig()?.rawTokens ?? process.env.OTEL_CAPTURE_RAW_TOKENS === 'true'
 }
 
 function setStringAttributes(span: Span, values: Record<string, unknown>): void {
@@ -71,7 +110,8 @@ export function setTokenAttributes(
 
   const prefix = `sai.token.${role}`
   span.setAttribute(`${prefix}.bytes`, token.length)
-  span.setAttribute(`${prefix}.sha256`, createHash('sha256').update(token).digest('base64url'))
+  const digest = sha256(token)
+  if (digest) span.setAttribute(`${prefix}.sha256`, digest)
 
   const raw = options.raw ?? isRawTokenCaptureEnabled()
   if (raw) span.setAttribute(`${prefix}.jwt`, token)
@@ -127,7 +167,7 @@ export function setTokenAttributes(
 
 /** Whether request/response payloads may be attached to spans (`OTEL_CAPTURE_BODIES`). */
 export function isBodyCaptureEnabled(): boolean {
-  return process.env.OTEL_CAPTURE_BODIES === 'true'
+  return captureConfig()?.bodies ?? process.env.OTEL_CAPTURE_BODIES === 'true'
 }
 
 /** Largest payload recorded on a span; keeps one big document from bloating a trace. */
@@ -158,8 +198,8 @@ export function setBodyAttribute(span: Span, key: string, body: string): void {
 
 /** Replaces every JWT in `body` with a stable digest of it. */
 function redactTokens(body: string): string {
-  return body.replace(
-    JWT_PATTERN,
-    (token) => `<jwt:${createHash('sha256').update(token).digest('base64url').slice(0, 12)}>`
-  )
+  return body.replace(JWT_PATTERN, (token) => {
+    const digest = sha256(token)
+    return `<jwt:${digest ? digest.slice(0, 12) : 'redacted'}>`
+  })
 }

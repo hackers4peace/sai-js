@@ -87,10 +87,39 @@ model {
         `typ: at+jwt`, `iss: https://auth/`, `aud: "solid"`, `sub`/`webid` = agent,
         `client_id`/`azp` = client, `cnf.jkt` = DPoP key thumbprint.
 
-        This — not an OpenID Connect ID Token — is what the suite presents as
-        `subject_token` (with `subject_token_type=…:id_token`). In tests it is
-        signed in-process; for the UI, `LwsTokenHandler` (`/.sai/lws-token`)
-        mints the same token on the caller's behalf.
+        This — not an OpenID Connect ID Token — is what the suite and the UI
+        present as `subject_token` (with `subject_token_type=…:id_token`). In
+        tests it is signed in-process; for the UI, `IdTokenIssuer` mints the
+        same shape at `/.sai/id-token`, bound to the browser's own DPoP key
+        (`dpop_jkt` = the key that signs the request, RFC 9449 §10).
+      '''
+    }
+
+    component IdTokenEndpoint 'Credential mint' '/.sai/id-token' {
+      description '''
+        `IdTokenHandler` + `IdTokenIssuer` (`config/identity/id-jag.json`).
+
+        `GET /.sai/id-token[?dpop_jkt=<thumbprint>][&client_id=<iri>]` mints the
+        DPoP-bound self-issued credential for the caller's own session. The
+        caller is authenticated by the regular CSS credentials extractor; the
+        `DPoP` proof (or, for a bearer session, the `dpop_jkt` parameter) names
+        the browser's key, so the credential cannot be exchanged without it at
+        `IdJagTokenEndpoint`.
+      '''
+    }
+
+    component IdJagTokenEndpoint 'UAS token exchange' 'ID-JAG' {
+      description '''
+        `IdJagRouter` + `IdJagTokenHandler`, `POST /.well-known/lws/token`.
+
+        **Exchange 1 of 2.** `requested_token_type=…:id-jag`,
+        `subject_token_type=…:id_token`, `audience=<resource AS>`, with a DPoP
+        proof for the credential's `cnf.jkt`. Mints one ID-JAG per resource
+        authorization server and never a storage access token.
+
+        The UAS advertises no `/.well-known/lws-configuration` (`auth.json`
+        imports no `css:config/identity/lws/default.json`), so clients use this
+        well-known path directly.
       '''
     }
   }
@@ -513,11 +542,12 @@ views {
       twice, once per resource authorization server.
     '''
 
+    include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
+    include h4p.Auth.IdTokenEndpoint, h4p.Auth.IdJagTokenEndpoint
     include App
     include App.UI
     include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
     include h4p.Registry, h4p.Registry.SPARQLEndpoint
-    include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
 
     style App {
       color: gray
@@ -532,14 +562,35 @@ views {
       color: red
     }
 
-    h4p.Auth.SelfIssuedCredential -> App.UI 'self-issued at+jwt (cnf.jkt)' {
+    App.UI -> h4p.Auth.IdTokenEndpoint 'GET /.sai/id-token?dpop_jkt=… (session)' {
       notes'''
-        Same credential as in 2a; `@elfpavlik/lws-auth` caches it only as an input
-        — it is never sent to a storage.
+        #### Browser credential (C5)
+
+        `auth` mints the DPoP-bound self-issued credential for the caller's own
+        session: `typ: at+jwt`, `iss: https://auth/`, `aud: "solid"`, `webid`,
+        `azp`, and `cnf.jkt` = the browser's key thumbprint. The caller is
+        authenticated by the regular CSS credentials extractor, so the credential
+        can only speak for that WebID; without the browser key it cannot be
+        exchanged (the UAS requires a matching DPoP proof).
+
+        The browser owns the key: the `DPoP` proof on this mint is the binding
+        (`dpop_jkt` is only needed by a session that cannot send a proof; when
+        both are present they must match, RFC 9449 §10.1).
+
+        Span `sai.lws.issue-id-token`; `sai.token.subject.*` carries the minted
+        credential. Replaces the retired `/.sai/lws-token` broker, which minted
+        storage tokens server-side.
       '''
     }
 
-    App.UI -> h4p.Auth 'POST /.well-known/lws/token (requested_token_type=id-jag)' {
+    h4p.Auth.IdTokenEndpoint -> App.UI '200 {id_token, token_type: N_A, expires_in: 300}' {
+      notes'''
+        Cached by `@elfpavlik/lws-auth` until shortly before `exp`; never sent to a
+        storage.
+      '''
+    }
+
+    App.UI -> h4p.Auth.IdJagTokenEndpoint 'POST /.well-known/lws/token (requested_token_type=id-jag)' {
       notes'''
         #### Span `sai.lws.request-id-jag` (client)
 
@@ -557,7 +608,7 @@ views {
       '''
     }
 
-    h4p.Auth -> App.UI '200 {issued_token_type: id-jag, token_type: N_A, expires_in: 300}' {
+    h4p.Auth.IdJagTokenEndpoint -> App.UI '200 {issued_token_type: id-jag, token_type: N_A, expires_in: 300}' {
       notes'''
         #### Span `sai.lws.issue-id-jag` (auth)
 
@@ -594,7 +645,7 @@ views {
     App.UI -> h4p.Data.LwsAccessTokenValidation 'GET /alice-work/k3pqsb + Bearer'
 
     parallel 'second storage, second authorization server' {
-      App.UI -> h4p.Auth 'POST /.well-known/lws/token (audience=https://registry/)' {
+      App.UI -> h4p.Auth.IdJagTokenEndpoint 'POST /.well-known/lws/token (audience=https://registry/)' {
         notes'''
           A **separate** grant: a grant minted for `https://data/` is refused by
           the registry's token endpoint (`invalid_request`).

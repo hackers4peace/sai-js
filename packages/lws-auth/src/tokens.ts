@@ -1,5 +1,6 @@
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { setBodyAttribute, setTokenAttributes, withSpan } from '@janeirodigital/interop-utils'
+import { context, trace } from '@opentelemetry/api'
 import * as oauth from 'oauth4webapi'
 
 /** OAuth 2.0 Token Exchange (RFC 8693) — the only grant LWS uses. */
@@ -55,7 +56,20 @@ async function tokenExchange(
   const as = authorizationServer(endpoint)
   const client: oauth.Client = { client_id: clientId }
   const requestOptions: Parameters<typeof oauth.genericTokenEndpointRequest>[5] = {}
-  if (options.fetch) requestOptions[oauth.customFetch] = options.fetch as typeof globalThis.fetch
+
+  // `oauth4webapi` calls the fetch after awaits, so the StackContextManager's
+  // active span is gone by then. Capture the client span (`withSpan`) here and
+  // re-enter it synchronously around the request: the fetch instrumentation's
+  // HTTP span (and its `traceparent` to the server) then nests under it.
+  const activeSpan = trace.getSpan(context.active())
+  const baseFetch = options.fetch ?? (globalThis.fetch as WhatwgFetch)
+  requestOptions[oauth.customFetch] = ((input: RequestInfo | URL, init?: RequestInit) =>
+    activeSpan
+      ? context.with(trace.setSpan(context.active(), activeSpan), () =>
+          baseFetch(input as RequestInfo, init)
+        )
+      : baseFetch(input as RequestInfo, init)) as typeof globalThis.fetch
+
   if (options.dpopKeyPair) requestOptions.DPoP = oauth.DPoP(client, options.dpopKeyPair)
 
   const response = await oauth.genericTokenEndpointRequest(

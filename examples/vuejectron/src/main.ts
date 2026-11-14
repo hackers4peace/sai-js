@@ -10,12 +10,19 @@ import { createApp } from 'vue'
 import { registerPlugins } from '@/plugins'
 
 import App from './App.vue'
-import { loadRuntimeConfig } from './runtime-config'
+import { getRuntimeConfig, loadRuntimeConfig } from './runtime-config'
 
 // Load runtime config before mounting the app
 // This ensures config is available to all components from the start
 loadRuntimeConfig()
-  .then(() => {
+  .then(async () => {
+    // Before any store/mount: the LWS client spans and fetch propagation need
+    // the provider registered before their first request. The import is dynamic
+    // so a deployment with tracing disabled never loads the OTel SDK at all.
+    if (getRuntimeConfig().tracing?.enabled) {
+      const { initTracing } = await import('./tracing')
+      initTracing(getRuntimeConfig())
+    }
     const app = createApp(App)
     registerPlugins(app)
     // Config loaded successfully, now it's safe to mount the app

@@ -132,7 +132,11 @@ const isStorageRequest = (request: { url: string; method: string }): boolean =>
 describe('createLwsAuthFetch', () => {
   test('uses one ID-JAG per authorization server for several storages', async () => {
     const world = createWorld()
-    const fetch = createLwsAuthFetch({ credential: createCredential(), fetch: world.fetch })
+    const fetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch: world.fetch,
+      now: () => world.clock(),
+    })
 
     const first = await fetch(`${DATA_STORAGE}k3pqsb`, { headers: { accept: 'text/turtle' } })
     const second = await fetch(`${DATA_STORAGE_2}x8v2lm`, { headers: { accept: 'text/turtle' } })
@@ -152,7 +156,11 @@ describe('createLwsAuthFetch', () => {
 
   test('mints a separate grant per storage authorization server', async () => {
     const world = createWorld()
-    const fetch = createLwsAuthFetch({ credential: createCredential(), fetch: world.fetch })
+    const fetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch: world.fetch,
+      now: () => world.clock(),
+    })
 
     expect((await fetch(`${DATA_STORAGE}k3pqsb`)).status).toBe(200)
     expect((await fetch(REGISTRY_STORAGE)).status).toBe(200)
@@ -165,7 +173,11 @@ describe('createLwsAuthFetch', () => {
 
   test('caches the access token per storage', async () => {
     const world = createWorld()
-    const fetch = createLwsAuthFetch({ credential: createCredential(), fetch: world.fetch })
+    const fetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch: world.fetch,
+      now: () => world.clock(),
+    })
 
     await fetch(`${DATA_STORAGE}k3pqsb`)
     const seen = world.requests.length
@@ -195,7 +207,11 @@ describe('createLwsAuthFetch', () => {
 
   test('never sends the ID-JAG to a storage', async () => {
     const world = createWorld()
-    const fetch = createLwsAuthFetch({ credential: createCredential(), fetch: world.fetch })
+    const fetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch: world.fetch,
+      now: () => world.clock(),
+    })
     await fetch(`${DATA_STORAGE}k3pqsb`)
 
     expect(world.grants).toHaveLength(1)

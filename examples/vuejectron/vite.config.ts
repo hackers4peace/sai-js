@@ -72,6 +72,10 @@ export default defineConfig({
   ],
   define: { 'process.env': {} },
   resolve: {
+    // The workspace and npm copies of the LWS packages must share one
+    // `@opentelemetry/api` instance, otherwise the web provider registered here
+    // is invisible to `withSpan`/`context.with` in `packages/lws-auth`.
+    dedupe: ['@opentelemetry/api'],
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },

@@ -68,6 +68,10 @@ services:
       # (auth process = the UAS)
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
       OTEL_SERVICE_NAME: sai-uas
+      # dev-loop capture: the collector is the local Tempo service
+      OTEL_CAPTURE_HEADERS: 'true'
+      OTEL_CAPTURE_TOKENS: 'true'
+      OTEL_CAPTURE_BODIES: 'true'
       CSS_PORT: 4800
     labels:
       - traefik.enable=true
@@ -106,6 +110,9 @@ services:
       # OpenTelemetry dev loop — live to the compose tempo service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
       OTEL_SERVICE_NAME: sai-registry
+      OTEL_CAPTURE_HEADERS: 'true'
+      OTEL_CAPTURE_TOKENS: 'true'
+      OTEL_CAPTURE_BODIES: 'true'
       CSS_PORT: 4600
     labels:
       - traefik.enable=true
@@ -144,6 +151,9 @@ services:
       # OpenTelemetry dev loop — live to the compose tempo service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
       OTEL_SERVICE_NAME: sai-data
+      OTEL_CAPTURE_HEADERS: 'true'
+      OTEL_CAPTURE_TOKENS: 'true'
+      OTEL_CAPTURE_BODIES: 'true'
       CSS_PORT: 4700
     labels:
       - traefik.enable=true
@@ -425,6 +435,9 @@ services:
       # OpenTelemetry dev loop — live to the compose tempo service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
       OTEL_SERVICE_NAME: sai-id
+      OTEL_CAPTURE_HEADERS: 'true'
+      OTEL_CAPTURE_TOKENS: 'true'
+      OTEL_CAPTURE_BODIES: 'true'
       # TODO: reuse CSS_ in origin-env
     labels:
       - traefik.enable=true
@@ -475,8 +488,19 @@ services:
       - traefik.http.routers.ui-otlp.tls=true
       - traefik.http.routers.ui-otlp.priority=100
       - traefik.http.routers.ui-otlp.middlewares=ui-otlp-strip
+      - traefik.http.routers.ui-otlp.service=ui-otlp
       - traefik.http.middlewares.ui-otlp-strip.stripprefix.prefixes=/otlp
       - traefik.http.services.ui-otlp.loadbalancer.server.port=4318
+      # Same-origin OTLP ingest for the example app (public/config.json:
+      # tracing.otlpBaseUrl=/otlp). Same reason as ui-otlp: Tempo sends no CORS.
+      - traefik.http.routers.vuejectron-otlp.rule=Host(`vuejectron.docker`) && PathPrefix(`/otlp`)
+      - traefik.http.routers.vuejectron-otlp.entrypoints=websecure
+      - traefik.http.routers.vuejectron-otlp.tls=true
+      - traefik.http.routers.vuejectron-otlp.priority=100
+      - traefik.http.routers.vuejectron-otlp.middlewares=vuejectron-otlp-strip
+      - traefik.http.routers.vuejectron-otlp.service=vuejectron-otlp
+      - traefik.http.middlewares.vuejectron-otlp-strip.stripprefix.prefixes=/otlp
+      - traefik.http.services.vuejectron-otlp.loadbalancer.server.port=4318
 
   grafana:
     image: grafana/grafana:latest

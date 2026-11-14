@@ -1,6 +1,6 @@
 # LWS auth — ID-JAG exchange, `packages/lws-auth`, token-aware tracing
 
-> **Status:** 🔶 in progress — **C1–C4 landed** (2026-11-13): the `auth` UAS mints audience-restricted ID-JAGs from DPoP-bound ID tokens, the storages accept them next to `id_token`, `packages/lws-auth` walks the two-step chain, and the whole chain is readable from Tempo. C5 open.
+> **Status:** 🔶 in progress — **C1–C5 landed** (2026-11-13): the `auth` UAS mints audience-restricted ID-JAGs from DPoP-bound ID tokens, the storages accept them next to `id_token`, `packages/lws-auth` walks the two-step chain (browser entry included), the whole chain is readable from Tempo, and the UI runs the chain itself against `/.sai/id-token`. Remaining: the manual dev capture and the OpenWiki migration that closes the plan.
 > **Last verified:** working tree `99c208447` (CommunitySolidServer `lws-sai`, 2026-11-13) — CSS accepts DPoP-bound ID tokens and issues RFC 9068 access tokens; `createLwsFetch({ tokenSource })` and the OTel headers-only capture are the current seams.
 > **Green gate:** **after every slice** — package gates (TypeScript-direct) + the single diagram trace test (`scripts/trace-test.sh`, see *Green gates*). The full `/test` suite runs once, at the end of C5 (>10 min).
 > **Workstream:** follow-up to the closed LWS alignment phases ([`lws-followup.md`](lws-followup.md)); the modelled design is [`../lws-auth.c4`](../lws-auth.c4) and [`../../../lws-auth/oidc.c4`](../../../lws-auth/oidc.c4).
@@ -46,7 +46,7 @@ any token decoding in traces.
 | HTTP payload capture (bodies + parsed JWKS) | ✅ landed | `packages/components/src/tracing/http-capture.cjs` (fetch wrapper + `ServerResponse` patch), installed from `preload.cjs`/`bootstrap.ts`; `setBodyAttribute`/`setTokenAttributes` for our own spans | package `http-capture.test.ts` (5) + `tracing-tokens.test.ts` (7); `/test` traces `72728215…`, `48e23f27…` | opt-in `OTEL_CAPTURE_BODIES`, 64 KiB cap, JWTs redacted unless `OTEL_CAPTURE_RAW_TOKENS`, `sai.jwks.*` for key sets (D13) |
 | `sai.lws.*` chain spans | ✅ landed | client: `packages/lws-auth/src/tokens.ts`; auth: `IdJagTokenHandler.ts`; storage: `IdJagSubjectTokenVerifier.ts` | `/test` trace `48e23f27…` (8 spans, two chains) | one chain per authorization server; every span carries `sai.token.*` for the token it handles |
 | `sai.*` spans from ESM components inside CSS processes | ✅ landed | `packages/utils/src/tracing/shared.ts` (`sharedTracer`, `withSpan`); `preload.cjs` publishes the SDK provider via `Reflect.get(sdk, '_tracerProvider')` | traces `1748b560…` (`sai.lws.issue-id-jag` + token attrs), `fded626c…` (`sai.rpc.handle` → `sai-jsonld` → `sai-sparql`) | `preload.cjs` is CJS, CSS loads these packages as ESM: the API's global-provider lookup did not reach the SDK |
-| **Browser credential flow (vuejectron)** | ⬜ open | `examples/vuejectron/` | manual + `/test` | needs a DPoP-bound ID token (D5) |
+| Browser credential flow (vuejectron) | ✅ landed | `IdTokenIssuer`/`IdTokenHandler` + `config/identity/id-jag.json` (`.sai/id-token`); `packages/lws-auth/src/{dpop,session,store,browser}.ts`; `examples/vuejectron/src/{session.ts,store/app.ts}` | package `id-token.test.ts` (7) + `browser.test.ts` (5) + `session.test.ts` (5); `/test` `lws-auth.test.ts` (10); `vite build` of both UIs | `LwsTokenHandler` (`/.sai/lws-token`) retired (D5); inrupt session replaced by `createBrowserSession` (D14) |
 
 ## Slices
 
@@ -323,7 +323,7 @@ containing `sai-jsonld/fetchJsonLd`+`frameDoc` (`sai.jsonld.raw`/`.framed`) and
 - `/test` `--only` is re-shelled by npm: wrap the `-t` pattern in literal single quotes and
   do not use `>`/`(`/`)` in it, or vitest silently matches nothing (67 skipped, zero spans).
 
-### C5 — vuejectron: real redirect, service-issued DPoP-bound ID token
+### C5 — vuejectron: real redirect, service-issued DPoP-bound ID token — ✅ landed (2026-11-13)
 
 **Done when:** the UI logs in through `auth` (authorization code), receives a
 **DPoP-bound** ID token for the browser's key, then fetches protected resources by
@@ -340,6 +340,49 @@ suite once (`dagger call --tempo-endpoint=… test`) — the only >10 min run in
 **Touchpoints:** `packages/lws-auth/src/browser.ts`, `examples/vuejectron/`,
 `packages/components/src/LwsTokenHandler.ts` (retire or reduce to ID-token mint),
 new `/.sai/id-token` handler + `config/auth.json`.
+
+**Landed:**
+- `auth` serves `GET /.sai/id-token[?dpop_jkt=<thumbprint>][&client_id=<iri>]`
+  (`IdTokenHandler` + `IdTokenIssuer`, `config/identity/id-jag.json`): the caller is
+  authenticated by the regular credentials extractor; a `DPoP` proof makes its key the
+  `cnf.jkt` binding (a `dpop_jkt` parameter must match when both are present, RFC 9449
+  §10.1), and `dpop_jkt` alone declares the binding when the caller cannot send a proof
+  (bearer session). Span `sai.lws.issue-id-token`, with
+  `sai.lws.dpop_jkt_source=proof|query`.
+- `packages/lws-auth/src/browser.ts`: `createBrowserCredential` (mints/caches the credential at
+  `/.sai/id-token`) and `createBrowserLwsFetch` (the two-step chain with that credential),
+  on top of `dpop.ts` (RFC 7638 thumbprint, non-extractable key pair, RFC 9449 proofs),
+  `session.ts` (authorization code + PKCE + DPoP session) and `store.ts` (IndexedDB).
+- `examples/vuejectron/src/store/app.ts` uses `createBrowserLwsFetch` instead of the broker;
+  `src/session.ts` runs the Solid-OIDC flow itself (`createBrowserSession`), so one
+  non-extractable DPoP key pair signs the session's `.sai` requests, the credential mint and
+  the ID-JAG exchange. **inrupt is gone** (`@inrupt/solid-client-authn-browser` removed). Vite
+  build is clean (the tracing helpers are browser-safe: `sha256` resolves `node:crypto`
+  lazily and `jwt.ts` decodes with `atob` when `Buffer` is absent).
+- **`LwsTokenHandler` retired** — handler, route, `SessionManager.getLwsAccessToken`, its
+  barrel export and the live test case are gone; nothing requests storage tokens from the
+  server any more (D5).
+- Gates: `id-token.test.ts` 7/7, `browser.test.ts` 5/5, `session.test.ts` 5/5, `/test`
+  `lws-auth.test.ts` 10/10 (incl. the endpoint refusing anonymous callers), continuity green,
+  `npx vite build` in `examples/vuejectron` and `ui/authorization`.
+- **Browser tracing (2026-11-14):** `examples/vuejectron/src/tracing.ts` + the `tracing`
+  block in `public/config.json` enable the Web SDK per deployment (`enabled`,
+  `otlpBaseUrl`, `serviceName`, `propagateTo`, `captureBodies`, `captureTokens`);
+  OTLP posts same-origin to `/otlp` (traefik → tempo, no CORS). The LWS client spans
+  (`request-id-token`, `request-id-jag`, `exchange-access-token`) are the client roots
+  and the W3C `traceparent` links them to the server spans in one trace (final run:
+  `18ac9ab3…`, `33765932…`, `6035be86…`). With capture on, the client spans carry the
+  request/response bodies (JWTs redacted) and the decoded `sai.token.*` claims,
+  including the issued storage access token (`sai.token.access.*`).
+  `StackContextManager` + an explicit span re-entry around the fetch, because ESNext
+  `await` breaks zone.js context.
+- **Manual dev capture (2026-11-14):** vuejectron login as `alice@acme.example` through
+  `auth.docker` with the single-key session — credential mint 200 (proof jkt == `dpop_jkt`),
+  one ID-JAG per storage AS, both storages 200 (Alice `alice-work`, ACME `acme-rnd`,
+  reusing the same ID-JAG per AS); a reload restores the session from IndexedDB and
+  mints with the **same** `dpop_jkt`.
+- Remaining for the plan: the **manual dev capture** (user-run) and then the OpenWiki
+  migration (CONVENTIONS §1: a done plan is removed and its design documented there).
 
 **Notes:** CSS's OP does **not** issue DPoP-bound ID tokens today:
 `IdentityProviderFactory.configureClaims` adds `webid`/`azp` only, and `oidc-provider`
@@ -364,6 +407,16 @@ our RAS speak RFC 8693. Implement `subject_token_type=…:id-jag` (zero changes 
 Today's token works untouched (`additionalAudiences: ['solid']`). Tighten to
 `aud = https://auth/` **and** `requireRestrictedTokens: true` only once `/.sai/id-token`
 (C5) can mint both, so the suite and the browser stay on one shape.
+
+**D3 (status note, C5):** the browser path proves possession with the DPoP proof of the
+credential's own key; no OAuth client authentication is added for the UI. Third-party clients
+still need `client_assertion` before they rely on the endpoint.
+
+**D3 (status note, D14):** `createBrowserSession` owns the Solid-OIDC session, so the same
+non-extractable key pair produces the session token's `cnf.jkt`, the `DPoP` proof on the mint
+(the minted credential's `cnf.jkt`) and the proof at the ID-JAG exchange. The browser's mint now
+omits `dpop_jkt` (the proof is authoritative; `declareDpopJkt` exists for the bearer-session
+rollout), and the RFC 9449 §10.1 rule "if both are present they MUST match" is enforced.
 
 **D3 — No client authentication on the UAS exchange in C1.**
 *pinned for C1 (confirmed 2026-11-13), open for C5.*
@@ -436,6 +489,21 @@ from TypeScript (`main: ./src/index.ts`); `build` runs in `prepublishOnly` for n
 component `@type`** (C1, C2) needs one `npm run build --workspace @elfpavlik/sai-components`
 before a `/test` run — an artifact refresh, not a gate.
 
+**D14 — One client key pair; DPoP is added per leg.** *pinned, 2026-11-14.*
+The browser keeps a **single** non-extractable ECDSA P-256 key pair per session
+(`createBrowserSession`, `packages/lws-auth/src/session.ts`): it signs the authorization-code
+token request, the session's `.sai` requests, the credential mint (`dpop_jkt` == the proof's
+jkt) and the ID-JAG exchange. `@inrupt/solid-client-authn-browser` is removed; the session is
+the app's own (`oauth4webapi`), and the key is persisted as a `CryptoKey` in IndexedDB so a
+redirect or reload reuses it.
+
+Rollout is per token, on that one key: session access token → minted credential → ID-JAG →
+(open) storage access token. `createBrowserSession({ dpop: false })` keeps the session leg on
+`Bearer` while everything downstream already proves the key, so a leg can be tightened without
+minting another key or changing `dpop_jkt`. The same ordering answers the open question about
+"no DPoP first, audience checks only": the ID-JAG leg needs no DPoP today because its `aud`
+is the restriction (`requestAccessToken` sends no proof).
+
 ## Green gates
 
 Two gates, both agent-runnable. The full `/test` suite runs **once**, at the end of C5.
@@ -490,7 +558,8 @@ is the only place the three-server exchange is exercised.
 
 1. Where does the "known RAS" list live for C1 — static config (`CSS_DATA_ORIGIN`,
    `CSS_REG_ORIGIN`) or the registry/pod-endpoint store? Static first, store later.
-2. Do we keep `LwsTokenHandler` (`/.sai/lws-token`) after C5, or delete it in the same
-   change set that lands `/.sai/id-token`?
+2. ~~Do we keep `LwsTokenHandler` (`/.sai/lws-token`) after C5?~~ **Answered in C5:** deleted
+   together with `/.sai/id-token`; the browser mints its own credential and the server no
+   longer mints storage tokens.
 3. Should `packages/lws-auth` also expose the reactive-authentication `TokenProvider`
    shape (`matches`/`upgrade`) for reuse by non-SAI apps, or stay a plain fetch factory?

@@ -1,7 +1,24 @@
+export interface TracingConfig {
+  /** Turns the browser OTel SDK on for this deployment. */
+  enabled: boolean
+  /** Collector base URL; a path is resolved against the page origin (`/otlp`). */
+  otlpBaseUrl?: string
+  /** `service.name` resource attribute. */
+  serviceName?: string
+  /** Origin regexes that get the `traceparent` header (cross-origin CORS). */
+  propagateTo?: string[]
+  /** Record request/response payloads on `sai.lws.*` spans (JWTs are redacted). */
+  captureBodies?: boolean
+  /** Record decoded credential claims/headers on `sai.lws.*` spans. */
+  captureTokens?: boolean
+}
+
 export interface RuntimeConfig {
   defaultOidcIssuer: string
   clientId: string
   baseUrl: string
+  /** Optional browser tracing; absent/disabled leaves the app untouched. */
+  tracing?: TracingConfig
 }
 
 // Cache the config after first load to avoid repeated fetches

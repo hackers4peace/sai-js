@@ -4,8 +4,15 @@
  * authorization server is the one that validates the signature.
  */
 
+function decodeBase64Url(part: string): string {
+  if (typeof Buffer !== 'undefined') return Buffer.from(part, 'base64url').toString('utf8')
+  // browsers
+  const padded = part.replace(/-/gu, '+').replace(/_/gu, '/')
+  return atob(padded + '='.repeat((4 - (padded.length % 4)) % 4))
+}
+
 function decodePart(part: string): Record<string, unknown> {
-  return JSON.parse(Buffer.from(part, 'base64url').toString('utf8')) as Record<string, unknown>
+  return JSON.parse(decodeBase64Url(part)) as Record<string, unknown>
 }
 
 export interface DecodedJwt {

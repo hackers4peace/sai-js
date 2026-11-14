@@ -1,11 +1,10 @@
-import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
+import { createBrowserLwsFetch } from '@elfpavlik/lws-auth'
 import { Application, NotificationManager } from '@janeirodigital/interop-application'
 import { WebIdProfile } from '@janeirodigital/interop-data-model'
 import {
   AS,
   RequestError,
   type WhatwgFetch,
-  createLwsFetch,
   loader,
   pickLanguage,
 } from '@janeirodigital/interop-utils'
@@ -19,6 +18,7 @@ import { ref, shallowRef, triggerRef } from 'vue'
 
 import type { Agent, ResourceServer } from '@/models'
 import { getRuntimeConfig } from '@/runtime-config'
+import { browserSession } from '@/session'
 
 import { FileShapeType } from '../../ldo/File.shapeTypes'
 import type { File as FileObject } from '../../ldo/File.typings'
@@ -55,36 +55,45 @@ export const useAppStore = defineStore('app', () => {
   let solidLdoDataset: SolidLdoDataset
   const projects = ref<Project[]>([])
 
-  const authnFetch = getDefaultSession().fetch
+  const authSession = browserSession()
 
   /**
    * The data and registry storages accept only LWS access tokens, while the
-   * `.sai` API keeps the Solid-OIDC DPoP session. The UAS mints a storage
-   * token for this session over `/.sai/lws-token`; `createLwsFetch` caches it
-   * per storage and retries a `401` after a fresh exchange.
+   * `.sai` API keeps the Solid-OIDC DPoP session.
+   *
+   * The browser runs the LWS chain itself (`@elfpavlik/lws-auth`): it mints a
+   * DPoP-bound credential for this session at `<auth>/.sai/id-token`, exchanges
+   * it for one ID-JAG per storage authorization server, and trades each grant
+   * for a storage access token. The credential never leaves the browser and the
+   * grants are `aud`-restricted, so nothing here can mint a token for another
+   * storage.
+   *
+   * Both legs use the session's **single** non-extractable DPoP key pair: the
+   * session fetch signs the `.sai`/mint requests with it, and the LWS client
+   * binds the minted credential (`cnf.jkt`) and proves it at the ID-JAG
+   * exchange with the same key.
    */
   let sessionFetchCache: WhatwgFetch | undefined
   function sessionFetch(): WhatwgFetch {
     if (sessionFetchCache) return sessionFetchCache
-    const authServer = new URL(getRuntimeConfig().defaultOidcIssuer).origin
-    const lwsFetch = createLwsFetch({
-      // plain fetch: the LWS access token is the credential for data/registry
-      // requests, the inrupt session's DPoP token is only for the `.sai` API
-      // (inrupt's authenticated fetch would overwrite the Bearer header).
-      tokenSource: async (storage) => {
-        const response = await authnFetch(
-          `${authServer}/.sai/lws-token?resource=${encodeURIComponent(storage)}`
-        )
-        if (!response.ok) {
-          throw new Error(`failed to obtain an LWS token for ${storage}: ${response.status}`)
-        }
-        const token = (await response.json()) as { access_token: string; expires_in?: number }
-        return { accessToken: token.access_token, expiresIn: token.expires_in ?? 300 }
-      },
+    const authServer = new URL(authSession.issuer).origin
+    const keyPair = authSession.dpopKeyPair
+    if (!keyPair) throw new Error('not signed in: there is no DPoP key pair')
+    // plain fetch for the storages: the LWS access token is their credential;
+    // the session's DPoP fetch is only for the UAS (mint) and `.sai`.
+    const lwsFetch = createBrowserLwsFetch({
+      issuer: authSession.issuer,
+      clientId: authSession.clientId,
+      keyPair,
+      credentialFetch: authSession.fetch,
+      // With DPoP the mint request already proves possession of this key; a
+      // bearer session has to declare the binding in the query instead.
+      declareDpopJkt: !authSession.dpop,
     })
-    sessionFetchCache = (input, init) => {
+    sessionFetchCache = async (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-      return url.startsWith(`${authServer}/`) ? authnFetch(input, init) : lwsFetch(input, init)
+      if (url.startsWith(`${authServer}/`)) return authSession.fetch(input, init)
+      return (await lwsFetch)(input, init)
     }
     return sessionFetchCache
   }

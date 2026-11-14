@@ -2,7 +2,11 @@ import type { Span } from '@opentelemetry/api'
 import { SignJWT, generateKeyPair, exportJWK, calculateJwkThumbprint } from 'jose'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
-import { setBodyAttribute, setTokenAttributes } from '../src/tracing/tokens.js'
+import {
+  configureTokenCapture,
+  setBodyAttribute,
+  setTokenAttributes,
+} from '../src/tracing/tokens.js'
 
 /** Minimal span stand-in: only `isRecording`/`setAttribute` are used by the helper. */
 function createSpan(recording = true): { span: Span; attributes: Map<string, unknown> } {
@@ -37,6 +41,7 @@ beforeEach(async () => {
 })
 
 afterEach(() => {
+  configureTokenCapture(undefined)
   delete process.env.OTEL_CAPTURE_TOKENS
   delete process.env.OTEL_CAPTURE_RAW_TOKENS
   delete process.env.OTEL_CAPTURE_BODIES
@@ -90,6 +95,21 @@ describe('setTokenAttributes', () => {
     expect(notRecording.attributes.size).toBe(0)
   })
 
+  test('takes the capture flags from a runtime configuration (browser)', () => {
+    delete process.env.OTEL_CAPTURE_TOKENS
+    configureTokenCapture({ tokens: true, bodies: true })
+    const { span, attributes } = createSpan()
+    setTokenAttributes(span, 'subject', token)
+    expect(attributes.get('sai.token.subject.iss')).toBe('https://auth/')
+
+    // an explicit runtime false wins over a true environment flag
+    process.env.OTEL_CAPTURE_TOKENS = 'true'
+    configureTokenCapture({ tokens: false })
+    const disabled = createSpan()
+    setTokenAttributes(disabled.span, 'subject', token)
+    expect(disabled.attributes.size).toBe(0)
+  })
+
   test('records only the digest for a value that is not a JWT', () => {
     const { span, attributes } = createSpan()
     setTokenAttributes(span, 'access', 'opaque-token')
@@ -109,6 +129,12 @@ describe('setBodyAttribute', () => {
     const enabled = createSpan()
     setBodyAttribute(enabled.span, 'sai.lws.request.body', 'grant_type=token-exchange')
     expect(enabled.attributes.get('sai.lws.request.body')).toBe('grant_type=token-exchange')
+
+    delete process.env.OTEL_CAPTURE_BODIES
+    configureTokenCapture({ bodies: true })
+    const runtime = createSpan()
+    setBodyAttribute(runtime.span, 'sai.lws.request.body', 'grant_type=token-exchange')
+    expect(runtime.attributes.get('sai.lws.request.body')).toBe('grant_type=token-exchange')
   })
 
   test('redacts the tokens a payload carries', () => {

@@ -30,7 +30,8 @@
   },
   "scripts": {
     "cmd": "node ./cmd.ts",
-    "publish:npm": "echo \"skip private package\""
+    "publish:npm": "echo \"skip private package\"",
+    "test": "vitest run"
   },
   "dependencies": {
     "@effect/cli": "^0.73.2",
@@ -39,6 +40,7 @@
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.31",
     "@janeirodigital/interop-data-model": "^1.0.0-rc.31",
+    "@janeirodigital/interop-test-utils": "^1.0.0-rc.31",
     "@paralleldrive/cuid2": "^3.3.0",
     "effect": "^3.19.16",
     "jose": "^6.1.3"

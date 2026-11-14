@@ -9,14 +9,23 @@
     "build:ldo": "ldo build --input ./shapes --output ./ldo"
   },
   "dependencies": {
-    "@inrupt/solid-client-authn-browser": "^2.0.0",
+    "@elfpavlik/lws-auth": "^0.1.0",
     "@janeirodigital/interop-application": "^1.0.0-rc.31",
     "@janeirodigital/interop-data-model": "^1.0.0-rc.31",
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
-    "@ldo/ldo": "1.0.0-alpha.32",
     "@ldo/connected": "1.0.0-alpha.32",
     "@ldo/connected-solid": "1.0.0-alpha.32",
+    "@ldo/ldo": "1.0.0-alpha.32",
     "@mdi/font": "7.3.67",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/core": "^2.11.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.222.0",
+    "@opentelemetry/instrumentation": "^0.222.0",
+    "@opentelemetry/instrumentation-fetch": "^0.222.0",
+    "@opentelemetry/resources": "^2.11.0",
+    "@opentelemetry/sdk-trace-base": "^2.11.0",
+    "@opentelemetry/sdk-trace-web": "^2.11.0",
+    "@opentelemetry/semantic-conventions": "^1.30.0",
     "@vueuse/core": "14.1.0",
     "core-js": "^3.33.0",
     "pinia": "^2.1.7",
@@ -32,7 +41,7 @@
       "@janeirodigital/interop-utils": "^1.0.0-rc.31"
     },
     "@solid-notifications/discovery": {
-      "@janeirodigital/interop-utils": "^1.0.0-rc.31"
+      "@janeirodigital/interop-utils": "1.0.0-rc.26"
     }
   },
   "devDependencies": {
