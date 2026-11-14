@@ -500,6 +500,69 @@ describe('protected resources (scope inherited, modes all)', () => {
   })
 })
 
+describe('protected resources (scope inherited, parent selected from registry)', () => {
+  // ACME's SelectedFromRegistry grant to Alice's vuejectron client
+  // (`registry/acme/wwp4j6`) selects only Project X (`pbh2yw`, read-only); the
+  // inherited Task grant (`qwvbcu`) hangs off it. The parent grant's target is
+  // an `odrl:Asset`: `odrl:source` is the selected instance while
+  // `odrl:partOf` is the containing registration (`reb39k`). The engine must
+  // derive the registration from `partOf`, otherwise reading a Task of the
+  // selected Project trips the "something fishy" parent-registration check.
+  const selectedProject = 'https://data/acme-rnd/pbh2yw'
+  const selectedTask = 'https://data/acme-rnd/n7k3zm' // Project X "Z1"
+  const unselectedProject = 'https://data/acme-rnd/z8w2pl' // "Matrix"
+  const unselectedTask = 'https://data/acme-rnd/m5t7jy' // "Matrix" "M1"
+  const aliceId = 'https://id/alice'
+
+  describe('authenticated request (authorized agent / authorized client)', () => {
+    const clientId = 'https://data/test-client/public/id'
+    let storageFetch: typeof fetch
+    beforeAll(async () => {
+      storageFetch = await buildLwsFetch(aliceId, clientId)
+    })
+
+    test('can Read the selected project', async () => {
+      const response = await storageFetch(selectedProject, {
+        headers: { Accept: 'text/turtle' },
+      })
+      expect(response.status).toBe(200)
+    })
+    test('can Read a task of the selected project', async () => {
+      const response = await storageFetch(selectedTask, { headers: { Accept: 'text/turtle' } })
+      expect(response.status).toBe(200)
+      expect(response.headers.get('Content-Type')).toEqual(expect.stringContaining('text/turtle'))
+    })
+    test('can not Read an unselected project', async () => {
+      const response = await storageFetch(unselectedProject, {
+        headers: { Accept: 'text/turtle' },
+      })
+      expect(response.status).toBe(403)
+    })
+    test('can not Read a task of an unselected project', async () => {
+      const response = await storageFetch(unselectedTask, { headers: { Accept: 'text/turtle' } })
+      expect(response.status).toBe(403)
+    })
+  })
+
+  describe('authenticated request (authorized agent using UAS)', () => {
+    // `registry/acme/g4yhtm` is the same target shape, granted to Alice as the
+    // assignee, so it is matched in UAS mode (as is the inherited `wpqyds`).
+    let storageFetch: typeof fetch
+    beforeAll(async () => {
+      storageFetch = await buildLwsFetch(aliceId)
+    })
+
+    test('can Read a task of the selected project', async () => {
+      const response = await storageFetch(selectedTask, { headers: { Accept: 'text/turtle' } })
+      expect(response.status).toBe(200)
+    })
+    test('can not Read a task of an unselected project', async () => {
+      const response = await storageFetch(unselectedTask, { headers: { Accept: 'text/turtle' } })
+      expect(response.status).toBe(403)
+    })
+  })
+})
+
 describe('protected resources (admin grant, scope DataRegistry, mode Read)', () => {
   // YoYo's data registry — Dan holds the Read-only DataRegistry-scoped
   // AdminGrants (ds0emv → yoyo-eu, f76tbp → yoyo-na; step 2.8 of

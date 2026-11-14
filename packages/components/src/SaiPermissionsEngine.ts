@@ -416,7 +416,11 @@ export class SaiPermissionsEngine implements PolicyEngine {
     if (!parentId) return
     // check if in parent registration
     const parentTarget = await this.findGrantTarget(data, parentGrantId)
-    const parentRegistrationId = parentTarget.source ?? parentTarget.partOf
+    // The target of a SelectedFromRegistry grant is an `odrl:Asset` whose
+    // `odrl:source` is the selected instance and whose `odrl:partOf` is the
+    // containing registration. Only AssetCollection targets (AllFromRegistry,
+    // Inherited) have the registration as `source` too, so prefer `partOf`.
+    const parentRegistrationId = parentTarget.partOf ?? parentTarget.source
     // TODO: not needed if query only in proper registration
     const actualParent = await this.getRegistrationId(parentId)
     if (actualParent !== parentRegistrationId)
