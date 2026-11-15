@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
+import { ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 import type { JwkGenerator } from '@solid/community-server'
 import type { JWK } from 'jose'
 import { calculateJwkThumbprint, importJWK, SignJWT } from 'jose'
@@ -9,6 +10,14 @@ export const ID_JAG_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id-jag'
 
 /** Protected header `typ` of an ID-JAG (`draft-ietf-oauth-identity-assertion-authz-grant` §4.3.2.1). */
 export const ID_JAG_JWT_TYPE = 'oauth-id-jag+jwt'
+
+/** The verified ODRL access claim an ID-JAG carries. */
+export interface IdJagAccessClaim {
+  /** Compact JSON-LD ODRL policies (the `access` claim). */
+  access: unknown
+  /** JSON-LD context of `access`; defaults to {@link ODRL_ID_JAG_CONTEXT}. */
+  context?: string
+}
 
 /**
  * Issues the ID-JAGs of the SAI User Authorization Server (`auth`).
@@ -62,12 +71,24 @@ export class IdJagIssuer {
    * @param client - The URI of the client requesting the grant.
    * @param audience - The issuer identifier of the resource authorization server
    *   the grant is intended for; it becomes the `aud` claim.
+   * @param claim - Optional ODRL access claim. When present, the ID-JAG carries
+   *   the claim plus its top-level JSON-LD `@context`.
    */
-  public async issue(subject: string, client: string, audience: string): Promise<string> {
+  public async issue(
+    subject: string,
+    client: string,
+    audience: string,
+    claim?: IdJagAccessClaim
+  ): Promise<string> {
     const privateJwk = await this.jwkGenerator.getPrivateKey()
     const key = await importJWK(privateJwk, this.jwkGenerator.alg)
     const kid = (await this.getPublicJwk()).kid
-    return new SignJWT({ client_id: client })
+    const payload: Record<string, unknown> = { client_id: client }
+    if (claim) {
+      payload['@context'] = claim.context ?? ODRL_ID_JAG_CONTEXT
+      payload.access = claim.access
+    }
+    return new SignJWT(payload)
       .setProtectedHeader({ alg: this.jwkGenerator.alg, typ: ID_JAG_JWT_TYPE, kid })
       .setSubject(subject)
       .setIssuer(this.issuer)

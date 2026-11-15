@@ -14,6 +14,14 @@ export interface LwsAuthFetchOptions {
   /** The user's authentication credential. */
   credential: LwsCredential
   /**
+   * Optional source of the ODRL `access` claim for a storage. It receives the
+   * storage (the `resource` of the final exchange) and the resource
+   * authorization server issuer. Because one ID-JAG carries a claim for exactly
+   * one storage, the cache is keyed per `(authorization server, storage)` when
+   * this is set.
+   */
+  accessClaim?: (storage: string, authorizationServer: string) => Promise<unknown> | unknown
+  /**
    * Storages the session knows about. Requests to them are authenticated before
    * the first `401`; unknown URLs are authenticated after a challenge.
    */
@@ -76,12 +84,17 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
     return endpoint
   }
 
-  /** The ID-JAG for one resource authorization server, minted at most once per lifetime. */
-  async function idJag(audience: string): Promise<string> {
-    const cached = grants.get(audience)
+  /**
+   * The ID-JAG for one resource authorization server (and, for an access-claim
+   * chain, one storage), minted at most once per lifetime. The ID-JAG itself
+   * has no `resource` claim; its ODRL target is what binds it to the storage.
+   */
+  async function idJag(audience: string, storage: string): Promise<string> {
+    const key = options.accessClaim ? `${audience}\n${storage}` : audience
+    const cached = grants.get(key)
     if (cached && cached.expiresAt > now() + renewalMargin) return cached.token
 
-    const inFlight = pendingGrants.get(audience)
+    const inFlight = pendingGrants.get(key)
     if (inFlight) return inFlight
 
     const promise = (async (): Promise<string> => {
@@ -92,19 +105,20 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
         subjectToken: await credential.getSubjectToken(),
         clientId: credential.clientId,
         dpopKeyPair: credential.dpopKeyPair,
+        accessClaim: await options.accessClaim?.(storage, audience),
         fetch: tokenFetch,
       })
-      grants.set(audience, {
+      grants.set(key, {
         token,
         expiresAt: jwtExpiresAt(token) ?? now() + 300_000,
       })
       return token
     })()
-    pendingGrants.set(audience, promise)
+    pendingGrants.set(key, promise)
     try {
       return await promise
     } finally {
-      pendingGrants.delete(audience)
+      pendingGrants.delete(key)
     }
   }
 
@@ -119,7 +133,7 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
       const ras: TokenEndpoint = { issuer: metadata.issuer, tokenEndpoint: metadata.tokenEndpoint }
       return requestAccessToken({
         ras,
-        idJag: await idJag(ras.issuer),
+        idJag: await idJag(ras.issuer, storage),
         resource: storage,
         clientId: credential.clientId,
         fetch: tokenFetch,

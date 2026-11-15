@@ -1,4 +1,5 @@
 import { setBodyAttribute, setTokenAttributes } from '@janeirodigital/interop-utils'
+import { ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 import { SpanStatusCode } from '@opentelemetry/api'
 import {
   APPLICATION_X_WWW_FORM_URLENCODED,
@@ -16,6 +17,8 @@ import type {
 } from '@solid/community-server'
 import { getLoggerFor } from 'global-logger-factory'
 
+import type { VerifiedAccessClaim } from './access-claim.js'
+import { verifyAccessClaim } from './access-claim.js'
 import { ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 import type { IdJagIssuer } from './IdJagIssuer.js'
 import { sharedTracer } from './tracing/otel-state.js'
@@ -158,6 +161,7 @@ export class IdJagTokenHandler extends HttpHandler {
     const subjectToken = this.getParameter(params, 'subject_token')
     const subjectTokenType = this.getParameter(params, 'subject_token_type')
     const resource = params.get('resource') ?? undefined
+    const access = await this.accessClaim(params)
 
     span.setAttributes({
       'sai.lws.grant_type': grantType,
@@ -166,6 +170,7 @@ export class IdJagTokenHandler extends HttpHandler {
       'sai.lws.audience': audience,
     })
     if (resource) span.setAttribute('sai.lws.resource', resource)
+    if (access) span.setAttribute('sai.lws.access.storage', access.storage)
     if (proofKeyThumbprint) span.setAttribute('sai.lws.dpop_proof', true)
     setTokenAttributes(span, 'subject', subjectToken)
 
@@ -190,7 +195,22 @@ export class IdJagTokenHandler extends HttpHandler {
     span.setAttribute('sai.lws.subject_id', subject.subject)
     span.setAttribute('sai.lws.subject_issuer', subject.issuer)
 
-    const idJag = await this.issuer.issue(subject.subject, subject.client, audience)
+    if (access) {
+      if (resource !== undefined && resource !== access.storage) {
+        throw new OAuthError(
+          'invalid_target',
+          `The access claim is for ${access.storage}, not the requested resource ${resource}.`
+        )
+      }
+      this.verifyClaimIdentity(access, subject.subject, subject.client)
+    }
+
+    const idJag = await this.issuer.issue(
+      subject.subject,
+      subject.client,
+      audience,
+      access ? { access: access.access, context: access.context } : undefined
+    )
     setTokenAttributes(span, 'id-jag', idJag)
 
     this.logger.info(
@@ -201,6 +221,52 @@ export class IdJagTokenHandler extends HttpHandler {
       access_token: idJag,
       token_type: 'N_A',
       expires_in: this.issuer.lifetime,
+    }
+  }
+
+  /**
+   * Parses and validates the optional ODRL `access` request parameter. The
+   * parameter is a JSON-encoded array of compact ODRL policies, using the
+   * bundled ID-JAG context. A request without it keeps the identity-only
+   * ID-JAG shape.
+   */
+  private async accessClaim(params: URLSearchParams): Promise<VerifiedAccessClaim | undefined> {
+    const values = params.getAll('access')
+    if (values.length === 0) return undefined
+    if (values.length !== 1) {
+      throw new OAuthError('invalid_request', 'The access parameter must have a single value.')
+    }
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(values[0])
+    } catch {
+      throw new OAuthError('invalid_request', 'The access parameter needs to be JSON.')
+    }
+    try {
+      return await verifyAccessClaim(parsed, ODRL_ID_JAG_CONTEXT)
+    } catch (error: unknown) {
+      throw new OAuthError('invalid_request', (error as Error).message)
+    }
+  }
+
+  /**
+   * The self-issued C1 claim is the user's own authorization to the calling
+   * client: it cannot name another assigner, and its assignee has to be the
+   * authenticated client (or the subject itself for a UAS acting as agent).
+   * C2 adds the impersonation/delegation rewriting rules.
+   */
+  private verifyClaimIdentity(claim: VerifiedAccessClaim, subject: string, client: string): void {
+    if (claim.assigners.some((assigner) => assigner !== subject)) {
+      throw new OAuthError(
+        'invalid_request',
+        'The access claim needs to be assigned by the authenticated subject.'
+      )
+    }
+    if (claim.assignees.some((assignee) => assignee !== client && assignee !== subject)) {
+      throw new OAuthError(
+        'invalid_request',
+        'The access claim needs to be assigned to the authenticated client or subject.'
+      )
     }
   }
 

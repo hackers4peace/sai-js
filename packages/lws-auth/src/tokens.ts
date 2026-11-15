@@ -97,6 +97,12 @@ export interface IdJagRequest extends TokenRequestOptions {
   /** DPoP key pair the credential is bound to (`cnf.jkt`). */
   dpopKeyPair: CryptoKeyPair
   clientId: string
+  /**
+   * Optional ODRL `access` claim for the storage the grant is for, as compact
+   * JSON-LD policies. The UAS attaches the context; the claim is valid for one
+   * storage only and carries no `resource` claim.
+   */
+  accessClaim?: unknown
 }
 
 /**
@@ -104,11 +110,14 @@ export interface IdJagRequest extends TokenRequestOptions {
  * one resource authorization server (`audience`).
  */
 export async function requestIdJag(request: IdJagRequest): Promise<string> {
-  const parameters = {
+  const parameters: Record<string, string> = {
     requested_token_type: ID_JAG_TOKEN_TYPE,
     audience: request.audience,
     subject_token: request.subjectToken,
     subject_token_type: ID_TOKEN_TYPE,
+  }
+  if (request.accessClaim !== undefined) {
+    parameters.access = JSON.stringify(request.accessClaim)
   }
 
   return withSpan('sai-lws', 'sai.lws.request-id-jag', async (span): Promise<string> => {
@@ -120,6 +129,9 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
       'sai.lws.client_auth_method': 'none',
     })
     setTokenAttributes(span, 'subject', request.subjectToken)
+    if (request.accessClaim !== undefined) {
+      span.setAttribute('sai.lws.access', JSON.stringify(request.accessClaim))
+    }
     setBodyAttribute(span, 'sai.lws.request.body', new URLSearchParams(parameters).toString())
 
     const body = await tokenExchange(

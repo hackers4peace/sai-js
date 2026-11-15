@@ -1,3 +1,4 @@
+import { ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 import type {
   RepresentationConverter,
   SubjectTokenVerifierInput,
@@ -16,6 +17,7 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE } from '../src/IdJagIssuer.js'
 import type { IdJagSubjectTokenVerifierArgs } from '../src/IdJagSubjectTokenVerifier.js'
 import { IdJagSubjectTokenVerifier } from '../src/IdJagSubjectTokenVerifier.js'
+import { CLAIM_OTHER_STORAGE, CLAIM_STORAGE, accessClaim } from './access-claim-helpers.js'
 
 const UAS = 'https://auth/'
 const RESOURCE_AS = 'https://data/'
@@ -33,6 +35,8 @@ interface Claims {
   client_id?: string
   typ?: string
   exp?: number
+  access?: unknown
+  '@context'?: string
 }
 
 async function makeGrant(overrides: Claims = {}): Promise<string> {
@@ -143,6 +147,63 @@ describe('IdJagSubjectTokenVerifier', () => {
 
     const expired = await makeGrant({ exp: Math.floor(Date.now() / 1000) - 120 })
     await expect(verifier.handleSafe(input(expired))).rejects.toThrow(BadRequestHttpError)
+  })
+
+  test('verifies the ODRL access claim and returns it for the access token', async () => {
+    const verifier = new TestVerifier()
+    const claim = accessClaim()
+    const result = await verifier.handleSafe(
+      input(await makeGrant({ access: claim, '@context': ODRL_ID_JAG_CONTEXT }), {
+        resource: CLAIM_STORAGE,
+      })
+    )
+    expect(result).toMatchObject({
+      subject: WEBID,
+      access: claim,
+      accessContext: ODRL_ID_JAG_CONTEXT,
+    })
+  })
+
+  test('rejects an access claim without the bundled context', async () => {
+    const verifier = new TestVerifier()
+    await expect(
+      verifier.handleSafe(
+        input(
+          await makeGrant({
+            access: accessClaim(),
+            '@context': 'https://context.example/unknown',
+          }),
+          { resource: CLAIM_STORAGE }
+        )
+      )
+    ).rejects.toThrow(ODRL_ID_JAG_CONTEXT)
+  })
+
+  test('rejects an access claim spanning more than one storage', async () => {
+    const verifier = new TestVerifier()
+    const claim = [...accessClaim(), ...accessClaim({ storage: CLAIM_OTHER_STORAGE })]
+    await expect(
+      verifier.handleSafe(
+        input(await makeGrant({ access: claim, '@context': ODRL_ID_JAG_CONTEXT }), {
+          resource: CLAIM_STORAGE,
+        })
+      )
+    ).rejects.toThrow('same lws:storage')
+  })
+
+  test('binds the access claim to the exchanged resource', async () => {
+    const verifier = new TestVerifier()
+    await expect(
+      verifier.handleSafe(
+        input(
+          await makeGrant({
+            access: accessClaim(),
+            '@context': ODRL_ID_JAG_CONTEXT,
+          }),
+          { resource: CLAIM_OTHER_STORAGE }
+        )
+      )
+    ).rejects.toThrow('not the requested storage')
   })
 
   test('falls back to the subject document for an untrusted issuer', async () => {

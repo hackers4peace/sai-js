@@ -1,5 +1,11 @@
 import { buildLwsFetch, buildSelfIssuedCredential } from '@elfpavlik/sai-components'
-import { createLwsTokenDpopProof } from '@janeirodigital/interop-utils'
+import { grantAccess } from '@janeirodigital/interop-data-model'
+import {
+  INTEROP,
+  ODRL,
+  ODRL_ID_JAG_CONTEXT,
+  createLwsTokenDpopProof,
+} from '@janeirodigital/interop-utils'
 import { decodeJwt, decodeProtectedHeader } from 'jose'
 import { describe, expect, test } from 'vitest'
 
@@ -182,6 +188,69 @@ describe('ID-JAG exchange at a storage authorization server', () => {
     const types = metadata.subject_token_types_supported as string[]
     expect(types).toContain(ID_JAG_TYPE)
     expect(types).toContain(ID_TOKEN_TYPE)
+  })
+})
+
+describe('ODRL access claim in the ID-JAG (C1)', () => {
+  const claim = grantAccess({
+    scopeOfGrant: INTEROP.AllFromRegistry,
+    owner: WEBID,
+    storage: DATA_STORAGE,
+    hasDataRegistration: 'https://data/alice-work/sx86hi',
+    registeredShapeTree: 'https://data/shapetrees/trees/Project',
+    assigner: WEBID,
+    assignee: CLIENT,
+    actions: [ODRL.read],
+  })
+
+  test('self-issues the claim, keeps it in the access token, and evaluates it claim-first', async () => {
+    const response = await requestIdJag({ overrides: { access: JSON.stringify(claim) } })
+    expect(response.status).toBe(200)
+    const body = (await response.json()) as Record<string, unknown>
+    const idJag = String(body.access_token)
+    expect(decodeJwt(idJag)).toMatchObject({
+      '@context': ODRL_ID_JAG_CONTEXT,
+      access: claim,
+    })
+
+    const exchange = await exchangeAtRas(DATA_AS, {
+      subject_token: idJag,
+      subject_token_type: ID_JAG_TYPE,
+      resource: DATA_STORAGE,
+    })
+    expect(exchange.status).toBe(200)
+    const tokens = (await exchange.json()) as Record<string, unknown>
+    const accessToken = String(tokens.access_token)
+    expect(decodeJwt(accessToken)).toMatchObject({
+      '@context': ODRL_ID_JAG_CONTEXT,
+      access: claim,
+    })
+
+    const read = await fetch(`${DATA_STORAGE}k3pqsb`, {
+      headers: { accept: 'text/turtle', authorization: `Bearer ${accessToken}` },
+    })
+    expect(read.status).toBe(200)
+  })
+
+  test('rejects a claim spanning two storages', async () => {
+    const twoStorages = [
+      ...claim,
+      ...grantAccess({
+        scopeOfGrant: INTEROP.AllFromRegistry,
+        owner: WEBID,
+        storage: REGISTRY_STORAGE,
+        hasDataRegistration: 'https://registry/alice/grant/',
+        registeredShapeTree: 'https://data/shapetrees/trees/Project',
+        assigner: WEBID,
+        assignee: CLIENT,
+        actions: [ODRL.read],
+      }),
+    ]
+    const response = await requestIdJag({
+      overrides: { access: JSON.stringify(twoStorages) },
+    })
+    expect(response.status).toBe(400)
+    expect(((await response.json()) as Record<string, unknown>).error).toBe('invalid_request')
   })
 })
 

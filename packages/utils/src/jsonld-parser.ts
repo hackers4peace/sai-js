@@ -4,6 +4,7 @@ import { Store } from 'n3'
 import { jsonld } from './jsonld-lib.ts'
 import { lwsV1Context } from './lws-v1-context.ts'
 import { odrlContext } from './odrl-context.ts'
+import { ODRL_ID_JAG_CONTEXT, odrlIdJagContext } from './odrl-id-jag-context.ts'
 import { saiContext } from './sai-context.ts'
 
 // Local type for the document loader result compatible with jsonld's RemoteDocument
@@ -54,6 +55,7 @@ const localContexts: Record<string, LocalContext> = {
   'https://www.w3.org/ns/lws/v1': lwsV1Context,
   'http://www.w3.org/ns/odrl.jsonld': odrlContext,
   'https://www.w3.org/ns/solid/interop-context/v1': saiContext,
+  [ODRL_ID_JAG_CONTEXT]: odrlIdJagContext,
   'https://www.w3.org/ns/solid/oidc-context.jsonld': {
     '@context': {
       '@version': 1.1,

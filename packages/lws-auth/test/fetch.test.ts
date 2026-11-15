@@ -154,6 +154,31 @@ describe('createLwsAuthFetch', () => {
     expect(resources).toEqual([DATA_STORAGE, DATA_STORAGE_2])
   })
 
+  test('keys access-claim grants by authorization server and storage', async () => {
+    const world = createWorld()
+    const claims: unknown[] = []
+    const fetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch: world.fetch,
+      now: () => world.clock(),
+      accessClaim: (storage) => {
+        const claim = [{ id: `urn:claim:${storage}`, target: { storage } }]
+        claims.push(claim)
+        return claim
+      },
+    })
+
+    expect((await fetch(`${DATA_STORAGE}k3pqsb`)).status).toBe(200)
+    expect((await fetch(`${DATA_STORAGE_2}x8v2lm`)).status).toBe(200)
+
+    const grantRequests = world.requests.filter(isGrantRequest)
+    expect(grantRequests).toHaveLength(2)
+    expect(grantRequests.map((request) => formBody(request).get('audience'))).toEqual([DATA, DATA])
+    expect(grantRequests.map((request) => JSON.parse(formBody(request).get('access')!))).toEqual(
+      claims
+    )
+  })
+
   test('mints a separate grant per storage authorization server', async () => {
     const world = createWorld()
     const fetch = createLwsAuthFetch({

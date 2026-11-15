@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'node:http'
 import { Readable } from 'node:stream'
 
-import { createLwsTokenDpopProof } from '@janeirodigital/interop-utils'
+import { ODRL_ID_JAG_CONTEXT, createLwsTokenDpopProof } from '@janeirodigital/interop-utils'
 import type {
   HttpResponse,
   JwkGenerator,
@@ -16,6 +16,13 @@ import { beforeAll, describe, expect, test } from 'vitest'
 
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE, IdJagIssuer } from '../src/IdJagIssuer.js'
 import { ID_JAG_GRANT_TYPE, IdJagTokenHandler } from '../src/IdJagTokenHandler.js'
+import {
+  CLAIM_CLIENT,
+  CLAIM_OTHER_STORAGE,
+  CLAIM_STORAGE,
+  CLAIM_SUBJECT,
+  accessClaim,
+} from './access-claim-helpers.js'
 
 const BASE_URL = 'https://auth/'
 const TOKEN_ENDPOINT = 'https://auth/.well-known/lws/token'
@@ -197,6 +204,80 @@ describe('IdJagTokenHandler', () => {
 
     expect(captured.status).toBe(200)
     expect(verifier.last?.proofKeyThumbprint).toBe(await calculateJwkThumbprint(publicJwk))
+  })
+
+  test('issues an ID-JAG carrying the ODRL access claim and its context', async () => {
+    const { handler } = buildHandler()
+    const claim = accessClaim()
+    const captured = await call(handler, tokenRequest({ access: JSON.stringify(claim) }))
+
+    expect(captured.status).toBe(200)
+    const { payload } = await jwtVerify(
+      JSON.parse(String(captured.body)).access_token,
+      keys.publicKey
+    )
+    expect(payload['@context']).toBe(ODRL_ID_JAG_CONTEXT)
+    expect(payload.access).toEqual(claim)
+    expect(payload).toMatchObject({ sub: CLAIM_SUBJECT, client_id: CLAIM_CLIENT })
+  })
+
+  test('rejects an access claim spanning more than one storage', async () => {
+    const { handler } = buildHandler()
+    const claim = [...accessClaim(), ...accessClaim({ storage: CLAIM_OTHER_STORAGE })]
+    const captured = await call(handler, tokenRequest({ access: JSON.stringify(claim) }))
+
+    expect(captured.status).toBe(400)
+    expect(JSON.parse(String(captured.body)).error).toBe('invalid_request')
+    expect(JSON.parse(String(captured.body)).error_description).toContain('same lws:storage')
+  })
+
+  test('rejects malformed and wrongly assigned access claims', async () => {
+    const { handler } = buildHandler()
+
+    const malformed = await call(handler, tokenRequest({ access: 'not-json' }))
+    expect(malformed.status).toBe(400)
+    expect(JSON.parse(String(malformed.body)).error).toBe('invalid_request')
+
+    const wrongAssigner = await call(
+      handler,
+      tokenRequest({
+        access: JSON.stringify(accessClaim({ assigner: 'https://id/mallory' })),
+      })
+    )
+    expect(wrongAssigner.status).toBe(400)
+    expect(JSON.parse(String(wrongAssigner.body)).error_description).toContain(
+      'assigned by the authenticated subject'
+    )
+
+    const wrongAssignee = await call(
+      handler,
+      tokenRequest({
+        access: JSON.stringify(accessClaim({ assignee: 'https://id/mallory' })),
+      })
+    )
+    expect(wrongAssignee.status).toBe(400)
+    expect(JSON.parse(String(wrongAssignee.body)).error_description).toContain(
+      'assigned to the authenticated client'
+    )
+  })
+
+  test('binds a claim to the requested resource when one is supplied', async () => {
+    const { handler } = buildHandler()
+    const request = tokenRequest({
+      access: JSON.stringify(accessClaim()),
+      resource: CLAIM_STORAGE,
+    })
+    expect((await call(handler, request)).status).toBe(200)
+
+    const mismatch = await call(
+      handler,
+      tokenRequest({
+        access: JSON.stringify(accessClaim()),
+        resource: CLAIM_OTHER_STORAGE,
+      })
+    )
+    expect(mismatch.status).toBe(400)
+    expect(JSON.parse(String(mismatch.body)).error).toBe('invalid_target')
   })
 
   test('rejects a proof for another endpoint or a malformed proof', async () => {

@@ -1,7 +1,7 @@
 import { DataFactory } from 'n3'
 import { expect, test } from 'vitest'
 
-import { parseJsonld } from '../src'
+import { ODRL_ID_JAG_CONTEXT, parseJsonld } from '../src'
 
 const snippet = `
 {
@@ -63,6 +63,58 @@ test('parses a CID document with the embedded cid context', async () => {
       namedNode('https://www.w3.org/ns/did#serviceEndpoint'),
       namedNode('https://auth.example/')
     )
+  )
+})
+
+test('expands the ODRL access claim through the bundled ID-JAG context', async () => {
+  const doc = JSON.stringify({
+    '@context': ODRL_ID_JAG_CONTEXT,
+    '@graph': [
+      {
+        id: 'urn:policy',
+        type: ['Agreement'],
+        profile: 'https://www.w3.org/ns/solid/interop#AccessProfile',
+        scopeOfGrant: 'https://www.w3.org/ns/solid/interop#AllFromRegistry',
+        permission: [
+          {
+            id: 'urn:permission',
+            assigner: 'https://id/yoyo',
+            assignee: 'https://app.example/id',
+            action: ['read'],
+            target: {
+              id: 'urn:target',
+              owner: 'https://id/acme',
+              storage: 'https://data/acme.example/',
+              type: ['AssetCollection', 'DataRegistration'],
+              source: ['https://data/acme.example/registration/'],
+            },
+          },
+        ],
+      },
+    ],
+  })
+  const dataset = await parseJsonld(doc)
+  const { namedNode, quad } = DataFactory
+  const ODRL = 'http://www.w3.org/ns/odrl/2/'
+  const INTEROP = 'http://www.w3.org/ns/solid/interop#'
+  const LWS = 'https://www.w3.org/ns/lws#'
+  const quads = [...dataset]
+
+  expect(quads).toContainEqual(
+    quad(namedNode('urn:permission'), namedNode(`${ODRL}assigner`), namedNode('https://id/yoyo'))
+  )
+  expect(quads).toContainEqual(
+    quad(namedNode('urn:target'), namedNode(`${INTEROP}dataOwner`), namedNode('https://id/acme'))
+  )
+  expect(quads).toContainEqual(
+    quad(
+      namedNode('urn:target'),
+      namedNode(`${LWS}storage`),
+      namedNode('https://data/acme.example/')
+    )
+  )
+  expect(quads).toContainEqual(
+    quad(namedNode('urn:permission'), namedNode(`${ODRL}action`), namedNode(`${ODRL}read`))
   )
 })
 

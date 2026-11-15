@@ -6,9 +6,7 @@
     "enabled": true,
     "otlpBaseUrl": "/otlp",
     "serviceName": "sai-vuejectron",
-    "propagateTo": [
-      "^https://[^/]*\\.docker/"
-    ],
+    "propagateTo": ["^https://[^/]*\\.docker/"],
     "captureBodies": true,
     "captureTokens": true
   }

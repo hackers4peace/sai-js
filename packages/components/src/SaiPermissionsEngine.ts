@@ -7,8 +7,10 @@ import {
   INTEROP,
   LWS,
   ODRL,
+  ODRL_ID_JAG_CONTEXT,
   discoverAuthorizationAgent,
   loader,
+  toStore,
 } from '@janeirodigital/interop-utils'
 import type { Quad } from '@rdfjs/types'
 import { arrayifyStream } from '@solid/community-server'
@@ -22,7 +24,7 @@ import type {
 import { ACP, PERMISSIONS } from '@solidlab/policy-engine'
 import { type IBindings, SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
 import { getLoggerFor } from 'global-logger-factory'
-import { Store } from 'n3'
+import { DataFactory, Store } from 'n3'
 
 import type { PodEndpointStore } from './PodEndpointStore.js'
 import type { SaiAuthorizationManager } from './SaiAuthorizationManager.js'
@@ -32,6 +34,15 @@ enum TargetType {
   Registration = 'Registration',
   Resource = 'Resource',
 }
+
+/** The token-carried credential fields of the LWS access-claim profile. */
+type AccessClaimCredentials = Credentials & {
+  access?: unknown
+  accessContext?: string
+  storage?: string
+}
+
+const { namedNode } = DataFactory
 
 export class SaiPermissionsEngine implements PolicyEngine {
   private readonly logger = getLoggerFor(this)
@@ -62,6 +73,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
    * @param credentials - Credentials identifying who or what is trying to access the target resource.
    */
   async getPermissions(target: string, credentials: Credentials): Promise<PermissionMap> {
+    const claimData = await this.findAccessClaimData(target, credentials)
+    if (claimData) return this.getClaimPermissions(target, credentials, claimData)
+
     // check if reqested by User Authorization Server
     let uasId: string | undefined
     if (credentials.agent && credentials.client) {
@@ -140,6 +154,10 @@ export class SaiPermissionsEngine implements PolicyEngine {
       default:
         throw new Error(`unexpected IRI: ${target}`)
     }
+    return this.permissionMap(modes)
+  }
+
+  private permissionMap(modes: string[]): PermissionMap {
     return {
       [PERMISSIONS.Create]: modes.includes(ACCESS_ACTIONS.create),
       // TODO: figure out why it is requested on Create
@@ -148,6 +166,111 @@ export class SaiPermissionsEngine implements PolicyEngine {
       [PERMISSIONS.Modify]: modes.includes(ACCESS_ACTIONS.modify),
       [PERMISSIONS.Delete]: modes.includes(ACCESS_ACTIONS.delete),
     }
+  }
+
+  /**
+   * The token-carried ODRL claim, converted to the same `lws:access` graph the
+   * registry path evaluates. Returns `undefined` when the credentials have no
+   * claim, and an empty graph when the claim is malformed or for another
+   * storage — a token with an `access` claim never falls back to broad registry
+   * matching (D10).
+   */
+  private async findAccessClaimData(
+    target: string,
+    credentials: Credentials
+  ): Promise<Quad[] | undefined> {
+    const { access, accessContext } = credentials as AccessClaimCredentials
+    if (access === undefined) return undefined
+    if (accessContext !== ODRL_ID_JAG_CONTEXT) return []
+
+    try {
+      const policies = Array.isArray(access) ? access : [access]
+      const store = await toStore({ '@context': accessContext, '@graph': policies })
+      const storages = new Set(
+        store.getObjects(null, namedNode(LWS.storage), null).map((term) => term.value)
+      )
+      const storage = await this.manager.getStorage(target)
+      if (storages.size !== 1 || !storage || [...storages][0] !== storage) return []
+
+      // The registry evaluator looks up policies through an `lws:access` edge;
+      // the token claim is just the policy graph. Give every policy its own
+      // synthetic grant root so a match reads only that policy's actions, and
+      // mirror `inheritsFromGrant` onto the root for `findInheritedModes`.
+      let index = 0
+      for (const policy of store.getSubjects(namedNode(ODRL.permission), null, null)) {
+        const grant = namedNode(`urn:sai:ld:access-claim:${index++}`)
+        store.addQuad(grant, namedNode(LWS.access), policy)
+        for (const inherited of store.getObjects(
+          policy,
+          namedNode(INTEROP.inheritsFromGrant),
+          null
+        )) {
+          store.addQuad(grant, namedNode(INTEROP.inheritsFromGrant), inherited)
+        }
+      }
+      return [...store]
+    } catch (error: unknown) {
+      this.logger.warn(`Ignoring an unparseable ODRL access claim: ${error}`)
+      return []
+    }
+  }
+
+  /**
+   * Claim-first evaluation: the verified ODRL claim is the only authority. It
+   * uses the same target/scope/action predicates as the registry path, but no
+   * admin grant and no public fallback apply.
+   */
+  private async getClaimPermissions(
+    target: string,
+    credentials: Credentials,
+    data: Quad[]
+  ): Promise<PermissionMap> {
+    const targetType = await this.determineTargetType(target)
+    let modes: string[] = []
+    switch (targetType) {
+      case TargetType.Registry:
+        modes = await this.findRegistrationModes(data, target, credentials, false, false)
+        break
+      case TargetType.Registration: {
+        const inheritedGrant = await this.findGrant(
+          data,
+          target,
+          credentials,
+          INTEROP.Inherited,
+          false,
+          false
+        )
+        modes = [
+          ...new Set([
+            ...(await this.findRegistrationModes(data, target, credentials, false, false)),
+            ...(inheritedGrant ? await this.getAccessModes(data, inheritedGrant) : []),
+          ]),
+        ]
+        break
+      }
+      case TargetType.Resource: {
+        const resourceModes = await this.findResourceModes(data, target, credentials, false, false)
+        const registryModes = await this.findRegistrationModes(
+          data,
+          (await this.getRegistrationId(target)) ?? target,
+          credentials,
+          false,
+          false
+        )
+        const inheritedModes = await this.findInheritedModes(
+          data,
+          target,
+          credentials,
+          false,
+          false
+        )
+        modes = [...new Set([...resourceModes, ...registryModes, ...inheritedModes])]
+        break
+      }
+      default:
+        throw new Error(`unexpected IRI: ${target}`)
+    }
+    return this.permissionMap(modes)
   }
 
   /**
@@ -215,7 +338,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     id: string,
     credentials: Credentials,
     scope: string,
-    uas: boolean
+    uas: boolean,
+    allowPublicFallback = true
   ): Promise<string | undefined> {
     let registrationId = id
     const selected = scope === INTEROP.SelectedFromRegistry
@@ -260,20 +384,24 @@ export class SaiPermissionsEngine implements PolicyEngine {
     const grantId = grantBindings[0]?.get('s')?.value
     if (grantId) return grantId
     // if not found try without credentials
-    if (credentials.agent && credentials.client) return this.findGrant(data, id, {}, scope, false)
+    if (allowPublicFallback && credentials.agent && credentials.client) {
+      return this.findGrant(data, id, {}, scope, false)
+    }
   }
   async findRegistrationModes(
     data: Quad[],
     registrationId: string,
     credentials: Credentials,
-    uas: boolean
+    uas: boolean,
+    allowPublicFallback = true
   ): Promise<string[]> {
     const grantId = await this.findGrant(
       data,
       registrationId,
       credentials,
       INTEROP.AllFromRegistry,
-      uas
+      uas,
+      allowPublicFallback
     )
     if (!grantId) return []
     return this.getAccessModes(data, grantId)
@@ -283,14 +411,16 @@ export class SaiPermissionsEngine implements PolicyEngine {
     data: Quad[],
     resourceId: string,
     credentials: Credentials,
-    uas: boolean
+    uas: boolean,
+    allowPublicFallback = true
   ): Promise<string[]> {
     const grantId = await this.findGrant(
       data,
       resourceId,
       credentials,
       INTEROP.SelectedFromRegistry,
-      uas
+      uas,
+      allowPublicFallback
     )
     if (!grantId) return []
     return this.getAccessModes(data, grantId)
@@ -300,10 +430,18 @@ export class SaiPermissionsEngine implements PolicyEngine {
     data: Quad[],
     resourceId: string,
     credentials: Credentials,
-    uas: boolean
+    uas: boolean,
+    allowPublicFallback = true
   ): Promise<string[]> {
     const registrationId = (await this.getRegistrationId(resourceId)) ?? resourceId
-    const grantId = await this.findGrant(data, registrationId, credentials, INTEROP.Inherited, uas)
+    const grantId = await this.findGrant(
+      data,
+      registrationId,
+      credentials,
+      INTEROP.Inherited,
+      uas,
+      allowPublicFallback
+    )
     if (!grantId) return []
     const parentGrantId = await this.findObject(data, grantId, INTEROP.inheritsFromGrant)
     if (!parentGrantId) throw new Error(`parent not found for Inherited grant: ${grantId}`)

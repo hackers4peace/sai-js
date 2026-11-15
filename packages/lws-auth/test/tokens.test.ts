@@ -15,6 +15,7 @@ const RAS_TOKEN_ENDPOINT = 'https://data/.well-known/lws/token'
 const CLIENT = 'https://data/test-client/public/id'
 const SUBJECT_TOKEN = makeJwt({ iss: UAS, aud: 'solid', sub: 'https://id/alice' })
 const ID_JAG = makeJwt({ iss: UAS, aud: RAS, sub: 'https://id/alice', client_id: CLIENT })
+const ACCESS_CLAIM = [{ id: 'urn:policy', permission: [] }]
 
 let keyPair: CryptoKeyPair
 
@@ -53,6 +54,26 @@ describe('requestIdJag', () => {
     expect(body.get('subject_token_type')).toBe(ID_TOKEN_TYPE)
     // the credential is sender-constrained: the proof is what makes it exchangeable
     expect(requests[0].headers.get('dpop')).toEqual(expect.any(String))
+  })
+
+  test('sends an ODRL access claim when the UAS is asked for one', async () => {
+    const { fetch, requests } = createFakeFetch((url, request) => {
+      if (url.href === UAS_TOKEN_ENDPOINT && request.method === 'POST') {
+        return json({ access_token: ID_JAG, token_type: 'N_A', expires_in: 300 })
+      }
+    })
+
+    await requestIdJag({
+      uas: UAS,
+      audience: RAS,
+      subjectToken: SUBJECT_TOKEN,
+      clientId: CLIENT,
+      dpopKeyPair: keyPair,
+      accessClaim: ACCESS_CLAIM,
+      fetch,
+    })
+
+    expect(formBody(requests[0]).get('access')).toBe(JSON.stringify(ACCESS_CLAIM))
   })
 
   test('surfaces the OAuth error of a rejected exchange', async () => {

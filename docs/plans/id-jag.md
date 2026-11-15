@@ -1,10 +1,11 @@
 # ID-JAG access claims — ODRL model migration, impersonation, delegation
 
-> **Status:** 🔶 in progress — **C0 landed** (new ODRL shape only, no token
-> behaviour changes); package gate and **full Dagger suite green** (24 files /
-> 206 tests). C1 is next.
+> **Status:** 🔶 in progress — **C0 landed**; **C1 implemented** (ID-JAG ODRL
+> access claim foundation; package gate and **full Dagger suite green**, 24 files
+> / 208 tests). C2 is next.
 > **Last verified:** working tree (2026-11-15) — C0 verified against the current
-> delegation, grant, policy-engine, ID-JAG, and Dagger code.
+> delegation, grant, policy-engine, ID-JAG, and Dagger code; C1 verified against
+> the current token chain and the local `lws-sai` CSS fork.
 > **Green gate:** package gate + **full** Dagger suite after every slice
 > ([§ Green gate](#green-gate)); Dagger is user-run.
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
@@ -71,11 +72,11 @@ first; C1+ adds the token flows.
 |---|---|---|---|---|
 | New ODRL shape: `assigner` = delegator, `target.owner` = data owner, no `requester` | ✅ landed — package + Dagger green | `packages/data-model/src/grant.ts` (`OdrlPermission`, `OdrlTarget`, `normalize*`, `deriveFields`, `grantAccess`, `toJsonLd`); `packages/data-model/src/context.ts`; `packages/utils/src/sai-context.ts` | data-model framing/pojo tests; grant-chain/generation; `/test` policy/delegation | C0; atomic commit |
 | Full grant/seed/mirror/admin migration to the new shape | ✅ landed — package fixtures/seed migrated; Dagger green | `environments/data/registry.trig`; grant registries/mirrors/issuer-side replicas; `temporal/activities/admin.ts` | package + `/test`; migration audit query | C0; no dual-write after cutover |
-| ODRL ID-JAG context URI + local copy; expand only `access` | ⬜ open | `packages/utils/src/jsonld-parser.ts`; new `odrl-id-jag-context` module; `IdJagIssuer`/verifier | package context/ID-JAG tests | C1 |
-| ID-JAG `access` claim carried into the access token | ⬜ open | `IdJagIssuer`, `IdJagSubjectTokenVerifier`, CSS `LwsTokenHttpHandler`/`LwsAccessTokenIssuer`/`LwsAccessTokenExtractor`, `PolicyEngineReader` | package ID-JAG/LWS tests; `/test` `lws-auth.test.ts` | C1 |
-| Claim-first policy-engine evaluation for token `access` claims | ⬜ open | `SaiPermissionsEngine.getPermissions`/`findGrant`; `Credentials` shape | package policy-engine tests; `/test` `policy-engine.test.ts` | C1 |
-| One storage per ID-JAG access claim; no `resource` claim; final `aud` = storage | ⬜ open | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `lws-auth` cache, CSS token handler | package + `/test` | C1 |
-| User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ⬜ open | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; `IdTokenIssuer`/CID docs | package + `/test` | C1; UAS-as-client case |
+| ODRL ID-JAG context URI + local copy; expand only `access` | ✅ landed — package + full Dagger green | `packages/utils/src/odrl-id-jag-context.ts`; `jsonld-parser.ts`; `accessClaimTerms` shared with `accessContext` | utils context parser test; ID-JAG tests | C1 |
+| ID-JAG `access` claim carried into the access token | ✅ landed — package + full Dagger green | `IdJagIssuer`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, CSS `LwsTokenHttpHandler`/`LwsAccessTokenIssuer`/`LwsAccessTokenExtractor`, `PolicyEngineReader` | package ID-JAG/LWS tests; `/test` `lws-auth.test.ts` (12) | C1 |
+| Claim-first policy-engine evaluation for token `access` claims | ✅ landed — package + full Dagger green | `SaiPermissionsEngine.getPermissions`/`findAccessClaimData`/`getClaimPermissions`; CSS `PolicyEngineReader` | new package `policy-engine-claim.test.ts`; `/test` `policy-engine.test.ts` (73) | C1 |
+| One storage per ID-JAG access claim; no `resource` claim; final `aud` = storage | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `verifyAccessClaim`, `lws-auth` cache, CSS token handler | package tests; `/test` `lws-auth.test.ts` | C1 |
+| User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path; grant backing still C2 | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; `IdTokenIssuer`/CID docs | package + `/test` | C1; UAS-as-client case |
 | Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ⬜ open | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `lws-auth`, CSS token issuer/extractor | new `/test/impersonation.test.ts` + existing suites | C2 |
 | Delegated grants issued/stored in the assigner registry; owner endpoint kept | ⬜ open | `grant-generation.ts`, `activities/grants.ts`, `AccessRequestHandler`, `delegation-request.ts`, `GrantReplica`/grant registry | package + `/test` delegation/equivalence | C2; migration/backfill |
 | Delegation token chain (`sub` top-level, nested `act` to client) | ⬜ open | `IdJag*`, `lws-auth`, CSS token handler, policy engine | new delegation-token `/test` + existing suites | C3 |
@@ -300,6 +301,45 @@ package tests for ID-JAG claim/context/token propagation (user-run).
 - The existing ID-token → ID-JAG path remains as the current flow.
 - Policy engine must reject/ignore claims it cannot parse, not silently fall
   back to broad registry matching for impersonation-shaped tokens.
+
+**Implementation (2026-11-15)**
+
+- `packages/utils/src/odrl-id-jag-context.ts` defines
+  `https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context` and the
+  shared `accessClaimTerms`; `accessContext` and the ID-JAG context now compose
+  the same ODRL/LWS/SAI terms. The URI is registered in `jsonld-parser.ts`, so
+  verification never fetches a remote context.
+- `IdJagIssuer.issue` accepts `{ access, context }`; the payload carries the
+  top-level `@context` and `access` only when a claim is present. The identity-
+  only shape is unchanged for requests without a claim.
+- `IdJagTokenHandler` accepts an optional form `access` parameter with the
+  compact ODRL policies, validates it with `verifyAccessClaim` (one storage, no
+  `resource`, bundled context), and requires the C1 self-issued identity:
+  `assigner` = authenticated subject, `assignee` = client (or subject for a UAS
+  acting as agent). The claim is bound to a request-supplied `resource` when
+  present. Grant-backed claim derivation is C2; C1 treats the authenticated
+  client as the self-issuing UAS.
+- `IdJagSubjectTokenVerifier` expands **only** the `access` subtree after the
+  signature check, validates the context/storage, and binds the claim to the
+  exchange `resource`. CSS passes `resource` to every subject-token verifier
+  (`SubjectTokenVerifierInput.resource`).
+- CSS `LwsTokenHttpHandler` copies the verified claim into
+  `LwsAccessTokenIssuer.issue`; `LwsAccessTokenExtractor` exposes `access` +
+  `accessContext`; `PolicyEngineReader` forwards them.
+- `SaiPermissionsEngine` evaluates a token claim claim-first: the policy graph
+  is given a synthetic per-policy `lws:access` root, then the existing
+  target/scope/action predicates run without registry/admin/public fallbacks.
+  Invalid context/claim/storage denies instead of falling back to registry
+  matching. `packages/lws-auth` sends an optional `accessClaim` and caches
+  grants per `(AS issuer, storage)` when a claim source is configured.
+- Gates: package `typecheck`, full `npx vitest run` (674 passed, 26 skipped,
+  2 todo), components build, CSS targeted Jest (37), targeted Dagger
+  `lws-auth.test.ts policy-engine.test.ts` (85 passed), and the **full Dagger
+  suite** (24 files / 208 tests).
+- The CSS changes live in the `elf-pavlik/CommunitySolidServer` `lws-sai`
+  branch (sibling `../CommunitySolidServer`). `package-lock.json` now pins
+  `341c0214aaaed367b567316d8adb5930dd1ea46b` (`feat(lws): ID-JAG with access
+  policy`), so a fresh `npm ci` gets the claim-aware CSS.
 
 ## C2 — Impersonation default + assigner-owned grants
 

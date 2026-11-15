@@ -38,7 +38,7 @@ file was deleted. The post-workstream follow-ups are in
 
 | Status | Count | Plans |
 |---|---|---|
-| 🔶 in progress | 2 | `lws-auth` (C1–C5 landed: ID-JAG chain end-to-end + browser credential; manual dev capture and OpenWiki migration remain); `id-jag` (C0 landed; package + full Dagger green) |
+| 🔶 in progress | 2 | `lws-auth` (C1–C5 landed: ID-JAG chain end-to-end + browser credential; manual dev capture and OpenWiki migration remain); `id-jag` (C0 + C1 landed; full Dagger green) |
 | ⬜ not started / design only | 12 | `grants-replication-polish`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing`, `lws-followup` |
 | 🧭 umbrella | 1 | `org-admin-feature` |
 | 📝 design notes | 3 | `architecture`, `fixes`, `improve-fetch-json-ld` |
@@ -110,7 +110,7 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
   `data`/`registry` keep their landed exchange as the RAS leg.
 - `lws-followup.md` — ⬜ not started; remaining LWS alignment follow-ups (grant view,
   needs/grants profile, flat storage, docs).
-- `id-jag.md` — 🔶 C0 landed (package + full Dagger green); staged ODRL model migration
+- `id-jag.md` — 🔶 C0 + C1 landed (package + full Dagger green); staged ODRL model migration
   (`assigner` = delegator, `target.owner` = data owner), ID-JAG access claims,
   impersonation-first token flow, then delegation via nested `act`; keeps the
   current owner access-request delegation flow.
@@ -135,7 +135,7 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 | `fixes.md` | 📝 design note — not implemented | Remove the HTTP list-and-scan invitation lookup in `agent-registry.ts`; route the duplicate check through the SPARQL `fetchSocialAgentInvitation` | — |
 | `improve-fetch-json-ld.md` | 📝 design note — decision deferred | `fetchJsonLd` status-carrying error instead of regex-matching the message; options evaluated, not implemented | — |
 | `lws-auth.md` | 🔶 in progress — C1–C5 landed (ID-JAG issuance, storage acceptance, `packages/lws-auth`, token-aware tracing, browser credential); manual capture + OpenWiki migration remain | ID-JAG exchange: `auth` mints audience-restricted ID-JAGs from DPoP-bound ID tokens, storages accept `id-jag` and exchange it for an access token, new `packages/lws-auth` client (one ID-JAG per RAS), token-aware tracing + opt-in body capture, vuejectron redirect flow with a DPoP-bound ID token | landed CSS LWS exchange (CommunitySolidServer `lws-sai`); `packages/utils/src/lws-auth.ts` `tokenSource` seam; `lws-followup.md` |
-| `id-jag.md` | 🔶 in progress — C0 landed (package + full Dagger green) | ODRL new shape (`assigner` = delegator, `target.owner` = data owner), full migration, ID-JAG ODRL access claim + context, claim-first policy engine, impersonation-first token chain, then delegation via nested `act`; keep owner access-request delegation flow | C0 model migration first; then C1–C3 token flows; admin impersonation/ProxyAdmin removal future TODO |
+| `id-jag.md` | 🔶 in progress — C0 landed; C1 implemented (package + full Dagger green) | ODRL new shape (`assigner` = delegator, `target.owner` = data owner), full migration, ID-JAG ODRL access claim + context, claim-first policy engine, impersonation-first token chain, then delegation via nested `act`; keep owner access-request delegation flow | C0 model migration first; then C1–C3 token flows; admin impersonation/ProxyAdmin removal future TODO |
 
 ## Dependency graph
 

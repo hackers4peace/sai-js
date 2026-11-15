@@ -16,6 +16,8 @@ import {
 } from '@solid/community-server'
 import { decodeProtectedHeader } from 'jose'
 
+import type { VerifiedAccessClaim } from './access-claim.js'
+import { verifyAccessClaim } from './access-claim.js'
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 
 export interface IdJagSubjectTokenVerifierArgs {
@@ -100,7 +102,7 @@ export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
   }
 
   private async verify(
-    { token, audience, proofKeyThumbprint }: SubjectTokenVerifierInput,
+    { token, audience, proofKeyThumbprint, resource }: SubjectTokenVerifierInput,
     span: Span
   ): Promise<VerifiedSubject> {
     span.setAttribute('sai.lws.audience', audience)
@@ -137,7 +139,18 @@ export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
     })
     this.verifyRestriction(payload, audience, proofKeyThumbprint)
 
+    let claim: VerifiedAccessClaim | undefined
+    if (payload.access !== undefined) {
+      claim = await verifyAccessClaim(payload.access, payload['@context'], resource)
+      span.setAttribute('sai.lws.access.storage', claim.storage)
+    }
+
     span.setAttributes({ 'sai.lws.subject_id': sub, 'sai.lws.client_id': client })
-    return { subject: sub, issuer: iss, client: toClientUri(client, iss) }
+    return {
+      subject: sub,
+      issuer: iss,
+      client: toClientUri(client, iss),
+      ...(claim ? { access: claim.access, accessContext: claim.context } : {}),
+    }
   }
 }
