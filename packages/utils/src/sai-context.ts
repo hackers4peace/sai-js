@@ -13,7 +13,7 @@ export const saiContext = {
     interop: 'http://www.w3.org/ns/solid/interop#',
     st: 'http://www.w3.org/ns/shapetrees#',
 
-    requester: { '@id': INTEROP.requester, '@type': '@id' },
+    owner: { '@id': INTEROP.dataOwner, '@type': '@id' },
     AccessProfile: INTEROP.AccessProfile,
     NeedBasedAccessRequest: INTEROP.NeedBasedAccessRequest,
     DelegationRequest: INTEROP.DelegationRequest,

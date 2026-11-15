@@ -19,6 +19,7 @@ export type GrantId = {
 export interface OdrlTarget {
   id?: string
   uid?: string
+  owner?: string
   storage?: string
   type: string[]
   source: string[]
@@ -30,7 +31,6 @@ export interface OdrlPermission {
   id?: string
   uid?: string
   assigner: string
-  requester: string
   assignee: string
   action: string[]
   target: OdrlTarget
@@ -81,6 +81,8 @@ export interface GeneratedGrants {
 
 export interface GrantTargetInput {
   scopeOfGrant: string
+  /** the data owner (`interop:dataOwner` on the target) */
+  owner: string
   storage: string
   hasDataRegistration: string
   hasDataInstance?: string[]
@@ -90,8 +92,8 @@ export interface GrantTargetInput {
 }
 
 export interface GrantPermissionInput extends GrantTargetInput {
+  /** the delegator */
   assigner: string
-  requester: string
   assignee: string
   actions: readonly string[]
 }
@@ -132,6 +134,7 @@ function normalizeTarget(node: Record<string, unknown>): OdrlTarget {
   return {
     id: node.id as string | undefined,
     uid: node.uid as string | undefined,
+    owner: resolveIri(node.owner as string | undefined),
     storage: resolveIri(node.storage as string | undefined),
     type: asArray(node.type as string | string[] | undefined).map((value) => resolveIri(value)!),
     source: asArray(node.source as string | string[] | undefined).map((value) =>
@@ -152,7 +155,6 @@ function normalizePermission(node: Record<string, unknown>): OdrlPermission {
     id: node.id as string | undefined,
     uid: node.uid as string | undefined,
     assigner: resolveIri(node.assigner as string)!,
-    requester: resolveIri(node.requester as string)!,
     assignee: resolveIri(node.assignee as string)!,
     action: asArray(node.action as string | string[] | undefined).map((value) =>
       resolveIri(value)!
@@ -213,8 +215,8 @@ function deriveFields(
     )
   return {
     storage: target?.storage ?? (node.storage as string | undefined) ?? '',
-    grantedBy: first?.requester ?? (node.grantedBy as string | undefined) ?? '',
-    dataOwner: first?.assigner ?? (node.dataOwner as string | undefined) ?? '',
+    grantedBy: first?.assigner ?? (node.grantedBy as string | undefined) ?? '',
+    dataOwner: first?.target.owner ?? (node.dataOwner as string | undefined) ?? '',
     registeredShapeTree: access[0]?.registeredShapeTree || shapeTreeFromTarget(target) || '',
     hasDataRegistration:
       registrationTarget?.source[0] ??
@@ -270,14 +272,14 @@ export function grantStorage(grant: Pick<GrantData, 'access'>): string {
   return grant.access[0]?.permission[0]?.target.storage ?? ''
 }
 
-/** The grant's data owner (first permission assigner). */
+/** The grant's data owner (first target owner). */
 export function grantDataOwner(grant: Pick<GrantData, 'access'>): string {
-  return grant.access[0]?.permission[0]?.assigner ?? ''
+  return grant.access[0]?.permission[0]?.target.owner ?? ''
 }
 
-/** The grant's requester (first permission requester). */
-export function grantRequester(grant: Pick<GrantData, 'access'>): string {
-  return grant.access[0]?.permission[0]?.requester ?? ''
+/** The grant's delegator (first permission assigner). */
+export function grantAssigner(grant: Pick<GrantData, 'access'>): string {
+  return grant.access[0]?.permission[0]?.assigner ?? ''
 }
 
 function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
@@ -287,6 +289,7 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
       return {
         id,
         uid: id,
+        owner: input.owner,
         storage: input.storage,
         type: [ODRL.Asset],
         source: instance ? [instance] : [...(input.hasDataInstance ?? [])],
@@ -297,6 +300,7 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
       return {
         id,
         uid: id,
+        owner: input.owner,
         storage: input.storage,
         type: [ODRL.AssetCollection, INTEROP.DataRegistration],
         source: [input.hasDataRegistration],
@@ -305,6 +309,7 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
       return {
         id,
         uid: id,
+        owner: input.owner,
         type: [INTEROP.SocialAgent],
         source: [input.agent ?? ''],
       }
@@ -324,7 +329,6 @@ export function grantAccess(input: GrantPermissionInput): OdrlPolicy[] {
         id: permissionId,
         uid: permissionId,
         assigner: input.assigner,
-        requester: input.requester,
         assignee: input.assignee,
         action: [...input.actions],
         target: targetFor(input, instance),
@@ -336,7 +340,6 @@ export function grantAccess(input: GrantPermissionInput): OdrlPolicy[] {
       id: permissionId,
       uid: permissionId,
       assigner: input.assigner,
-      requester: input.requester,
       assignee: input.assignee,
       action: [...input.actions],
       target: targetFor(input),
@@ -378,12 +381,12 @@ export function toJsonLd(grant: FinalGrantData): Record<string, unknown> {
         id: permission.id,
         uid: permission.uid ?? permission.id,
         assigner: permission.assigner,
-        requester: permission.requester,
         assignee: permission.assignee,
         action: permission.action,
         target: {
           id: permission.target.id,
           uid: permission.target.uid ?? permission.target.id,
+          ...(permission.target.owner ? { owner: permission.target.owner } : {}),
           ...(permission.target.storage ? { storage: permission.target.storage } : {}),
           type: permission.target.type,
           source: permission.target.source,

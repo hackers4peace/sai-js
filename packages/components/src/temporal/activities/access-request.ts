@@ -63,13 +63,13 @@ export async function forwardNeedBasedAccessRequest(
       permission: [
         {
           uid: permissionId,
-          assigner: input.request.dataOwner,
-          requester: input.request.grantedBy,
+          assigner: input.request.grantedBy,
           assignee: input.request.grantee,
           action: (need.accessMode as string[]) ?? [],
           target: {
             type: ['AssetCollection', 'st:ShapeTree'],
             uid: targetId,
+            owner: input.request.dataOwner,
             source: [need.registeredShapeTree],
           },
         },

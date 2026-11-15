@@ -246,7 +246,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
           uas
             ? `?permission <${ODRL.assignee}> <${agent}> .`
             : `
-            ?permission <${INTEROP.requester}> <${agent}> .
+            ?permission <${ODRL.assigner}> <${agent}> .
             ?permission <${ODRL.assignee}> <${client}> .
           `
         }

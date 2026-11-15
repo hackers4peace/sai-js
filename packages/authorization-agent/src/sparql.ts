@@ -434,7 +434,8 @@ export async function getLinkedGrantOwners(
   GRAPH ?graph {
     ?grant <${LWS.access}> ?policy .
     ?policy <${ODRL.permission}> ?permission .
-    ?permission <${ODRL.assigner}> ?owner .
+    ?permission <${ODRL.target}> ?target .
+    ?target <${INTEROP.dataOwner}> ?owner .
   }
 }`
   )
@@ -714,9 +715,10 @@ export async function getGrantsAuthority(
       ?grant <${LWS.access}> ?policy .
       ?policy <${ODRL.permission}> ?permission .
       ?permission
-        <${ODRL.assigner}> ?dataOwner;
-        <${INTEROP.requester}> ?grantedBy;
-        <${ODRL.assignee}> ?grantee .
+        <${ODRL.assigner}> ?grantedBy;
+        <${ODRL.assignee}> ?grantee;
+        <${ODRL.target}> ?target .
+      ?target <${INTEROP.dataOwner}> ?dataOwner .
     }
     VALUES ?grant { ${values} }
   }`
@@ -861,8 +863,9 @@ SELECT DISTINCT ?grant ?grantedBy ?shapeTree WHERE {
     ?policy <${INTEROP.registeredShapeTree}> ?shapeTree ;
            <${ODRL.permission}> ?permission .
     ?permission
-      <${ODRL.assigner}> ?grantedBy ;
-      <${ODRL.assignee}> <${webId}> .
+      <${ODRL.assignee}> <${webId}> ;
+      <${ODRL.target}> ?target .
+    ?target <${INTEROP.dataOwner}> ?grantedBy .
   }
 }`
   const bindings = await transport.fetchBindings(query)

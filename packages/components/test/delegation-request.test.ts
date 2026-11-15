@@ -57,11 +57,11 @@ const grant = (dataOwner = 'https://id/alice') => {
     storage,
     access: grantAccess({
       scopeOfGrant: INTEROP.AllFromRegistry,
+      owner: dataOwner,
       storage,
       hasDataRegistration,
       registeredShapeTree: 'https://data/shapetrees/trees/Project',
-      assigner: dataOwner,
-      requester: 'https://id/acme',
+      assigner: 'https://id/acme',
       assignee: 'https://id/kim',
       actions: [ACCESS_ACTIONS.read],
     }),

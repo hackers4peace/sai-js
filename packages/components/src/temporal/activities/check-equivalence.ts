@@ -54,16 +54,18 @@ function sameSet(a: readonly string[] | undefined, b: readonly string[] | undefi
 }
 
 /**
- * Normalize the LWS access policies into comparable strings: assignee, the
- * action set, the target type and the target value set. The policy order and
- * the action/value order do not matter.
+ * Normalize the LWS access policies into comparable strings: assigner,
+ * assignee, target owner, the action set, the target type and the target value
+ * set. The policy order and the action/value order do not matter.
  */
 function accessShape(grant: GrantData): string[] {
   return grant.access
     .flatMap((policy) => policy.permission)
     .map((permission) =>
       [
+        permission.assigner,
         permission.assignee,
+        permission.target.owner ?? '',
         [...new Set(permission.action)].toSorted().join(','),
         [...new Set(permission.target.type)].toSorted().join(','),
         [...new Set(permission.target.source)].toSorted().join(','),

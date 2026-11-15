@@ -8,7 +8,7 @@ import {
   type GrantData,
   grantDataOwner,
   grantGrantee,
-  grantRequester,
+  grantAssigner,
 } from '@janeirodigital/interop-data-model'
 import { LWS } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
@@ -26,13 +26,13 @@ async function ownerGrants(owner: string): Promise<GrantData[]> {
 }
 
 describe('access grant view', () => {
-  test('the UAS sees every assigner-registry grant where the user is assignee or requester', async () => {
+  test('the UAS sees every assigner-registry grant where the user is assignee or assigner', async () => {
     const grants = await ownerGrants(acmeId)
     const expected = grants
       .filter(
         (grant) =>
           grantDataOwner(grant) === acmeId &&
-          (grantGrantee(grant) === acmeId || grantRequester(grant) === acmeId)
+          (grantGrantee(grant) === acmeId || grantAssigner(grant) === acmeId)
       )
       .map((grant) => grant.id!)
       .toSorted()
@@ -57,13 +57,13 @@ describe('access grant view', () => {
     }
   })
 
-  test('a social agent UAS sees the grants where it is assignee or requester', async () => {
+  test('a social agent UAS sees the grants where it is assignee or assigner', async () => {
     const grants = await ownerGrants(acmeId)
     const expected = grants
       .filter(
         (grant) =>
           grantDataOwner(grant) === acmeId &&
-          (grantGrantee(grant) === bobId || grantRequester(grant) === bobId)
+          (grantGrantee(grant) === bobId || grantAssigner(grant) === bobId)
       )
       .map((grant) => grant.id!)
       .toSorted()
@@ -83,13 +83,13 @@ describe('access grant view', () => {
         (grant) =>
           grantDataOwner(grant) === acmeId &&
           grantGrantee(grant) === testClient &&
-          grantDataOwner(grant) === acmeId
+          grantAssigner(grant) === aliceId
       )
       .map((grant) => grant.id!)
       .toSorted()
     expect(expected.length).toBeGreaterThan(0)
 
-    const session = await buildOidcSession(acmeId, testClient)
+    const session = await buildOidcSession(aliceId, testClient)
     const response = await session.authFetch(accessGrantsUrl(acmeId))
     expect(response.status).toBe(200)
     const body = (await response.json()) as { id: string }[]
@@ -97,7 +97,7 @@ describe('access grant view', () => {
   })
 
   test('a non-UAS client only sees grants assigned to that client', async () => {
-    const session = await buildOidcSession(acmeId, testClient)
+    const session = await buildOidcSession(aliceId, testClient)
     const response = await session.authFetch(accessGrantsUrl(acmeId))
     expect(response.status).toBe(200)
     const body = (await response.json()) as {
@@ -116,9 +116,13 @@ describe('access grant view', () => {
     const body = (await response.json()) as {
       access: { permission: { assigner: string; assignee: string }[] }[]
     }[]
-    // Alice is not the assigner, so the non-UAS branch yields nothing even if
-    // she is a grantee/requester elsewhere (delegated/mirrored grants are TODO).
-    expect(body).toEqual([])
+    // The non-UAS branch sees grants the authenticated user (Alice) assigned to
+    // the client (testClient) in this registry; grants Alice received elsewhere
+    // are not exposed by this owner-scoped view.
+    for (const grant of body) {
+      expect(grant.access[0].permission[0].assigner).toBe(aliceId)
+      expect(grant.access[0].permission[0].assignee).toBe(testClient)
+    }
   })
 
   test('HEAD is supported and POST is not', async () => {

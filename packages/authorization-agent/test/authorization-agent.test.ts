@@ -1146,12 +1146,12 @@ describe('revokeGrants core (C1)', () => {
       storage,
       access: grantAccess({
         scopeOfGrant,
+        owner: overrides.dataOwner ?? ALICE,
         storage,
         hasDataRegistration,
         hasDataInstance: overrides.hasDataInstance,
         registeredShapeTree: overrides.registeredShapeTree ?? PROJECT_TREE,
-        assigner: overrides.dataOwner ?? ALICE,
-        requester: overrides.grantedBy ?? ALICE,
+        assigner: overrides.grantedBy ?? ALICE,
         assignee: grantee,
         actions,
       }),
@@ -1204,7 +1204,13 @@ describe('revokeGrants core (C1)', () => {
       DataFactory.quad(node, DataFactory.namedNode(predicate), DataFactory.namedNode(object))
     const targetQuads = (
       targetId: string,
-      targetValue: { type: string[]; source: string[]; storage?: string; partOf?: string[] }
+      targetValue: {
+        type: string[]
+        source: string[]
+        owner?: string
+        storage?: string
+        partOf?: string[]
+      }
     ) => {
       const targetNode = DataFactory.namedNode(targetId)
       const quads = [
@@ -1222,6 +1228,15 @@ describe('revokeGrants core (C1)', () => {
             targetNode,
             DataFactory.namedNode(ODRL.source),
             DataFactory.namedNode(source)
+          )
+        )
+      }
+      if (targetValue.owner) {
+        quads.push(
+          DataFactory.quad(
+            targetNode,
+            DataFactory.namedNode(INTEROP.dataOwner),
+            DataFactory.namedNode(targetValue.owner)
           )
         )
       }
@@ -1275,11 +1290,6 @@ describe('revokeGrants core (C1)', () => {
       DataFactory.quad(
         permission,
         DataFactory.namedNode(ODRL.assigner),
-        DataFactory.namedNode(grant.dataOwner)
-      ),
-      DataFactory.quad(
-        permission,
-        DataFactory.namedNode(INTEROP.requester),
         DataFactory.namedNode(grant.grantedBy)
       ),
       DataFactory.quad(

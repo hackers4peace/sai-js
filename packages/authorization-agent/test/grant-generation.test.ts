@@ -181,7 +181,6 @@ const grantGraph = (
     quad(policy, namedNode(ODRL.permission), permission),
     quad(permission, namedNode(ODRL.uid), permission),
     quad(permission, namedNode(ODRL.assigner), namedNode(ALICE)),
-    quad(permission, namedNode(INTEROP.requester), namedNode(ALICE)),
     quad(permission, namedNode(ODRL.assignee), namedNode(ACME)),
     ...(fields.accessMode ?? [ACCESS_ACTIONS.read]).map((mode) =>
       quad(permission, namedNode(ODRL.action), namedNode(mode))
@@ -195,6 +194,7 @@ const grantGraph = (
     for (const source of target.sources) {
       quads.push(quad(target.id, namedNode(ODRL.source), namedNode(source)))
     }
+    quads.push(quad(target.id, namedNode(INTEROP.dataOwner), namedNode(ALICE)))
     quads.push(quad(target.id, namedNode(LWS.storage), namedNode(fields.storage)))
     if (scopeOfGrant === INTEROP.SelectedFromRegistry) {
       quads.push(quad(target.id, namedNode(ODRL.partOf), namedNode(fields.dataRegistration)))

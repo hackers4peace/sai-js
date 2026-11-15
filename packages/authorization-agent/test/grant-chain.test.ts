@@ -58,11 +58,11 @@ function grant(id: string, overrides: GrantOverrides = {}): GrantData {
     storage,
     access: grantAccess({
       scopeOfGrant,
+      owner: overrides.dataOwner ?? OWNER,
       storage,
       hasDataRegistration,
       hasDataInstance,
-      assigner: overrides.dataOwner ?? OWNER,
-      requester: overrides.grantedBy ?? A,
+      assigner: overrides.grantedBy ?? A,
       assignee: grantee,
       actions,
       registeredShapeTree: overrides.registeredShapeTree ?? PROJECT_TREE,

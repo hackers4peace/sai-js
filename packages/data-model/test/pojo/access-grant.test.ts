@@ -17,6 +17,7 @@ function targetInput(
 ): GrantTargetInput {
   return {
     scopeOfGrant,
+    owner: DATA_OWNER,
     storage: STORAGE,
     hasDataRegistration: REGISTRATION,
     registeredShapeTree: SHAPE_TREE,
@@ -36,7 +37,6 @@ function grantData(
     access: grantAccess({
       ...targetInput(scopeOfGrant, targetExtra),
       assigner: DATA_OWNER,
-      requester: DATA_OWNER,
       assignee: GRANTEE,
       actions: [ACCESS_ACTIONS.read],
     }),
@@ -71,9 +71,6 @@ describe('toJsonLd', () => {
     expect(store.getQuads(permission, ODRL.terms.assigner, null, null)[0].object.value).toBe(
       DATA_OWNER
     )
-    expect(store.getQuads(permission, INTEROP.terms.requester, null, null)[0].object.value).toBe(
-      DATA_OWNER
-    )
     expect(store.getQuads(permission, ODRL.terms.assignee, null, null)[0].object.value).toBe(
       GRANTEE
     )
@@ -87,6 +84,9 @@ describe('toJsonLd', () => {
       store.getQuads(target, RDF.terms.type, INTEROP.terms.DataRegistration, null)
     ).toHaveLength(1)
     expect(store.getQuads(target, ODRL.terms.source, null, null)[0].object.value).toBe(REGISTRATION)
+    expect(store.getQuads(target, INTEROP.terms.dataOwner, null, null)[0].object.value).toBe(
+      DATA_OWNER
+    )
     expect(store.getQuads(target, LWS.terms.storage, null, null)[0].object.value).toBe(STORAGE)
   })
 

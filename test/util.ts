@@ -99,8 +99,7 @@ export function needBasedAccessRequestPayload({
         {
           id: permissionId,
           uid: permissionId,
-          assigner: dataOwner,
-          requester: grantedBy,
+          assigner: grantedBy,
           assignee: grantee,
           action: ((need.accessMode as string[] | undefined) ?? []).map(
             (action) => COMPACT_ACTIONS[action] ?? action
@@ -109,6 +108,7 @@ export function needBasedAccessRequestPayload({
             type: ['AssetCollection', 'st:ShapeTree'],
             id: targetId,
             uid: targetId,
+            owner: dataOwner,
             source: [need.registeredShapeTree],
           },
         },
@@ -230,7 +230,7 @@ export async function openNotificationStream(
   const receiveFrom = getNotificationChannel(linkHeader)
   if (!receiveFrom) throw new Error(`Failed to discover notification chanel for: ${resourceId}`)
 
-  const response = await authFetch(receiveFrom)
+  const response = await authFetch(receiveFrom, { headers: { accept: 'application/x-ndjson' } })
   if (!response.ok) {
     throw new Error(`failed connecting to notification stream: ${receiveFrom}, ${response.status}`)
   }
@@ -576,7 +576,7 @@ export interface EventsStream {
  */
 export async function openEventsStream(cookie: string): Promise<EventsStream> {
   const response = await fetch(EVENTS_ENDPOINT, {
-    headers: { Cookie: cookie },
+    headers: { Cookie: cookie, accept: 'application/x-ndjson' },
   })
   if (!response.ok) {
     throw new Error(`failed connecting to events stream: ${EVENTS_ENDPOINT}, ${response.status}`)

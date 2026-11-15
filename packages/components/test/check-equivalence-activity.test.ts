@@ -84,6 +84,7 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
   const scopeOfGrant = rest.scopeOfGrant ?? INTEROP.AllFromRegistry
   const target: GrantTargetInput = {
     scopeOfGrant,
+    owner: rest.dataOwner ?? 'https://id/acme',
     storage,
     hasDataRegistration,
     hasDataInstance: rest.hasDataInstance,
@@ -95,6 +96,7 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
       rest.access ??
       grantAccess({
         ...target,
+        assigner: rest.grantedBy ?? 'https://id/acme',
         assignee: grantee,
         actions: accessMode,
       }),

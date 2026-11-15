@@ -26,7 +26,7 @@ import { storeGrant } from './temporal/workflows/grants.js'
 type HandlerOperation = OperationHttpHandlerInput['operation']
 
 function firstDataOwner(policy: OdrlPolicy): string {
-  return policy.permission[0]?.assigner ?? ''
+  return policy.permission[0]?.target.owner ?? ''
 }
 
 function grantFromPolicy(policy: OdrlPolicy, id: string, envelopeScope: string): FinalGrantData {
@@ -46,8 +46,8 @@ function grantFromPolicy(policy: OdrlPolicy, id: string, envelopeScope: string):
     access: [policy],
     scopeOfGrant: policy.scopeOfGrant ?? envelopeScope,
     storage: target?.storage ?? '',
-    dataOwner: permission?.assigner ?? '',
-    grantedBy: permission?.requester ?? '',
+    dataOwner: target?.owner ?? '',
+    grantedBy: permission?.assigner ?? '',
     registeredShapeTree: policy.registeredShapeTree ?? '',
     hasDataRegistration: registration,
     ...(instances.length ? { hasDataInstance: instances } : {}),

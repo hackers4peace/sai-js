@@ -50,7 +50,7 @@ function target(
   hasDataInstance: string[] | undefined,
   storage: string
 ): GrantTargetInput {
-  return { scopeOfGrant, hasDataRegistration, hasDataInstance, storage }
+  return { scopeOfGrant, owner: ALICE, hasDataRegistration, hasDataInstance, storage }
 }
 
 function withAssignee(grant: GrantData, assignee: string): GrantData {
@@ -78,8 +78,7 @@ function grant(overrides: GrantOverrides = {}): GrantData {
       (grantAccess({
         ...target(scopeOfGrant, hasDataRegistration, rest.hasDataInstance, storage),
         registeredShapeTree: PROJECT_TREE,
-        assigner: ALICE,
-        requester: ACME,
+        assigner: ACME,
         assignee: grantee,
         actions: accessMode,
       }) as OdrlPolicy[]),

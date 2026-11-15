@@ -75,7 +75,7 @@ export {
   grantAccessModes,
   grantDataOwner,
   grantGrantee,
-  grantRequester,
+  grantAssigner,
   grantStorage,
   grantTargets,
   toJsonLd,

@@ -186,11 +186,11 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9>.
 <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/acme>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:ff4ad546-70cc-4304-8e06-2a8e39f7dba0>.
 <urn:uuid:ff4ad546-70cc-4304-8e06-2a8e39f7dba0> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:ff4ad546-70cc-4304-8e06-2a8e39f7dba0>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/reb39k>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
@@ -213,11 +213,11 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d>.
 <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/acme>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:d333bc2c-ca2f-4347-892c-277983b90daa>.
 <urn:uuid:d333bc2c-ca2f-4347-892c-277983b90daa> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:d333bc2c-ca2f-4347-892c-277983b90daa>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
@@ -240,11 +240,11 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:f4a32ed5-b585-4847-8d3a-859f12da3d16> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:44a00a19-9359-43ae-8265-7bece4107264>.
 <urn:uuid:44a00a19-9359-43ae-8265-7bece4107264> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:44a00a19-9359-43ae-8265-7bece4107264>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/acme>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:cbe65b73-ff54-49d6-8654-ee1e1a51271f>.
 <urn:uuid:cbe65b73-ff54-49d6-8654-ee1e1a51271f> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:cbe65b73-ff54-49d6-8654-ee1e1a51271f>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-hr/p7t9km>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-hr/p7t9km>;
@@ -267,11 +267,11 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:2985ffe8-e78a-4358-8ba2-a46e427cfa1f> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:75a43410-3758-47bc-88ec-fb64e148a18c>.
 <urn:uuid:75a43410-3758-47bc-88ec-fb64e148a18c> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:75a43410-3758-47bc-88ec-fb64e148a18c>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/acme>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:40a4b0e5-7796-472b-8485-2c251febda96>.
 <urn:uuid:40a4b0e5-7796-472b-8485-2c251febda96> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:40a4b0e5-7796-472b-8485-2c251febda96>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-hr/v4n2qx>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-hr/v4n2qx>;
@@ -294,11 +294,11 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c>.
 <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/acme>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:4728e226-a323-4e4b-8715-244479f8d517>.
 <urn:uuid:4728e226-a323-4e4b-8715-244479f8d517> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:4728e226-a323-4e4b-8715-244479f8d517>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/Asset>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
@@ -321,11 +321,11 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f>.
 <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/acme>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:21b49ca3-d8c4-43ed-8fd2-a7c24d814d09>.
 <urn:uuid:21b49ca3-d8c4-43ed-8fd2-a7c24d814d09> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:21b49ca3-d8c4-43ed-8fd2-a7c24d814d09>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
@@ -347,12 +347,12 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <https://registry/acme/wwp4j6> <https://www.w3.org/ns/lws#access> <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc>.
 <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733>.
 <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733>;
-    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/alice>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://data/test-client/public/id>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:b451f872-226a-46b2-808c-e871ea3f7785>.
 <urn:uuid:b451f872-226a-46b2-808c-e871ea3f7785> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:b451f872-226a-46b2-808c-e871ea3f7785>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/Asset>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
@@ -374,12 +374,12 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <https://registry/acme/qwvbcu> <https://www.w3.org/ns/lws#access> <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7>.
 <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb>.
 <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb>;
-    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/alice>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://data/test-client/public/id>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:681456e1-4d72-4d29-85d7-d9c762c17107>.
 <urn:uuid:681456e1-4d72-4d29-85d7-d9c762c17107> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:681456e1-4d72-4d29-85d7-d9c762c17107>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
@@ -400,12 +400,12 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <https://registry/acme/vled83> <https://www.w3.org/ns/lws#access> <urn:uuid:a2d68c67-e6f1-4c6a-8f3c-70d0201acc10>.
 <urn:uuid:a2d68c67-e6f1-4c6a-8f3c-70d0201acc10> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:04e7aa48-6c44-48f1-8996-056a7f82ddb0>.
 <urn:uuid:04e7aa48-6c44-48f1-8996-056a7f82ddb0> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:04e7aa48-6c44-48f1-8996-056a7f82ddb0>;
-    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <http://www.w3.org/ns/solid/acp#PublicAgent>;
+    <http://www.w3.org/ns/odrl/2/assigner> <http://www.w3.org/ns/solid/acp#PublicAgent>;
     <http://www.w3.org/ns/odrl/2/assignee> <http://www.w3.org/ns/solid/acp#PublicClient>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:fce5e47a-3a35-45d6-8c1d-1ca943cf4377>.
 <urn:uuid:fce5e47a-3a35-45d6-8c1d-1ca943cf4377> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:fce5e47a-3a35-45d6-8c1d-1ca943cf4377>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/shapetrees/trees/>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/shapetrees/trees/>;
@@ -429,12 +429,12 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <https://registry/acme/wegvwe> <https://www.w3.org/ns/lws#access> <urn:uuid:dfdbee2a-de65-4933-8420-93119a327c4a>.
 <urn:uuid:dfdbee2a-de65-4933-8420-93119a327c4a> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:00b965a2-dd07-44dd-829a-f7a9b875c74b>.
 <urn:uuid:00b965a2-dd07-44dd-829a-f7a9b875c74b> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:00b965a2-dd07-44dd-829a-f7a9b875c74b>;
-    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
-    <http://www.w3.org/ns/solid/interop#requester> <http://www.w3.org/ns/solid/acp#PublicAgent>;
+    <http://www.w3.org/ns/odrl/2/assigner> <http://www.w3.org/ns/solid/acp#PublicAgent>;
     <http://www.w3.org/ns/odrl/2/assignee> <http://www.w3.org/ns/solid/acp#PublicClient>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:714729ed-3cb2-4895-82a4-25e32c6d599e>.
 <urn:uuid:714729ed-3cb2-4895-82a4-25e32c6d599e> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:714729ed-3cb2-4895-82a4-25e32c6d599e>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/test-client/public/>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/test-client/public/>;
@@ -710,11 +710,11 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
 <urn:uuid:ba6ea1d8-8a25-466d-861b-b4c466a18c2e> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:3905f30d-e61a-48bd-872e-2e5d9531ccc8>.
 <urn:uuid:3905f30d-e61a-48bd-872e-2e5d9531ccc8> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:3905f30d-e61a-48bd-872e-2e5d9531ccc8>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:934929ae-3d21-4d34-89e3-072cdc3a81c8>.
 <urn:uuid:934929ae-3d21-4d34-89e3-072cdc3a81c8> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:934929ae-3d21-4d34-89e3-072cdc3a81c8>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-home/x1n3cm>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-home/x1n3cm>;
@@ -737,11 +737,11 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
 <urn:uuid:c2da024a-8071-4f0b-8805-48b41e9d7423> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:1e75065a-b470-4dea-8a51-5d9650b08d53>.
 <urn:uuid:1e75065a-b470-4dea-8a51-5d9650b08d53> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:1e75065a-b470-4dea-8a51-5d9650b08d53>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:c9f04a0a-1708-4f28-8200-484d2b80e671>.
 <urn:uuid:c9f04a0a-1708-4f28-8200-484d2b80e671> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:c9f04a0a-1708-4f28-8200-484d2b80e671>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-home/pm1oxz>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-home/pm1oxz>;
@@ -798,11 +798,11 @@ _:n3-48 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-49.
 <urn:uuid:5eea7200-7c34-41a4-8a02-829d4d7fc08f> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:c070c329-ced4-431d-81c4-224a1949233a>.
 <urn:uuid:c070c329-ced4-431d-81c4-224a1949233a> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:c070c329-ced4-431d-81c4-224a1949233a>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://data/test-client/public/id>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:4e99988e-2f39-4370-8b8d-727605639823>.
 <urn:uuid:4e99988e-2f39-4370-8b8d-727605639823> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:4e99988e-2f39-4370-8b8d-727605639823>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-work/sx86hi>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-work/sx86hi>;
@@ -825,11 +825,11 @@ _:n3-48 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-49.
 <urn:uuid:2e473325-66f9-476c-890f-3671401c1750> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:5dda5ba1-217f-435f-8562-a2c11aeacf37>.
 <urn:uuid:5dda5ba1-217f-435f-8562-a2c11aeacf37> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:5dda5ba1-217f-435f-8562-a2c11aeacf37>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/alice>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://data/test-client/public/id>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:ea40e200-f35f-4f20-8b21-cd61175bb552>.
 <urn:uuid:ea40e200-f35f-4f20-8b21-cd61175bb552> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:ea40e200-f35f-4f20-8b21-cd61175bb552>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-work/btze4a>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-work/btze4a>;
@@ -886,11 +886,11 @@ _:n3-54 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-55.
 <urn:uuid:29c881a7-e355-45a6-865b-ebcd0f15b6a2> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:34770a9c-f220-4ea0-85b8-ee0847a72a53>.
 <urn:uuid:34770a9c-f220-4ea0-85b8-ee0847a72a53> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:34770a9c-f220-4ea0-85b8-ee0847a72a53>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/bob>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/yoyo>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:1d72a7b2-9198-4ad7-8041-1d93d9c33357>.
 <urn:uuid:1d72a7b2-9198-4ad7-8041-1d93d9c33357> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:1d72a7b2-9198-4ad7-8041-1d93d9c33357>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/bob>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/bob/avn9hv>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/bob/avn9hv>;
@@ -1356,11 +1356,11 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
 <urn:uuid:f99f6421-9ca5-4ffe-8e3d-1b32a08536a2> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:dbd7a0e7-319c-477d-8a3d-3f380883edf5>.
 <urn:uuid:dbd7a0e7-319c-477d-8a3d-3f380883edf5> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:dbd7a0e7-319c-477d-8a3d-3f380883edf5>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/yoyo>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/yoyo>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:90501779-fe26-414f-807c-a9d65f3ff729>.
 <urn:uuid:90501779-fe26-414f-807c-a9d65f3ff729> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:90501779-fe26-414f-807c-a9d65f3ff729>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/yoyo-eu/w4n9kx>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/yoyo-eu/w4n9kx>;
@@ -1383,11 +1383,11 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
 <urn:uuid:912a9fe4-0dd9-4823-87f1-9484b0641b9a> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:e62ca0fa-d036-4de7-8093-7745d915223e>.
 <urn:uuid:e62ca0fa-d036-4de7-8093-7745d915223e> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:e62ca0fa-d036-4de7-8093-7745d915223e>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/yoyo>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/yoyo>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:837e029c-3aba-4b38-8082-65138549ffc0>.
 <urn:uuid:837e029c-3aba-4b38-8082-65138549ffc0> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:837e029c-3aba-4b38-8082-65138549ffc0>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/yoyo-eu/m7p3qt>;
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/yoyo-eu/m7p3qt>;
@@ -1407,11 +1407,11 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
 <urn:uuid:8ebd2c6f-9a12-438a-8647-3c24add1074e> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:384a7596-1e79-4896-8ee5-54cc5fb32b8b>.
 <urn:uuid:384a7596-1e79-4896-8ee5-54cc5fb32b8b> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:384a7596-1e79-4896-8ee5-54cc5fb32b8b>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/yoyo>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/yoyo>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/dan>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:d9de0982-e5af-444e-81e4-53b016f09581>.
 <urn:uuid:d9de0982-e5af-444e-81e4-53b016f09581> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:d9de0982-e5af-444e-81e4-53b016f09581>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <https://www.w3.org/ns/lws#Storage>;
     <https://www.w3.org/ns/lws#storage> <https://registry/yoyo/>;
     <http://www.w3.org/ns/odrl/2/source> <https://registry/yoyo/>
@@ -1454,11 +1454,11 @@ _:n3-100 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-101.
 <urn:uuid:70b3bff5-66e9-4073-89d8-2ca5635358ff> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:26ff6c63-6667-4556-8479-845f094b6e56>.
 <urn:uuid:26ff6c63-6667-4556-8479-845f094b6e56> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:26ff6c63-6667-4556-8479-845f094b6e56>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/yoyo>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/yoyo>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/dan>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:2797c3de-1d38-451a-86ec-d56cb8b77a0c>.
 <urn:uuid:2797c3de-1d38-451a-86ec-d56cb8b77a0c> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:2797c3de-1d38-451a-86ec-d56cb8b77a0c>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <https://www.w3.org/ns/lws#Storage>;
     <https://www.w3.org/ns/lws#storage> <https://data/yoyo-eu/>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/yoyo-eu/>
@@ -1501,11 +1501,11 @@ _:n3-106 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-107.
 <urn:uuid:02f4582c-8cff-40af-8270-2e95c8774fa0> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:8745f685-bfe3-47b9-8069-d604e8e724e7>.
 <urn:uuid:8745f685-bfe3-47b9-8069-d604e8e724e7> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:8745f685-bfe3-47b9-8069-d604e8e724e7>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/yoyo>;
-    <http://www.w3.org/ns/solid/interop#requester> <https://id/yoyo>;
     <http://www.w3.org/ns/odrl/2/assignee> <https://id/dan>;
     <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>;
     <http://www.w3.org/ns/odrl/2/target> <urn:uuid:6b403d71-cf4c-4567-84bb-18fa0ea90ead>.
 <urn:uuid:6b403d71-cf4c-4567-84bb-18fa0ea90ead> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:6b403d71-cf4c-4567-84bb-18fa0ea90ead>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <https://www.w3.org/ns/lws#Storage>;
     <https://www.w3.org/ns/lws#storage> <https://data/yoyo-na/>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/yoyo-na/>

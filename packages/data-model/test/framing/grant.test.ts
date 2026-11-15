@@ -22,11 +22,11 @@ describe('Grant framing', () => {
     expect(policy.type).toContain(ODRL.Agreement)
     const permission = policy.permission[0]
     expect(permission.assigner).toBe('https://id/acme')
-    expect(permission.requester).toBe('https://id/acme')
     expect(permission.assignee).toBe('https://id/bob')
     expect(permission.target.type).toContain(ODRL.AssetCollection)
     expect(permission.target.type).toContain(INTEROP.DataRegistration)
     expect(permission.target.source).toEqual(['https://data/acme-rnd/reb39k'])
+    expect(permission.target.owner).toBe('https://id/acme')
     expect(permission.target.storage).toBe('https://data/acme-rnd/')
   })
 })

@@ -6,7 +6,7 @@ import {
   type FinalGrantData,
   grantDataOwner,
   grantGrantee,
-  grantRequester,
+  grantAssigner,
   toJsonLd,
 } from '@janeirodigital/interop-data-model'
 import { discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
@@ -38,7 +38,7 @@ type Credentials = Awaited<ReturnType<CredentialsExtractor['handleSafe']>>
  * peer grants are not included:
  *
  * - authorization-agent/UAS clients see every grant in that registry where the
- *   authenticated user is the assignee or requester;
+ *   authenticated user is the assignee or assigner;
  * - any other client sees only grants whose assignee is that client and whose
  *   assigner is the authenticated user.
  *
@@ -85,12 +85,12 @@ export class AccessGrantHandler extends OperationHttpHandler {
       if (isUas) {
         return (
           grantGrantee(grant) === credentials.agent.webId ||
-          grantRequester(grant) === credentials.agent.webId
+          grantAssigner(grant) === credentials.agent.webId
         )
       }
       return (
         grantGrantee(grant) === credentials.client?.clientId &&
-        grantDataOwner(grant) === credentials.agent.webId
+        grantAssigner(grant) === credentials.agent.webId
       )
     })
 

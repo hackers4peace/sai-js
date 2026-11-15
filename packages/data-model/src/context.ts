@@ -211,7 +211,7 @@ export const accessContext: JsonLdContext = {
   assignee: { '@id': ODRL.assignee, '@type': '@id' },
   uid: { '@id': ODRL.uid, '@type': '@id' },
   profile: { '@id': ODRL.profile, '@type': '@id' },
-  requester: { '@id': INTEROP.requester, '@type': '@id' },
+  owner: { '@id': INTEROP.dataOwner, '@type': '@id' },
   storage: { '@id': LWS.storage, '@type': '@id' },
 }
 

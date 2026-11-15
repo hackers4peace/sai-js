@@ -85,17 +85,17 @@ export function needBasedAccessRequestFromOdrl(
       group: policy.accessNeedGroup as string | undefined,
       assignee: permission?.assignee as string,
       assigner: permission?.assigner as string,
-      requester: permission?.requester as string,
+      owner: target.owner as string | undefined,
     }
   })
   const first = nodes[0]
-  if (!first.requester || first.requester !== requesterWebId) {
+  if (!first.assigner || first.assigner !== requesterWebId) {
     throw new BadRequestHttpError('invalid requester')
   }
-  if (first.assignee !== first.requester) {
+  if (first.assignee !== first.assigner) {
     throw new BadRequestHttpError('invalid grantedBy/grantee')
   }
-  if (expectedDataOwner && first.assigner !== expectedDataOwner) {
+  if (expectedDataOwner && first.owner !== expectedDataOwner) {
     throw new BadRequestHttpError('invalid dataOwner')
   }
   const groupId = first.group ?? `urn:uuid:${crypto.randomUUID()}`
@@ -116,8 +116,8 @@ export function needBasedAccessRequestFromOdrl(
   return {
     type: [INTEROP.NeedBasedAccessRequest],
     grantee: first.assignee,
-    grantedBy: first.requester,
-    dataOwner: first.assigner,
+    grantedBy: first.assigner,
+    dataOwner: first.owner!,
     hasAccessNeedGroup: group,
   }
 }

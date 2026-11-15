@@ -63,12 +63,12 @@ function adminAccess(assignee: string, storage: string, owner: string): OdrlPoli
           id: permissionId,
           uid: permissionId,
           assigner: owner,
-          requester: owner,
           assignee,
           action: [ACCESS_ACTIONS.read],
           target: {
             id: targetId,
             uid: targetId,
+            owner,
             storage,
             type: ['http://www.w3.org/ns/odrl/2/AssetCollection', LWS.Storage],
             source: [storage],

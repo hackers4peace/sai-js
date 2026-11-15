@@ -23,7 +23,7 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
     queries,
     async fetchBindings(query: string) {
       queries.push(query)
-      if (query.includes(ODRL.assigner)) {
+      if (query.includes(INTEROP.dataOwner)) {
         const owners = new Set<string>()
         for (const name of [RECIPROCAL, `meta:${RECIPROCAL}`]) {
           const grantIris = (graphs.get(name) ?? [])
@@ -37,8 +37,12 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
               (q) => q.predicate.value === ODRL.permission && q.subject.value === policy
             )?.object.value
             if (!permission) continue
+            const target = grantQuads.find(
+              (q) => q.predicate.value === ODRL.target && q.subject.value === permission
+            )?.object.value
+            if (!target) continue
             const owner = grantQuads.find(
-              (q) => q.predicate.value === ODRL.assigner && q.subject.value === permission
+              (q) => q.predicate.value === INTEROP.dataOwner && q.subject.value === target
             )?.object.value
             if (owner) owners.add(owner)
           }
@@ -69,10 +73,12 @@ const link = (predicate: string, target: string): Quad =>
 const grant = (id: string, owner: string): Quad[] => {
   const policy = `${id}#policy`
   const permission = `${id}#permission`
+  const target = `${id}#target`
   return [
     quad(namedNode(id), namedNode(LWS.access), namedNode(policy)),
     quad(namedNode(policy), namedNode(ODRL.permission), namedNode(permission)),
-    quad(namedNode(permission), namedNode(ODRL.assigner), namedNode(owner)),
+    quad(namedNode(permission), namedNode(ODRL.target), namedNode(target)),
+    quad(namedNode(target), namedNode(INTEROP.dataOwner), namedNode(owner)),
   ]
 }
 
