@@ -73,6 +73,11 @@
       ]
     },
     {
+      "comment": "Independent UAS check (C4): an incoming delegated ID-JAG claim must match a grant the assigner issued and stores in their own grant registry before this UAS re-issues it.",
+      "@id": "urn:sai:default:DelegatedAccessClaimValidator",
+      "@type": "DelegatedAccessClaimValidator"
+    },
+    {
       "comment": "LWS token endpoint of the UAS: exchanges an ID token (optionally DPoP-bound) for an ID-JAG restricted to one storage's authorization server.",
       "@id": "urn:sai:default:IdJagRouter",
       "@type": "RouterHandler",
@@ -105,7 +110,10 @@
           {
             "@id": "urn:solid-server:default:variable:baseUrl"
           }
-        ]
+        ],
+        "claimValidator": {
+          "@id": "urn:sai:default:DelegatedAccessClaimValidator"
+        }
       }
     }
   ]

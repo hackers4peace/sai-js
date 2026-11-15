@@ -317,11 +317,17 @@ describe('IdJagTokenHandler', () => {
       getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
     }
     const verifier = new StubIdJagVerifier(claim)
+    const validated: unknown[] = []
     const handler = new IdJagTokenHandler({
       issuer: new IdJagIssuer(BASE_URL, generator, 300),
       verifier,
       storageOrigins: ['data', 'registry'],
       authorizationServerOrigins: [BASE_URL],
+      claimValidator: {
+        validate: async (input) => {
+          validated.push(input)
+        },
+      },
     })
 
     const captured = await call(
@@ -335,6 +341,16 @@ describe('IdJagTokenHandler', () => {
     )
 
     expect(captured.status).toBe(200)
+    expect(validated).toEqual([
+      {
+        assigner: YOYO,
+        subject: CLAIM_SUBJECT,
+        client: CLAIM_CLIENT,
+        access: claim,
+        context: ODRL_ID_JAG_CONTEXT,
+        storage: CLAIM_STORAGE,
+      },
+    ])
     const { payload } = await jwtVerify(
       JSON.parse(String(captured.body)).access_token,
       keys.publicKey
@@ -452,6 +468,40 @@ describe('IdJagTokenHandler', () => {
     expect(payload.act).toEqual({
       sub: CLAIM_SUBJECT,
       act: { sub: 'https://id/intermediate', act: { sub: CLAIM_CLIENT } },
+    })
+  })
+
+  test('rejects an incoming claim not backed by the assigner grant registry', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const handler = new IdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier: new StubIdJagVerifier(claim),
+      storageOrigins: ['data'],
+      authorizationServerOrigins: [BASE_URL],
+      claimValidator: {
+        validate: async () => {
+          throw new Error('no existing grant')
+        },
+      },
+    })
+
+    const captured = await call(
+      handler,
+      tokenRequest({
+        audience: DATA,
+        subject_token: 'incoming-id-jag',
+        subject_token_type: ID_JAG_TOKEN_TYPE,
+        resource: CLAIM_STORAGE,
+      })
+    )
+    expect(captured.status).toBe(400)
+    expect(JSON.parse(String(captured.body))).toMatchObject({
+      error: 'invalid_grant',
     })
   })
 

@@ -9,6 +9,8 @@ import {
 import { decodeJwt } from 'jose'
 import { describe, expect, test } from 'vitest'
 
+import { storeDelegatedGrant } from './grant-fixtures'
+
 /*
  * C2 impersonation (docs/plans/id-jag.md):
  *
@@ -69,6 +71,17 @@ async function mintIdJag(body: Record<string, unknown>): Promise<string> {
 
 describe('C2 impersonation chain', () => {
   test('Bob -> YoYo -> ACME hides Bob and the delegated grant references', async () => {
+    await storeDelegatedGrant({
+      assigner: YOYO,
+      assignee: BOB,
+      dataOwner: ACME,
+      claim,
+      scopeOfGrant: INTEROP.SelectedFromRegistry,
+      storage: DATA_STORAGE,
+      registeredShapeTree: SHAPE_TREE,
+      hasDataRegistration: DATA_REGISTRATION,
+      hasDataInstance: [DATA_RESOURCE],
+    })
     const bob = await buildSelfIssuedCredential(BOB)
     const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
     const dpop = await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair)
@@ -171,6 +184,36 @@ describe('C2 impersonation chain', () => {
       headers: { accept: 'text/turtle', authorization: `Bearer ${accessToken}` },
     })
     expect(read.status).toBe(200)
+  })
+
+  test('rejects a delegated claim with no backing grant in the assigner registry', async () => {
+    const bob = await buildSelfIssuedCredential(BOB)
+    const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
+
+    const firstResponse = await exchange(
+      {
+        audience: AUTH,
+        subject_token: subjectToken,
+        subject_token_type: ID_TOKEN_TYPE,
+        access: JSON.stringify(claim),
+      },
+      await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair)
+    )
+    expect(firstResponse.status).toBe(200)
+    const first = await mintIdJag((await firstResponse.json()) as Record<string, unknown>)
+
+    // Deliberately no storeDelegatedGrant: YoYo's UAS must reject the claim
+    // rather than trusting Bob's UAS signature alone.
+    const secondResponse = await exchange({
+      audience: DATA_AS,
+      resource: DATA_STORAGE,
+      subject_token: first,
+      subject_token_type: ID_JAG_TYPE,
+    })
+    expect(secondResponse.status).toBe(400)
+    expect((await secondResponse.json()) as Record<string, unknown>).toMatchObject({
+      error: 'invalid_grant',
+    })
   })
 
   test('rejects an incoming ID-JAG whose claim was issued to another delegatee', async () => {

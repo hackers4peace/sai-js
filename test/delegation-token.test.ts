@@ -9,6 +9,8 @@ import {
 import { decodeJwt } from 'jose'
 import { describe, expect, test } from 'vitest'
 
+import { storeDelegatedGrant } from './grant-fixtures'
+
 /*
  * C3 delegation mode (docs/plans/id-jag.md): the same Bob -> YoYo -> ACME
  * chain as C2, but the actor chain stays visible.
@@ -68,6 +70,17 @@ async function mintIdJag(body: Record<string, unknown>): Promise<string> {
 
 describe('C3 delegation token chain', () => {
   test('keeps the actor chain and re-issues the claim to the final client', async () => {
+    await storeDelegatedGrant({
+      assigner: YOYO,
+      assignee: BOB,
+      dataOwner: ACME,
+      claim,
+      scopeOfGrant: INTEROP.SelectedFromRegistry,
+      storage: DATA_STORAGE,
+      registeredShapeTree: SHAPE_TREE,
+      hasDataRegistration: DATA_REGISTRATION,
+      hasDataInstance: [DATA_RESOURCE],
+    })
     const bob = await buildSelfIssuedCredential(BOB)
     const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
 

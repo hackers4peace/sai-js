@@ -21,6 +21,7 @@ import type { VerifiedAccessClaim } from './access-claim.js'
 import { rewriteAccessClaim, verifyAccessClaim } from './access-claim.js'
 import type { ActorClaim } from './actor-chain.js'
 import { appendActor, deepestActor, verifyActorChain } from './actor-chain.js'
+import type { AccessClaimValidator } from './DelegatedAccessClaimValidator.js'
 import { ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 import type { IdJagIssuer } from './IdJagIssuer.js'
 import { sharedTracer } from './tracing/otel-state.js'
@@ -60,6 +61,12 @@ export interface IdJagTokenHandlerArgs {
    */
   authorizationServerOrigins?: string[]
   /**
+   * Optional independent UAS check of an incoming delegated claim. The auth
+   * server wires the grant-registry-backed validator; package tests can inject
+   * a stub or omit it.
+   */
+  claimValidator?: AccessClaimValidator
+  /**
    * The path of the token endpoint, relative to this server's base URL. Used to
    * verify the `htu` claim of DPoP proofs. Defaults to `.well-known/lws/token`.
    */
@@ -98,6 +105,7 @@ export class IdJagTokenHandler extends HttpHandler {
   private readonly verifier: SubjectTokenVerifier
   private readonly audienceOrigins: string[]
   private readonly tokenEndpoint: string
+  private readonly claimValidator?: AccessClaimValidator
 
   public constructor(args: IdJagTokenHandlerArgs) {
     super()
@@ -105,6 +113,7 @@ export class IdJagTokenHandler extends HttpHandler {
     this.verifier = args.verifier
     this.audienceOrigins = [...args.storageOrigins, ...(args.authorizationServerOrigins ?? [])]
     this.tokenEndpoint = new URL(args.tokenPath ?? '.well-known/lws/token', args.issuer.issuer).href
+    this.claimValidator = args.claimValidator
   }
 
   public async handle({ request, response }: HttpHandlerInput): Promise<void> {
@@ -227,6 +236,24 @@ export class IdJagTokenHandler extends HttpHandler {
       const incoming = await this.incomingClaim(subject.access, subject.accessContext, resource)
       const incomingAct = subject.act === undefined ? undefined : verifyActorChain(subject.act)
       issuedSubject = this.visibleSubject(incoming, subject.subject, subject.client)
+
+      if (this.claimValidator) {
+        try {
+          await this.claimValidator.validate({
+            assigner: issuedSubject,
+            subject: subject.subject,
+            client: subject.client,
+            access: incoming.access,
+            context: incoming.context,
+            storage: incoming.storage,
+          })
+        } catch (error: unknown) {
+          throw new OAuthError(
+            'invalid_grant',
+            `Invalid delegated access claim: ${(error as Error).message}`
+          )
+        }
+      }
 
       if (mode === 'delegation') {
         // Delegation retains the actor chain: the incoming subject/client stay

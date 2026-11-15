@@ -9,6 +9,8 @@ import {
 import { decodeJwt, decodeProtectedHeader } from 'jose'
 import { describe, expect, test } from 'vitest'
 
+import { storeDelegatedGrant } from './grant-fixtures'
+
 /*
  * The LWS authorization chain (docs/plans/lws-auth.md):
  *
@@ -293,6 +295,17 @@ describe('C2 impersonation through @elfpavlik/lws-auth', () => {
   })
 
   test('delegation mode reads the same project with a visible actor chain', async () => {
+    await storeDelegatedGrant({
+      assigner: yoyo,
+      assignee: bob,
+      dataOwner: 'https://id/acme',
+      claim,
+      scopeOfGrant: INTEROP.SelectedFromRegistry,
+      storage: 'https://data/acme-rnd/',
+      registeredShapeTree: 'https://data/shapetrees/trees/Project',
+      hasDataRegistration: 'https://data/acme-rnd/reb39k',
+      hasDataInstance: ['https://data/acme-rnd/pbh2yw'],
+    })
     const storageFetch = await buildLwsFetch(bob, undefined, {
       idJag: true,
       impersonation: { uas: AUTH, mode: 'delegation' },
@@ -306,6 +319,17 @@ describe('C2 impersonation through @elfpavlik/lws-auth', () => {
   })
 
   test('Bob -> YoYo -> ACME reads a narrowed project', async () => {
+    await storeDelegatedGrant({
+      assigner: yoyo,
+      assignee: bob,
+      dataOwner: 'https://id/acme',
+      claim,
+      scopeOfGrant: INTEROP.SelectedFromRegistry,
+      storage: 'https://data/acme-rnd/',
+      registeredShapeTree: 'https://data/shapetrees/trees/Project',
+      hasDataRegistration: 'https://data/acme-rnd/reb39k',
+      hasDataInstance: ['https://data/acme-rnd/pbh2yw'],
+    })
     const storageFetch = await buildLwsFetch(bob, undefined, {
       idJag: true,
       impersonation: { uas: AUTH },

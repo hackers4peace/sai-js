@@ -1,11 +1,12 @@
 # ID-JAG access claims — ODRL model migration, impersonation, delegation
 
-> **Status:** 🔶 in progress — **C0–C2 landed**; **C3 implemented** (delegation
-> token chain with nested `act`; package gate and **full Dagger suite green**,
-> 26 files / 214 tests). C4 remains design-only.
-> **Last verified:** working tree (2026-11-15) — C0–C2 verified against the
-> delegation, grant, policy-engine, ID-JAG, and Dagger code; C3 verified against
-> the real delegation token chain and CSS actor-chain propagation.
+> **Status:** 🔶 in progress — **C0–C3 landed**; **C4 item 4 implemented**
+> (independent assigner-registry validation of delegated claims; package gate and
+> full Dagger suite green). Other C4 decisions remain design-only.
+> **Last verified:** working tree (2026-11-15) — C0–C3 verified against the
+> delegation, grant, policy-engine, ID-JAG, and Dagger code; C4 item 4 verified
+> against a delegated grant stored in the assigner's registry and the full
+> Bob -> YoYo -> ACME chain.
 > **Green gate:** package gate + **full** Dagger suite after every slice
 > ([§ Green gate](#green-gate)); Dagger is user-run.
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
@@ -79,6 +80,7 @@ first; C1+ adds the token flows.
 | User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path + assigner-owned grant storage | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; `IdTokenIssuer`/CID docs | package + `/test` | C1; UAS-as-client case |
 | Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, `lws-auth` impersonation chain, CSS token issuer/extractor | new `/test/impersonation.test.ts` (2); `/test/lws-auth.test.ts`; package token/LWS tests | C2 |
 | Delegated grants issued/stored in the assigner registry; owner endpoint kept | ✅ landed — package + full Dagger green | `grant-generation.ts` (minted ids), `workflows/grants.ts` (local store + `registryOwner`), `activities/grants.ts` (`ownGrantIds` migration), `AccessRequestHandler`/`delegation-request.ts` kept | package workflow/equivalence tests; `/test` `check-equivalence.test.ts`, `delegation-endpoint.test.ts`, `roles.test.ts` | C2 |
+| Intermediate UAS validates incoming delegated claim against its own issued grants | ✅ landed — package + full Dagger green | `DelegatedAccessClaimValidator`, `IdJagTokenHandler` (`claimValidator`), `grant-policy.ts`, `grantFieldsEqual` | package ID-JAG tests; `/test` `impersonation.test.ts` (3), `delegation-token.test.ts` (2), `lws-auth.test.ts` (14) | C4 item 4 |
 | Delegation token chain (`sub` top-level, nested `act` to client) | ✅ landed — package + full Dagger green | `IdJagIssuer`/`IdJagTokenHandler`/`IdJagSubjectTokenVerifier`, `actor-chain.ts`, `lws-auth`, CSS token issuer/extractor, policy engine | package token tests; new `/test/delegation-token.test.ts` (2); `/test/lws-auth.test.ts` (14) | C3 |
 | 403/401 chain refresh per storage | ⬜ open | `packages/lws-auth` fetch/cache; RPC/UI callers | package fetch tests; `/test` revocation scenario | C3/C4 |
 | Admin impersonation / `ProxyAdminHandler` removal / `/sparql-admin` future | ⬜ open | `ProxyAdminHandler`, `peerFetch`, `peerProxy`, `AdminSparqlHandler` | future TODO | not in this plan’s implementation |
@@ -492,13 +494,25 @@ continues to work.
 
 No implementation in this slice until the token flows are green.
 
+**C4 item 4 — implemented (2026-11-15).** The intermediate UAS now performs an
+independent check before re-issuing an ID-JAG: the incoming claim's `assigner`
+must be a local user, each claim policy must map to a grant issued by that user
+and stored in their own grant registry (semantic fields + ODRL permissions,
+ids ignored), and the grantee must be the incoming subject/client bound to the
+requested storage. The auth config wires `DelegatedAccessClaimValidator` into
+`IdJagTokenHandler`; a mismatch returns `invalid_grant`. Tests store the
+YoYo -> Bob delegated grant in YoYo's registry, then prove the positive
+impersonation/delegation chain and the negative no-backing-grant rejection.
+The seed still contains legacy owner-stored delegated grants (for example the
+ACME registry grants `qwvbcu`/`wwp4j6` assigned by Alice); they are not used by
+the new validator and remain part of the migration/backfill follow-up.
+
+
 - How requests/approvals indicate delegation vs impersonation.
 - Whether owner materialization/mirroring is required for revocation or only
   optional visibility.
 - Whether the owner access-request endpoint stores a copy, approves, or just
   acknowledges.
-- Intermediate UAS validation of the hidden delegated claim against its own
-  grant registry (C2 currently trusts the first UAS's signed claim).
 - Admin impersonation + `ProxyAdminHandler` removal; `/sparql-admin` future.
 - DPoP-bound final access token for impersonation.
 - Audit/visibility mapping for hidden actors.
