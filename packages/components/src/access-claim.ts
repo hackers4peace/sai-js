@@ -123,3 +123,72 @@ export async function verifyAccessClaim(
     assignees: [...assignees],
   }
 }
+
+/** Fields that identify the hidden delegation edge rather than the permission. */
+const freshId = (): string => `urn:uuid:${crypto.randomUUID()}`
+
+const HIDDEN_CLAIM_FIELDS = new Set([
+  'id',
+  'uid',
+  'act',
+  'requester',
+  'inheritsFromGrant',
+  'hasInheritingGrant',
+])
+
+/**
+ * Remove grant/node identifiers and actor-chain fields from a claim subtree.
+ * Used by the impersonation hop: the final token must not expose the hidden
+ * delegatee or resolvable grant references.
+ */
+function sanitizeClaimNode(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sanitizeClaimNode)
+  if (!value || typeof value !== 'object') return value
+  const result: Record<string, unknown> = {}
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+    if (HIDDEN_CLAIM_FIELDS.has(key)) continue
+    result[key] = sanitizeClaimNode(nested)
+  }
+  return result
+}
+
+/**
+ * Re-issue an ODRL access claim under a new visible delegation edge:
+ * `assigner` becomes the requester/visible actor, `assignee` the outgoing
+ * client. Permission, target, action, and scope stay unchanged; grant ids,
+ * `inheritsFromGrant`, and any `act` chain are dropped (C2 strict hiding).
+ */
+export function rewriteAccessClaim(
+  access: unknown[],
+  assigner: string,
+  assignee: string
+): unknown[] {
+  return access.map((raw) => {
+    const policy = sanitizeClaimNode(raw) as Record<string, unknown>
+    // Keep the policy-level convenience target/action out of the re-issued
+    // claim; the permission is the graph the policy engine evaluates. Fresh
+    // ids replace the hidden grant ids (targets must stay IRI nodes).
+    delete policy.target
+    delete policy.action
+    policy.id = freshId()
+    policy.uid = policy.id
+    policy.assigner = assigner
+    policy.assignee = assignee
+    if (Array.isArray(policy.permission)) {
+      policy.permission = policy.permission.map((rawPermission) => {
+        const permission = sanitizeClaimNode(rawPermission) as Record<string, unknown>
+        permission.id = freshId()
+        permission.uid = permission.id
+        permission.assigner = assigner
+        permission.assignee = assignee
+        if (permission.target && typeof permission.target === 'object') {
+          const target = permission.target as Record<string, unknown>
+          target.id = freshId()
+          target.uid = target.id
+        }
+        return permission
+      })
+    }
+    return policy
+  })
+}

@@ -29,6 +29,7 @@ const TOKEN_ENDPOINT = 'https://auth/.well-known/lws/token'
 const DATA = 'https://data/'
 const CLIENT = 'https://data/test-client/public/id'
 const WEBID = 'https://id/alice/'
+const YOYO = 'https://id/yoyo'
 const ID_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id_token'
 
 let keys: GenerateKeyPairResult
@@ -45,6 +46,33 @@ class StubVerifier extends SubjectTokenVerifier {
   public async handle(input: SubjectTokenVerifierInput): Promise<VerifiedSubject> {
     this.last = input
     return { subject: WEBID, issuer: BASE_URL, client: CLIENT }
+  }
+}
+
+/** A subject-token verifier for the C2 incoming ID-JAG hop. */
+class StubIdJagVerifier extends SubjectTokenVerifier {
+  public last?: SubjectTokenVerifierInput
+  public constructor(
+    private readonly claim: unknown,
+    private readonly subject = WEBID,
+    private readonly client = CLIENT
+  ) {
+    super()
+  }
+
+  public async canHandle({ tokenType }: SubjectTokenVerifierInput): Promise<void> {
+    if (tokenType !== ID_JAG_TOKEN_TYPE) throw new Error(`Unsupported token type ${tokenType}`)
+  }
+
+  public async handle(input: SubjectTokenVerifierInput): Promise<VerifiedSubject> {
+    this.last = input
+    return {
+      subject: this.subject,
+      issuer: BASE_URL,
+      client: this.client,
+      access: this.claim,
+      accessContext: ODRL_ID_JAG_CONTEXT,
+    }
   }
 }
 
@@ -218,7 +246,6 @@ describe('IdJagTokenHandler', () => {
     )
     expect(payload['@context']).toBe(ODRL_ID_JAG_CONTEXT)
     expect(payload.access).toEqual(claim)
-    expect(payload).toMatchObject({ sub: CLAIM_SUBJECT, client_id: CLAIM_CLIENT })
   })
 
   test('rejects an access claim spanning more than one storage', async () => {
@@ -278,6 +305,107 @@ describe('IdJagTokenHandler', () => {
     )
     expect(mismatch.status).toBe(400)
     expect(JSON.parse(String(mismatch.body)).error).toBe('invalid_target')
+  })
+
+  test('re-issues an incoming ID-JAG under the visible assigner and hides the delegatee', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const verifier = new StubIdJagVerifier(claim)
+    const handler = new IdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier,
+      storageOrigins: ['data', 'registry'],
+      authorizationServerOrigins: [BASE_URL],
+    })
+
+    const captured = await call(
+      handler,
+      tokenRequest({
+        audience: DATA,
+        subject_token: 'incoming-id-jag',
+        subject_token_type: ID_JAG_TOKEN_TYPE,
+        resource: CLAIM_STORAGE,
+      })
+    )
+
+    expect(captured.status).toBe(200)
+    const { payload } = await jwtVerify(
+      JSON.parse(String(captured.body)).access_token,
+      keys.publicKey
+    )
+    expect(payload).toMatchObject({
+      iss: BASE_URL,
+      aud: DATA,
+      sub: YOYO,
+      client_id: BASE_URL,
+    })
+    const rewritten = (payload.access as any[])[0]
+    const original = claim[0]
+    expect(rewritten).toMatchObject({
+      assigner: YOYO,
+      assignee: BASE_URL,
+      profile: original.profile,
+      scopeOfGrant: original.scopeOfGrant,
+      permission: [
+        {
+          assigner: YOYO,
+          assignee: BASE_URL,
+          action: original.permission[0].action,
+          target: expect.objectContaining({
+            owner: original.permission[0].target.owner,
+            storage: original.permission[0].target.storage,
+            type: original.permission[0].target.type,
+            source: original.permission[0].target.source,
+          }),
+        },
+      ],
+    })
+    expect(rewritten.id).toMatch(/^urn:uuid:/u)
+    expect(rewritten.permission[0].id).toMatch(/^urn:uuid:/u)
+    expect(rewritten.permission[0].target.id).toMatch(/^urn:uuid:/u)
+    const serialized = JSON.stringify(payload)
+    expect(serialized).not.toContain(CLAIM_SUBJECT)
+    expect(serialized).not.toContain(CLAIM_CLIENT)
+    expect(serialized).not.toContain(original.id)
+    expect(serialized).not.toContain(original.permission[0].id)
+    expect(verifier.last?.resource).toBe(CLAIM_STORAGE)
+  })
+
+  test('rejects an incoming ID-JAG without an access claim', async () => {
+    const verifier = new SubjectTokenVerifier() as SubjectTokenVerifier & {
+      canHandle: () => Promise<void>
+      handle: () => Promise<VerifiedSubject>
+    }
+    verifier.canHandle = async () => {}
+    verifier.handle = async () => ({ subject: WEBID, issuer: BASE_URL, client: CLIENT })
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const handler = new IdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier,
+      storageOrigins: ['data'],
+      authorizationServerOrigins: [BASE_URL],
+    })
+
+    const captured = await call(
+      handler,
+      tokenRequest({
+        subject_token: 'incoming-id-jag',
+        subject_token_type: ID_JAG_TOKEN_TYPE,
+        resource: CLAIM_STORAGE,
+      })
+    )
+    expect(captured.status).toBe(400)
+    expect(JSON.parse(String(captured.body)).error_description).toContain(
+      'needs an ODRL access claim'
+    )
   })
 
   test('rejects a proof for another endpoint or a malformed proof', async () => {

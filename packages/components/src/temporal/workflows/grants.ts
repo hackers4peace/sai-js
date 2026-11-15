@@ -88,7 +88,6 @@ const {
   createRoleAtId,
   storeAccessGrant,
   createAcr,
-  requestDelegations,
   replaceAccessGrantsOnRegistration,
   getPendingDelegatedGrantsUpdates,
   getPendingActivities,
@@ -101,9 +100,34 @@ const {
   startToCloseTimeout: '1 minute',
 })
 
-async function storeGrantAndAcr(grant: FinalGrantData) {
-  await storeAccessGrant(grant)
-  await createAcr(grant)
+async function storeGrantAndAcr(grant: FinalGrantData, registryOwner?: string) {
+  const payload = registryOwner ? { ...grant, registryOwner } : grant
+  await storeAccessGrant(payload)
+  await createAcr(payload)
+}
+
+/**
+ * Flatten a generated delegated tree for local storage in the assigner's grant
+ * registry. Generated children ride the parent as embedded objects; the stored
+ * parent links them by the ids minted during generation, and every child is
+ * stored as its own grant body.
+ */
+function delegatedGrantBodies(grant: GrantData): FinalGrantData[] {
+  if (!grant.id) throw new Error('generated delegated grant has no id')
+  const embedded = ((grant.hasInheritingGrant ?? []) as unknown[]).filter(
+    (child): child is GrantData => typeof child === 'object' && child !== null
+  )
+  const children = embedded.flatMap((child) => delegatedGrantBodies(child))
+  const childIds = embedded.map((child) => child.id).filter((id): id is string => Boolean(id))
+  const { hasInheritingGrant: _embedded, ...rest } = grant
+  return [
+    {
+      ...rest,
+      id: grant.id,
+      ...(childIds.length ? { hasInheritingGrant: childIds } : {}),
+    },
+    ...children,
+  ]
 }
 
 export async function storeGrant(payload: FinalGrantData[]): Promise<void> {
@@ -773,6 +797,7 @@ export async function reconcileGrantsForGrantee(
     grantee: payload.grantee,
     generated,
     existing,
+    ownGrantIds: orphans.map((grant) => grant.id!).filter(Boolean),
   })
   const reusedSource = new Set(reusedSourceIds)
   const reusedDelegated = new Set(reusedDelegatedIndexes)
@@ -792,7 +817,10 @@ export async function reconcileGrantsForGrantee(
     for (const grant of removeIds) {
       if (!grant.id) continue
       const body = bodyById.get(grant.id)
-      const owner = body?.dataOwner ?? (ownIds.has(grant.id) ? payload.webId.id : undefined)
+      // Own-registry grants (source and C2 delegated) are removed locally;
+      // owner-side copies from the explicit request path go through the
+      // data owner's revocation boundary.
+      const owner = ownIds.has(grant.id) ? payload.webId.id : body?.dataOwner
       if (!owner) continue
       const group = byOwner.get(owner) ?? []
       group.push({ id: grant.id, type: body?.type ?? [ACCESS_GRANT_TYPE] })
@@ -821,17 +849,18 @@ export async function reconcileGrantsForGrantee(
     newGrantIds.push({ id: grant.id, type: grant.type })
   }
 
-  // one delegation request per data owner (the access request endpoint accepts
-  // a single dataOwner batch)
-  const delegatedByOwner = new Map<string, GrantData[]>()
+  // C2 default: delegated grants are issued and stored in the assigner's own
+  // grant registry. The data-owner access-request endpoint remains available
+  // for explicit delegation requests, but the reconciliation path no longer
+  // materializes owner-side copies.
   for (const [index, grant] of generated.delegatedGrants.entries()) {
     if (reusedDelegated.has(index)) continue
-    const group = delegatedByOwner.get(grant.dataOwner) ?? []
-    group.push(grant)
-    delegatedByOwner.set(grant.dataOwner, group)
-  }
-  for (const grants of delegatedByOwner.values()) {
-    newGrantIds.push(...(await requestDelegations({ webId: payload.webId, grants })))
+    for (const body of delegatedGrantBodies(grant)) {
+      // Delegated grants live in the assigner's registry (C2), not the data
+      // owner's. `storeGrant` (the explicit owner endpoint) keeps dataOwner.
+      await storeGrantAndAcr(body, payload.webId.id)
+      newGrantIds.push({ id: body.id, type: body.type })
+    }
   }
 
   await replaceAccessGrantsOnRegistration({

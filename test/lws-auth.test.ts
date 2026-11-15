@@ -277,6 +277,36 @@ describe('two-step chain from the client (@elfpavlik/lws-auth)', () => {
   })
 })
 
+describe('C2 impersonation through @elfpavlik/lws-auth', () => {
+  const bob = 'https://id/bob'
+  const yoyo = 'https://id/yoyo'
+  const claim = grantAccess({
+    scopeOfGrant: INTEROP.SelectedFromRegistry,
+    owner: 'https://id/acme',
+    storage: 'https://data/acme-rnd/',
+    hasDataRegistration: 'https://data/acme-rnd/reb39k',
+    hasDataInstance: ['https://data/acme-rnd/pbh2yw'],
+    registeredShapeTree: 'https://data/shapetrees/trees/Project',
+    assigner: yoyo,
+    assignee: bob,
+    actions: [ODRL.read],
+  })
+
+  test('Bob -> YoYo -> ACME reads a narrowed project', async () => {
+    const storageFetch = await buildLwsFetch(bob, undefined, {
+      idJag: true,
+      impersonation: { uas: AUTH },
+      accessClaim: () => claim,
+    })
+
+    const response = await storageFetch('https://data/acme-rnd/pbh2yw', {
+      headers: { accept: 'text/turtle' },
+    })
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toEqual(expect.stringContaining('text/turtle'))
+  })
+})
+
 describe('browser credential endpoint (C5)', () => {
   test('serves /.sai/id-token and refuses anonymous callers', async () => {
     const response = await fetch(`${AUTH}.sai/id-token?dpop_jkt=abc`)

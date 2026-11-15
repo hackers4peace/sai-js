@@ -18,7 +18,7 @@ import type {
 import { getLoggerFor } from 'global-logger-factory'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
-import { verifyAccessClaim } from './access-claim.js'
+import { rewriteAccessClaim, verifyAccessClaim } from './access-claim.js'
 import { ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 import type { IdJagIssuer } from './IdJagIssuer.js'
 import { sharedTracer } from './tracing/otel-state.js'
@@ -51,6 +51,12 @@ export interface IdJagTokenHandlerArgs {
    * otherwise a client could ask for a grant "for" any URL.
    */
   storageOrigins: string[]
+  /**
+   * Authorization servers/UASs that may be the `audience` of an ID-JAG. C2 uses
+   * this for the first hop (Bob's UAS -> YoYo's UAS) before the final storage
+   * exchange.
+   */
+  authorizationServerOrigins?: string[]
   /**
    * The path of the token endpoint, relative to this server's base URL. Used to
    * verify the `htu` claim of DPoP proofs. Defaults to `.well-known/lws/token`.
@@ -88,14 +94,14 @@ export class IdJagTokenHandler extends HttpHandler {
 
   private readonly issuer: IdJagIssuer
   private readonly verifier: SubjectTokenVerifier
-  private readonly storageOrigins: string[]
+  private readonly audienceOrigins: string[]
   private readonly tokenEndpoint: string
 
   public constructor(args: IdJagTokenHandlerArgs) {
     super()
     this.issuer = args.issuer
     this.verifier = args.verifier
-    this.storageOrigins = args.storageOrigins
+    this.audienceOrigins = [...args.storageOrigins, ...(args.authorizationServerOrigins ?? [])]
     this.tokenEndpoint = new URL(args.tokenPath ?? '.well-known/lws/token', args.issuer.issuer).href
   }
 
@@ -183,6 +189,7 @@ export class IdJagTokenHandler extends HttpHandler {
         tokenType: subjectTokenType,
         audience: this.issuer.issuer,
         proofKeyThumbprint,
+        resource,
       })
     } catch (error: unknown) {
       if (NotImplementedHttpError.isInstance(error)) {
@@ -195,26 +202,57 @@ export class IdJagTokenHandler extends HttpHandler {
     span.setAttribute('sai.lws.subject_id', subject.subject)
     span.setAttribute('sai.lws.subject_issuer', subject.issuer)
 
-    if (access) {
-      if (resource !== undefined && resource !== access.storage) {
+    let issuedSubject = subject.subject
+    let issuedClient = subject.client
+    let issuedAccess = access
+
+    if (subjectTokenType === ID_JAG_TOKEN_TYPE) {
+      // C2 impersonation hop: re-issue a verified ID-JAG under the visible
+      // requester (the incoming claim's assigner) and this UAS as client. The
+      // original subject/client (the hidden delegatee) never enters the new
+      // token or claim.
+      if (access !== undefined) {
         throw new OAuthError(
-          'invalid_target',
-          `The access claim is for ${access.storage}, not the requested resource ${resource}.`
+          'invalid_request',
+          'An ID-JAG subject token cannot be combined with a request access claim.'
         )
       }
-      this.verifyClaimIdentity(access, subject.subject, subject.client)
+      if (subject.access === undefined || typeof subject.accessContext !== 'string') {
+        throw new OAuthError(
+          'invalid_request',
+          'An ID-JAG subject token needs an ODRL access claim.'
+        )
+      }
+      const incoming = await this.incomingClaim(subject.access, subject.accessContext, resource)
+      issuedSubject = this.visibleSubject(incoming, subject.subject, subject.client)
+      issuedClient = this.issuer.issuer
+      issuedAccess = {
+        ...incoming,
+        access: rewriteAccessClaim(incoming.access, issuedSubject, issuedClient),
+        assigners: [issuedSubject],
+        assignees: [issuedClient],
+      }
+      span.setAttribute('sai.lws.impersonation', true)
+    } else if (issuedAccess) {
+      if (resource !== undefined && resource !== issuedAccess.storage) {
+        throw new OAuthError(
+          'invalid_target',
+          `The access claim is for ${issuedAccess.storage}, not the requested resource ${resource}.`
+        )
+      }
+      this.verifyClaimIdentity(issuedAccess, subject.subject, subject.client)
     }
 
     const idJag = await this.issuer.issue(
-      subject.subject,
-      subject.client,
+      issuedSubject,
+      issuedClient,
       audience,
-      access ? { access: access.access, context: access.context } : undefined
+      issuedAccess ? { access: issuedAccess.access, context: issuedAccess.context } : undefined
     )
     setTokenAttributes(span, 'id-jag', idJag)
 
     this.logger.info(
-      `Issued an ID-JAG for ${audience} to ${subject.subject} using client ${subject.client}`
+      `Issued an ID-JAG for ${audience} to ${issuedSubject} using client ${issuedClient}`
     )
     return {
       issued_token_type: ID_JAG_TOKEN_TYPE,
@@ -222,6 +260,37 @@ export class IdJagTokenHandler extends HttpHandler {
       token_type: 'N_A',
       expires_in: this.issuer.lifetime,
     }
+  }
+
+  /** Validates the claim of an incoming ID-JAG and binds it to the requested storage. */
+  private async incomingClaim(
+    access: unknown,
+    context: string,
+    resource?: string
+  ): Promise<VerifiedAccessClaim> {
+    try {
+      return await verifyAccessClaim(access, context, resource)
+    } catch (error: unknown) {
+      throw new OAuthError('invalid_request', (error as Error).message)
+    }
+  }
+
+  /**
+   * The visible actor of an impersonation hop is the incoming claim's assigner
+   * (YoYo). The incoming subject/client (Bob) must be the delegatee the claim
+   * was issued to, so a claim for an unrelated agent cannot be re-issued.
+   */
+  private visibleSubject(claim: VerifiedAccessClaim, subject: string, client: string): string {
+    if (claim.assigners.length !== 1) {
+      throw new OAuthError('invalid_request', 'An impersonated ID-JAG needs exactly one assigner.')
+    }
+    if (claim.assignees.some((assignee) => assignee !== subject && assignee !== client)) {
+      throw new OAuthError(
+        'invalid_request',
+        'The incoming claim needs to be assigned to the subject or client of the ID-JAG.'
+      )
+    }
+    return claim.assigners[0]
   }
 
   /**
@@ -250,22 +319,27 @@ export class IdJagTokenHandler extends HttpHandler {
   }
 
   /**
-   * The self-issued C1 claim is the user's own authorization to the calling
-   * client: it cannot name another assigner, and its assignee has to be the
-   * authenticated client (or the subject itself for a UAS acting as agent).
-   * C2 adds the impersonation/delegation rewriting rules.
+   * C1 self-issued claims must be assigned by the subject (or be a delegated
+   * grant to the subject, which is the first C2 hop). The assignee always has
+   * to be the authenticated client or subject.
    */
   private verifyClaimIdentity(claim: VerifiedAccessClaim, subject: string, client: string): void {
-    if (claim.assigners.some((assigner) => assigner !== subject)) {
-      throw new OAuthError(
-        'invalid_request',
-        'The access claim needs to be assigned by the authenticated subject.'
-      )
-    }
     if (claim.assignees.some((assignee) => assignee !== client && assignee !== subject)) {
       throw new OAuthError(
         'invalid_request',
         'The access claim needs to be assigned to the authenticated client or subject.'
+      )
+    }
+    // C1 self-issued claims are assigned by the subject. C2 also accepts a
+    // delegated grant to the subject (assigner = hidden delegator, assignee =
+    // subject) as the first hop towards the assigner's UAS.
+    if (
+      claim.assigners.some((assigner) => assigner !== subject) &&
+      !claim.assignees.every((assignee) => assignee === subject)
+    ) {
+      throw new OAuthError(
+        'invalid_request',
+        'The access claim needs to be assigned by the authenticated subject.'
       )
     }
   }
@@ -324,7 +398,7 @@ export class IdJagTokenHandler extends HttpHandler {
         `${audience} needs to be the https issuer identifier (the base URL) of a resource authorization server.`
       )
     }
-    const known = this.storageOrigins.some((origin) => {
+    const known = this.audienceOrigins.some((origin) => {
       try {
         return new URL(origin).host === url.host
       } catch {

@@ -1,4 +1,8 @@
-import type { LwsCredential } from '@elfpavlik/lws-auth'
+import type {
+  LwsAuthFetchOptions,
+  LwsCredential,
+  LwsImpersonationOptions,
+} from '@elfpavlik/lws-auth'
 import { createLwsAuthFetch } from '@elfpavlik/lws-auth'
 import { createLwsFetch, type WhatwgFetch } from '@janeirodigital/interop-utils'
 import { type GenerateKeyPairResult, generateKeyPair } from 'jose'
@@ -73,6 +77,10 @@ export interface BuildLwsFetchOptions {
    * each storage. Defaults to the single exchange while C3 rolls out.
    */
   idJag?: boolean
+  /** C2 impersonation: the UAS that re-issues the ID-JAG under the visible identity. */
+  impersonation?: LwsImpersonationOptions
+  /** Optional ODRL access claim source (C1/C2). */
+  accessClaim?: LwsAuthFetchOptions['accessClaim']
 }
 
 /**
@@ -111,5 +119,9 @@ export async function buildLwsFetch(
     dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
     getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
   }
-  return createLwsAuthFetch({ credential })
+  return createLwsAuthFetch({
+    credential,
+    ...(options.accessClaim ? { accessClaim: options.accessClaim } : {}),
+    ...(options.impersonation ? { impersonation: options.impersonation } : {}),
+  })
 }

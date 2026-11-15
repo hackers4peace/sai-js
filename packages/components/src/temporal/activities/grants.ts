@@ -98,6 +98,12 @@ export interface CheckEquivalenceInput {
   generated: GeneratedGrants
   /** the grantee's current grant IRIs (from `getExistingGrants`) */
   existing: GrantId[]
+  /**
+   * IRIs present in the actor's own grant registry (the orphan scan). C2
+   * delegated grants are stored locally; an owner-side delegated copy from the
+   * explicit request path is not reusable and is migrated by regeneration.
+   */
+  ownGrantIds?: string[]
 }
 
 export interface EquivalenceResult {
@@ -365,14 +371,11 @@ export async function generateGrants(payload: GenerateGrantsInput): Promise<Gene
  * The grantee's current grant **IRIs**, read from the grantor's registration of
  * the grantee (`hasDataGrant`) — local, one registration read, no grant bodies.
  *
- * Why IRIs only: every grant where the context
- * is the `grantedBy` and a peer is the `dataOwner` lives in the *peer's* grant
- * registry, so loading the bodies would be one HTTP dereference per grant — for
- * a value only `checkEquivalence` consumes, and that activity is still a dummy.
- * When real equivalence lands it needs the bodies (body-only fields like
- * `registeredShapeTree`/`scopeOfGrant`); those must come from an issuer-side
- * replica, not a peer read — see
- * [`docs/plans/check-equivalence.md`](../../../../docs/plans/check-equivalence.md) §2.1.
+ * Why IRIs only: loading the bodies is a separate activity, and the projection
+ * is also the value `checkEquivalence` compares. C2 stores delegated grants in
+ * the grantor's own registry; a legacy owner-side delegated copy still has only
+ * an issuer-side replica (or nothing) and is migrated by regeneration rather
+ * than read from the peer.
  */
 export async function getExistingGrants(payload: {
   webId: SocialAgentId
@@ -400,9 +403,9 @@ export interface GetExistingGrantBodiesInput {
 
 /**
  * Load existing grant **bodies** from the local plane only — the grantor's own
- * grant registry for source grants and (once replicated) the issuer-side grant
- * replica for delegated grants. Never dereferences a peer resource: one graph
- * read per IRI through the session's own SPARQL endpoint.
+ * grant registry for source and C2 delegated grants, plus any legacy
+ * issuer-side replica. Never dereferences a peer resource: one graph read per
+ * IRI through the session's own SPARQL endpoint.
  *
  * Declared children (`hasInheritingGrant`) are followed recursively, so a
  * child that is not linked from the registration projection still joins its
@@ -617,8 +620,11 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
   })
   const existingTrees = grantTrees(existingGrants)
   const sourceExisting = existingTrees.filter((tree) => tree.grant.dataOwner === payload.webId.id)
+  const ownGrantIds = payload.ownGrantIds ? new Set(payload.ownGrantIds) : undefined
   const delegatedExisting = existingTrees.filter(
-    (tree) => tree.grant.dataOwner !== payload.webId.id
+    (tree) =>
+      tree.grant.dataOwner !== payload.webId.id &&
+      (!ownGrantIds || (tree.grant.id !== undefined && ownGrantIds.has(tree.grant.id)))
   )
 
   const reusedSourceIds: string[] = []
@@ -645,8 +651,8 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
   }
   rememberExisting(sourcePairs)
 
-  // delegated generated grants carry no ids yet — the result addresses them by
-  // their position in the workflow's `delegatedGrants` array
+  // Generated delegated grants carry ids but are still addressed by their
+  // position in the workflow's `delegatedGrants` array for reuse.
   const delegatedTrees = delegatedGrantTrees(payload.generated.delegatedGrants)
   const delegatedIndexByTree = new Map(delegatedTrees.map((tree, index) => [tree, index] as const))
   const delegatedPairs = pairTrees(delegatedTrees, delegatedExisting)
@@ -695,9 +701,11 @@ export async function deleteAuthorizations(payload: {
 // Storing grants (unchanged)
 // ---------------------------------------------------------------------------
 
-export async function storeAccessGrant(payload: FinalGrantData): Promise<void> {
+export async function storeAccessGrant(
+  payload: FinalGrantData & { registryOwner?: string }
+): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.dataOwner)
+  const session = await manager.getSession(payload.registryOwner ?? payload.dataOwner)
 
   // The storage identifier strategy creates the member at its pre-minted id.
   // Find-first at the callee (`storeGrant` is retried by Temporal) — a
@@ -716,9 +724,11 @@ export async function storeAccessGrant(payload: FinalGrantData): Promise<void> {
  * 3. grantor grants to a peer (delegation)
  * 4. grantor grants to an application (delegation)
  */
-export async function createAcr(payload: FinalGrantData): Promise<void> {
+export async function createAcr(
+  payload: FinalGrantData & { registryOwner?: string }
+): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.dataOwner)
+  const session = await manager.getSession(payload.registryOwner ?? payload.dataOwner)
   const grantee = grantGrantee(payload) ?? ''
   // TODO: improve error handling
   let uasId

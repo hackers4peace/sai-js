@@ -35,9 +35,9 @@ const GRANTEE_COOKIES: Record<string, string> = {
  *
  * Asserted on the authoritative sides plus the public surface:
  * - the grantor's own registration of the grantee links the grants (local read);
- * - the grant body carries the expected fields, read with the **data owner's**
- *   session — the grantor for source grants, the peer owner for delegated ones
- *   (where the authoritative copy lives);
+ * - the grant body carries the expected fields, read with the **grantor's**
+ *   session (C2 stores delegated grants in the assigner's registry); legacy
+ *   owner-side copies are read with the data owner's session as a fallback;
  * - the grantee-facing view the UI uses, `ListDataRegistries` with the grantee's
  *   context ("data of <grantedBy> that I can see"), which the product serves
  *   from the grantee's replica — polled, because replication is webhook-driven.
@@ -58,7 +58,8 @@ async function verifyAccessGrant(
   expect(registration).toBeDefined()
   expect(registration!.registeredAgent).toBe(granteeId)
 
-  // grant bodies live in the data owner's grant registry
+  // C2: delegated grant bodies live in the grantor's registry. Keep the data
+  // owner's session as a fallback for source grants / legacy owner-side copies.
   const ownerSession = await manager.getSession(dataOwnerId)
   const findAccessGrant = async (): Promise<GrantData | undefined> => {
     // re-read the registration: the projection is PATCHed by the workflow
@@ -66,7 +67,9 @@ async function verifyAccessGrant(
     if (!current) return undefined
     const grants: GrantData[] = []
     for (const iri of getAccessGrantIris(current)) {
-      const grant = await loadGrant(iri, ownerSession.fetch).catch(() => undefined)
+      const grant =
+        (await loadGrant(iri, grantedBySession.fetch).catch(() => undefined)) ??
+        (await loadGrant(iri, ownerSession.fetch).catch(() => undefined))
       if (grant) grants.push(grant)
     }
     return grants.find(

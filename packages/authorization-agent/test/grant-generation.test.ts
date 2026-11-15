@@ -320,11 +320,12 @@ function deps(): { deps: DataModelDependencies; fetchStub: ReturnType<typeof vi.
   const fetchStub = vi.fn(() => {
     throw new Error('delegated-grant generation must not fetch (mirror-only)')
   })
-  const strategy = new FlatIdentifierStrategy('https://registry/acme/', () => 'minted')
+  let counter = 0
+  const strategy = new FlatIdentifierStrategy('https://registry/acme/', () => `minted-${counter++}`)
   return {
     deps: {
       fetch: fetchStub as unknown as DataModelDependencies['fetch'],
-      randomUUID: () => 'minted',
+      randomUUID: () => `minted-${counter++}`,
       identifierStrategies: {
         resolve: async (storageUrl: string) => ({
           storageUrl,
@@ -491,8 +492,9 @@ describe('delegated-grant generation — mirror only', () => {
       dataOwner: ALICE,
       hasDataRegistration: PROJECT_REGISTRATION,
     })
-    // the child rides the parent as embedded data (the issuance endpoint assigns
-    // IRIs); chain validity is match-based, so no source pointer is stored
+    expect(parent.id).toBeDefined()
+    // the child rides the parent as embedded data; both ids are minted in the
+    // assigner's registry and the child stores `inheritsFromGrant` on write
     const [child] = parent.hasInheritingGrant as unknown as {
       registeredShapeTree: string
       scopeOfGrant: string
@@ -504,7 +506,10 @@ describe('delegated-grant generation — mirror only', () => {
       scopeOfGrant: INTEROP.Inherited,
       hasDataRegistration: TASK_REGISTRATION,
       dataOwner: ALICE,
+      inheritsFromGrant: parent.id,
     })
+    expect(child.id).toBeDefined()
+    expect(child.id).not.toBe(parent.id)
     expect(fetchStub).not.toHaveBeenCalled()
   })
 })

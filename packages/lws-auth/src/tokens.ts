@@ -92,8 +92,13 @@ export interface IdJagRequest extends TokenRequestOptions {
   tokenEndpoint?: string
   /** Issuer identifier of the resource authorization server the grant is for. */
   audience: string
-  /** The authentication credential (ID token / self-issued JWT). */
+  /** The authentication credential (ID token / self-issued JWT) or an ID-JAG. */
   subjectToken: string
+  /**
+   * Token type of {@link subjectToken}. Defaults to the ID token type; the C2
+   * impersonation hop presents an ID-JAG (`...:id-jag`) instead.
+   */
+  subjectTokenType?: string
   /** DPoP key pair the credential is bound to (`cnf.jkt`). */
   dpopKeyPair: CryptoKeyPair
   clientId: string
@@ -110,11 +115,12 @@ export interface IdJagRequest extends TokenRequestOptions {
  * one resource authorization server (`audience`).
  */
 export async function requestIdJag(request: IdJagRequest): Promise<string> {
+  const subjectTokenType = request.subjectTokenType ?? ID_TOKEN_TYPE
   const parameters: Record<string, string> = {
     requested_token_type: ID_JAG_TOKEN_TYPE,
     audience: request.audience,
     subject_token: request.subjectToken,
-    subject_token_type: ID_TOKEN_TYPE,
+    subject_token_type: subjectTokenType,
   }
   if (request.accessClaim !== undefined) {
     parameters.access = JSON.stringify(request.accessClaim)
@@ -124,7 +130,7 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
     span.setAttributes({
       'sai.lws.grant_type': TOKEN_EXCHANGE_GRANT,
       'sai.lws.requested_token_type': ID_JAG_TOKEN_TYPE,
-      'sai.lws.subject_token_type': ID_TOKEN_TYPE,
+      'sai.lws.subject_token_type': subjectTokenType,
       'sai.lws.audience': request.audience,
       'sai.lws.client_auth_method': 'none',
     })

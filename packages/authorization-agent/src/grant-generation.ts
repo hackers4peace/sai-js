@@ -151,8 +151,9 @@ async function generateChildDelegatedGrantData(
     const hasDataRegistration = childSourceGrant.hasDataRegistration
     const scopeOfGrant = INTEROP.Inherited
     const sourceActions = grantAccessModes(childSourceGrant)
+    const childGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
     const childData: GrantData = {
-      // no id — the access request handler assigns IRIs
+      id: childGrantIri,
       type: [LWS.AccessGrant],
       storage,
       access: grantAccess({
@@ -336,6 +337,7 @@ async function generateDelegatedAccessGrants(
           : undefined
       const sourceActions = grantAccessModes(sourceGrant)
       const grant: GrantData = {
+        id: regularGrantIri,
         type: [LWS.AccessGrant],
         storage,
         access: grantAccess({

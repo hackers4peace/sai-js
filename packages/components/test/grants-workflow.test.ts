@@ -79,8 +79,9 @@ const sourceGrant = (suffix: string, overrides: Record<string, unknown> = {}) =>
   ...overrides,
 })
 
-/** A delegated grant (we are grantedBy, the peer is dataOwner) — no id yet. */
+/** A delegated grant (we are grantedBy, the peer is dataOwner) — local id. */
 const delegatedGrant = (overrides: Record<string, unknown> = {}) => ({
+  id: grantIri('g-delegated'),
   type: [ACCESS_GRANT],
   grantee: ALICE,
   grantedBy: ACME,
@@ -119,7 +120,7 @@ beforeEach(() => {
 })
 
 describe('reconcileGrantsForGrantee — projection + GC', () => {
-  test('stores and delegates everything when nothing is reused, removing the old own grants', async () => {
+  test('stores source and delegated grants locally when nothing is reused, removing the old own grants', async () => {
     const parent = sourceGrant('s-parent', { hasInheritingGrant: [grantIri('s-child')] })
     const child = sourceGrant('s-child', {
       inheritsFromGrant: grantIri('s-parent'),
@@ -136,7 +137,6 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       sourceGrants: [parent, child],
       delegatedGrants: [delegated],
     })
-    h.activities.requestDelegations.mockResolvedValue([grantId('new-delegated')])
 
     await createGrantsForAgent({ webId, grantee })
 
@@ -145,19 +145,21 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       grantee,
       generated: { sourceGrants: [parent, child], delegatedGrants: [delegated] },
       existing,
+      ownGrantIds: [],
     })
     // the GC happens before the creates (delete-before-create)
     expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({ webId, grants: existing })
-    expect(h.activities.storeAccessGrant).toHaveBeenCalledTimes(2)
-    expect(h.activities.createAcr).toHaveBeenCalledTimes(2)
-    expect(h.activities.requestDelegations).toHaveBeenCalledWith({
-      webId,
-      grants: [delegated],
+    expect(h.activities.storeAccessGrant).toHaveBeenCalledTimes(3)
+    expect(h.activities.createAcr).toHaveBeenCalledTimes(3)
+    expect(h.activities.storeAccessGrant).toHaveBeenCalledWith({
+      ...delegated,
+      registryOwner: webId.id,
     })
+    expect(h.activities.requestDelegations).not.toHaveBeenCalled()
     expect(h.activities.replaceAccessGrantsOnRegistration).toHaveBeenCalledWith({
       webId,
       grantee,
-      grants: [grantId('s-parent'), grantId('s-child'), grantId('new-delegated')],
+      grants: [grantId('s-parent'), grantId('s-child'), grantId('g-delegated')],
     })
   })
 
@@ -205,7 +207,7 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
     const reusedSource = sourceGrant('s-reused')
     const newSource = sourceGrant('s-new')
     const requestedDelegated = delegatedGrant()
-    const reusedDelegated = delegatedGrant()
+    const reusedDelegated = delegatedGrant({ id: grantIri('g-reused-delegated') })
     const existing = [grantId('e-reused'), grantId('e-old')]
     h.activities.getExistingGrants.mockResolvedValue(existing)
     h.activities.getExistingGrantBodies.mockResolvedValue([body(grantId('e-old'), ACME)])
@@ -219,7 +221,6 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       reusedDelegatedIndexes: [1],
       reusedExisting: [grantId('e-reused')],
     })
-    h.activities.requestDelegations.mockResolvedValue([grantId('new-delegated')])
 
     await createGrantsForAgent({ webId, grantee })
 
@@ -227,19 +228,23 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       webId,
       grants: [grantId('e-old')],
     })
-    expect(h.activities.storeAccessGrant).toHaveBeenCalledTimes(1)
+    expect(h.activities.storeAccessGrant).toHaveBeenCalledTimes(2)
     expect(h.activities.storeAccessGrant).toHaveBeenCalledWith(newSource)
-    expect(h.activities.createAcr).toHaveBeenCalledTimes(1)
-    expect(h.activities.createAcr).toHaveBeenCalledWith(newSource)
-    expect(h.activities.requestDelegations).toHaveBeenCalledTimes(1)
-    expect(h.activities.requestDelegations).toHaveBeenCalledWith({
-      webId,
-      grants: [requestedDelegated],
+    expect(h.activities.storeAccessGrant).toHaveBeenCalledWith({
+      ...requestedDelegated,
+      registryOwner: webId.id,
     })
+    expect(h.activities.createAcr).toHaveBeenCalledTimes(2)
+    expect(h.activities.createAcr).toHaveBeenCalledWith(newSource)
+    expect(h.activities.createAcr).toHaveBeenCalledWith({
+      ...requestedDelegated,
+      registryOwner: webId.id,
+    })
+    expect(h.activities.requestDelegations).not.toHaveBeenCalled()
     expect(h.activities.replaceAccessGrantsOnRegistration).toHaveBeenCalledWith({
       webId,
       grantee,
-      grants: [grantId('s-new'), grantId('new-delegated'), grantId('e-reused')],
+      grants: [grantId('s-new'), grantId('g-delegated'), grantId('e-reused')],
     })
   })
 
@@ -256,6 +261,7 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       grantee,
       generated: { sourceGrants: [], delegatedGrants: [] },
       existing: [grantId('e-parent')],
+      ownGrantIds: [],
     })
     expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({
       webId,
@@ -266,6 +272,19 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       grantee,
       grants: [],
     })
+  })
+
+  test('removes a C2 local delegated grant through the own-registry closure', async () => {
+    const existing = [grantId('e-delegated')]
+    h.activities.getExistingGrants.mockResolvedValue(existing)
+    h.activities.getExistingGrantBodies.mockResolvedValue([body(grantId('e-delegated'), ALICE)])
+    h.activities.getRegistryGrantsForGrantee.mockResolvedValue(existing)
+
+    await createGrantsForAgent({ webId, grantee })
+
+    // The body's dataOwner is the peer, but the grant lives in our registry.
+    expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({ webId, grants: existing })
+    expect(h.activities.requestRevocations).not.toHaveBeenCalled()
   })
 
   test('peer-owned non-reused grants go through the boundary and drop their replica', async () => {
@@ -305,6 +324,7 @@ describe('reconcileGrantsForGrantee — projection + GC', () => {
       grantee,
       generated: { sourceGrants: [], delegatedGrants: [] },
       existing: [orphan],
+      ownGrantIds: [orphan.id],
     })
     expect(h.activities.revokeGrantClosure).toHaveBeenCalledWith({
       webId,

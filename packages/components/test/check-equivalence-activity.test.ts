@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 // SPARQL endpoint (`localSparqlTransport(session.sparqlEndpoint)`) — no peer
 // dereference. Children are followed via `hasInheritingGrant`; a missing body
 // fails closed (the whole tree never matches). Source trees pair with existing
-// trees we own; delegated trees pair with the issuer-side replica.
+// trees we own; delegated trees pair with local registry grants (or the legacy replica via ownGrantIds).
 //
 // `getAccessGrant` is mocked at the package boundary so these cases stay about
 // the tree loader and pairing, not SPARQL framing (covered in the AA package).
@@ -153,7 +153,7 @@ const delegatedChild = (id: string, parentId: string, overrides: GrantOverrides 
     ...overrides,
   })
 
-/** A generated delegated grant: no id, children ride as embedded objects. */
+/** A generated delegated grant: children ride as embedded objects. */
 const generatedDelegated = (overrides: GrantOverrides = {}, withChild = true): GrantData =>
   makeGrant({
     dataOwner: 'https://id/alice',
@@ -287,6 +287,24 @@ describe('checkEquivalence — source-grant reuse', () => {
     expect(result.reusedSourceIds).toEqual([])
     expect(result.reusedDelegatedIndexes).toEqual([0])
     expect(result.reusedExisting).toEqual([ref(eParent), ref(eChild)])
+  })
+
+  test('does not reuse an owner-side delegated copy during the C2 migration', async () => {
+    const eParent = delegatedParent('https://registry/acme/e-dparent')
+    h.bodies.set(eParent.id!, eParent)
+
+    const result = await checkEquivalence({
+      webId,
+      grantee,
+      generated: { sourceGrants: [], delegatedGrants: [generatedDelegated({}, false)] },
+      existing: [ref(eParent)],
+      // the body is the grantor's replica of the owner-side copy, not a grant
+      // in the grantor's own registry
+      ownGrantIds: [],
+    })
+
+    expect(result.reusedDelegatedIndexes).toEqual([])
+    expect(result.reusedExisting).toEqual([])
   })
 
   test('fails closed when a delegated child body is missing from the replica', async () => {

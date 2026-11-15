@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'vitest'
 
 import type { LwsCredential } from '../src/credential.ts'
 import { createLwsAuthFetch } from '../src/fetch.ts'
+import { ID_JAG_TOKEN_TYPE, ID_TOKEN_TYPE } from '../src/tokens.ts'
 import { createFakeFetch, formBody, json, makeJwt } from './helpers.ts'
 
 const UAS = 'https://auth/'
@@ -177,6 +178,29 @@ describe('createLwsAuthFetch', () => {
     expect(grantRequests.map((request) => JSON.parse(formBody(request).get('access')!))).toEqual(
       claims
     )
+  })
+
+  test('walks the C2 impersonation hop before the storage exchange', async () => {
+    const world = createWorld()
+    const fetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch: world.fetch,
+      now: () => world.clock(),
+      impersonation: { uas: UAS },
+      accessClaim: (storage) => [{ id: `urn:claim:${storage}`, target: { storage } }],
+    })
+
+    expect((await fetch(`${DATA_STORAGE}k3pqsb`)).status).toBe(200)
+
+    const grantRequests = world.requests.filter(isGrantRequest)
+    expect(grantRequests).toHaveLength(2)
+    const [first, second] = grantRequests.map(formBody)
+    expect(first.get('audience')).toBe(UAS)
+    expect(first.get('subject_token_type')).toBe(ID_TOKEN_TYPE)
+    expect(second.get('audience')).toBe(DATA)
+    expect(second.get('subject_token_type')).toBe(ID_JAG_TOKEN_TYPE)
+    expect(second.get('subject_token')).toBe(world.grants[0])
+    expect(second.get('access')).toBeNull()
   })
 
   test('mints a separate grant per storage authorization server', async () => {

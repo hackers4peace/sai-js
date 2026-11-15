@@ -1,11 +1,11 @@
 # ID-JAG access claims — ODRL model migration, impersonation, delegation
 
-> **Status:** 🔶 in progress — **C0 landed**; **C1 implemented** (ID-JAG ODRL
-> access claim foundation; package gate and **full Dagger suite green**, 24 files
-> / 208 tests). C2 is next.
-> **Last verified:** working tree (2026-11-15) — C0 verified against the current
-> delegation, grant, policy-engine, ID-JAG, and Dagger code; C1 verified against
-> the current token chain and the local `lws-sai` CSS fork.
+> **Status:** 🔶 in progress — **C0 + C1 landed**; **C2 implemented** (C2
+> impersonation chain + assigner-owned delegated grants; package gate and
+> **full Dagger suite green**, 25 files / 211 tests). C3 is next.
+> **Last verified:** working tree (2026-11-15) — C0/C1 verified against the
+> delegation, grant, policy-engine, ID-JAG, and Dagger code; C2 verified against
+> the real token chain, local grant registry, and `/test` roles/equivalence.
 > **Green gate:** package gate + **full** Dagger suite after every slice
 > ([§ Green gate](#green-gate)); Dagger is user-run.
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
@@ -76,9 +76,9 @@ first; C1+ adds the token flows.
 | ID-JAG `access` claim carried into the access token | ✅ landed — package + full Dagger green | `IdJagIssuer`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, CSS `LwsTokenHttpHandler`/`LwsAccessTokenIssuer`/`LwsAccessTokenExtractor`, `PolicyEngineReader` | package ID-JAG/LWS tests; `/test` `lws-auth.test.ts` (12) | C1 |
 | Claim-first policy-engine evaluation for token `access` claims | ✅ landed — package + full Dagger green | `SaiPermissionsEngine.getPermissions`/`findAccessClaimData`/`getClaimPermissions`; CSS `PolicyEngineReader` | new package `policy-engine-claim.test.ts`; `/test` `policy-engine.test.ts` (73) | C1 |
 | One storage per ID-JAG access claim; no `resource` claim; final `aud` = storage | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `verifyAccessClaim`, `lws-auth` cache, CSS token handler | package tests; `/test` `lws-auth.test.ts` | C1 |
-| User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path; grant backing still C2 | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; `IdTokenIssuer`/CID docs | package + `/test` | C1; UAS-as-client case |
-| Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ⬜ open | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `lws-auth`, CSS token issuer/extractor | new `/test/impersonation.test.ts` + existing suites | C2 |
-| Delegated grants issued/stored in the assigner registry; owner endpoint kept | ⬜ open | `grant-generation.ts`, `activities/grants.ts`, `AccessRequestHandler`, `delegation-request.ts`, `GrantReplica`/grant registry | package + `/test` delegation/equivalence | C2; migration/backfill |
+| User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path + assigner-owned grant storage | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; `IdTokenIssuer`/CID docs | package + `/test` | C1; UAS-as-client case |
+| Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, `lws-auth` impersonation chain, CSS token issuer/extractor | new `/test/impersonation.test.ts` (2); `/test/lws-auth.test.ts`; package token/LWS tests | C2 |
+| Delegated grants issued/stored in the assigner registry; owner endpoint kept | ✅ landed — package + full Dagger green | `grant-generation.ts` (minted ids), `workflows/grants.ts` (local store + `registryOwner`), `activities/grants.ts` (`ownGrantIds` migration), `AccessRequestHandler`/`delegation-request.ts` kept | package workflow/equivalence tests; `/test` `check-equivalence.test.ts`, `delegation-endpoint.test.ts`, `roles.test.ts` | C2 |
 | Delegation token chain (`sub` top-level, nested `act` to client) | ⬜ open | `IdJag*`, `lws-auth`, CSS token handler, policy engine | new delegation-token `/test` + existing suites | C3 |
 | 403/401 chain refresh per storage | ⬜ open | `packages/lws-auth` fetch/cache; RPC/UI callers | package fetch tests; `/test` revocation scenario | C3/C4 |
 | Admin impersonation / `ProxyAdminHandler` removal / `/sparql-admin` future | ⬜ open | `ProxyAdminHandler`, `peerFetch`, `peerProxy`, `AdminSparqlHandler` | future TODO | not in this plan’s implementation |
@@ -380,6 +380,50 @@ access-request endpoint/workflow still works when explicitly used.
   strict-hiding trade-off.
 - Admin impersonation remains a TODO; `ProxyAdminHandler` stays.
 
+**Implementation (2026-11-15)**
+
+- **Impersonation token chain.** `IdJagTokenHandler` now accepts an ID-JAG as
+  the subject token at a UAS (the `auth` config prepends
+  `IdJagSubjectTokenVerifier` to the subject-token waterfall) and re-issues it
+  under the visible actor: incoming claim `assigner` becomes `sub`, the UAS
+  issuer becomes `client_id`, and the hidden subject/client are dropped.
+  `rewriteAccessClaim` preserves permission/target/action/scope but replaces
+  grant ids with fresh opaque ids, strips policy/permission/target `uid`/`id`
+  references, `inheritsFromGrant`, and any `act` chain. The first hop
+  (Bob's UAS -> YoYo's UAS) self-issues the delegated claim; the final ID-JAG
+  and access token contain only YoYo and the narrowed ODRL claim.
+- **Request audience.** `IdJagTokenHandler` accepts a configured
+  `authorizationServerOrigins` list next to `storageOrigins`, so the first
+  ID-JAG can target the next UAS rather than a storage.
+- **`packages/lws-auth`.** `requestIdJag` accepts `subjectTokenType` (ID token
+  or ID-JAG) and `createLwsAuthFetch` has an `impersonation` option: it first
+  self-issues an ID-JAG for the intermediate UAS, then uses that UAS's re-issued
+  ID-JAG for the storage. The claim cache is keyed by
+  `(AS issuer, storage, impersonation UAS)`.
+- **Assigner-owned delegated grants.** Delegated generation now mints parent
+  and child ids in the grantor's registry. The reconciliation workflow stores
+  delegated trees locally (`storeAccessGrant`/`createAcr` with
+  `registryOwner = grantedBy`) instead of POSTing to the data owner by default.
+  The explicit owner access-request endpoint and `requestDelegations` remain
+  available and unchanged. Removal uses the own-registry closure when the body
+  is in the actor's registry; legacy owner-side copies still go through
+  `requestRevocations`.
+- **Migration.** `checkEquivalence` takes `ownGrantIds`; a delegated tree is
+  reusable only when it is in the actor's own registry. A legacy owner-side
+  delegated copy is therefore regenerated into the assigner's registry on the
+  next reconciliation. `/test` `check-equivalence.test.ts` covers the migration
+  and stable reuse.
+- **Trust boundary.** The intermediate UAS validates the incoming ID-JAG
+  signature, audience, claim shape, and that the hidden delegatee is the token
+  subject/client before re-issuing. It does not yet re-check the hidden claim
+  against its own grant registry; that hardening is tracked under C4, alongside
+  the owner-visible audit story.
+- **Tests/gates.** Package `typecheck`, full `npx vitest run` (679 passed, 26
+  skipped, 2 todo), components build, `npm run check`, and the **full Dagger
+  suite** (25 files / 211 tests) are green. `/test` includes the new
+  `impersonation.test.ts`, the C2 `lws-auth` chain, `check-equivalence`,
+  `delegation-endpoint`, and `roles`.
+
 ## C3 — Delegation via token exchange
 
 **Done when:** the same chain works in delegation mode: final `sub` = top-level
@@ -420,6 +464,8 @@ No implementation in this slice until the token flows are green.
   optional visibility.
 - Whether the owner access-request endpoint stores a copy, approves, or just
   acknowledges.
+- Intermediate UAS validation of the hidden delegated claim against its own
+  grant registry (C2 currently trusts the first UAS's signed claim).
 - Admin impersonation + `ProxyAdminHandler` removal; `/sparql-admin` future.
 - DPoP-bound final access token for impersonation.
 - Audit/visibility mapping for hidden actors.

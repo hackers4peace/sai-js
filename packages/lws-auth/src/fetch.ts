@@ -8,11 +8,24 @@ import {
 import type { LwsCredential } from './credential.ts'
 import { jwtExpiresAt } from './jwt.ts'
 import type { TokenEndpoint } from './tokens.ts'
-import { LWS_TOKEN_PATH, requestAccessToken, requestIdJag } from './tokens.ts'
+import { ID_JAG_TOKEN_TYPE, LWS_TOKEN_PATH, requestAccessToken, requestIdJag } from './tokens.ts'
+
+export interface LwsImpersonationOptions {
+  /** The UAS that re-issues the ID-JAG under the visible identity. */
+  uas: string
+  /** Its token endpoint; defaults to `<uas>/.well-known/lws/token`. */
+  tokenEndpoint?: string
+}
 
 export interface LwsAuthFetchOptions {
   /** The user's authentication credential. */
   credential: LwsCredential
+  /**
+   * C2 impersonation chain: first self-issue an ID-JAG for this UAS, then use
+   * that UAS's re-issued ID-JAG (visible subject, hidden caller) for the
+   * storage. The UAS is responsible for the claim rewrite and hiding.
+   */
+  impersonation?: LwsImpersonationOptions
   /**
    * Optional source of the ODRL `access` claim for a storage. It receives the
    * storage (the `resource` of the final exchange) and the resource
@@ -51,9 +64,11 @@ interface CachedGrant {
  *    the storage,
  * 3. the storage request, retried once on `401`.
  *
- * The ID-JAG cache is keyed by **resource authorization server**, not by
- * storage: `aud` makes a grant useless anywhere else, and several storages may
- * share one authorization server. Access tokens are cached per storage by
+ * Without an access claim (or an impersonation hop) the ID-JAG cache is keyed
+ * by **resource authorization server**: `aud` makes a grant useless anywhere
+ * else, and several storages may share one authorization server. With a claim
+ * or impersonation it is keyed by `(issuer, storage)` because one claim binds
+ * the grant to one storage. Access tokens are cached per storage by
  * `createLwsFetch` itself (one token serves every request to that storage).
  *
  * `docs/plans/lws-auth.md` C3; the credential is never sent to a storage.
@@ -90,7 +105,8 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
    * has no `resource` claim; its ODRL target is what binds it to the storage.
    */
   async function idJag(audience: string, storage: string): Promise<string> {
-    const key = options.accessClaim ? `${audience}\n${storage}` : audience
+    const scoped = options.accessClaim !== undefined || options.impersonation !== undefined
+    const key = scoped ? `${audience}\n${storage}\n${options.impersonation?.uas ?? ''}` : audience
     const cached = grants.get(key)
     if (cached && cached.expiresAt > now() + renewalMargin) return cached.token
 
@@ -98,16 +114,33 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
     if (inFlight) return inFlight
 
     const promise = (async (): Promise<string> => {
-      const token = await requestIdJag({
+      const firstAudience = options.impersonation?.uas ?? audience
+      let token = await requestIdJag({
         uas: credential.issuer,
         tokenEndpoint: await uasTokenEndpoint(credential.issuer),
-        audience,
+        audience: firstAudience,
         subjectToken: await credential.getSubjectToken(),
         clientId: credential.clientId,
         dpopKeyPair: credential.dpopKeyPair,
         accessClaim: await options.accessClaim?.(storage, audience),
         fetch: tokenFetch,
       })
+
+      if (options.impersonation) {
+        // The intermediate UAS verifies the self-issued ID-JAG, rewrites the
+        // claim to the visible actor, and issues the ID-JAG for the storage AS.
+        token = await requestIdJag({
+          uas: options.impersonation.uas,
+          tokenEndpoint: options.impersonation.tokenEndpoint,
+          audience,
+          subjectToken: token,
+          subjectTokenType: ID_JAG_TOKEN_TYPE,
+          clientId: credential.clientId,
+          dpopKeyPair: credential.dpopKeyPair,
+          fetch: tokenFetch,
+        })
+      }
+
       grants.set(key, {
         token,
         expiresAt: jwtExpiresAt(token) ?? now() + 300_000,
