@@ -215,9 +215,25 @@ export class IdJagTokenHandler extends HttpHandler {
     span.setAttribute('sai.lws.subject_id', subject.subject)
     span.setAttribute('sai.lws.subject_issuer', subject.issuer)
 
+    // The client only names the storage; the UAS adds the grants the user has
+    // for that storage and client. A client-supplied `access` claim bypasses
+    // derivation and is validated against the assigner's grant registry below.
+    let derivedAccess: VerifiedAccessClaim | undefined
+    if (access === undefined && subjectTokenType !== ID_JAG_TOKEN_TYPE && resource !== undefined) {
+      derivedAccess = await this.claimValidator?.find?.({
+        subject: subject.subject,
+        client: subject.client,
+        storage: resource,
+      })
+      if (derivedAccess) {
+        span.setAttribute('sai.lws.access.derived', true)
+        span.setAttribute('sai.lws.access.storage', derivedAccess.storage)
+      }
+    }
+
     let issuedSubject = subject.subject
     let issuedClient = subject.client
-    let issuedAccess = access
+    let issuedAccess = access ?? derivedAccess
     let issuedAct: ActorClaim | undefined
 
     if (subjectTokenType === ID_JAG_TOKEN_TYPE) {
@@ -287,6 +303,12 @@ export class IdJagTokenHandler extends HttpHandler {
         )
       }
       this.verifyClaimIdentity(issuedAccess, subject.subject, subject.client)
+      // A client-supplied claim is grant-backed, exactly like an incoming
+      // ID-JAG's claim. A claim derived from the user's registries needs no
+      // second lookup here; the next UAS validates it on the wire.
+      if (access !== undefined && this.claimValidator) {
+        await this.validateClaim(issuedAccess, subject.subject, subject.client)
+      }
     }
 
     const idJag = await this.issuer.issue(
@@ -363,10 +385,38 @@ export class IdJagTokenHandler extends HttpHandler {
   }
 
   /**
+   * Validates a client-supplied claim against the assigner's grant registry.
+   * The form field is kept for clients that already hold a grant; derivation
+   * via `resource` is the normal app flow.
+   */
+  private async validateClaim(
+    claim: VerifiedAccessClaim,
+    subject: string,
+    client: string
+  ): Promise<void> {
+    const assigner = claim.assigners[0]
+    if (claim.assigners.length !== 1 || !assigner) {
+      throw new OAuthError('invalid_request', 'An access claim needs exactly one assigner.')
+    }
+    try {
+      await this.claimValidator!.validate({
+        assigner,
+        subject,
+        client,
+        access: claim.access,
+        context: claim.context,
+        storage: claim.storage,
+      })
+    } catch (error: unknown) {
+      throw new OAuthError('invalid_grant', `Invalid access claim: ${(error as Error).message}`)
+    }
+  }
+
+  /**
    * Parses and validates the optional ODRL `access` request parameter. The
    * parameter is a JSON-encoded array of compact ODRL policies, using the
    * bundled ID-JAG context. A request without it keeps the identity-only
-   * ID-JAG shape.
+   * ID-JAG shape unless `resource` lets the UAS derive a grant-backed claim.
    */
   private async accessClaim(params: URLSearchParams): Promise<VerifiedAccessClaim | undefined> {
     const values = params.getAll('access')

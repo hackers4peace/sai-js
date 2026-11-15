@@ -1,3 +1,4 @@
+import { createDpopProof } from '@elfpavlik/lws-auth'
 import { buildSelfIssuedCredential } from '@elfpavlik/sai-components'
 import { grantAccess } from '@janeirodigital/interop-data-model'
 import {
@@ -9,16 +10,24 @@ import {
 import { decodeJwt } from 'jose'
 import { describe, expect, test } from 'vitest'
 
-import { storeDelegatedGrant } from './grant-fixtures'
+import { loginAsClient } from './oidc-client'
 
 /*
  * C2 impersonation (docs/plans/id-jag.md):
  *
- *   Bob's UAS --ID-JAG(aud=auth, claim YoYo -> Bob)--> YoYo's UAS
- *            --ID-JAG(aud=data, sub=YoYo, claim YoYo -> auth)--> ACME's AS
+ *   App --at+jwt-->
+ *   Bob's UAS --ID-JAG(aud=YoYo's UAS, claim YoYo -> Bob)-->
+ *   YoYo's UAS --ID-JAG(aud=data, sub=YoYo, claim YoYo -> auth)--> ACME's AS
  *
  * Bob and his client must not appear in the second ID-JAG or the access token;
  * ACME only sees YoYo and the narrowed ODRL claim.
+ *
+ * The happy path acts as a real **app**: it signs in through the OIDC code flow
+ * (PKCE + `dpop_jkt`), mints the DPoP-bound LWS credential with itself as
+ * `client_id`, and drives both ID-JAG hops. The app only names the storage;
+ * Bob's UAS finds the pre-existing YoYo -> Bob grant in Bob's registry-pod
+ * dataset and adds it as the access claim. The two rejection tests keep the
+ * cheaper self-issued credential — they only exercise the UAS checks.
  */
 
 const AUTH = process.env.CSS_BASE_URL ?? 'https://auth/'
@@ -31,6 +40,9 @@ const SHAPE_TREE = 'https://data/shapetrees/trees/Project'
 const BOB = 'https://id/bob'
 const YOYO = 'https://id/yoyo'
 const ACME = 'https://id/acme'
+/** The app acting for Bob: the `test-client` metadata document, served by `data`. */
+const TEST_CLIENT = 'https://data/test-client/public/id'
+const BOB_EMAIL = 'bob@yoyodyne.example'
 
 const TOKEN_EXCHANGE = 'urn:ietf:params:oauth:grant-type:token-exchange'
 const ID_JAG_TYPE = 'urn:ietf:params:oauth:token-type:id-jag'
@@ -71,40 +83,64 @@ async function mintIdJag(body: Record<string, unknown>): Promise<string> {
 
 describe('C2 impersonation chain', () => {
   test('Bob -> YoYo -> ACME hides Bob and the delegated grant references', async () => {
-    await storeDelegatedGrant({
-      assigner: YOYO,
-      assignee: BOB,
-      dataOwner: ACME,
-      claim,
-      scopeOfGrant: INTEROP.SelectedFromRegistry,
-      storage: DATA_STORAGE,
-      registeredShapeTree: SHAPE_TREE,
-      hasDataRegistration: DATA_REGISTRATION,
-      hasDataInstance: [DATA_RESOURCE],
+    // The app signs Bob in through the OP (`auth` is both UAS and OP): code +
+    // PKCE bound to the app's key, then the DPoP-bound credential naming the
+    // app as `client_id` — no in-process signing with the env key.
+    const app = await loginAsClient({ webid: BOB, email: BOB_EMAIL, clientId: TEST_CLIENT })
+    const subjectToken = app.subjectToken
+    const dpop = await createDpopProof({
+      method: 'POST',
+      url: TOKEN_ENDPOINT,
+      keyPair: app.keyPair,
     })
-    const bob = await buildSelfIssuedCredential(BOB)
-    const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
-    const dpop = await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair)
+    expect(app.credentialClaims).toMatchObject({
+      iss: AUTH,
+      sub: BOB,
+      webid: BOB,
+      client_id: TEST_CLIENT,
+      cnf: { jkt: app.dpopJkt },
+    })
 
-    // Bob's UAS self-issues the first hop for YoYo's UAS. The claim is the
-    // delegated grant YoYo -> Bob (assigner != subject is allowed for this hop).
+    // The app only names the storage. Bob's UAS derives the claim from the
+    // pre-existing delegated grant YoYo -> Bob for that storage (the grant is
+    // mirrored into Bob's registry-pod dataset).
     const firstResponse = await exchange(
       {
         audience: AUTH,
+        resource: DATA_STORAGE,
         subject_token: subjectToken,
         subject_token_type: ID_TOKEN_TYPE,
-        access: JSON.stringify(claim),
       },
       dpop
     )
     expect(firstResponse.status).toBe(200)
     const first = await mintIdJag((await firstResponse.json()) as Record<string, unknown>)
-    expect(decodeJwt(first)).toMatchObject({
+    const firstPayload = decodeJwt(first)
+    expect(firstPayload).toMatchObject({
       iss: AUTH,
       aud: AUTH,
       sub: BOB,
-      client_id: bob.clientId,
-      access: claim,
+      client_id: TEST_CLIENT,
+      '@context': ODRL_ID_JAG_CONTEXT,
+    })
+    const derived = (firstPayload.access as any[])[0]
+    expect(derived).toMatchObject({
+      assignee: BOB,
+      profile: claim[0].profile,
+      scopeOfGrant: claim[0].scopeOfGrant,
+      permission: [
+        expect.objectContaining({
+          assigner: YOYO,
+          assignee: BOB,
+          action: claim[0].permission[0].action,
+          target: expect.objectContaining({
+            owner: claim[0].permission[0].target.owner,
+            storage: claim[0].permission[0].target.storage,
+            type: claim[0].permission[0].target.type,
+            source: claim[0].permission[0].target.source,
+          }),
+        }),
+      ],
     })
 
     // YoYo's UAS verifies the incoming ID-JAG, rewrites the claim to the
@@ -151,7 +187,7 @@ describe('C2 impersonation chain', () => {
     expect(rewritten.permission[0].id).toMatch(/^urn:uuid:/u)
     const serialized = JSON.stringify(secondPayload)
     expect(serialized).not.toContain(BOB)
-    expect(serialized).not.toContain(bob.clientId)
+    expect(serialized).not.toContain(TEST_CLIENT)
     expect(serialized).not.toContain('"act"')
 
     // ACME's AS exchanges the visible ID-JAG for a storage access token.
@@ -177,7 +213,7 @@ describe('C2 impersonation chain', () => {
       '@context': ODRL_ID_JAG_CONTEXT,
     })
     expect(JSON.stringify(accessPayload)).not.toContain(BOB)
-    expect(JSON.stringify(accessPayload)).not.toContain(bob.clientId)
+    expect(JSON.stringify(accessPayload)).not.toContain(TEST_CLIENT)
 
     // The claim-first policy engine grants the narrowed project.
     const read = await fetch(DATA_RESOURCE, {
@@ -186,63 +222,36 @@ describe('C2 impersonation chain', () => {
     expect(read.status).toBe(200)
   })
 
-  test('rejects a delegated claim with no backing grant in the assigner registry', async () => {
+  test('issues an identity-only ID-JAG when the user has no grant for the storage', async () => {
     const bob = await buildSelfIssuedCredential(BOB)
     const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
 
+    // `kim-red` is a storage on the same data server, but the seed holds no grant
+    // for Bob there: the derivation finds nothing and the UAS mints an
+    // identity-only ID-JAG instead of inventing a claim.
     const firstResponse = await exchange(
       {
         audience: AUTH,
+        resource: 'https://data/kim-red/',
         subject_token: subjectToken,
         subject_token_type: ID_TOKEN_TYPE,
-        access: JSON.stringify(claim),
       },
       await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair)
     )
     expect(firstResponse.status).toBe(200)
     const first = await mintIdJag((await firstResponse.json()) as Record<string, unknown>)
+    expect(decodeJwt(first).access).toBeUndefined()
 
-    // Deliberately no storeDelegatedGrant: YoYo's UAS must reject the claim
-    // rather than trusting Bob's UAS signature alone.
+    // The next UAS needs the claim the client never got.
     const secondResponse = await exchange({
       audience: DATA_AS,
-      resource: DATA_STORAGE,
+      resource: 'https://data/kim-red/',
       subject_token: first,
       subject_token_type: ID_JAG_TYPE,
     })
     expect(secondResponse.status).toBe(400)
     expect((await secondResponse.json()) as Record<string, unknown>).toMatchObject({
-      error: 'invalid_grant',
+      error: 'invalid_request',
     })
-  })
-
-  test('rejects an incoming ID-JAG whose claim was issued to another delegatee', async () => {
-    const bob = await buildSelfIssuedCredential(BOB)
-    const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
-    const wrongClaim = grantAccess({
-      scopeOfGrant: INTEROP.SelectedFromRegistry,
-      owner: ACME,
-      storage: DATA_STORAGE,
-      hasDataRegistration: DATA_REGISTRATION,
-      hasDataInstance: [DATA_RESOURCE],
-      registeredShapeTree: SHAPE_TREE,
-      assigner: YOYO,
-      assignee: 'https://id/mallory',
-      actions: [ODRL.read],
-    })
-
-    // Bob's UAS may self-issue a grant assigned to *him*; a claim for another
-    // delegatee is rejected before the first ID-JAG exists.
-    const response = await exchange(
-      {
-        audience: AUTH,
-        subject_token: subjectToken,
-        subject_token_type: ID_TOKEN_TYPE,
-        access: JSON.stringify(wrongClaim),
-      },
-      await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair)
-    )
-    expect(response.status).toBe(400)
-    expect(((await response.json()) as Record<string, unknown>).error).toBe('invalid_request')
   })
 })

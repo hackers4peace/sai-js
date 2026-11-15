@@ -13,6 +13,7 @@ const UAS_TOKEN_ENDPOINT = 'https://auth/.well-known/lws/token'
 const RAS = 'https://data/'
 const RAS_TOKEN_ENDPOINT = 'https://data/.well-known/lws/token'
 const CLIENT = 'https://data/test-client/public/id'
+const STORAGE = 'https://data/alice-work/'
 const SUBJECT_TOKEN = makeJwt({ iss: UAS, aud: 'solid', sub: 'https://id/alice' })
 const ID_JAG = makeJwt({ iss: UAS, aud: RAS, sub: 'https://id/alice', client_id: CLIENT })
 const ACCESS_CLAIM = [{ id: 'urn:policy', permission: [] }]
@@ -38,6 +39,7 @@ describe('requestIdJag', () => {
       requestIdJag({
         uas: UAS,
         audience: RAS,
+        resource: STORAGE,
         subjectToken: SUBJECT_TOKEN,
         clientId: CLIENT,
         dpopKeyPair: keyPair,
@@ -50,6 +52,7 @@ describe('requestIdJag', () => {
     expect(body.get('grant_type')).toBe('urn:ietf:params:oauth:grant-type:token-exchange')
     expect(body.get('requested_token_type')).toBe(ID_JAG_TOKEN_TYPE)
     expect(body.get('audience')).toBe(RAS)
+    expect(body.get('resource')).toBe(STORAGE)
     expect(body.get('subject_token')).toBe(SUBJECT_TOKEN)
     expect(body.get('subject_token_type')).toBe(ID_TOKEN_TYPE)
     // the credential is sender-constrained: the proof is what makes it exchangeable

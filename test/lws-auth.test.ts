@@ -2,14 +2,13 @@ import { buildLwsFetch, buildSelfIssuedCredential } from '@elfpavlik/sai-compone
 import { grantAccess } from '@janeirodigital/interop-data-model'
 import {
   INTEROP,
+  LWS,
   ODRL,
   ODRL_ID_JAG_CONTEXT,
   createLwsTokenDpopProof,
 } from '@janeirodigital/interop-utils'
 import { decodeJwt, decodeProtectedHeader } from 'jose'
 import { describe, expect, test } from 'vitest'
-
-import { storeDelegatedGrant } from './grant-fixtures'
 
 /*
  * The LWS authorization chain (docs/plans/lws-auth.md):
@@ -202,7 +201,8 @@ describe('ODRL access claim in the ID-JAG (C1)', () => {
     registeredShapeTree: 'https://data/shapetrees/trees/Project',
     assigner: WEBID,
     assignee: CLIENT,
-    actions: [ODRL.read],
+    // Exactly the pre-existing Alice -> test-client grant in the seed registry.
+    actions: [ODRL.read, LWS.create, ODRL.modify, ODRL.delete],
   })
 
   test('self-issues the claim, keeps it in the access token, and evaluates it claim-first', async () => {
@@ -279,37 +279,26 @@ describe('two-step chain from the client (@elfpavlik/lws-auth)', () => {
   })
 })
 
+describe('UAS-derived app grant', () => {
+  test('uses the user -> client grant of the requested storage', async () => {
+    const storageFetch = await buildLwsFetch('https://id/bob', CLIENT, { idJag: true })
+
+    const response = await storageFetch('https://data/bob/n3onkx', {
+      headers: { accept: 'text/turtle' },
+    })
+    expect(response.status).toBe(200)
+  })
+})
+
 describe('C2 impersonation through @elfpavlik/lws-auth', () => {
   const bob = 'https://id/bob'
-  const yoyo = 'https://id/yoyo'
-  const claim = grantAccess({
-    scopeOfGrant: INTEROP.SelectedFromRegistry,
-    owner: 'https://id/acme',
-    storage: 'https://data/acme-rnd/',
-    hasDataRegistration: 'https://data/acme-rnd/reb39k',
-    hasDataInstance: ['https://data/acme-rnd/pbh2yw'],
-    registeredShapeTree: 'https://data/shapetrees/trees/Project',
-    assigner: yoyo,
-    assignee: bob,
-    actions: [ODRL.read],
-  })
 
   test('delegation mode reads the same project with a visible actor chain', async () => {
-    await storeDelegatedGrant({
-      assigner: yoyo,
-      assignee: bob,
-      dataOwner: 'https://id/acme',
-      claim,
-      scopeOfGrant: INTEROP.SelectedFromRegistry,
-      storage: 'https://data/acme-rnd/',
-      registeredShapeTree: 'https://data/shapetrees/trees/Project',
-      hasDataRegistration: 'https://data/acme-rnd/reb39k',
-      hasDataInstance: ['https://data/acme-rnd/pbh2yw'],
-    })
+    // No `accessClaim`: the client only names the storage, and Bob's UAS derives
+    // YoYo -> Bob from the pre-existing seed grant.
     const storageFetch = await buildLwsFetch(bob, undefined, {
       idJag: true,
       impersonation: { uas: AUTH, mode: 'delegation' },
-      accessClaim: () => claim,
     })
 
     const response = await storageFetch('https://data/acme-rnd/pbh2yw', {
@@ -319,21 +308,9 @@ describe('C2 impersonation through @elfpavlik/lws-auth', () => {
   })
 
   test('Bob -> YoYo -> ACME reads a narrowed project', async () => {
-    await storeDelegatedGrant({
-      assigner: yoyo,
-      assignee: bob,
-      dataOwner: 'https://id/acme',
-      claim,
-      scopeOfGrant: INTEROP.SelectedFromRegistry,
-      storage: 'https://data/acme-rnd/',
-      registeredShapeTree: 'https://data/shapetrees/trees/Project',
-      hasDataRegistration: 'https://data/acme-rnd/reb39k',
-      hasDataInstance: ['https://data/acme-rnd/pbh2yw'],
-    })
     const storageFetch = await buildLwsFetch(bob, undefined, {
       idJag: true,
       impersonation: { uas: AUTH },
-      accessClaim: () => claim,
     })
 
     const response = await storageFetch('https://data/acme-rnd/pbh2yw', {

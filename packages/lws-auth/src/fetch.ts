@@ -66,12 +66,11 @@ interface CachedGrant {
  *    the storage,
  * 3. the storage request, retried once on `401`.
  *
- * Without an access claim (or an impersonation hop) the ID-JAG cache is keyed
- * by **resource authorization server**: `aud` makes a grant useless anywhere
- * else, and several storages may share one authorization server. With a claim
- * or impersonation it is keyed by `(issuer, storage)` because one claim binds
- * the grant to one storage. Access tokens are cached per storage by
- * `createLwsFetch` itself (one token serves every request to that storage).
+ * The UAS derives the claim from the user's grants for the requested storage,
+ * so the ID-JAG cache is keyed by `(issuer, storage)` (and the impersonation
+ * UAS when present): one claim binds the grant to one storage. Access tokens
+ * are cached per storage by `createLwsFetch` itself (one token serves every
+ * request to that storage).
  *
  * `docs/plans/lws-auth.md` C3; the credential is never sent to a storage.
  */
@@ -107,8 +106,7 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
    * has no `resource` claim; its ODRL target is what binds it to the storage.
    */
   async function idJag(audience: string, storage: string): Promise<string> {
-    const scoped = options.accessClaim !== undefined || options.impersonation !== undefined
-    const key = scoped ? `${audience}\n${storage}\n${options.impersonation?.uas ?? ''}` : audience
+    const key = `${audience}\n${storage}\n${options.impersonation?.uas ?? ''}`
     const cached = grants.get(key)
     if (cached && cached.expiresAt > now() + renewalMargin) return cached.token
 
@@ -121,6 +119,7 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
         uas: credential.issuer,
         tokenEndpoint: await uasTokenEndpoint(credential.issuer),
         audience: firstAudience,
+        resource: storage,
         subjectToken: await credential.getSubjectToken(),
         clientId: credential.clientId,
         dpopKeyPair: credential.dpopKeyPair,
@@ -135,6 +134,7 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
           uas: options.impersonation.uas,
           tokenEndpoint: options.impersonation.tokenEndpoint,
           audience,
+          resource: storage,
           subjectToken: token,
           subjectTokenType: ID_JAG_TOKEN_TYPE,
           clientId: credential.clientId,

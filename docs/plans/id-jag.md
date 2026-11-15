@@ -319,8 +319,17 @@ package tests for ID-JAG claim/context/token propagation (user-run).
   `resource`, bundled context), and requires the C1 self-issued identity:
   `assigner` = authenticated subject, `assignee` = client (or subject for a UAS
   acting as agent). The claim is bound to a request-supplied `resource` when
-  present. Grant-backed claim derivation is C2; C1 treats the authenticated
-  client as the self-issuing UAS.
+  present. A client-supplied claim is validated against the assigner's grant
+  registry, exactly like an incoming ID-JAG claim.
+- **UAS-derived claims (2026-11-15).** The app sends `resource` (the storage)
+  and no `access`; the UAS finds the grants in the user's registry-pod dataset
+  (reciprocal mirrors included) for that storage and client. An app-specific
+  grant (user -> client) wins; otherwise the narrowest delegated grant edge is
+  used (Selected > Inherited > AllFromRegistry > AllFromAgent). The optional
+  form `access` remains for clients that hold the grant themselves, but it is
+  now validated against the assigner's grant registry exactly like an incoming
+  ID-JAG claim. `@elfpavlik/lws-auth` sends `resource` and keys the ID-JAG cache
+  per storage.
 - `IdJagSubjectTokenVerifier` expands **only** the `access` subtree after the
   signature check, validates the context/storage, and binds the claim to the
   exchange `resource`. CSS passes `resource` to every subject-token verifier

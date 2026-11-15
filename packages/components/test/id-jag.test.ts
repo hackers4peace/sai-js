@@ -15,6 +15,7 @@ import type { GenerateKeyPairResult } from 'jose'
 import { beforeAll, describe, expect, test } from 'vitest'
 
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE, IdJagIssuer } from '../src/IdJagIssuer.js'
+import type { IdJagTokenHandlerArgs } from '../src/IdJagTokenHandler.js'
 import { ID_JAG_GRANT_TYPE, IdJagTokenHandler } from '../src/IdJagTokenHandler.js'
 import {
   CLAIM_CLIENT,
@@ -135,7 +136,10 @@ beforeAll(async () => {
   await calculateJwkThumbprint(publicJwk)
 })
 
-function buildHandler(): { handler: IdJagTokenHandler; verifier: StubVerifier } {
+function buildHandler(overrides: Partial<IdJagTokenHandlerArgs> = {}): {
+  handler: IdJagTokenHandler
+  verifier: StubVerifier
+} {
   const generator: JwkGenerator = {
     alg: 'ES256',
     getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
@@ -147,6 +151,7 @@ function buildHandler(): { handler: IdJagTokenHandler; verifier: StubVerifier } 
     issuer,
     verifier,
     storageOrigins: ['data', 'registry'],
+    ...overrides,
   })
   return { handler, verifier }
 }
@@ -248,6 +253,80 @@ describe('IdJagTokenHandler', () => {
     )
     expect(payload['@context']).toBe(ODRL_ID_JAG_CONTEXT)
     expect(payload.access).toEqual(claim)
+  })
+
+  test('derives the access claim from the grants for the requested storage', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const lookups: unknown[] = []
+    const { handler } = buildHandler({
+      claimValidator: {
+        validate: async () => undefined,
+        find: async (input) => {
+          lookups.push(input)
+          return {
+            access: claim,
+            context: ODRL_ID_JAG_CONTEXT,
+            storage: CLAIM_STORAGE,
+            assigners: [YOYO],
+            assignees: [CLAIM_SUBJECT],
+          }
+        },
+      },
+    })
+
+    const captured = await call(handler, tokenRequest({ resource: CLAIM_STORAGE }))
+
+    expect(captured.status).toBe(200)
+    expect(lookups).toEqual([{ subject: WEBID, client: CLIENT, storage: CLAIM_STORAGE }])
+    const { payload } = await jwtVerify(
+      JSON.parse(String(captured.body)).access_token,
+      keys.publicKey
+    )
+    expect(payload['@context']).toBe(ODRL_ID_JAG_CONTEXT)
+    expect(payload.access).toEqual(claim)
+  })
+
+  test('validates a client-supplied delegated claim like an incoming ID-JAG', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const validated: unknown[] = []
+    const { handler } = buildHandler({
+      claimValidator: {
+        validate: async (input) => {
+          validated.push(input)
+        },
+      },
+    })
+
+    const captured = await call(handler, tokenRequest({ access: JSON.stringify(claim) }))
+
+    expect(captured.status).toBe(200)
+    expect(validated).toEqual([
+      {
+        assigner: YOYO,
+        subject: WEBID,
+        client: CLIENT,
+        access: claim,
+        context: ODRL_ID_JAG_CONTEXT,
+        storage: CLAIM_STORAGE,
+      },
+    ])
+  })
+
+  test('rejects a client-supplied delegated claim with no backing grant', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const { handler } = buildHandler({
+      claimValidator: {
+        validate: async () => {
+          throw new Error('no existing grant')
+        },
+      },
+    })
+
+    const captured = await call(handler, tokenRequest({ access: JSON.stringify(claim) }))
+
+    expect(captured.status).toBe(400)
+    expect(JSON.parse(String(captured.body)).error).toBe('invalid_grant')
+    expect(JSON.parse(String(captured.body)).error_description).toContain('no existing grant')
   })
 
   test('rejects an access claim spanning more than one storage', async () => {

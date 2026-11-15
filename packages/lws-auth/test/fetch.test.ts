@@ -131,7 +131,7 @@ const isStorageRequest = (request: { url: string; method: string }): boolean =>
   request.method === 'GET' && !request.url.includes('/.well-known/')
 
 describe('createLwsAuthFetch', () => {
-  test('uses one ID-JAG per authorization server for several storages', async () => {
+  test('asks the UAS for a storage-specific grant for each storage', async () => {
     const world = createWorld()
     const fetch = createLwsAuthFetch({
       credential: createCredential(),
@@ -146,8 +146,12 @@ describe('createLwsAuthFetch', () => {
     expect(second.status).toBe(200)
 
     const grantRequests = world.requests.filter(isGrantRequest)
-    expect(grantRequests).toHaveLength(1)
-    expect(formBody(grantRequests[0]).get('audience')).toBe(DATA)
+    expect(grantRequests).toHaveLength(2)
+    expect(grantRequests.map((request) => formBody(request).get('audience'))).toEqual([DATA, DATA])
+    expect(grantRequests.map((request) => formBody(request).get('resource'))).toEqual([
+      DATA_STORAGE,
+      DATA_STORAGE_2,
+    ])
 
     const resources = world.requests
       .filter(isStorageTokenRequest)
@@ -196,8 +200,10 @@ describe('createLwsAuthFetch', () => {
     expect(grantRequests).toHaveLength(2)
     const [first, second] = grantRequests.map(formBody)
     expect(first.get('audience')).toBe(UAS)
+    expect(first.get('resource')).toBe(DATA_STORAGE)
     expect(first.get('subject_token_type')).toBe(ID_TOKEN_TYPE)
     expect(second.get('audience')).toBe(DATA)
+    expect(second.get('resource')).toBe(DATA_STORAGE)
     expect(second.get('subject_token_type')).toBe(ID_JAG_TOKEN_TYPE)
     expect(second.get('subject_token')).toBe(world.grants[0])
     expect(second.get('access')).toBeNull()

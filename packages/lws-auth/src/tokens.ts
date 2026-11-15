@@ -92,6 +92,11 @@ export interface IdJagRequest extends TokenRequestOptions {
   tokenEndpoint?: string
   /** Issuer identifier of the resource authorization server the grant is for. */
   audience: string
+  /**
+   * The storage the grant is for. The UAS uses it to derive the access claim
+   * from the user's grants; a client no longer needs to build the claim.
+   */
+  resource?: string
   /** The authentication credential (ID token / self-issued JWT) or an ID-JAG. */
   subjectToken: string
   /**
@@ -124,6 +129,9 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
     subject_token: request.subjectToken,
     subject_token_type: subjectTokenType,
   }
+  if (request.resource !== undefined) {
+    parameters.resource = request.resource
+  }
   if (request.accessClaim !== undefined) {
     parameters.access = JSON.stringify(request.accessClaim)
   }
@@ -138,6 +146,7 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
       'sai.lws.subject_token_type': subjectTokenType,
       'sai.lws.audience': request.audience,
       'sai.lws.client_auth_method': 'none',
+      ...(request.resource === undefined ? {} : { 'sai.lws.resource': request.resource }),
       ...(request.mode === undefined ? {} : { 'sai.lws.mode': request.mode }),
     })
     setTokenAttributes(span, 'subject', request.subjectToken)

@@ -143,6 +143,29 @@ model {
         deployed by SAI** — `h4p.Data.LwsAuthorizationServer` fills this role.
       '''
     }
+
+    component CID 'CID' 'id' {
+      description '''
+        Bob's controlled identifier (`https://id/bob`, served by `sai-id`). It is
+        the `sub`/`webid` of every credential his UAS issues, and his UAS loads it
+        when it builds the session that derives the claim from the grant registry.
+        A storage dereferences it only for a token from another issuer — Bob's UAS
+        is the issuer here, so ACME never fetches it.
+      '''
+    }
+  }
+
+  extend YoYo {
+    component CID 'CID' 'id' {
+      description '''
+        YoYo's controlled identifier (`https://id/yoyo`, served by `sai-id`).
+        Loaded twice in the impersonation chain: by YoYo's own UAS when its
+        session bootstraps the profile (the registry set is **derived** from the
+        id origin plus the account-storage endpoint record, not read from this
+        document), and by ACME's AS when it verifies the re-issued ID-JAG (`sub`
+        is now YoYo).
+      '''
+    }
   }
 
   // Subject-token validation hops (SAI's flavour of "validate all presented tokens")
@@ -668,7 +691,761 @@ views {
   }
 
   /*
-   * 3. The decentralized variant lws-auth/oidc.c4 draws: a separate UAS and
+   * 3. C2 impersonation (`docs/plans/id-jag.md`): the app names a storage and
+   *    Bob's UAS derives the claim from the delegated grant it holds; the next
+   *    UAS re-issues it under the VISIBLE actor (YoYo) — Bob, the client's
+   *    identity in the claim, the actor chain and the original claim ids all
+   *    disappear before ACME's AS sees anything. The single-hop view above
+   *    explains the endpoints this reuses.
+   */
+  dynamic view lws-impersonation {
+    title: 'LWS impersonation (implemented, C2)'
+    description '''
+      **SAI capture, 2026-11-15** (`/test` `impersonation.test.ts` ›
+      `Bob -> YoYo -> ACME hides Bob and the delegated grant references`,
+      trace `a034196f…`, 3.9 s, dagger `--tempo-endpoint`). One trace holds the
+      whole chain: the app's OIDC sign-in (discovery 30 ms, authorize 291 ms,
+      code → token 109 ms), the credential mint (`sai.lws.issue-id-token`,
+      78 ms), **hop 1 with claim derivation** (658 ms — Bob's UAS loads the
+      profile, authenticates to Bob's registry and reads the grants), the
+      impersonation hop (368 ms), the `sai.lws.verify-id-jag` at each receiving
+      server (6 ms at YoYo's UAS, 53 ms at ACME's AS) and the storage read
+      (206 ms).
+
+      The app never builds the claim: it sends `audience` (the UAS),
+      `resource` (the storage) and its credential, and Bob's UAS adds the grant
+      as `access`. The grant is **seed data**, not a test fixture write:
+      `https://registry/yoyo/q7w2nz` (YoYo → Bob, `SelectedFromRegistry`,
+      `https://data/acme-rnd/`) in `environments/data/registry.trig`. In the
+      dev/test setup one shared registry endpoint makes peer grants visible in
+      Bob's registry-pod dataset; a split deployment backfills them through the
+      reciprocal mirror. With no matching grant the UAS mints an identity-only
+      ID-JAG instead of inventing a claim.
+
+      The client is the **test client** (`https://data/test-client/public/id`, its
+      metadata document served by `data`): the happy path signs in through the
+      OIDC code flow with PKCE and `dpop_jkt`, mints a credential naming itself
+      as `client_id`, and drives both hops. In the trace it is `sai-test`
+      (`App.UI`); nothing is self-issued with `CSS_ENCODED_PRIVATE_JWK`.
+
+      Roles, not processes: one `auth.docker` process plays Bob's UAS *and*
+      YoYo's UAS (both ID-JAGs have `iss=https://auth/`) and is the OpenID
+      provider for both, so no separate provider box exists — each UAS answers
+      its own discovery and `/.oidc/jwks`. Likewise each party's CID is its own
+      document (`Bob.CID`, `YoYo.CID`), not a shared WebID service.
+
+      ACME's AS is the LWS authorization server of `h4p.Data` (`https://data/`)
+      and the storage is `https://acme-rnd.data.docker/`.
+
+      `sai.token.id-jag.*` is captured on all four spans; the `access` claims
+      quoted below are verbatim from `sai.token.id-jag.claims` for this run.
+    '''
+
+    include App, Bob, YoYo
+    include App.UI, Bob.UAS, Bob.CID, Bob.Registry, YoYo.UAS, YoYo.CID, YoYo.Registry
+    include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
+
+    style App {
+      color: gray
+    }
+
+    style Bob {
+      color: green
+    }
+
+    style YoYo {
+      color: indigo
+    }
+
+    style h4p.Data {
+      color: sky
+    }
+
+    App.UI -> Bob.UAS 'GET /.well-known/openid-configuration — OIDC discovery' {
+      notes'''
+      #### GET /.well-known/openid-configuration — OIDC discovery
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > Bob's UAS is also his OpenID provider — no separate provider element
+
+      >[!TIP]
+      > `oauth4webapi` (`createBrowserSession`) discovers the endpoints once;
+      > `issuer` must equal this URL. The client's metadata document
+      > (`https://data/test-client/public/id`) is fetched by the OP during the
+      > authorize request — served by `data` from the fixture.
+
+      ```http
+      GET https://auth.docker/.well-known/openid-configuration
+      Accept: application/json
+      ```
+      ---
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+      ```
+      '''
+    }
+
+    App.UI -> Bob.UAS 'GET /.oidc/auth — code + PKCE + dpop_jkt' {
+      notes'''
+      #### GET /.oidc/auth — code + PKCE + dpop_jkt
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > Auth: none yet — this *is* the sign-in
+
+      >[!TIP]
+      > the code is bound to the app's key (`dpop_jkt`), so the token request
+      > needs a `DPoP` proof for it (RFC 9449 §10)
+
+      ```http
+      GET https://auth.docker/.oidc/auth
+        ?client_id=https%3A%2F%2Fdata%2Ftest-client%2Fpublic%2Fid
+        &redirect_uri=https%3A%2F%2Fdata%2Ftest-client%2Fpublic%2Fid
+        &response_type=code&scope=openid+webid
+        &state=…&nonce=…
+        &code_challenge=…&code_challenge_method=S256
+        &dpop_jkt=8UULSx3lKWs4c3oLQyKg1DuTnaWGSFQsxFuf1JTyCxM
+      ```
+
+      The OP has no session, so the response is `303` to its own interaction
+      pages; `test/oidc-client.ts` drives them like a browser would, posting the
+      controls each page advertises:
+
+      | step | request | then |
+      | --- | --- | --- |
+      | sign-in | `POST /.account/login/password/` `{email, password}` | `200 {location}` → `GET` resume → `303` |
+      | WebID picker | `POST /.account/oidc/pick-webid/` `{webId, remember}` | `200 {location}` → `GET` resume → `303` |
+      | consent | `POST /.account/oidc/consent/` | `200 {location}` → `GET` resume → `303` to the client |
+
+      (76 ms, 7 ms and 7 ms; the `GET` resumes are 104 / 109 / 98 ms.)
+
+      **Where the identity comes from.** The picker's `GET` returns the WebIDs
+      linked to the signed-in account (`WebIdStore.findLinks`, the `webIdLink`
+      records of `bob@yoyodyne.example` → `https://id/bob`), and its `POST` stores
+      the pick as the OIDC session's `accountId`. That value — not the CID document
+      — is what the OP later puts in `sub`/`webid`; nothing fetches
+      `https://id/bob` during the sign-in.
+      '''
+    }
+
+    Bob.UAS -> App.UI '303 redirect_uri?code=…&state=…&iss=https://auth/' {
+      notes'''
+      #### 303 redirect_uri?code=…&state=…&iss=https://auth/
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!TIP]
+      > `oauth4webapi.validateAuthResponse` checks `state` and `iss` before the
+      > code is redeemed; the test never follows this redirect (no browser)
+
+      ```http
+      HTTP/1.1 303 See Other
+      Location: https://data/test-client/public/id
+        ?code=…&state=…&iss=https%3A%2F%2Fauth.docker%2F
+      ```
+      '''
+    }
+
+    App.UI -> Bob.UAS 'POST /.oidc/token — code + verifier + DPoP' {
+      notes'''
+      #### POST /.oidc/token — code + verifier + DPoP
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > Auth: PKCE `code_verifier` + a `DPoP` proof for `dpop_jkt`
+
+      ```http
+      POST https://auth.docker/.oidc/token
+      Content-Type: application/x-www-form-urlencoded
+      DPoP: <proof for 8UULSx3l…>
+
+      grant_type=authorization_code
+      &code=…
+      &redirect_uri=https://data/test-client/public/id
+      &client_id=https://data/test-client/public/id
+      &code_verifier=…
+      ```
+      '''
+    }
+
+    Bob.UAS -> App.UI '200 {access_token, id_token} — OIDC session tokens' {
+      notes'''
+      #### 200 {access_token, id_token} — OIDC session tokens
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+      ```
+
+      ```json
+      {
+        "access_token": "<at+jwt>",
+        "id_token": "<jwt>",
+        "token_type": "DPoP",
+        "expires_in": 3600,
+        "scope": "openid webid"
+      }
+      ```
+      `sub` and `webid` are the WebID picked during the interaction (step 2) — the
+      OP answers from its stored session, it never fetches `https://id/bob` here.
+
+      This is the **session**, not the LWS credential: the access token
+      authenticates the app at `.sai` endpoints (`Authorization: DPoP <access_token>`),
+      the ID token is the OIDC proof of authentication, and neither is ever sent to
+      a storage. Why the chain presents neither as `subject_token` — next step.
+      '''
+    }
+
+    App.UI -> Bob.UAS 'GET /.sai/id-token — DPoP-bound LWS credential' {
+      notes'''
+      #### GET /.sai/id-token — DPoP-bound LWS credential
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > Auth: `Authorization: DPoP <session access token>` + `DPoP` proof
+
+      >[!TIP]
+      > span `sai.lws.request-id-token` (client) → `sai.lws.issue-id-token` (auth,
+      > 75 ms). No `dpop_jkt` in the query: the mint request proves the key, so the
+      > binding comes from the proof (`sai.lws.dpop_jkt_source=proof`).
+
+      ```http
+      GET https://auth.docker/.sai/id-token?client_id=https%3A%2F%2Fdata%2Ftest-client%2Fpublic%2Fid
+      Authorization: DPoP <session access token>
+      DPoP: <proof for GET /.sai/id-token>
+      ```
+
+      ### Why a second token
+
+      | | OIDC `access_token` | OIDC `id_token` | minted credential |
+      | --- | --- | --- | --- |
+      | `azp`/`client_id` | `client_id` only | `azp` = the app | `client_id` = the app (explicit) |
+      | sender-constrained | `cnf.jkt` | none | `cnf.jkt`, proven at the mint |
+      | `sub` | WebID | WebID | WebID |
+      | lifetime | 3600 s | 3600 s | 300 s |
+
+      The UAS reads the client from `azp`, falling back to a single-valued `aud`.
+      A JWT access token carries no `azp` and its `aud` is `solid`, so
+      `OidcSubjectTokenVerifier` would resolve the client to `https://auth/#solid`
+      (`toClientUri('solid', 'https://auth/')`) — the app's identity would be lost
+      from ID-JAG #1. The ID token has the right `azp` but no `cnf`, i.e. it is a
+      replayable bearer credential. The mint takes the identity from the
+      authenticated session and the key from the proof, so the credential has
+      both, plus the short lifetime.
+      '''
+    }
+
+    Bob.UAS -> App.UI '200 LWS credential — at+jwt {sub, client_id, cnf.jkt}' {
+      notes'''
+      #### 200 LWS credential — at+jwt {sub, client_id, cnf.jkt}
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+      ```
+
+      ```json
+      {
+        "id_token": "<at+jwt>",
+        "token_type": "N_A",
+        "expires_in": 300,
+        "issuer": "https://auth/"
+      }
+      ```
+
+      decoded (`sai.token.subject.*` on both the client and the server span):
+      ```json
+      {
+        "typ": "at+jwt",
+        "iss": "https://auth/",
+        "sub": "https://id/bob",
+        "webid": "https://id/bob",
+        "aud": "solid",
+        "client_id": "https://data/test-client/public/id",
+        "azp": "https://data/test-client/public/id",
+        "cnf": { "jkt": "XUUBekpunmf0XwQTfll5BsfiUKAzMHLzC6f01Hd3Moc" },
+        "jti": "ddf70e52-7bc0-4179-bb13-97752a958e8b"
+      }
+      ```
+      The **app** is the client — not `agentId(webid)` and not Bob's UAS — and the
+      credential is sender-constrained to the app's key, so the next hop needs a
+      proof.
+      '''
+    }
+
+    App.UI -> Bob.UAS 'POST /.well-known/lws/token — resource=<storage>, subject_token=at+jwt' {
+      notes'''
+      #### POST /.well-known/lws/token — resource=<storage>, subject_token=at+jwt
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > the app requests **no claim**. It names the business object — `resource`,
+      > the storage holding the data — and the UAS finds the grants the user has
+      > for that storage and client
+
+      >[!TIP]
+      > span `sai.lws.issue-id-jag` (**657 ms**, `sai.lws.mode=impersonation`,
+      > `sai.lws.access.derived=true`, `sai.lws.access.storage=https://data/acme-rnd/`).
+      > Derivation runs when there is no `access` parameter, the subject token is
+      > not an ID-JAG, and `resource` is present.
+
+      ```http
+      POST https://auth.docker/.well-known/lws/token
+      Content-Type: application/x-www-form-urlencoded
+      DPoP: <proof for 8UULSx3l…>
+
+      grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+      &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
+      &audience=https://auth/
+      &resource=https://data/acme-rnd/
+      &subject_token=<at+jwt: sQ--ghpKlnKw>
+      &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+      ```
+      No `access` field and no JSON here — the UAS adds the claim (next steps).
+      '''
+    }
+
+    Bob.UAS -> Bob.CID 'GET https://id/bob — load the profile' {
+      notes'''
+      #### GET https://id/bob — load the profile
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > the registry is **not** read from this document: `SessionManager` derives
+      > the registry set (`registryId(webid)` → `https://registry/bob/`) and takes
+      > the pod's SPARQL endpoint from the **account storage** endpoint records
+
+      >[!TIP]
+      > the CID advertises `solid:oidcIssuer`, `interop:hasAuthorizationAgent` and
+      > the `lws:AccessRequestService` / `lws:AccessGrantService` endpoints — no
+      > registries. `Link: rel="interop:hasRegistrySet"` is `AgentIdHandler`'s
+      > cross-user discovery header, not part of the CID.
+
+      `sai-id` answers `200` Turtle in 29 ms; the `id` dataset resolves the
+      profile/agent statements (8 ms SPARQL).
+      '''
+    }
+
+    Bob.UAS -> Bob.Registry 'find the grants for the client + storage (registry-pod dataset)' {
+      notes'''
+      #### find the grants for the client + storage (registry-pod dataset)
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > one ID-JAG carries one delegation edge. An app-specific grant (user → this
+      > client) wins; otherwise the narrowest received edge is taken —
+      > `SelectedFromRegistry` > `Inherited` > `AllFromRegistry` > `AllFromAgent`
+
+      >[!TIP]
+      > the UAS authenticates as Bob first: `GET /bob/` → `401` → discovery →
+      > `POST /.well-known/lws/token` (96 ms) → `200` (105 ms), then `GET /bob/`
+      > again for the registry set — `~460 ms` before the first grant read
+
+      ```http
+      POST http://fuseki:3030/reg-bob/sparql    // 12 grant queries (+ registry reads)
+      ```
+      Matches the seeded `https://registry/yoyo/q7w2nz` (YoYo → Bob,
+      `SelectedFromRegistry`, `https://data/acme-rnd/`) — visible in Bob's
+      registry-pod dataset through the shared dev/test endpoint (a split
+      deployment backfills it with the reciprocal mirror). The claim is that
+      grant's own ODRL, ids included; nothing is invented.
+
+      With no matching grant the UAS issues an **identity-only** ID-JAG (no
+      `access`), which the next UAS refuses.
+      '''
+    }
+
+    Bob.UAS -> App.UI 'ID-JAG #1 — derived claim, aud=YoYo.UAS, sub=bob, client_id=test-client' {
+      notes'''
+      #### ID-JAG #1 — derived claim, aud=YoYo.UAS, sub=bob, client_id=test-client
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!TIP]
+      > `sai.token.id-jag.*` on the same `sai.lws.issue-id-jag` span
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+      ```
+
+      ```json
+      {
+        "issued_token_type": "urn:ietf:params:oauth:token-type:id-jag",
+        "access_token": "<ID-JAG #1: ffbcc46e>",
+        "token_type": "N_A",
+        "expires_in": 300
+      }
+      ```
+
+      decoded (`typ=oauth-id-jag+jwt`, `kid=5Q5ZOPHv…`):
+      ```json
+      {
+        "iss": "https://auth/",
+        "aud": "https://auth/",
+        "sub": "https://id/bob",
+        "client_id": "https://data/test-client/public/id",
+        "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
+        "access": [{
+          "id": "urn:uuid:199c923b-2b67-4eac-997e-0b12f59c8de8",
+          "type": ["http://www.w3.org/ns/odrl/2/Agreement"],
+          "profile": "http://www.w3.org/ns/solid/interop#AccessProfile",
+          "permission": [{
+            "id": "urn:uuid:60e67784-d389-40df-b05f-0b5dcb7a2b62",
+            "assigner": "https://id/yoyo",
+            "assignee": "https://id/bob",
+            "action": ["http://www.w3.org/ns/odrl/2/read"],
+            "target": {
+              "id": "urn:uuid:0e00a1c2-63e4-4f9f-9d7b-6ecedd5e4787",
+              "owner": "https://id/acme",
+              "storage": "https://data/acme-rnd/",
+              "type": ["http://www.w3.org/ns/odrl/2/Asset"],
+              "source": ["https://data/acme-rnd/pbh2yw"],
+              "partOf": ["https://data/acme-rnd/reb39k"]
+            }
+          }],
+          "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
+          "registeredShapeTree": "https://data/shapetrees/trees/Project",
+          "assignee": "https://id/bob"
+        }],
+        "iat": 1794782153,
+        "exp": 1794782453,
+        "jti": "ffbcc46e-8f66-4012-955f-7cf6aa631d52"
+      }
+      ```
+      Still the **hidden** pair: `sub` = Bob, `client_id` = the app, claim
+      `assignee` = Bob, the grant's own `urn:uuid` ids, no `act`. The ids survive
+      unchanged from the seed grant; only the next hop replaces them.
+      '''
+    }
+
+    App.UI -> YoYo.UAS 'POST /.well-known/lws/token — subject_token=ID-JAG #1, resource=<storage>' {
+      notes'''
+      #### POST /.well-known/lws/token — subject_token=ID-JAG #1, resource=<storage>
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > no `access` parameter: an ID-JAG subject token plus a request claim is
+      > refused (`invalid_request`) — the claim rides the incoming ID-JAG
+
+      >[!TIP]
+      > span `sai.lws.issue-id-jag` (366 ms) with `sai.lws.verify-id-jag` as its
+      > child (6 ms) — verify, registry lookup and re-issue all in one request
+
+      ```http
+      POST https://auth.docker/.well-known/lws/token
+      Content-Type: application/x-www-form-urlencoded
+
+      grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+      &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
+      &audience=https://data/
+      &resource=https://data/acme-rnd/
+      &subject_token=<ID-JAG #1>
+      &subject_token_type=urn:ietf:params:oauth:token-type:id-jag
+      ```
+      No `DPoP` on this hop — the ID-JAG's `aud` is the restriction
+      (`sai.lws.dpop_proof` is absent).
+      '''
+    }
+
+    YoYo.UAS -> YoYo.UAS 'sai.lws.verify-id-jag — incoming ID-JAG #1' {
+      notes'''
+      #### sai.lws.verify-id-jag — incoming ID-JAG #1
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > `aud` must name this AS (`https://auth/`), `typ` pinned to
+      > `oauth-id-jag+jwt`, `jti`/`exp` checked
+
+      Children of the span: `GET https://auth/.well-known/openid-configuration`
+      (2 ms) and `GET https://auth/.oidc/jwks` (2 ms) — the UAS verifies the grant
+      with its own keys; no CID dereference for a local subject.
+
+      `sai.lws.subject_id=https://id/bob`, `sai.lws.client_id=https://data/test-client/public/id`,
+      `sai.lws.access.storage=https://data/acme-rnd/`.
+      '''
+    }
+
+    YoYo.UAS -> YoYo.CID 'GET https://id/yoyo — load the WebID profile' {
+      notes'''
+      #### GET https://id/yoyo — load the WebID profile
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > the registry set is **not** discovered from the CID. `SessionManager` derives
+      > it (`registryId(webid)` → `https://registry/yoyo/`) and reads the pod's
+      > SPARQL endpoint from the **account storage** endpoint records.
+
+      >[!TIP]
+      > the profile (CID) advertises only `interop:hasAuthorizationAgent` and the
+      > `lws:AccessRequestService` / `lws:AccessGrantService` endpoints — no
+      > registries. `Link: rel="interop:hasRegistrySet"` comes from
+      > `AgentIdHandler` for *cross-user* discovery (admin-gated), not from here.
+
+      `sai-id` answers `200` Turtle (11 ms); the `id` dataset resolves the
+      profile/agent statements (6 ms SPARQL). This is a *local* session as YoYo,
+      not a check of Bob's claim.
+      '''
+    }
+
+    YoYo.UAS -> YoYo.Registry 'find the grant backing the claim (DelegatedAccessClaimValidator)' {
+      notes'''
+      #### find the grant backing the claim (DelegatedAccessClaimValidator)
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > the incoming ID-JAG's `iss` is *this* UAS, so a self-signed claim is never
+      > trusted on its own — the assigner registry must already hold a matching grant
+
+      >[!TIP]
+      > the UAS authenticates to its own registry first: `GET /yoyo/` → `401` →
+      > `/.well-known/oauth-protected-resource/yoyo/` → `/.well-known/lws-configuration`
+      > → `POST /.well-known/lws/token` (27 ms) → `200` (93 ms), then `GET /yoyo/`
+      > again — `~290 ms` before the first grant read
+
+      ```http
+      POST http://fuseki:3030/reg-yoyo/sparql     // 7 grant queries (+ registry reads)
+      ```
+      Every claim policy must match a grant in `hasGrantRegistry` on its semantic
+      fields and ODRL permissions (ids excluded), with `grantedBy` = YoYo,
+      grantee = the incoming subject/client and the same storage; an
+      `inheritsFromGrant` must itself exist in the registry.
+
+      Failure is `400 invalid_grant`:
+      ```
+      no existing grant issued by https://id/yoyo to https://id/bob covers the delegated claim
+      ```
+      '''
+    }
+
+    YoYo.UAS -> App.UI 'ID-JAG #2 — sub=yoyo, aud=https://data/, client_id=https://auth/' {
+      notes'''
+      #### ID-JAG #2 — sub=yoyo, aud=https://data/, client_id=https://auth/
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > the visible actor is the incoming claim's **assigner** (`visibleSubject`), and
+      > the outgoing client is the issuing UAS (`issuedClient = this.issuer.issuer`);
+      > `rewriteAccessClaim` re-issues the claim from YoYo to that client with fresh
+      > `urn:uuid` ids
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+      ```
+
+      ```json
+      {
+        "issued_token_type": "urn:ietf:params:oauth:token-type:id-jag",
+        "access_token": "<ID-JAG #2>",
+        "token_type": "N_A",
+        "expires_in": 300
+      }
+      ```
+
+      decoded (`sai.lws.impersonation=true`, `sai.lws.delegation=false`):
+      ```json
+      {
+        "iss": "https://auth/",
+        "aud": "https://data/",
+        "sub": "https://id/yoyo",
+        "client_id": "https://auth/",
+        "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
+        "access": [{
+          "id": "urn:uuid:42aaeb4a-488f-491c-9365-7179daee8fe7",
+          "type": ["http://www.w3.org/ns/odrl/2/Agreement"],
+          "profile": "http://www.w3.org/ns/solid/interop#AccessProfile",
+          "assigner": "https://id/yoyo",
+          "assignee": "https://auth/",
+          "permission": [{
+            "id": "urn:uuid:0031f5a0-81d8-4d6f-9aa1-7032c33ce917",
+            "assigner": "https://id/yoyo",
+            "assignee": "https://auth/",
+            "action": ["http://www.w3.org/ns/odrl/2/read"],
+            "target": {
+              "id": "urn:uuid:faa2abed-b474-44af-8964-e852bf57a2b2",
+              "owner": "https://id/acme",
+              "storage": "https://data/acme-rnd/",
+              "type": ["http://www.w3.org/ns/odrl/2/Asset"],
+              "source": ["https://data/acme-rnd/pbh2yw"],
+              "partOf": ["https://data/acme-rnd/reb39k"]
+            }
+          }],
+          "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
+          "registeredShapeTree": "https://data/shapetrees/trees/Project"
+        }],
+        "iat": 1794782154,
+        "exp": 1794782454,
+        "jti": "f432d275-b497-4cd3-b91a-82a3ff6338c2"
+      }
+      ```
+      Fresh `urn:uuid` ids for the policy, the permission and the target; the
+      claim is narrowed to the one ACME project and re-assigned to
+      `https://auth/`. **No `act`** — `mode=delegation` would keep the actor chain
+      instead.
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'POST /.well-known/lws/token — subject_token=ID-JAG #2' {
+      notes'''
+      #### POST /.well-known/lws/token — subject_token=ID-JAG #2
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!TIP]
+      > the app redeems the visible ID-JAG at ACME's AS — the grant is bound to the
+      > **AS** (`aud=https://data/`), not to a storage; `resource` narrows it to
+      > one storage
+
+      ```http
+      POST https://data.docker/.well-known/lws/token
+      Content-Type: application/x-www-form-urlencoded
+
+      grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+      &subject_token=<ID-JAG #2>
+      &subject_token_type=urn:ietf:params:oauth:token-type:id-jag
+      &resource=https://data/acme-rnd/
+      ```
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> YoYo.CID 'GET https://id/yoyo — dereference sub' {
+      notes'''
+      #### GET https://id/yoyo — dereference sub
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!IMPORTANT]
+      > `sub` is now YoYo, so ACME dereferences **YoYo's** CID — never Bob's
+
+      Inside `sai.lws.verify-id-jag` (53 ms): `sai-id` answered `GET /yoyo` `200`
+      in 18 ms. Bob's document is not fetched by ACME at all.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> YoYo.UAS 'discovery + JWKS' {
+      notes'''
+      #### discovery + JWKS
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      Also inside `sai.lws.verify-id-jag`: `GET https://auth/.well-known/openid-configuration`
+      (8 ms) and `GET https://auth/.oidc/jwks` (2 ms) — YoYo's UAS is its own
+      provider, the discovered `issuer` must equal the ID-JAG's `iss`, and the
+      JWKS supplies `kid=5Q5ZOPHv…` for the ES256 signature.
+
+      `sai.lws.audience=https://data/`, `sai.lws.subject_id=https://id/yoyo`,
+      `sai.lws.client_id=https://auth/`, `sai.lws.access.storage=https://data/acme-rnd/`.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> App.UI 'access token — sub=yoyo, client_id=https://auth/, aud=storage' {
+      notes'''
+      #### access token — sub=yoyo, client_id=https://auth/, aud=storage
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+      ```
+
+      The test asserts the decoded token (`sai.token.access.*` is not emitted
+      server-side — CSS's `LwsTokenHttpHandler` owns the exchange; the response body
+      is not captured):
+      ```json
+      {
+        "iss": "https://data/",
+        "aud": "https://data/acme-rnd/",
+        "sub": "https://id/yoyo",
+        "client_id": "https://auth/",
+        "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
+        "access": [ <the rewritten claim, verbatim> ]
+      }
+      ```
+      '''
+    }
+
+    App.UI -> h4p.Data.LwsAccessTokenValidation 'GET /acme-rnd/pbh2yw + Bearer' {
+      notes'''
+      #### GET /acme-rnd/pbh2yw + Bearer
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      ```http
+      GET https://acme-rnd.data.docker/pbh2yw
+      Accept: text/turtle
+      Authorization: Bearer <access token>
+      ```
+      '''
+    }
+
+    h4p.Data.LwsAccessTokenValidation -> h4p.Data.SaiPolicyEngine 'claim-first decision (claim + registries)' {
+      notes'''
+      #### claim-first decision (claim + registries)
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      >[!TIP]
+      > `h4p.Data` serves both the AS and the storage endpoint, so the decision runs
+      > in the process that answered the token exchange — 204 ms inside
+      > `data.docker` (`sai-data`), no second server hop
+
+      Observed reads: `GET https://id/yoyo` (18 ms) then `22` SPARQL queries —
+      `15` on `data-acme-rnd` (the resource + its registration) and `7` on
+      `reg-acme` (the owner's registries). The token's `access` claim is evaluated
+      **first**, so the claim's narrowed `source` (`pbh2yw`) / `partOf` (`reb39k`)
+      bound the decision.
+      '''
+    }
+
+    h4p.Data.SaiPolicyEngine -> App.UI '200 text/turtle — the narrowed project' {
+      notes'''
+      #### 200 text/turtle — the narrowed project
+      >[!NOTE]
+      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
+
+      ```http
+      HTTP/1.1 200 OK
+      Content-Type: text/turtle
+      ```
+      ### Checks
+
+      #### String matching — on ID-JAG #2 and on the access token
+      * no `https://id/bob` anywhere
+      * no the app's `client_id` (`https://data/test-client/public/id`)
+      * no `"act"` claim (impersonation, not delegation)
+
+      #### Compare with request
+      * `sub` — `https://id/yoyo`
+      * `client_id` — `https://auth/`
+      * `assigner`/`assignee` — `https://id/yoyo` / `https://auth/`
+      * `scopeOfGrant`, `registeredShapeTree`, `storage`, `source` — unchanged
+      '''
+    }
+  }
+
+  /*
+   * 4. The decentralized variant lws-auth/oidc.c4 draws: a separate UAS and
    *    RAS, and an ID-JAG in between — NOT what SAI implements (2b is the
    *    in-repo ID-JAG, with the storage as its own RAS).
    */

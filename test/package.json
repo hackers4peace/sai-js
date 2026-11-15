@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@elfpavlik/lws-auth": "0.1.0",
     "@elfpavlik/sai-components": "1.0.0-rc.31",
     "@janeirodigital/interop-authorization-agent": "1.0.0-rc.31",
     "@janeirodigital/interop-data-model": "1.0.0-rc.31",
