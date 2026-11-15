@@ -102,6 +102,8 @@ export interface IdJagRequest extends TokenRequestOptions {
   /** DPoP key pair the credential is bound to (`cnf.jkt`). */
   dpopKeyPair: CryptoKeyPair
   clientId: string
+  /** Token-flow mode for an ID-JAG subject at a UAS. Defaults to impersonation. */
+  mode?: 'impersonation' | 'delegation'
   /**
    * Optional ODRL `access` claim for the storage the grant is for, as compact
    * JSON-LD policies. The UAS attaches the context; the claim is valid for one
@@ -125,6 +127,9 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
   if (request.accessClaim !== undefined) {
     parameters.access = JSON.stringify(request.accessClaim)
   }
+  if (request.mode !== undefined) {
+    parameters.mode = request.mode
+  }
 
   return withSpan('sai-lws', 'sai.lws.request-id-jag', async (span): Promise<string> => {
     span.setAttributes({
@@ -133,6 +138,7 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
       'sai.lws.subject_token_type': subjectTokenType,
       'sai.lws.audience': request.audience,
       'sai.lws.client_auth_method': 'none',
+      ...(request.mode === undefined ? {} : { 'sai.lws.mode': request.mode }),
     })
     setTokenAttributes(span, 'subject', request.subjectToken)
     if (request.accessClaim !== undefined) {

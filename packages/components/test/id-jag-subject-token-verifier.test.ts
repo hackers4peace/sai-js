@@ -37,6 +37,7 @@ interface Claims {
   exp?: number
   access?: unknown
   '@context'?: string
+  act?: unknown
 }
 
 async function makeGrant(overrides: Claims = {}): Promise<string> {
@@ -204,6 +205,23 @@ describe('IdJagSubjectTokenVerifier', () => {
         )
       )
     ).rejects.toThrow('not the requested storage')
+  })
+
+  test('verifies and returns the actor chain', async () => {
+    const verifier = new TestVerifier()
+    const act = { sub: WEBID, act: { sub: CLIENT } }
+    const result = await verifier.handleSafe(input(await makeGrant({ act })))
+    expect(result).toMatchObject({ subject: WEBID, act })
+  })
+
+  test('rejects a malformed actor chain', async () => {
+    const verifier = new TestVerifier()
+    await expect(
+      verifier.handleSafe(input(await makeGrant({ act: { sub: 'not-a-uri' } })))
+    ).rejects.toThrow('Every actor chain entry needs an HTTP(S) sub.')
+    await expect(
+      verifier.handleSafe(input(await makeGrant({ act: { sub: WEBID, act: 'nested' } })))
+    ).rejects.toThrow('The actor chain needs to be an object.')
   })
 
   test('falls back to the subject document for an untrusted issuer', async () => {

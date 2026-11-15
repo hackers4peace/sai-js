@@ -292,6 +292,19 @@ describe('C2 impersonation through @elfpavlik/lws-auth', () => {
     actions: [ODRL.read],
   })
 
+  test('delegation mode reads the same project with a visible actor chain', async () => {
+    const storageFetch = await buildLwsFetch(bob, undefined, {
+      idJag: true,
+      impersonation: { uas: AUTH, mode: 'delegation' },
+      accessClaim: () => claim,
+    })
+
+    const response = await storageFetch('https://data/acme-rnd/pbh2yw', {
+      headers: { accept: 'text/turtle' },
+    })
+    expect(response.status).toBe(200)
+  })
+
   test('Bob -> YoYo -> ACME reads a narrowed project', async () => {
     const storageFetch = await buildLwsFetch(bob, undefined, {
       idJag: true,

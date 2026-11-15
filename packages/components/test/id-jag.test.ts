@@ -55,7 +55,8 @@ class StubIdJagVerifier extends SubjectTokenVerifier {
   public constructor(
     private readonly claim: unknown,
     private readonly subject = WEBID,
-    private readonly client = CLIENT
+    private readonly client = CLIENT,
+    private readonly act?: unknown
   ) {
     super()
   }
@@ -72,6 +73,7 @@ class StubIdJagVerifier extends SubjectTokenVerifier {
       client: this.client,
       access: this.claim,
       accessContext: ODRL_ID_JAG_CONTEXT,
+      ...(this.act ? { act: this.act } : {}),
     }
   }
 }
@@ -373,6 +375,84 @@ describe('IdJagTokenHandler', () => {
     expect(serialized).not.toContain(original.id)
     expect(serialized).not.toContain(original.permission[0].id)
     expect(verifier.last?.resource).toBe(CLAIM_STORAGE)
+  })
+
+  test('delegation mode keeps the actor chain and re-issues to the final client', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const verifier = new StubIdJagVerifier(claim)
+    const handler = new IdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier,
+      storageOrigins: ['data'],
+      authorizationServerOrigins: [BASE_URL],
+    })
+
+    const captured = await call(
+      handler,
+      tokenRequest({
+        audience: DATA,
+        subject_token: 'incoming-id-jag',
+        subject_token_type: ID_JAG_TOKEN_TYPE,
+        mode: 'delegation',
+        resource: CLAIM_STORAGE,
+      })
+    )
+
+    expect(captured.status).toBe(200)
+    const { payload } = await jwtVerify(
+      JSON.parse(String(captured.body)).access_token,
+      keys.publicKey
+    )
+    expect(payload).toMatchObject({
+      sub: YOYO,
+      client_id: CLAIM_CLIENT,
+      act: { sub: CLAIM_SUBJECT, act: { sub: CLAIM_CLIENT } },
+    })
+    const permission = (payload.access as any[])[0].permission[0]
+    expect(permission).toMatchObject({ assigner: YOYO, assignee: CLAIM_CLIENT })
+  })
+
+  test('delegation mode nests an incoming actor chain under the new subject', async () => {
+    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const verifier = new StubIdJagVerifier(claim, WEBID, CLIENT, {
+      sub: 'https://id/intermediate',
+    })
+    const handler = new IdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier,
+      storageOrigins: ['data'],
+      authorizationServerOrigins: [BASE_URL],
+    })
+
+    const captured = await call(
+      handler,
+      tokenRequest({
+        audience: DATA,
+        subject_token: 'incoming-id-jag',
+        subject_token_type: ID_JAG_TOKEN_TYPE,
+        mode: 'delegation',
+        resource: CLAIM_STORAGE,
+      })
+    )
+    expect(captured.status).toBe(200)
+    const { payload } = await jwtVerify(
+      JSON.parse(String(captured.body)).access_token,
+      keys.publicKey
+    )
+    expect(payload.act).toEqual({
+      sub: CLAIM_SUBJECT,
+      act: { sub: 'https://id/intermediate', act: { sub: CLAIM_CLIENT } },
+    })
   })
 
   test('rejects an incoming ID-JAG without an access claim', async () => {

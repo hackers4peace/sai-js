@@ -11,10 +11,12 @@ import type { TokenEndpoint } from './tokens.ts'
 import { ID_JAG_TOKEN_TYPE, LWS_TOKEN_PATH, requestAccessToken, requestIdJag } from './tokens.ts'
 
 export interface LwsImpersonationOptions {
-  /** The UAS that re-issues the ID-JAG under the visible identity. */
+  /** The UAS that re-issues the ID-JAG at the next hop. */
   uas: string
   /** Its token endpoint; defaults to `<uas>/.well-known/lws/token`. */
   tokenEndpoint?: string
+  /** `impersonation` (default) hides the caller; `delegation` keeps the `act` chain. */
+  mode?: 'impersonation' | 'delegation'
 }
 
 export interface LwsAuthFetchOptions {
@@ -136,6 +138,7 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
           subjectToken: token,
           subjectTokenType: ID_JAG_TOKEN_TYPE,
           clientId: credential.clientId,
+          mode: options.impersonation.mode,
           dpopKeyPair: credential.dpopKeyPair,
           fetch: tokenFetch,
         })

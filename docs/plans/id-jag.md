@@ -1,11 +1,11 @@
 # ID-JAG access claims — ODRL model migration, impersonation, delegation
 
-> **Status:** 🔶 in progress — **C0 + C1 landed**; **C2 implemented** (C2
-> impersonation chain + assigner-owned delegated grants; package gate and
-> **full Dagger suite green**, 25 files / 211 tests). C3 is next.
-> **Last verified:** working tree (2026-11-15) — C0/C1 verified against the
-> delegation, grant, policy-engine, ID-JAG, and Dagger code; C2 verified against
-> the real token chain, local grant registry, and `/test` roles/equivalence.
+> **Status:** 🔶 in progress — **C0–C2 landed**; **C3 implemented** (delegation
+> token chain with nested `act`; package gate and **full Dagger suite green**,
+> 26 files / 214 tests). C4 remains design-only.
+> **Last verified:** working tree (2026-11-15) — C0–C2 verified against the
+> delegation, grant, policy-engine, ID-JAG, and Dagger code; C3 verified against
+> the real delegation token chain and CSS actor-chain propagation.
 > **Green gate:** package gate + **full** Dagger suite after every slice
 > ([§ Green gate](#green-gate)); Dagger is user-run.
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
@@ -79,7 +79,7 @@ first; C1+ adds the token flows.
 | User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path + assigner-owned grant storage | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; `IdTokenIssuer`/CID docs | package + `/test` | C1; UAS-as-client case |
 | Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, `lws-auth` impersonation chain, CSS token issuer/extractor | new `/test/impersonation.test.ts` (2); `/test/lws-auth.test.ts`; package token/LWS tests | C2 |
 | Delegated grants issued/stored in the assigner registry; owner endpoint kept | ✅ landed — package + full Dagger green | `grant-generation.ts` (minted ids), `workflows/grants.ts` (local store + `registryOwner`), `activities/grants.ts` (`ownGrantIds` migration), `AccessRequestHandler`/`delegation-request.ts` kept | package workflow/equivalence tests; `/test` `check-equivalence.test.ts`, `delegation-endpoint.test.ts`, `roles.test.ts` | C2 |
-| Delegation token chain (`sub` top-level, nested `act` to client) | ⬜ open | `IdJag*`, `lws-auth`, CSS token handler, policy engine | new delegation-token `/test` + existing suites | C3 |
+| Delegation token chain (`sub` top-level, nested `act` to client) | ✅ landed — package + full Dagger green | `IdJagIssuer`/`IdJagTokenHandler`/`IdJagSubjectTokenVerifier`, `actor-chain.ts`, `lws-auth`, CSS token issuer/extractor, policy engine | package token tests; new `/test/delegation-token.test.ts` (2); `/test/lws-auth.test.ts` (14) | C3 |
 | 403/401 chain refresh per storage | ⬜ open | `packages/lws-auth` fetch/cache; RPC/UI callers | package fetch tests; `/test` revocation scenario | C3/C4 |
 | Admin impersonation / `ProxyAdminHandler` removal / `/sparql-admin` future | ⬜ open | `ProxyAdminHandler`, `peerFetch`, `peerProxy`, `AdminSparqlHandler` | future TODO | not in this plan’s implementation |
 
@@ -337,9 +337,9 @@ package tests for ID-JAG claim/context/token propagation (user-run).
   `lws-auth.test.ts policy-engine.test.ts` (85 passed), and the **full Dagger
   suite** (24 files / 208 tests).
 - The CSS changes live in the `elf-pavlik/CommunitySolidServer` `lws-sai`
-  branch (sibling `../CommunitySolidServer`). `package-lock.json` now pins
-  `341c0214aaaed367b567316d8adb5930dd1ea46b` (`feat(lws): ID-JAG with access
-  policy`), so a fresh `npm ci` gets the claim-aware CSS.
+  branch (sibling `../CommunitySolidServer`). `package-lock.json` tracks the
+  claim-aware CSS commit, so a fresh `npm ci` gets the access-claim/actor-chain
+  support.
 
 ## C2 — Impersonation default + assigner-owned grants
 
@@ -454,6 +454,39 @@ continues to work.
 - The final claim is the re-issued ODRL policy from the top-level requester to
   the final client/actor; `target.owner` remains the data owner.
 - Coexistence with the current delegation flow is deliberately decided in C4.
+
+**Implementation (2026-11-15)**
+
+- **Mode select.** An ID-JAG subject at a UAS accepts an optional form
+  `mode=impersonation|delegation`; the default is impersonation (C2). The mode
+  only applies to ID-JAG subjects (`invalid_request` for ID tokens/unknown
+  values).
+- **Actor chain.** `actor-chain.ts` validates bounded `act` nesting (HTTP(S)
+  `sub` entries) and appends actors. In delegation mode the outgoing token keeps
+  the incoming subject/client visible:
+  - final `sub` = incoming claim `assigner` (top-level requester);
+  - final `client_id` = incoming client (the most nested actor);
+  - `act` = incoming chain (prefixed by the incoming subject) with the final
+    client appended as the deepest actor;
+  - final claim `assigner` = visible requester, `assignee` = final client;
+    target/action/scope unchanged.
+  Impersonation remains the C2 shape (no `act`, visible UAS client).
+- **Token propagation.** `IdJagIssuer.issue` carries `act`;
+  `IdJagSubjectTokenVerifier` validates and returns it. CSS
+  `LwsTokenHttpHandler` passes `act` into `LwsAccessTokenIssuer`, the access
+  token carries it, and `LwsAccessTokenExtractor` exposes it. The policy engine
+  continues to evaluate the ODRL claim only.
+- **`packages/lws-auth`.** `requestIdJag` sends `mode` and accepts an ID-JAG
+  subject type; `createLwsAuthFetch`'s `impersonation` option gains
+  `mode: 'delegation'`. The existing owner-request delegation flow is untouched.
+- **Tests/gates.** Package `typecheck`, full `npx vitest run` (684 passed, 26
+  skipped, 2 todo), components build, `npm run check`, CSS unit coverage (100%
+  statements/branches/functions/lines), and the **full Dagger suite** (26 files
+  / 214 tests) are green.
+- **CSS pin.** The C3 actor-chain changes are in the sibling
+  `elf-pavlik/CommunitySolidServer` checkout. `package-lock.json` now pins
+  `228af240f7d5dab2f2bbcd8f2d50fd77c48a93f6` (`feat(lws): ID-JAG with access
+  policy - delegation`), so a fresh `npm ci` gets the actor-chain propagation.
 
 ## C4 — Coexistence decisions / follow-ups (design only)
 
