@@ -24,13 +24,12 @@ import type { JWTPayload } from 'jose'
  *   2. {@link completeInteraction} — the OP's own pages (sign-in, WebID picker,
  *      consent) driven through `/.account/` controls with a cookie jar, exactly
  *      like the sign-in page in a browser (CSS's `Identity.test.ts` does the
- *      same); this is the only part the package leaves to the app;
- *   3. `createBrowserCredential` — `GET /.sai/id-token` with the session's
- *      DPoP-bound access token, minting the credential whose `client_id` is the
- *      app and whose `cnf.jkt` is the session key.
+ *      same); this is the only part the package leaves to the app.
  *
- * The credential is what the app presents as `subject_token` at the UAS; the
- * UAS is the issuer, so nothing dereferences the WebID document.
+ * The session's **access token** is the LWS credential: the OP issues it with
+ * `aud` = its own identifier (`iss`) and `cnf.jkt` of the session key, so the
+ * app presents it as a `…:access_token` subject token at the UAS and proves
+ * possession of the key. See `docs/plans/lws-auth.md` C5/D15.
  */
 
 const ISSUER = process.env.CSS_BASE_URL ?? 'https://auth/'
@@ -173,14 +172,16 @@ export interface OidcClientSession {
   dpopJkt: string
   /** The LWS credential the app presents at the UAS token endpoint. */
   credential: BrowserCredential
-  /** The credential's JWT (minted on first use). */
+  /** The credential's `subject_token_type` (`…:access_token`). */
+  subjectTokenType: string
+  /** The credential's JWT (the session access token). */
   subjectToken: string
   /** Decoded claims of {@link subjectToken}. */
   credentialClaims: JWTPayload
 }
 
 /**
- * Signs an app in through the OIDC code flow and mints its LWS credential.
+ * Signs an app in through the OIDC code flow and returns its LWS credential.
  * See the module comment for the steps.
  */
 export async function loginAsClient(options: OidcClientOptions): Promise<OidcClientSession> {
@@ -210,15 +211,9 @@ export async function loginAsClient(options: OidcClientOptions): Promise<OidcCli
   const keyPair = session.dpopKeyPair
   if (!keyPair) throw new Error('the session has no DPoP key pair')
 
-  // The UI's path (`credentialFetch: authSession.fetch`): the mint request
-  // proves possession of the session key, so `cnf.jkt` comes from the proof.
-  const credential = await createBrowserCredential({
-    issuer: ISSUER,
-    clientId,
-    keyPair,
-    credentialFetch: session.fetch,
-    declareDpopJkt: !session.dpop,
-  })
+  // No separate mint: the session's own DPoP-bound access token is the LWS
+  // credential (`cnf.jkt` is this key, `aud` is the UAS that verifies it).
+  const credential = await createBrowserCredential(session)
   const subjectToken = await credential.getSubjectToken()
 
   return {
@@ -228,6 +223,7 @@ export async function loginAsClient(options: OidcClientOptions): Promise<OidcCli
     keyPair,
     dpopJkt: await dpopThumbprint(keyPair.publicKey),
     credential,
+    subjectTokenType: credential.subjectTokenType!,
     subjectToken,
     credentialClaims: decodeJwt(subjectToken).claims,
   }

@@ -87,24 +87,12 @@ model {
         `typ: at+jwt`, `iss: https://auth/`, `aud: "solid"`, `sub`/`webid` = agent,
         `client_id`/`azp` = client, `cnf.jkt` = DPoP key thumbprint.
 
-        This — not an OpenID Connect ID Token — is what the suite and the UI
-        present as `subject_token` (with `subject_token_type=…:id_token`). In
-        tests it is signed in-process; for the UI, `IdTokenIssuer` mints the
-        same shape at `/.sai/id-token`, bound to the browser's own DPoP key
-        (`dpop_jkt` = the key that signs the request, RFC 9449 §10).
-      '''
-    }
-
-    component IdTokenEndpoint 'Credential mint' '/.sai/id-token' {
-      description '''
-        `IdTokenHandler` + `IdTokenIssuer` (`config/identity/id-jag.json`).
-
-        `GET /.sai/id-token[?dpop_jkt=<thumbprint>][&client_id=<iri>]` mints the
-        DPoP-bound self-issued credential for the caller's own session. The
-        caller is authenticated by the regular CSS credentials extractor; the
-        `DPoP` proof (or, for a bearer session, the `dpop_jkt` parameter) names
-        the browser's key, so the credential cannot be exchanged without it at
-        `IdJagTokenEndpoint`.
+        This — not an OpenID Connect ID Token — is what the suite and the
+        authorization agents present as `subject_token`
+        (`subject_token_type=…:id_token`), signed in-process with the shared key.
+        The **UI** presents its own session access token instead
+        (`…:access_token`, `aud` = `https://auth/`, `cnf.jkt` = the session key);
+        the UAS mints no credentials of its own (`lws-auth` D15).
       '''
     }
 
@@ -147,10 +135,11 @@ model {
     component CID 'CID' 'id' {
       description '''
         Bob's controlled identifier (`https://id/bob`, served by `sai-id`). It is
-        the `sub`/`webid` of every credential his UAS issues, and his UAS loads it
-        when it builds the session that derives the claim from the grant registry.
-        A storage dereferences it only for a token from another issuer — Bob's UAS
-        is the issuer here, so ACME never fetches it.
+        the `sub`/`webid` of every credential his UAS issues. In a federated
+        deployment another UAS dereferences it to check that it designates Bob's
+        UAS as his OpenID provider; in the single-`auth` test topology the issuer
+        is trusted outright, so only the profile load inside claim derivation
+        touches it.
       '''
     }
   }
@@ -566,7 +555,7 @@ views {
     '''
 
     include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
-    include h4p.Auth.IdTokenEndpoint, h4p.Auth.IdJagTokenEndpoint
+    include h4p.Auth.IdJagTokenEndpoint
     include App
     include App.UI
     include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
@@ -585,34 +574,6 @@ views {
       color: red
     }
 
-    App.UI -> h4p.Auth.IdTokenEndpoint 'GET /.sai/id-token?dpop_jkt=… (session)' {
-      notes'''
-        #### Browser credential (C5)
-
-        `auth` mints the DPoP-bound self-issued credential for the caller's own
-        session: `typ: at+jwt`, `iss: https://auth/`, `aud: "solid"`, `webid`,
-        `azp`, and `cnf.jkt` = the browser's key thumbprint. The caller is
-        authenticated by the regular CSS credentials extractor, so the credential
-        can only speak for that WebID; without the browser key it cannot be
-        exchanged (the UAS requires a matching DPoP proof).
-
-        The browser owns the key: the `DPoP` proof on this mint is the binding
-        (`dpop_jkt` is only needed by a session that cannot send a proof; when
-        both are present they must match, RFC 9449 §10.1).
-
-        Span `sai.lws.issue-id-token`; `sai.token.subject.*` carries the minted
-        credential. Replaces the retired `/.sai/lws-token` broker, which minted
-        storage tokens server-side.
-      '''
-    }
-
-    h4p.Auth.IdTokenEndpoint -> App.UI '200 {id_token, token_type: N_A, expires_in: 300}' {
-      notes'''
-        Cached by `@elfpavlik/lws-auth` until shortly before `exp`; never sent to a
-        storage.
-      '''
-    }
-
     App.UI -> h4p.Auth.IdJagTokenEndpoint 'POST /.well-known/lws/token (requested_token_type=id-jag)' {
       notes'''
         #### Span `sai.lws.request-id-jag` (client)
@@ -621,8 +582,8 @@ views {
         grant_type=urn:ietf:params:oauth:grant-type:token-exchange
         &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
         &audience=https://data/
-        &subject_token=<at+jwt>
-        &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+        &subject_token=<session access token>
+        &subject_token_type=urn:ietf:params:oauth:token-type:access_token
         DPoP: <proof for cnf.jkt>
         ```
 
@@ -701,38 +662,57 @@ views {
   dynamic view lws-impersonation {
     title: 'LWS impersonation (implemented, C2)'
     description '''
-      **SAI capture, 2026-11-15** (`/test` `impersonation.test.ts` ›
+      **SAI capture, 2026-11-16** (`/test` `impersonation.test.ts` ›
       `Bob -> YoYo -> ACME hides Bob and the delegated grant references`,
-      trace `a034196f…`, 3.9 s, dagger `--tempo-endpoint`). One trace holds the
-      whole chain: the app's OIDC sign-in (discovery 30 ms, authorize 291 ms,
-      code → token 109 ms), the credential mint (`sai.lws.issue-id-token`,
-      78 ms), **hop 1 with claim derivation** (658 ms — Bob's UAS loads the
-      profile, authenticates to Bob's registry and reads the grants), the
-      impersonation hop (368 ms), the `sai.lws.verify-id-jag` at each receiving
-      server (6 ms at YoYo's UAS, 53 ms at ACME's AS) and the storage read
-      (206 ms).
+      trace `d8da9c50…`, 3.1 s, dagger `--tempo-endpoint`). One trace holds the
+      whole chain: the app's OIDC sign-in (discovery 49 ms, authorize 323 ms,
+      code → token 105 ms), **hop 1 with claim derivation** (727 ms — Bob's UAS
+      authenticates to Bob's registry and reads the grants), the impersonation
+      hop (393 ms), the `sai.lws.verify-id-jag` at each receiving server (6 ms at
+      YoYo's UAS, 54 ms at ACME's AS) and the storage read (211 ms).
+
+      The app presents the **access token of its own OIDC session**: `auth` issues
+      it with `aud` = `https://auth/` (the UAS that verifies it) and
+      `cnf.jkt` = the app's DPoP key, and the app sends it as a
+      `…:access_token` subject token. There is no separate credential endpoint and
+      nothing is self-issued with `CSS_ENCODED_PRIVATE_JWK`.
 
       The app never builds the claim: it sends `audience` (the UAS),
-      `resource` (the storage) and its credential, and Bob's UAS adds the grant
-      as `access`. The grant is **seed data**, not a test fixture write:
+      `resource` (the storage) and that token, and Bob's UAS adds the grant as
+      `access`. The grant is **seed data**, not a test fixture write:
       `https://registry/yoyo/q7w2nz` (YoYo → Bob, `SelectedFromRegistry`,
-      `https://data/acme-rnd/`) in `environments/data/registry.trig`. In the
-      dev/test setup one shared registry endpoint makes peer grants visible in
-      Bob's registry-pod dataset; a split deployment backfills them through the
-      reciprocal mirror. With no matching grant the UAS mints an identity-only
-      ID-JAG instead of inventing a claim.
+      `https://data/acme-rnd/`) in `environments/data/registry.trig`, **mirrored
+      into Bob's registry-pod dataset at seed time** (`applyReciprocalMirrors`, the
+      offline equivalent of the runtime `updateReciprocalMirror`). With no matching
+      grant the UAS mints an identity-only ID-JAG instead of inventing a claim.
 
       The client is the **test client** (`https://data/test-client/public/id`, its
-      metadata document served by `data`): the happy path signs in through the
-      OIDC code flow with PKCE and `dpop_jkt`, mints a credential naming itself
-      as `client_id`, and drives both hops. In the trace it is `sai-test`
-      (`App.UI`); nothing is self-issued with `CSS_ENCODED_PRIVATE_JWK`.
+      metadata document served by `data`), so `client_id` is the app on the
+      credential — not `agentId(webid)` and not the UAS. In the trace it is
+      `sai-test` (`App.UI`).
 
       Roles, not processes: one `auth.docker` process plays Bob's UAS *and*
       YoYo's UAS (both ID-JAGs have `iss=https://auth/`) and is the OpenID
       provider for both, so no separate provider box exists — each UAS answers
       its own discovery and `/.oidc/jwks`. Likewise each party's CID is its own
-      document (`Bob.CID`, `YoYo.CID`), not a shared WebID service.
+      document — the traced flow dereferences `YoYo.CID`, and the federated half
+      (step 10, not traced) would dereference `Bob.CID`.
+
+      **What this topology flattens** (the notes, not just the arrows, say which):
+
+      - hop 1 and hop 2 post to the *same* `/.well-known/lws/token` — only `aud`
+        tells them apart; federated they are Bob's and YoYo's UAS;
+      - YoYo's UAS verifies an ID-JAG whose `iss` is itself, so it skips the
+        CID + JWKS lookup: steps 10–11 show that federated half and are marked
+        **not traced**;
+      - the reciprocal mirror is **pre-applied by the fixture seed**
+        (`applyReciprocalMirrors`), so the runtime `updateReciprocalMirror`
+        activity never runs in this trace;
+      - ACME's AS, storage and policy engine are one process (`h4p.Data`), so there
+        is no AS → storage hop — and `storageOrigins` trusts the whole `data`
+        origin, i.e. one AS serves every pod, not just `acme-rnd`;
+      - all CIDs are served by the one `sai-id` (`https://id/<handle>`), so their
+        hosting is not per-party here (the *fetch* in step 16 is still real).
 
       ACME's AS is the LWS authorization server of `h4p.Data` (`https://data/`)
       and the storage is `https://acme-rnd.data.docker/`.
@@ -742,7 +722,7 @@ views {
     '''
 
     include App, Bob, YoYo
-    include App.UI, Bob.UAS, Bob.CID, Bob.Registry, YoYo.UAS, YoYo.CID, YoYo.Registry
+    include App.UI, Bob.UAS, Bob.Registry, Bob.CID, YoYo.UAS, YoYo.Registry, YoYo.CID
     include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
 
     style App {
@@ -806,10 +786,10 @@ views {
       GET https://auth.docker/.oidc/auth
         ?client_id=https%3A%2F%2Fdata%2Ftest-client%2Fpublic%2Fid
         &redirect_uri=https%3A%2F%2Fdata%2Ftest-client%2Fpublic%2Fid
-        &response_type=code&scope=openid+webid
+        &response_type=code&scope=openid+webid+offline_access
         &state=…&nonce=…
         &code_challenge=…&code_challenge_method=S256
-        &dpop_jkt=8UULSx3lKWs4c3oLQyKg1DuTnaWGSFQsxFuf1JTyCxM
+        &dpop_jkt=DE5GDQRigXe9lfhUWgqwkO-8v3aS05R4vABWxV7_Dz4
       ```
 
       The OP has no session, so the response is `303` to its own interaction
@@ -822,7 +802,7 @@ views {
       | WebID picker | `POST /.account/oidc/pick-webid/` `{webId, remember}` | `200 {location}` → `GET` resume → `303` |
       | consent | `POST /.account/oidc/consent/` | `200 {location}` → `GET` resume → `303` to the client |
 
-      (76 ms, 7 ms and 7 ms; the `GET` resumes are 104 / 109 / 98 ms.)
+      (78 ms, 7 ms and 6 ms; the `GET` resumes are 111 / 107 / 101 ms.)
 
       **Where the identity comes from.** The picker's `GET` returns the WebIDs
       linked to the signed-in account (`WebIdStore.findLinks`, the `webIdLink`
@@ -863,7 +843,7 @@ views {
       ```http
       POST https://auth.docker/.oidc/token
       Content-Type: application/x-www-form-urlencoded
-      DPoP: <proof for 8UULSx3l…>
+      DPoP: <proof for DE5GDQRi…>
 
       grant_type=authorization_code
       &code=…
@@ -874,9 +854,9 @@ views {
       '''
     }
 
-    Bob.UAS -> App.UI '200 {access_token, id_token} — OIDC session tokens' {
+    Bob.UAS -> App.UI '200 {access_token, id_token} — the access token is the credential' {
       notes'''
-      #### 200 {access_token, id_token} — OIDC session tokens
+      #### 200 {access_token, id_token} — the access token is the credential
       >[!NOTE]
       >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
 
@@ -894,99 +874,33 @@ views {
         "scope": "openid webid"
       }
       ```
-      `sub` and `webid` are the WebID picked during the interaction (step 2) — the
-      OP answers from its stored session, it never fetches `https://id/bob` here.
 
-      This is the **session**, not the LWS credential: the access token
-      authenticates the app at `.sai` endpoints (`Authorization: DPoP <access_token>`),
-      the ID token is the OIDC proof of authentication, and neither is ever sent to
-      a storage. Why the chain presents neither as `subject_token` — next step.
-      '''
-    }
-
-    App.UI -> Bob.UAS 'GET /.sai/id-token — DPoP-bound LWS credential' {
-      notes'''
-      #### GET /.sai/id-token — DPoP-bound LWS credential
-      >[!NOTE]
-      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
-
-      >[!IMPORTANT]
-      > Auth: `Authorization: DPoP <session access token>` + `DPoP` proof
-
-      >[!TIP]
-      > span `sai.lws.request-id-token` (client) → `sai.lws.issue-id-token` (auth,
-      > 75 ms). No `dpop_jkt` in the query: the mint request proves the key, so the
-      > binding comes from the proof (`sai.lws.dpop_jkt_source=proof`).
-
-      ```http
-      GET https://auth.docker/.sai/id-token?client_id=https%3A%2F%2Fdata%2Ftest-client%2Fpublic%2Fid
-      Authorization: DPoP <session access token>
-      DPoP: <proof for GET /.sai/id-token>
-      ```
-
-      ### Why a second token
-
-      | | OIDC `access_token` | OIDC `id_token` | minted credential |
-      | --- | --- | --- | --- |
-      | `azp`/`client_id` | `client_id` only | `azp` = the app | `client_id` = the app (explicit) |
-      | sender-constrained | `cnf.jkt` | none | `cnf.jkt`, proven at the mint |
-      | `sub` | WebID | WebID | WebID |
-      | lifetime | 3600 s | 3600 s | 300 s |
-
-      The UAS reads the client from `azp`, falling back to a single-valued `aud`.
-      A JWT access token carries no `azp` and its `aud` is `solid`, so
-      `OidcSubjectTokenVerifier` would resolve the client to `https://auth/#solid`
-      (`toClientUri('solid', 'https://auth/')`) — the app's identity would be lost
-      from ID-JAG #1. The ID token has the right `azp` but no `cnf`, i.e. it is a
-      replayable bearer credential. The mint takes the identity from the
-      authenticated session and the key from the proof, so the credential has
-      both, plus the short lifetime.
-      '''
-    }
-
-    Bob.UAS -> App.UI '200 LWS credential — at+jwt {sub, client_id, cnf.jkt}' {
-      notes'''
-      #### 200 LWS credential — at+jwt {sub, client_id, cnf.jkt}
-      >[!NOTE]
-      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
-
-      ```http
-      HTTP/1.1 200 OK
-      Content-Type: application/json
-      ```
-
+      `access_token`, decoded (`sai.token.subject.*` on hop 1's span):
       ```json
       {
-        "id_token": "<at+jwt>",
-        "token_type": "N_A",
-        "expires_in": 300,
-        "issuer": "https://auth/"
-      }
-      ```
-
-      decoded (`sai.token.subject.*` on both the client and the server span):
-      ```json
-      {
-        "typ": "at+jwt",
         "iss": "https://auth/",
+        "aud": "https://auth/",
         "sub": "https://id/bob",
         "webid": "https://id/bob",
-        "aud": "solid",
         "client_id": "https://data/test-client/public/id",
-        "azp": "https://data/test-client/public/id",
-        "cnf": { "jkt": "XUUBekpunmf0XwQTfll5BsfiUKAzMHLzC6f01Hd3Moc" },
-        "jti": "ddf70e52-7bc0-4179-bb13-97752a958e8b"
+        "cnf": { "jkt": "DE5GDQRigXe9lfhUWgqwkO-8v3aS05R4vABWxV7_Dz4" },
+        "jti": "IyNgmqlDNib6YmUT-h9YChebuemPDHk4mGG6rQgNj21",
+        "iat": 1794790501,
+        "exp": 1794794101
       }
       ```
-      The **app** is the client — not `agentId(webid)` and not Bob's UAS — and the
-      credential is sender-constrained to the app's key, so the next hop needs a
-      proof.
+      No separate mint: this **is** the LWS credential. `aud` is the UAS itself, so
+      the token is only usable there (not at a storage, not at another AS), and
+      `cnf.jkt` is the app's key from `dpop_jkt` — hop 1 has to prove it.
+      `client_id` names the app, which is what keeps the app's identity in ID-JAG #1.
+      `sub`/`webid` come from the pick in step 2; the OP answers from its stored
+      session and never fetches `https://id/bob` here.
       '''
     }
 
-    App.UI -> Bob.UAS 'POST /.well-known/lws/token — resource=<storage>, subject_token=at+jwt' {
+    App.UI -> Bob.UAS 'POST /.well-known/lws/token — resource=<storage>, subject_token=<access token>' {
       notes'''
-      #### POST /.well-known/lws/token — resource=<storage>, subject_token=at+jwt
+      #### POST /.well-known/lws/token — resource=<storage>, subject_token=<access token>
       >[!NOTE]
       >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
 
@@ -996,46 +910,25 @@ views {
       > for that storage and client
 
       >[!TIP]
-      > span `sai.lws.issue-id-jag` (**657 ms**, `sai.lws.mode=impersonation`,
+      > span `sai.lws.issue-id-jag` (**724 ms**, `sai.lws.mode=impersonation`,
       > `sai.lws.access.derived=true`, `sai.lws.access.storage=https://data/acme-rnd/`).
       > Derivation runs when there is no `access` parameter, the subject token is
-      > not an ID-JAG, and `resource` is present.
+      > not an ID-JAG, and `resource` is present. `DPoP` proves the credential's
+      > `cnf.jkt` (`sai.lws.dpop_proof=true`).
 
       ```http
       POST https://auth.docker/.well-known/lws/token
       Content-Type: application/x-www-form-urlencoded
-      DPoP: <proof for 8UULSx3l…>
+      DPoP: <proof for DE5GDQRi…>
 
       grant_type=urn:ietf:params:oauth:grant-type:token-exchange
       &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
       &audience=https://auth/
       &resource=https://data/acme-rnd/
-      &subject_token=<at+jwt: sQ--ghpKlnKw>
-      &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+      &subject_token=<session access token: 50rcv4IOl_4P>
+      &subject_token_type=urn:ietf:params:oauth:token-type:access_token
       ```
       No `access` field and no JSON here — the UAS adds the claim (next steps).
-      '''
-    }
-
-    Bob.UAS -> Bob.CID 'GET https://id/bob — load the profile' {
-      notes'''
-      #### GET https://id/bob — load the profile
-      >[!NOTE]
-      >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
-
-      >[!IMPORTANT]
-      > the registry is **not** read from this document: `SessionManager` derives
-      > the registry set (`registryId(webid)` → `https://registry/bob/`) and takes
-      > the pod's SPARQL endpoint from the **account storage** endpoint records
-
-      >[!TIP]
-      > the CID advertises `solid:oidcIssuer`, `interop:hasAuthorizationAgent` and
-      > the `lws:AccessRequestService` / `lws:AccessGrantService` endpoints — no
-      > registries. `Link: rel="interop:hasRegistrySet"` is `AgentIdHandler`'s
-      > cross-user discovery header, not part of the CID.
-
-      `sai-id` answers `200` Turtle in 29 ms; the `id` dataset resolves the
-      profile/agent statements (8 ms SPARQL).
       '''
     }
 
@@ -1052,17 +945,18 @@ views {
 
       >[!TIP]
       > the UAS authenticates as Bob first: `GET /bob/` → `401` → discovery →
-      > `POST /.well-known/lws/token` (96 ms) → `200` (105 ms), then `GET /bob/`
-      > again for the registry set — `~460 ms` before the first grant read
+      > `POST /.well-known/lws/token` (100 ms) → `200` (109 ms), then `GET /bob/`
+      > again for the registry set — `~470 ms` before the first grant read
 
       ```http
       POST http://fuseki:3030/reg-bob/sparql    // 12 grant queries (+ registry reads)
       ```
       Matches the seeded `https://registry/yoyo/q7w2nz` (YoYo → Bob,
-      `SelectedFromRegistry`, `https://data/acme-rnd/`) — visible in Bob's
-      registry-pod dataset through the shared dev/test endpoint (a split
-      deployment backfills it with the reciprocal mirror). The claim is that
-      grant's own ODRL, ids included; nothing is invented.
+      `SelectedFromRegistry`, `https://data/acme-rnd/`). That graph reaches
+      `reg-bob` through the reciprocal mirror the test fixture seeds
+      (`applyReciprocalMirrors`, copying the linked registration's graphs and its
+      grants into the grantee's dataset). The claim is that grant's own ODRL, ids
+      included; nothing is invented.
 
       With no matching grant the UAS issues an **identity-only** ID-JAG (no
       `access`), which the next UAS refuses.
@@ -1086,13 +980,13 @@ views {
       ```json
       {
         "issued_token_type": "urn:ietf:params:oauth:token-type:id-jag",
-        "access_token": "<ID-JAG #1: ffbcc46e>",
+        "access_token": "<ID-JAG #1: 67cc8c0e>",
         "token_type": "N_A",
         "expires_in": 300
       }
       ```
 
-      decoded (`typ=oauth-id-jag+jwt`, `kid=5Q5ZOPHv…`):
+      decoded (header `typ=oauth-id-jag+jwt`, `kid=5Q5ZOPHv…`):
       ```json
       {
         "iss": "https://auth/",
@@ -1122,9 +1016,9 @@ views {
           "registeredShapeTree": "https://data/shapetrees/trees/Project",
           "assignee": "https://id/bob"
         }],
-        "iat": 1794782153,
-        "exp": 1794782453,
-        "jti": "ffbcc46e-8f66-4012-955f-7cf6aa631d52"
+        "iat": 1794790501,
+        "exp": 1794790801,
+        "jti": "67cc8c0e-b5e0-4ed0-98d7-a116afdcd2b6"
       }
       ```
       Still the **hidden** pair: `sub` = Bob, `client_id` = the app, claim
@@ -1143,8 +1037,13 @@ views {
       > no `access` parameter: an ID-JAG subject token plus a request claim is
       > refused (`invalid_request`) — the claim rides the incoming ID-JAG
 
+      >[!NOTE]
+      > in this environment this is the **same URL as step 6** (`auth` serves Bob's
+      > and YoYo's token endpoints); federated, step 6 goes to Bob's UAS and this
+      > one to YoYo's, and the ID-JAG's `aud` is the latter's identifier.
+
       >[!TIP]
-      > span `sai.lws.issue-id-jag` (366 ms) with `sai.lws.verify-id-jag` as its
+      > span `sai.lws.issue-id-jag` (390 ms) with `sai.lws.verify-id-jag` as its
       > child (6 ms) — verify, registry lookup and re-issue all in one request
 
       ```http
@@ -1163,45 +1062,49 @@ views {
       '''
     }
 
-    YoYo.UAS -> YoYo.UAS 'sai.lws.verify-id-jag — incoming ID-JAG #1' {
+    YoYo.UAS -> Bob.CID 'GET https://id/bob — resolve the issuer (federated)' {
       notes'''
-      #### sai.lws.verify-id-jag — incoming ID-JAG #1
+      #### GET https://id/bob — resolve the issuer (federated)
       >[!NOTE]
       >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
 
-      >[!IMPORTANT]
-      > `aud` must name this AS (`https://auth/`), `typ` pinned to
-      > `oauth-id-jag+jwt`, `jti`/`exp` checked
+      >[!WARNING]
+      > not from this trace — architectural. Here Bob's UAS and YoYo's UAS are the
+      > same `auth` process, so `iss` is in `trustedIssuers` and nothing is fetched:
+      > the whole check is the local `sai.lws.verify-id-jag` span (6 ms, discovery +
+      > JWKS against itself).
 
-      Children of the span: `GET https://auth/.well-known/openid-configuration`
-      (2 ms) and `GET https://auth/.oidc/jwks` (2 ms) — the UAS verifies the grant
-      with its own keys; no CID dereference for a local subject.
+      Federated, the incoming ID-JAG's `sub` is Bob and its `iss` is **Bob's** UAS.
+      `IdJagSubjectTokenVerifier` dereferences `https://id/bob` and requires the
+      document to designate that issuer as its OpenID provider
+      (`lws:OpenIdProvider` with `serviceEndpoint` = `iss`, or `solid:oidcIssuer`),
+      so YoYo's UAS never trusts a claim just because it arrived over TLS.
 
-      `sai.lws.subject_id=https://id/bob`, `sai.lws.client_id=https://data/test-client/public/id`,
-      `sai.lws.access.storage=https://data/acme-rnd/`.
+      ```http
+      GET https://id/bob
+      Accept: application/ld+json, application/json;q=0.9, text/turtle;q=0.8
+      ```
       '''
     }
 
-    YoYo.UAS -> YoYo.CID 'GET https://id/yoyo — load the WebID profile' {
+    YoYo.UAS -> Bob.UAS 'discovery + JWKS (federated)' {
       notes'''
-      #### GET https://id/yoyo — load the WebID profile
+      #### discovery + JWKS (federated)
       >[!NOTE]
       >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
 
-      >[!IMPORTANT]
-      > the registry set is **not** discovered from the CID. `SessionManager` derives
-      > it (`registryId(webid)` → `https://registry/yoyo/`) and reads the pod's
-      > SPARQL endpoint from the **account storage** endpoint records.
+      >[!WARNING]
+      > not from this trace — architectural, the partner of the previous step
 
-      >[!TIP]
-      > the profile (CID) advertises only `interop:hasAuthorizationAgent` and the
-      > `lws:AccessRequestService` / `lws:AccessGrantService` endpoints — no
-      > registries. `Link: rel="interop:hasRegistrySet"` comes from
-      > `AgentIdHandler` for *cross-user* discovery (admin-gated), not from here.
+      With the issuer resolved, `IdJagSubjectTokenVerifier` runs OpenID Connect
+      discovery at **Bob's** UAS and verifies the ID-JAG's ES256 signature with
+      its `jwks_uri` (the discovered `issuer` must equal `iss`). In this run those
+      two calls go to `https://auth/…` — its own provider — which is why they show
+      up as 2 + 2 ms children of `sai.lws.verify-id-jag`.
 
-      `sai-id` answers `200` Turtle (11 ms); the `id` dataset resolves the
-      profile/agent statements (6 ms SPARQL). This is a *local* session as YoYo,
-      not a check of Bob's claim.
+      In both environments the order is fixed: `aud` must name this AS,
+      `typ` is pinned to `oauth-id-jag+jwt`, then the issuer is established, then
+      `jti`/`exp` are checked.
       '''
     }
 
@@ -1218,8 +1121,8 @@ views {
       >[!TIP]
       > the UAS authenticates to its own registry first: `GET /yoyo/` → `401` →
       > `/.well-known/oauth-protected-resource/yoyo/` → `/.well-known/lws-configuration`
-      > → `POST /.well-known/lws/token` (27 ms) → `200` (93 ms), then `GET /yoyo/`
-      > again — `~290 ms` before the first grant read
+      > → `POST /.well-known/lws/token` (29 ms) → `200` (104 ms), then `GET /yoyo/`
+      > again — `~300 ms` before the first grant read
 
       ```http
       POST http://fuseki:3030/reg-yoyo/sparql     // 7 grant queries (+ registry reads)
@@ -1271,18 +1174,18 @@ views {
         "client_id": "https://auth/",
         "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
         "access": [{
-          "id": "urn:uuid:42aaeb4a-488f-491c-9365-7179daee8fe7",
+          "id": "urn:uuid:ec083afe-43bd-4834-ad4b-83477cce3c12",
           "type": ["http://www.w3.org/ns/odrl/2/Agreement"],
           "profile": "http://www.w3.org/ns/solid/interop#AccessProfile",
           "assigner": "https://id/yoyo",
           "assignee": "https://auth/",
           "permission": [{
-            "id": "urn:uuid:0031f5a0-81d8-4d6f-9aa1-7032c33ce917",
+            "id": "urn:uuid:a6058d52-d42a-42bb-a189-3461f5204b6c",
             "assigner": "https://id/yoyo",
             "assignee": "https://auth/",
             "action": ["http://www.w3.org/ns/odrl/2/read"],
             "target": {
-              "id": "urn:uuid:faa2abed-b474-44af-8964-e852bf57a2b2",
+              "id": "urn:uuid:ed062028-5640-495f-9876-a37a84f25572",
               "owner": "https://id/acme",
               "storage": "https://data/acme-rnd/",
               "type": ["http://www.w3.org/ns/odrl/2/Asset"],
@@ -1293,9 +1196,9 @@ views {
           "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
           "registeredShapeTree": "https://data/shapetrees/trees/Project"
         }],
-        "iat": 1794782154,
-        "exp": 1794782454,
-        "jti": "f432d275-b497-4cd3-b91a-82a3ff6338c2"
+        "iat": 1794790502,
+        "exp": 1794790802,
+        "jti": "ac00b7a7-f90c-4f60-9133-9465f0383b02"
       }
       ```
       Fresh `urn:uuid` ids for the policy, the permission and the target; the
@@ -1337,8 +1240,13 @@ views {
       >[!IMPORTANT]
       > `sub` is now YoYo, so ACME dereferences **YoYo's** CID — never Bob's
 
-      Inside `sai.lws.verify-id-jag` (53 ms): `sai-id` answered `GET /yoyo` `200`
-      in 18 ms. Bob's document is not fetched by ACME at all.
+      >[!TIP]
+      > this is the check YoYo's UAS skips in steps 10–11 only because `iss` is
+      > itself. `data` is a different server from `auth`, so it cannot shortcut:
+      > it resolves the issuer through the subject document, then discovery + JWKS.
+
+      Inside `sai.lws.verify-id-jag` (54 ms): `sai-id` answered `GET /yoyo` `200`
+      in 17 ms. Bob's document is not fetched by ACME at all.
       '''
     }
 
@@ -1407,10 +1315,10 @@ views {
 
       >[!TIP]
       > `h4p.Data` serves both the AS and the storage endpoint, so the decision runs
-      > in the process that answered the token exchange — 204 ms inside
+      > in the process that answered the token exchange — 209 ms inside
       > `data.docker` (`sai-data`), no second server hop
 
-      Observed reads: `GET https://id/yoyo` (18 ms) then `22` SPARQL queries —
+      Observed reads: `GET https://id/yoyo` (17 ms) then `22` SPARQL queries —
       `15` on `data-acme-rnd` (the resource + its registration) and `7` on
       `reg-acme` (the owner's registries). The token's `access` claim is evaluated
       **first**, so the claim's narrowed `source` (`pbh2yw`) / `partOf` (`reb39k`)

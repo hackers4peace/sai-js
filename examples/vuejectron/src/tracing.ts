@@ -22,10 +22,11 @@ import type { RuntimeConfig } from './runtime-config'
  * header (the SAI servers reflect it in their CORS preflight).
  *
  * Two spans make the LWS chain readable from the browser:
- * `sai.lws.request-id-token` (mint, `packages/lws-auth`), the two exchange
- * spans (`request-id-jag`, `exchange-access-token`) and the `HTTP` span created
- * by the fetch instrumentation. Their `traceparent` is what links the server
- * spans (`/sai/id-token`, `/.well-known/lws/token`, …) into one trace.
+ * `sai.lws.request-id-jag` and `sai.lws.exchange-access-token`
+ * (`packages/lws-auth`) plus the `HTTP` span created by the fetch
+ * instrumentation. Their `traceparent` is what links the server spans
+ * (`/.well-known/lws/token`, …) into one trace. The session's own access token
+ * needs no client span: it comes from the OIDC token endpoint.
  *
  * `StackContextManager`, not `ZoneContextManager`: the app targets ESNext, so
  * `await` is native and zone.js cannot carry the context across it. The LWS

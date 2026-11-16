@@ -57,7 +57,6 @@
           { "@id": "urn:sai:default:AccessGrantRouter" },
           { "@id": "urn:sai:default:ReciprocalWebhookRouter" },
           { "@id": "urn:sai:default:ActivityWebhookRouter" },
-          { "@id": "urn:sai:default:IdTokenRouter" },
           { "@id": "urn:sai:default:AuthorizationAgentDiscoveryHandler" },
           { "@id": "urn:sai:default:AdminSparqlRouter" },
           { "@id": "urn:sai:default:ProxyAdminRouter" },
@@ -70,20 +69,6 @@
       "@type": "AbsolutePathInteractionRoute",
       "path": { "@id": "urn:sai:default:variable:authorizationEndpoint" },
       "ensureSlash": false
-    },
-    {
-      "comment": "Hands the UI a DPoP-bound credential for its own session, so the browser runs the LWS chain itself (ID token → ID-JAG per storage AS → access token). Replaces the old `/.sai/lws-token` broker.",
-      "@id": "urn:sai:default:IdTokenRouter",
-      "@type": "OperationRouterHandler",
-      "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" },
-      "allowedPathNames": ["^/.sai/id-token$"],
-      "allowedMethods": ["GET"],
-      "handler": {
-        "@id": "urn:sai:default:IdTokenHandler",
-        "@type": "IdTokenHandler",
-        "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
-        "issuer": { "@id": "urn:sai:default:IdTokenIssuer" }
-      }
     },
     {
       "comment": "Handles reading and writing notification subscriptions and channels.",

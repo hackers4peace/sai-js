@@ -49,12 +49,19 @@ export interface BrowserSession {
   readonly webId: string | undefined
   /**
    * The client's single DPoP key pair. Non-extractable; the same one signs the
-   * session token's proofs, the ID token mint and the ID-JAG exchange.
+   * session token's proofs and the ID-JAG exchange.
    */
   readonly dpopKeyPair: CryptoKeyPair | undefined
   /** Whether session requests send DPoP proofs (see {@link BrowserSessionOptions.dpop}). */
   readonly dpop: boolean
   readonly isLoggedIn: boolean
+  /**
+   * The session's DPoP-bound access token, refreshed with the refresh token
+   * when it is about to expire. It is the credential the app exchanges at its
+   * authorization server for ID-JAGs, so it needs to be sender-constrained with
+   * `cnf` (DPoP) or restricted to that server with `aud`.
+   */
+  accessToken(): Promise<string>
   /** Starts an authorization code flow and returns the URL to navigate to. */
   login(issuer?: string): Promise<string>
   /** Completes the flow from the redirect URL the provider sent the browser to. */
@@ -102,10 +109,9 @@ function sessionInfo(session: StoredSession): BrowserSessionInfo {
  *
  * One non-extractable DPoP key pair is generated when the flow starts and is
  * used for everything afterwards: the authorization code token request, the
- * session's `.sai` requests, the credential mint at `/.sai/id-token`
- * (`createBrowserCredential`) and the ID-JAG exchange at the UAS. That makes
- * `dpop_jkt` and the proof on the mint request the same key, so the UAS can
- * verify possession instead of trusting the query parameter.
+ * session's `.sai` requests and the ID-JAG exchange at the UAS. The access
+ * token it obtains is the app's LWS authentication credential, so the UAS
+ * verifies possession of the same key instead of trusting a bearer token.
  *
  * No third-party session library is involved: `oauth4webapi` runs the
  * authorization code + PKCE flow, and {@link createDpopProof} signs resource
@@ -213,8 +219,8 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
       throw new Error(`${issuerId} does not advertise an authorization endpoint`)
     }
 
-    // The one key pair for this session: token requests, `.sai`, the mint and
-    // the ID-JAG exchange all use it (and it never leaves WebCrypto).
+    // The one key pair for this session: token requests, `.sai` and the
+    // ID-JAG exchange all use it (and it never leaves WebCrypto).
     const keyPair = await createDpopKeyPair(false)
     const codeVerifier = oauth.generateRandomCodeVerifier()
     const state = oauth.generateRandomState()
@@ -310,7 +316,7 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
   }
 
   const sessionFetch: WhatwgFetch = async (input, init) => {
-    // Capture the caller's span (the mint's `sai.lws.request-id-token`) before
+    // Capture the caller's span (the storage request's `sai.lws.*` root) before
     // the first await; async context is not preserved by StackContextManager.
     const activeSpan = trace.getSpan(context.active())
     const token = await accessToken()
@@ -375,6 +381,7 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     get isLoggedIn() {
       return current !== undefined
     },
+    accessToken,
     login,
     handleRedirect,
     restore,

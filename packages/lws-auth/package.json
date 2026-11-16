@@ -1,7 +1,7 @@
 {
   "name": "@elfpavlik/lws-auth",
   "version": "0.1.0",
-  "description": "LWS authorization client: ID token -> ID-JAG -> storage access token (docs/plans/lws-auth.md)",
+  "description": "LWS authorization client: DPoP-bound access token -> ID-JAG -> storage access token (docs/plans/lws-auth.md)",
   "license": "MIT",
   "type": "module",
   "main": "./src/index.ts",

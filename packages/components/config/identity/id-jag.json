@@ -18,19 +18,21 @@
       "lifetime": 300
     },
     {
-      "comment": "Issues the DPoP-bound self-issued credential the UI exchanges for ID-JAGs (`.sai/id-token`). Same key as `/.oidc/jwks`.",
-      "@id": "urn:sai:default:IdTokenIssuer",
-      "@type": "IdTokenIssuer",
-      "issuer": {
-        "@id": "urn:solid-server:default:variable:baseUrl"
+      "comment": "The access tokens of this OpenID provider are the LWS authentication credentials of its users: the UI and other clients of this server exchange them at the UAS below for ID-JAGs. Restricting them to this server (`aud` = `iss`) keeps them from being replayed at another authorization server; `cnf.jkt` (DPoP) proves possession on top of that. Solid-OIDC deployments keep the default `solid` audience.",
+      "@id": "urn:sai:default:OverrideAccessTokenAudience",
+      "@type": "Override",
+      "overrideInstance": {
+        "@id": "urn:solid-server:default:IdentityProviderFactory"
       },
-      "jwkGenerator": {
-        "@id": "urn:solid-server:default:JwkGenerator"
-      },
-      "lifetime": 300
+      "overrideParameters": {
+        "@type": "IdentityProviderFactory",
+        "accessTokenAudience": {
+          "@id": "urn:solid-server:default:variable:baseUrl"
+        }
+      }
     },
     {
-      "comment": "Verifies the authentication credential presented at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced; `solid` stays accepted as audience because the suite's self-issued credential uses it. A token with `cnf.jkt` is only accepted together with a DPoP proof for that key.",
+      "comment": "Verifies the authentication credential presented at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced. Two shapes are accepted: access tokens of the OpenID provider of this server (`aud` = this server, `cnf.jkt` from DPoP), and the self-issued `at+jwt` of the agent/authorization-agent suite (`aud: solid`, `cnf.jkt`). A token with `cnf.jkt` is only accepted together with a DPoP proof for that key, and `requireRestrictedTokens` refuses unbound tokens whose audience is not this server.",
       "@id": "urn:sai:default:IdTokenVerifier",
       "@type": "OidcSubjectTokenVerifier",
       "converter": {
@@ -43,7 +45,7 @@
       ],
       "additionalAudiences": ["solid"],
       "acceptSolidOidcIssuer": false,
-      "requireRestrictedTokens": false
+      "requireRestrictedTokens": true
     },
     {
       "comment": "Accepts an incoming ID-JAG at a UAS for the C2 impersonation hop (Bob -> YoYo). The signature/audience/claim are verified before the handler re-issues it under the visible subject.",

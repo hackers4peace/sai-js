@@ -3,14 +3,22 @@ import { beforeAll, describe, expect, test } from 'vitest'
 
 import { createBrowserCredential, createBrowserLwsFetch } from '../src/browser.ts'
 import { dpopThumbprint } from '../src/dpop.ts'
-import { createFakeFetch, json, makeJwt } from './helpers.ts'
+import type { BrowserSession } from '../src/session.ts'
+import { ACCESS_TOKEN_TYPE } from '../src/tokens.ts'
+import { createFakeFetch, formBody, json, makeJwt } from './helpers.ts'
 
 const AUTH = 'https://auth/'
-const ID_TOKEN_ENDPOINT = 'https://auth/.sai/id-token'
 const WEBID = 'https://id/alice'
 const CLIENT = 'https://ui.auth/id'
 const DATA_AS = 'https://data/'
 const DATA_STORAGE = 'https://data/alice-work/'
+const SESSION_ACCESS_TOKEN = makeJwt({
+  iss: AUTH,
+  aud: AUTH,
+  sub: WEBID,
+  webid: WEBID,
+  client_id: CLIENT,
+})
 
 let keyPair: CryptoKeyPair
 
@@ -21,26 +29,19 @@ beforeAll(async () => {
   ])) as CryptoKeyPair
 })
 
-/** The mint endpoint of `auth`, answering with a credential bound to `jkt`. */
-function mintRoute(grantLifetime: number, clock: () => number) {
-  return (url: URL): Response | undefined => {
-    if (url.pathname !== '/.sai/id-token') return undefined
-    return json({
-      id_token: makeJwt({
-        iss: AUTH,
-        aud: 'solid',
-        sub: WEBID,
-        webid: WEBID,
-        azp: url.searchParams.get('client_id'),
-        client_id: url.searchParams.get('client_id'),
-        cnf: { jkt: url.searchParams.get('dpop_jkt') },
-        exp: Math.floor(clock() / 1000) + grantLifetime,
-      }),
-      token_type: 'N_A',
-      expires_in: grantLifetime,
-      issuer: AUTH,
-    })
-  }
+/** The parts of a signed-in {@link BrowserSession} the credential and the chain use. */
+function fakeSession(
+  accessToken = async (): Promise<string> => SESSION_ACCESS_TOKEN
+): BrowserSession {
+  return {
+    issuer: AUTH,
+    clientId: CLIENT,
+    webId: WEBID,
+    dpopKeyPair: keyPair,
+    dpop: true,
+    isLoggedIn: true,
+    accessToken,
+  } as unknown as BrowserSession
 }
 
 describe('dpopThumbprint', () => {
@@ -56,84 +57,39 @@ describe('dpopThumbprint', () => {
 })
 
 describe('createBrowserCredential', () => {
-  test('mints a credential bound to the browser key, with the client and jkt', async () => {
-    const clock = () => Date.UTC(2026, 10, 14, 12, 0, 0)
-    const { fetch, requests } = createFakeFetch(mintRoute(300, clock))
-    const credential = await createBrowserCredential({
-      issuer: AUTH,
-      clientId: CLIENT,
-      keyPair,
-      credentialFetch: fetch,
-      now: clock,
-    })
+  test('uses the session access token as the subject token', async () => {
+    const credential = await createBrowserCredential(fakeSession())
 
-    const token = await credential.getSubjectToken()
-
-    expect(requests).toHaveLength(1)
-    const url = new URL(requests[0].url)
-    expect(url.origin + url.pathname).toBe(ID_TOKEN_ENDPOINT)
-    expect(url.searchParams.get('client_id')).toBe(CLIENT)
-    expect(url.searchParams.get('dpop_jkt')).toBe(credential.dpopJkt)
     expect(credential.issuer).toBe(AUTH)
     expect(credential.clientId).toBe(CLIENT)
     expect(credential.dpopKeyPair).toBe(keyPair)
-    expect(token).toContain('.')
+    expect(credential.subjectTokenType).toBe(ACCESS_TOKEN_TYPE)
+    expect(credential.dpopJkt).toBe(await dpopThumbprint(keyPair.publicKey))
+    await expect(credential.getSubjectToken()).resolves.toBe(SESSION_ACCESS_TOKEN)
   })
 
-  test('caches the credential until shortly before it expires', async () => {
-    let clock = Date.UTC(2026, 10, 14, 12, 0, 0)
-    const { fetch, requests } = createFakeFetch(mintRoute(60, () => clock))
-    const credential = await createBrowserCredential({
-      issuer: AUTH,
-      clientId: CLIENT,
-      keyPair,
-      credentialFetch: fetch,
-      now: () => clock,
-    })
+  test('asks the session for the token every time, so a refresh is picked up', async () => {
+    const tokens = ['first', 'second']
+    const credential = await createBrowserCredential(
+      fakeSession(async () => tokens.shift() ?? 'unused')
+    )
 
-    await credential.getSubjectToken()
-    await credential.getSubjectToken()
-    expect(requests).toHaveLength(1)
-
-    // still inside the 30 s renewal margin → minted again
-    clock += 40_000
-    await credential.getSubjectToken()
-    expect(requests).toHaveLength(2)
+    await expect(credential.getSubjectToken()).resolves.toBe('first')
+    await expect(credential.getSubjectToken()).resolves.toBe('second')
   })
 
-  test('rejects a response without a credential, and failed requests', async () => {
-    const empty = createFakeFetch(() => json({ expires_in: 300 }))
+  test('rejects a session without a key pair', async () => {
     await expect(
-      createBrowserCredential({
-        issuer: AUTH,
-        clientId: CLIENT,
-        keyPair,
-        credentialFetch: empty.fetch,
-      }).then((credential) => credential.getSubjectToken())
-    ).rejects.toThrow(/carries no id_token/u)
-
-    const denied = createFakeFetch(() => json({ error: 'unauthorized' }, 403))
-    await expect(
-      createBrowserCredential({
-        issuer: AUTH,
-        clientId: CLIENT,
-        keyPair,
-        credentialFetch: denied.fetch,
-      }).then((credential) => credential.getSubjectToken())
-    ).rejects.toThrow(/403/u)
+      createBrowserCredential({ ...fakeSession(), dpopKeyPair: undefined } as BrowserSession)
+    ).rejects.toThrow(/no DPoP key pair/u)
   })
 })
 
 describe('createBrowserLwsFetch', () => {
-  test('runs the two-step chain with the browser credential', async () => {
-    const clock = Date.UTC(2026, 10, 14, 12, 0, 0)
-    const mint = mintRoute(300, () => clock)
-    const { fetch } = createFakeFetch((url, request): Response | undefined => {
-      const minted = mint(url)
-      if (minted) return minted
-      const href = url.href
+  test('runs the two-step chain with the session access token', async () => {
+    const { fetch, requests } = createFakeFetch((url, request): Response | undefined => {
       if (url.pathname === '/.well-known/lws/token' && request.method === 'POST') {
-        const body = new URLSearchParams(request.body ?? '')
+        const body = formBody(request)
         return json({
           access_token: `access-${body.get('resource')}`,
           token_type: 'Bearer',
@@ -141,7 +97,7 @@ describe('createBrowserLwsFetch', () => {
         })
       }
       if (url.pathname.includes('/.well-known/oauth-protected-resource/')) {
-        return json({ resource: href, authorization_servers: [DATA_AS] })
+        return json({ resource: url.href, authorization_servers: [DATA_AS] })
       }
       if (url.pathname === '/.well-known/lws-configuration') {
         return json({
@@ -167,14 +123,24 @@ describe('createBrowserLwsFetch', () => {
     })
 
     const lwsFetch = await createBrowserLwsFetch({
-      issuer: AUTH,
-      clientId: CLIENT,
-      keyPair,
-      credentialFetch: fetch,
+      session: fakeSession(),
       fetch,
+      tokenFetch: fetch,
     })
 
     const response = await lwsFetch(`${DATA_STORAGE}k3pqsb`)
     expect(response.status).toBe(200)
+
+    // The UAS leg carries the session token as an access token and proves the
+    // session key, so the `cnf.jkt` of the token is enforced.
+    const idJagRequest = requests.find(
+      (request) => new URL(request.url).pathname === '/.well-known/lws/token'
+    )
+    expect(idJagRequest).toBeDefined()
+    const body = formBody(idJagRequest!)
+    expect(body.get('subject_token')).toBe(SESSION_ACCESS_TOKEN)
+    expect(body.get('subject_token_type')).toBe(ACCESS_TOKEN_TYPE)
+    expect(body.get('audience')).toBe(DATA_AS)
+    expect(idJagRequest!.headers.get('dpop')).toContain('.')
   })
 })

@@ -61,35 +61,24 @@ export const useAppStore = defineStore('app', () => {
    * The data and registry storages accept only LWS access tokens, while the
    * `.sai` API keeps the Solid-OIDC DPoP session.
    *
-   * The browser runs the LWS chain itself (`@elfpavlik/lws-auth`): it mints a
-   * DPoP-bound credential for this session at `<auth>/.sai/id-token`, exchanges
-   * it for one ID-JAG per storage authorization server, and trades each grant
-   * for a storage access token. The credential never leaves the browser and the
+   * The browser runs the LWS chain itself (`@elfpavlik/lws-auth`): its session
+   * **access token** (`aud` = `auth`, `cnf.jkt` = the session key) is exchanged
+   * for one ID-JAG per storage authorization server, and each grant is traded
+   * for a storage access token. The token never leaves the browser and the
    * grants are `aud`-restricted, so nothing here can mint a token for another
    * storage.
    *
    * Both legs use the session's **single** non-extractable DPoP key pair: the
-   * session fetch signs the `.sai`/mint requests with it, and the LWS client
-   * binds the minted credential (`cnf.jkt`) and proves it at the ID-JAG
-   * exchange with the same key.
+   * session fetch signs the `.sai`/token requests with it, and the LWS client
+   * proves the `cnf.jkt` of the access token at the ID-JAG exchange with it.
    */
   let sessionFetchCache: WhatwgFetch | undefined
   function sessionFetch(): WhatwgFetch {
     if (sessionFetchCache) return sessionFetchCache
     const authServer = new URL(authSession.issuer).origin
-    const keyPair = authSession.dpopKeyPair
-    if (!keyPair) throw new Error('not signed in: there is no DPoP key pair')
     // plain fetch for the storages: the LWS access token is their credential;
-    // the session's DPoP fetch is only for the UAS (mint) and `.sai`.
-    const lwsFetch = createBrowserLwsFetch({
-      issuer: authSession.issuer,
-      clientId: authSession.clientId,
-      keyPair,
-      credentialFetch: authSession.fetch,
-      // With DPoP the mint request already proves possession of this key; a
-      // bearer session has to declare the binding in the query instead.
-      declareDpopJkt: !authSession.dpop,
-    })
+    // the session's DPoP fetch is only for the UAS and `.sai`.
+    const lwsFetch = createBrowserLwsFetch({ session: authSession })
     sessionFetchCache = async (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
       if (url.startsWith(`${authServer}/`)) return authSession.fetch(input, init)

@@ -86,8 +86,8 @@ See [Configuration Reference](https://vitejs.dev/config/).
   `sai.token.access.*`); the raw serialized JWT stays out unless
   `captureRawTokens` is added.
 
-With tracing on, the app emits `sai.lws.request-id-token`, `sai.lws.request-id-jag`
-and `sai.lws.exchange-access-token` client spans; the fetch instrumentation adds
+With tracing on, the app emits `sai.lws.request-id-jag` and
+`sai.lws.exchange-access-token` client spans; the fetch instrumentation adds
 the HTTP spans and `traceparent` links them to the server spans in Tempo.
 `packages/lws-auth` re-enters the client span around the actual fetch because the
 app targets ESNext (native `await`; no zone.js).

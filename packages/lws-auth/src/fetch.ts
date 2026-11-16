@@ -60,7 +60,8 @@ interface CachedGrant {
  * `fetch` for LWS storages that goes through the **two-step** authorization
  * chain instead of exchanging the authentication credential directly:
  *
- * 1. `POST <uas>/.well-known/lws/token` — credential + DPoP proof → one ID-JAG
+ * 1. `POST <uas>/.well-known/lws/token` — the authentication credential (an ID
+ *    token, or the browser's DPoP-bound access token) + DPoP proof → one ID-JAG
  *    per resource authorization server (`aud` = that server's issuer),
  * 2. `POST <storage>/.well-known/lws/token` — ID-JAG → bearer access token for
  *    the storage,
@@ -121,6 +122,7 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
         audience: firstAudience,
         resource: storage,
         subjectToken: await credential.getSubjectToken(),
+        subjectTokenType: credential.subjectTokenType,
         clientId: credential.clientId,
         dpopKeyPair: credential.dpopKeyPair,
         accessClaim: await options.accessClaim?.(storage, audience),

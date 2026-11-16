@@ -33,7 +33,7 @@ const SPARQL_QUERY_MEDIA_TYPE = 'application/sparql-query'
  * Read from the RAW request URL: the deployment's `TargetExtractor` strips
  * query strings (`includeQueryString: false` in the LDP request parser), so
  * `operation.target.path` does not carry `?pod=` — the same pitfall
- * `/proxy-admin` (`?iri=`) and `/.sai/id-token` (`?dpop_jkt=`) document.
+ * `/proxy-admin` (`?iri=`) documents.
  * Parsing the path silently fell back to the org's REGISTRY pod for every
  * data-pod query (the org-context share/registration reads got an empty
  * `lws:partOf` result instead of an error).

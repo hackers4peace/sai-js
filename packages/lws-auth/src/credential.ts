@@ -1,5 +1,6 @@
 /**
- * The user's authentication credential as this client sees it: an ID token (or
+ * The user's authentication credential as this client sees it: a token of the
+ * user's authorization server (an OpenID Connect access token, an ID token, or
  * the self-issued JWT the SAI test stack uses) plus the DPoP key pair its `cnf`
  * claim is bound to.
  *
@@ -18,6 +19,12 @@ export interface LwsCredential {
    * exchanged.
    */
   readonly dpopKeyPair: CryptoKeyPair
+  /**
+   * The RFC 8693 `subject_token_type` of the credential.
+   * Defaults to `urn:ietf:params:oauth:token-type:id_token`; the browser sends
+   * its session access token instead (`…:access_token`).
+   */
+  readonly subjectTokenType?: string
   /** Mints a fresh subject token (one exchange per resource authorization server). */
   getSubjectToken(): Promise<string>
 }

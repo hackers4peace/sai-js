@@ -320,12 +320,3 @@ describe('C2 impersonation through @elfpavlik/lws-auth', () => {
     expect(response.headers.get('content-type')).toEqual(expect.stringContaining('text/turtle'))
   })
 })
-
-describe('browser credential endpoint (C5)', () => {
-  test('serves /.sai/id-token and refuses anonymous callers', async () => {
-    const response = await fetch(`${AUTH}.sai/id-token?dpop_jkt=abc`)
-    // a registered route with the regular credentials extractor: an anonymous
-    // caller is refused by the handler (a missing route would be a 404)
-    expect(response.status).toBe(403)
-  })
-})

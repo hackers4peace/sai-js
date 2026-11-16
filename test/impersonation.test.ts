@@ -84,8 +84,9 @@ async function mintIdJag(body: Record<string, unknown>): Promise<string> {
 describe('C2 impersonation chain', () => {
   test('Bob -> YoYo -> ACME hides Bob and the delegated grant references', async () => {
     // The app signs Bob in through the OP (`auth` is both UAS and OP): code +
-    // PKCE bound to the app's key, then the DPoP-bound credential naming the
-    // app as `client_id` — no in-process signing with the env key.
+    // PKCE bound to the app's key, and the session's access token is the LWS
+    // credential — `aud` is `auth` itself and `client_id` names the app, so no
+    // in-process signing with the env key is involved.
     const app = await loginAsClient({ webid: BOB, email: BOB_EMAIL, clientId: TEST_CLIENT })
     const subjectToken = app.subjectToken
     const dpop = await createDpopProof({
@@ -95,6 +96,7 @@ describe('C2 impersonation chain', () => {
     })
     expect(app.credentialClaims).toMatchObject({
       iss: AUTH,
+      aud: AUTH,
       sub: BOB,
       webid: BOB,
       client_id: TEST_CLIENT,
@@ -109,7 +111,7 @@ describe('C2 impersonation chain', () => {
         audience: AUTH,
         resource: DATA_STORAGE,
         subject_token: subjectToken,
-        subject_token_type: ID_TOKEN_TYPE,
+        subject_token_type: app.subjectTokenType,
       },
       dpop
     )
