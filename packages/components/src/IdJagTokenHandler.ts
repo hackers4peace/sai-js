@@ -19,8 +19,6 @@ import { getLoggerFor } from 'global-logger-factory'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
 import { rewriteAccessClaim, setAccessClaimAssignee, verifyAccessClaim } from './access-claim.js'
-import type { ActorClaim } from './actor-chain.js'
-import { appendActor, deepestActor, verifyActorChain } from './actor-chain.js'
 import type { AccessClaimValidator } from './DelegatedAccessClaimValidator.js'
 import { ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 import type { IdJagIssuer } from './IdJagIssuer.js'
@@ -177,7 +175,6 @@ export class IdJagTokenHandler extends HttpHandler {
     const audience = this.getParameter(params, 'audience')
     const subjectToken = this.getParameter(params, 'subject_token')
     const subjectTokenType = this.getParameter(params, 'subject_token_type')
-    const mode = this.mode(params, subjectTokenType)
     const resource = params.get('resource') ?? undefined
     const access = await this.accessClaim(params)
 
@@ -186,7 +183,6 @@ export class IdJagTokenHandler extends HttpHandler {
       'sai.lws.requested_token_type': requestedTokenType,
       'sai.lws.subject_token_type': subjectTokenType,
       'sai.lws.audience': audience,
-      'sai.lws.mode': mode,
     })
     if (resource) span.setAttribute('sai.lws.resource', resource)
     if (access) span.setAttribute('sai.lws.access.storage', access.storage)
@@ -234,7 +230,6 @@ export class IdJagTokenHandler extends HttpHandler {
     let issuedSubject = subject.subject
     let issuedClient = subject.client
     let issuedAccess = access ?? derivedAccess
-    let issuedAct: ActorClaim | undefined
 
     if (subjectTokenType === ID_JAG_TOKEN_TYPE) {
       if (access !== undefined) {
@@ -255,7 +250,6 @@ export class IdJagTokenHandler extends HttpHandler {
         resource,
         subject.subject
       )
-      const incomingAct = subject.act === undefined ? undefined : verifyActorChain(subject.act)
       let assigner = incoming.assigners[0]
 
       if (this.claimValidator) {
@@ -279,21 +273,9 @@ export class IdJagTokenHandler extends HttpHandler {
 
       issuedSubject = this.visibleSubject(incoming, assigner, subject.subject, subject.client)
 
-      if (mode === 'delegation') {
-        // Delegation retains the actor chain: the incoming subject/client stay
-        // visible and the current client is the most nested actor. The claim
-        // is still bound to the visible subject, not to the client.
-        issuedClient = subject.client
-        let act: ActorClaim = incomingAct
-          ? { sub: subject.subject, act: incomingAct }
-          : { sub: subject.subject }
-        if (deepestActor(act) !== issuedClient) act = appendActor(act, issuedClient)
-        issuedAct = act
-      } else {
-        // C2 impersonation: the outgoing client is this UAS and Bob/the actor
-        // chain are dropped.
-        issuedClient = this.issuer.issuer
-      }
+      // Impersonation is the only flow: the outgoing client is this UAS and
+      // the hidden subject/client are dropped.
+      issuedClient = this.issuer.issuer
 
       issuedAccess = {
         ...incoming,
@@ -301,8 +283,7 @@ export class IdJagTokenHandler extends HttpHandler {
         assigners: [],
         assignees: [issuedSubject],
       }
-      span.setAttribute('sai.lws.impersonation', mode === 'impersonation')
-      span.setAttribute('sai.lws.delegation', mode === 'delegation')
+      span.setAttribute('sai.lws.impersonation', true)
     } else if (issuedAccess) {
       if (resource !== undefined && resource !== issuedAccess.storage) {
         throw new OAuthError(
@@ -335,7 +316,6 @@ export class IdJagTokenHandler extends HttpHandler {
         ? {
             access: issuedAccess.access,
             context: issuedAccess.context,
-            ...(issuedAct ? { act: issuedAct } : {}),
           }
         : undefined
     )
@@ -350,23 +330,6 @@ export class IdJagTokenHandler extends HttpHandler {
       token_type: 'N_A',
       expires_in: this.issuer.lifetime,
     }
-  }
-
-  /** Reads and validates the optional token-flow mode (`impersonation` default). */
-  private mode(params: URLSearchParams, subjectTokenType: string): 'impersonation' | 'delegation' {
-    const values = params.getAll('mode')
-    if (values.length === 0) return 'impersonation'
-    if (values.length !== 1) {
-      throw new OAuthError('invalid_request', 'The mode parameter must have a single value.')
-    }
-    const [mode] = values
-    if (mode !== 'impersonation' && mode !== 'delegation') {
-      throw new OAuthError('invalid_request', `Unsupported mode: ${mode}`)
-    }
-    if (subjectTokenType !== ID_JAG_TOKEN_TYPE) {
-      throw new OAuthError('invalid_request', 'The mode parameter only applies to ID-JAG subjects.')
-    }
-    return mode
   }
 
   /** Validates the claim of an incoming ID-JAG and binds it to the requested storage. */

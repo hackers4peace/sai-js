@@ -161,7 +161,7 @@ const HIDDEN_CLAIM_FIELDS = new Set([
 ])
 
 /**
- * Remove grant/node identifiers and actor-chain fields from a claim subtree.
+ * Remove grant/node identifiers and hidden claim fields from a claim subtree.
  * Used by the impersonation hop: the final token must not expose the hidden
  * delegatee or resolvable grant references.
  */

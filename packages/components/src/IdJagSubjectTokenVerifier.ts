@@ -18,8 +18,6 @@ import { decodeProtectedHeader } from 'jose'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
 import { verifyAccessClaim } from './access-claim.js'
-import type { ActorClaim } from './actor-chain.js'
-import { verifyActorChain } from './actor-chain.js'
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 
 export interface IdJagSubjectTokenVerifierArgs {
@@ -148,27 +146,12 @@ export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
       })
       span.setAttribute('sai.lws.access.storage', claim.storage)
     }
-    let act: ActorClaim | undefined
-    if (payload.act !== undefined) {
-      act = verifyActorChain(payload.act)
-      span.setAttribute(
-        'sai.lws.act.depth',
-        (() => {
-          let depth = 1
-          for (let cursor: ActorClaim | undefined = act; cursor?.act; cursor = cursor.act)
-            depth += 1
-          return depth
-        })()
-      )
-    }
-
     span.setAttributes({ 'sai.lws.subject_id': sub, 'sai.lws.client_id': client })
     return {
       subject: sub,
       issuer: iss,
       client: toClientUri(client, iss),
       ...(claim ? { access: claim.access, accessContext: claim.context } : {}),
-      ...(act ? { act } : {}),
     }
   }
 }

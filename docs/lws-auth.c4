@@ -913,7 +913,7 @@ views {
       > for that storage and client
 
       >[!TIP]
-      > span `sai.lws.issue-id-jag` (**724 ms**, `sai.lws.mode=impersonation`,
+      > span `sai.lws.issue-id-jag` (**696 ms**,
       > `sai.lws.access.derived=true`, `sai.lws.access.storage=https://data/acme-rnd/`).
       > Derivation runs when there is no `access` parameter, the subject token is
       > not an ID-JAG, and `resource` is present. `DPoP` proves the credential's
@@ -1173,7 +1173,7 @@ views {
       }
       ```
 
-      decoded (`sai.lws.impersonation=true`, `sai.lws.delegation=false`):
+      decoded (`sai.lws.impersonation=true`):
       ```json
       {
         "iss": "https://auth/",
@@ -1210,7 +1210,7 @@ views {
       Fresh `urn:uuid` ids for the policy, the permission and the target; the
       claim is narrowed to the one ACME project, has **no `assigner`**, and is
       assigned to `https://id/yoyo` (the token subject). **No `act`** —
-      `mode=delegation` would keep the actor chain instead.
+      impersonation drops the hidden actor chain.
       '''
     }
 
@@ -1347,7 +1347,7 @@ views {
       #### String matching — on ID-JAG #2 and on the access token
       * no `https://id/bob` anywhere
       * no the app's `client_id` (`https://data/test-client/public/id`)
-      * no `"act"` claim (impersonation, not delegation)
+      * no `"act"` claim (impersonation drops the hidden actor chain)
 
       #### Compare with request
       * `sub` — `https://id/yoyo`

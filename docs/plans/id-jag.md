@@ -12,6 +12,10 @@
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
 > revocation. This plan owns the token-carried access-claim path and the ODRL
 > shape migration that precedes it.
+>
+> **2026-11-17:** ID-JAG delegation mode (`mode=delegation`, `act`) was removed.
+> Impersonation is the only ID-JAG token flow; the `mode` parameter is no longer
+> accepted. The C3 notes below are historical.
 
 ## Context
 

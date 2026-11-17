@@ -304,20 +304,6 @@ describe('UAS-derived app grant', () => {
 describe('C2 impersonation through @elfpavlik/lws-auth', () => {
   const bob = 'https://id/bob'
 
-  test('delegation mode reads the same project with a visible actor chain', async () => {
-    // No `accessClaim`: the client only names the storage, and Bob's UAS derives
-    // YoYo -> Bob from the pre-existing seed grant.
-    const storageFetch = await buildLwsFetch(bob, undefined, {
-      idJag: true,
-      impersonation: { uas: AUTH, mode: 'delegation' },
-    })
-
-    const response = await storageFetch('https://data/acme-rnd/pbh2yw', {
-      headers: { accept: 'text/turtle' },
-    })
-    expect(response.status).toBe(200)
-  })
-
   test('Bob -> YoYo -> ACME reads a narrowed project', async () => {
     const storageFetch = await buildLwsFetch(bob, undefined, {
       idJag: true,

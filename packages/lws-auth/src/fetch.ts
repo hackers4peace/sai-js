@@ -15,8 +15,6 @@ export interface LwsImpersonationOptions {
   uas: string
   /** Its token endpoint; defaults to `<uas>/.well-known/lws/token`. */
   tokenEndpoint?: string
-  /** `impersonation` (default) hides the caller; `delegation` keeps the `act` chain. */
-  mode?: 'impersonation' | 'delegation'
 }
 
 export interface LwsAuthFetchOptions {
@@ -140,7 +138,6 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
           subjectToken: token,
           subjectTokenType: ID_JAG_TOKEN_TYPE,
           clientId: credential.clientId,
-          mode: options.impersonation.mode,
           dpopKeyPair: credential.dpopKeyPair,
           fetch: tokenFetch,
         })

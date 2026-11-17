@@ -79,29 +79,6 @@ describe('requestIdJag', () => {
     expect(formBody(requests[0]).get('access')).toBe(JSON.stringify(ACCESS_CLAIM))
   })
 
-  test('sends an ID-JAG subject type and delegation mode for the next hop', async () => {
-    const { fetch, requests } = createFakeFetch((url, request) => {
-      if (url.href === UAS_TOKEN_ENDPOINT && request.method === 'POST') {
-        return json({ access_token: ID_JAG, token_type: 'N_A', expires_in: 300 })
-      }
-    })
-
-    await requestIdJag({
-      uas: UAS,
-      audience: RAS,
-      subjectToken: ID_JAG,
-      subjectTokenType: ID_JAG_TOKEN_TYPE,
-      mode: 'delegation',
-      clientId: CLIENT,
-      dpopKeyPair: keyPair,
-      fetch,
-    })
-
-    const body = formBody(requests[0])
-    expect(body.get('subject_token_type')).toBe(ID_JAG_TOKEN_TYPE)
-    expect(body.get('mode')).toBe('delegation')
-  })
-
   test('surfaces the OAuth error of a rejected exchange', async () => {
     const { fetch } = createFakeFetch(() =>
       json({ error: 'invalid_target', error_description: 'not a storage' }, 400)

@@ -5,8 +5,6 @@ import type { JwkGenerator } from '@solid/community-server'
 import type { JWK } from 'jose'
 import { calculateJwkThumbprint, importJWK, SignJWT } from 'jose'
 
-import type { ActorClaim } from './actor-chain.js'
-
 /** Token type URI of an Identity Assertion JWT Authorization Grant (ID-JAG). */
 export const ID_JAG_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id-jag'
 
@@ -19,8 +17,6 @@ export interface IdJagAccessClaim {
   access: unknown
   /** JSON-LD context of `access`; defaults to {@link ODRL_ID_JAG_CONTEXT}. */
   context?: string
-  /** Verified OAuth actor chain (`act`) for delegation mode. */
-  act?: ActorClaim
 }
 
 /**
@@ -91,9 +87,6 @@ export class IdJagIssuer {
     if (claim) {
       payload['@context'] = claim.context ?? ODRL_ID_JAG_CONTEXT
       payload.access = claim.access
-      if (claim.act !== undefined) {
-        payload.act = claim.act
-      }
     }
     return new SignJWT(payload)
       .setProtectedHeader({ alg: this.jwkGenerator.alg, typ: ID_JAG_JWT_TYPE, kid })
