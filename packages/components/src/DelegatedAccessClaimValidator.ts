@@ -10,8 +10,7 @@ import { INTEROP, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 import type { VerifiedAccessClaim } from './access-claim.js'
 import { verifyAccessClaim } from './access-claim.js'
 import { buildSessionManager } from './builders/sessionManager.js'
-import { grantFromPolicy } from './grant-policy.js'
-import { grantFieldsEqual } from './temporal/activities/check-equivalence.js'
+import { grantCoversClaim } from './grant-policy.js'
 
 /** Input of one independent UAS validation of an incoming delegated claim. */
 export interface AccessClaimValidationInput {
@@ -89,17 +88,6 @@ export interface AccessClaimValidator {
   find?(input: AccessClaimLookupInput): Promise<VerifiedAccessClaim | undefined>
 }
 
-/** Fill a missing permission assigner so a claim can be compared to a grant. */
-function withClaimAssigner(policy: OdrlPolicy, assigner: string): OdrlPolicy {
-  return {
-    ...policy,
-    permission: (policy.permission ?? []).map((permission) => ({
-      ...permission,
-      assigner: permission.assigner || assigner,
-    })),
-  }
-}
-
 function usableGrants(grants: GrantData[]): GrantData[] {
   const ids = new Set(grants.map((grant) => grant.id))
   return grants.filter((grant) => !grant.inheritsFromGrant || ids.has(grant.inheritsFromGrant))
@@ -109,19 +97,18 @@ function usableGrants(grants: GrantData[]): GrantData[] {
  * Intersect the assigners of the grants matching every policy of the claim.
  * The claim may omit the assigner; the candidate grant supplies it.
  */
-function matchingAssigners(access: unknown[], grants: GrantData[]): Set<string> {
+function matchingAssigners(
+  access: unknown[],
+  grants: GrantData[],
+  assignees: Iterable<string>
+): Set<string> {
   const usable = usableGrants(grants)
   let matches: Set<string> | undefined
   for (const raw of access) {
     const policy = raw as OdrlPolicy
     const assigners = new Set(
       usable
-        .filter((grant) =>
-          grantFieldsEqual(
-            grant,
-            grantFromPolicy(withClaimAssigner(policy, grant.grantedBy), 'urn:claim', '')
-          )
-        )
+        .filter((grant) => grantCoversClaim(grant, policy, { assignees }))
         .map((grant) => grant.grantedBy)
     )
     if (assigners.size === 0) return new Set()
@@ -140,8 +127,8 @@ function matchingAssigners(access: unknown[], grants: GrantData[]): Set<string> 
  *
  * New ID-JAG claims omit the assigner and are assigned to their subject. The
  * grant edge is recovered from the subject's visible grants, then every claim
- * policy must exactly match a grant in the assigner's own registry (semantic
- * fields and ODRL permissions, ids excluded). Full chain validity is
+ * policy must be covered by a grant in the assigner's own registry (semantic
+ * fields, scope/target/action subset; ids excluded). Full chain validity is
  * intentionally not used here: the upstream source grant belongs to the data
  * owner's registry and is not expected to be present in the assigner's local
  * registry.
@@ -188,7 +175,9 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     // A legacy claim still names its assigner: check only that user's registry.
     if (input.assigner) {
       const grants = await this.assignerGrants(input.assigner)
-      if (!matchingAssigners(input.access, grants).has(input.assigner)) {
+      if (
+        !matchingAssigners(input.access, grants, [input.subject, input.client]).has(input.assigner)
+      ) {
         throw new Error(`no existing grant issued by ${input.assigner} covers the delegated claim`)
       }
       return input.assigner
@@ -196,24 +185,30 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
 
     // New claims omit the assigner. Find the grant edge in the subject's plane
     // first, then independently confirm that edge in the assigner's registry.
+    // A broad source grant may also cover a narrower delegated claim; prefer
+    // the most specific matching edge (Selected > Inherited > AllFromRegistry
+    // > AllFromAgent), as the derivation does.
     const visible = await this.visibleGrants(input.subject, input.client, input.storage)
-    const candidates = matchingAssigners(input.access, visible)
-    if (candidates.size === 0) {
+    const assignees = [input.subject, input.client]
+    const candidates = [...new Set(visible.map((grant) => grant.grantedBy))]
+      .map((assigner) => ({
+        assigner,
+        grants: visible.filter((grant) => grant.grantedBy === assigner),
+      }))
+      .filter(({ grants }) => matchingAssigners(input.access, grants, assignees).size > 0)
+      .toSorted(
+        (a, b) =>
+          grantEdgeRank(b.grants) - grantEdgeRank(a.grants) || a.assigner.localeCompare(b.assigner)
+      )
+    if (candidates.length === 0) {
       throw new Error('no existing grant covers the delegated claim')
     }
 
-    const backed: string[] = []
-    for (const assigner of candidates) {
+    for (const { assigner } of candidates) {
       const grants = await this.assignerGrants(assigner)
-      if (matchingAssigners(input.access, grants).has(assigner)) backed.push(assigner)
+      if (matchingAssigners(input.access, grants, assignees).has(assigner)) return assigner
     }
-    if (backed.length === 0) {
-      throw new Error('no grant in the assigner registry covers the delegated claim')
-    }
-    if (backed.length > 1) {
-      throw new Error('the delegated claim is backed by more than one assigner')
-    }
-    return backed[0]
+    throw new Error('no grant in the assigner registry covers the delegated claim')
   }
 
   /** Load the grants visible to a subject for one client and storage. */

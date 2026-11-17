@@ -15,7 +15,7 @@ const bobId = 'https://id/bob'
 const authorizationRegistry = 'https://registry/acme/authorization/'
 const grantRegistry = 'https://registry/acme/grant/'
 // seeded in environments/data/registry.trig
-const seededGrantCount = 8
+const seededGrantCount = 9
 
 const parent = 'https://registry/acme/p3j7mq' // Project, AllFromAgent
 const child = 'https://registry/acme/m9k4wr' // Task, Inherited

@@ -7,13 +7,20 @@
   "import": [],
   "@graph": [
     {
+      "comment": "Storage-AS check: the final ID-JAG claim must stay within a grant the data owner issued for the requested storage. Reuses the policy engine's owner-registry grant source.",
+      "@id": "urn:sai:default:OwnerAccessClaimValidator",
+      "@type": "OwnerAccessClaimValidator",
+      "manager": { "@id": "urn:sai:policy-engine:AuthorizationManager" }
+    },
+    {
       "comment": "Accepts an ID-JAG as the subject token of the token exchange, next to the ID token of the OIDC suite. The grant is `aud`-restricted to this authorization server, so an ID-JAG minted for another storage is useless here. See docs/plans/lws-auth.md C2.",
       "@id": "urn:sai:default:IdJagSubjectTokenVerifier",
       "@type": "IdJagSubjectTokenVerifier",
       "converter": { "@id": "urn:solid-server:default:RepresentationConverter" },
       "trustedIssuers": [{ "@id": "urn:solid-server:default:variable:baseUrl" }],
       "acceptSolidOidcIssuer": true,
-      "clockTolerance": 60
+      "clockTolerance": 60,
+      "claimValidator": { "@id": "urn:sai:default:OwnerAccessClaimValidator" }
     },
     {
       "comment": "Put the ID-JAG verifier first: its `canHandle` declines every other token type, so an `id_token` exchange falls through to the OIDC suite unchanged.",

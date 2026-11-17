@@ -18,6 +18,7 @@ import { decodeProtectedHeader } from 'jose'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
 import { verifyAccessClaim } from './access-claim.js'
+import type { AccessClaimValidator } from './DelegatedAccessClaimValidator.js'
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 
 export interface IdJagSubjectTokenVerifierArgs {
@@ -38,6 +39,12 @@ export interface IdJagSubjectTokenVerifierArgs {
   acceptSolidOidcIssuer?: boolean
   /** Allowed clock skew in seconds. Defaults to 60. */
   clockTolerance?: number
+  /**
+   * Optional storage-AS check that the final claim is still covered by an
+   * owner grant at exchange time. The UAS accept config leaves this unset; the
+   * storage config wires the owner-registry validator.
+   */
+  claimValidator?: AccessClaimValidator
 }
 
 /**
@@ -67,6 +74,7 @@ export interface IdJagSubjectTokenVerifierArgs {
 export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
   private readonly trustedIssuerSet: Set<string>
   private readonly skew: number
+  private readonly claimValidator?: AccessClaimValidator
 
   public constructor(args: IdJagSubjectTokenVerifierArgs) {
     super({
@@ -80,6 +88,7 @@ export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
     })
     this.trustedIssuerSet = new Set((args.trustedIssuers ?? []).map(trimTrailingSlashes))
     this.skew = args.clockTolerance ?? 60
+    this.claimValidator = args.claimValidator
   }
 
   public async canHandle({ tokenType }: SubjectTokenVerifierInput): Promise<void> {
@@ -144,6 +153,20 @@ export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
       claim = await verifyAccessClaim(payload.access, payload['@context'], resource, {
         assignee: sub,
       })
+      if (this.claimValidator) {
+        try {
+          await this.claimValidator.validate({
+            subject: sub,
+            client,
+            access: claim.access,
+            context: claim.context,
+            storage: claim.storage,
+          })
+        } catch (error: unknown) {
+          span.setAttribute('sai.lws.error', (error as Error).message)
+          throw new BadRequestHttpError(`Invalid access claim: ${(error as Error).message}`)
+        }
+      }
       span.setAttribute('sai.lws.access.storage', claim.storage)
     }
     span.setAttributes({ 'sai.lws.subject_id': sub, 'sai.lws.client_id': client })

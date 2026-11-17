@@ -26,6 +26,7 @@
     "css:config/ldp/metadata-writer/lws.json",
     "css:config/ldp/modes/lws.json",
     "sai:config/storage/flat-sparql.json",
+    "sai:config/policy/engine.json",
     "sai:config/storage/pod-endpoints.json",
     "sai:config/storage/routed-sparql.json",
     "sai:config/storage/key-value/memory.json",

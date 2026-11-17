@@ -12,7 +12,7 @@ import {
 } from '@solid/community-server'
 import type { GenerateKeyPairResult, JWTVerifyGetKey } from 'jose'
 import { SignJWT, generateKeyPair } from 'jose'
-import { beforeAll, describe, expect, test } from 'vitest'
+import { beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE } from '../src/IdJagIssuer.js'
 import type { IdJagSubjectTokenVerifierArgs } from '../src/IdJagSubjectTokenVerifier.js'
@@ -162,6 +162,39 @@ describe('IdJagSubjectTokenVerifier', () => {
       access: claim,
       accessContext: ODRL_ID_JAG_CONTEXT,
     })
+  })
+
+  test('runs the storage-AS owner claim validator before accepting the claim', async () => {
+    const validate = vi.fn(async () => undefined)
+    const verifier = new TestVerifier({ claimValidator: { validate } })
+    const claim = idJagClaim({ assignee: WEBID })
+    await verifier.handleSafe(
+      input(await makeGrant({ access: claim, '@context': ODRL_ID_JAG_CONTEXT }), {
+        resource: CLAIM_STORAGE,
+      })
+    )
+    expect(validate).toHaveBeenCalledWith({
+      subject: WEBID,
+      client: CLIENT,
+      access: claim,
+      context: ODRL_ID_JAG_CONTEXT,
+      storage: CLAIM_STORAGE,
+    })
+
+    const reject = new TestVerifier({
+      claimValidator: {
+        validate: async () => {
+          throw new Error('owner grant revoked')
+        },
+      },
+    })
+    await expect(
+      reject.handleSafe(
+        input(await makeGrant({ access: claim, '@context': ODRL_ID_JAG_CONTEXT }), {
+          resource: CLAIM_STORAGE,
+        })
+      )
+    ).rejects.toThrow('owner grant revoked')
   })
 
   test('rejects an access claim assigned to another subject', async () => {

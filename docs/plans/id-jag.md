@@ -1,9 +1,8 @@
 # ID-JAG access claims — ODRL model migration and impersonation-only delegation
 
 > **Status:** 🔶 in progress — **C0–C2 landed**; **C3 removed**; **C4 item 4
-> implemented**; **C5 implemented in the working tree except claim-coverage
-> validation and exchange-time owner-AS revocation enforcement** (package gate
-> green; full Dagger `/test` remains user-run).
+> implemented**; **C5 implemented** (owner-AS claim coverage checks included;
+> package gate and full Dagger `/test` green).
 > **Last verified:** working tree (2026-11-17) — C0–C2 verified against the
 > delegation, grant, policy-engine, ID-JAG, and Dagger code; C3 delegation mode
 > removed; C4 item 4 verified against a delegated grant stored in the assigner's
@@ -98,14 +97,14 @@ everywhere. C0 migrated that shape; C1–C2 added the token flow.
 | User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path + assigner-owned grant storage | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; CID docs (the UAS mints no credentials: the caller's own token is the credential, `lws-auth` D15) | package + `/test` | C1; UAS-as-client case |
 | Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, `lws-auth` impersonation chain, CSS token issuer/extractor | new `/test/impersonation.test.ts` (2); `/test/lws-auth.test.ts`; package token/LWS tests | C2 |
 | Delegated grants are projections of a `DataAuthorization`, issued/stored in the assigner registry; no owner materialization | ✅ landed — owner delegation/revocation endpoint paths removed | `grant-generation.ts` (minted ids), `workflows/grants.ts` (local store + `registryOwner`), `activities/grants.ts` (`ownGrantIds`) | package workflow/equivalence tests; `/test` `check-equivalence.test.ts`, `roles.test.ts` | C2; C5 owns the endpoint path |
-| Intermediate UAS validates incoming delegated claim against its own issued grants | ✅ landed — package + full Dagger green | `DelegatedAccessClaimValidator`, `IdJagTokenHandler` (`claimValidator`), `grant-policy.ts`, `grantFieldsEqual` | package ID-JAG tests; `/test` `impersonation.test.ts` (3), `lws-auth.test.ts` (14) | C4 item 4 |
+| Intermediate UAS validates incoming delegated claim against its own issued grants | ✅ landed — package + full Dagger green | `DelegatedAccessClaimValidator`, `IdJagTokenHandler` (`claimValidator`), `grant-policy.ts`, `grantCoversClaim` | package ID-JAG tests; `/test` `impersonation.test.ts` (3), `lws-auth.test.ts` (14) | C4 item 4 |
 | Delegation token chain (`sub` top-level, nested `act` to client) | ❌ removed 2026-11-17 | — | — | C3 withdrawn; impersonation only |
 | Grant/link invariant: every `hasDataGrant` target is in the registration's own registry set | ✅ landed — seed audit test | `environments/data/registry.trig`; `replaceAccessGrantsOnRegistration`; `AccessGrantHandler` | framing audit + `/test` | C5; delegated grants now share the assigner registry |
 | Owner access-request endpoint is need-based only; delegation/revocation branches removed | ✅ landed — breaking change | `AccessRequestHandler`, `need-based-access-request.ts`; removed `delegation-request.ts`/`GrantRevocationHandler` | `/test` access-request + rejection tests | C5; breaking change, no compatibility window |
 | Storage-facing tests use the ID-JAG exchange | ✅ landed — `buildLwsFetch` always chains | `/test` builders, `packages/lws-auth`, test utils | package gate + full Dagger | C5; global DPoP-bound access-token removal is a follow-up |
-| Claim coverage (`claim ⊆ grant`) at every hop | 🔶 open — inheritance preservation fixed; equality validator still rejects narrower claims | `DelegatedAccessClaimValidator`, `access-claim.ts`, `grantFieldsEqual` | package claim tests; `/test` policy-engine | C5 follow-up |
-| Storage-AS claim validation reuses the policy-engine grant source | ⬜ open | `SaiAuthorizationManager.getAuthorizationData`, `IdJagSubjectTokenVerifier`, `SaiPermissionsEngine` | package + `/test` revocation scenario | C5 follow-up; owner local registry only |
-| SPARQL endpoint topology documented for federated deployment | ⬜ open | `SaiAuthorizationManager`, `SaiPermissionsEngine`, `PodEndpointStore` | deployment docs | per-pod endpoints, not SPARQL federation |
+| Claim coverage (`claim ⊆ grant`) at every hop | ✅ landed — `grantCoversClaim`; equality remains only for equivalence | `grant-policy.ts`, `DelegatedAccessClaimValidator`, `access-claim.ts` | package claim/grant tests; `/test` policy-engine | C5 |
+| Storage-AS claim validation reuses the policy-engine grant source | ✅ landed — `OwnerAccessClaimValidator` | `SaiAuthorizationManager.getAuthorizationData`, `IdJagSubjectTokenVerifier`, `SaiPermissionsEngine` | package validator tests; `/test` revocation scenario | C5; owner local registry only |
+| SPARQL endpoint topology documented for federated deployment | ✅ documented | `SaiAuthorizationManager`, `SaiPermissionsEngine`, `PodEndpointStore` | deployment docs | per-pod endpoints, not SPARQL federation |
 | 403/401 chain refresh per storage | ⬜ open | `packages/lws-auth` fetch/cache; RPC/UI callers | package fetch tests; `/test` revocation scenario | C3/C4 |
 | Admin impersonation / `ProxyAdminHandler` removal / `/sparql-admin` future | ⬜ open | `ProxyAdminHandler`, `peerFetch`, `peerProxy`, `AdminSparqlHandler` | future TODO | not in this plan’s implementation |
 
@@ -560,14 +559,14 @@ in the issuing/delegator context.
   side must refuse the final ID-JAG exchange once the original grant that was
   delegated (and re-delegated) is revoked. Reconciliation/mirror refresh is
   sufficient; no owner-side delegated grant copy is required.
-- **Open:** `IdJagSubjectTokenVerifier` does not yet intersect the final claim
-  with the owner's grants at exchange time. The existing equality validator is
-  not sufficient for narrowed claims; this needs a subset validator (scope,
-  target/source/partOf, actions) over the owner registry. Until then the
-  claim-first policy engine is the denial point.
+- `IdJagSubjectTokenVerifier` wires `OwnerAccessClaimValidator` at the storage
+  AS. It reads the same owner-registry grants as the policy engine and rejects
+  an exchange when no owner grant covers every claim policy. Existing access
+  tokens still live until expiry; the policy engine remains the resource-time
+  denial point.
 - No `AccessRevocationRequest` endpoint path remains.
 
-**Claim coverage at every hop (open)**
+**Claim coverage at every hop (implemented 2026-11-17)**
 
 A grant may be narrowed at each delegation step, so claim validation is
 **coverage**, not equality:
@@ -579,20 +578,19 @@ A grant may be narrowed at each delegation step, so claim validation is
 - the data-owner AS must accept any final claim that is a subset of its own
   source grant.
 
-The current `DelegatedAccessClaimValidator` still uses `grantFieldsEqual`
-(exact equality), so it rejects valid narrower claims. `checkEquivalence` keeps
-using equality; add a separate `grantCoversClaim(grant, claim)` predicate for
-validation, covering scope, target/source/partOf, action subset, assignee, and
-the parent/child `Inherited` relation.
+`grantCoversClaim(grant, claim)` covers scope, target/source/partOf, action
+subset, assignee, and the parent/child `Inherited` relation. Both the UAS
+validator and the owner validator use it; `checkEquivalence` keeps using exact
+equality.
 
-**Grant source for the owner AS (open)**
+**Grant source for the owner AS (implemented 2026-11-17)**
 
-The storage AS should reuse the policy engine's grant access path:
+The storage AS reuses the policy engine's grant access path:
 `SaiAuthorizationManager.getAuthorizationData(resource)` (same owner-registry
-query used by `SaiPermissionsEngine`), then apply `grantCoversClaim` before
-issuing an access token. This avoids a second grant-read implementation and
-binds exchange-time revocation to the same source grants the policy engine
-already uses.
+query used by `SaiPermissionsEngine`), then applies `grantCoversClaim` in
+`OwnerAccessClaimValidator` before issuing an access token. This binds
+exchange-time revocation to the same source grants the policy engine already
+uses.
 
 **SPARQL topology**
 
@@ -658,12 +656,15 @@ the subject's own registry plus reciprocal mirrors.
   parent/child policy link, impersonation rewrite remaps it to fresh policy ids,
   and `SaiPermissionsEngine.findAccessClaimData` maps it to synthetic parent
   roots. Package tests cover both the rewrite and the claim-graph mapping.
-- Package gate: `npm run typecheck`, full `npx vitest run` (659 passed, 26
+- Claim validation uses coverage (`grantCoversClaim`) at both the UAS and the
+  storage AS. `OwnerAccessClaimValidator` reuses
+  `SaiAuthorizationManager.getAuthorizationData(storage)`; `id-jag-accept.json`
+  wires it into `IdJagSubjectTokenVerifier`.
+- Package gate: `npm run typecheck`, full `npx vitest run` (666 passed, 26
   skipped, 2 todo), `npm run build -w @elfpavlik/sai-components`, and
-  `npm run check`. Full Dagger `/test` is the remaining user-run gate.
-- Remaining C5 gap: claim coverage/subset validation and exchange-time owner-AS
-  denial after upstream revocation. The current verifier validates token/claim
-  shape only; the policy engine is claim-first.
+  `npm run check`.
+- Full Dagger `/test`: 24 files / 196 tests passed. CSS dependency is pinned to
+  `195c682eddd5afcd2d224f34b7818ac42782e596` on the `lws-sai` branch.
 
 ## Green gate
 
