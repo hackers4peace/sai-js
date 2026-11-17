@@ -269,7 +269,7 @@ describe('ODRL access claim in the ID-JAG (C1)', () => {
 
 describe('two-step chain from the client (@elfpavlik/lws-auth)', () => {
   test('reads a data and a registry resource, one grant per authorization server', async () => {
-    const fetch = await buildLwsFetch(WEBID, CLIENT, { idJag: true })
+    const fetch = await buildLwsFetch(WEBID, CLIENT)
 
     const data = await fetch(`${DATA_STORAGE}k3pqsb`, { headers: { accept: 'text/turtle' } })
     expect(data.status).toBe(200)
@@ -292,7 +292,7 @@ describe('two-step chain from the client (@elfpavlik/lws-auth)', () => {
 
 describe('UAS-derived app grant', () => {
   test('uses the user -> client grant of the requested storage', async () => {
-    const storageFetch = await buildLwsFetch('https://id/bob', CLIENT, { idJag: true })
+    const storageFetch = await buildLwsFetch('https://id/bob', CLIENT)
 
     const response = await storageFetch('https://data/bob/n3onkx', {
       headers: { accept: 'text/turtle' },
@@ -306,7 +306,6 @@ describe('C2 impersonation through @elfpavlik/lws-auth', () => {
 
   test('Bob -> YoYo -> ACME reads a narrowed project', async () => {
     const storageFetch = await buildLwsFetch(bob, undefined, {
-      idJag: true,
       impersonation: { uas: AUTH },
     })
 

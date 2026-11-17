@@ -98,8 +98,8 @@ describe('reconciliation sweep', () => {
     const iris = await getAccessGrantIris(regForAlice)
     expect(iris.length).toBeGreaterThan(0)
     // real equivalence (source trees): the unchanged seed subtree is REUSED —
-    // same IRIs after the regeneration. The seed links only the parent; the
-    // reused child is re-linked from the parent's `hasInheritingGrant`.
+    // same IRIs after the regeneration. The seed links the parent and its
+    // inherited child; both are reused.
     expect(iris).toContain(seedGrant)
     expect(iris).toContain(seedChildGrant)
     await waitForQuiescence([acmeId, aliceId, bobId])

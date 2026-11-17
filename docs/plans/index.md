@@ -38,7 +38,7 @@ file was deleted. The post-workstream follow-ups are in
 
 | Status | Count | Plans |
 |---|---|---|
-| 🔶 in progress | 2 | `lws-auth` (C1–C5 landed: ID-JAG chain end-to-end + browser credential; manual dev capture and OpenWiki migration remain); `id-jag` (C0–C3 landed + C4 item 4; full Dagger green) |
+| 🔶 in progress | 2 | `lws-auth` (C1–C5 landed: ID-JAG chain end-to-end + browser credential; manual dev capture and OpenWiki migration remain); `id-jag` (C0–C2 landed + C4 item 4; C5 mostly implemented: owner endpoint need-based only, assigner-local link invariant, impersonation-only; claim-coverage/AS revocation validation and full Dagger pending) |
 | ⬜ not started / design only | 12 | `grants-replication-polish`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing`, `lws-followup` |
 | 🧭 umbrella | 1 | `org-admin-feature` |
 | 📝 design notes | 3 | `architecture`, `fixes`, `improve-fetch-json-ld` |
@@ -110,10 +110,12 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
   `data`/`registry` keep their landed exchange as the RAS leg.
 - `lws-followup.md` — ⬜ not started; remaining LWS alignment follow-ups (grant view,
   needs/grants profile, flat storage, docs).
-- `id-jag.md` — 🔶 C0–C3 landed + C4 item 4 (package + full Dagger green); staged ODRL model migration
-  (`assigner` = delegator, `target.owner` = data owner), ID-JAG access claims,
-  impersonation-first token flow, then delegation via nested `act`; keeps the
-  current owner access-request delegation flow.
+- `id-jag.md` — 🔶 C0–C2 landed + C4 item 4; C5 mostly implemented in the working tree
+  (owner endpoint need-based only, assigner-local grant/link invariant,
+  impersonation-only; claim-coverage/AS revocation validation and full Dagger
+  pending). Staged ODRL model migration (`assigner` = delegator,
+  `target.owner` = data owner), ID-JAG access claims, claim-first policy engine;
+  no `act`/delegation-token mode.
 
 ## Full table
 
@@ -124,7 +126,7 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 | `pod-isolation-followup.md` | ⬜ not started | Remaining per-pod isolation edge cases: mirror backfill/drift scan, unregister mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion cleanup, cross-pod/mirror-freshness tests, named-graph patch guard | landed per-pod storage code (OpenWiki `architecture/storage-isolation.md`); `update-deployment.md` for production |
 | `webhook-subscription-bootstrap.md` | ⬜ not done (design only) | `ensureActivityWebhookChannel` at account creation + startup/periodic healing for real deployments; admin/org channels | — |
 | `registry-set-permissions.md` | ⬜ not started (design) | Scope the blanket `#fullAdminAccess` per structural registry: per-container ACRs, GrantRegistry owner-only (admins never write grants; per-grant ACRs serve reads), ActivityRegistry Read + create/append instead of blanket Write; seed ACR hygiene for the ACR-less yoyo DataGrants | `org-admin-feature` R1 |
-| `components-tweaks.md` | ⬜ design only (investigation write-up) | Residual SAI domain/spec logic still in components after the reorganize phases: extract `SaiPermissionsEngine`'s grant-evaluation predicates and the 4×-duplicated `hasAdminGrant` admin-marker rule to AA session methods/predicates; move the delegation-endpoint inheritance completion and `buildAdminGrants` materialization to AA; plane-based session `findRegistration` | — |
+| `components-tweaks.md` | ⬜ design only (investigation write-up) | Residual SAI domain/spec logic still in components after the reorganize phases: extract `SaiPermissionsEngine`'s grant-evaluation predicates and the 4×-duplicated `hasAdminGrant` admin-marker rule to AA session methods/predicates; move `buildAdminGrants` materialization to AA; plane-based session `findRegistration` | — |
 | `update-deployment.md` | ⬜ not started | Production NixOS/Podman cutover to per-pod Fuseki + Garage, Node 26 source images, env/secrets/volumes, data/account migration, OCI/flake/hosts, deployed smoke test; **workstream F**: scheduled reconciliation (C5 runtime) + activity-webhook channel healing | landed per-pod storage code; `pod-isolation-followup.md` mirror-backfill prerequisite; `grants-replication-polish.md` (remaining C5 polish) + `webhook-subscription-bootstrap.md` |
 | `npm-publishing.md` | ⬜ not started (future goal) | Move all packages to the `@hackers4peace` npm org and publish there (rename scopes, published artifact, release workflow); **not** a deployment prerequisite | landed ESM/no-build groundwork; `update-deployment.md` for the source-build path |
 | `extract-temporal-workflows.md` | ⬜ not started — blocked on a cycle decision | Move all Temporal code out of `packages/components` into a private `temporal-workflows` package and shrink `components` to Components.js-only; a `components ↔ temporal` dependency cycle needs option A/B/C resolved first | overlaps `components-tweaks.md` |
@@ -135,7 +137,7 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 | `fixes.md` | 📝 design note — not implemented | Remove the HTTP list-and-scan invitation lookup in `agent-registry.ts`; route the duplicate check through the SPARQL `fetchSocialAgentInvitation` | — |
 | `improve-fetch-json-ld.md` | 📝 design note — decision deferred | `fetchJsonLd` status-carrying error instead of regex-matching the message; options evaluated, not implemented | — |
 | `lws-auth.md` | 🔶 in progress — C1–C5 landed (ID-JAG issuance, storage acceptance, `packages/lws-auth`, token-aware tracing, browser credential); manual capture + OpenWiki migration remain | ID-JAG exchange: `auth` mints audience-restricted ID-JAGs from DPoP-bound ID tokens, storages accept `id-jag` and exchange it for an access token, new `packages/lws-auth` client (one ID-JAG per RAS), token-aware tracing + opt-in body capture, vuejectron redirect flow with a DPoP-bound ID token | landed CSS LWS exchange (CommunitySolidServer `lws-sai`); `packages/utils/src/lws-auth.ts` `tokenSource` seam; `lws-followup.md` |
-| `id-jag.md` | 🔶 in progress — C0–C3 landed + C4 item 4 (package + full Dagger green) | ODRL new shape (`assigner` = delegator, `target.owner` = data owner), full migration, ID-JAG ODRL access claim + context, claim-first policy engine, impersonation-first token chain, then delegation via nested `act`; keep owner access-request delegation flow | C0 model migration first; then C1–C3 token flows; admin impersonation/ProxyAdmin removal future TODO |
+| `id-jag.md` | 🔶 in progress — C0–C2 landed + C4 item 4; C5 mostly implemented (claim-coverage/AS revocation validation + Dagger pending) | ODRL new shape (`assigner` = delegator, `target.owner` = data owner), full migration, ID-JAG ODRL access claim + context, claim-first policy engine, impersonation-only delegation, assigner-local projection grants; owner access-request endpoint is need-based only | C0 model migration; C1–C2 tokens; C5 endpoint narrowing/seed-link invariant; admin impersonation/ProxyAdmin removal future TODO |
 
 ## Dependency graph
 

@@ -16,15 +16,11 @@ import {
 import type { CredentialsExtractor, OperationHttpHandlerInput } from '@solid/community-server'
 import { getLoggerFor } from 'global-logger-factory'
 
-import { issueDelegationRequest } from './delegation-request.js'
-import { GrantRevocationHandler } from './GrantRevocationHandler.js'
-import { isAccessRevocationMessage } from './messages.js'
 import {
   acceptNeedBasedAccessRequest,
   isOdrlNeedBasedAccessRequest,
   needBasedAccessRequestFromOdrl,
 } from './need-based-access-request.js'
-import type { PodEndpointStore } from './PodEndpointStore.js'
 import type { SessionManager } from './SessionManager.js'
 
 /** The JSON-LD media type the access request endpoint requires. */
@@ -49,9 +45,8 @@ const FORWARDED_HEADERS = [
  * Owner-scoped access request endpoint:
  * `/.sai/access-requests/<base64url(owner)>`.
  *
- * `POST` dispatches needs requests, the frozen top-level delegation array,
- * and revocation requests (`AccessRequest` + `AccessRevocationRequest` with
- * `grants`).
+ * `POST` dispatches only need-based access requests. Delegation and revocation
+ * are projections in the issuing agent's own context and are not handled here.
  *
  * `GET`/`HEAD` are a facade over the owner's `AccessRequestRegistry`: the
  * owner's credentials are checked, then the endpoint target is rewritten to
@@ -64,8 +59,7 @@ export class AccessRequestHandler extends OperationHttpHandler {
 
   public constructor(
     private readonly credentialsExtractor: CredentialsExtractor,
-    private readonly sessionManager: SessionManager,
-    private readonly endpointStore: PodEndpointStore
+    private readonly sessionManager: SessionManager
   ) {
     super()
   }
@@ -104,22 +98,6 @@ export class AccessRequestHandler extends OperationHttpHandler {
     }
 
     const message = await this.parseMessage(operation)
-    if (isAccessRevocationMessage(message)) {
-      return new GrantRevocationHandler(this.endpointStore, this.sessionManager).revoke(
-        message,
-        credentials,
-        operation
-      )
-    }
-    if (Array.isArray(message)) {
-      return issueDelegationRequest({
-        sessionManager: this.sessionManager,
-        envelopes: message,
-        requesterWebId: credentials.agent.webId,
-        expectedDataOwner: owner,
-        operation,
-      })
-    }
     if (isOdrlNeedBasedAccessRequest(message)) {
       return acceptNeedBasedAccessRequest(
         this.sessionManager,
@@ -128,7 +106,7 @@ export class AccessRequestHandler extends OperationHttpHandler {
         owner
       )
     }
-    throw new BadRequestHttpError('expected a needs or delegation access request')
+    throw new BadRequestHttpError('expected a need-based access request')
   }
 
   private async readRegistry(

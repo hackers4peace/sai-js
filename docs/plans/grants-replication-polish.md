@@ -8,6 +8,10 @@
 > **Last verified:** `b9f01a17` (2026-10-21) — C0–C5 runtime landed; the
 > production schedules/cadence and activity-webhook channel healing live in
 > [`update-deployment.md` §F](update-deployment.md#workstream-f--scheduled-reconciliation-c5--channel-healing).
+> **2026-11-17 superseded for P1:** [`id-jag.md`](id-jag.md) C5 removed
+> owner-side delegated grants, issuer-side replicas, and the
+> `requestRevocations`/`dropGrantReplicas` paths. The peer-side orphan scan has
+> no peer-owned grant source anymore; P1 is obsolete. P2/P3/P4 remain.
 > **Green gate:** package gate below + `/test` acceptance (user-run).
 > **Workstream:** follow-up to the closed revocation workstream (C0–C5).
 > Landed design: OpenWiki `architecture/authorization-revocation.md`,
@@ -37,12 +41,15 @@ slice; each closes a recovery/verification gap in the landed replication model.
 
 | Item | Status | Code anchors | Verified by | Notes |
 |---|---|---|---|---|
-| Peer-side orphan scan | ⬜ open | `getRegistryGrantsForGrantee` (`activities/grants.ts`); `storeGrantReplica`/`dropGrantReplicas` (`services/GrantReplica.ts`); `reconcileGrantsForGrantee` | package + `/test` | Own-registry orphan scan landed in C3; peer-owned orphans with a **local replica body** are still invisible to `existing` |
+| Peer-side orphan scan | ❌ obsolete | removed by id-jag C5 | — | owner-side delegated grants and issuer-side replicas no longer exist |
 | Stranded `AuthorizationRevoked` end-state | ⬜ open (verify) | `reconcileActivities` → `processAuthorizationRevoked` (`workflows/grants.ts`) | package + `/test` | Routing already works (404-tolerant DA deletes); add the explicit end-state verification/test |
-| Role-grantee projection healing | ⬜ open (verify) | `removeGrantsFromRegistrations` skips role grantees; `reconcileGrantsForGrantee` per member; `findAuthorizationsForAgent` includes via-role | package + `/test` | Expected to be covered by the D19 drift arm for registered members; prove it, fix only if the test fails |
+| Role-grantee projection healing | ⬜ open (verify) | `replaceAccessGrantsOnRegistration` per member; `reconcileGrantsForGrantee`; `findAuthorizationsForAgent` includes via-role | package + `/test` | Expected to be covered by the D19 drift arm for registered members; prove it, fix only if the test fails |
 | Tests / docs | ⬜ open | `test/reconciliation.test.ts`, package suites | gate | Remaining acceptance for the three items above |
 
-## P1 — Peer-side orphan scan
+## P1 — Peer-side orphan scan (obsolete)
+
+> **Obsolete:** no peer-owned delegated grants or issuer-side replicas remain
+> after the id-jag C5 cutover. Do not implement this section.
 
 **Problem.** C3's `existing` set is the registration projection plus the
 **own-registry** orphan scan (`getRegistryGrantsForGrantee`). Peer-owned grants
@@ -108,10 +115,10 @@ no resurrection.
 
 ## P3 — Role-grantee projection healing
 
-**Problem.** `removeGrantsFromRegistrations` removes the owner's `hasDataGrant`
-links for the removed grants grouped by `grantee`; a role grantee has no agent
-registration, so it is skipped. The C4 note said role members' links heal via
-reconciliation/the sweep.
+**Problem.** A role grantee has no agent registration of its own; the
+members' registrations are updated by the per-member reconciliation projection
+(`replaceAccessGrantsOnRegistration`). The C4 note said role members' links heal
+via reconciliation/the sweep.
 
 **Verify:** the D19 drift arm re-runs `reconcileGrantsForGrantee` for every
 **registered** member; `getAuthorizations` includes via-role authorizations, so

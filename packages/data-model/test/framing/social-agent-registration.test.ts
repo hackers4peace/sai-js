@@ -18,7 +18,7 @@ describe('SocialAgentRegistration framing', () => {
       id: REGISTRATION_IRI,
       type: [INTEROP.SocialAgentRegistration, LDP.Container, LDP.BasicContainer, LDP.Resource],
       registeredAgent: 'https://id/alice',
-      hasDataGrant: ['https://registry/acme/g4yhtm'],
+      hasDataGrant: ['https://registry/acme/g4yhtm', 'https://registry/acme/wpqyds'],
       label: { '@none': 'Alice' },
       note: 'Chasing white rabits.',
       reciprocalRegistration: 'https://registry/alice/cp9g7p',

@@ -5,8 +5,7 @@ import {
   dpopThumbprint,
   memoryStore,
 } from '@elfpavlik/lws-auth'
-import type { BrowserCredential, BrowserSession } from '@elfpavlik/lws-auth'
-import type { JWTPayload } from 'jose'
+import type { BrowserCredential, BrowserSession, DecodedJwt } from '@elfpavlik/lws-auth'
 
 /*
  * A real OIDC client session for `/test`, without a browser.
@@ -177,7 +176,7 @@ export interface OidcClientSession {
   /** The credential's JWT (the session access token). */
   subjectToken: string
   /** Decoded claims of {@link subjectToken}. */
-  credentialClaims: JWTPayload
+  credentialClaims: DecodedJwt['claims']
 }
 
 /**

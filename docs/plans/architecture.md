@@ -117,8 +117,7 @@ no change happens on the basis of this list alone.
 2. **Move registry CRUD helpers out of components into `authorization-agent`:**
    `markActivitiesDone` + the completion partition in `getPendingActivities`,
    `replaceDataGrantsOnRegistration`, `storeGrantAndAcr`, and the C2/C3 GC
-   activities (`revokeGrantClosure`, `getRegistryGrantsForGrantee`,
-   `dropGrantReplicas`). (`getGrantees` already delegates to the AA session.)
+   activities (`revokeGrantClosure`, `getRegistryGrantsForGrantee`). (`getGrantees` already delegates to the AA session.)
 3. **Move the read-side rule `agentsWithAccessMatching`** from
    `services/ShareResource.ts:40-60` into `authorization-agent` — it is a rule
    (uses AA `matchesScope`), not transport.

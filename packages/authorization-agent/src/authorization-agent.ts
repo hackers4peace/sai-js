@@ -114,12 +114,11 @@ export interface RevokedGrant {
 
 /**
  * Validate and compute the revocation closure over an explicit transport +
- * grant registry — the context-aware core of `AuthorizationAgent.revokeGrants`
- * and the components handler. The class method binds the session's own
- * registry; `GrantRevocationHandler` binds the **owner's** endpoint (resolved
- * from the grant IRI), so an org admin revokes in the org's registry instead of
- * their personal one (B1). Returns the listed grants plus the C1 dependent
- * closure; already-removed grants are absent (idempotent tolerance).
+ * grant registry — the context-aware core of `AuthorizationAgent.revokeGrants`.
+ * The class method binds the session's own registry, so an org admin revokes in
+ * the org's registry instead of their personal one (B1). Returns the listed
+ * grants plus the C1 dependent closure; already-removed grants are absent
+ * (idempotent tolerance).
  *
  * Authority is per grant, checked before any mutation (C4): the grantor
  * (`grantedBy`) or the data owner. Grantee self-revocation is deliberately not
@@ -625,7 +624,7 @@ export class AuthorizationAgent {
   }
 
   // ──────────────────────────
-  // Revocation core (Phase 4 — moved from GrantRevocationHandler)
+  // Revocation core
   // ──────────────────────────
 
   /**

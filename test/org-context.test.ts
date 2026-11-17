@@ -479,7 +479,7 @@ describe('org context — sharing the org’s own data (2.4 write path)', () => 
 
     // the read side agrees: the org context reports the peer as a DIRECT
     // grantee (the grantee-facing replication of these grants is covered by
-    // delegation-endpoint / federation-mirror)
+    // federation-mirror)
     const access = await rpcCall<{ accessGrantedTo: string[] }>(
       rpcPayload({ _tag: 'GetResource', id: ghost, lang: 'en', context: yoyoId }),
       danCookie

@@ -1,10 +1,14 @@
 import { grantAccess } from '@janeirodigital/interop-data-model'
-import { INTEROP, ODRL, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
+import { INTEROP, LWS, ODRL, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
+import type { Quad } from '@rdfjs/types'
 import type { Credentials } from '@solidlab/policy-engine'
 import { PERMISSIONS } from '@solidlab/policy-engine'
+import { DataFactory, Store } from 'n3'
 import { describe, expect, test, vi } from 'vitest'
 
 import { SaiPermissionsEngine } from '../src/SaiPermissionsEngine.js'
+
+const { namedNode } = DataFactory
 
 const STORAGE = 'https://data/acme.example/'
 const OTHER_STORAGE = 'https://data/other.example/'
@@ -100,6 +104,40 @@ describe('claim-first policy evaluation', () => {
       credentials(claim(INTEROP.SelectedFromRegistry))
     )
     expect(permissions[PERMISSIONS.Read]).toBe(true)
+  })
+
+  test('maps a claim-internal parent link to the synthetic parent root', async () => {
+    const { engine } = createEngine()
+    const parent = claim(INTEROP.AllFromRegistry)
+    parent[0].id = 'urn:uuid:claim-parent'
+    parent[0].uid = parent[0].id
+    const child = claim(INTEROP.Inherited, STORAGE, 'https://data/acme.example/task-reg/')
+    child[0].id = 'urn:uuid:claim-child'
+    child[0].uid = child[0].id
+    child[0].inheritsFromGrant = parent[0].id
+
+    const data = await (
+      engine as unknown as {
+        findAccessClaimData(target: string, credentials: Credentials): Promise<Quad[] | undefined>
+      }
+    ).findAccessClaimData(RESOURCE, credentials([...parent, ...child]))
+    const store = new Store(data ?? [])
+    const roots = [...store.getSubjects(namedNode(LWS.access), null, null)]
+    const childRoot = roots.find((root) =>
+      store
+        .getObjects(root, namedNode(LWS.access), null)
+        .some((policy) => policy.value === child[0].id)
+    )
+    const parentRoot = roots.find((root) =>
+      store
+        .getObjects(root, namedNode(LWS.access), null)
+        .some((policy) => policy.value === parent[0].id)
+    )
+    expect(parentRoot).toBeDefined()
+    expect(childRoot).toBeDefined()
+    expect(store.getObjects(childRoot!, namedNode(INTEROP.inheritsFromGrant), null)[0]?.value).toBe(
+      parentRoot!.value
+    )
   })
 
   test('evaluates each policy of a multi-policy claim independently', async () => {

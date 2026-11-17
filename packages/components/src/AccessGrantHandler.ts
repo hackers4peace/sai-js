@@ -4,7 +4,6 @@ import {
 } from '@janeirodigital/interop-authorization-agent'
 import {
   type FinalGrantData,
-  grantDataOwner,
   grantGrantee,
   grantAssigner,
   toJsonLd,
@@ -42,8 +41,9 @@ type Credentials = Awaited<ReturnType<CredentialsExtractor['handleSafe']>>
  * - any other client sees only grants whose assignee is that client and whose
  *   assigner is the authenticated user.
  *
- * TODO: also expose grants delegated from other assigners' registries (and
- * their mirrors) — this view intentionally reads only the assigner registry.
+ * Only grants issued by the registry owner's agent are exposed. Delegated
+ * grants in this registry remain visible even though their `target.owner` is a
+ * peer.
  *
  * No POST/PUT/DELETE: grant creation and deletion remain owner-workflow
  * operations. A role grant is already materialized per member, so this handler
@@ -79,9 +79,9 @@ export class AccessGrantHandler extends OperationHttpHandler {
     const grants = await getRegistryGrants(localSparqlTransport(sai.sparqlEndpoint), registry.id)
     const isUas = await this.isAuthorizationAgent(credentials)
     const visible = grants.filter((grant) => {
-      // Only grants issued from the assigner's own registry. Never expose a
+      // Only grants issued by the registry owner. Never expose a
       // peer-owned/mirrored grant through this view.
-      if (grantDataOwner(grant) !== owner) return false
+      if (grantAssigner(grant) !== owner) return false
       if (isUas) {
         return (
           grantGrantee(grant) === credentials.agent.webId ||

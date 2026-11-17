@@ -359,10 +359,10 @@ async function generateDelegatedAccessGrants(
         ...(hasDataInstance ? { hasDataInstance } : {}),
       }
       if (childGrantData.length) {
-        // embed full child grant data for the access request handler to assign IRIs
+        // embed full child grant data so reconciliation can flatten the tree
         grant.hasInheritingGrant = childGrantData as unknown as string[]
       }
-      // only push parent — children are embedded in hasInheritingGrant and handled by the access request handler
+      // only push parent — children are embedded in hasInheritingGrant and stored by reconciliation
       result.push(grant)
     }
   }

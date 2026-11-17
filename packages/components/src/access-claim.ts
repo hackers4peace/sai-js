@@ -213,11 +213,38 @@ export function setAccessClaimAssignee(access: unknown[], assignee: string): unk
 /**
  * Re-issue an ODRL access claim under the visible subject: the claim has no
  * `assigner` and its `assignee` is the outgoing token subject. Permission,
- * target, action, and scope stay unchanged; grant ids, `inheritsFromGrant`,
- * and any `act` chain are dropped (C2 strict hiding).
+ * target, action, and scope stay unchanged. External grant ids and any `act`
+ * chain are dropped; internal parent/child links between claim policies are
+ * remapped to the fresh policy ids (C2 strict hiding).
  */
 export function rewriteAccessClaim(access: unknown[], assignee: string): unknown[] {
-  return access.map((raw) => {
+  // Parent/child links inside the claim reference the parent policy's local
+  // id/uid. Allocate the fresh ids first so a child can be remapped to its
+  // parent without exposing the hidden grant IRIs.
+  const entries = access.map((raw) => {
+    const policy = raw as Record<string, unknown>
+    const inherited = Array.isArray(policy.inheritsFromGrant)
+      ? policy.inheritsFromGrant
+      : policy.inheritsFromGrant
+        ? [policy.inheritsFromGrant]
+        : []
+    return {
+      raw,
+      newId: freshId(),
+      refs: [policy.uid, policy.id].filter(
+        (value): value is string => typeof value === 'string' && value.length > 0
+      ),
+      inherited: inherited.filter(
+        (value): value is string => typeof value === 'string' && value.length > 0
+      ),
+    }
+  })
+  const byRef = new Map<string, string>()
+  for (const entry of entries) {
+    for (const ref of entry.refs) byRef.set(ref, entry.newId)
+  }
+
+  return entries.map(({ raw, newId, inherited }) => {
     const policy = sanitizeClaimNode(raw) as Record<string, unknown>
     // Keep the policy-level convenience target/action out of the re-issued
     // claim; the permission is the graph the policy engine evaluates. Fresh
@@ -225,9 +252,14 @@ export function rewriteAccessClaim(access: unknown[], assignee: string): unknown
     delete policy.target
     delete policy.action
     delete policy.assigner
-    policy.id = freshId()
-    policy.uid = policy.id
+    policy.id = newId
+    policy.uid = newId
     policy.assignee = assignee
+    const remapped = inherited
+      .map((ref) => byRef.get(ref))
+      .filter((ref): ref is string => typeof ref === 'string')
+    if (remapped.length === 1) policy.inheritsFromGrant = remapped[0]
+    else if (remapped.length > 1) policy.inheritsFromGrant = remapped
     if (Array.isArray(policy.permission)) {
       policy.permission = policy.permission.map((rawPermission) => {
         const permission = sanitizeClaimNode(rawPermission) as Record<string, unknown>

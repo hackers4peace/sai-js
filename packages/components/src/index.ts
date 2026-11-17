@@ -34,7 +34,6 @@ export * from './GarageAdminClient.js'
 export * from './AccessRequestHandler.js'
 export * from './AccessGrantHandler.js'
 export * from './SaiAccessServiceDescriber.js'
-export * from './GrantRevocationHandler.js'
 
 export * from './util/uriTemplates.js'
 

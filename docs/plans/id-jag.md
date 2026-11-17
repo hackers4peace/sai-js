@@ -1,48 +1,50 @@
-# ID-JAG access claims — ODRL model migration, impersonation, delegation
+# ID-JAG access claims — ODRL model migration and impersonation-only delegation
 
-> **Status:** 🔶 in progress — **C0–C3 landed**; **C4 item 4 implemented**
-> (independent assigner-registry validation of delegated claims; package gate and
-> full Dagger suite green). Other C4 decisions remain design-only.
-> **Last verified:** working tree (2026-11-15) — C0–C3 verified against the
-> delegation, grant, policy-engine, ID-JAG, and Dagger code; C4 item 4 verified
-> against a delegated grant stored in the assigner's registry and the full
-> Bob -> YoYo -> ACME chain.
+> **Status:** 🔶 in progress — **C0–C2 landed**; **C3 removed**; **C4 item 4
+> implemented**; **C5 implemented in the working tree except claim-coverage
+> validation and exchange-time owner-AS revocation enforcement** (package gate
+> green; full Dagger `/test` remains user-run).
+> **Last verified:** working tree (2026-11-17) — C0–C2 verified against the
+> delegation, grant, policy-engine, ID-JAG, and Dagger code; C3 delegation mode
+> removed; C4 item 4 verified against a delegated grant stored in the assigner's
+> registry and the full Bob -> YoYo -> ACME impersonation chain; C5 endpoint
+> removal, seed/link invariant, and ID-JAG test path verified by the package
+> gate.
 > **Green gate:** package gate + **full** Dagger suite after every slice
 > ([§ Green gate](#green-gate)); Dagger is user-run.
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
 > revocation. This plan owns the token-carried access-claim path and the ODRL
 > shape migration that precedes it.
 >
-> **2026-11-17:** ID-JAG delegation mode (`mode=delegation`, `act`) was removed.
-> Impersonation is the only ID-JAG token flow; the `mode` parameter is no longer
-> accepted. The C3 notes below are historical.
+> **2026-11-17 decisions (pinned):** impersonation is the only ID-JAG/delegation
+> token flow; delegated grants are only projections of a `DataAuthorization`
+> created in the delegator's context and are stored in the delegator's own grant
+> registry; the owner access-request endpoint remains only for need-based
+> requests. The owner-delegation/revocation endpoint paths are removed rather
+> than kept for compatibility. See [§ C5](#c5--owner-endpoint-narrowing--seedlink-invariant-implemented-2026-11-17).
+>
+> **2026-11-17:** ID-JAG delegation mode (`mode=delegation`, `act`) is removed.
+> The `mode` parameter is not accepted. The C3 section remains only as a removal
+> note.
 
 ## Context
 
-Today delegated grants are created by the grantor but **materialized in the
-data owner's grant registry** through the owner-scoped access-request endpoint.
-`validateDelegable` checks the chain at request time; the policy engine later
-trusts the stored grants and matches them by:
+Historically, delegated grants were created by the grantor but **materialized in
+the data owner's grant registry** through the owner-scoped access-request
+endpoint. `validateDelegable` checked the chain at request time; the policy
+engine later trusted the stored grants and matched them by:
 
 - UAS credentials: `odrl:assignee = agent`
 - app credentials: `interop:requester = agent` and `odrl:assignee = client`
 
-The ID-JAG is currently identity-only: `sub`, `client_id`, `aud`, `jti`,
-`iat`, `exp`. The storage exchanges it for an access token with the same
-identity claims and no access information; `PolicyEngineReader` forwards only
-`agent`, `client`, and `issuer`.
-
-The target end state adds two token-carried paths alongside the existing
-owner-access-request flow:
-
-1. **Impersonation** — the delegatee uses the requester's identity; ACME sees
-   only the requester and a narrowed ODRL access claim. The delegatee is hidden.
-2. **Delegation** — the final token carries the visible actor chain
-   (`sub = top-level requester`, nested `act` down to the client).
-
-The access claim uses the **same ODRL profile as grants and access requests**,
-so the policy engine evaluates one shape everywhere. C0 migrates that shape
-first; C1+ adds the token flows.
+That owner-materialization model is being removed (C5). The target end state is
+one model: every ordinary access grant is a **projection of a
+`DataAuthorization` in the issuing agent's context** — source grants in the
+owner/grantor context, delegated grants in the delegator/assigner context.
+Impersonation is the only delegation token flow; there is no nested `act` /
+delegation-token mode. The access claim still uses the **same ODRL profile as
+grants and access requests**, so the policy engine evaluates one shape
+everywhere. C0 migrated that shape; C1–C2 added the token flow.
 
 ## Goals / non-goals
 
@@ -51,41 +53,59 @@ first; C1+ adds the token flows.
 - Migrate ODRL to `assigner` = delegator, `assignee` = delegatee,
   `target.owner = interop:dataOwner`; remove `requester`.
 - Carry an ODRL `access` claim in the ID-JAG and final access token.
-- Make impersonation the first token flow; hidden actors never appear in the
-  final ID-JAG, access token, access claim, or ACME-side policy evaluation.
-- Migrate current delegated grants to be **issued by and stored in the
-  assigner's registry**, while keeping the existing owner access-request
-  endpoints/workflows available for explicit delegation requests.
-- Keep the current owner-access-request delegation flow working.
+- Make impersonation the **only** token flow for delegation; hidden actors never
+  appear in the final ID-JAG, access token, access claim, or ACME-side policy
+  evaluation.
+- Make every ordinary access grant a projection of a `DataAuthorization` in the
+  issuing agent's context. Delegated grants live in the **assigner/delegator's**
+  grant registry and are linked from the **grantor's registration of the
+  grantee**; the linked grant is always in the same registry set as that
+  registration. Source grants already follow this rule.
+- Keep the owner access-request endpoint for **need-based access requests only**;
+  remove its delegation and revocation branches (breaking change, no stale-client
+  compatibility window).
+- Keep `checkEquivalence` as the projection diff: it continues to reuse only the
+  grants whose projected content did not change. The seed change does not require
+  an algorithm change.
 - One ID-JAG access claim is for **one storage**; no `resource` claim.
 - Bounded 403 recovery: invalidate the token chain for that storage and restart
   it once.
+- Correct the seed/link invariant: every `interop:hasDataGrant` link resolves to
+  a grant in the same registry storage owned by the same agent.
 
 **Non-goals (explicit follow-ups)**
 
 - Admin impersonation and removal of `ProxyAdminHandler` — future TODO.
 - Replacing `/sparql-admin` — separate transport/security question.
-- Deciding the request/approval wire semantics for choosing delegation vs
-  impersonation — designed after the token flows work (C4).
+- Owner-mediated delegation approval/audit beyond need-based access requests —
+  only if a later requirement appears.
 - DPoP-bound final access tokens — evaluate after the claim path works.
 - Batch validation / new revocation protocol — reuse the existing revocation
   primitives where possible.
+- Removing the remaining global DPoP-bound access-token use from all clients and
+  test helpers — tracked as a C5 follow-up; tests use the ID-JAG chain now.
 
 ## State map
 
 | Capability / primitive | Status | Code anchors | Verified by | Notes |
 |---|---|---|---|---|
 | New ODRL shape: `assigner` = delegator, `target.owner` = data owner, no `requester` | ✅ landed — package + Dagger green | `packages/data-model/src/grant.ts` (`OdrlPermission`, `OdrlTarget`, `normalize*`, `deriveFields`, `grantAccess`, `toJsonLd`); `packages/data-model/src/context.ts`; `packages/utils/src/sai-context.ts` | data-model framing/pojo tests; grant-chain/generation; `/test` policy/delegation | C0; atomic commit |
-| Full grant/seed/mirror/admin migration to the new shape | ✅ landed — package fixtures/seed migrated; Dagger green | `environments/data/registry.trig`; grant registries/mirrors/issuer-side replicas; `temporal/activities/admin.ts` | package + `/test`; migration audit query | C0; no dual-write after cutover |
+| Full grant/seed/mirror/admin migration to the new shape | ✅ landed — C5 corrects the seed/link invariant | `environments/data/registry.trig`; grant registries/mirrors; `temporal/activities/admin.ts` | package + `/test`; migration audit query | C0 shape; C5 storage/link cleanup |
 | ODRL ID-JAG context URI + local copy; expand only `access` | ✅ landed — package + full Dagger green | `packages/utils/src/odrl-id-jag-context.ts`; `jsonld-parser.ts`; `accessClaimTerms` shared with `accessContext` | utils context parser test; ID-JAG tests | C1 |
 | ID-JAG `access` claim carried into the access token | ✅ landed — package + full Dagger green | `IdJagIssuer`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, CSS `LwsTokenHttpHandler`/`LwsAccessTokenIssuer`/`LwsAccessTokenExtractor`, `PolicyEngineReader` | package ID-JAG/LWS tests; `/test` `lws-auth.test.ts` (12) | C1 |
 | Claim-first policy-engine evaluation for token `access` claims | ✅ landed — package + full Dagger green | `SaiPermissionsEngine.getPermissions`/`findAccessClaimData`/`getClaimPermissions`; CSS `PolicyEngineReader` | new package `policy-engine-claim.test.ts`; `/test` `policy-engine.test.ts` (73) | C1 |
 | One storage per ID-JAG access claim; no `resource` claim; final `aud` = storage | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `verifyAccessClaim`, `lws-auth` cache, CSS token handler | package tests; `/test` `lws-auth.test.ts` | C1 |
 | User's UAS self-issues the initial ID-JAG; CID designation is the root authority | ✅ landed — self-issued claim path + assigner-owned grant storage | `IdJagIssuer`/`IdJagTokenHandler`; `packages/lws-auth`; CID docs (the UAS mints no credentials: the caller's own token is the credential, `lws-auth` D15) | package + `/test` | C1; UAS-as-client case |
 | Impersonation chain: assigner rewrite, hidden actor, final token has no delegatee | ✅ landed — package + full Dagger green | `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`, `access-claim.ts`, `lws-auth` impersonation chain, CSS token issuer/extractor | new `/test/impersonation.test.ts` (2); `/test/lws-auth.test.ts`; package token/LWS tests | C2 |
-| Delegated grants issued/stored in the assigner registry; owner endpoint kept | ✅ landed — package + full Dagger green | `grant-generation.ts` (minted ids), `workflows/grants.ts` (local store + `registryOwner`), `activities/grants.ts` (`ownGrantIds` migration), `AccessRequestHandler`/`delegation-request.ts` kept | package workflow/equivalence tests; `/test` `check-equivalence.test.ts`, `delegation-endpoint.test.ts`, `roles.test.ts` | C2 |
-| Intermediate UAS validates incoming delegated claim against its own issued grants | ✅ landed — package + full Dagger green | `DelegatedAccessClaimValidator`, `IdJagTokenHandler` (`claimValidator`), `grant-policy.ts`, `grantFieldsEqual` | package ID-JAG tests; `/test` `impersonation.test.ts` (3), `delegation-token.test.ts` (2), `lws-auth.test.ts` (14) | C4 item 4 |
-| Delegation token chain (`sub` top-level, nested `act` to client) | ✅ landed — package + full Dagger green | `IdJagIssuer`/`IdJagTokenHandler`/`IdJagSubjectTokenVerifier`, `actor-chain.ts`, `lws-auth`, CSS token issuer/extractor, policy engine | package token tests; new `/test/delegation-token.test.ts` (2); `/test/lws-auth.test.ts` (14) | C3 |
+| Delegated grants are projections of a `DataAuthorization`, issued/stored in the assigner registry; no owner materialization | ✅ landed — owner delegation/revocation endpoint paths removed | `grant-generation.ts` (minted ids), `workflows/grants.ts` (local store + `registryOwner`), `activities/grants.ts` (`ownGrantIds`) | package workflow/equivalence tests; `/test` `check-equivalence.test.ts`, `roles.test.ts` | C2; C5 owns the endpoint path |
+| Intermediate UAS validates incoming delegated claim against its own issued grants | ✅ landed — package + full Dagger green | `DelegatedAccessClaimValidator`, `IdJagTokenHandler` (`claimValidator`), `grant-policy.ts`, `grantFieldsEqual` | package ID-JAG tests; `/test` `impersonation.test.ts` (3), `lws-auth.test.ts` (14) | C4 item 4 |
+| Delegation token chain (`sub` top-level, nested `act` to client) | ❌ removed 2026-11-17 | — | — | C3 withdrawn; impersonation only |
+| Grant/link invariant: every `hasDataGrant` target is in the registration's own registry set | ✅ landed — seed audit test | `environments/data/registry.trig`; `replaceAccessGrantsOnRegistration`; `AccessGrantHandler` | framing audit + `/test` | C5; delegated grants now share the assigner registry |
+| Owner access-request endpoint is need-based only; delegation/revocation branches removed | ✅ landed — breaking change | `AccessRequestHandler`, `need-based-access-request.ts`; removed `delegation-request.ts`/`GrantRevocationHandler` | `/test` access-request + rejection tests | C5; breaking change, no compatibility window |
+| Storage-facing tests use the ID-JAG exchange | ✅ landed — `buildLwsFetch` always chains | `/test` builders, `packages/lws-auth`, test utils | package gate + full Dagger | C5; global DPoP-bound access-token removal is a follow-up |
+| Claim coverage (`claim ⊆ grant`) at every hop | 🔶 open — inheritance preservation fixed; equality validator still rejects narrower claims | `DelegatedAccessClaimValidator`, `access-claim.ts`, `grantFieldsEqual` | package claim tests; `/test` policy-engine | C5 follow-up |
+| Storage-AS claim validation reuses the policy-engine grant source | ⬜ open | `SaiAuthorizationManager.getAuthorizationData`, `IdJagSubjectTokenVerifier`, `SaiPermissionsEngine` | package + `/test` revocation scenario | C5 follow-up; owner local registry only |
+| SPARQL endpoint topology documented for federated deployment | ⬜ open | `SaiAuthorizationManager`, `SaiPermissionsEngine`, `PodEndpointStore` | deployment docs | per-pod endpoints, not SPARQL federation |
 | 403/401 chain refresh per storage | ⬜ open | `packages/lws-auth` fetch/cache; RPC/UI callers | package fetch tests; `/test` revocation scenario | C3/C4 |
 | Admin impersonation / `ProxyAdminHandler` removal / `/sparql-admin` future | ⬜ open | `ProxyAdminHandler`, `peerFetch`, `peerProxy`, `AdminSparqlHandler` | future TODO | not in this plan’s implementation |
 
@@ -213,9 +233,9 @@ explicitly rejected.
 **Green gate:** full package gate + full Dagger suite (below). This is the
 commit the user reviews and commits before C1.
 
-**`/test` acceptance:** `policy-engine.test.ts`, `delegation-endpoint.test.ts`,
-`check-equivalence.test.ts`, `access-grants.test.ts`, `share.test.ts`,
-`roles.test.ts`, `org-context.test.ts` (user-run).
+**`/test` acceptance:** `policy-engine.test.ts`, `delegation-endpoint.test.ts`
+(removed in C5), `check-equivalence.test.ts`, `access-grants.test.ts`,
+`share.test.ts`, `roles.test.ts`, `org-context.test.ts` (user-run).
 
 **Touchpoints**
 
@@ -271,9 +291,10 @@ commit the user reviews and commits before C1.
 
 **Notes**
 
-- C0 must not change token behaviour. The existing owner-request delegation
-  flow continues to work with the new shape.
-- The old `requestDelegations`/`validateDelegable` path remains through C0.
+- Historical C0: token behaviour was unchanged. The old owner-request
+  delegation flow continued to work with the new shape; C5 removes it.
+- Historical C0: the old `requestDelegations`/`validateDelegable` path remained
+  through C0; C5 removes it.
 
 ## C1 — ID-JAG access claim foundation (self-issued, single-hop)
 
@@ -353,24 +374,27 @@ package tests for ID-JAG claim/context/token propagation (user-run).
   suite** (24 files / 208 tests).
 - The CSS changes live in the `elf-pavlik/CommunitySolidServer` `lws-sai`
   branch (sibling `../CommunitySolidServer`). `package-lock.json` tracks the
-  claim-aware CSS commit, so a fresh `npm ci` gets the access-claim/actor-chain
-  support.
+  claim-aware CSS commit, so a fresh `npm ci` gets the access-claim support.
 
 ## C2 — Impersonation default + assigner-owned grants
+
+> **Superseded in part by C5 (2026-11-17):** delegated grants remain
+> assigner-local, but the owner access-request delegation/revocation paths are
+> removed. The owner endpoint is need-based only.
 
 **Done when:** Bob can impersonate YoYo through Bob's UAS → YoYo's UAS → ACME's
 AS; ACME sees only YoYo and the narrowed ODRL claim; Bob/`act`/hidden grant
 references do not appear in the final ID-JAG or access token. Delegated grants
-are issued and stored in the assigner's registry by default; the owner
-access-request endpoint/workflow still works when explicitly used.
+are issued and stored in the assigner's registry; the owner access-request
+endpoint is **not** used for delegation (C5).
 
 **Depends on:** C1.
 
 **Green gate:** full package gate + full Dagger suite.
 
 **`/test` acceptance:** new `impersonation.test.ts`, `lws-auth.test.ts`,
-`policy-engine.test.ts`, `delegation-endpoint.test.ts`,
-`check-equivalence.test.ts` (user-run).
+`policy-engine.test.ts`, `check-equivalence.test.ts` (user-run);
+`delegation-endpoint.test.ts` is removed in C5.
 
 **Touchpoints**
 
@@ -378,12 +402,11 @@ access-request endpoint/workflow still works when explicitly used.
   ID-JAG exchange; rewrite `assigner`, keep `target.owner`/target/action/scope;
   drop hidden actors.
 - `grant-generation.ts` / `activities/grants.ts` / grant registry: delegated
-  grants minted/stored in the assigner's registry; owner copies only when the
-  owner request path is used.
+  grants minted/stored in the assigner's registry; no owner-side copies.
 - `lws-auth`: initial self-issued ID-JAG for the next UAS; final exchange.
 - CSS token issuer/extractor: copy sanitized claim; no hidden actor fields.
-- Migration/backfill of existing delegated grants into assigner registries;
-  keep the owner-side endpoint/workflow.
+- C5 moves the remaining owner-side delegated seed grants into assigner
+  registries; the owner-side endpoint/workflow is removed.
 
 **Notes**
 
@@ -415,19 +438,18 @@ access-request endpoint/workflow still works when explicitly used.
   self-issues an ID-JAG for the intermediate UAS, then uses that UAS's re-issued
   ID-JAG for the storage. The claim cache is keyed by
   `(AS issuer, storage, impersonation UAS)`.
-- **Assigner-owned delegated grants.** Delegated generation now mints parent
-  and child ids in the grantor's registry. The reconciliation workflow stores
+- **Assigner-owned delegated grants.** Delegated generation mints parent and
+  child ids in the grantor's registry. The reconciliation workflow stores
   delegated trees locally (`storeAccessGrant`/`createAcr` with
-  `registryOwner = grantedBy`) instead of POSTing to the data owner by default.
-  The explicit owner access-request endpoint and `requestDelegations` remain
-  available and unchanged. Removal uses the own-registry closure when the body
-  is in the actor's registry; legacy owner-side copies still go through
-  `requestRevocations`.
-- **Migration.** `checkEquivalence` takes `ownGrantIds`; a delegated tree is
-  reusable only when it is in the actor's own registry. A legacy owner-side
-  delegated copy is therefore regenerated into the assigner's registry on the
-  next reconciliation. `/test` `check-equivalence.test.ts` covers the migration
-  and stable reuse.
+  `registryOwner = grantedBy`) instead of POSTing to the data owner. The owner
+  access-request delegation path was still present at C2 but is removed by C5;
+  no owner-side copies are kept. Removal uses the own-registry closure; C5
+  migrates the remaining legacy owner-side seed grants.
+- **Equivalence.** `checkEquivalence` takes `ownGrantIds`; a delegated tree is
+  reusable only when it is in the actor's own registry. The algorithm remains the
+  projection diff after C5 — only the seed/fixtures move to the correct local
+  layout. The owner-side → assigner-side migration is no longer a seed fixture;
+  use a synthetic legacy fixture if that migration path still needs coverage.
 - **Trust boundary.** The intermediate UAS validates the incoming ID-JAG
   signature, audience, claim shape, and that the hidden delegatee is the token
   subject/client before re-issuing. It does not yet re-check the hidden claim
@@ -436,76 +458,23 @@ access-request endpoint/workflow still works when explicitly used.
 - **Tests/gates.** Package `typecheck`, full `npx vitest run` (679 passed, 26
   skipped, 2 todo), components build, `npm run check`, and the **full Dagger
   suite** (25 files / 211 tests) are green. `/test` includes the new
-  `impersonation.test.ts`, the C2 `lws-auth` chain, `check-equivalence`,
-  `delegation-endpoint`, and `roles`.
+  `impersonation.test.ts`, the C2 `lws-auth` chain, `check-equivalence`, and
+  `roles`; `delegation-endpoint` is removed in C5.
 
-## C3 — Delegation via token exchange
+## C3 — Delegation via token exchange (removed 2026-11-17)
 
-**Done when:** the same chain works in delegation mode: final `sub` = top-level
-requester, nested `act` = intermediate actors + client (most nested), final
-claim `assigner` = top-level requester, `assignee` = final client/actor, and
-the policy engine evaluates it claim-first. Current owner-request delegation
-continues to work.
+**Withdrawn.** Impersonation is the only delegation token flow. There is no
+`mode=delegation`, no `act` actor chain, and no nested delegation token. The
+former C3 implementation is retained in git history only; do not reintroduce it
+from this plan.
 
-**Depends on:** C2.
+**Acceptance:** the UAS rejects delegation-mode requests / delegation-shaped
+tokens, and the impersonation chain remains green. `/test/delegation-token.test.ts`
+is not part of the suite.
 
-**Green gate:** full package gate + full Dagger suite.
+## C4 — Coexistence decisions / follow-ups
 
-**`/test` acceptance:** new delegation-token test,
-`lws-auth.test.ts`, `policy-engine.test.ts`,
-`delegation-endpoint.test.ts` (user-run).
-
-**Touchpoints**
-
-- `IdJagIssuer`/`IdJagTokenHandler`/verifier: nested `act` construction and
-  validation; no hidden actor when mode = delegation.
-- `lws-auth` token chain; CSS token issuer/extractor; policy engine.
-- Existing `requestDelegations`/`AccessRequestHandler` path unchanged.
-
-**Notes**
-
-- Client is the most nested actor; when the UAS is the client, that is the UAS
-  IRI.
-- The final claim is the re-issued ODRL policy from the top-level requester to
-  the final client/actor; `target.owner` remains the data owner.
-- Coexistence with the current delegation flow is deliberately decided in C4.
-
-**Implementation (2026-11-15)**
-
-- **Mode select.** An ID-JAG subject at a UAS accepts an optional form
-  `mode=impersonation|delegation`; the default is impersonation (C2). The mode
-  only applies to ID-JAG subjects (`invalid_request` for ID tokens/unknown
-  values).
-- **Actor chain.** `actor-chain.ts` validates bounded `act` nesting (HTTP(S)
-  `sub` entries) and appends actors. In delegation mode the outgoing token keeps
-  the incoming subject/client visible:
-  - final `sub` = incoming claim `assigner` (top-level requester);
-  - final `client_id` = incoming client (the most nested actor);
-  - `act` = incoming chain (prefixed by the incoming subject) with the final
-    client appended as the deepest actor;
-  - final claim `assigner` = visible requester, `assignee` = final client;
-    target/action/scope unchanged.
-  Impersonation remains the C2 shape (no `act`, visible UAS client).
-- **Token propagation.** `IdJagIssuer.issue` carries `act`;
-  `IdJagSubjectTokenVerifier` validates and returns it. CSS
-  `LwsTokenHttpHandler` passes `act` into `LwsAccessTokenIssuer`, the access
-  token carries it, and `LwsAccessTokenExtractor` exposes it. The policy engine
-  continues to evaluate the ODRL claim only.
-- **`packages/lws-auth`.** `requestIdJag` sends `mode` and accepts an ID-JAG
-  subject type; `createLwsAuthFetch`'s `impersonation` option gains
-  `mode: 'delegation'`. The existing owner-request delegation flow is untouched.
-- **Tests/gates.** Package `typecheck`, full `npx vitest run` (684 passed, 26
-  skipped, 2 todo), components build, `npm run check`, CSS unit coverage (100%
-  statements/branches/functions/lines), and the **full Dagger suite** (26 files
-  / 214 tests) are green.
-- **CSS pin.** The C3 actor-chain changes are in the sibling
-  `elf-pavlik/CommunitySolidServer` checkout. `package-lock.json` now pins
-  `228af240f7d5dab2f2bbcd8f2d50fd77c48a93f6` (`feat(lws): ID-JAG with access
-  policy - delegation`), so a fresh `npm ci` gets the actor-chain propagation.
-
-## C4 — Coexistence decisions / follow-ups (design only)
-
-No implementation in this slice until the token flows are green.
+C4 item 4 landed; the remaining coexistence questions are resolved by C5.
 
 **C4 item 4 — implemented (2026-11-15).** The intermediate UAS now performs an
 independent check before re-issuing an ID-JAG: the incoming claim's `assigner`
@@ -513,22 +482,188 @@ must be a local user, each claim policy must map to a grant issued by that user
 and stored in their own grant registry (semantic fields + ODRL permissions,
 ids ignored), and the grantee must be the incoming subject/client bound to the
 requested storage. The auth config wires `DelegatedAccessClaimValidator` into
-`IdJagTokenHandler`; a mismatch returns `invalid_grant`. Tests store the
-YoYo -> Bob delegated grant in YoYo's registry, then prove the positive
-impersonation/delegation chain and the negative no-backing-grant rejection.
-The seed still contains legacy owner-stored delegated grants (for example the
-ACME registry grants `qwvbcu`/`wwp4j6` assigned by Alice); they are not used by
-the new validator and remain part of the migration/backfill follow-up.
+`IdJagTokenHandler`; a mismatch returns `invalid_grant`. The seed provides the
+YoYo -> Bob delegated grant in YoYo's registry; the tests prove the positive
+impersonation chain and the negative no-backing-grant rejection. The seed still
+contains legacy owner-stored delegated grants (for example the ACME registry
+grants `qwvbcu`/`wwp4j6` assigned by Alice); C5 moves/removes them, after which
+they must not be used.
 
+**C4 decisions resolved (2026-11-17).**
 
-- How requests/approvals indicate delegation vs impersonation.
-- Whether owner materialization/mirroring is required for revocation or only
-  optional visibility.
-- Whether the owner access-request endpoint stores a copy, approves, or just
-  acknowledges.
+- Request/approval mode selection: none. Impersonation is the only delegation
+  flow.
+- Owner materialization/mirroring: not required for delegated grants or their
+  revocation; local projections + reconciliation/mirror propagation are the
+  model.
+- Owner access-request endpoint: need-based requests only; delegation/revocation
+  branches are removed. No owner copy/approval path for delegation.
 - Admin impersonation + `ProxyAdminHandler` removal; `/sparql-admin` future.
-- DPoP-bound final access token for impersonation.
-- Audit/visibility mapping for hidden actors.
+- DPoP-bound final access token: open.
+- Audit/visibility mapping for hidden actors: open.
+
+## C5 — Owner endpoint narrowing + seed/link invariant (implemented 2026-11-17)
+
+**Decision (2026-11-17, pinned).** The owner endpoint is no longer a delegation
+or revocation boundary. `/.sai/access-requests/<owner>` keeps only
+`NeedBasedAccessRequest`. Delegated grants and their revocation are projections
+in the issuing/delegator context.
+
+**Done when**
+
+- `AccessRequestHandler` accepts only `NeedBasedAccessRequest`: it does not
+  implement `DelegationRequest` or `AccessRevocationRequest`.
+- `issueDelegationRequest`, `requestDelegations`, `requestRevocations`,
+  `GrantRevocationHandler`, and their message/vocab/context entries and tests are
+  removed. This is a breaking change; no stale-client compatibility is needed.
+- `environments/data/registry.trig` contains no owner-side delegated grant. Every
+  `interop:hasDataGrant` link is on a registration whose registry owner is the
+  grantor/assigner and points to a grant in that same registry set.
+- `checkEquivalence` is unchanged as an algorithm: it still pairs generated trees
+  with existing local bodies and reuses unchanged source/delegated IDs. Only its
+  fixtures change; the owner-side migration case is no longer a seed fixture (use
+  a synthetic legacy fixture if that migration path still needs coverage).
+- Delegated grants and their revocation are generated/removed only by
+  `reconcileGrantsForGrantee` / `processAuthorizationRevoked`.
+- The final exchange must be denied when the owner revoked the original grant
+  that was delegated and re-delegated downstream. Mirror/
+  `delegatedGrantsUpdated` + reconciliation is the accepted propagation path.
+  **Open:** the storage AS verifier currently checks token/claim shape only; the
+  policy engine denies access claim-first, but exchange-time subset validation
+  against the owner's grants is not implemented yet.
+- `/.sai/grants/<owner>` reads by registry/assigner ownership, so delegated
+  grants in the delegator's registry are visible.
+- Storage-facing `/test` access uses the ID-JAG chain (`createLwsAuthFetch`);
+  `buildLwsFetch`'s direct credential-to-storage mode is not used by tests.
+  `buildOidcSession` / `buildSessionManager` remain for setup, RPC, and owner-side
+  reads.
+
+**Seed/link invariant**
+
+- Source grant: grantor = data owner; the grant body and the `hasDataGrant`
+  registration share the owner's registry set.
+- Delegated grant: grantor = delegator/assigner; the grant body and the
+  `hasDataGrant` registration share the delegator's registry set; `target.owner`
+  remains the data owner.
+- Concretely, the seed now stores `https://registry/alice/wwp4j6` and
+  `https://registry/alice/qwvbcu` (Alice -> test-client, data owner ACME) in
+  Alice's registry, linked from Alice's registration of the client;
+  `https://registry/yoyo/q7w2nz` was already correct.
+- Grant ACRs and `meta:partOf` use the new registry owner; the owner-side bodies
+  and replica path are gone. A framing test audits the invariant.
+
+**Revocation decision**
+
+- Revocation is local: deleting the delegator's `DataAuthorization` removes its
+  delegated grant closure.
+- When the data owner revokes the source grant, the chain is invalid. The owner
+  side must refuse the final ID-JAG exchange once the original grant that was
+  delegated (and re-delegated) is revoked. Reconciliation/mirror refresh is
+  sufficient; no owner-side delegated grant copy is required.
+- **Open:** `IdJagSubjectTokenVerifier` does not yet intersect the final claim
+  with the owner's grants at exchange time. The existing equality validator is
+  not sufficient for narrowed claims; this needs a subset validator (scope,
+  target/source/partOf, actions) over the owner registry. Until then the
+  claim-first policy engine is the denial point.
+- No `AccessRevocationRequest` endpoint path remains.
+
+**Claim coverage at every hop (open)**
+
+A grant may be narrowed at each delegation step, so claim validation is
+**coverage**, not equality:
+
+- the first ID-JAG may be narrower than the grant held by the next UAS that
+  exchanges it;
+- an intermediate UAS must accept any claim that is a subset of its locally
+  issued grant;
+- the data-owner AS must accept any final claim that is a subset of its own
+  source grant.
+
+The current `DelegatedAccessClaimValidator` still uses `grantFieldsEqual`
+(exact equality), so it rejects valid narrower claims. `checkEquivalence` keeps
+using equality; add a separate `grantCoversClaim(grant, claim)` predicate for
+validation, covering scope, target/source/partOf, action subset, assignee, and
+the parent/child `Inherited` relation.
+
+**Grant source for the owner AS (open)**
+
+The storage AS should reuse the policy engine's grant access path:
+`SaiAuthorizationManager.getAuthorizationData(resource)` (same owner-registry
+query used by `SaiPermissionsEngine`), then apply `grantCoversClaim` before
+issuing an access token. This avoids a second grant-read implementation and
+binds exchange-time revocation to the same source grants the policy engine
+already uses.
+
+**SPARQL topology**
+
+Current policy-engine grant reads are targeted, not federated:
+
+- resolve the target storage through `StorageLocationStrategy`;
+- resolve its owner through `PodStore`;
+- resolve `registryId(owner)` through `PodEndpointStore.findSparqlByPodUrl`;
+- run the grant `SELECT`/`CONSTRUCT` against that **single owner-registry pod
+  endpoint**;
+- evaluate in memory with Comunica.
+
+The data pod endpoint is used separately for target type/parent metadata. This
+works with per-pod endpoints when the owner/registry records are present, and it
+is sufficient for the owner AS validating its own source grant. It does **not**
+federate across registry pods: delegated grants now live in delegator
+registries, so the owner policy engine cannot see them through this query (and
+does not need to under claim-first impersonation). UAS-side validation relies on
+the subject's own registry plus reciprocal mirrors.
+
+**Tests**
+
+- Keep and update `access-request.test.ts`, `authorization.test.ts`,
+  `check-equivalence.test.ts`, `roles.test.ts`, `impersonation.test.ts`,
+  `lws-auth.test.ts`, `policy-engine.test.ts`, `access-grants.test.ts`, and
+  `reconciliation.test.ts` for the new seed/link/token assumptions.
+- Replace `delegation-endpoint.test.ts` with rejection coverage for the removed
+  message types (or remove it if the remaining endpoint assertions live
+  elsewhere).
+- Add: link-invariant audit, owner-source-revocation -> final-exchange denial,
+  local delegated-grant revoke, and `/grants/<delegator>` visibility.
+
+**Follow-ups**
+
+- Remove the remaining use of global DPoP-bound access tokens over time; use the
+  ID-JAG chain for storage-facing access. Track separately from this slice.
+- `packages/lws-auth` stays a product client library. Move test-only helpers
+  (self-issued CSS credential, CSS `/.account/` interaction driver, fixture login)
+  into test utils; keep generic token-chain/OIDC/credential logic in
+  `packages/lws-auth`.
+
+**Implementation (2026-11-17)**
+
+- Removed the owner-endpoint delegation/revocation paths:
+  `delegation-request.ts`, `GrantRevocationHandler`, `messages.ts`, the
+  data-model `AccessRevocation` exports, the `DelegationRequest`/
+  `AccessRevocationRequest` vocab/context terms, `requestDelegations`,
+  `requestRevocations`, the grant-replica service, and their tests.
+  `AccessRequestHandler` now dispatches `NeedBasedAccessRequest` only.
+- Reconciliation removes every non-reused grant through the own-registry
+  closure; there is no peer-owned/replica branch left.
+- Seed: `wwp4j6`/`qwvbcu` moved from ACME's to Alice's grant registry, including
+  their meta `partOf` and ACR owner; ACME's registration of Alice now links the
+  inherited `wpqyds` too, so reciprocal mirrors carry the full tree into UAS
+  claim derivation. A framing test audits every registration → grant link for
+  the same registry owner and assigner.
+- `buildLwsFetch` always uses `createLwsAuthFetch` (ID-JAG chain); the
+  test-only OIDC login helper moved to `packages/test-utils`, so
+  `packages/lws-auth` stays product-only.
+- `/.sai/grants/<owner>` filters by assigner/registry ownership, so delegated
+  grants in the delegator's registry are visible.
+- Inherited claim regression fixed: claim derivation now preserves the
+  parent/child policy link, impersonation rewrite remaps it to fresh policy ids,
+  and `SaiPermissionsEngine.findAccessClaimData` maps it to synthetic parent
+  roots. Package tests cover both the rewrite and the claim-graph mapping.
+- Package gate: `npm run typecheck`, full `npx vitest run` (659 passed, 26
+  skipped, 2 todo), `npm run build -w @elfpavlik/sai-components`, and
+  `npm run check`. Full Dagger `/test` is the remaining user-run gate.
+- Remaining C5 gap: claim coverage/subset validation and exchange-time owner-AS
+  denial after upstream revocation. The current verifier validates token/claim
+  shape only; the policy engine is claim-first.
 
 ## Green gate
 
@@ -589,12 +724,15 @@ still authenticate the caller.
 OAuth client, `client_id` is the UAS IRI and the access claim's `assignee` may
 be that UAS; no separate application grant is involved.
 
-**D8 — Impersonation is the first token flow; delegation token flow follows.**
-*pinned for sequencing.* C2 lands impersonation; C3 adds nested `act`.
+**D8 — Impersonation is the only delegation token flow.** *pinned 2026-11-17.*
+No `mode=delegation`, no nested `act`; hidden actors never appear in the
+owner-facing token or claim.
 
-**D9 — Delegated grants are issued/stored in the assigner's registry by
-default; the owner access-request endpoint/workflow stays available.** *pinned.*
-Explicit owner-requested materialization remains a supported coexistence path.
+**D9 — Delegated grants are projections of a `DataAuthorization` in the
+delegator's context, stored in the delegator's own grant registry and linked from
+the grantor's registration of the grantee.** *pinned 2026-11-17.* The owner
+access-request endpoint handles need-based requests only; the delegation and
+revocation endpoint paths are removed.
 
 **D10 — Claim-first policy engine for tokens with `access`; registry matching
 only when no claim is present.** *pinned.* This supports app and agent cases
@@ -608,18 +746,70 @@ UAS is the revocation signal.
 replacement are future TODOs.** *pinned (deferred).* The proxy stays until
 explicit admin impersonation authority and client/network support exist.
 
-**D13 — Request/approval mode selection (delegation vs impersonation) is a
-C4 decision.** *open.* The token flows do not pre-empt the request wire shape.
+**D13 — There is no request/approval mode selection.** *resolved 2026-11-17.*
+Impersonation is the only delegation flow; need-based requests ask for source
+access, not delegated grants.
 
 **D14 — Old ID-JAG/access tokens must not be silently interpreted under the new
 semantics.** *pinned.* Use short TTL plus a version/required-claim gate; old
 policy engines must not ignore `access` for impersonation-shaped tokens.
 
+**D15 — Grant/link invariant: every `hasDataGrant` link targets a grant in the
+same registry set as the linking registration.** *pinned 2026-11-17.* Source
+grants: owner/grantor. Delegated grants: assigner/delegator. The owner does not
+store delegated grant copies.
+
+**D16 — Delegation revocation is local projection closure; upstream revocation
+invalidates the chain.** *pinned 2026-11-17.* The data owner's AS refuses the
+final ID-JAG exchange when the original delegated/re-delegated grant is revoked;
+mirror/`delegatedGrantsUpdated` + reconciliation propagation is accepted. No
+`AccessRevocationRequest` endpoint path remains.
+
+**D17 — Storage-facing tests use the ID-JAG exchange; `packages/lws-auth` remains
+a product client library.** *pinned 2026-11-17.* Test-only helpers move to test
+utils. Removing global DPoP-bound access-token use is a follow-up.
+
+**D18 — `checkEquivalence` remains the projection diff.** *pinned 2026-11-17.*
+The seed/link change updates fixtures, not the algorithm; unchanged source and
+delegated trees continue to be reused.
+
+**D19 — Claim validation is coverage, not equality.** *pinned 2026-11-17.*
+A claim may be narrower than the grant it is checked against at every hop.
+`checkEquivalence` keeps exact equality; validation uses a separate
+`grantCoversClaim` predicate.
+
+**D20 — The storage AS reuses the policy-engine grant source.** *pinned
+2026-11-17.* Validate the final claim against
+`SaiAuthorizationManager.getAuthorizationData(resource)` rather than adding a
+second owner-registry query.
+
+**D21 — The policy engine reads one owner-registry endpoint; it is not a SPARQL
+federation layer.** *pinned 2026-11-17.* Per-pod endpoint resolution is
+sufficient for owner-local source grants; delegated grants in other registries
+are not queried by the owner policy engine.
+
 ## Hazards / verification
 
-- **Migration completeness:** owner registries, reciprocal mirrors, issuer-side
-  replicas, admin grants, seed, and test fixtures must all move. Add an audit
-  query before cutover.
+- **Seed/link invariant:** owner registries, reciprocal mirrors, issuer-side
+  replicas, admin grants, seed, and test fixtures must move together. Add an
+  audit query proving every `hasDataGrant` target shares the registration's
+  registry owner.
+- **Breaking endpoint removal:** every caller (UI/RPC/repl/tests) must stop using
+  `DelegationRequest`/`AccessRevocationRequest`; no stale-client compatibility
+  window is provided.
+- **Upstream revocation:** the final exchange must deny after the owner revokes
+  the original delegated/re-delegated grant. Mirror/reconciliation propagation is
+  eventually consistent; do not reintroduce an owner-side delegated grant copy
+  just to make revocation immediate.
+- **Narrowing at every hop:** an equality check rejects a valid claim that is
+  narrower than the exchanging UAS's grant. Use coverage semantics, including
+  scope/target/action subsets and the parent/child relation.
+- **Federation assumption:** `SaiAuthorizationManager` reads the owner's
+  registry endpoint resolved from local pod records. A deployment without those
+  records denies; a cross-registry query needs a separate federation/mirroring
+  design.
+- **Test-harness extraction:** `packages/lws-auth` must stay product-only; do not
+  make it depend on `components` or test utilities (avoid a dependency cycle).
 - **Context scope:** expanding the whole JWT as JSON-LD will pull OAuth claims
   into RDF; only expand `access`.
 - **Hidden actor leakage:** final impersonation tokens/claims must not contain
@@ -628,8 +818,6 @@ policy engines must not ignore `access` for impersonation-shaped tokens.
   impersonation tokens require the claim-aware engine.
 - **Token size:** ODRL claims with selected instances can be large; enforce
   policy/target limits and non-identifying final claims.
-- **Assigner-local grants:** the data owner may no longer have delegated grant
-  bodies. Decide visibility/revocation mirroring before deleting owner copies.
 - **Final `client_id`:** do not use a personal UAS client ID when impersonation
   must hide the delegatee; use the shared app/UAS or a pseudonymous client.
 - **403 loops:** cache retry state per storage/target; do not restart on every
@@ -642,11 +830,9 @@ policy engines must not ignore `access` for impersonation-shaped tokens.
 - Exact context URI path/filename and whether the access token reuses the same
   context or a compact subset.
 - Whether the final access token should be DPoP-bound for impersonation.
-- How a request/approval chooses delegation vs impersonation (grant field,
-  request field, or both).
-- Whether owner-side delegated grant copies are required for revocation or only
-  optional visibility.
 - Whether final access claims keep the full ODRL policy or a filtered
   single-storage subset (recommended: filter to the requested storage at the
   final exchange).
+- Audit/visibility mapping for hidden actors.
 - Cutover mechanics for old grants/tokens and the migration audit gate.
+- Exact split of reusable LWS helpers between `packages/lws-auth` and test utils.

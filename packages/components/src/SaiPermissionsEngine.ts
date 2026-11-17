@@ -196,18 +196,28 @@ export class SaiPermissionsEngine implements PolicyEngine {
       // the token claim is just the policy graph. Give every policy its own
       // synthetic grant root so a match reads only that policy's actions, and
       // mirror `inheritsFromGrant` onto the root for `findInheritedModes`.
-      let index = 0
-      for (const policy of store.getSubjects(namedNode(ODRL.permission), null, null)) {
-        const grant = namedNode(`urn:sai:ld:access-claim:${index++}`)
+      // Claim-internal parent references point at policy ids; remap them to the
+      // parent policy's synthetic root so inheritance stays in the claim graph.
+      const claimPolicies = [...store.getSubjects(namedNode(ODRL.permission), null, null)]
+      const rootByPolicy = new Map<string, string>()
+      claimPolicies.forEach((policy, index) => {
+        const root = `urn:sai:ld:access-claim:${index}`
+        for (const ref of [policy, ...store.getObjects(policy, namedNode(ODRL.uid), null)]) {
+          if (ref.termType === 'NamedNode') rootByPolicy.set(ref.value, root)
+        }
+      })
+      claimPolicies.forEach((policy, index) => {
+        const grant = namedNode(`urn:sai:ld:access-claim:${index}`)
         store.addQuad(grant, namedNode(LWS.access), policy)
         for (const inherited of store.getObjects(
           policy,
           namedNode(INTEROP.inheritsFromGrant),
           null
         )) {
-          store.addQuad(grant, namedNode(INTEROP.inheritsFromGrant), inherited)
+          const mapped = rootByPolicy.get(inherited.value) ?? inherited.value
+          store.addQuad(grant, namedNode(INTEROP.inheritsFromGrant), namedNode(mapped))
         }
-      }
+      })
       return [...store]
     } catch (error: unknown) {
       this.logger.warn(`Ignoring an unparseable ODRL access claim: ${error}`)

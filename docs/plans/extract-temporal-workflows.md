@@ -25,7 +25,7 @@ Registered Components.js classes currently in the package (**keep**):
 ActivityEvents, ActivityWebhookHandler, ActivityWebhookStore,
 AdminPermissionReader, AdminSparqlHandler, AgentIdHandler, ApiHandler,
 CustomWebIdStore, EnvJwkGenerator, EventsHandler, AccessRequestHandler,
-GrantRevocationHandler, HybridDataAccessor, InvitationHandler, NdjsonNotification,
+HybridDataAccessor, InvitationHandler, NdjsonNotification,
 PostgresKeyValueStorage, ProxyAdminHandler, ReciprocalWebhookHandler,
 ReciprocalWebhookStore, S3DataAccessor, SaiAuthorizationManager,
 SaiPermissionsEngine, SessionManager, UiPushSubscriptionStore — plus the
@@ -39,9 +39,8 @@ CompactedNotification, S3DataAccessorArgs, SparqlStoreEntry, ClientIdHandler) an
 Moving `temporal/*` out as-is creates a `components ↔ temporal-workflows` package
 cycle:
 
-- **components → temporal:** `ActivityWebhookHandler`, `AccessRequestHandler`,
-  `GrantRevocationHandler` import `temporal/client` + the workflow definitions to
-  start workflows.
+- **components → temporal:** `ActivityWebhookHandler` and `AccessRequestHandler`
+  import `temporal/client` + the workflow definitions to start workflows.
 - **temporal → components:** activities import `builders/*` — and
   `builders/sessionManager` constructs the `SessionManager` + `EnvJwkGenerator`
   components, `builders/accountLoginStorage` constructs `PostgresKeyValueStorage`,

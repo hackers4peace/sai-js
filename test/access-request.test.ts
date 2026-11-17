@@ -271,3 +271,37 @@ describe('request access (receive side)', () => {
     expectRequestShape(stored[0], { grantee: bobId, grantedBy: bobId, dataOwner: aliceId })
   })
 })
+
+describe('owner access-request endpoint — removed delegation/revocation paths', () => {
+  const headers = { 'Content-Type': 'application/ld+json' }
+
+  test('rejects a DelegationRequest payload', async () => {
+    const bob = await buildOidcSession(bobId)
+    const response = await bob.authFetch(accessRequestsUrl(aliceId), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify([]),
+    })
+    expect(response.status).toBe(400)
+    expect(await response.text()).toContain('need-based access request')
+  })
+
+  test('rejects an AccessRevocationRequest payload', async () => {
+    const bob = await buildOidcSession(bobId)
+    const response = await bob.authFetch(accessRequestsUrl(aliceId), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        '@context': [
+          'https://www.w3.org/ns/lws/v1',
+          'http://www.w3.org/ns/odrl.jsonld',
+          'https://www.w3.org/ns/solid/interop-context/v1',
+        ],
+        type: ['AccessRequest', 'AccessRevocationRequest'],
+        grants: ['https://registry/alice/does-not-exist'],
+      }),
+    })
+    expect(response.status).toBe(400)
+    expect(await response.text()).toContain('need-based access request')
+  })
+})

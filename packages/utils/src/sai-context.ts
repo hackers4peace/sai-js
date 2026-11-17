@@ -16,8 +16,6 @@ export const saiContext = {
     owner: { '@id': INTEROP.dataOwner, '@type': '@id' },
     AccessProfile: INTEROP.AccessProfile,
     NeedBasedAccessRequest: INTEROP.NeedBasedAccessRequest,
-    DelegationRequest: INTEROP.DelegationRequest,
-    AccessRevocationRequest: INTEROP.AccessRevocationRequest,
     AccessNeed: INTEROP.AccessNeed,
     AccessRequired: INTEROP.AccessRequired,
     AccessOptional: INTEROP.AccessOptional,

@@ -165,11 +165,23 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     const selected = appSpecific.length > 0 ? appSpecific : mostSpecificGrantEdge(received)
     if (selected.length === 0) return undefined
 
-    return verifyAccessClaim(
-      selected.flatMap((grant) => grant.access),
-      ODRL_ID_JAG_CONTEXT,
-      input.storage
-    )
+    // The claim must preserve the parent/child relation between selected
+    // grants: the policy engine evaluates inheritance from the claim alone.
+    // Link the child policy to the parent policy's local id (not the hidden
+    // grant IRI); the impersonation rewrite remaps those ids to fresh opaque
+    // ids.
+    const byId = new Map(selected.map((grant) => [grant.id, grant]))
+    const policies = selected.flatMap((grant) => {
+      const parent = grant.inheritsFromGrant ? byId.get(grant.inheritsFromGrant) : undefined
+      const parentPolicy = parent?.access[0]
+      const parentRef = parentPolicy?.uid ?? parentPolicy?.id
+      return grant.access.map((policy) => ({
+        ...policy,
+        ...(parentRef ? { inheritsFromGrant: parentRef } : {}),
+      }))
+    })
+
+    return verifyAccessClaim(policies, ODRL_ID_JAG_CONTEXT, input.storage)
   }
 
   public async validate(input: AccessClaimValidationInput): Promise<string | undefined> {

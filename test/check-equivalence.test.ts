@@ -97,7 +97,7 @@ describe('checkEquivalence — unchanged regeneration keeps the same IRIs', () =
   test('source grants: the seeded subtree survives and children are re-linked', async () => {
     await regenerate(acmeId, agent(aliceId, INTEROP.SocialAgent))
     const first = await acmeRegistrationIris()
-    // the seed links only the parent; reuse re-links the child from the body
+    // the seed links both the parent and its inherited child
     expect(first).toContain(seedGrant)
     expect(first).toContain(seedChildGrant)
 
@@ -106,10 +106,9 @@ describe('checkEquivalence — unchanged regeneration keeps the same IRIs', () =
     expect(second).toEqual(first)
   }, 40_000)
 
-  test('delegated grants: the subtree issued on the first run is reused', async () => {
-    // first run replaces the pre-replica delegated grants (their bodies do not
-    // exist locally yet) and writes the replica for what it issued; the second
-    // run must reuse those delegated grants instead of issuing again
+  test('delegated grants: the subtree in the assigner registry is reused', async () => {
+    // The seed already stores Alice's delegated grants in Alice's own registry.
+    // Both runs must reuse the unchanged tree instead of issuing new IRIs.
     await regenerate(aliceId, agent(testClientId, INTEROP.Application))
     const first = await stableApplicationRegistrationIris()
     expect(first.length).toBeGreaterThan(0)

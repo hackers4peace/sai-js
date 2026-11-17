@@ -21,8 +21,8 @@ describe('ApplicationRegistration framing', () => {
       hasDataGrant: [
         'https://registry/alice/afiooi',
         'https://registry/alice/azgyc5',
-        'https://registry/acme/wwp4j6',
-        'https://registry/acme/qwvbcu',
+        'https://registry/alice/wwp4j6',
+        'https://registry/alice/qwvbcu',
       ],
       granted: true,
     })

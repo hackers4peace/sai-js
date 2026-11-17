@@ -147,11 +147,10 @@
       "allowedMethods": ["POST", "GET", "HEAD"],
       "handler": {
         "@id": "urn:sai:default:AccessRequestHandler",
-        "comment": "Accepts needs, delegation, and revocation access requests and exposes the owner's AccessRequestRegistry.",
+        "comment": "Accepts need-based access requests and exposes the owner's AccessRequestRegistry.",
         "@type": "AccessRequestHandler",
         "credentialsExtractor": { "@id": "urn:solid-server:default:CredentialsExtractor" },
-        "sessionManager": { "@id": "urn:sai:default:SessionManager" },
-        "endpointStore": { "@id": "urn:sai:default:PodEndpointStore" }
+        "sessionManager": { "@id": "urn:sai:default:SessionManager" }
       }
     },
     {

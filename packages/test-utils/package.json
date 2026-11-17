@@ -43,6 +43,7 @@
     "publish:npm": "echo \"skip private package\""
   },
   "dependencies": {
+    "@elfpavlik/lws-auth": "0.1.0",
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "jsonld": "^9.0.0",
     "n3": "^1.23.1"

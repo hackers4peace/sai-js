@@ -57,8 +57,6 @@ import { syncReciprocalMirror } from './reciprocal.js'
 // built-ins). The values must match what producers put in the refs they build.
 const ROLE_TYPE = 'http://www.w3.org/ns/solid/interop#Role'
 const SOCIAL_AGENT_TYPE = 'http://www.w3.org/ns/solid/interop#SocialAgent'
-const ACCESS_GRANT_TYPE = 'https://www.w3.org/ns/lws#AccessGrant'
-
 /** Sandbox-safe discriminant check (the data-model `isActivityClass` helper
  * is a runtime import — not allowed here; the tuples are read as string[]). */
 function isActivityClass(activity: ActivityData, cls: string): boolean {
@@ -73,16 +71,11 @@ const {
   findIncompleteReciprocalMirrors,
   getAuthorizations,
   getExistingGrants,
-  getExistingGrantBodies,
   getRegistryGrantsForGrantee,
   generateGrants,
   checkEquivalence,
-  deleteAccessGrants,
   deleteAuthorizations,
   revokeGrantClosure,
-  requestRevocations,
-  removeGrantsFromRegistrations,
-  dropGrantReplicas,
   resolveGranteeKind,
   findRoleUsage,
   createRoleAtId,
@@ -128,42 +121,6 @@ function delegatedGrantBodies(grant: GrantData): FinalGrantData[] {
     },
     ...children,
   ]
-}
-
-export async function storeGrant(payload: FinalGrantData[]): Promise<void> {
-  // TODO same race condition as in createGrantsForAgent — change back to
-  // Promise.all after the CSS SPARQL backend dcterms:modified bug is fixed
-  for (const grant of payload) {
-    await storeGrantAndAcr(grant)
-  }
-}
-
-/**
- * Revoke grants in the data owner's registry: delete the given grant resources
- * (the listed grants plus their inheriting children — the dependent closure is
- * computed by the revocation handler) with the data owner's own session, then
- * clear the owner's registration projection for the removed grants (grouped by
- * grantee). The registration PATCH is last: a crash before it leaves a stale
- * projection (enforcement is already correct, the next reconciliation/sweep
- * heals it) and, because the registration is what the grantee mirrors, the
- * peer's reciprocal webhook finally drops the revoked grants from its mirror.
- * Mirrors `storeGrant`: the worker performs the writes, so the deletes get
- * Temporal activity-retry semantics. Idempotent — 404/link-removal are
- * tolerated.
- */
-export async function revokeGrants(payload: {
-  webId: SocialAgentId
-  grants: GrantId[]
-  /** removed grants grouped by grantee for the owner's projection patch */
-  projection?: { grantee: string; grants: string[] }[]
-}): Promise<void> {
-  await deleteAccessGrants(payload)
-  if (payload.projection?.length) {
-    await removeGrantsFromRegistrations({
-      webId: payload.webId,
-      groups: payload.projection,
-    })
-  }
 }
 
 /**
@@ -434,12 +391,7 @@ export async function updateDelegatedGrants(
 }
 
 /**
- * Requester hop (grantor-side, §5 System 1): POST the AccessRevocationRequest to the
- * data owner's access request endpoint, then on success clear the grantor's
- * registration projection (`hasDataGrant`) for the revoked grants, then mark
- * the triggering activity done. The data owner's handler removes the listed
- * grants plus their inheriting children; the response echo drives the link
- * cleanup here.
+ * Activity-first role creation: PUT the role at its pre-minted id, then complete.
  */
 export async function createRole(
   webId: SocialAgentId,
@@ -755,11 +707,9 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
  * decides reuse; `existing − reused` is the GC set, removed **before** the new
  * trees are created (fail closed). "Existing" is the registration projection
  * union the own-registry orphan scan (recovery after a crash between delete
- * and PATCH). Removal is grouped by `dataOwner`: own registry → C1 closure
- * delete (`revokeGrantClosure`); peer-owned → the `AccessRevocationRequest` boundary
- * (`requestRevocations`, which also runs the owner's C1 closure). The removed
- * delegated trees' issuer-side replicas are dropped; the registration
- * projection is PATCHed last.
+ * and PATCH). Every normal grant is in this context's own registry, so removal
+ * is the C1 closure delete (`revokeGrantClosure`); the registration projection
+ * is PATCHed last.
  */
 export async function reconcileGrantsForGrantee(
   payload: activities.CreateGrantsForAgentInput
@@ -805,40 +755,9 @@ export async function reconcileGrantsForGrantee(
   const removeIds = existing.filter((grant) => !grant.id || !reusedExistingIds.has(grant.id))
 
   if (removeIds.length > 0) {
-    const bodies = await getExistingGrantBodies({ webId: payload.webId, grants: removeIds })
-    const bodyById = new Map(bodies.map((body) => [body.id, body]))
-    // own-registry grants are removable by IRI even without a body (the
-    // owner-session closure loads the registry itself); peer-owned grants
-    // without a replica body cannot be owner-grouped — they are left to the
-    // data owner's sweep/closure (fail-closed reuse already kept them out of
-    // the projection)
-    const ownIds = new Set(orphans.map((grant) => grant.id))
-    const byOwner = new Map<string, GrantId[]>()
-    for (const grant of removeIds) {
-      if (!grant.id) continue
-      const body = bodyById.get(grant.id)
-      // Own-registry grants (source and C2 delegated) are removed locally;
-      // owner-side copies from the explicit request path go through the
-      // data owner's revocation boundary.
-      const owner = ownIds.has(grant.id) ? payload.webId.id : body?.dataOwner
-      if (!owner) continue
-      const group = byOwner.get(owner) ?? []
-      group.push({ id: grant.id, type: body?.type ?? [ACCESS_GRANT_TYPE] })
-      byOwner.set(owner, group)
-    }
-    for (const [owner, grants] of byOwner) {
-      if (owner === payload.webId.id) {
-        // own registry: the owner session deletes the C1 closure
-        await revokeGrantClosure({ webId: payload.webId, grants })
-      } else {
-        // peer-owned: the data owner deletes the closure at its boundary
-        await requestRevocations({ webId: payload.webId, dataOwner: owner, grants })
-        await dropGrantReplicas({
-          webId: payload.webId,
-          grants: grants.map((grant) => grant.id!),
-        })
-      }
-    }
+    // Every normal grant (source and delegated) is in this context's own grant
+    // registry; the owner-session closure deletes the whole dependent subtree.
+    await revokeGrantClosure({ webId: payload.webId, grants: removeIds })
   }
 
   // create the unmatched desired trees (after the GC — delete-before-create)
@@ -849,15 +768,12 @@ export async function reconcileGrantsForGrantee(
     newGrantIds.push({ id: grant.id, type: grant.type })
   }
 
-  // C2 default: delegated grants are issued and stored in the assigner's own
-  // grant registry. The data-owner access-request endpoint remains available
-  // for explicit delegation requests, but the reconciliation path no longer
-  // materializes owner-side copies.
+  // Delegated grants are projections of this context's DataAuthorizations and
+  // are stored in the assigner's own grant registry.
   for (const [index, grant] of generated.delegatedGrants.entries()) {
     if (reusedDelegated.has(index)) continue
     for (const body of delegatedGrantBodies(grant)) {
-      // Delegated grants live in the assigner's registry (C2), not the data
-      // owner's. `storeGrant` (the explicit owner endpoint) keeps dataOwner.
+      // Delegated grants live in the assigner's registry, not the data owner's.
       await storeGrantAndAcr(body, payload.webId.id)
       newGrantIds.push({ id: body.id, type: body.type })
     }

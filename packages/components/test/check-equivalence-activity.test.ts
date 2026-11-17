@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 // SPARQL endpoint (`localSparqlTransport(session.sparqlEndpoint)`) — no peer
 // dereference. Children are followed via `hasInheritingGrant`; a missing body
 // fails closed (the whole tree never matches). Source trees pair with existing
-// trees we own; delegated trees pair with local registry grants (or the legacy replica via ownGrantIds).
+// trees we own; delegated trees pair with local registry grants, scoped by ownGrantIds.
 //
 // `getAccessGrant` is mocked at the package boundary so these cases stay about
 // the tree loader and pairing, not SPARQL framing (covered in the AA package).
@@ -269,7 +269,7 @@ describe('checkEquivalence — source-grant reuse', () => {
     expect(result.reusedExisting).toEqual([ref(e1)])
   })
 
-  test('reuses an equivalent delegated subtree from the local replica', async () => {
+  test('reuses an equivalent delegated subtree from the local registry', async () => {
     const eParent = delegatedParent('https://registry/acme/e-dparent', [
       'https://registry/acme/e-dchild',
     ])
@@ -289,7 +289,7 @@ describe('checkEquivalence — source-grant reuse', () => {
     expect(result.reusedExisting).toEqual([ref(eParent), ref(eChild)])
   })
 
-  test('does not reuse an owner-side delegated copy during the C2 migration', async () => {
+  test('does not reuse a delegated copy outside the actor registry', async () => {
     const eParent = delegatedParent('https://registry/acme/e-dparent')
     h.bodies.set(eParent.id!, eParent)
 
@@ -298,8 +298,8 @@ describe('checkEquivalence — source-grant reuse', () => {
       grantee,
       generated: { sourceGrants: [], delegatedGrants: [generatedDelegated({}, false)] },
       existing: [ref(eParent)],
-      // the body is the grantor's replica of the owner-side copy, not a grant
-      // in the grantor's own registry
+      // the body is visible locally but is not a grant in the actor's own
+      // registry, so it cannot be reused
       ownGrantIds: [],
     })
 
@@ -307,7 +307,7 @@ describe('checkEquivalence — source-grant reuse', () => {
     expect(result.reusedExisting).toEqual([])
   })
 
-  test('fails closed when a delegated child body is missing from the replica', async () => {
+  test('fails closed when a delegated child body is missing from the local registry', async () => {
     const eParent = delegatedParent('https://registry/acme/e-dparent', [
       'https://registry/acme/e-dchild',
     ])

@@ -4,7 +4,7 @@ import type {
   LwsImpersonationOptions,
 } from '@elfpavlik/lws-auth'
 import { createLwsAuthFetch } from '@elfpavlik/lws-auth'
-import { createLwsFetch, type WhatwgFetch } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { type GenerateKeyPairResult, generateKeyPair } from 'jose'
 
 import { EnvJwkGenerator } from '../EnvJwkGenerator.js'
@@ -71,12 +71,6 @@ export async function buildOidcSession(
 }
 
 export interface BuildLwsFetchOptions {
-  /**
-   * Use the two-step chain (ID token → ID-JAG per resource authorization server
-   * → storage access token) instead of exchanging the credential directly at
-   * each storage. Defaults to the single exchange while C3 rolls out.
-   */
-  idJag?: boolean
   /** C2 impersonation: the UAS that re-issues the ID-JAG under the visible identity. */
   impersonation?: LwsImpersonationOptions
   /** Optional ODRL access claim source (C1/C2). */
@@ -90,10 +84,10 @@ export interface BuildLwsFetchOptions {
  * token's `azp`, i.e. the LWS token's `client_id`, so callers can exercise
  * agent/client combinations the way the real clients do.
  *
- * With `{ idJag: true }` the request goes through `@elfpavlik/lws-auth`: the
- * credential is exchanged at the user's authorization server for one ID-JAG per
- * storage authorization server, and each storage trades its grant for an access
- * token. See `docs/plans/lws-auth.md` C3.
+ * Every storage request goes through the two-step ID-JAG chain in
+ * `@elfpavlik/lws-auth`: the credential is exchanged at the user's authorization
+ * server for one ID-JAG per storage authorization server, and each storage
+ * trades its grant for an access token. See `docs/plans/lws-auth.md` C3.
  */
 export async function buildLwsFetch(
   webid: string,
@@ -106,12 +100,6 @@ export async function buildLwsFetch(
     issuer,
     clientId: resolvedClientId,
   } = await buildSelfIssuedCredential(webid, clientId)
-  if (!options.idJag) {
-    return createLwsFetch({
-      subjectToken: () => oidc.generateSelfIssuedAccessToken(),
-      dpopKeyPair,
-    })
-  }
   const credential: LwsCredential = {
     issuer,
     clientId: resolvedClientId,

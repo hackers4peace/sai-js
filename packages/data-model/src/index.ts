@@ -83,8 +83,6 @@ export {
 export type { NeedBasedAccessRequestData, NeedBasedAccessRequestGroup } from './access-request.ts'
 export * as AccessRequest from './access-request.ts'
 export { fromJsonLd as AccessRequestFromJsonLd } from './access-request.ts'
-export type { AccessRevocationMessage } from './access-revocation.ts'
-export * as AccessRevocation from './access-revocation.ts'
 export type {
   DataAuthorizationData,
   DataAuthorizationId,

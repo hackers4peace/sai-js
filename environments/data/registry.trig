@@ -19,7 +19,7 @@
 <meta:https://registry/acme/grant/> {
 <https://registry/acme/grant/> a <http://www.w3.org/ns/solid/interop#GrantRegistry>, <http://www.w3.org/ns/ldp#Resource>;
     <https://www.w3.org/ns/lws#partOf> <https://registry/acme/>;
-    <https://www.w3.org/ns/lws#contains> <https://registry/acme/g4yhtm>, <https://registry/acme/hdaymz>, <https://registry/acme/p9m2vr>, <https://registry/acme/q2v9pt>, <https://registry/acme/qwvbcu>, <https://registry/acme/vled83>, <https://registry/acme/wegvwe>, <https://registry/acme/wpqyds>, <https://registry/acme/wwp4j6>, <https://registry/acme/x4j8lm>
+    <https://www.w3.org/ns/lws#contains> <https://registry/acme/g4yhtm>, <https://registry/acme/hdaymz>, <https://registry/acme/p9m2vr>, <https://registry/acme/q2v9pt>, <https://registry/acme/vled83>, <https://registry/acme/wegvwe>, <https://registry/acme/wpqyds>, <https://registry/acme/x4j8lm>
 }
 <https://registry/acme/k9m4vp> {
 <https://registry/acme/k9m4vp> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
@@ -109,7 +109,7 @@
 <https://registry/acme/je0s7n> a <http://www.w3.org/ns/solid/interop#SocialAgentRegistration>, <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#BasicContainer>, <http://www.w3.org/ns/ldp#Resource>;
     <http://www.w3.org/ns/solid/interop#registeredAgent> <https://id/alice>;
     <http://www.w3.org/ns/solid/interop#reciprocalRegistration> <https://registry/alice/cp9g7p>;
-    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/acme/g4yhtm>;
+    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/acme/g4yhtm>, <https://registry/acme/wpqyds>;
     <http://www.w3.org/2004/02/skos/core#prefLabel> "Alice";
     <http://www.w3.org/2004/02/skos/core#note> "Chasing white rabits.";
     <https://www.w3.org/ns/lws#partOf> <https://registry/acme/social-agent/>
@@ -335,16 +335,16 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <https://registry/acme/wpqyds> a <http://www.w3.org/ns/ldp#Resource>;
     <https://www.w3.org/ns/lws#partOf> <https://registry/acme/grant/>
 }
-<https://registry/acme/wwp4j6> {
-<https://registry/acme/qwvbcu> <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/acme/wwp4j6>.
-<https://registry/acme/wwp4j6> a <https://www.w3.org/ns/lws#AccessGrant>;
+<https://registry/alice/wwp4j6> {
+<https://registry/alice/qwvbcu> <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/alice/wwp4j6>.
+<https://registry/alice/wwp4j6> a <https://www.w3.org/ns/lws#AccessGrant>;
     <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
 <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
     <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>;
     <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
-<https://registry/acme/wwp4j6> <https://www.w3.org/ns/lws#access> <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc>.
+<https://registry/alice/wwp4j6> <https://www.w3.org/ns/lws#access> <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc>.
 <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733>.
 <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
@@ -358,20 +358,20 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
-<meta:https://registry/acme/wwp4j6> {
-<https://registry/acme/wwp4j6> a <http://www.w3.org/ns/ldp#Resource>;
-    <https://www.w3.org/ns/lws#partOf> <https://registry/acme/grant/>
+<meta:https://registry/alice/wwp4j6> {
+<https://registry/alice/wwp4j6> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/alice/grant/>
 }
-<https://registry/acme/qwvbcu> {
-<https://registry/acme/qwvbcu> a <https://www.w3.org/ns/lws#AccessGrant>;
+<https://registry/alice/qwvbcu> {
+<https://registry/alice/qwvbcu> a <https://www.w3.org/ns/lws#AccessGrant>;
     <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/acme/wwp4j6>.
+    <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/alice/wwp4j6>.
 <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
     <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
     <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
-<https://registry/acme/qwvbcu> <https://www.w3.org/ns/lws#access> <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7>.
+<https://registry/alice/qwvbcu> <https://www.w3.org/ns/lws#access> <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7>.
 <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb>.
 <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb>;
     <http://www.w3.org/ns/odrl/2/assigner> <https://id/alice>;
@@ -385,9 +385,9 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
-<meta:https://registry/acme/qwvbcu> {
-<https://registry/acme/qwvbcu> a <http://www.w3.org/ns/ldp#Resource>;
-    <https://www.w3.org/ns/lws#partOf> <https://registry/acme/grant/>
+<meta:https://registry/alice/qwvbcu> {
+<https://registry/alice/qwvbcu> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/alice/grant/>
 }
 <https://registry/acme/vled83> {
 <https://registry/acme/vled83> a <https://www.w3.org/ns/lws#AccessGrant>;
@@ -474,7 +474,7 @@ _:n3-28 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-29.
 <meta:https://registry/alice/grant/> {
 <https://registry/alice/grant/> a <http://www.w3.org/ns/solid/interop#GrantRegistry>, <http://www.w3.org/ns/ldp#Resource>;
     <https://www.w3.org/ns/lws#partOf> <https://registry/alice/>;
-    <https://www.w3.org/ns/lws#contains> <https://registry/alice/afiooi>, <https://registry/alice/azgyc5>, <https://registry/alice/p3m8kr>, <https://registry/alice/t7k5nw>
+    <https://www.w3.org/ns/lws#contains> <https://registry/alice/afiooi>, <https://registry/alice/azgyc5>, <https://registry/alice/p3m8kr>, <https://registry/alice/qwvbcu>, <https://registry/alice/t7k5nw>, <https://registry/alice/wwp4j6>
 }
 <meta:https://registry/alice/authorization/> {
 <https://registry/alice/authorization/> a <http://www.w3.org/ns/solid/interop#AuthorizationRegistry>, <http://www.w3.org/ns/ldp#Resource>;
@@ -754,7 +754,7 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
 <meta:https://registry/alice/cvmsa4> {
 <https://registry/alice/cvmsa4> a <http://www.w3.org/ns/solid/interop#ApplicationRegistration>, <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#BasicContainer>, <http://www.w3.org/ns/ldp#Resource>;
     <http://www.w3.org/ns/solid/interop#registeredAgent> <https://data/test-client/public/id>;
-    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/alice/afiooi>, <https://registry/alice/azgyc5>, <https://registry/acme/wwp4j6>, <https://registry/acme/qwvbcu>.
+    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/alice/afiooi>, <https://registry/alice/azgyc5>, <https://registry/alice/wwp4j6>, <https://registry/alice/qwvbcu>.
 <https://data/test-client/public/id> <http://www.w3.org/ns/solid/oidc#client_name> "Test client";
     <http://www.w3.org/ns/solid/interop#hasAccessNeedGroup> <https://data/test-client/public/access-needs#need-group-pm>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationCallbackEndpoint> <https://test-client>.
@@ -3027,22 +3027,22 @@ _:sai-access-request-yoyo a <https://www.w3.org/ns/lws#AccessRequestService>;
 _:sai-access-grant-yoyo a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC95b3lv>.
 }
-<meta:https://registry/acme/wwp4j6.acr> {
-<https://registry/acme/wwp4j6.acr> a <http://www.w3.org/ns/ldp#Resource>
+<meta:https://registry/alice/wwp4j6.acr> {
+<https://registry/alice/wwp4j6.acr> a <http://www.w3.org/ns/ldp#Resource>
 }
-<https://registry/acme/wwp4j6.acr> {
-<https://registry/acme/wwp4j6.acr#root> a <http://www.w3.org/ns/solid/acp#AccessControlResource>;
-    <http://www.w3.org/ns/solid/acp#resource> <https://registry/acme/wwp4j6>;
-    <http://www.w3.org/ns/solid/acp#accessControl> <https://registry/acme/wwp4j6.acr#fullOwnerAccess>, <https://registry/acme/wwp4j6.acr#peerReadAccess>.
-<https://registry/acme/wwp4j6.acr#fullOwnerAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+<https://registry/alice/wwp4j6.acr> {
+<https://registry/alice/wwp4j6.acr#root> a <http://www.w3.org/ns/solid/acp#AccessControlResource>;
+    <http://www.w3.org/ns/solid/acp#resource> <https://registry/alice/wwp4j6>;
+    <http://www.w3.org/ns/solid/acp#accessControl> <https://registry/alice/wwp4j6.acr#fullOwnerAccess>, <https://registry/alice/wwp4j6.acr#peerReadAccess>.
+<https://registry/alice/wwp4j6.acr#fullOwnerAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
 _:n3-168 a <http://www.w3.org/ns/solid/acp#Policy>;
     <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>, <http://www.w3.org/ns/auth/acl#Write>, <http://www.w3.org/ns/auth/acl#Control>.
 _:n3-169 a <http://www.w3.org/ns/solid/acp#Matcher>;
-    <http://www.w3.org/ns/solid/acp#agent> <https://id/acme>;
-    <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>.
+    <http://www.w3.org/ns/solid/acp#agent> <https://id/alice>;
+    <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>.
 _:n3-168 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-169.
-<https://registry/acme/wwp4j6.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-168.
-<https://registry/acme/wwp4j6.acr#peerReadAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+<https://registry/alice/wwp4j6.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-168.
+<https://registry/alice/wwp4j6.acr#peerReadAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
 _:n3-170 a <http://www.w3.org/ns/solid/acp#Policy>;
     <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>.
 _:n3-171 a <http://www.w3.org/ns/solid/acp#Matcher>;
@@ -3053,24 +3053,24 @@ _:n3-172 a <http://www.w3.org/ns/solid/acp#Matcher>;
     <http://www.w3.org/ns/solid/acp#agent> <https://id/alice>;
     <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>.
 _:n3-170 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-172.
-<https://registry/acme/wwp4j6.acr#peerReadAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-170
+<https://registry/alice/wwp4j6.acr#peerReadAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-170
 }
-<meta:https://registry/acme/qwvbcu.acr> {
-<https://registry/acme/qwvbcu.acr> a <http://www.w3.org/ns/ldp#Resource>
+<meta:https://registry/alice/qwvbcu.acr> {
+<https://registry/alice/qwvbcu.acr> a <http://www.w3.org/ns/ldp#Resource>
 }
-<https://registry/acme/qwvbcu.acr> {
-<https://registry/acme/qwvbcu.acr#root> a <http://www.w3.org/ns/solid/acp#AccessControlResource>;
-    <http://www.w3.org/ns/solid/acp#resource> <https://registry/acme/qwvbcu>;
-    <http://www.w3.org/ns/solid/acp#accessControl> <https://registry/acme/qwvbcu.acr#fullOwnerAccess>, <https://registry/acme/qwvbcu.acr#peerReadAccess>.
-<https://registry/acme/qwvbcu.acr#fullOwnerAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+<https://registry/alice/qwvbcu.acr> {
+<https://registry/alice/qwvbcu.acr#root> a <http://www.w3.org/ns/solid/acp#AccessControlResource>;
+    <http://www.w3.org/ns/solid/acp#resource> <https://registry/alice/qwvbcu>;
+    <http://www.w3.org/ns/solid/acp#accessControl> <https://registry/alice/qwvbcu.acr#fullOwnerAccess>, <https://registry/alice/qwvbcu.acr#peerReadAccess>.
+<https://registry/alice/qwvbcu.acr#fullOwnerAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
 _:n3-173 a <http://www.w3.org/ns/solid/acp#Policy>;
     <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>, <http://www.w3.org/ns/auth/acl#Write>, <http://www.w3.org/ns/auth/acl#Control>.
 _:n3-174 a <http://www.w3.org/ns/solid/acp#Matcher>;
-    <http://www.w3.org/ns/solid/acp#agent> <https://id/acme>;
-    <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>.
+    <http://www.w3.org/ns/solid/acp#agent> <https://id/alice>;
+    <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>.
 _:n3-173 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-174.
-<https://registry/acme/qwvbcu.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-173.
-<https://registry/acme/qwvbcu.acr#peerReadAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+<https://registry/alice/qwvbcu.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-173.
+<https://registry/alice/qwvbcu.acr#peerReadAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
 _:n3-175 a <http://www.w3.org/ns/solid/acp#Policy>;
     <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>.
 _:n3-176 a <http://www.w3.org/ns/solid/acp#Matcher>;
@@ -3081,7 +3081,7 @@ _:n3-177 a <http://www.w3.org/ns/solid/acp#Matcher>;
     <http://www.w3.org/ns/solid/acp#agent> <https://id/alice>;
     <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>.
 _:n3-175 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-177.
-<https://registry/acme/qwvbcu.acr#peerReadAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-175
+<https://registry/alice/qwvbcu.acr#peerReadAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-175
 }
 <meta:https://registry/alice/afiooi.acr> {
 <https://registry/alice/afiooi.acr> a <http://www.w3.org/ns/ldp#Resource>

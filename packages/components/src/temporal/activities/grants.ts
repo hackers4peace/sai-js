@@ -55,12 +55,7 @@ import {
 } from '@janeirodigital/interop-utils'
 
 import { buildSessionManager } from '../../builders/sessionManager.js'
-import {
-  dropGrantReplicas as dropReplicas,
-  storeGrantReplica,
-} from '../../services/GrantReplica.js'
 import { mirroredGrants } from '../../services/ReciprocalMirror.js'
-import { accessRequestsUrl } from '../../util/uriTemplates.js'
 import { delegatedGrantTrees, grantTrees, pairTrees } from './check-equivalence.js'
 
 export interface FindAffectedAuthorizationsInput {
@@ -100,8 +95,7 @@ export interface CheckEquivalenceInput {
   existing: GrantId[]
   /**
    * IRIs present in the actor's own grant registry (the orphan scan). C2
-   * delegated grants are stored locally; an owner-side delegated copy from the
-   * explicit request path is not reusable and is migrated by regeneration.
+   * delegated grants are stored locally in the same registry.
    */
   ownGrantIds?: string[]
 }
@@ -372,10 +366,8 @@ export async function generateGrants(payload: GenerateGrantsInput): Promise<Gene
  * the grantee (`hasDataGrant`) — local, one registration read, no grant bodies.
  *
  * Why IRIs only: loading the bodies is a separate activity, and the projection
- * is also the value `checkEquivalence` compares. C2 stores delegated grants in
- * the grantor's own registry; a legacy owner-side delegated copy still has only
- * an issuer-side replica (or nothing) and is migrated by regeneration rather
- * than read from the peer.
+ * is also the value `checkEquivalence` compares. Both source and delegated
+ * grants live in the grantor's own registry.
  */
 export async function getExistingGrants(payload: {
   webId: SocialAgentId
@@ -403,16 +395,14 @@ export interface GetExistingGrantBodiesInput {
 
 /**
  * Load existing grant **bodies** from the local plane only — the grantor's own
- * grant registry for source and C2 delegated grants, plus any legacy
- * issuer-side replica. Never dereferences a peer resource: one graph read per
- * IRI through the session's own SPARQL endpoint.
+ * grant registry for source and delegated grants. Never dereferences a peer
+ * resource: one graph read per IRI through the session's own SPARQL endpoint.
  *
  * Declared children (`hasInheritingGrant`) are followed recursively, so a
  * child that is not linked from the registration projection still joins its
  * parent's tree. A missing or unframable body is skipped — the tree it belongs
  * to then fails `grantTrees`' completeness check and is never reused (fail
- * closed; the regeneration replaces the old subtree and, in a later step, the
- * replica write repopulates the body).
+ * closed; regeneration replaces the old subtree).
  */
 export async function getExistingGrantBodies(
   payload: GetExistingGrantBodiesInput
@@ -450,10 +440,9 @@ export async function getExistingGrantBodies(
 /**
  * HTTP-DELETE grant resources using the webId's session.
  *
- * Internal to the data owner's revocation handler only (DD14): the
- * access-grant ACR is read-only for everyone but the owner, so a
- * grantor's direct DELETE of grant resources in another peer's registry is
- * ACR-blocked. Idempotent: 404 is tolerated (already gone).
+ * Internal to the owner's own-registry closure (`revokeGrantClosure`): the
+ * access-grant ACR is owner-write only. Idempotent: 404 is tolerated (already
+ * gone).
  */
 export async function deleteAccessGrants(payload: {
   webId: SocialAgentId
@@ -509,62 +498,6 @@ export async function revokeGrantClosure(payload: {
 }
 
 /**
- * Grantor-side revocation request at the data owner's access request boundary
- * (C2/C3, the `requestDelegations` mirror): POST `AccessRevocationRequest`
- * with the listed grant IRIs and return the owner's echo. The owner deletes
- * the whole C1 closure with its own session; the echo is the listed set (the
- * requester only cleans up its own projection/replicas for those).
- */
-export async function requestRevocations(payload: {
-  webId: SocialAgentId
-  dataOwner: string
-  grants: GrantId[]
-}): Promise<string[]> {
-  if (payload.grants.length === 0) return []
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.webId.id)
-  const endpoint = accessRequestsUrl(payload.dataOwner)
-  const response = await session.fetch(endpoint, {
-    method: 'POST',
-    headers: { 'content-type': 'application/ld+json' },
-    body: JSON.stringify({
-      '@context': [
-        'https://www.w3.org/ns/lws/v1',
-        'http://www.w3.org/ns/odrl.jsonld',
-        'https://www.w3.org/ns/solid/interop-context/v1',
-      ],
-      type: ['AccessRequest', 'AccessRevocationRequest'],
-      grants: payload.grants.map((grant) => grant.id!),
-    }),
-  })
-  if (!response.ok) {
-    throw new Error(
-      `revocation request failed: ${response.status} ${await response.text().catch(() => '')}`
-    )
-  }
-  const removed = (await response.json()) as unknown
-  if (!Array.isArray(removed) || !removed.every((id) => typeof id === 'string')) {
-    throw new Error('invalid revocation response: expected the removed grant IRIs')
-  }
-  return removed as string[]
-}
-
-/**
- * Drop the issuer-side replica graphs of the given delegated grants (the
- * grantor's local copy used by `checkEquivalence`). Never touches own
- * grant-registry graphs.
- */
-export async function dropGrantReplicas(payload: {
-  webId: SocialAgentId
-  grants: string[]
-}): Promise<void> {
-  if (payload.grants.length === 0) return
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.webId.id)
-  await dropReplicas(session.sparqlEndpoint, payload.grants)
-}
-
-/**
  * Orphan scan for the actor's own grant registry: grants whose
  * `access[].assignee` matches, including ones no longer linked from the
  * registration projection.
@@ -607,11 +540,11 @@ export async function resolveGranteeKind(payload: {
  *
  * - Source trees (we are the `dataOwner`) pair with existing trees owned by us
  *   (own grant registry).
- * - Delegated trees (a peer is the `dataOwner`) pair with existing trees owned
- *   by a peer — the issuer-side replica written at issuance time.
+ * - Delegated trees (a peer is the `dataOwner`) also pair with existing trees in
+ *   our own grant registry; `ownGrantIds` keeps that scoped to the registry.
  *
- * Missing bodies fail closed (`getExistingGrantBodies` skips them), so a
- * pre-replica grant simply gets regenerated and repopulates the replica.
+ * Missing bodies fail closed (`getExistingGrantBodies` skips them), so an
+ * incomplete tree is regenerated instead of reused.
  */
 export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<EquivalenceResult> {
   const existingGrants = await getExistingGrantBodies({
@@ -708,7 +641,7 @@ export async function storeAccessGrant(
   const session = await manager.getSession(payload.registryOwner ?? payload.dataOwner)
 
   // The storage identifier strategy creates the member at its pre-minted id.
-  // Find-first at the callee (`storeGrant` is retried by Temporal) — a
+  // Find-first at the callee (the storing workflow is retried by Temporal) — a
   // duplicate create is handled by the strategy's retry policy (TODO).
   await session.createIdentifierResource(
     session.registrySet.hasGrantRegistry.id,
@@ -785,93 +718,6 @@ export async function createAcr(
   )
 }
 
-export interface RequestDelegationsInput {
-  /** the grantor (`grantedBy`) whose session issues the request */
-  webId: SocialAgentId
-  /** grants delegated to one data owner — the endpoint accepts them together */
-  grants: GrantData[]
-}
-
-/**
- * Request delegated grants from the data owner in **one** call: grants for a
- * single `dataOwner` travel in one `interop:AccessRequest` envelope (the
- * owner-scoped access request endpoint validates a single data owner and
- * materializes the whole batch), so the POST happens once instead of once per
- * grant. Discovery moves to the access-request service in Phase 2 Step 6.
- */
-export async function requestDelegations(payload: RequestDelegationsInput): Promise<GrantId[]> {
-  if (payload.grants.length === 0) return []
-  const dataOwners = new Set(payload.grants.map((grant) => grant.dataOwner))
-  if (dataOwners.size !== 1) {
-    throw new Error('requestDelegations requires grants of a single data owner')
-  }
-  const [dataOwner] = [...dataOwners]
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.webId.id)
-
-  const endpoint = accessRequestsUrl(dataOwner)
-  const wireContext = [
-    'https://www.w3.org/ns/lws/v1',
-    'http://www.w3.org/ns/odrl.jsonld',
-    'https://www.w3.org/ns/solid/interop-context/v1',
-  ]
-  const envelopes = payload.grants.map((parent) => {
-    const parentPolicies = parent.access
-    const parentPolicyId = parentPolicies[0]?.uid ?? parentPolicies[0]?.id
-    const children = Array.isArray(parent.hasInheritingGrant) ? parent.hasInheritingGrant : []
-    const childPolicies = children.flatMap((child) => {
-      if (typeof child !== 'object' || child === null) return []
-      const embedded = child as unknown as GrantData
-      return embedded.access.map((policy) => ({
-        ...policy,
-        ...(parentPolicyId ? { inheritsFromGrant: parentPolicyId } : {}),
-      }))
-    })
-    return {
-      '@context': wireContext,
-      type: ['AccessRequest', 'DelegationRequest'],
-      access: [...parentPolicies, ...childPolicies],
-    }
-  })
-  const response = await session.fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/ld+json',
-    },
-    body: JSON.stringify(envelopes),
-  })
-  if (!response.ok) {
-    throw new Error(
-      `delegation request failed: ${response.status} ${await response.text().catch(() => '')}`
-    )
-  }
-  if (response.status !== 200) {
-    throw new Error(`expected 200 but received ${response.status}`)
-  }
-  const issued = (await response.json()) as unknown
-  if (
-    !Array.isArray(issued) ||
-    !issued.every(
-      (grant) =>
-        typeof grant === 'object' &&
-        grant !== null &&
-        typeof (grant as FinalGrantData).id === 'string'
-    )
-  ) {
-    throw new Error('invalid delegation response: expected the finalised grants')
-  }
-  const finalGrants = issued as FinalGrantData[]
-  // Best-effort replica write: the grants are already issued, so failing here
-  // would retry the POST and mint duplicates. A missing replica body only
-  // disables reuse (fail closed); the next issuance repopulates it.
-  try {
-    await storeGrantReplica(session.sparqlEndpoint, finalGrants)
-  } catch {
-    // intentionally swallowed — see the comment above
-  }
-  return finalGrants.map((grant) => ({ id: grant.id, type: grant.type }))
-}
-
 // ---------------------------------------------------------------------------
 // Registration link/unlink
 // ---------------------------------------------------------------------------
@@ -909,27 +755,6 @@ export async function replaceAccessGrantsOnRegistration(
     session.fetch,
     payload.grants.map((grant) => grant.id!)
   )
-}
-
-/**
- * Owner-side projection cleanup after a boundary/owner revocation (C4):
- * remove the removed grant IRIs from the data owner's registration of each
- * grantee (`hasDataGrant`). The owner's registration is the document the
- * grantee mirrors, so this PATCH is what makes the peer's reciprocal webhook
- * drop the grants from its mirror. A role grantee has no agent registration
- * and is skipped (its members' links are healed by the next reconciliation /
- * sweep). Idempotent — removing an absent link is a no-op PATCH.
- */
-export async function removeGrantsFromRegistrations(payload: {
-  webId: SocialAgentId
-  groups: { grantee: string; grants: string[] }[]
-}): Promise<void> {
-  if (payload.groups.length === 0) return
-  const manager = buildSessionManager()
-  const session = await manager.getSession(payload.webId.id)
-  for (const group of payload.groups) {
-    await session.removeGrantsFromRegistration(group.grantee, group.grants)
-  }
 }
 
 // ---------------------------------------------------------------------------

@@ -17,7 +17,7 @@ is unused:
 |---|---|---|---|
 | Agent | owner via org session; **admin** (org context, `addSocialAgent`, `AddAdmin` PATCHes registration) | peers via per-registration `.acr` `peerReadAccess`; admin/owner via inheritance | **Read+Write** |
 | Authorization | org AA / admin RPC (`recordAuthorization`, `AddAdmin` records the AdminAuthorization) | UI authorization views; workflows (authorization iterators, SPARQL) | **Read+Write** |
-| Grant | **org AA only** (Temporal: `storeGrant`, `createAcr`, revocation — owner session) | grantee via **per-grant `.acr`** (`peerReadAccess`); engine via SPARQL (`getAuthorizationData`), not HTTP | **none** |
+| Grant | **org AA only** (Temporal: `storeAccessGrant`, `createAcr`, revocation — owner session) | grantee via **per-grant `.acr`** (`peerReadAccess`); engine via SPARQL (`getAuthorizationData`), not HTTP | **none** |
 | Role | org AA / owner (roles service) | UI role views | Read+Write (unchanged) |
 | Activity | org AA workflows (`activityCompleted`); **admin RPC** (`AddAdmin` writes the `adminAuthorizationGranted` activity) | UI events stream (`ActivityEvents`); `ActivityWebhookHandler` (org AA) | **Read + create/append** |
 

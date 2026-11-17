@@ -4,12 +4,7 @@ import {
   localSparqlTransport,
   type AuthorizationAgent,
 } from '@janeirodigital/interop-authorization-agent'
-import {
-  type GrantData,
-  grantDataOwner,
-  grantGrantee,
-  grantAssigner,
-} from '@janeirodigital/interop-data-model'
+import { type GrantData, grantGrantee, grantAssigner } from '@janeirodigital/interop-data-model'
 import { LWS } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
@@ -31,7 +26,7 @@ describe('access grant view', () => {
     const expected = grants
       .filter(
         (grant) =>
-          grantDataOwner(grant) === acmeId &&
+          grantAssigner(grant) === acmeId &&
           (grantGrantee(grant) === acmeId || grantAssigner(grant) === acmeId)
       )
       .map((grant) => grant.id!)
@@ -62,7 +57,7 @@ describe('access grant view', () => {
     const expected = grants
       .filter(
         (grant) =>
-          grantDataOwner(grant) === acmeId &&
+          grantAssigner(grant) === acmeId &&
           (grantGrantee(grant) === bobId || grantAssigner(grant) === bobId)
       )
       .map((grant) => grant.id!)
@@ -77,20 +72,19 @@ describe('access grant view', () => {
   })
 
   test('another client sees only grants assigned to it by the authenticated user', async () => {
-    const grants = await ownerGrants(acmeId)
+    const grants = await ownerGrants(aliceId)
     const expected = grants
-      .filter(
-        (grant) =>
-          grantDataOwner(grant) === acmeId &&
-          grantGrantee(grant) === testClient &&
-          grantAssigner(grant) === aliceId
-      )
+      .filter((grant) => grantGrantee(grant) === testClient && grantAssigner(grant) === aliceId)
       .map((grant) => grant.id!)
       .toSorted()
     expect(expected.length).toBeGreaterThan(0)
+    // includes the delegated Alice -> client grants stored in Alice's registry
+    expect(expected).toEqual(
+      expect.arrayContaining(['https://registry/alice/wwp4j6', 'https://registry/alice/qwvbcu'])
+    )
 
     const session = await buildOidcSession(aliceId, testClient)
-    const response = await session.authFetch(accessGrantsUrl(acmeId))
+    const response = await session.authFetch(accessGrantsUrl(aliceId))
     expect(response.status).toBe(200)
     const body = (await response.json()) as { id: string }[]
     expect(body.map((grant) => grant.id).toSorted()).toEqual(expected)
@@ -98,7 +92,7 @@ describe('access grant view', () => {
 
   test('a non-UAS client only sees grants assigned to that client', async () => {
     const session = await buildOidcSession(aliceId, testClient)
-    const response = await session.authFetch(accessGrantsUrl(acmeId))
+    const response = await session.authFetch(accessGrantsUrl(aliceId))
     expect(response.status).toBe(200)
     const body = (await response.json()) as {
       access: { permission: { assignee: string }[] }[]
@@ -111,14 +105,14 @@ describe('access grant view', () => {
 
   test('owner and other-client views only read the assigner registry', async () => {
     const aliceSession = await buildOidcSession(aliceId, testClient)
-    const response = await aliceSession.authFetch(accessGrantsUrl(acmeId))
+    const response = await aliceSession.authFetch(accessGrantsUrl(aliceId))
     expect(response.status).toBe(200)
     const body = (await response.json()) as {
       access: { permission: { assigner: string; assignee: string }[] }[]
     }[]
     // The non-UAS branch sees grants the authenticated user (Alice) assigned to
-    // the client (testClient) in this registry; grants Alice received elsewhere
-    // are not exposed by this owner-scoped view.
+    // the client (testClient) in Alice's registry; source and delegated grants
+    // share the registry now.
     for (const grant of body) {
       expect(grant.access[0].permission[0].assigner).toBe(aliceId)
       expect(grant.access[0].permission[0].assignee).toBe(testClient)

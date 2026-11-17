@@ -84,21 +84,12 @@ admin" — is implemented independently in:
 logic with no AA session method. Plan §9 flags the `buildSocialAgentProfile`
 variant as deferred; the re-investigation found the other three.
 
-### 2.3 Delegation-request inheritance completion — `AccessRequestHandler`
+### 2.3 Delegation-request inheritance completion — removed
 
-`packages/components/src/delegation-request.ts` `issueDelegationRequest` (validation in `validateDelegable`):
-
-- assigns grant IRIs via `iriForContained(sai.registrySet.hasGrantRegistry, ...)`;
-- completes the child grants embedded by the requester (AA's
-  `generateDelegatedDataGrants` / `generateChildDelegatedGrantData` produce
-  the `Inherited` payload with no id) into `FinalGrantData`, wiring
-  `inheritsFromGrant` and the parent's `hasInheritingGrant` list;
-- then validates every grant with `grantChainValidity` (AA) before the
-  Temporal store.
-
-The IRI-assignment + inheritance wiring is the exact grant-side mirror of
-AA `generateDataAuthorizations` (`authorization.ts`, which does the same for
-authorizations), and the completing half of the AA's grant-generation chain.
+**Obsolete (2026-11-17):** [`id-jag.md`](id-jag.md) C5 removed the owner
+access-request delegation path (`issueDelegationRequest`/`validateDelegable`).
+Grant inheritance is completed by the assigner-local reconciliation instead, so
+there is no delegation-request logic left to move into the AA.
 
 ### 2.4 AdminGrant materialization — `temporal/activities/admin.ts`
 

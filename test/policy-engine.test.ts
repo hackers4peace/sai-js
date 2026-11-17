@@ -501,9 +501,9 @@ describe('protected resources (scope inherited, modes all)', () => {
 })
 
 describe('protected resources (scope inherited, parent selected from registry)', () => {
-  // ACME's SelectedFromRegistry grant to Alice's vuejectron client
-  // (`registry/acme/wwp4j6`) selects only Project X (`pbh2yw`, read-only); the
-  // inherited Task grant (`qwvbcu`) hangs off it. The parent grant's target is
+  // Alice's SelectedFromRegistry delegated grant to the test client
+  // (`registry/alice/wwp4j6`, data owner ACME) selects only Project X
+  // (`pbh2yw`, read-only); the inherited Task grant (`qwvbcu`) hangs off it. The parent grant's target is
   // an `odrl:Asset`: `odrl:source` is the selected instance while
   // `odrl:partOf` is the containing registration (`reb39k`). The engine must
   // derive the registration from `partOf`, otherwise reading a Task of the
