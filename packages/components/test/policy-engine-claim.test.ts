@@ -15,18 +15,33 @@ const ALICE = 'https://id/alice'
 const CLIENT = 'https://data/test-client/public/id'
 const READ = ODRL.read
 
-function claim(scope: string, storage = STORAGE, registration = REGISTRATION) {
-  return grantAccess({
-    scopeOfGrant: scope,
-    owner: ALICE,
-    storage,
-    hasDataRegistration: registration,
-    hasDataInstance: scope === INTEROP.SelectedFromRegistry ? [RESOURCE] : undefined,
-    registeredShapeTree: SHAPE_TREE,
-    assigner: ALICE,
-    assignee: CLIENT,
-    actions: [READ],
+function withoutAssigner(policies: any[]): any[] {
+  return policies.map((policy) => {
+    const { assigner: _policyAssigner, ...rest } = policy
+    return {
+      ...rest,
+      permission: policy.permission.map((permission: any) => {
+        const { assigner: _permissionAssigner, ...permissionRest } = permission
+        return permissionRest
+      }),
+    }
   })
+}
+
+function claim(scope: string, storage = STORAGE, registration = REGISTRATION) {
+  return withoutAssigner(
+    grantAccess({
+      scopeOfGrant: scope,
+      owner: ALICE,
+      storage,
+      hasDataRegistration: registration,
+      hasDataInstance: scope === INTEROP.SelectedFromRegistry ? [RESOURCE] : undefined,
+      registeredShapeTree: SHAPE_TREE,
+      assigner: ALICE,
+      assignee: ALICE,
+      actions: [READ],
+    })
+  )
 }
 
 function createEngine() {
@@ -137,19 +152,23 @@ describe('claim-first policy evaluation', () => {
     expect(manager.getAuthorizationData).not.toHaveBeenCalled()
   })
 
-  test('does not grant a claim assigned to another client', async () => {
+  test('ignores identity fields in an AS-issued claim', async () => {
     const { engine } = createEngine()
-    const other = grantAccess({
-      scopeOfGrant: INTEROP.AllFromRegistry,
-      owner: ALICE,
-      storage: STORAGE,
-      hasDataRegistration: REGISTRATION,
-      registeredShapeTree: SHAPE_TREE,
-      assigner: ALICE,
-      assignee: 'https://id/mallory',
-      actions: [READ],
-    })
+    // The token endpoint already bound the claim to the subject; the engine
+    // evaluates only target/action.
+    const other = withoutAssigner(
+      grantAccess({
+        scopeOfGrant: INTEROP.AllFromRegistry,
+        owner: ALICE,
+        storage: STORAGE,
+        hasDataRegistration: REGISTRATION,
+        registeredShapeTree: SHAPE_TREE,
+        assigner: ALICE,
+        assignee: 'https://id/mallory',
+        actions: [READ],
+      })
+    )
     const permissions = await engine.getPermissions(RESOURCE, credentials(other))
-    expect(permissions[PERMISSIONS.Read]).toBe(false)
+    expect(permissions[PERMISSIONS.Read]).toBe(true)
   })
 })

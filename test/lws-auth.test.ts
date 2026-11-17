@@ -206,13 +206,24 @@ describe('ODRL access claim in the ID-JAG (C1)', () => {
   })
 
   test('self-issues the claim, keeps it in the access token, and evaluates it claim-first', async () => {
+    const expectedClaim = claim.map((policy) => {
+      const { assigner: _policyAssigner, ...rest } = policy
+      return {
+        ...rest,
+        assignee: WEBID,
+        permission: policy.permission.map((permission) => {
+          const { assigner: _permissionAssigner, ...permissionRest } = permission
+          return { ...permissionRest, assignee: WEBID }
+        }),
+      }
+    })
     const response = await requestIdJag({ overrides: { access: JSON.stringify(claim) } })
     expect(response.status).toBe(200)
     const body = (await response.json()) as Record<string, unknown>
     const idJag = String(body.access_token)
     expect(decodeJwt(idJag)).toMatchObject({
       '@context': ODRL_ID_JAG_CONTEXT,
-      access: claim,
+      access: expectedClaim,
     })
 
     const exchange = await exchangeAtRas(DATA_AS, {
@@ -225,7 +236,7 @@ describe('ODRL access claim in the ID-JAG (C1)', () => {
     const accessToken = String(tokens.access_token)
     expect(decodeJwt(accessToken)).toMatchObject({
       '@context': ODRL_ID_JAG_CONTEXT,
-      access: claim,
+      access: expectedClaim,
     })
 
     const read = await fetch(`${DATA_STORAGE}k3pqsb`, {

@@ -143,7 +143,9 @@ export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
 
     let claim: VerifiedAccessClaim | undefined
     if (payload.access !== undefined) {
-      claim = await verifyAccessClaim(payload.access, payload['@context'], resource)
+      claim = await verifyAccessClaim(payload.access, payload['@context'], resource, {
+        assignee: sub,
+      })
       span.setAttribute('sai.lws.access.storage', claim.storage)
     }
     let act: ActorClaim | undefined

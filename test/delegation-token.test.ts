@@ -16,7 +16,7 @@ import { describe, expect, test } from 'vitest'
  *   final sub      = YoYo (top-level requester / claim assigner)
  *   final client   = Bob's UAS/client (most nested act)
  *   final act      = { sub: Bob, act: { sub: Bob's client } }
- *   final claim    = YoYo -> Bob's client
+ *   final claim    = no assigner; assignee = YoYo (the token subject)
  */
 
 const AUTH = process.env.CSS_BASE_URL ?? 'https://auth/'
@@ -67,7 +67,7 @@ async function mintIdJag(body: Record<string, unknown>): Promise<string> {
 }
 
 describe('C3 delegation token chain', () => {
-  test('keeps the actor chain and re-issues the claim to the final client', async () => {
+  test('keeps the actor chain and binds the claim to the visible subject', async () => {
     // The YoYo -> Bob grant is pre-existing in the seed registry and mirrored
     // into Bob's registry-pod dataset; the client only names the storage.
     const bob = await buildSelfIssuedCredential(BOB)
@@ -105,10 +105,10 @@ describe('C3 delegation token chain', () => {
     })
     const permission = (secondPayload.access as any[])[0].permission[0]
     expect(permission).toMatchObject({
-      assigner: YOYO,
-      assignee: bob.clientId,
+      assignee: YOYO,
       action: claim[0].permission[0].action,
     })
+    expect(permission).not.toHaveProperty('assigner')
 
     const tokenResponse = await fetch(new URL('.well-known/lws/token', DATA_AS).href, {
       method: 'POST',

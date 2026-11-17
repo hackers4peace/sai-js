@@ -18,7 +18,7 @@ import type {
 import { getLoggerFor } from 'global-logger-factory'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
-import { rewriteAccessClaim, verifyAccessClaim } from './access-claim.js'
+import { rewriteAccessClaim, setAccessClaimAssignee, verifyAccessClaim } from './access-claim.js'
 import type { ActorClaim } from './actor-chain.js'
 import { appendActor, deepestActor, verifyActorChain } from './actor-chain.js'
 import type { AccessClaimValidator } from './DelegatedAccessClaimValidator.js'
@@ -249,20 +249,26 @@ export class IdJagTokenHandler extends HttpHandler {
           'An ID-JAG subject token needs an ODRL access claim.'
         )
       }
-      const incoming = await this.incomingClaim(subject.access, subject.accessContext, resource)
+      const incoming = await this.incomingClaim(
+        subject.access,
+        subject.accessContext,
+        resource,
+        subject.subject
+      )
       const incomingAct = subject.act === undefined ? undefined : verifyActorChain(subject.act)
-      issuedSubject = this.visibleSubject(incoming, subject.subject, subject.client)
+      let assigner = incoming.assigners[0]
 
       if (this.claimValidator) {
         try {
-          await this.claimValidator.validate({
-            assigner: issuedSubject,
+          const validated = await this.claimValidator.validate({
+            ...(assigner ? { assigner } : {}),
             subject: subject.subject,
             client: subject.client,
             access: incoming.access,
             context: incoming.context,
             storage: incoming.storage,
           })
+          assigner = validated ?? assigner
         } catch (error: unknown) {
           throw new OAuthError(
             'invalid_grant',
@@ -271,10 +277,12 @@ export class IdJagTokenHandler extends HttpHandler {
         }
       }
 
+      issuedSubject = this.visibleSubject(incoming, assigner, subject.subject, subject.client)
+
       if (mode === 'delegation') {
         // Delegation retains the actor chain: the incoming subject/client stay
-        // visible, the current client is the most nested actor, and the claim
-        // is re-issued from the visible requester to that final client.
+        // visible and the current client is the most nested actor. The claim
+        // is still bound to the visible subject, not to the client.
         issuedClient = subject.client
         let act: ActorClaim = incomingAct
           ? { sub: subject.subject, act: incomingAct }
@@ -289,9 +297,9 @@ export class IdJagTokenHandler extends HttpHandler {
 
       issuedAccess = {
         ...incoming,
-        access: rewriteAccessClaim(incoming.access, issuedSubject, issuedClient),
-        assigners: [issuedSubject],
-        assignees: [issuedClient],
+        access: rewriteAccessClaim(incoming.access, issuedSubject),
+        assigners: [],
+        assignees: [issuedSubject],
       }
       span.setAttribute('sai.lws.impersonation', mode === 'impersonation')
       span.setAttribute('sai.lws.delegation', mode === 'delegation')
@@ -308,6 +316,14 @@ export class IdJagTokenHandler extends HttpHandler {
       // second lookup here; the next UAS validates it on the wire.
       if (access !== undefined && this.claimValidator) {
         await this.validateClaim(issuedAccess, subject.subject, subject.client)
+      }
+      // The first ID-JAG never exposes the grant assigner; the claim is bound
+      // to its subject and the policy engine no longer matches identity fields.
+      issuedAccess = {
+        ...issuedAccess,
+        access: setAccessClaimAssignee(issuedAccess.access, issuedSubject),
+        assigners: [],
+        assignees: [issuedSubject],
       }
     }
 
@@ -357,23 +373,36 @@ export class IdJagTokenHandler extends HttpHandler {
   private async incomingClaim(
     access: unknown,
     context: string,
-    resource?: string
+    resource: string | undefined,
+    subject: string
   ): Promise<VerifiedAccessClaim> {
     try {
-      return await verifyAccessClaim(access, context, resource)
+      return await verifyAccessClaim(access, context, resource, { assignee: subject })
     } catch (error: unknown) {
       throw new OAuthError('invalid_request', (error as Error).message)
     }
   }
 
   /**
-   * The visible actor of an impersonation hop is the incoming claim's assigner
-   * (YoYo). The incoming subject/client (Bob) must be the delegatee the claim
-   * was issued to, so a claim for an unrelated agent cannot be re-issued.
+   * The visible actor of an impersonation hop is the assigner of the grant that
+   * backs the incoming claim (YoYo). New ID-JAG claims carry no assigner, so
+   * the validator supplies it from the matched grant. The incoming subject/client
+   * must still be the delegatee the claim was issued to.
    */
-  private visibleSubject(claim: VerifiedAccessClaim, subject: string, client: string): string {
-    if (claim.assigners.length !== 1) {
-      throw new OAuthError('invalid_request', 'An impersonated ID-JAG needs exactly one assigner.')
+  private visibleSubject(
+    claim: VerifiedAccessClaim,
+    assigner: string | undefined,
+    subject: string,
+    client: string
+  ): string {
+    if (claim.assigners.length > 1) {
+      throw new OAuthError('invalid_request', 'An ID-JAG access claim needs at most one assigner.')
+    }
+    if (claim.assigners.length === 1 && assigner && claim.assigners[0] !== assigner) {
+      throw new OAuthError(
+        'invalid_request',
+        'The access claim assigner does not match the backing grant.'
+      )
     }
     if (claim.assignees.some((assignee) => assignee !== subject && assignee !== client)) {
       throw new OAuthError(
@@ -381,7 +410,14 @@ export class IdJagTokenHandler extends HttpHandler {
         'The incoming claim needs to be assigned to the subject or client of the ID-JAG.'
       )
     }
-    return claim.assigners[0]
+    const visible = assigner ?? claim.assigners[0]
+    if (!visible) {
+      throw new OAuthError(
+        'invalid_request',
+        'Could not determine the assigner of the incoming access claim.'
+      )
+    }
+    return visible
   }
 
   /**
@@ -394,19 +430,22 @@ export class IdJagTokenHandler extends HttpHandler {
     subject: string,
     client: string
   ): Promise<void> {
-    const assigner = claim.assigners[0]
-    if (claim.assigners.length !== 1 || !assigner) {
-      throw new OAuthError('invalid_request', 'An access claim needs exactly one assigner.')
+    if (claim.assigners.length > 1) {
+      throw new OAuthError('invalid_request', 'An access claim needs at most one assigner.')
     }
+    const assigner = claim.assigners[0]
     try {
-      await this.claimValidator!.validate({
-        assigner,
+      const validated = await this.claimValidator!.validate({
+        ...(assigner ? { assigner } : {}),
         subject,
         client,
         access: claim.access,
         context: claim.context,
         storage: claim.storage,
       })
+      if (assigner && validated && validated !== assigner) {
+        throw new Error('the backing grant is assigned by a different user')
+      }
     } catch (error: unknown) {
       throw new OAuthError('invalid_grant', `Invalid access claim: ${(error as Error).message}`)
     }

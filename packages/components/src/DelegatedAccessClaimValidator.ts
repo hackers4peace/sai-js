@@ -15,8 +15,8 @@ import { grantFieldsEqual } from './temporal/activities/check-equivalence.js'
 
 /** Input of one independent UAS validation of an incoming delegated claim. */
 export interface AccessClaimValidationInput {
-  /** Visible requester / claim assigner (YoYo). */
-  assigner: string
+  /** Legacy visible assigner; new ID-JAG claims omit it and the grant supplies it. */
+  assigner?: string
   /** Hidden delegatee subject of the incoming ID-JAG (Bob). */
   subject: string
   /** Client of the incoming ID-JAG (Bob's UAS/client). */
@@ -75,7 +75,12 @@ function mostSpecificGrantEdge(grants: GrantData[]): GrantData[] {
 
 /** A UAS-side source and validator of delegated access claims. */
 export interface AccessClaimValidator {
-  validate(input: AccessClaimValidationInput): Promise<void>
+  /**
+   * Validates the incoming claim against the assigner's grant registry and
+   * returns the assigner of the matched grant. New ID-JAGs have no assigner in
+   * the claim, so this is where the visible actor is recovered.
+   */
+  validate(input: AccessClaimValidationInput): Promise<string | undefined>
   /**
    * Finds the grants in the subject's plane for one client and storage and
    * turns them into the compact ODRL claim an ID-JAG carries. Optional so
@@ -84,17 +89,62 @@ export interface AccessClaimValidator {
   find?(input: AccessClaimLookupInput): Promise<VerifiedAccessClaim | undefined>
 }
 
+/** Fill a missing permission assigner so a claim can be compared to a grant. */
+function withClaimAssigner(policy: OdrlPolicy, assigner: string): OdrlPolicy {
+  return {
+    ...policy,
+    permission: (policy.permission ?? []).map((permission) => ({
+      ...permission,
+      assigner: permission.assigner || assigner,
+    })),
+  }
+}
+
+function usableGrants(grants: GrantData[]): GrantData[] {
+  const ids = new Set(grants.map((grant) => grant.id))
+  return grants.filter((grant) => !grant.inheritsFromGrant || ids.has(grant.inheritsFromGrant))
+}
+
+/**
+ * Intersect the assigners of the grants matching every policy of the claim.
+ * The claim may omit the assigner; the candidate grant supplies it.
+ */
+function matchingAssigners(access: unknown[], grants: GrantData[]): Set<string> {
+  const usable = usableGrants(grants)
+  let matches: Set<string> | undefined
+  for (const raw of access) {
+    const policy = raw as OdrlPolicy
+    const assigners = new Set(
+      usable
+        .filter((grant) =>
+          grantFieldsEqual(
+            grant,
+            grantFromPolicy(withClaimAssigner(policy, grant.grantedBy), 'urn:claim', '')
+          )
+        )
+        .map((grant) => grant.grantedBy)
+    )
+    if (assigners.size === 0) return new Set()
+    matches = matches
+      ? new Set([...matches].filter((assigner) => assigners.has(assigner)))
+      : assigners
+    if (matches.size === 0) return matches
+  }
+  return matches ?? new Set()
+}
+
 /**
  * C4 item 4: each intermediate UAS independently checks that an incoming
  * delegated claim is backed by a grant the UAS itself issued and stores in its
  * own grant registry.
  *
- * This mirrors the delegation-request authority check at the assigner:
- * the claim's assigner must be the local user, and every claim policy must
- * exactly match a grant in that user's registry (semantic fields and ODRL
- * permissions, ids excluded). Full chain validity is intentionally not used
- * here: the upstream source grant belongs to the data owner's registry and is
- * not expected to be present in the assigner's local registry.
+ * New ID-JAG claims omit the assigner and are assigned to their subject. The
+ * grant edge is recovered from the subject's visible grants, then every claim
+ * policy must exactly match a grant in the assigner's own registry (semantic
+ * fields and ODRL permissions, ids excluded). Full chain validity is
+ * intentionally not used here: the upstream source grant belongs to the data
+ * owner's registry and is not expected to be present in the assigner's local
+ * registry.
  */
 export class DelegatedAccessClaimValidator implements AccessClaimValidator {
   /**
@@ -104,38 +154,7 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
    * user received for that storage.
    */
   public async find(input: AccessClaimLookupInput): Promise<VerifiedAccessClaim | undefined> {
-    let session: Awaited<ReturnType<ReturnType<typeof buildSessionManager>['getSession']>>
-    try {
-      session = await buildSessionManager().getSession(input.subject)
-    } catch (error: unknown) {
-      throw new Error(
-        `no local grant registry for the claim subject ${input.subject}: ${(error as Error).message}`,
-        { cause: error }
-      )
-    }
-
-    const transport = localSparqlTransport(session.sparqlEndpoint)
-    // The mirrored recipient side is not a grant-registry member, so query the
-    // whole registry-pod dataset by grantee (the shared dev/test endpoint makes
-    // peer grants visible; the mirror backfills them in a split deployment).
-    const [subjectGrants, clientGrants] = await Promise.all([
-      getAccessGrantsForGrantee(transport, input.subject),
-      getAccessGrantsForGrantee(transport, input.client),
-    ])
-    const ids = [...new Set([...subjectGrants, ...clientGrants].map((entry) => entry.grant))]
-    const grants = (
-      await Promise.all(
-        ids.map(async (id) => {
-          try {
-            return await getAccessGrant(transport, id)
-          } catch {
-            return undefined
-          }
-        })
-      )
-    ).filter((grant): grant is GrantData => grant !== undefined)
-
-    const relevant = grants.filter((grant) => grant.storage === input.storage)
+    const relevant = await this.visibleGrants(input.subject, input.client, input.storage)
     const appSpecific = relevant.filter(
       (grant) => grant.grantedBy === input.subject && grantGrantee(grant) === input.client
     )
@@ -153,44 +172,91 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     )
   }
 
-  public async validate(input: AccessClaimValidationInput): Promise<void> {
+  public async validate(input: AccessClaimValidationInput): Promise<string | undefined> {
+    // A legacy claim still names its assigner: check only that user's registry.
+    if (input.assigner) {
+      const grants = await this.assignerGrants(input.assigner)
+      if (!matchingAssigners(input.access, grants).has(input.assigner)) {
+        throw new Error(`no existing grant issued by ${input.assigner} covers the delegated claim`)
+      }
+      return input.assigner
+    }
+
+    // New claims omit the assigner. Find the grant edge in the subject's plane
+    // first, then independently confirm that edge in the assigner's registry.
+    const visible = await this.visibleGrants(input.subject, input.client, input.storage)
+    const candidates = matchingAssigners(input.access, visible)
+    if (candidates.size === 0) {
+      throw new Error('no existing grant covers the delegated claim')
+    }
+
+    const backed: string[] = []
+    for (const assigner of candidates) {
+      const grants = await this.assignerGrants(assigner)
+      if (matchingAssigners(input.access, grants).has(assigner)) backed.push(assigner)
+    }
+    if (backed.length === 0) {
+      throw new Error('no grant in the assigner registry covers the delegated claim')
+    }
+    if (backed.length > 1) {
+      throw new Error('the delegated claim is backed by more than one assigner')
+    }
+    return backed[0]
+  }
+
+  /** Load the grants visible to a subject for one client and storage. */
+  private async visibleGrants(
+    subject: string,
+    client: string,
+    storage: string
+  ): Promise<GrantData[]> {
     let session: Awaited<ReturnType<ReturnType<typeof buildSessionManager>['getSession']>>
     try {
-      session = await buildSessionManager().getSession(input.assigner)
+      session = await buildSessionManager().getSession(subject)
     } catch (error: unknown) {
       throw new Error(
-        `no local grant registry for the claim assigner ${input.assigner}: ${(error as Error).message}`,
+        `no local grant registry for the claim subject ${subject}: ${(error as Error).message}`,
         { cause: error }
       )
     }
 
     const transport = localSparqlTransport(session.sparqlEndpoint)
-    const grants = await getRegistryGrants(transport, session.registrySet.hasGrantRegistry.id)
-    const ids = new Set(grants.map((grant) => grant.id))
-
-    for (const [index, raw] of input.access.entries()) {
-      const claim = grantFromPolicy(raw as OdrlPolicy, `urn:claim:${index}`, '')
-      if (claim.grantedBy !== input.assigner) {
-        throw new Error('the delegated claim is not assigned by this UAS user')
-      }
-      const grantee = grantGrantee(claim)
-      if (grantee !== input.subject && grantee !== input.client) {
-        throw new Error('the delegated claim is not assigned to the incoming subject/client')
-      }
-      if (claim.storage !== input.storage) {
-        throw new Error('the delegated claim target is not the requested storage')
-      }
-
-      const backed = grants.some(
-        (grant) =>
-          grantFieldsEqual(grant, claim) &&
-          (!grant.inheritsFromGrant || ids.has(grant.inheritsFromGrant))
+    // The mirrored recipient side is not a grant-registry member, so query the
+    // whole registry-pod dataset by grantee (the shared dev/test endpoint makes
+    // peer grants visible; the mirror backfills them in a split deployment).
+    const [subjectGrants, clientGrants] = await Promise.all([
+      getAccessGrantsForGrantee(transport, subject),
+      getAccessGrantsForGrantee(transport, client),
+    ])
+    const ids = [...new Set([...subjectGrants, ...clientGrants].map((entry) => entry.grant))]
+    const grants = (
+      await Promise.all(
+        ids.map(async (id) => {
+          try {
+            return await getAccessGrant(transport, id)
+          } catch {
+            return undefined
+          }
+        })
       )
-      if (!backed) {
-        throw new Error(
-          `no existing grant issued by ${input.assigner} to ${grantee} covers the delegated claim`
-        )
-      }
+    ).filter((grant): grant is GrantData => grant !== undefined)
+
+    return grants.filter((grant) => grant.storage === storage)
+  }
+
+  /** Load all grants in one assigner's own grant registry. */
+  private async assignerGrants(assigner: string): Promise<GrantData[]> {
+    let session: Awaited<ReturnType<ReturnType<typeof buildSessionManager>['getSession']>>
+    try {
+      session = await buildSessionManager().getSession(assigner)
+    } catch (error: unknown) {
+      throw new Error(
+        `no local grant registry for the claim assigner ${assigner}: ${(error as Error).message}`,
+        { cause: error }
+      )
     }
+
+    const transport = localSparqlTransport(session.sparqlEndpoint)
+    return getRegistryGrants(transport, session.registrySet.hasGrantRegistry.id)
   }
 }

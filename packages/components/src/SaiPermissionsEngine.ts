@@ -216,9 +216,11 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   /**
-   * Claim-first evaluation: the verified ODRL claim is the only authority. It
-   * uses the same target/scope/action predicates as the registry path, but no
-   * admin grant and no public fallback apply.
+   * Claim-first evaluation: the access token was issued by this server's AS
+   * after verifying the ID-JAG, so the claim is the only authority. Identity
+   * fields are not re-matched here; target/scope/action are checked, including
+   * inheritance among policies carried by the token. No admin grant and no
+   * public fallback apply.
    */
   private async getClaimPermissions(
     target: string,
@@ -229,7 +231,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
     let modes: string[] = []
     switch (targetType) {
       case TargetType.Registry:
-        modes = await this.findRegistrationModes(data, target, credentials, false, false)
+        modes = await this.findRegistrationModes(data, target, credentials, false, false, true)
         break
       case TargetType.Registration: {
         const inheritedGrant = await this.findGrant(
@@ -238,31 +240,41 @@ export class SaiPermissionsEngine implements PolicyEngine {
           credentials,
           INTEROP.Inherited,
           false,
-          false
+          false,
+          true
         )
         modes = [
           ...new Set([
-            ...(await this.findRegistrationModes(data, target, credentials, false, false)),
+            ...(await this.findRegistrationModes(data, target, credentials, false, false, true)),
             ...(inheritedGrant ? await this.getAccessModes(data, inheritedGrant) : []),
           ]),
         ]
         break
       }
       case TargetType.Resource: {
-        const resourceModes = await this.findResourceModes(data, target, credentials, false, false)
+        const resourceModes = await this.findResourceModes(
+          data,
+          target,
+          credentials,
+          false,
+          false,
+          true
+        )
         const registryModes = await this.findRegistrationModes(
           data,
           (await this.getRegistrationId(target)) ?? target,
           credentials,
           false,
-          false
+          false,
+          true
         )
         const inheritedModes = await this.findInheritedModes(
           data,
           target,
           credentials,
           false,
-          false
+          false,
+          true
         )
         modes = [...new Set([...resourceModes, ...registryModes, ...inheritedModes])]
         break
@@ -339,7 +351,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     credentials: Credentials,
     scope: string,
     uas: boolean,
-    allowPublicFallback = true
+    allowPublicFallback = true,
+    claimFirst = false
   ): Promise<string | undefined> {
     let registrationId = id
     const selected = scope === INTEROP.SelectedFromRegistry
@@ -367,9 +380,11 @@ export class SaiPermissionsEngine implements PolicyEngine {
             : `?target <${ODRL.source}> <${registrationId}> .`
         }
         ${
-          uas
-            ? `?permission <${ODRL.assignee}> <${agent}> .`
-            : `
+          claimFirst
+            ? ''
+            : uas
+              ? `?permission <${ODRL.assignee}> <${agent}> .`
+              : `
             ?permission <${ODRL.assigner}> <${agent}> .
             ?permission <${ODRL.assignee}> <${client}> .
           `
@@ -385,7 +400,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
     if (grantId) return grantId
     // if not found try without credentials
     if (allowPublicFallback && credentials.agent && credentials.client) {
-      return this.findGrant(data, id, {}, scope, false)
+      return this.findGrant(data, id, {}, scope, false, true, claimFirst)
     }
   }
   async findRegistrationModes(
@@ -393,7 +408,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     registrationId: string,
     credentials: Credentials,
     uas: boolean,
-    allowPublicFallback = true
+    allowPublicFallback = true,
+    claimFirst = false
   ): Promise<string[]> {
     const grantId = await this.findGrant(
       data,
@@ -401,7 +417,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
       credentials,
       INTEROP.AllFromRegistry,
       uas,
-      allowPublicFallback
+      allowPublicFallback,
+      claimFirst
     )
     if (!grantId) return []
     return this.getAccessModes(data, grantId)
@@ -412,7 +429,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     resourceId: string,
     credentials: Credentials,
     uas: boolean,
-    allowPublicFallback = true
+    allowPublicFallback = true,
+    claimFirst = false
   ): Promise<string[]> {
     const grantId = await this.findGrant(
       data,
@@ -420,7 +438,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
       credentials,
       INTEROP.SelectedFromRegistry,
       uas,
-      allowPublicFallback
+      allowPublicFallback,
+      claimFirst
     )
     if (!grantId) return []
     return this.getAccessModes(data, grantId)
@@ -431,7 +450,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     resourceId: string,
     credentials: Credentials,
     uas: boolean,
-    allowPublicFallback = true
+    allowPublicFallback = true,
+    claimFirst = false
   ): Promise<string[]> {
     const registrationId = (await this.getRegistrationId(resourceId)) ?? resourceId
     const grantId = await this.findGrant(
@@ -440,7 +460,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
       credentials,
       INTEROP.Inherited,
       uas,
-      allowPublicFallback
+      allowPublicFallback,
+      claimFirst
     )
     if (!grantId) return []
     const parentGrantId = await this.findObject(data, grantId, INTEROP.inheritsFromGrant)

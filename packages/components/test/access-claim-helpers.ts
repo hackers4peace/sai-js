@@ -28,3 +28,22 @@ export function accessClaim(
     actions: options.actions ?? [ODRL.read],
   })
 }
+
+/** The wire shape of an ID-JAG access claim: no assigner, assignee = subject. */
+export function idJagClaim(
+  options: {
+    storage?: string
+    assignee?: string
+    actions?: string[]
+  } = {}
+) {
+  const assignee = options.assignee ?? CLAIM_SUBJECT
+  return accessClaim({ ...options, assignee }).map((policy) => ({
+    ...policy,
+    assignee,
+    permission: policy.permission.map((permission) => {
+      const { assigner: _assigner, ...rest } = permission
+      return { ...rest, assignee }
+    }),
+  }))
+}

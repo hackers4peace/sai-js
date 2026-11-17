@@ -19,10 +19,16 @@ export interface VerifiedAccessClaim {
   context: string
   /** The single storage every target of the claim is bound to. */
   storage: string
-  /** Every `odrl:assigner` of the claim (normally one: the requester). */
+  /** Legacy `odrl:assigner` values; ID-JAG claims no longer carry one. */
   assigners: string[]
-  /** Every `odrl:assignee` of the claim (normally one: the client/actor). */
+  /** Every `odrl:assignee` of the claim (the token subject for an ID-JAG). */
   assignees: string[]
+}
+
+/** Options for {@link verifyAccessClaim}. */
+export interface VerifyAccessClaimOptions {
+  /** Expected assignee; an ID-JAG passes its `sub` here. */
+  assignee?: string
 }
 
 function badRequest(message: string): never {
@@ -57,11 +63,13 @@ function iriValues(store: Store, subject: Term, predicate: string, what: string)
  * @param access - Compact JSON-LD ODRL policies.
  * @param context - Top-level `@context` claim of the token.
  * @param expectedStorage - The storage a RAS is trading the grant for, when known.
+ * @param options - Expected assignee, if the claim is bound to a token subject.
  */
 export async function verifyAccessClaim(
   access: unknown,
   context: unknown,
-  expectedStorage?: string
+  expectedStorage?: string,
+  options: VerifyAccessClaimOptions = {}
 ): Promise<VerifiedAccessClaim> {
   if (context !== ODRL_ID_JAG_CONTEXT) {
     badRequest(`the JSON-LD context needs to be ${ODRL_ID_JAG_CONTEXT}.`)
@@ -92,7 +100,18 @@ export async function verifyAccessClaim(
   const assignees = new Set<string>()
   const targets = new Set<string>()
   for (const permission of permissions) {
-    assigners.add(oneIri(store, permission, ODRL.assigner, 'odrl:assigner'))
+    // `odrl:assigner` is no longer part of an ID-JAG claim. Keep accepting it
+    // on legacy claims, but never require it here.
+    const permissionAssigners = store.getObjects(permission, namedNode(ODRL.assigner), null)
+    if (permissionAssigners.length > 1) {
+      badRequest('odrl:assigner needs at most one IRI value.')
+    }
+    for (const assigner of permissionAssigners) {
+      if (assigner.termType !== 'NamedNode') {
+        badRequest('odrl:assigner needs an IRI value.')
+      }
+      assigners.add(assigner.value)
+    }
     assignees.add(oneIri(store, permission, ODRL.assignee, 'odrl:assignee'))
     iriValues(store, permission, ODRL.action, 'odrl:action')
     for (const target of iriValues(store, permission, ODRL.target, 'odrl:target')) {
@@ -100,6 +119,11 @@ export async function verifyAccessClaim(
     }
   }
   if (targets.size === 0) badRequest('at least one odrl:target is required.')
+  if (options.assignee !== undefined) {
+    if (assignees.size !== 1 || !assignees.has(options.assignee)) {
+      badRequest(`the claim needs to be assigned to ${options.assignee}.`)
+    }
+  }
 
   const storages = new Set<string>()
   for (const target of targets) {
@@ -152,17 +176,47 @@ function sanitizeClaimNode(value: unknown): unknown {
   return result
 }
 
+function cloneClaimNode(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(cloneClaimNode)
+  if (!value || typeof value !== 'object') return value
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, nested]) => [
+      key,
+      cloneClaimNode(nested),
+    ])
+  )
+}
+
 /**
- * Re-issue an ODRL access claim under a new visible delegation edge:
- * `assigner` becomes the requester/visible actor, `assignee` the outgoing
- * client. Permission, target, action, and scope stay unchanged; grant ids,
- * `inheritsFromGrant`, and any `act` chain are dropped (C2 strict hiding).
+ * Remove every `assigner` and make the claim assigned to `assignee`, keeping
+ * the grant/node identifiers. Used for the first ID-JAG, where the claim is
+ * still the grant-derived policy but the wire shape must not expose an
+ * assigner.
  */
-export function rewriteAccessClaim(
-  access: unknown[],
-  assigner: string,
-  assignee: string
-): unknown[] {
+export function setAccessClaimAssignee(access: unknown[], assignee: string): unknown[] {
+  return access.map((raw) => {
+    const policy = cloneClaimNode(raw) as Record<string, unknown>
+    delete policy.assigner
+    policy.assignee = assignee
+    if (Array.isArray(policy.permission)) {
+      policy.permission = policy.permission.map((rawPermission) => {
+        const permission = rawPermission as Record<string, unknown>
+        delete permission.assigner
+        permission.assignee = assignee
+        return permission
+      })
+    }
+    return policy
+  })
+}
+
+/**
+ * Re-issue an ODRL access claim under the visible subject: the claim has no
+ * `assigner` and its `assignee` is the outgoing token subject. Permission,
+ * target, action, and scope stay unchanged; grant ids, `inheritsFromGrant`,
+ * and any `act` chain are dropped (C2 strict hiding).
+ */
+export function rewriteAccessClaim(access: unknown[], assignee: string): unknown[] {
   return access.map((raw) => {
     const policy = sanitizeClaimNode(raw) as Record<string, unknown>
     // Keep the policy-level convenience target/action out of the re-issued
@@ -170,16 +224,16 @@ export function rewriteAccessClaim(
     // ids replace the hidden grant ids (targets must stay IRI nodes).
     delete policy.target
     delete policy.action
+    delete policy.assigner
     policy.id = freshId()
     policy.uid = policy.id
-    policy.assigner = assigner
     policy.assignee = assignee
     if (Array.isArray(policy.permission)) {
       policy.permission = policy.permission.map((rawPermission) => {
         const permission = sanitizeClaimNode(rawPermission) as Record<string, unknown>
         permission.id = freshId()
         permission.uid = permission.id
-        permission.assigner = assigner
+        delete permission.assigner
         permission.assignee = assignee
         if (permission.target && typeof permission.target === 'object') {
           const target = permission.target as Record<string, unknown>

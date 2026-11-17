@@ -184,7 +184,7 @@ views {
 
     include App
     include App.UI
-    include h4p.Data, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
+    include h4p.Data with { title 'Acme' }, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
     include h4p.Auth, h4p.Auth.OP, h4p.WebID.WebIdDocument
 
     style App {
@@ -412,7 +412,7 @@ views {
 
     include App
     include App.UI
-    include h4p.Data, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine, h4p.Data.SPARQLEndpoint
+    include h4p.Data with { title 'Acme' }, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine, h4p.Data.SPARQLEndpoint
     include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
     include h4p.WebID, h4p.WebID.WebIdDocument
 
@@ -558,7 +558,7 @@ views {
     include h4p.Auth.IdJagTokenEndpoint
     include App
     include App.UI
-    include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
+    include h4p.Data with { title 'Acme' }, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation
     include h4p.Registry, h4p.Registry.SPARQLEndpoint
 
     style App {
@@ -662,14 +662,16 @@ views {
   dynamic view lws-impersonation {
     title: 'LWS impersonation (implemented, C2)'
     description '''
-      **SAI capture, 2026-11-16** (`/test` `impersonation.test.ts` ›
+      **SAI capture, 2026-11-17** (`/test` `impersonation.test.ts` ›
       `Bob -> YoYo -> ACME hides Bob and the delegated grant references`,
-      trace `d8da9c50…`, 3.1 s, dagger `--tempo-endpoint`). One trace holds the
-      whole chain: the app's OIDC sign-in (discovery 49 ms, authorize 323 ms,
-      code → token 105 ms), **hop 1 with claim derivation** (727 ms — Bob's UAS
+      trace `dfc9f2c9…`, 3.4 s, dagger `--tempo-endpoint`). One trace holds the
+      whole chain: the app's OIDC sign-in (discovery 30 ms, authorize 318 ms,
+      code → token 104 ms), **hop 1 with claim derivation** (696 ms — Bob's UAS
       authenticates to Bob's registry and reads the grants), the impersonation
-      hop (393 ms), the `sai.lws.verify-id-jag` at each receiving server (6 ms at
-      YoYo's UAS, 54 ms at ACME's AS) and the storage read (211 ms).
+      hop (723 ms — the claim is checked against the mirrored subject grants and
+      YoYo's assigner registry), the `sai.lws.verify-id-jag` at each receiving
+      server (6 ms at YoYo's UAS, 51 ms at ACME's AS) and the storage read
+      (188 ms).
 
       The app presents the **access token of its own OIDC session**: `auth` issues
       it with `aud` = `https://auth/` (the UAS that verifies it) and
@@ -718,12 +720,13 @@ views {
       and the storage is `https://acme-rnd.data.docker/`.
 
       `sai.token.id-jag.*` is captured on all four spans; the `access` claims
-      quoted below are verbatim from `sai.token.id-jag.claims` for this run.
+      quoted below are decoded from `sai.token.id-jag.claims` for this run
+      (repeated `uid` and policy-level convenience fields omitted).
     '''
 
     include App, Bob, YoYo
     include App.UI, Bob.UAS, Bob.Registry, Bob.CID, YoYo.UAS, YoYo.Registry, YoYo.CID
-    include h4p.Data, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
+    include h4p.Data with { title 'Acme' }, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
 
     style App {
       color: gray
@@ -789,7 +792,7 @@ views {
         &response_type=code&scope=openid+webid+offline_access
         &state=…&nonce=…
         &code_challenge=…&code_challenge_method=S256
-        &dpop_jkt=DE5GDQRigXe9lfhUWgqwkO-8v3aS05R4vABWxV7_Dz4
+        &dpop_jkt=i4j-vhsHyf9SgdTvZL-XlsNf3JOg3zO-4FgukUohUX4
       ```
 
       The OP has no session, so the response is `303` to its own interaction
@@ -802,7 +805,7 @@ views {
       | WebID picker | `POST /.account/oidc/pick-webid/` `{webId, remember}` | `200 {location}` → `GET` resume → `303` |
       | consent | `POST /.account/oidc/consent/` | `200 {location}` → `GET` resume → `303` to the client |
 
-      (78 ms, 7 ms and 6 ms; the `GET` resumes are 111 / 107 / 101 ms.)
+      (78 ms, 8 ms and 6 ms; the `GET` resumes are 102 / 108 / 98 ms.)
 
       **Where the identity comes from.** The picker's `GET` returns the WebIDs
       linked to the signed-in account (`WebIdStore.findLinks`, the `webIdLink`
@@ -843,7 +846,7 @@ views {
       ```http
       POST https://auth.docker/.oidc/token
       Content-Type: application/x-www-form-urlencoded
-      DPoP: <proof for DE5GDQRi…>
+      DPoP: <proof for i4j-vhsH…>
 
       grant_type=authorization_code
       &code=…
@@ -883,10 +886,10 @@ views {
         "sub": "https://id/bob",
         "webid": "https://id/bob",
         "client_id": "https://data/test-client/public/id",
-        "cnf": { "jkt": "DE5GDQRigXe9lfhUWgqwkO-8v3aS05R4vABWxV7_Dz4" },
-        "jti": "IyNgmqlDNib6YmUT-h9YChebuemPDHk4mGG6rQgNj21",
-        "iat": 1794790501,
-        "exp": 1794794101
+        "cnf": { "jkt": "i4j-vhsHyf9SgdTvZL-XlsNf3JOg3zO-4FgukUohUX4" },
+        "jti": "i1MhbbzyKipCCOMQ9yUGRNDncUG41KzU3EakaXp2nK4",
+        "iat": 1794876407,
+        "exp": 1794880007
       }
       ```
       No separate mint: this **is** the LWS credential. `aud` is the UAS itself, so
@@ -919,7 +922,7 @@ views {
       ```http
       POST https://auth.docker/.well-known/lws/token
       Content-Type: application/x-www-form-urlencoded
-      DPoP: <proof for DE5GDQRi…>
+      DPoP: <proof for i4j-vhsH…>
 
       grant_type=urn:ietf:params:oauth:grant-type:token-exchange
       &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
@@ -980,7 +983,7 @@ views {
       ```json
       {
         "issued_token_type": "urn:ietf:params:oauth:token-type:id-jag",
-        "access_token": "<ID-JAG #1: 67cc8c0e>",
+        "access_token": "<ID-JAG #1: a03f6596>",
         "token_type": "N_A",
         "expires_in": 300
       }
@@ -1000,7 +1003,6 @@ views {
           "profile": "http://www.w3.org/ns/solid/interop#AccessProfile",
           "permission": [{
             "id": "urn:uuid:60e67784-d389-40df-b05f-0b5dcb7a2b62",
-            "assigner": "https://id/yoyo",
             "assignee": "https://id/bob",
             "action": ["http://www.w3.org/ns/odrl/2/read"],
             "target": {
@@ -1016,14 +1018,15 @@ views {
           "registeredShapeTree": "https://data/shapetrees/trees/Project",
           "assignee": "https://id/bob"
         }],
-        "iat": 1794790501,
-        "exp": 1794790801,
-        "jti": "67cc8c0e-b5e0-4ed0-98d7-a116afdcd2b6"
+        "iat": 1794876408,
+        "exp": 1794876708,
+        "jti": "a03f6596-efd0-425a-8dae-b67919b6e640"
       }
       ```
       Still the **hidden** pair: `sub` = Bob, `client_id` = the app, claim
-      `assignee` = Bob, the grant's own `urn:uuid` ids, no `act`. The ids survive
-      unchanged from the seed grant; only the next hop replaces them.
+      `assignee` = Bob and **no `assigner`**, the grant's own `urn:uuid` ids, no
+      `act`. The ids survive unchanged from the seed grant; only the next hop
+      replaces them.
       '''
     }
 
@@ -1043,8 +1046,9 @@ views {
       > one to YoYo's, and the ID-JAG's `aud` is the latter's identifier.
 
       >[!TIP]
-      > span `sai.lws.issue-id-jag` (390 ms) with `sai.lws.verify-id-jag` as its
-      > child (6 ms) — verify, registry lookup and re-issue all in one request
+      > span `sai.lws.issue-id-jag` (723 ms) with `sai.lws.verify-id-jag` as its
+      > child (6 ms) — verify, subject-plane lookup, assigner-registry check and
+      > re-issue all in one request
 
       ```http
       POST https://auth.docker/.well-known/lws/token
@@ -1116,25 +1120,28 @@ views {
 
       >[!IMPORTANT]
       > the incoming ID-JAG's `iss` is *this* UAS, so a self-signed claim is never
-      > trusted on its own — the assigner registry must already hold a matching grant
+      > trusted on its own — the subject's mirrored grant must resolve to a matching
+      > grant in the assigner registry
 
       >[!TIP]
-      > the UAS authenticates to its own registry first: `GET /yoyo/` → `401` →
-      > `/.well-known/oauth-protected-resource/yoyo/` → `/.well-known/lws-configuration`
-      > → `POST /.well-known/lws/token` (29 ms) → `200` (104 ms), then `GET /yoyo/`
-      > again — `~300 ms` before the first grant read
+      > the UAS authenticates to the subject's registry first: `GET /bob/` → `401`
+      > → `/.well-known/oauth-protected-resource/bob/` →
+      > `/.well-known/lws-configuration` → `POST /.well-known/lws/token` (26 ms) →
+      > `200` (104 ms), then reads the mirrored grants. It repeats the exchange with
+      > the assigner's registry (`/yoyo/`, 24 ms → 87 ms) to confirm the match.
 
       ```http
-      POST http://fuseki:3030/reg-yoyo/sparql     // 7 grant queries (+ registry reads)
+      POST http://fuseki:3030/reg-bob/sparql      // mirrored subject grants
+      POST http://fuseki:3030/reg-yoyo/sparql     // assigner grant registry
       ```
       Every claim policy must match a grant in `hasGrantRegistry` on its semantic
-      fields and ODRL permissions (ids excluded), with `grantedBy` = YoYo,
-      grantee = the incoming subject/client and the same storage; an
+      fields and ODRL permissions (ids excluded), with `grantedBy` = the recovered
+      assigner, grantee = the incoming subject/client and the same storage; an
       `inheritsFromGrant` must itself exist in the registry.
 
       Failure is `400 invalid_grant`:
       ```
-      no existing grant issued by https://id/yoyo to https://id/bob covers the delegated claim
+      no existing grant covers the delegated claim
       ```
       '''
     }
@@ -1146,10 +1153,11 @@ views {
       >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
 
       >[!IMPORTANT]
-      > the visible actor is the incoming claim's **assigner** (`visibleSubject`), and
-      > the outgoing client is the issuing UAS (`issuedClient = this.issuer.issuer`);
-      > `rewriteAccessClaim` re-issues the claim from YoYo to that client with fresh
-      > `urn:uuid` ids
+      > the visible actor is recovered from the backing grant's `grantedBy`
+      > (`DelegatedAccessClaimValidator`), then `visibleSubject` uses that value;
+      > the outgoing client is the issuing UAS (`issuedClient = this.issuer.issuer`).
+      > `rewriteAccessClaim` re-issues the claim with `assignee = YoYo` (the token
+      > subject), **no `assigner`**, and fresh `urn:uuid` ids
 
       ```http
       HTTP/1.1 200 OK
@@ -1174,18 +1182,16 @@ views {
         "client_id": "https://auth/",
         "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
         "access": [{
-          "id": "urn:uuid:ec083afe-43bd-4834-ad4b-83477cce3c12",
+          "id": "urn:uuid:1984da14-9da6-4c21-a10e-e4daf42c5f20",
           "type": ["http://www.w3.org/ns/odrl/2/Agreement"],
           "profile": "http://www.w3.org/ns/solid/interop#AccessProfile",
-          "assigner": "https://id/yoyo",
-          "assignee": "https://auth/",
+          "assignee": "https://id/yoyo",
           "permission": [{
-            "id": "urn:uuid:a6058d52-d42a-42bb-a189-3461f5204b6c",
-            "assigner": "https://id/yoyo",
-            "assignee": "https://auth/",
+            "id": "urn:uuid:0f2d11d6-3799-43bb-8bfc-2066000204ff",
+            "assignee": "https://id/yoyo",
             "action": ["http://www.w3.org/ns/odrl/2/read"],
             "target": {
-              "id": "urn:uuid:ed062028-5640-495f-9876-a37a84f25572",
+              "id": "urn:uuid:ac76aeb8-3ec4-41d9-ad7a-2cdcdacdfe99",
               "owner": "https://id/acme",
               "storage": "https://data/acme-rnd/",
               "type": ["http://www.w3.org/ns/odrl/2/Asset"],
@@ -1196,15 +1202,15 @@ views {
           "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
           "registeredShapeTree": "https://data/shapetrees/trees/Project"
         }],
-        "iat": 1794790502,
-        "exp": 1794790802,
-        "jti": "ac00b7a7-f90c-4f60-9133-9465f0383b02"
+        "iat": 1794876409,
+        "exp": 1794876709,
+        "jti": "442bea6a-084c-4ced-8f5a-54e507f3d35d"
       }
       ```
       Fresh `urn:uuid` ids for the policy, the permission and the target; the
-      claim is narrowed to the one ACME project and re-assigned to
-      `https://auth/`. **No `act`** — `mode=delegation` would keep the actor chain
-      instead.
+      claim is narrowed to the one ACME project, has **no `assigner`**, and is
+      assigned to `https://id/yoyo` (the token subject). **No `act`** —
+      `mode=delegation` would keep the actor chain instead.
       '''
     }
 
@@ -1245,7 +1251,7 @@ views {
       > itself. `data` is a different server from `auth`, so it cannot shortcut:
       > it resolves the issuer through the subject document, then discovery + JWKS.
 
-      Inside `sai.lws.verify-id-jag` (54 ms): `sai-id` answered `GET /yoyo` `200`
+      Inside `sai.lws.verify-id-jag` (51 ms): `sai-id` answered `GET /yoyo` `200`
       in 17 ms. Bob's document is not fetched by ACME at all.
       '''
     }
@@ -1315,10 +1321,10 @@ views {
 
       >[!TIP]
       > `h4p.Data` serves both the AS and the storage endpoint, so the decision runs
-      > in the process that answered the token exchange — 209 ms inside
+      > in the process that answered the token exchange — 185 ms inside
       > `data.docker` (`sai-data`), no second server hop
 
-      Observed reads: `GET https://id/yoyo` (17 ms) then `22` SPARQL queries —
+      Observed reads: `GET https://id/yoyo` (15 ms) then `22` SPARQL queries —
       `15` on `data-acme-rnd` (the resource + its registration) and `7` on
       `reg-acme` (the owner's registries). The token's `access` claim is evaluated
       **first**, so the claim's narrowed `source` (`pbh2yw`) / `partOf` (`reb39k`)
@@ -1346,7 +1352,8 @@ views {
       #### Compare with request
       * `sub` — `https://id/yoyo`
       * `client_id` — `https://auth/`
-      * `assigner`/`assignee` — `https://id/yoyo` / `https://auth/`
+      * `assigner` — omitted from the claim
+      * `assignee` — `https://id/yoyo`, equal to the token `sub`
       * `scopeOfGrant`, `registeredShapeTree`, `storage`, `source` — unchanged
       '''
     }
@@ -1478,7 +1485,7 @@ views {
   view lws of h4p.Data {
     title: 'LWS endpoints on a storage server'
 
-    include h4p.Data, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
+    include h4p.Data with { title 'Acme' }, h4p.Data.LwsProtectedResourceMetadata, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
     include h4p.Auth.OP, h4p.WebID.WebIdDocument
     include App.UI
 

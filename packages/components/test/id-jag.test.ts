@@ -23,6 +23,7 @@ import {
   CLAIM_STORAGE,
   CLAIM_SUBJECT,
   accessClaim,
+  idJagClaim,
 } from './access-claim-helpers.js'
 
 const BASE_URL = 'https://auth/'
@@ -35,6 +36,21 @@ const ID_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id_token'
 
 let keys: GenerateKeyPairResult
 let publicJwk: JWK
+
+/** The wire shape expected from the handler: no assigner, assignee = subject. */
+function idJagShape(access: any[], assignee: string): unknown[] {
+  return access.map((policy) => {
+    const { assigner: _policyAssigner, ...rest } = policy
+    return {
+      ...rest,
+      assignee,
+      permission: policy.permission.map((permission: any) => {
+        const { assigner: _permissionAssigner, ...permissionRest } = permission
+        return { ...permissionRest, assignee }
+      }),
+    }
+  })
+}
 
 /** Records the input it was asked to verify and answers with a fixed subject. */
 class StubVerifier extends SubjectTokenVerifier {
@@ -252,7 +268,7 @@ describe('IdJagTokenHandler', () => {
       keys.publicKey
     )
     expect(payload['@context']).toBe(ODRL_ID_JAG_CONTEXT)
-    expect(payload.access).toEqual(claim)
+    expect(payload.access).toEqual(idJagShape(claim, WEBID))
   })
 
   test('derives the access claim from the grants for the requested storage', async () => {
@@ -283,7 +299,7 @@ describe('IdJagTokenHandler', () => {
       keys.publicKey
     )
     expect(payload['@context']).toBe(ODRL_ID_JAG_CONTEXT)
-    expect(payload.access).toEqual(claim)
+    expect(payload.access).toEqual(idJagShape(claim, CLAIM_SUBJECT))
   })
 
   test('validates a client-supplied delegated claim like an incoming ID-JAG', async () => {
@@ -389,7 +405,7 @@ describe('IdJagTokenHandler', () => {
   })
 
   test('re-issues an incoming ID-JAG under the visible assigner and hides the delegatee', async () => {
-    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const claim = idJagClaim()
     const generator: JwkGenerator = {
       alg: 'ES256',
       getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
@@ -405,6 +421,7 @@ describe('IdJagTokenHandler', () => {
       claimValidator: {
         validate: async (input) => {
           validated.push(input)
+          return YOYO
         },
       },
     })
@@ -422,7 +439,6 @@ describe('IdJagTokenHandler', () => {
     expect(captured.status).toBe(200)
     expect(validated).toEqual([
       {
-        assigner: YOYO,
         subject: CLAIM_SUBJECT,
         client: CLAIM_CLIENT,
         access: claim,
@@ -443,14 +459,12 @@ describe('IdJagTokenHandler', () => {
     const rewritten = (payload.access as any[])[0]
     const original = claim[0]
     expect(rewritten).toMatchObject({
-      assigner: YOYO,
-      assignee: BASE_URL,
+      assignee: YOYO,
       profile: original.profile,
       scopeOfGrant: original.scopeOfGrant,
       permission: [
         {
-          assigner: YOYO,
-          assignee: BASE_URL,
+          assignee: YOYO,
           action: original.permission[0].action,
           target: expect.objectContaining({
             owner: original.permission[0].target.owner,
@@ -461,6 +475,8 @@ describe('IdJagTokenHandler', () => {
         },
       ],
     })
+    expect(rewritten).not.toHaveProperty('assigner')
+    expect(rewritten.permission[0]).not.toHaveProperty('assigner')
     expect(rewritten.id).toMatch(/^urn:uuid:/u)
     expect(rewritten.permission[0].id).toMatch(/^urn:uuid:/u)
     expect(rewritten.permission[0].target.id).toMatch(/^urn:uuid:/u)
@@ -473,7 +489,7 @@ describe('IdJagTokenHandler', () => {
   })
 
   test('delegation mode keeps the actor chain and re-issues to the final client', async () => {
-    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const claim = idJagClaim()
     const generator: JwkGenerator = {
       alg: 'ES256',
       getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
@@ -485,6 +501,7 @@ describe('IdJagTokenHandler', () => {
       verifier,
       storageOrigins: ['data'],
       authorizationServerOrigins: [BASE_URL],
+      claimValidator: { validate: async () => YOYO },
     })
 
     const captured = await call(
@@ -509,11 +526,12 @@ describe('IdJagTokenHandler', () => {
       act: { sub: CLAIM_SUBJECT, act: { sub: CLAIM_CLIENT } },
     })
     const permission = (payload.access as any[])[0].permission[0]
-    expect(permission).toMatchObject({ assigner: YOYO, assignee: CLAIM_CLIENT })
+    expect(permission).toMatchObject({ assignee: YOYO })
+    expect(permission).not.toHaveProperty('assigner')
   })
 
   test('delegation mode nests an incoming actor chain under the new subject', async () => {
-    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const claim = idJagClaim()
     const generator: JwkGenerator = {
       alg: 'ES256',
       getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
@@ -527,6 +545,7 @@ describe('IdJagTokenHandler', () => {
       verifier,
       storageOrigins: ['data'],
       authorizationServerOrigins: [BASE_URL],
+      claimValidator: { validate: async () => YOYO },
     })
 
     const captured = await call(
@@ -551,7 +570,7 @@ describe('IdJagTokenHandler', () => {
   })
 
   test('rejects an incoming claim not backed by the assigner grant registry', async () => {
-    const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
+    const claim = idJagClaim()
     const generator: JwkGenerator = {
       alg: 'ES256',
       getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },

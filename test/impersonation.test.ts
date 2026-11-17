@@ -132,7 +132,6 @@ describe('C2 impersonation chain', () => {
       scopeOfGrant: claim[0].scopeOfGrant,
       permission: [
         expect.objectContaining({
-          assigner: YOYO,
           assignee: BOB,
           action: claim[0].permission[0].action,
           target: expect.objectContaining({
@@ -144,6 +143,8 @@ describe('C2 impersonation chain', () => {
         }),
       ],
     })
+    expect(derived).not.toHaveProperty('assigner')
+    expect(derived.permission[0]).not.toHaveProperty('assigner')
 
     // YoYo's UAS verifies the incoming ID-JAG, rewrites the claim to the
     // visible actor, and issues the storage grant. No request `access` claim
@@ -167,14 +168,12 @@ describe('C2 impersonation chain', () => {
     const rewritten = (secondPayload.access as any[])[0]
     const original = claim[0]
     expect(rewritten).toMatchObject({
-      assigner: YOYO,
-      assignee: AUTH,
+      assignee: YOYO,
       profile: original.profile,
       scopeOfGrant: original.scopeOfGrant,
       permission: [
         {
-          assigner: YOYO,
-          assignee: AUTH,
+          assignee: YOYO,
           action: original.permission[0].action,
           target: expect.objectContaining({
             owner: original.permission[0].target.owner,
@@ -185,6 +184,8 @@ describe('C2 impersonation chain', () => {
         },
       ],
     })
+    expect(rewritten).not.toHaveProperty('assigner')
+    expect(rewritten.permission[0]).not.toHaveProperty('assigner')
     expect(rewritten.id).toMatch(/^urn:uuid:/u)
     expect(rewritten.permission[0].id).toMatch(/^urn:uuid:/u)
     const serialized = JSON.stringify(secondPayload)
