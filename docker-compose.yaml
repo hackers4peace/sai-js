@@ -237,9 +237,9 @@ services:
       - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/conf/traefik.yml:/etc/traefik/traefik.yml
-      - ./traefik/certs/cert.pem:/etc/traefik/cert.pem
-      - ./traefik/certs/key.pem:/etc/traefik/key.pem
+      - ./environments/dev/traefik/conf/traefik.yml:/etc/traefik/traefik.yml
+      - ./environments/dev/traefik/certs/cert.pem:/etc/traefik/cert.pem
+      - ./environments/dev/traefik/certs/key.pem:/etc/traefik/key.pem
     labels:
       - traefik.enable=true
       - traefik.http.routers.router.rule=Host(`router${SHARED_DOMAIN_SEGMENT}.docker`)
@@ -313,7 +313,7 @@ services:
     networks:
       - default
     volumes:
-      - ./temporal/setup-postgres.sh:/etc/temporal/setup-postgres.sh
+      - ./environments/temporal/setup-postgres.sh:/etc/temporal/setup-postgres.sh
     entrypoint: ['/bin/sh']
     command: /etc/temporal/setup-postgres.sh
 
@@ -336,7 +336,7 @@ services:
     ports:
       - 7233:7233
     volumes:
-      - ./temporal/development.yaml:/etc/temporal/development-sql.yaml
+      - ./environments/temporal/development.yaml:/etc/temporal/development-sql.yaml
     healthcheck:
       test: ['CMD', 'nc', '-z', 'localhost', '7233']
       interval: 5s
@@ -357,7 +357,7 @@ services:
     networks:
       - default
     volumes:
-      - ./temporal/create-namespace.sh:/etc/temporal/create-namespace.sh
+      - ./environments/temporal/create-namespace.sh:/etc/temporal/create-namespace.sh
     entrypoint: ['/bin/sh']
     command: /etc/temporal/create-namespace.sh
 
@@ -458,9 +458,9 @@ services:
       - '3902:3902'
       - '3903:3903'
     volumes:
-      - ./garage/garage.toml:/etc/garage.toml
-      - ./garage/meta:/var/lib/garage/meta
-      - ./garage/data:/var/lib/garage/data
+      - ./environments/garage/garage.toml:/etc/garage.toml
+      - ./environments/garage/meta:/var/lib/garage/meta
+      - ./environments/garage/data:/var/lib/garage/data
 
   tempo:
     image: grafana/tempo:latest
@@ -473,7 +473,7 @@ services:
       - '4318:4318' # OTLP/HTTP
       - '4317:4317' # OTLP/gRPC
     volumes:
-      - ./tempo/tempo.yaml:/etc/tempo.yaml
+      - ./environments/dev/tempo/tempo.yaml:/etc/tempo.yaml
       # blocks + live store, so `devbox run tempo-import` can add dagger traces
       - tempo-data:/var/tempo
     command:
@@ -513,7 +513,7 @@ services:
     ports:
       - '3000:3000' # Grafana UI + datasource proxy
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./environments/dev/grafana/provisioning:/etc/grafana/provisioning:ro
     environment:
       # anonymous admin: local dev convenience (no login or token needed)
       GF_AUTH_ANONYMOUS_ENABLED: 'true'

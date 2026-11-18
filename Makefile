@@ -129,7 +129,7 @@ override-create: ## Generate override file from dist
 .PHONY: override-create
 
 cert-install: ## Run mkcert to install CA into system storage and generate default certs for traefik
-	bash mkcert.sh
+	bash environments/dev/scripts/mkcert.sh
 .PHONY: cert-install
 
 #

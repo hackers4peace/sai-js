@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+ENV_FILE="$ROOT_DIR/.env"
+CERT_DIR="$ROOT_DIR/environments/dev/traefik/certs"
+
 # Function to check if mkcert is installed
 check_mkcert_installed() {
     if ! command -v mkcert &> /dev/null; then
@@ -16,13 +20,13 @@ install_mkcert_ca() {
 
 # Function to load environment variables from .env file
 load_env() {
-    if [ ! -f .env ]; then
+    if [ ! -f "$ENV_FILE" ]; then
         echo "[Warning] .env file not found. Please generate it using make env command!"
         exit 1
     else
         set -a
         # shellcheck disable=SC2002
-        source <(cat .env | sed -e '/^#/d;/^\s*$/d' -e "s/'/'\\\''/g" -e "s/=\(.*\)/='\1'/g")
+        source <(cat "$ENV_FILE" | sed -e '/^#/d;/^\s*$/d' -e "s/'/'\\\''/g" -e "s/=\(.*\)/='\1'/g")
         set +a
     fi
 }
@@ -44,8 +48,9 @@ display_domains() {
 generate_certs() {
     local DOMAINS
     DOMAINS=$(echo "$TLS_DOMAINS" | sed -e 's/^"//' -e 's/"$//')
+    mkdir -p "$CERT_DIR"
     # shellcheck disable=SC2086
-    mkcert -key-file traefik/certs/key.pem -cert-file traefik/certs/cert.pem $DOMAINS
+    mkcert -key-file "$CERT_DIR/key.pem" -cert-file "$CERT_DIR/cert.pem" $DOMAINS
 }
 
 # Main script execution

@@ -198,9 +198,15 @@ export class SaiJs {
     return dag
       .container()
       .from('dxflrs/garage:v2.2.0')
-      .withMountedFile('/etc/garage.toml', this.source.file('garage/garage.toml'))
-      .withMountedDirectory('/var/lib/garage/meta', this.source.directory('garage/meta'))
-      .withMountedDirectory('/var/lib/garage/data', this.source.directory('garage/data'))
+      .withMountedFile('/etc/garage.toml', this.source.file('environments/garage/garage.toml'))
+      .withMountedDirectory(
+        '/var/lib/garage/meta',
+        this.source.directory('environments/garage/meta')
+      )
+      .withMountedDirectory(
+        '/var/lib/garage/data',
+        this.source.directory('environments/garage/data')
+      )
       .withExposedPort(3900)
       .withExposedPort(3901)
       .withExposedPort(3902)
@@ -220,8 +226,8 @@ export class SaiJs {
   // empty Postgres service. Private builders receive the ID so every service
   // in one stack shares the same ephemeral database and cache-busting key.
   private async temporalServiceFor(runId: string): Promise<Service> {
-    const scripts = this.source.directory('temporal/scripts')
-    const dynamicConfig = this.source.directory('temporal/dynamicconfig')
+    const scripts = this.source.directory('environments/temporal/scripts')
+    const dynamicConfig = this.source.directory('environments/temporal/dynamicconfig')
 
     const pg = dag
       .container()

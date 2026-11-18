@@ -97,7 +97,7 @@ Production NixOS/Podman matches the dev/test storage model:
 - [ ] Add a **Garage** container (`dxflrs/garage:v2.2.0`) with its own config,
   `meta`/`data` volumes, node key/layout, and an admin token from ragenix.
   S3 API on 3900 and admin API on 3903 stay internal. Do **not** reuse the dev
-  token/node key from `garage/garage.toml`.
+  token/node key from `environments/garage/garage.toml`.
 - [ ] Remove the `sparql` options (`tag`, `resolver`) from
   `nix/podman.nix`; add Fuseki/Garage options (image/tag, config path, secret
   paths, volumes).

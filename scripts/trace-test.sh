@@ -15,7 +15,8 @@
 #    in literal single quotes and its `(`/`)` regex-escaped. Without both, `>` becomes
 #    a shell redirect and vitest silently reports "67 skipped" with zero spans.
 #  - Tempo's default search window is ~4 s (`query_end_cutoff: 1s` +
-#    `search.query_backend_after: 5s` in tempo/tempo.yaml), so query it with explicit
+#    `search.query_backend_after: 5s` in
+#    `environments/dev/tempo/tempo.yaml`), so query it with explicit
 #    `start`/`end` (the script prints a ready-made URL).
 #
 # Usage: scripts/trace-test.sh [-e http://host:4318]

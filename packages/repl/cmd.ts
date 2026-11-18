@@ -20,7 +20,9 @@ const datasetSourcePath = fileURLToPath(
   new URL('../../environments/data/registry.trig', import.meta.url)
 )
 const kvSourcePath = fileURLToPath(new URL('../../environments/data/kv.json', import.meta.url))
-const garageTomlPath = fileURLToPath(new URL('../../garage/garage.toml', import.meta.url))
+const garageTomlPath = fileURLToPath(
+  new URL('../../environments/garage/garage.toml', import.meta.url)
+)
 
 /**
  * The Garage admin token — the `[admin] admin_token` from `garage.toml`, so the
@@ -30,7 +32,7 @@ const garageTomlPath = fileURLToPath(new URL('../../garage/garage.toml', import.
 function garageAdminToken(): string {
   if (process.env.CSS_GARAGE_ADMIN_TOKEN) return process.env.CSS_GARAGE_ADMIN_TOKEN
   const match = readFileSync(garageTomlPath, 'utf-8').match(/^admin_token\s*=\s*"([^"]+)"/m)
-  if (!match) throw new Error('admin_token not found in garage/garage.toml')
+  if (!match) throw new Error('admin_token not found in environments/garage/garage.toml')
   return match[1]
 }
 const mapPaths = {

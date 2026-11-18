@@ -3,15 +3,15 @@ node_modules/
 yarn.lock
 # Garage state. Only the node identity (node_key[.pub]) and the applied layout
 # (cluster_layout) need to be committed; everything else (db, data_layout, the
-# data-dir marker, runtime state) is regenerated on start. See garage/README or
-# openwiki/architecture/storage-isolation.md.
-garage/meta/*
-garage/data/*
-!garage/meta/.gitkeep
-!garage/meta/cluster_layout
-!garage/meta/node_key
-!garage/meta/node_key.pub
-!garage/data/.gitkeep
+# data-dir marker, runtime state) is regenerated on start. See
+# environments/garage/README or openwiki/architecture/storage-isolation.md.
+environments/garage/meta/*
+environments/garage/data/*
+!environments/garage/meta/.gitkeep
+!environments/garage/meta/cluster_layout
+!environments/garage/meta/node_key
+!environments/garage/meta/node_key.pub
+!environments/garage/data/.gitkeep
 
 dist/
 dev-dist/
@@ -39,5 +39,5 @@ tsconfig.tsbuildinfo
 
 .turbo
 
-traefik/certs/*
+environments/dev/traefik/certs/*
 

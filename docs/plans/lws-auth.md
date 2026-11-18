@@ -239,7 +239,7 @@ body it received; no raw token strings appear unless `OTEL_CAPTURE_RAW_TOKENS=tr
 **`/test` acceptance:** `--testFile="lws-auth.test.ts"` for the four-span chain.
 **Touchpoints:** `packages/utils/src/tracing/tokens.ts`,
 `packages/components/src/tracing/{bootstrap.ts,preload.cjs}`,
-`.dagger/src/index.ts` (`withTracing`), `tempo/tempo.yaml` (no change expected).
+`.dagger/src/index.ts` (`withTracing`), `environments/dev/tempo/tempo.yaml` (no change expected).
 
 **Landed:**
 - `sai.lws.request-id-jag` (client, `packages/lws-auth/src/tokens.ts`) — `grant_type`,
@@ -327,7 +327,7 @@ containing `sai-jsonld/fetchJsonLd`+`frameDoc` (`sai.jsonld.raw`/`.framed`) and
 - `SimpleSpanProcessor` is deliberate (tail spans would be lost); body capture must not
   add buffering that outlives the request.
 - Tempo search defaults to a ~4 s window (`query_end_cutoff: 1s` +
-  `search.query_backend_after: 5s` in `tempo/tempo.yaml`): query with explicit
+  `search.query_backend_after: 5s` in `environments/dev/tempo/tempo.yaml`): query with explicit
   `start`/`end`, e.g. `curl "localhost:3200/api/search?start=$(date -d -10min +%s)&end=$(date +%s)"`.
 - `/test` `--only` is re-shelled by npm: wrap the `-t` pattern in literal single quotes and
   do not use `>`/`(`/`)` in it, or vitest silently matches nothing (67 skipped, zero spans).
@@ -566,7 +566,7 @@ devbox run -- bash -lc 'dagger call --tempo-endpoint=http://172.16.0.1:4318 test
   literal single quotes and `(`/`)` regex-escaped — otherwise `>` becomes a redirect and
   vitest reports "67 skipped" with zero spans.
 - **Tempo's default search window is ~4 s** (`query_end_cutoff: 1s` +
-  `search.query_backend_after: 5s` in `tempo/tempo.yaml`), so inspect with explicit
+  `search.query_backend_after: 5s` in `environments/dev/tempo/tempo.yaml`), so inspect with explicit
   `start`/`end`.
 - **Fresh spans are not searchable immediately** (live store → block flush takes ~1 min) and
   `/api/search` caps its result set, so a "missing" span is often just unsurfaced: verify

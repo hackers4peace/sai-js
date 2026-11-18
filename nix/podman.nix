@@ -384,17 +384,17 @@ in
       };
       dynamicConfig = lib.mkOption {
         type = lib.types.path;
-        default = ../temporal/dynamicconfig/development-sql.yaml;
+        default = ../environments/temporal/dynamicconfig/development-sql.yaml;
         description = "temporal config";
       };
       setupPostgresScript = lib.mkOption {
         type = lib.types.path;
-        default = ../temporal/scripts/setup-postgres.sh;
+        default = ../environments/temporal/scripts/setup-postgres.sh;
         description = "temporal postgres setup";
       };
       createNamespaceScript = lib.mkOption {
         type = lib.types.path;
-        default = ../temporal/scripts/create-namespace.sh;
+        default = ../environments/temporal/scripts/create-namespace.sh;
         description = "temporal namespace setup";
       };
     };
@@ -513,7 +513,7 @@ in
       };
       config = lib.mkOption {
         type = lib.types.path;
-        default = ../services/css/registry.json;
+        default = ../environments/nixos/css/registry.json;
         description = "registry service config";
       };
     };
@@ -528,7 +528,7 @@ in
       };
       config = lib.mkOption {
         type = lib.types.path;
-        default = ../services/css/data.json;
+        default = ../environments/nixos/css/data.json;
         description = "data service config";
       };
     };
