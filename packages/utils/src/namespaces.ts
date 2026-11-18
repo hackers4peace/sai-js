@@ -170,6 +170,12 @@ export const LWS = createVocabulary(
  * ODRL 2 terms used by LWS access policies (action vocabulary + policy shape).
  * The canonical SAI access actions reuse these IRIs — see `ACCESS_ACTIONS`.
  */
+export const SAI = createVocabulary(
+  'https://www.w3.org/ns/solid/sai#',
+  'DataStorage',
+  'RegistryStorage'
+)
+
 export const ODRL = createVocabulary(
   'http://www.w3.org/ns/odrl/2/',
   'action',

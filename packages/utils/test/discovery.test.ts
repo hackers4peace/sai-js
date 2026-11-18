@@ -9,6 +9,8 @@ import {
   discoverAuthorizationAgent,
   discoverAuthorizationRedirectEndpoint,
   discoverDescriptionResource,
+  descriptionHasStorageType,
+  descriptionStorageTypes,
   discoverWebPushService,
   lwsStorageRoot,
   requireLwsStorageRoot,
@@ -292,5 +294,26 @@ describe('upContainer', () => {
       async () => ({ ok: false, status: 403, headers: new Headers() }) as unknown as Response
     ) as unknown as WhatwgFetch
     expect(await upContainer('https://data/yoyo-na/q7p2lm', denied)).toBeUndefined()
+  })
+})
+
+describe('storage description types', () => {
+  const registry = 'https://www.w3.org/ns/solid/sai#RegistryStorage'
+  const description = {
+    '@context': ['https://www.w3.org/ns/lws/v1', 'https://www.w3.org/ns/solid/interop-context/v1'],
+    id: 'https://registry/alice/',
+    type: ['Storage', 'RegistryStorage'],
+  }
+
+  test('reads compact aliases and expanded type IRIs', () => {
+    expect(descriptionStorageTypes(description)).toEqual(['Storage', 'RegistryStorage'])
+    expect(descriptionHasStorageType(description, registry)).toBe(true)
+    expect(descriptionHasStorageType(description, 'DataStorage')).toBe(false)
+  })
+
+  test('accepts an expanded description type', () => {
+    expect(
+      descriptionHasStorageType({ ...description, type: ['Storage', registry] }, registry)
+    ).toBe(true)
   })
 })

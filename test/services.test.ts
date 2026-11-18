@@ -41,6 +41,24 @@ describe('main', () => {
       ])
     )
   })
+  test('data storage advertises sai:DataStorage in its public description', async () => {
+    const response = await fetch('https://data/bob/', {
+      headers: { accept: 'application/lws+cid' },
+    })
+    expect(response.status).toBe(200)
+    const body = (await response.json()) as { '@context': string[]; type: string | string[] }
+    expect(body.type).toEqual(expect.arrayContaining(['Storage', 'DataStorage']))
+    expect(body['@context']).toContain('https://www.w3.org/ns/solid/interop-context/v1')
+  })
+  test('registry storage advertises sai:RegistryStorage in its public description', async () => {
+    const response = await fetch('https://registry/bob/', {
+      headers: { accept: 'application/lws+cid' },
+    })
+    expect(response.status).toBe(200)
+    const body = (await response.json()) as { '@context': string[]; type: string | string[] }
+    expect(body.type).toEqual(expect.arrayContaining(['Storage', 'RegistryStorage']))
+    expect(body['@context']).toContain('https://www.w3.org/ns/solid/interop-context/v1')
+  })
   test('data pod has no .lws access containers', async () => {
     const session = await buildSessionManager().getSession(aliceId)
     for (const path of ['.lws/grants/', '.lws/requests/']) {

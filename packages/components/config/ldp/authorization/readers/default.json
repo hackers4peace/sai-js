@@ -7,7 +7,6 @@
   "import": [
     "css:config/ldp/authorization/readers/auth-manager.json",
     "css:config/ldp/authorization/readers/auxiliary.json",
-    "sai:config/ldp/authorization/readers/admin.json",
     "css:config/ldp/authorization/readers/path-based.json",
     "css:config/ldp/authorization/readers/policy-engine.json",
     "css:config/ldp/authorization/readers/read-delete.json"
@@ -25,14 +24,20 @@
           "@id": "urn:solid-server:default:PathBasedReader",
           "@type": "PathBasedReader",
           "defaultReader": {
-            "@id": "urn:sai:default:AdminPermissionReader",
-            "@type": "AdminPermissionReader",
+            "@id": "urn:solid-server:default:ReadDeleteReader",
+            "@type": "ReadDeleteReader",
             "reader": {
-              "@id": "urn:solid-server:default:ReadDeleteReader",
-              "@type": "ReadDeleteReader",
-              "reader": {
-                "@id": "urn:solid-server:default:PolicyEngineReader"
-              }
+              "comment": "Token authority (scope/claim) and the credential-independent public reader. No registry grant matching happens at request time.",
+              "@id": "urn:sai:default:TokenAndPublicPermissionReader",
+              "@type": "UnionPermissionReader",
+              "readers": [
+                { "@id": "urn:solid-server:default:PolicyEngineReader" },
+                {
+                  "@id": "urn:sai:default:PublicPermissionReader",
+                  "@type": "PublicPermissionReader",
+                  "engine": { "@id": "urn:solidlab:policy-engine:PolicyEngine" }
+                }
+              ]
             }
           }
         }

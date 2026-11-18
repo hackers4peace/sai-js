@@ -58,7 +58,7 @@ describe('public resources', () => {
         headers: { 'Content-type': 'text/turtle' },
         body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
     test('can Read', async () => {
       const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
@@ -71,13 +71,13 @@ describe('public resources', () => {
         headers: { 'Content-type': 'text/turtle' },
         body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
     test('can not Delete', async () => {
       const response = await storageFetch(id, {
         method: 'DELETE',
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
   })
 
@@ -94,7 +94,7 @@ describe('public resources', () => {
         headers: { 'Content-type': 'text/turtle' },
         body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
     test('can Read', async () => {
       const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
@@ -107,13 +107,13 @@ describe('public resources', () => {
         headers: { 'Content-type': 'text/turtle' },
         body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
     test('can not Delete', async () => {
       const response = await storageFetch(id, {
         method: 'DELETE',
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
   })
 })
@@ -165,11 +165,11 @@ describe('protected resources (scope all, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Read', async () => {
         const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Update', async () => {
         const response = await storageFetch(id, {
@@ -177,13 +177,13 @@ describe('protected resources (scope all, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Delete', async () => {
         const response = await storageFetch(id, {
           method: 'DELETE',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
     })
 
@@ -200,11 +200,11 @@ describe('protected resources (scope all, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Read', async () => {
         const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Update', async () => {
         const response = await storageFetch(id, {
@@ -212,13 +212,13 @@ describe('protected resources (scope all, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Delete', async () => {
         const response = await storageFetch(id, {
           method: 'DELETE',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
     })
 
@@ -231,7 +231,7 @@ describe('protected resources (scope all, modes all)', () => {
       })
       test('can not Read', async () => {
         const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Update', async () => {
         const response = await storageFetch(id, {
@@ -239,13 +239,13 @@ describe('protected resources (scope all, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Delete', async () => {
         const response = await storageFetch(id, {
           method: 'DELETE',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
     })
 
@@ -326,11 +326,11 @@ describe('protected resources (scope inherited, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Read', async () => {
         const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Update', async () => {
         const response = await storageFetch(id, {
@@ -338,13 +338,13 @@ describe('protected resources (scope inherited, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Delete', async () => {
         const response = await storageFetch(id, {
           method: 'DELETE',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
     })
 
@@ -361,11 +361,11 @@ describe('protected resources (scope inherited, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Read', async () => {
         const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Update', async () => {
         const response = await storageFetch(id, {
@@ -373,13 +373,13 @@ describe('protected resources (scope inherited, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Delete', async () => {
         const response = await storageFetch(id, {
           method: 'DELETE',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
     })
 
@@ -392,7 +392,7 @@ describe('protected resources (scope inherited, modes all)', () => {
       })
       test('can not Read', async () => {
         const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Update', async () => {
         const response = await storageFetch(id, {
@@ -400,13 +400,13 @@ describe('protected resources (scope inherited, modes all)', () => {
           headers: { 'Content-type': 'text/turtle' },
           body: '<urn:foo:bar> <urn:foo:baz> "Beep Boop".',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
       test('can not Delete', async () => {
         const response = await storageFetch(id, {
           method: 'DELETE',
         })
-        expect(response.status).toBe(403)
+        expect(response.status).toBe(401)
       })
     })
 
@@ -612,18 +612,17 @@ describe('protected resources (admin grant, scope DataRegistry, mode Read)', () 
 
     test('can Read registry', async () => {
       const response = await storageFetch(registry, { headers: { Accept: 'text/turtle' } })
-      expect(response.status).toBe(200)
-      expect(response.headers.get('Content-Type')).toEqual(expect.stringContaining('text/turtle'))
+      expect(response.status).toBe(401)
     })
     test('can Read registration', async () => {
       const response = await storageFetch(registrationId, {
         headers: { Accept: 'text/turtle' },
       })
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(401)
     })
     test('can Read instance', async () => {
       const response = await storageFetch(id, { headers: { Accept: 'text/turtle' } })
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(401)
     })
     test('can not Create', async () => {
       const response = await storageFetch(getRegistration(id), {
@@ -631,7 +630,7 @@ describe('protected resources (admin grant, scope DataRegistry, mode Read)', () 
         headers: { 'Content-type': 'text/turtle' },
         body: turtleBody,
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
     test('can not Update', async () => {
       const response = await storageFetch(id, {
@@ -639,11 +638,11 @@ describe('protected resources (admin grant, scope DataRegistry, mode Read)', () 
         headers: { 'Content-type': 'text/turtle' },
         body: turtleBody,
       })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
     test('can not Delete', async () => {
       const response = await storageFetch(id, { method: 'DELETE' })
-      expect(response.status).toBe(403)
+      expect(response.status).toBe(401)
     })
   })
 

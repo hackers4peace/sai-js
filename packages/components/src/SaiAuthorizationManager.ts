@@ -96,9 +96,9 @@ export class SaiAuthorizationManager implements AuthorizationManager {
         data = data.concat(grantQuads)
       }
       // AdminGrants carry `storage` too (the Read-only DataRegistry-scoped
-      // ones) — they ride along in the same dataset and the engine's admin
-      // branch (SaiPermissionsEngine.findAdminModes, step 2.8 of
-      // org-admin-feature.md) consumes them by type/policy assignee/scope.
+      // ones) — they ride along in the same dataset. The storage exchange
+      // policy consumes them by type/scope/policy assignee when it mints
+      // `scope: admin`; the request-time engine never matches them.
       return data
     } catch (err) {
       if (NotFoundHttpError.isInstance(err)) {

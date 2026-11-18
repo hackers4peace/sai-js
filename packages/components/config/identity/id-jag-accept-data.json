@@ -1,0 +1,46 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": ["sai:config/identity/id-jag-accept.json"],
+  "@graph": [
+    {
+      "comment": "Storage-AS check: the final ID-JAG claim must stay within a grant the data owner issued for the requested storage. Reuses the policy engine's owner-registry grant source.",
+      "@id": "urn:sai:default:OwnerAccessClaimValidator",
+      "@type": "OwnerAccessClaimValidator",
+      "manager": { "@id": "urn:sai:policy-engine:AuthorizationManager" }
+    },
+    {
+      "comment": "Data storage: validate the carried claim against the owner's grant at exchange time.",
+      "@id": "urn:sai:default:OverrideIdJagSubjectTokenVerifier",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:sai:default:IdJagSubjectTokenVerifier" },
+      "overrideSteps": [
+        {
+          "@type": "OverrideParameters",
+          "overrideValue": {
+            "@type": "IdJagSubjectTokenVerifier",
+            "claimValidator": { "@id": "urn:sai:default:OwnerAccessClaimValidator" }
+          }
+        }
+      ]
+    },
+    {
+      "comment": "Data exchange policy (C6): a claim is required unless this exchange mints `scope: owner` or `scope: admin`; every other claimless exchange is invalid_grant. A claim always wins over a scope.",
+      "@id": "urn:sai:default:OverrideLwsTokenAccessPolicy",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:LwsTokenHttpHandler" },
+      "overrideSteps": [
+        {
+          "@type": "OverrideParameters",
+          "overrideValue": {
+            "@type": "LwsTokenHttpHandler",
+            "accessPolicy": { "@id": "urn:sai:default:StorageExchangeAccessPolicy" }
+          }
+        }
+      ]
+    }
+  ]
+}

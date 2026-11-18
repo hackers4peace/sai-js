@@ -241,6 +241,29 @@ export async function fetchLwsStorageDescription(
   return (await response.json()) as Record<string, unknown>
 }
 
+/**
+ * The storage types advertised by an LWS storage description. The SAI context
+ * aliases `sai:DataStorage` and `sai:RegistryStorage` to the bare terms
+ * `DataStorage` and `RegistryStorage`, so accept both the compact and the
+ * expanded IRI.
+ */
+export function descriptionStorageTypes(description: Record<string, unknown>): string[] {
+  const raw = description.type
+  const types = Array.isArray(raw) ? raw : raw ? [raw] : []
+  return types.filter((type): type is string => typeof type === 'string')
+}
+
+/** Whether the storage description advertises `type` (compact alias or expanded IRI). */
+export function descriptionHasStorageType(
+  description: Record<string, unknown>,
+  type: string
+): boolean {
+  const compact = type.slice(Math.max(type.lastIndexOf('#'), type.lastIndexOf('/')) + 1)
+  return descriptionStorageTypes(description).some(
+    (candidate) => candidate === type || candidate === compact
+  )
+}
+
 /** The exact `StorageRoot` service endpoint advertised by the description. */
 export function storageRootFromDescription(
   description: Record<string, unknown>

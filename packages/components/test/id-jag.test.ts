@@ -12,7 +12,7 @@ import { SubjectTokenVerifier } from '@solid/community-server'
 import type { JWK } from 'jose'
 import { calculateJwkThumbprint, exportJWK, generateKeyPair, jwtVerify } from 'jose'
 import type { GenerateKeyPairResult } from 'jose'
-import { beforeAll, describe, expect, test } from 'vitest'
+import { beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE, IdJagIssuer } from '../src/IdJagIssuer.js'
 import type { IdJagTokenHandlerArgs } from '../src/IdJagTokenHandler.js'
@@ -32,7 +32,7 @@ const DATA = 'https://data/'
 const CLIENT = 'https://data/test-client/public/id'
 const WEBID = 'https://id/alice/'
 const YOYO = 'https://id/yoyo'
-const ID_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id_token'
+const ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 
 let keys: GenerateKeyPairResult
 let publicJwk: JWK
@@ -63,6 +63,15 @@ class StubVerifier extends SubjectTokenVerifier {
   public async handle(input: SubjectTokenVerifierInput): Promise<VerifiedSubject> {
     this.last = input
     return { subject: WEBID, issuer: BASE_URL, client: CLIENT }
+  }
+}
+
+/** Test handler with a local registry-storage classification (no network). */
+class TestIdJagTokenHandler extends IdJagTokenHandler {
+  public readonly registryStorages = new Set<string>()
+
+  protected async isRegistryStorage(storage: string): Promise<boolean> {
+    return this.registryStorages.has(storage)
   }
 }
 
@@ -128,7 +137,7 @@ function tokenRequest(overrides: Record<string, string> = {}): string {
     requested_token_type: ID_JAG_TOKEN_TYPE,
     audience: DATA,
     subject_token: 'id-token',
-    subject_token_type: ID_TOKEN_TYPE,
+    subject_token_type: ACCESS_TOKEN_TYPE,
     ...overrides,
   })
   return params.toString()
@@ -161,7 +170,7 @@ function buildHandler(overrides: Partial<IdJagTokenHandlerArgs> = {}): {
   }
   const verifier = new StubVerifier()
   const issuer = new IdJagIssuer(BASE_URL, generator, 300)
-  const handler = new IdJagTokenHandler({
+  const handler = new TestIdJagTokenHandler({
     issuer,
     verifier,
     storageOrigins: ['data', 'registry'],
@@ -200,10 +209,62 @@ describe('IdJagTokenHandler', () => {
     // the subject token is verified against this server, not against the storage
     expect(verifier.last).toMatchObject({
       token: 'id-token',
-      tokenType: ID_TOKEN_TYPE,
+      tokenType: ACCESS_TOKEN_TYPE,
       audience: BASE_URL,
     })
     expect(verifier.last?.proofKeyThumbprint).toBeUndefined()
+  })
+
+  test('does not derive a claim for a claimless storage origin', async () => {
+    const find = vi.fn(async () => {
+      throw new Error('must not derive')
+    })
+    const { handler } = buildHandler({
+      claimValidator: { find, validate: async () => undefined },
+    })
+    handler.registryStorages.add('https://registry/alice/')
+    const captured = await call(
+      handler,
+      tokenRequest({
+        audience: 'https://registry/',
+        resource: 'https://registry/alice/',
+      })
+    )
+    expect(captured.status).toBe(200)
+    expect(find).not.toHaveBeenCalled()
+    const payload = (
+      await jwtVerify(JSON.parse(String(captured.body)).access_token, keys.publicKey)
+    ).payload
+    expect(payload.access).toBeUndefined()
+  })
+
+  test('issues an identity-only ID-JAG when claim derivation fails', async () => {
+    const { handler } = buildHandler({
+      claimValidator: {
+        find: async () => {
+          throw new Error('registry unavailable')
+        },
+        validate: async () => undefined,
+      },
+    })
+    const captured = await call(handler, tokenRequest())
+    expect(captured.status).toBe(200)
+    const payload = (
+      await jwtVerify(JSON.parse(String(captured.body)).access_token, keys.publicKey)
+    ).payload
+    expect(payload.access).toBeUndefined()
+  })
+
+  test('rejects an id_token subject token type at the first hop', async () => {
+    const { handler, verifier } = buildHandler()
+    const captured = await call(
+      handler,
+      tokenRequest({ subject_token_type: 'urn:ietf:params:oauth:token-type:id_token' })
+    )
+
+    expect(captured.status).toBe(400)
+    expect(JSON.parse(String(captured.body)).error).toBe('invalid_request')
+    expect(verifier.last).toBeUndefined()
   })
 
   test('rejects an audience that is not one of its storages', async () => {
@@ -411,7 +472,7 @@ describe('IdJagTokenHandler', () => {
     }
     const verifier = new StubIdJagVerifier(claim)
     const validated: unknown[] = []
-    const handler = new IdJagTokenHandler({
+    const handler = new TestIdJagTokenHandler({
       issuer: new IdJagIssuer(BASE_URL, generator, 300),
       verifier,
       storageOrigins: ['data', 'registry'],
@@ -493,7 +554,7 @@ describe('IdJagTokenHandler', () => {
       getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
       getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
     }
-    const handler = new IdJagTokenHandler({
+    const handler = new TestIdJagTokenHandler({
       issuer: new IdJagIssuer(BASE_URL, generator, 300),
       verifier: new StubIdJagVerifier(claim),
       storageOrigins: ['data'],
@@ -532,7 +593,7 @@ describe('IdJagTokenHandler', () => {
       getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
       getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
     }
-    const handler = new IdJagTokenHandler({
+    const handler = new TestIdJagTokenHandler({
       issuer: new IdJagIssuer(BASE_URL, generator, 300),
       verifier,
       storageOrigins: ['data'],

@@ -3007,51 +3007,66 @@ _:n3-166 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-167.
 <https://id/acme> <http://www.w3.org/2004/02/skos/core#prefLabel> "ACME";
     <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>;
-    <https://www.w3.org/ns/did#service> _:sai-access-request-acme, _:sai-access-grant-acme .
+    <https://www.w3.org/ns/did#service> _:sai-access-request-acme, _:sai-access-grant-acme;
+    <https://www.w3.org/ns/cid/v1#service> _:sai-openid-provider-acme .
 _:sai-access-request-acme a <https://www.w3.org/ns/lws#AccessRequestService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9hY21l>.
 _:sai-access-grant-acme a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC9hY21l>.
+_:sai-openid-provider-acme a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>.
 }
 <https://id/alice> {
 <https://id/alice> <http://www.w3.org/2004/02/skos/core#prefLabel> "Alice";
     <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ>;
-    <https://www.w3.org/ns/did#service> _:sai-access-request-alice, _:sai-access-grant-alice .
+    <https://www.w3.org/ns/did#service> _:sai-access-request-alice, _:sai-access-grant-alice;
+    <https://www.w3.org/ns/cid/v1#service> _:sai-openid-provider-alice .
 _:sai-access-request-alice a <https://www.w3.org/ns/lws#AccessRequestService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9hbGljZQ>.
 _:sai-access-grant-alice a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC9hbGljZQ>.
+_:sai-openid-provider-alice a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>.
 }
 <https://id/bob> {
 <https://id/bob> <http://www.w3.org/2004/02/skos/core#prefLabel> "Bob";
     <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9ib2I>;
-    <https://www.w3.org/ns/did#service> _:sai-access-request-bob, _:sai-access-grant-bob .
+    <https://www.w3.org/ns/did#service> _:sai-access-request-bob, _:sai-access-grant-bob;
+    <https://www.w3.org/ns/cid/v1#service> _:sai-openid-provider-bob .
 _:sai-access-request-bob a <https://www.w3.org/ns/lws#AccessRequestService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9ib2I>.
 _:sai-access-grant-bob a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC9ib2I>.
+_:sai-openid-provider-bob a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>.
 }
 <https://id/kim> {
 <https://id/kim> <http://www.w3.org/2004/02/skos/core#prefLabel> "Kim";
     <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0>;
-    <https://www.w3.org/ns/did#service> _:sai-access-request-kim, _:sai-access-grant-kim .
+    <https://www.w3.org/ns/did#service> _:sai-access-request-kim, _:sai-access-grant-kim;
+    <https://www.w3.org/ns/cid/v1#service> _:sai-openid-provider-kim .
 _:sai-access-request-kim a <https://www.w3.org/ns/lws#AccessRequestService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9raW0>.
 _:sai-access-grant-kim a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC9raW0>.
+_:sai-openid-provider-kim a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>.
 }
 <https://id/yoyo> {
 <https://id/yoyo> <http://www.w3.org/2004/02/skos/core#prefLabel> "Yoyo";
     <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC95b3lv>;
-    <https://www.w3.org/ns/did#service> _:sai-access-request-yoyo, _:sai-access-grant-yoyo .
+    <https://www.w3.org/ns/did#service> _:sai-access-request-yoyo, _:sai-access-grant-yoyo;
+    <https://www.w3.org/ns/cid/v1#service> _:sai-openid-provider-yoyo .
 _:sai-access-request-yoyo a <https://www.w3.org/ns/lws#AccessRequestService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC95b3lv>.
 _:sai-access-grant-yoyo a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC95b3lv>.
+_:sai-openid-provider-yoyo a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>.
 }
 <meta:https://registry/alice/wwp4j6.acr> {
 <https://registry/alice/wwp4j6.acr> a <http://www.w3.org/ns/ldp#Resource>
@@ -3295,9 +3310,12 @@ _:n3-194 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-195.
 <https://id/dan> {
 <https://id/dan> <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
     <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9kYW4>;
-    <https://www.w3.org/ns/did#service> _:sai-access-request-dan, _:sai-access-grant-dan .
+    <https://www.w3.org/ns/did#service> _:sai-access-request-dan, _:sai-access-grant-dan;
+    <https://www.w3.org/ns/cid/v1#service> _:sai-openid-provider-dan .
 _:sai-access-request-dan a <https://www.w3.org/ns/lws#AccessRequestService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9kYW4>.
 _:sai-access-grant-dan a <https://www.w3.org/ns/lws#AccessGrantService>;
     <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC9kYW4>.
+_:sai-openid-provider-dan a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>.
 }

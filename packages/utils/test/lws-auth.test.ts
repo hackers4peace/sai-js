@@ -1,4 +1,3 @@
-import { generateKeyPair } from 'jose'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import {
@@ -130,7 +129,7 @@ describe('exchangeLwsAccessToken', () => {
     const token = await exchangeLwsAccessToken({
       authorizationServer: AS_SERVER,
       resource: STORAGE,
-      subjectToken: 'id-token',
+      subjectToken: 'id-jag',
       fetch,
     })
     expect(token).toEqual({ accessToken: 'lws-token', expiresIn: 300 })
@@ -139,30 +138,21 @@ describe('exchangeLwsAccessToken', () => {
     expect(init.method).toBe('POST')
     const body = new URLSearchParams(init.body as string)
     expect(body.get('grant_type')).toBe('urn:ietf:params:oauth:grant-type:token-exchange')
-    expect(body.get('subject_token_type')).toBe('urn:ietf:params:oauth:token-type:id_token')
-    expect(body.get('subject_token')).toBe('id-token')
+    expect(body.get('subject_token_type')).toBe('urn:ietf:params:oauth:token-type:id-jag')
+    expect(body.get('subject_token')).toBe('id-jag')
     expect(body.get('resource')).toBe(STORAGE)
   })
 
-  test('signs a DPoP proof with the subject token key', async () => {
-    const dpopKeyPair = await generateKeyPair('ES256')
+  test('uses a bearer grant exchange without a DPoP proof', async () => {
     const fetch = vi.fn(async () => json({ access_token: 'lws-token', expires_in: 300 }))
     await exchangeLwsAccessToken({
       authorizationServer: AS_SERVER,
       resource: STORAGE,
-      subjectToken: 'id-token',
-      dpopKeyPair,
+      subjectToken: 'id-jag',
       fetch: fetch as unknown as typeof globalThis.fetch,
     })
     const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
-    const proof = (init.headers as Record<string, string>).dpop
-    expect(proof).toBeTruthy()
-    const [header, payload] = proof!.split('.')
-    expect(JSON.parse(Buffer.from(header, 'base64url').toString()).typ).toBe('dpop+jwt')
-    expect(JSON.parse(Buffer.from(payload, 'base64url').toString())).toMatchObject({
-      htm: 'POST',
-      htu: TOKEN_ENDPOINT,
-    })
+    expect(init.headers).toEqual({ 'content-type': 'application/x-www-form-urlencoded' })
   })
 
   test('throws with the OAuth error when the exchange is rejected', async () => {
@@ -173,7 +163,7 @@ describe('exchangeLwsAccessToken', () => {
       exchangeLwsAccessToken({
         authorizationServer: AS_SERVER,
         resource: STORAGE,
-        subjectToken: 'id-token',
+        subjectToken: 'id-jag',
         fetch,
       })
     ).rejects.toThrow('invalid_target')

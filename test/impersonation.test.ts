@@ -45,7 +45,7 @@ const BOB_EMAIL = 'bob@yoyodyne.example'
 
 const TOKEN_EXCHANGE = 'urn:ietf:params:oauth:grant-type:token-exchange'
 const ID_JAG_TYPE = 'urn:ietf:params:oauth:token-type:id-jag'
-const ID_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id_token'
+const ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 
 /** The delegated grant Bob holds: YoYo -> Bob, narrowed to one ACME project. */
 const claim = grantAccess({
@@ -236,7 +236,7 @@ describe('C2 impersonation chain', () => {
         audience: AUTH,
         resource: 'https://data/kim-red/',
         subject_token: subjectToken,
-        subject_token_type: ID_TOKEN_TYPE,
+        subject_token_type: ACCESS_TOKEN_TYPE,
       },
       await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair)
     )

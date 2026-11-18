@@ -54,15 +54,24 @@ interface CachedGrant {
   expiresAt: number
 }
 
+/** An OAuth error response with `error: invalid_grant`. */
+function isInvalidGrant(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { error?: unknown }).error === 'invalid_grant'
+  )
+}
+
 /**
  * `fetch` for LWS storages that goes through the **two-step** authorization
  * chain instead of exchanging the authentication credential directly:
  *
- * 1. `POST <uas>/.well-known/lws/token` — the authentication credential (an ID
- *    token, or the browser's DPoP-bound access token) + DPoP proof → one ID-JAG
+ * 1. `POST <uas>/.well-known/lws/token` — the user's DPoP-bound access token
+ *    (or an incoming ID-JAG at an impersonation hop) + DPoP proof → one ID-JAG
  *    per resource authorization server (`aud` = that server's issuer),
  * 2. `POST <storage>/.well-known/lws/token` — ID-JAG → bearer access token for
- *    the storage,
+ *    the storage (a bearer grant exchange, no DPoP proof),
  * 3. the storage request, retried once on `401`.
  *
  * The UAS derives the claim from the user's grants for the requested storage,
@@ -163,16 +172,24 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
     tokenSource: async (
       storage: string,
       challenge
-    ): Promise<{ accessToken: string; expiresIn: number }> => {
+    ): Promise<{ accessToken: string; expiresIn: number } | undefined> => {
       const metadata = await discoverLwsAuthorizationServerMetadata(storage, baseFetch, challenge)
       const ras: TokenEndpoint = { issuer: metadata.issuer, tokenEndpoint: metadata.tokenEndpoint }
-      return requestAccessToken({
-        ras,
-        idJag: await idJag(ras.issuer, storage),
-        resource: storage,
-        clientId: credential.clientId,
-        fetch: tokenFetch,
-      })
+      try {
+        return await requestAccessToken({
+          ras,
+          idJag: await idJag(ras.issuer, storage),
+          resource: storage,
+          clientId: credential.clientId,
+          fetch: tokenFetch,
+        })
+      } catch (error: unknown) {
+        // A storage `invalid_grant` means "no token for this storage", not a
+        // crash: the request is retried without Authorization, so public data
+        // still works. An expired/invalid access token is still a 401.
+        if (isInvalidGrant(error)) return undefined
+        throw error
+      }
     },
   })
 }

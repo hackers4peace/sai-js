@@ -21,6 +21,7 @@ export const webIdTemplate = ({
   PREFIX interop: <http://www.w3.org/ns/solid/interop#>
   PREFIX lws: <https://www.w3.org/ns/lws#>
   PREFIX did: <https://www.w3.org/ns/did#>
+  PREFIX cid: <https://www.w3.org/ns/cid/v1#>
 
   GRAPH <${document}> {
     <${id}>
@@ -32,6 +33,10 @@ export const webIdTemplate = ({
         ], [
           a lws:AccessGrantService;
           did:serviceEndpoint <${accessGrants}>
+        ];
+        cid:service [
+          a lws:OpenIdProvider;
+          cid:serviceEndpoint <${issuer}>
         ] .
   }
 `

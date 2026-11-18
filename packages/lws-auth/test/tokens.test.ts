@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, test } from 'vitest'
 
 import {
+  ACCESS_TOKEN_TYPE,
   ID_JAG_TOKEN_TYPE,
-  ID_TOKEN_TYPE,
   requestAccessToken,
   requestIdJag,
 } from '../src/tokens.ts'
@@ -54,7 +54,7 @@ describe('requestIdJag', () => {
     expect(body.get('audience')).toBe(RAS)
     expect(body.get('resource')).toBe(STORAGE)
     expect(body.get('subject_token')).toBe(SUBJECT_TOKEN)
-    expect(body.get('subject_token_type')).toBe(ID_TOKEN_TYPE)
+    expect(body.get('subject_token_type')).toBe(ACCESS_TOKEN_TYPE)
     // the credential is sender-constrained: the proof is what makes it exchangeable
     expect(requests[0].headers.get('dpop')).toEqual(expect.any(String))
   })

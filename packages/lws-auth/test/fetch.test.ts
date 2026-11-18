@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, test } from 'vitest'
 
 import type { LwsCredential } from '../src/credential.ts'
 import { createLwsAuthFetch } from '../src/fetch.ts'
-import { ID_JAG_TOKEN_TYPE, ID_TOKEN_TYPE } from '../src/tokens.ts'
+import { ACCESS_TOKEN_TYPE, ID_JAG_TOKEN_TYPE } from '../src/tokens.ts'
 import { createFakeFetch, formBody, json, makeJwt } from './helpers.ts'
 
 const UAS = 'https://auth/'
@@ -201,7 +201,7 @@ describe('createLwsAuthFetch', () => {
     const [first, second] = grantRequests.map(formBody)
     expect(first.get('audience')).toBe(UAS)
     expect(first.get('resource')).toBe(DATA_STORAGE)
-    expect(first.get('subject_token_type')).toBe(ID_TOKEN_TYPE)
+    expect(first.get('subject_token_type')).toBe(ACCESS_TOKEN_TYPE)
     expect(second.get('audience')).toBe(DATA)
     expect(second.get('resource')).toBe(DATA_STORAGE)
     expect(second.get('subject_token_type')).toBe(ID_JAG_TOKEN_TYPE)
@@ -258,6 +258,60 @@ describe('createLwsAuthFetch', () => {
     await fetch(`${DATA_STORAGE_2}x8v2lm`)
 
     expect(world.requests.filter(isGrantRequest)).toHaveLength(2)
+  })
+
+  test('treats a storage invalid_grant as no token and retries without Authorization', async () => {
+    let resourceRequests = 0
+    const { fetch, requests } = createFakeFetch((url, request): Response | undefined => {
+      const href = url.href
+      if (href === UAS_TOKEN && request.method === 'POST') {
+        return json({
+          issued_token_type: ID_JAG_TOKEN_TYPE,
+          access_token: makeJwt({ iss: UAS, aud: DATA, sub: WEBID, client_id: CLIENT }),
+          token_type: 'N_A',
+          expires_in: 300,
+        })
+      }
+      if (url.pathname === '/.well-known/lws-configuration') {
+        if (href === `${UAS}.well-known/lws-configuration`) return undefined
+        return json({
+          issuer: `https://${url.host}/`,
+          token_endpoint: `https://${url.host}/.well-known/lws/token`,
+          jwks_uri: `https://${url.host}/.well-known/lws/jwks`,
+        })
+      }
+      if (url.pathname === '/.well-known/lws/token' && request.method === 'POST') {
+        return json({ error: 'invalid_grant', error_description: 'no token' }, 400)
+      }
+      if (href.startsWith(DATA_STORAGE)) {
+        resourceRequests += 1
+        if (resourceRequests === 1) {
+          return new Response(undefined, {
+            status: 401,
+            headers: {
+              'www-authenticate': `Bearer resource_metadata="${DATA_STORAGE}.well-known/oauth-protected-resource/x", as_uri="${DATA}", realm="${DATA_STORAGE}"`,
+            },
+          })
+        }
+        return new Response('<urn:public> <urn:ok> "yes".', {
+          status: 200,
+          headers: { 'content-type': 'text/turtle' },
+        })
+      }
+    })
+    const lwsFetch = createLwsAuthFetch({
+      credential: createCredential(),
+      fetch,
+      now: () => Date.now(),
+    })
+
+    const response = await lwsFetch(`${DATA_STORAGE}k3pqsb`)
+    expect(response.status).toBe(200)
+    const storageRequests = requests.filter((request) => request.url === `${DATA_STORAGE}k3pqsb`)
+    expect(storageRequests).toHaveLength(2)
+    expect(storageRequests[0].headers.get('authorization')).toBeNull()
+    // the denied exchange is not retried; the fallback goes out tokenless
+    expect(storageRequests[1].headers.get('authorization')).toBeNull()
   })
 
   test('never sends the ID-JAG to a storage', async () => {

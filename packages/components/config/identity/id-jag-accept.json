@@ -7,37 +7,31 @@
   "import": [],
   "@graph": [
     {
-      "comment": "Storage-AS check: the final ID-JAG claim must stay within a grant the data owner issued for the requested storage. Reuses the policy engine's owner-registry grant source.",
-      "@id": "urn:sai:default:OwnerAccessClaimValidator",
-      "@type": "OwnerAccessClaimValidator",
-      "manager": { "@id": "urn:sai:policy-engine:AuthorizationManager" }
-    },
-    {
-      "comment": "Accepts an ID-JAG as the subject token of the token exchange, next to the ID token of the OIDC suite. The grant is `aud`-restricted to this authorization server, so an ID-JAG minted for another storage is useless here. See docs/plans/lws-auth.md C2.",
+      "comment": "Accepts an ID-JAG as the only subject token of a storage's token exchange (C6). The grant is `aud`-restricted to this authorization server, so a grant minted for another storage is useless here. The issuer is trusted through `trustedIssuers` or an `lws:OpenIdProvider` service; the Solid-OIDC `solid:oidcIssuer` fallback is disabled (D34).",
       "@id": "urn:sai:default:IdJagSubjectTokenVerifier",
       "@type": "IdJagSubjectTokenVerifier",
       "converter": { "@id": "urn:solid-server:default:RepresentationConverter" },
       "trustedIssuers": [{ "@id": "urn:solid-server:default:variable:baseUrl" }],
-      "acceptSolidOidcIssuer": true,
-      "clockTolerance": 60,
-      "claimValidator": { "@id": "urn:sai:default:OwnerAccessClaimValidator" }
+      "acceptSolidOidcIssuer": false,
+      "clockTolerance": 60
     },
     {
-      "comment": "Put the ID-JAG verifier first: its `canHandle` declines every other token type, so an `id_token` exchange falls through to the OIDC suite unchanged.",
+      "comment": "Storages accept only ID-JAG subject tokens; the OIDC, CID, and did:key suites are not configured at a storage authorization server (D25).",
       "@id": "urn:sai:default:OverrideSubjectTokenVerifier",
       "@type": "Override",
       "overrideInstance": { "@id": "urn:solid-server:default:SubjectTokenVerifier" },
       "overrideSteps": [
         {
-          "@type": "OverrideListInsertAt",
-          "overrideParameter": { "@id": "StatusWaterfallHandler:_handlers" },
-          "overrideTarget": { "@value": "0" },
-          "overrideValue": { "@id": "urn:sai:default:IdJagSubjectTokenVerifier" }
+          "@type": "OverrideParameters",
+          "overrideValue": {
+            "@type": "StatusWaterfallHandler",
+            "handlers": [{ "@id": "urn:sai:default:IdJagSubjectTokenVerifier" }]
+          }
         }
       ]
     },
     {
-      "comment": "Advertises the accepted subject token types, including the ID-JAG. Replacing the metadata route (first match wins) avoids duplicating the whole authorization server handler list from CSS.",
+      "comment": "Advertises the accepted subject token types: ID-JAG only. Replacing the metadata route (first match wins) avoids duplicating the whole authorization server handler list from CSS.",
       "@id": "urn:sai:default:OverrideLwsAuthorizationServerMetadata",
       "@type": "Override",
       "overrideInstance": { "@id": "urn:solid-server:default:LwsAuthorizationServerHandler" },
@@ -62,11 +56,7 @@
         "issuer": { "@id": "urn:solid-server:default:LwsAccessTokenIssuer" },
         "tokenPath": ".well-known/lws/token",
         "jwksPath": ".well-known/lws/jwks",
-        "subjectTokenTypes": [
-          "urn:ietf:params:oauth:token-type:jwt",
-          "urn:ietf:params:oauth:token-type:id_token",
-          "urn:ietf:params:oauth:token-type:id-jag"
-        ]
+        "subjectTokenTypes": ["urn:ietf:params:oauth:token-type:id-jag"]
       }
     }
   ]

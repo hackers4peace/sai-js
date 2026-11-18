@@ -49,7 +49,9 @@ export class SelfIssuedSession extends SessionCore {
    * Login by generating a self-issued access token.
    */
   async login(): Promise<void> {
-    const accessToken = await this.generateSelfIssuedAccessToken()
+    // The `.sai` API session keeps its Solid-OIDC audience; the LWS credential
+    // is minted per first-hop exchange with this UAS as its only audience.
+    const accessToken = await this.generateSelfIssuedAccessToken('solid')
 
     const tokenDetails: TokenDetails = {
       access_token: accessToken,
@@ -73,10 +75,12 @@ export class SelfIssuedSession extends SessionCore {
   }
 
   /**
-   * Generate a self-issued access token for Solid.
+   * Generate a self-issued access token.
    * The token is signed with the DPoP private key and bound to the DPoP public key.
+   * Defaults to this UAS as the only audience (the LWS first-hop credential);
+   * `login()` explicitly uses `solid` for the `.sai` session.
    */
-  async generateSelfIssuedAccessToken(): Promise<string> {
+  async generateSelfIssuedAccessToken(audience: string = this.issuer): Promise<string> {
     const thumbprint = await calculateJwkThumbprint(
       await exportJWK(this.dpopKeyPair.publicKey),
       'sha256'
@@ -85,27 +89,31 @@ export class SelfIssuedSession extends SessionCore {
     const now = Math.floor(Date.now() / 1000)
     const exp = now + this.expiresIn
 
-    return new SignJWT({
-      webid: this.webid,
-      client_id: this.clientId,
-      // `azp` is what the LWS token exchange reads as the client: it becomes
-      // the `client_id` of the storage access token, so the SAI policy engine
-      // recognizes the request as coming from the owner's Authorization Agent.
-      azp: this.clientId,
-      cnf: { jkt: thumbprint },
-    })
-      .setProtectedHeader({
-        alg: this.privateKey.alg,
-        typ: 'at+jwt',
-        kid: await calculateJwkThumbprint(this.publicKey, 'sha256'),
+    return (
+      new SignJWT({
+        webid: this.webid,
+        client_id: this.clientId,
+        // `azp` is what the LWS token exchange reads as the client: it becomes
+        // the `client_id` of the storage access token, so the SAI policy engine
+        // recognizes the request as coming from the owner's Authorization Agent.
+        azp: this.clientId,
+        cnf: { jkt: thumbprint },
       })
-      .setIssuer(this.issuer)
-      .setSubject(this.webid)
-      .setAudience('solid')
-      .setIssuedAt(now)
-      .setExpirationTime(exp)
-      .setJti(crypto.randomUUID())
-      .sign(this.privateKey)
+        .setProtectedHeader({
+          alg: this.privateKey.alg,
+          typ: 'at+jwt',
+          kid: await calculateJwkThumbprint(this.publicKey, 'sha256'),
+        })
+        .setIssuer(this.issuer)
+        .setSubject(this.webid)
+        // The first ID-JAG exchange always happens at this UAS: the credential
+        // has no `solid` audience and no external IdP/UAS is trusted for it.
+        .setAudience(audience)
+        .setIssuedAt(now)
+        .setExpirationTime(exp)
+        .setJti(crypto.randomUUID())
+        .sign(this.privateKey)
+    )
   }
 
   /**

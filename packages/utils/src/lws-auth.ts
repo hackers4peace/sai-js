@@ -9,8 +9,8 @@ import type { WhatwgFetch } from './whatwg-fetch.ts'
  */
 export const LWS_TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange'
 
-/** OpenID Connect ID token type, the LWS authentication suite the SAI UAS uses. */
-export const LWS_TOKEN_TYPE_ID_TOKEN = 'urn:ietf:params:oauth:token-type:id_token'
+/** Identity Assertion JWT Authorization Grant — the only subject token a storage accepts. */
+export const LWS_TOKEN_TYPE_ID_JAG = 'urn:ietf:params:oauth:token-type:id-jag'
 
 /** Path of the LWS authorization server metadata resource (LWS, §Authorization Server Metadata). */
 export const LWS_CONFIGURATION_PATH = '/.well-known/lws-configuration'
@@ -213,10 +213,12 @@ export interface LwsTokenExchangeOptions {
   authorizationServer: LwsAuthorizationServer
   /** The storage the access token is requested for (the `resource` parameter). */
   resource: string
-  /** The ID token that authenticates the agent (the `subject_token` parameter). */
+  /**
+   * The ID-JAG that authorizes this exchange (the `subject_token` parameter).
+   * Storages accept only ID-JAG subject tokens; a raw ID/access token is not a
+   * storage credential.
+   */
   subjectToken: string
-  /** Key pair bound to the subject token's `cnf.jkt` claim. */
-  dpopKeyPair?: GenerateKeyPairResult
   fetch: WhatwgFetch
 }
 
@@ -227,29 +229,24 @@ export interface LwsAccessToken {
 }
 
 /**
- * Exchanges an ID token for an LWS access token of a storage (LWS, §Token
+ * Exchanges an ID-JAG for an LWS access token of a storage (LWS, §Token
  * Exchange). The access token is a bearer token bound to the storage through
- * its `aud` claim.
+ * its `aud` claim. The exchange itself is a bearer grant exchange: DPoP is only
+ * used at the first hop (the user's UAS), never at a storage.
  */
 export async function exchangeLwsAccessToken(
   options: LwsTokenExchangeOptions
 ): Promise<LwsAccessToken> {
-  const { authorizationServer, resource, subjectToken, dpopKeyPair, fetch } = options
+  const { authorizationServer, resource, subjectToken, fetch } = options
   const body = new URLSearchParams({
     grant_type: LWS_TOKEN_EXCHANGE_GRANT,
-    subject_token_type: LWS_TOKEN_TYPE_ID_TOKEN,
+    subject_token_type: LWS_TOKEN_TYPE_ID_JAG,
     subject_token: subjectToken,
     resource,
   })
-  const headers: Record<string, string> = {
-    'content-type': 'application/x-www-form-urlencoded',
-  }
-  if (dpopKeyPair) {
-    headers.dpop = await createLwsTokenDpopProof(authorizationServer.tokenEndpoint, dpopKeyPair)
-  }
   const response = await fetch(authorizationServer.tokenEndpoint, {
     method: 'POST',
-    headers,
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
   })
   if (!response.ok) {
@@ -270,19 +267,19 @@ export async function exchangeLwsAccessToken(
 
 export interface LwsFetchOptions {
   /**
-   * Returns the ID token that authenticates the agent, called for every
-   * exchange (the token is short-lived, so it is not cached here). Required
-   * unless `tokenSource` is set.
+   * Returns the ID-JAG that authorizes the storage exchange, called for every
+   * exchange (the grant is short-lived, so it is not cached here). Required
+   * unless `tokenSource` is set. Storages accept only ID-JAG subject tokens.
    */
   subjectToken?: () => Promise<string>
-  /** Key pair bound to the subject token's `cnf.jkt` claim. */
-  dpopKeyPair?: GenerateKeyPairResult
   /**
-   * Custom access token source, e.g. a client that asks its User
-   * Authorization Server for a storage token over HTTP. Defaults to the local
-   * LWS token exchange with `subjectToken`.
+   * Custom access token source, e.g. a client that obtains the ID-JAG and
+   * exchanges it over HTTP. Returns `undefined` when the storage authorization
+   * server denied the exchange with `invalid_grant` (no token for this
+   * storage); the request then goes out without `Authorization`, so public
+   * resources still work.
    */
-  tokenSource?: (storage: string, challenge?: LwsChallenge) => Promise<LwsAccessToken>
+  tokenSource?: (storage: string, challenge?: LwsChallenge) => Promise<LwsAccessToken | undefined>
   /**
    * Storages the session knows about (e.g. its data and registry pods). Their
    * requests are authenticated up front instead of after a `401` round trip.
@@ -302,10 +299,8 @@ interface CachedToken {
 export interface LwsAccessTokenRequestOptions {
   /** The storage the token is requested for (the `resource` parameter). */
   resource: string
-  /** Returns the ID token that authenticates the agent. */
+  /** Returns the ID-JAG that authorizes the agent at this storage. */
   subjectToken: () => Promise<string>
-  /** Key pair bound to the subject token's `cnf.jkt` claim. */
-  dpopKeyPair?: GenerateKeyPairResult
   /** Underlying fetch for the challenge probe, discovery and the exchange. */
   fetch?: WhatwgFetch
 }
@@ -314,7 +309,7 @@ export interface LwsAccessTokenRequestOptions {
  * Obtains an LWS access token for a storage without a request to it: probes
  * the storage for its `401` challenge (the storage root is public, its LDP
  * representation is not), discovers the authorization server and exchanges
- * the ID token. Used by the SAI UAS to hand a storage token to its UI.
+ * the ID-JAG. Used by the SAI UAS to hand a storage token to its UI.
  */
 export async function requestLwsAccessToken(
   options: LwsAccessTokenRequestOptions
@@ -334,7 +329,6 @@ export async function requestLwsAccessToken(
     authorizationServer,
     resource: options.resource,
     subjectToken: await options.subjectToken(),
-    dpopKeyPair: options.dpopKeyPair,
     fetch: baseFetch,
   })
 }
@@ -342,11 +336,13 @@ export async function requestLwsAccessToken(
 /**
  * Wraps a fetch so requests to LWS storages carry an LWS access token.
  *
- * The session owner's ID token is exchanged for a storage access token, cached
+ * The session owner's ID-JAG is exchanged for a storage access token, cached
  * per storage until shortly before it expires. The token is bound to the
  * storage, not to a resource, so one token serves every request to that
  * storage. A `401` response re-runs discovery and the exchange (the token may
- * have expired or been revoked) and retries the request once.
+ * have expired or been revoked) and retries the request once. An exchange
+ * `invalid_grant` means the agent has no token for the storage: the request is
+ * retried once without `Authorization` so public data still works.
  *
  * Requests to URLs outside the known storages are sent unauthenticated; if
  * they answer with an LWS challenge, the storage from the challenge `realm` is
@@ -364,7 +360,12 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
   )
   const tokens = new Map<string, CachedToken>()
   const servers = new Map<string, LwsAuthorizationServer>()
-  const pending = new Map<string, Promise<string>>()
+  const pending = new Map<string, Promise<string | undefined>>()
+  // `invalid_grant` means "this agent has no token for this storage": cache the
+  // negative result briefly and send the request without credentials so public
+  // resources still work. A stale token is a 401, not a reason to go anonymous.
+  const noToken = new Map<string, number>()
+  const noTokenTtl = 30_000
 
   /** Longest known storage that contains the URL. */
   function findStorage(url: string): string | undefined {
@@ -405,19 +406,25 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
     return metadata
   }
 
-  async function exchange(storage: string, challenge?: LwsChallenge): Promise<string> {
+  async function exchange(storage: string, challenge?: LwsChallenge): Promise<string | undefined> {
     const inFlight = pending.get(storage)
     if (inFlight) return inFlight
-    const promise = (async () => {
+    const promise = (async (): Promise<string | undefined> => {
       const token = options.tokenSource
         ? await options.tokenSource(storage, challenge)
         : await exchangeLwsAccessToken({
             authorizationServer: await resolveServer(storage, challenge),
             resource: storage,
             subjectToken: await options.subjectToken!(),
-            dpopKeyPair: options.dpopKeyPair,
             fetch: baseFetch,
           })
+      if (!token) {
+        noToken.set(storage, Date.now() + noTokenTtl)
+        tokens.delete(storage)
+        if (!storages.has(storage)) storages.add(storage)
+        return undefined
+      }
+      noToken.delete(storage)
       tokens.set(storage, {
         accessToken: token.accessToken,
         expiresAt: Date.now() + Math.max(30_000, token.expiresIn * 1000 - renewalMargin),
@@ -433,12 +440,21 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
     }
   }
 
+  function denied(storage: string): boolean {
+    const until = noToken.get(storage)
+    if (until === undefined) return false
+    if (until > Date.now()) return true
+    noToken.delete(storage)
+    return false
+  }
+
   async function accessToken(
     storage: string,
     challenge?: LwsChallenge
   ): Promise<string | undefined> {
     const cached = tokens.get(storage)
     if (cached && cached.expiresAt > Date.now() && !challenge) return cached.accessToken
+    if (denied(storage)) return undefined
     // Without a challenge, the authorization server of a storage that is not
     // its own base URL can not be discovered yet: send the request
     // unauthenticated first and use the challenge of its `401` response.
@@ -464,6 +480,7 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
       const challenge = parseLwsChallenge(response.headers.get('www-authenticate'))
       if (!challenge?.realm && !challenge?.asUri && !challenge?.resourceMetadata) return response
       const storage = serviceStorage ?? normalizeStorage(challenge.realm ?? new URL(url).origin)
+      if (serviceToken === undefined && denied(storage)) return response
       const token = await accessToken(storage, challenge)
       return baseFetch(token ? withBearer(retryable, token) : retryable)
     }
@@ -474,7 +491,8 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
     const challenge = parseLwsChallenge(response.headers.get('www-authenticate'))
     if (!challenge?.realm && !challenge?.asUri && !challenge?.resourceMetadata) return response
     const storage = challenge.realm ? normalizeStorage(challenge.realm) : known
+    if (denied(storage)) return response
     const renewed = await exchange(storage, challenge)
-    return baseFetch(withBearer(retryable, renewed))
+    return baseFetch(renewed ? withBearer(retryable, renewed) : retryable)
   }
 }

@@ -32,7 +32,7 @@
       }
     },
     {
-      "comment": "Verifies the authentication credential presented at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced. Two shapes are accepted: access tokens of the OpenID provider of this server (`aud` = this server, `cnf.jkt` from DPoP), and the self-issued `at+jwt` of the agent/authorization-agent suite (`aud: solid`, `cnf.jkt`). A token with `cnf.jkt` is only accepted together with a DPoP proof for that key, and `requireRestrictedTokens` refuses unbound tokens whose audience is not this server.",
+      "comment": "Verifies the first-hop authentication credential at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced. Only a sender-constrained access token is accepted: the OpenID provider's access token or the self-issued `at+jwt`, both with `aud` = this server and `cnf.jkt` from DPoP. `requireSenderConstrained` rejects an unbound token even with the right audience; `requireRestrictedTokens` enforces the audience; `additionalAudiences` is empty (no `solid`) and the Solid-OIDC issuer fallback is disabled.",
       "@id": "urn:sai:default:IdTokenVerifier",
       "@type": "OidcSubjectTokenVerifier",
       "converter": {
@@ -43,9 +43,10 @@
           "@id": "urn:solid-server:default:variable:baseUrl"
         }
       ],
-      "additionalAudiences": ["solid"],
+      "additionalAudiences": [],
       "acceptSolidOidcIssuer": false,
-      "requireRestrictedTokens": true
+      "requireRestrictedTokens": true,
+      "requireSenderConstrained": true
     },
     {
       "comment": "Accepts an incoming ID-JAG at a UAS for the C2 impersonation hop (Bob -> YoYo). The signature/audience/claim are verified before the handler re-issues it under the visible subject.",
@@ -59,7 +60,7 @@
           "@id": "urn:solid-server:default:variable:baseUrl"
         }
       ],
-      "acceptSolidOidcIssuer": true,
+      "acceptSolidOidcIssuer": false,
       "clockTolerance": 60
     },
     {
@@ -80,7 +81,7 @@
       "@type": "DelegatedAccessClaimValidator"
     },
     {
-      "comment": "LWS token endpoint of the UAS: exchanges an ID token (optionally DPoP-bound) for an ID-JAG restricted to one storage's authorization server.",
+      "comment": "LWS token endpoint of the UAS: exchanges the user's DPoP-bound access token (or an incoming ID-JAG at an impersonation hop) for an ID-JAG restricted to one storage's authorization server. A regular ID token is rejected.",
       "@id": "urn:sai:default:IdJagRouter",
       "@type": "RouterHandler",
       "baseUrl": {

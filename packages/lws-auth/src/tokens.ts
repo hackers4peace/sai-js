@@ -100,8 +100,8 @@ export interface IdJagRequest extends TokenRequestOptions {
   /** The authentication credential (ID token / self-issued JWT) or an ID-JAG. */
   subjectToken: string
   /**
-   * Token type of {@link subjectToken}. Defaults to the ID token type; the C2
-   * impersonation hop presents an ID-JAG (`...:id-jag`) instead.
+   * Token type of {@link subjectToken}. Defaults to the DPoP-bound access
+   * token type; the impersonation hop presents an ID-JAG (`...:id-jag`).
    */
   subjectTokenType?: string
   /** DPoP key pair the credential is bound to (`cnf.jkt`). */
@@ -120,7 +120,7 @@ export interface IdJagRequest extends TokenRequestOptions {
  * one resource authorization server (`audience`).
  */
 export async function requestIdJag(request: IdJagRequest): Promise<string> {
-  const subjectTokenType = request.subjectTokenType ?? ID_TOKEN_TYPE
+  const subjectTokenType = request.subjectTokenType ?? ACCESS_TOKEN_TYPE
   const parameters: Record<string, string> = {
     requested_token_type: ID_JAG_TOKEN_TYPE,
     audience: request.audience,

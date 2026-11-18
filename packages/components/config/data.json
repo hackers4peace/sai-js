@@ -48,9 +48,22 @@
     "sai:config/overrides/disable-v6-migration.json",
     "sai:config/overrides/disable-ui.json",
     "css:config/identity/lws/default.json",
-    "sai:config/identity/id-jag-accept.json",
+    "sai:config/identity/id-jag-accept-data.json",
     "sai:config/overrides/lws-subscription-storage.json",
     "sai:config/overrides/lws-notification-service-paths.json",
     "sai:config/storage/no-cache.json"
+  ],
+  "@graph": [
+    {
+      "comment": "Advertises the SAI storage role in the public LWS storage description. The UAS uses it to decide whether a storage is a claimless registry (ACP) or a data storage whose grant claim must be derived.",
+      "@id": "urn:sai:default:DataStorageTypeDescriber",
+      "@type": "SaiStorageTypeDescriber",
+      "storageType": "DataStorage"
+    },
+    {
+      "@id": "urn:solid-server:default:LwsStorageDescriptionHandler",
+      "@type": "LwsStorageDescriptionHandler",
+      "describers": [{ "@id": "urn:sai:default:DataStorageTypeDescriber" }]
+    }
   ]
 }

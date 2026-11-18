@@ -1,0 +1,25 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": ["sai:config/identity/id-jag-accept.json"],
+  "@graph": [
+    {
+      "comment": "Registry exchange (D27): ID-JAG only, no access claim required, and no claim copied into the access token. ACP authorizes registry resources using sub/client_id.",
+      "@id": "urn:sai:default:OverrideLwsTokenRegistryCopy",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:LwsTokenHttpHandler" },
+      "overrideSteps": [
+        {
+          "@type": "OverrideParameters",
+          "overrideValue": {
+            "@type": "LwsTokenHttpHandler",
+            "copyAccessClaim": false
+          }
+        }
+      ]
+    }
+  ]
+}

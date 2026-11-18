@@ -1,10 +1,17 @@
-import { setBodyAttribute, setTokenAttributes } from '@janeirodigital/interop-utils'
-import { ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
+import {
+  ODRL_ID_JAG_CONTEXT,
+  SAI,
+  descriptionHasStorageType,
+  fetchLwsStorageDescription,
+  setBodyAttribute,
+  setTokenAttributes,
+} from '@janeirodigital/interop-utils'
 import { SpanStatusCode } from '@opentelemetry/api'
 import {
   APPLICATION_X_WWW_FORM_URLENCODED,
   HttpHandler,
   NotImplementedHttpError,
+  TOKEN_TYPE_ACCESS_TOKEN,
   parseContentType,
   readableToString,
   verifyDpopProof,
@@ -44,7 +51,7 @@ class OAuthError extends Error {
 export interface IdJagTokenHandlerArgs {
   /** Issues the ID-JAGs. */
   issuer: IdJagIssuer
-  /** Validates the subject token (an ID token, optionally DPoP-bound). */
+  /** Validates the subject token (a DPoP-bound access token or an incoming ID-JAG). */
   verifier: SubjectTokenVerifier
   /**
    * The storages this UAS issues ID-JAGs for, as hostnames (`data`) or origins
@@ -83,8 +90,8 @@ export interface IdJagTokenHandlerArgs {
  * grant_type=urn:ietf:params:oauth:grant-type:token-exchange
  * &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
  * &audience=https://data/
- * &subject_token=<ID token>
- * &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+ * &subject_token=<DPoP-bound access token>
+ * &subject_token_type=urn:ietf:params:oauth:token-type:access_token
  * ```
  *
  * The subject token is verified by a {@link SubjectTokenVerifier}; a
@@ -104,6 +111,7 @@ export class IdJagTokenHandler extends HttpHandler {
   private readonly audienceOrigins: string[]
   private readonly tokenEndpoint: string
   private readonly claimValidator?: AccessClaimValidator
+  private readonly deriving = new Set<string>()
 
   public constructor(args: IdJagTokenHandlerArgs) {
     super()
@@ -175,6 +183,16 @@ export class IdJagTokenHandler extends HttpHandler {
     const audience = this.getParameter(params, 'audience')
     const subjectToken = this.getParameter(params, 'subject_token')
     const subjectTokenType = this.getParameter(params, 'subject_token_type')
+    // The first hop accepts only a DPoP-bound access token (or an incoming
+    // ID-JAG at an impersonation hop). A regular ID token is not a mediated
+    // credential and is explicitly rejected, even if a verifier would accept
+    // its claims.
+    if (subjectTokenType !== ID_JAG_TOKEN_TYPE && subjectTokenType !== TOKEN_TYPE_ACCESS_TOKEN) {
+      throw new OAuthError(
+        'invalid_request',
+        `Only ${TOKEN_TYPE_ACCESS_TOKEN} and ${ID_JAG_TOKEN_TYPE} subject tokens are supported.`
+      )
+    }
     const resource = params.get('resource') ?? undefined
     const access = await this.accessClaim(params)
 
@@ -215,12 +233,34 @@ export class IdJagTokenHandler extends HttpHandler {
     // for that storage and client. A client-supplied `access` claim bypasses
     // derivation and is validated against the assigner's grant registry below.
     let derivedAccess: VerifiedAccessClaim | undefined
-    if (access === undefined && subjectTokenType !== ID_JAG_TOKEN_TYPE && resource !== undefined) {
-      derivedAccess = await this.claimValidator?.find?.({
-        subject: subject.subject,
-        client: subject.client,
-        storage: resource,
-      })
+    if (
+      access === undefined &&
+      subjectTokenType !== ID_JAG_TOKEN_TYPE &&
+      resource !== undefined &&
+      !(await this.isRegistryStorage(resource)) &&
+      !this.deriving.has(resource)
+    ) {
+      // The registry bootstrap asks this same UAS for a registry ID-JAG while
+      // deriving a data claim. The guard keeps that second request claimless
+      // even if the storage description is temporarily unavailable.
+      this.deriving.add(resource)
+      try {
+        derivedAccess = await this.claimValidator?.find?.({
+          subject: subject.subject,
+          client: subject.client,
+          storage: resource,
+        })
+      } catch (error: unknown) {
+        // A registry outage must not turn the UAS into a 500; an identity-only
+        // ID-JAG still reaches the owner/admin/public paths, and a data
+        // exchange will reject a claimless non-owner/non-admin token.
+        this.logger.warn(
+          `could not derive an access claim for ${resource}: ${(error as Error).message}`
+        )
+        span.setAttribute('sai.lws.access.derivation_error', (error as Error).message)
+      } finally {
+        this.deriving.delete(resource)
+      }
       if (derivedAccess) {
         span.setAttribute('sai.lws.access.derived', true)
         span.setAttribute('sai.lws.access.storage', derivedAccess.storage)
@@ -519,7 +559,43 @@ export class IdJagTokenHandler extends HttpHandler {
         `${audience} needs to be the https issuer identifier (the base URL) of a resource authorization server.`
       )
     }
-    const known = this.audienceOrigins.some((origin) => {
+    if (!this.matchesOrigin(this.audienceOrigins, audience)) {
+      throw new OAuthError(
+        'invalid_target',
+        `${audience} is not a storage known to this authorization server.`
+      )
+    }
+  }
+
+  /**
+   * A registry storage advertises `sai:RegistryStorage` in its public LWS
+   * storage description. Its exchange is claimless by design (ACP authorizes
+   * registry resources), so the UAS must not derive an ODRL claim for it.
+   * This is open-world: no deployment-local origin list is involved.
+   */
+  protected async isRegistryStorage(storage: string): Promise<boolean> {
+    try {
+      const description = await fetchLwsStorageDescription(storage, fetch)
+      return !!description && descriptionHasStorageType(description, SAI.RegistryStorage)
+    } catch (error: unknown) {
+      // An unavailable description is an unknown storage: try the normal
+      // grant derivation; the `deriving` guard still breaks the registry loop.
+      this.logger.warn(
+        `could not read the storage description of ${storage}: ${(error as Error).message}`
+      )
+      return false
+    }
+  }
+
+  /** Whether the IRI belongs to one of the configured origins (URLs or bare hosts). */
+  private matchesOrigin(origins: string[], iri: string): boolean {
+    let url: URL
+    try {
+      url = new URL(iri)
+    } catch {
+      return false
+    }
+    return origins.some((origin) => {
       try {
         return new URL(origin).host === url.host
       } catch {
@@ -527,12 +603,6 @@ export class IdJagTokenHandler extends HttpHandler {
         return origin === url.host
       }
     })
-    if (!known) {
-      throw new OAuthError(
-        'invalid_target',
-        `${audience} is not a storage known to this authorization server.`
-      )
-    }
   }
 
   private writeJson(response: HttpResponse, status: number, body: Record<string, unknown>): void {

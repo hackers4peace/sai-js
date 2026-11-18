@@ -8,7 +8,6 @@ import {
   LWS,
   ODRL,
   ODRL_ID_JAG_CONTEXT,
-  discoverAuthorizationAgent,
   loader,
   toStore,
 } from '@janeirodigital/interop-utils'
@@ -40,6 +39,19 @@ type AccessClaimCredentials = Credentials & {
   access?: unknown
   accessContext?: string
   storage?: string
+  /** Storage authority minted by this server's exchange (`owner`/`admin`). */
+  scope?: string[]
+}
+
+/** The grant identity a registry lookup matches; public grants use ACP's public actors. */
+interface GrantIdentity {
+  agent: string
+  client: string
+}
+
+const PUBLIC_IDENTITY: GrantIdentity = {
+  agent: ACP.PublicAgent,
+  client: ACP.PublicClient,
 }
 
 const { namedNode } = DataFactory
@@ -73,99 +85,62 @@ export class SaiPermissionsEngine implements PolicyEngine {
    * @param credentials - Credentials identifying who or what is trying to access the target resource.
    */
   async getPermissions(target: string, credentials: Credentials): Promise<PermissionMap> {
+    // A claim always wins over a scope: an owner/admin who presents a narrower
+    // claim gets exactly that claim, never the broad scope.
     const claimData = await this.findAccessClaimData(target, credentials)
-    if (claimData) return this.getClaimPermissions(target, credentials, claimData)
+    if (claimData !== undefined) return this.getClaimPermissions(target, credentials, claimData)
 
-    // check if reqested by User Authorization Server
-    let uasId: string | undefined
-    if (credentials.agent && credentials.client) {
-      try {
-        uasId = await discoverAuthorizationAgent(credentials.agent, fetch)
-      } catch (err) {
-        this.logger.error(`UAS discovery failed for: ${credentials.agent}; ${err}`)
-      }
-    }
-    const uas = uasId && uasId === credentials.client
-
-    // TODO: does it need spread or just fix in typings
-    const authorizationData = [...(await this.manager.getAuthorizationData(target))]
-    const targetType = await this.determineTargetType(target)
-    let modes: string[] = []
-    switch (targetType) {
-      case TargetType.Registry:
-        // admins hold a Read-only DataRegistry-scoped AdminGrant per storage
-        // (R1 / step 2.8 of org-admin-feature.md) — lets them list/read the
-        // org's data registries; structural registries stay on ACP
-        modes = await this.findAdminModes(authorizationData, credentials)
-        break
-      case TargetType.Registration: {
-        // An Inherited grant covers its registration too: creating a new
-        // member (POST to the registration container) happens *before* the
-        // parent instance links it, so the parent-instance gate of
-        // `findInheritedModes` can not apply here — the grant's access modes
-        // on the registration are what authorizes the append.
-        const inheritedGrant = await this.findGrant(
-          authorizationData,
-          target,
-          credentials,
-          INTEROP.Inherited,
-          uas
-        )
-        modes = [
-          ...new Set([
-            ...(await this.findRegistrationModes(authorizationData, target, credentials, uas)),
-            ...(inheritedGrant ? await this.getAccessModes(authorizationData, inheritedGrant) : []),
-            ...(await this.findAdminModes(authorizationData, credentials)),
-          ]),
-        ]
-        break
-      }
-      case TargetType.Resource:
-        // could happen read on all and write on selected
-        {
-          const resourceModes = await this.findResourceModes(
-            authorizationData,
-            target,
-            credentials,
-            uas
-          )
-          const registryModes = await this.findRegistrationModes(
-            authorizationData,
-            (await this.getRegistrationId(target)) ?? target,
-            credentials,
-            uas
-          )
-          const inheritedModes = await this.findInheritedModes(
-            authorizationData,
-            target,
-            credentials,
-            uas
-          )
-          modes = [
-            ...new Set([
-              ...resourceModes,
-              ...registryModes,
-              ...inheritedModes,
-              ...(await this.findAdminModes(authorizationData, credentials)),
-            ]),
-          ]
-        }
-        break
-      default:
-        throw new Error(`unexpected IRI: ${target}`)
-    }
-    return this.permissionMap(modes)
+    const { scope: rawScope } = credentials as AccessClaimCredentials
+    const scope = new Set(
+      Array.isArray(rawScope)
+        ? rawScope.filter((value): value is string => typeof value === 'string')
+        : []
+    )
+    if (scope.has('owner')) return this.permissionMap(Object.values(ACCESS_ACTIONS))
+    // Admin access is read-only; writing needs a normal access claim.
+    if (scope.has('admin')) return this.permissionMap([ACCESS_ACTIONS.read])
+    // Claimless, scopeless tokens are never issued for a data storage. Deny
+    // rather than falling back to registry or public matching (D10/D22).
+    return this.permissionMap([])
   }
 
-  private permissionMap(modes: string[]): PermissionMap {
-    return {
-      [PERMISSIONS.Create]: modes.includes(ACCESS_ACTIONS.create),
-      // TODO: figure out why it is requested on Create
-      [PERMISSIONS.Append]: modes.includes(ACCESS_ACTIONS.create),
-      [PERMISSIONS.Read]: modes.includes(ACCESS_ACTIONS.read),
-      [PERMISSIONS.Modify]: modes.includes(ACCESS_ACTIONS.modify),
-      [PERMISSIONS.Delete]: modes.includes(ACCESS_ACTIONS.delete),
+  /**
+   * Public grants are credential-independent (D24) and read-only. They are
+   * evaluated in `PublicPermissionReader`, never as a fallback for a claim or a
+   * scope.
+   */
+  async getPublicPermissions(target: string): Promise<PermissionMap> {
+    let data: Awaited<ReturnType<SaiAuthorizationManager['getAuthorizationData']>>
+    try {
+      data = await this.manager.getAuthorizationData(target)
+    } catch (error: unknown) {
+      // Fail closed on a registry-store outage.
+      this.logger.warn(`could not read public grants for ${target}: ${(error as Error).message}`)
+      return this.permissionMap([])
     }
+    if (!data) return this.permissionMap([])
+    const quads: Quad[] = Array.isArray(data) ? data : [...data]
+    return this.evaluateTarget(target, quads, PUBLIC_IDENTITY, (parent) =>
+      this.getPublicPermissions(parent)
+    )
+  }
+
+  /**
+   * Only granted modes are reported. A `false` would be an explicit denial in
+   * `UnionPermissionReader` and would veto the credential-independent public
+   * reader; an absent mode is denied by the LDP authorization by default.
+   */
+  private permissionMap(modes: string[]): PermissionMap {
+    const permissions: PermissionMap = {}
+    if (modes.includes(ACCESS_ACTIONS.create)) {
+      permissions[PERMISSIONS.Create] = true
+      // LDP POST on a container asks for Append, which is separate from Create.
+      permissions[PERMISSIONS.Append] = true
+    }
+    if (modes.includes(ACCESS_ACTIONS.read)) permissions[PERMISSIONS.Read] = true
+    if (modes.includes(ACCESS_ACTIONS.modify)) permissions[PERMISSIONS.Modify] = true
+    if (modes.includes(ACCESS_ACTIONS.delete)) permissions[PERMISSIONS.Delete] = true
+    return permissions
   }
 
   /**
@@ -226,65 +201,62 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   /**
-   * Claim-first evaluation: the access token was issued by this server's AS
-   * after verifying the ID-JAG, so the claim is the only authority. Identity
-   * fields are not re-matched here; target/scope/action are checked, including
-   * inheritance among policies carried by the token. No admin grant and no
-   * public fallback apply.
+   * Claim evaluation: the access token was issued by this server's AS after
+   * verifying the ID-JAG, so the claim is the only authority. Identity fields
+   * are not re-matched here; target/scope/action are checked, including
+   * inheritance among policies carried by the token. No admin grant, registry
+   * fallback, or public fallback applies.
    */
   private async getClaimPermissions(
     target: string,
     credentials: Credentials,
     data: Quad[]
   ): Promise<PermissionMap> {
+    return this.evaluateTarget(target, data, undefined, (parent) =>
+      this.getPermissions(parent, credentials)
+    )
+  }
+
+  /** Evaluate one grant graph (a token claim or a public registry grant). */
+  private async evaluateTarget(
+    target: string,
+    data: Quad[],
+    identity: GrantIdentity | undefined,
+    parentPermissions: (id: string) => Promise<PermissionMap>
+  ): Promise<PermissionMap> {
     const targetType = await this.determineTargetType(target)
     let modes: string[] = []
     switch (targetType) {
       case TargetType.Registry:
-        modes = await this.findRegistrationModes(data, target, credentials, false, false, true)
+        modes = await this.findRegistrationModes(data, target, identity)
         break
       case TargetType.Registration: {
-        const inheritedGrant = await this.findGrant(
-          data,
-          target,
-          credentials,
-          INTEROP.Inherited,
-          false,
-          false,
-          true
-        )
+        // An Inherited grant covers its registration too: creating a new
+        // member (POST to the registration container) happens *before* the
+        // parent instance links it, so the parent-instance gate of
+        // `findInheritedModes` can not apply here — the grant's access modes
+        // on the registration are what authorizes the append.
+        const inheritedGrant = await this.findGrant(data, target, INTEROP.Inherited, identity)
         modes = [
           ...new Set([
-            ...(await this.findRegistrationModes(data, target, credentials, false, false, true)),
+            ...(await this.findRegistrationModes(data, target, identity)),
             ...(inheritedGrant ? await this.getAccessModes(data, inheritedGrant) : []),
           ]),
         ]
         break
       }
       case TargetType.Resource: {
-        const resourceModes = await this.findResourceModes(
-          data,
-          target,
-          credentials,
-          false,
-          false,
-          true
-        )
+        const resourceModes = await this.findResourceModes(data, target, identity)
         const registryModes = await this.findRegistrationModes(
           data,
           (await this.getRegistrationId(target)) ?? target,
-          credentials,
-          false,
-          false,
-          true
+          identity
         )
         const inheritedModes = await this.findInheritedModes(
           data,
           target,
-          credentials,
-          false,
-          false,
-          true
+          identity,
+          parentPermissions
         )
         modes = [...new Set([...resourceModes, ...registryModes, ...inheritedModes])]
         break
@@ -321,58 +293,17 @@ export class SaiPermissionsEngine implements PolicyEngine {
       .filter((item): item is NonNullable<typeof item> => Boolean(item))
   }
 
-  /**
-   * The requester's Read-only DataRegistry-scoped AdminGrant for the target's
-   * storage (R1 / step 2.8 of org-admin-feature.md). `authorizationData` is
-   * already filtered by `getAuthorizationData` to grants with `storage` = the
-   * target's storage, so matching `AdminGrant` + policy assignee +
-   * `scopeOfAdminGrant DataRegistry` here identifies an admin of *this*
-   * storage. Returns the grant's `access[].action`s (Read-only in the seed —
-   * the design keeps admins read-only through the data service; structural
-   * registries stay on ACP).
-   */
-  async findAdminModes(data: Quad[], credentials: Credentials): Promise<string[]> {
-    const agent = credentials.agent
-    if (!agent) return []
-    const store = new Store([...data])
-    const adminGrantQuery = `
-      SELECT * WHERE {
-        ?s
-          a <${INTEROP.AdminGrant}> ;
-          <${INTEROP.scopeOfAdminGrant}> <${INTEROP.DataRegistry}> ;
-          <${LWS.access}> ?policy .
-        ?policy <${ODRL.permission}> ?permission .
-        ?permission <${ODRL.assignee}> <${agent}> .
-      }
-    `
-    const bindingsStream = await this.queryEngine.queryBindings(adminGrantQuery, {
-      sources: [store],
-    })
-    const bindings = await bindingsStream.toArray()
-    const adminGrantId = bindings[0]?.get('s')?.value
-    if (!adminGrantId) return []
-    return this.getAccessModes(data, adminGrantId)
-  }
-
   // Inherited is the same as AllFromRegistry here
   async findGrant(
     data: Quad[],
     id: string,
-    credentials: Credentials,
     scope: string,
-    uas: boolean,
-    allowPublicFallback = true,
-    claimFirst = false
+    identity?: GrantIdentity
   ): Promise<string | undefined> {
     let registrationId = id
     const selected = scope === INTEROP.SelectedFromRegistry
     if (selected) {
       registrationId = (await this.getRegistrationId(id)) ?? id
-    }
-    let { agent, client } = credentials
-    if (!agent || !client) {
-      agent = ACP.PublicAgent
-      client = ACP.PublicClient
     }
     const store = new Store([...data])
     const grantQuery = `
@@ -390,14 +321,10 @@ export class SaiPermissionsEngine implements PolicyEngine {
             : `?target <${ODRL.source}> <${registrationId}> .`
         }
         ${
-          claimFirst
-            ? ''
-            : uas
-              ? `?permission <${ODRL.assignee}> <${agent}> .`
-              : `
-            ?permission <${ODRL.assigner}> <${agent}> .
-            ?permission <${ODRL.assignee}> <${client}> .
-          `
+          identity
+            ? `?permission <${ODRL.assigner}> <${identity.agent}> .
+               ?permission <${ODRL.assignee}> <${identity.client}> .`
+            : ''
         }
       }
     `
@@ -406,30 +333,15 @@ export class SaiPermissionsEngine implements PolicyEngine {
     })
     const grantBindings = await grantBindingsStream.toArray()
     // TODO: handle multiple valid grants
-    const grantId = grantBindings[0]?.get('s')?.value
-    if (grantId) return grantId
-    // if not found try without credentials
-    if (allowPublicFallback && credentials.agent && credentials.client) {
-      return this.findGrant(data, id, {}, scope, false, true, claimFirst)
-    }
+    return grantBindings[0]?.get('s')?.value
   }
+
   async findRegistrationModes(
     data: Quad[],
     registrationId: string,
-    credentials: Credentials,
-    uas: boolean,
-    allowPublicFallback = true,
-    claimFirst = false
+    identity?: GrantIdentity
   ): Promise<string[]> {
-    const grantId = await this.findGrant(
-      data,
-      registrationId,
-      credentials,
-      INTEROP.AllFromRegistry,
-      uas,
-      allowPublicFallback,
-      claimFirst
-    )
+    const grantId = await this.findGrant(data, registrationId, INTEROP.AllFromRegistry, identity)
     if (!grantId) return []
     return this.getAccessModes(data, grantId)
   }
@@ -437,20 +349,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
   async findResourceModes(
     data: Quad[],
     resourceId: string,
-    credentials: Credentials,
-    uas: boolean,
-    allowPublicFallback = true,
-    claimFirst = false
+    identity?: GrantIdentity
   ): Promise<string[]> {
-    const grantId = await this.findGrant(
-      data,
-      resourceId,
-      credentials,
-      INTEROP.SelectedFromRegistry,
-      uas,
-      allowPublicFallback,
-      claimFirst
-    )
+    const grantId = await this.findGrant(data, resourceId, INTEROP.SelectedFromRegistry, identity)
     if (!grantId) return []
     return this.getAccessModes(data, grantId)
   }
@@ -458,28 +359,18 @@ export class SaiPermissionsEngine implements PolicyEngine {
   async findInheritedModes(
     data: Quad[],
     resourceId: string,
-    credentials: Credentials,
-    uas: boolean,
-    allowPublicFallback = true,
-    claimFirst = false
+    identity: GrantIdentity | undefined,
+    parentPermissions: (id: string) => Promise<PermissionMap>
   ): Promise<string[]> {
     const registrationId = (await this.getRegistrationId(resourceId)) ?? resourceId
-    const grantId = await this.findGrant(
-      data,
-      registrationId,
-      credentials,
-      INTEROP.Inherited,
-      uas,
-      allowPublicFallback,
-      claimFirst
-    )
+    const grantId = await this.findGrant(data, registrationId, INTEROP.Inherited, identity)
     if (!grantId) return []
     const parentGrantId = await this.findObject(data, grantId, INTEROP.inheritsFromGrant)
     if (!parentGrantId) throw new Error(`parent not found for Inherited grant: ${grantId}`)
     // TODO: consider multi parent, and parents of different types
     const parentResourceId = await this.findParentResource(data, grantId, parentGrantId, resourceId)
     if (!parentResourceId) return []
-    const parentResourcePermissions = await this.getPermissions(parentResourceId, credentials)
+    const parentResourcePermissions = await parentPermissions(parentResourceId)
     if (parentResourcePermissions[PERMISSIONS.Read]) {
       return this.getAccessModes(data, grantId)
     }

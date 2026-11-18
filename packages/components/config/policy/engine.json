@@ -14,6 +14,14 @@
       "storageStrategy": { "@id": "urn:solid-server:default:StorageLocationStrategy" },
       "podStore": { "@id": "urn:solid-server:default:PodStore" },
       "endpointStore": { "@id": "urn:sai:default:PodEndpointStore" }
+    },
+    {
+      "comment": "Data-storage exchange policy (C6): mints `scope: owner`/`admin` for a claimless ID-JAG exchange and rejects every other claimless exchange with invalid_grant. A present ODRL access claim is handled by the token handler and never gets a scope.",
+      "@id": "urn:sai:default:StorageExchangeAccessPolicy",
+      "@type": "StorageExchangeAccessPolicy",
+      "podStore": { "@id": "urn:solid-server:default:PodStore" },
+      "storageStrategy": { "@id": "urn:solid-server:default:StorageLocationStrategy" },
+      "manager": { "@id": "urn:sai:policy-engine:AuthorizationManager" }
     }
   ]
 }

@@ -33,7 +33,7 @@ const REGISTRY_STORAGE = 'https://registry/alice/'
 
 const TOKEN_EXCHANGE = 'urn:ietf:params:oauth:grant-type:token-exchange'
 const ID_JAG_TYPE = 'urn:ietf:params:oauth:token-type:id-jag'
-const ID_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id_token'
+const ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 
 interface IdJagRequest {
   overrides?: Record<string, string>
@@ -52,7 +52,7 @@ async function requestIdJag({
     requested_token_type: ID_JAG_TYPE,
     audience: DATA_AS,
     subject_token: subjectToken,
-    subject_token_type: ID_TOKEN_TYPE,
+    subject_token_type: ACCESS_TOKEN_TYPE,
     ...overrides,
   })
   const headers: Record<string, string> = {
@@ -67,7 +67,9 @@ async function requestIdJag({
 
 /** Mints an ID-JAG for `DATA_AS` and returns the grant itself. */
 async function mintIdJag(): Promise<string> {
-  const response = await requestIdJag()
+  // Let the UAS derive the user -> client grant for this storage; a claimless
+  // data exchange is rejected with `invalid_grant` (C6).
+  const response = await requestIdJag({ overrides: { resource: DATA_STORAGE } })
   expect(response.status).toBe(200)
   const body = (await response.json()) as Record<string, unknown>
   return String(body.access_token)
@@ -179,7 +181,63 @@ describe('ID-JAG exchange at a storage authorization server', () => {
     expect(((await response.json()) as Record<string, unknown>).error).toBe('invalid_request')
   })
 
-  test('advertises the id-jag subject token type next to id_token', async () => {
+  test('rejects a claimless ID-JAG on a data storage with invalid_grant', async () => {
+    const bob = await buildSelfIssuedCredential('https://id/bob')
+    const subjectToken = await bob.oidc.generateSelfIssuedAccessToken()
+    const minted = await fetch(TOKEN_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        dpop: await createLwsTokenDpopProof(TOKEN_ENDPOINT, bob.dpopKeyPair),
+      },
+      body: new URLSearchParams({
+        grant_type: TOKEN_EXCHANGE,
+        requested_token_type: ID_JAG_TYPE,
+        audience: DATA_AS,
+        resource: 'https://data/kim-red/',
+        subject_token: subjectToken,
+        subject_token_type: ACCESS_TOKEN_TYPE,
+      }).toString(),
+    })
+    expect(minted.status).toBe(200)
+    const idJag = String(((await minted.json()) as Record<string, unknown>).access_token)
+    expect((decodeJwt(idJag) as Record<string, unknown>).access).toBeUndefined()
+
+    const response = await exchangeAtRas(DATA_AS, {
+      subject_token: idJag,
+      subject_token_type: ID_JAG_TYPE,
+      resource: 'https://data/kim-red/',
+    })
+    expect(response.status).toBe(400)
+    expect(((await response.json()) as Record<string, unknown>).error).toBe('invalid_grant')
+  })
+
+  test('issues a claimless registry token and copies no claim into it', async () => {
+    const minted = await requestIdJag({
+      overrides: { audience: REGISTRY_AS, resource: REGISTRY_STORAGE },
+    })
+    expect(minted.status).toBe(200)
+    const idJag = String(((await minted.json()) as Record<string, unknown>).access_token)
+    const response = await exchangeAtRas(REGISTRY_AS, {
+      subject_token: idJag,
+      subject_token_type: ID_JAG_TYPE,
+      resource: REGISTRY_STORAGE,
+    })
+    expect(response.status).toBe(200)
+    const accessToken = String(((await response.json()) as Record<string, unknown>).access_token)
+    expect((decodeJwt(accessToken) as Record<string, unknown>).access).toBeUndefined()
+    expect((decodeJwt(accessToken) as Record<string, unknown>)['@context']).toBeUndefined()
+  })
+
+  test('rejects an id_token subject token at the UAS', async () => {
+    const response = await requestIdJag({
+      overrides: { subject_token_type: 'urn:ietf:params:oauth:token-type:id_token' },
+    })
+    expect(response.status).toBe(400)
+    expect(((await response.json()) as Record<string, unknown>).error).toBe('invalid_request')
+  })
+
+  test('advertises only the accepted subject token types', async () => {
     const response = await fetch(new URL('.well-known/lws-configuration', DATA_AS).href, {
       headers: { accept: 'application/json' },
     })
@@ -187,8 +245,7 @@ describe('ID-JAG exchange at a storage authorization server', () => {
     expect(response.status).toBe(200)
     const metadata = (await response.json()) as Record<string, unknown>
     const types = metadata.subject_token_types_supported as string[]
-    expect(types).toContain(ID_JAG_TYPE)
-    expect(types).toContain(ID_TOKEN_TYPE)
+    expect(types).toEqual([ID_JAG_TYPE])
   })
 })
 

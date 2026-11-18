@@ -1,5 +1,6 @@
+import { ACCESS_TOKEN_TYPE, createLwsAuthFetch } from '@elfpavlik/lws-auth'
+import type { LwsCredential } from '@elfpavlik/lws-auth'
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
-import { createLwsFetch } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { JwkGenerator } from '@solid/community-server'
 import { generateKeyPair } from 'jose'
@@ -100,13 +101,23 @@ export class SessionManager {
     }
 
     // The `.sai` API of this server keeps the Solid-OIDC DPoP session; data and
-    // registry storages accept only LWS access tokens, so their requests are
-    // routed through a fetch that exchanges the session's ID token for one
-    // access token per storage (LWS, §Token Exchange).
+    // registry storages accept only ID-JAG subject tokens, so their requests go
+    // through the two-step LWS chain: the self-issued DPoP-bound access token
+    // becomes one ID-JAG per storage authorization server, and the storage
+    // exchanges it for a bearer access token (C6). The worker is the owner's
+    // own UAS, so a claimless data exchange can mint `scope: owner`; the
+    // registry exchange is claimless and authorized by ACP.
     const dpopFetch = oidc.authFetch.bind(oidc) as WhatwgFetch
-    const lwsFetch = createLwsFetch({
-      subjectToken: () => oidc.generateSelfIssuedAccessToken(),
-      dpopKeyPair,
+    const credential: LwsCredential = {
+      issuer: this.baseUrl,
+      clientId: agentId(webid),
+      // jose generates WebCrypto keys here; oauth4webapi needs the raw pair
+      dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+      subjectTokenType: ACCESS_TOKEN_TYPE,
+      getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
+    }
+    const lwsFetch = createLwsAuthFetch({
+      credential,
       storages: [...sparqlEndpoints.keys(), registryPodUrl],
     })
     const sessionFetch: WhatwgFetch = (input, init) => {

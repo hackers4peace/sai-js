@@ -3,7 +3,7 @@ import type {
   LwsCredential,
   LwsImpersonationOptions,
 } from '@elfpavlik/lws-auth'
-import { createLwsAuthFetch } from '@elfpavlik/lws-auth'
+import { ACCESS_TOKEN_TYPE, createLwsAuthFetch } from '@elfpavlik/lws-auth'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { type GenerateKeyPairResult, generateKeyPair } from 'jose'
 
@@ -105,6 +105,7 @@ export async function buildLwsFetch(
     clientId: resolvedClientId,
     // jose generates WebCrypto keys here; oauth4webapi needs the raw pair
     dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+    subjectTokenType: ACCESS_TOKEN_TYPE,
     getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
   }
   return createLwsAuthFetch({

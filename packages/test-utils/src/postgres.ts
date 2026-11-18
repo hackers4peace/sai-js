@@ -64,13 +64,21 @@ export class Postgres {
 
   async importFromJson(data: Record<string, string | object>): Promise<void> {
     this.init()
-    await this.dropTable()
+    // Keep the table in place: a running CSS server may read it while a test is
+    // being seeded (for example the worker's `findAffectedGrantees` activity).
+    // The transaction also makes the replacement atomic for those readers.
     await this.ensureTable()
     const entries = Object.entries(data).map(([key, value]) => ({
       key,
       value: JSON.stringify(value),
     }))
-    await this.sql`INSERT INTO ${this.sql(this.tableName)} ${this.sql(entries as any)}`
+    await this.sql.begin(async (tx) => {
+      const sql = tx as unknown as typeof this.sql
+      await sql`TRUNCATE ${sql(this.tableName)}`
+      if (entries.length > 0) {
+        await sql`INSERT INTO ${sql(this.tableName)} ${sql(entries as any)}`
+      }
+    })
   }
 
   async exportToJson(): Promise<Record<string, string | object>> {
