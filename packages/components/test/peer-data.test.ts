@@ -1,22 +1,21 @@
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
-import type {
-  DataAuthorizationData,
-  DataInstanceData,
-  GrantData,
-  RoleData,
+import {
+  type DataAuthorizationData,
+  type DataInstanceData,
+  type GrantData,
+  grantAccess,
 } from '@janeirodigital/interop-data-model'
-import { grantAccess } from '@janeirodigital/interop-data-model'
 import { ACCESS_ACTIONS, INTEROP, LWS, ODRL } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import type { ResolvedContext } from '../src/services/Context.js'
-import { PeerFetchError, fetchPeerResource } from '../src/services/peerFetch.js'
 import {
   PeerProxyError,
   dataRegistrationContains,
   fetchPeerDocument,
   peerInstanceIris,
-} from '../src/services/peerProxy.js'
+} from '../src/services/peerData.js'
 import {
   getSocialAgentRegistration,
   listContained,
@@ -31,8 +30,15 @@ import { agentsWithAccessMatching, whoHasAccessMatching } from '../src/services/
 const YOYO_WEBID = 'https://yoyo.example/profile/card#me'
 const YOYO_AA = 'https://yoyo.example/.sai/agents/zzzz'
 const DAN_WEBID = 'https://dan.example/profile/card#me'
+const PEER_STORAGE = 'https://peer.example/data/'
 const PEER_REGISTRATION = 'https://peer.example/data/registrations/abc/'
 const PEER_INSTANCE = 'https://peer.example/data/abc/123'
+
+/** WebID profile doc with `interop:hasAuthorizationAgent` as a full-IRI key. */
+const yoyoProfileDoc = {
+  '@id': YOYO_WEBID,
+  'http://www.w3.org/ns/solid/interop#hasAuthorizationAgent': { '@id': YOYO_AA },
+}
 
 /** Static JSON-LD doc for the peer data registration (absolute-IRI keys, no context). */
 const peerRegistrationDoc = {
@@ -41,12 +47,6 @@ const peerRegistrationDoc = {
     '@id': 'https://shapetrees.example/Project',
   },
   'http://www.w3.org/ns/ldp#contains': [{ '@id': PEER_INSTANCE }],
-}
-
-/** WebID profile doc with `interop:hasAuthorizationAgent` as a full-IRI key. */
-const yoyoProfileDoc = {
-  '@id': YOYO_WEBID,
-  'http://www.w3.org/ns/solid/interop#hasAuthorizationAgent': { '@id': YOYO_AA },
 }
 
 // Minimal Response-like object for mocked fetches (same pattern as the
@@ -63,128 +63,100 @@ function jsonResponse(body: unknown, status = 200, contentType = 'application/ld
   } as unknown as Response
 }
 
-/** Fake session: a WhatwgFetch that records requests and answers by URL. */
+/** Fake session: a WhatwgFetch that answers by URL. */
 function fakeSession(
   onRequest: (url: string, init?: RequestInit) => Promise<Response>
 ): AuthorizationAgent {
-  return { fetch: onRequest as AuthorizationAgent['fetch'] } as unknown as AuthorizationAgent
+  return {
+    fetch: onRequest as unknown as AuthorizationAgent['fetch'],
+  } as unknown as AuthorizationAgent
 }
 
-/** Minimal ResolvedContext for the data-plane helpers. */
-function fakeCtx(session: AuthorizationAgent, webId: string, userWebId: string): ResolvedContext {
+/**
+ * Minimal ResolvedContext. `storageFetch` is what the data plane now uses for
+ * peer documents — in the org context it carries the read-only impersonation,
+ * in the personal context the user's own credentials. `session.fetch` stays for
+ * public documents (shape trees) and for the user's own plane.
+ */
+function fakeCtx(
+  byIri: Record<string, unknown>,
+  options: {
+    ctxWebId?: string
+    userWebId?: string
+    status?: Record<string, number>
+    storageFetchError?: Error
+  } = {}
+): { ctx: ResolvedContext; requests: { storage: string; url: string }[] } {
+  const requests: { storage: string; url: string }[] = []
+  const answer = async (url: string): Promise<Response> => {
+    const failed = options.status?.[url]
+    if (failed) return jsonResponse({ error: 'denied' }, failed, 'text/plain')
+    const doc = byIri[url]
+    if (!doc) throw new Error(`unexpected fetch for ${url}`)
+    return jsonResponse(doc)
+  }
+  const ctx = {
+    session: { fetch: ((url: string) => answer(url)) as unknown as WhatwgFetch },
+    webId: options.ctxWebId ?? YOYO_WEBID,
+    userWebId: options.userWebId ?? DAN_WEBID,
+    storageFetch: async (storage: string) => {
+      if (options.storageFetchError) throw options.storageFetchError
+      return (async (url: string) => {
+        requests.push({ storage, url })
+        return answer(url)
+      }) as unknown as WhatwgFetch
+    },
+  } as unknown as ResolvedContext
+  return { ctx, requests }
+}
+
+/** Minimal context for the registry-plane tests (no storage fetch involved). */
+function fakeSessionCtx(
+  session: AuthorizationAgent,
+  webId: string,
+  userWebId: string
+): ResolvedContext {
   return { session, webId, userWebId } as unknown as ResolvedContext
 }
 
-const proxyAdminUrl = (orgWebId: string, targetIri: string): string =>
-  `${new URL(YOYO_AA).origin}/.sai/proxy-admin/${Buffer.from(orgWebId).toString('base64url')}` +
-  `?iri=${encodeURIComponent(targetIri)}`
-
-/** Session answering: WebID profile → YOYO_AA; proxy-admin request → peer doc (or dispatch). */
-function happySession(overrides?: {
-  proxyAdmin?: (url: string, init?: RequestInit) => Promise<Response>
-}): { session: AuthorizationAgent; requests: { url: string; init?: RequestInit }[] } {
-  const requests: { url: string; init?: RequestInit }[] = []
-  const session = fakeSession(async (url, init) => {
-    requests.push({ url, init })
-    if (url === YOYO_WEBID) return jsonResponse(yoyoProfileDoc)
-    return (overrides?.proxyAdmin ?? (() => jsonResponse(peerRegistrationDoc)))(url, init)
-  })
-  return { session, requests }
+const collect = async (iter: AsyncIterable<string>): Promise<string[]> => {
+  const out: string[] = []
+  for await (const iri of iter) out.push(iri)
+  return out
 }
 
 // ──────────────────────────
-// fetchPeerResource (YoYo-side upstream)
-// ──────────────────────────
-
-describe('fetchPeerResource', () => {
-  test('fetches the target with the org session and returns the JSON-LD document', async () => {
-    let seenInit: RequestInit | undefined
-    const session = fakeSession(async (_url, init) => {
-      seenInit = init
-      return jsonResponse(peerRegistrationDoc)
-    })
-    const doc = await fetchPeerResource(session, PEER_REGISTRATION)
-    // the LWS profile is the preferred Accept; `fetchJsonLd` falls back for
-    // servers that do not support it, and re-reads an LWS page listing as RDF
-    expect(String((seenInit?.headers as Record<string, string>)?.Accept)).toContain(
-      'application/ld+json'
-    )
-    expect(doc).toEqual(peerRegistrationDoc)
-  })
-
-  test('surfaces the upstream status as HttpStatusError', async () => {
-    const session = fakeSession(async () => jsonResponse({}, 403))
-    await expect(fetchPeerResource(session, PEER_REGISTRATION)).rejects.toMatchObject({
-      name: 'HttpStatusError',
-      status: 403,
-    })
-  })
-
-  test('rejects non-http(s) and relative targets before any fetch', async () => {
-    let fetched = false
-    const session = fakeSession(async () => {
-      fetched = true
-      return jsonResponse(peerRegistrationDoc)
-    })
-    for (const target of ['relative/path', 'file:///tmp/x.ldjson', 'ftp://peer.example/x', '']) {
-      await expect(fetchPeerResource(session, target)).rejects.toBeInstanceOf(PeerFetchError)
-    }
-    expect(fetched).toBe(false)
-  })
-})
-
-// ──────────────────────────
-// fetchPeerDocument (Dan-side client)
+// fetchPeerDocument
 // ──────────────────────────
 
 describe('fetchPeerDocument', () => {
-  test('discovers the org AA, builds the proxy-admin URL and returns the parsed JSON-LD', async () => {
-    const { session, requests } = happySession()
-    const doc = await fetchPeerDocument(session, YOYO_WEBID, PEER_REGISTRATION)
+  test('reads the document through the storage fetch, scoped to the grant storage', async () => {
+    const { ctx, requests } = fakeCtx({ [PEER_REGISTRATION]: peerRegistrationDoc })
 
-    expect(doc).toEqual(peerRegistrationDoc)
-
-    const [profileRequest, proxyRequest] = requests
-    expect(profileRequest.url).toBe(YOYO_WEBID)
-    expect(proxyRequest.url).toBe(proxyAdminUrl(YOYO_WEBID, PEER_REGISTRATION))
-    expect((proxyRequest.init?.headers as Record<string, string> | undefined)?.Accept).toBe(
-      'application/ld+json'
+    await expect(fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION)).resolves.toEqual(
+      peerRegistrationDoc
     )
-  })
-
-  test('URL-encodes the target IRI (ampersands, existing queries)', async () => {
-    const quirky = 'https://peer.example/data/abc?a=1&b=two#frag'
-    const { session, requests } = happySession()
-    await fetchPeerDocument(session, YOYO_WEBID, quirky)
-    expect(requests[1].url).toBe(proxyAdminUrl(YOYO_WEBID, quirky))
-    // the href passed to fetchPeerResource must survive the round-trip
-    const encoded = new URL(proxyAdminUrl(YOYO_WEBID, quirky)).searchParams.get('iri')
-    expect(encoded).toBe(quirky)
+    // one request, through the storage the context holds credentials for —
+    // no document-proxy endpoint, no discovery round trip
+    expect(requests).toEqual([{ storage: PEER_STORAGE, url: PEER_REGISTRATION }])
   })
 
   test('surfaces the upstream status as PeerProxyError', async () => {
-    const { session } = happySession({
-      proxyAdmin: () => jsonResponse({ error: 'forbidden' }, 403, 'text/plain'),
-    })
-    await expect(fetchPeerDocument(session, YOYO_WEBID, PEER_REGISTRATION)).rejects.toMatchObject({
-      message: expect.stringContaining(`upstream 403 for ${PEER_REGISTRATION}`),
+    const { ctx } = fakeCtx({}, { status: { [PEER_REGISTRATION]: 403 } })
+
+    await expect(fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION)).rejects.toMatchObject({
+      name: 'PeerProxyError',
       status: 403,
     })
-    await expect(fetchPeerDocument(session, YOYO_WEBID, PEER_REGISTRATION)).rejects.toBeInstanceOf(
-      PeerProxyError
-    )
   })
 
-  test('indistinguishable failure when the org AA cannot be discovered', async () => {
-    const session = fakeSession(async () => {
-      throw new Error('network failure')
-    })
-    await expect(fetchPeerDocument(session, YOYO_WEBID, PEER_REGISTRATION)).rejects.toThrow(
-      `cannot discover authorization agent for ${YOYO_WEBID}`
-    )
-    await expect(fetchPeerDocument(session, YOYO_WEBID, PEER_REGISTRATION)).rejects.toBeInstanceOf(
-      PeerProxyError
-    )
+  test('wraps a storage fetch that cannot be created (no authority) in PeerProxyError', async () => {
+    const { ctx } = fakeCtx({}, { storageFetchError: new Error('not an admin') })
+
+    const error = await fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION).catch((e) => e)
+    expect(PeerProxyError.isInstance?.(error) ?? error instanceof PeerProxyError).toBe(true)
+    expect((error as PeerProxyError).message).toContain('not an admin')
+    expect((error as PeerProxyError).status).toBeUndefined()
   })
 })
 
@@ -193,34 +165,21 @@ describe('fetchPeerDocument', () => {
 // ──────────────────────────
 
 describe('dataRegistrationContains', () => {
-  test('org context — fetches the peer registration through /proxy-admin and parses `contains`', async () => {
-    const { session, requests } = happySession()
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+  test('parses `contains` from the registration read with the storage credentials', async () => {
+    const { ctx, requests } = fakeCtx({ [PEER_REGISTRATION]: peerRegistrationDoc })
 
-    const contains = await dataRegistrationContains(ctx, PEER_REGISTRATION)
-    expect(contains).toEqual([PEER_INSTANCE])
-    expect(requests[1].url).toBe(proxyAdminUrl(YOYO_WEBID, PEER_REGISTRATION))
+    await expect(dataRegistrationContains(ctx, PEER_STORAGE, PEER_REGISTRATION)).resolves.toEqual([
+      PEER_INSTANCE,
+    ])
+    expect(requests).toHaveLength(1)
   })
 
-  test('personal context — derefs directly with the session fetch, no proxy call', async () => {
-    // only a `fetch` on the session (no proxy dispatch): if the personal
-    // branch tried to proxy, this would fail on the unexpected URL
-    const session = {
-      fetch: async () => jsonResponse(peerRegistrationDoc),
-    } as unknown as AuthorizationAgent
-    const ctx = fakeCtx(session, DAN_WEBID, DAN_WEBID)
+  test('propagates the upstream status', async () => {
+    const { ctx } = fakeCtx({}, { status: { [PEER_REGISTRATION]: 403 } })
 
-    await expect(dataRegistrationContains(ctx, PEER_REGISTRATION)).resolves.toEqual([PEER_INSTANCE])
-  })
-
-  test('org context — propagates the upstream status', async () => {
-    const { session } = happySession({
-      proxyAdmin: () => jsonResponse({ error: 'forbidden' }, 403, 'text/plain'),
-    })
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
-    await expect(dataRegistrationContains(ctx, PEER_REGISTRATION)).rejects.toMatchObject({
-      status: 403,
-    })
+    await expect(
+      dataRegistrationContains(ctx, PEER_STORAGE, PEER_REGISTRATION)
+    ).rejects.toMatchObject({ status: 403 })
   })
 })
 
@@ -229,16 +188,15 @@ describe('dataRegistrationContains', () => {
 // ──────────────────────────
 
 const grantData = (scopeOfGrant: string, extra: Partial<GrantData> = {}): GrantData => {
-  const storage = 'https://peer.example/data/'
   const registeredShapeTree = extra.registeredShapeTree ?? 'https://shapetrees.example/Child'
   const hasDataInstance = extra.hasDataInstance ?? []
   return {
     id: 'https://peer.example/grants/1',
     type: [LWS.AccessGrant],
-    storage,
+    storage: PEER_STORAGE,
     access: grantAccess({
       scopeOfGrant,
-      storage,
+      storage: PEER_STORAGE,
       hasDataRegistration: PEER_REGISTRATION,
       hasDataInstance,
       registeredShapeTree,
@@ -257,36 +215,15 @@ const grantData = (scopeOfGrant: string, extra: Partial<GrantData> = {}): GrantD
   }
 }
 
-/** Fetch dispatcher keyed on the *decoded proxy target* (plus the profile). */
-function proxyDispatcher(byIri: Record<string, unknown>) {
-  return fakeSession(async (url) => {
-    if (url === YOYO_WEBID) return jsonResponse(yoyoProfileDoc)
-    const target = new URL(url).searchParams.get('iri')
-    const doc = target && byIri[target]
-    if (!doc) throw new Error(`unexpected proxy fetch for ${target ?? url}`)
-    return jsonResponse(doc)
-  })
-}
-
-const collect = async (iter: AsyncIterable<string>): Promise<string[]> => {
-  const out: string[] = []
-  for await (const iri of iter) out.push(iri)
-  return out
-}
-
 describe('peerInstanceIris', () => {
-  test('AllFromRegistry — `contains` of the peer registration via /proxy-admin', async () => {
-    const session = proxyDispatcher({ [PEER_REGISTRATION]: peerRegistrationDoc })
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+  test('AllFromRegistry — `contains` of the peer registration', async () => {
+    const { ctx } = fakeCtx({ [PEER_REGISTRATION]: peerRegistrationDoc })
     const iris = await collect(peerInstanceIris(ctx, grantData(INTEROP.AllFromRegistry)))
     expect(iris).toEqual([PEER_INSTANCE])
   })
 
   test('SelectedFromRegistry — instance list from grant metadata, no fetch', async () => {
-    const session = fakeSession(async () => {
-      throw new Error('no fetch expected for SelectedFromRegistry')
-    })
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+    const { ctx, requests } = fakeCtx({})
     const iris = await collect(
       peerInstanceIris(
         ctx,
@@ -295,13 +232,13 @@ describe('peerInstanceIris', () => {
         })
       )
     )
-    expect(iris).toHaveLength(2)
     expect(iris).toEqual(
       expect.arrayContaining(['https://peer.example/data/a', 'https://peer.example/data/b'])
     )
+    expect(requests).toHaveLength(0)
   })
 
-  test('Inherited — parent grant, parent `contains`, and parent content via /proxy-admin', async () => {
+  test('Inherited — parent grant, parent `contains`, and parent content', async () => {
     const parentGrantIri = 'https://peer.example/grants/parent'
     const parentRegistrationIri = 'https://peer.example/data/registrations/parent/'
     const parentInstanceIri = 'https://peer.example/data/parent/1'
@@ -334,7 +271,7 @@ describe('peerInstanceIris', () => {
                   '@type': [ODRL.AssetCollection, INTEROP.DataRegistration],
                   [ODRL.source]: [{ '@id': parentRegistrationIri }],
                   [INTEROP.dataOwner]: [{ '@id': 'https://peer.example/profile/card#me' }],
-                  [LWS.storage]: [{ '@id': 'https://peer.example/data/' }],
+                  [LWS.storage]: [{ '@id': PEER_STORAGE }],
                 },
               ],
             },
@@ -350,7 +287,7 @@ describe('peerInstanceIris', () => {
       '@id': parentInstanceIri,
       [viaPredicate]: [{ '@id': childInstanceIri }],
     }
-    // public shape tree — resolved with the (admin) session over the proxy
+    // public shape tree — resolved with the (admin) session, not the storage
     const parentShapeTreeDoc = {
       '@id': parentShapeTreeIri,
       'http://www.w3.org/ns/shapetrees#expectsType': {
@@ -368,33 +305,26 @@ describe('peerInstanceIris', () => {
         },
       ],
     }
-    const byIri: Record<string, unknown> = {
+    const { ctx, requests } = fakeCtx({
       [parentGrantIri]: parentGrantDoc,
       [parentRegistrationIri]: parentRegistrationDoc,
       [parentInstanceIri]: parentInstanceDoc,
       [parentShapeTreeIri]: parentShapeTreeDoc,
-    }
-    const { fetch: proxyFetch } = proxyDispatcher(byIri)
-    const session = {
-      // shape trees are public and fetched directly (no proxy); everything
-      // else (peer grants/registrations/instances) goes via /proxy-admin
-      fetch: async (url: string, init?: RequestInit) => {
-        if (url === YOYO_WEBID) return jsonResponse(yoyoProfileDoc)
-        const target = new URL(url).searchParams.get('iri')
-        if (target) return proxyFetch(url, init)
-        if (byIri[url]) return jsonResponse(byIri[url])
-        throw new Error(`unexpected direct request: ${url}`)
-      },
-    } as unknown as AuthorizationAgent
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+    })
 
     const iris = await collect(
       peerInstanceIris(ctx, grantData(INTEROP.Inherited, { inheritsFromGrant: parentGrantIri }))
     )
     expect(iris).toEqual([childInstanceIri])
+    // every peer document went through the grant's storage
+    expect(requests.map((request) => request.url)).toEqual([
+      parentGrantIri,
+      parentRegistrationIri,
+      parentInstanceIri,
+    ])
+    expect(new Set(requests.map((request) => request.storage))).toEqual(new Set([PEER_STORAGE]))
   })
 })
-
 // ──────────────────────────
 // agentsWithAccessMatching
 // ──────────────────────────
@@ -638,7 +568,7 @@ describe('sparqlTransportFor — org context routes via /sparql-admin', () => {
         'application/sparql-results+json'
       )
     )
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+    const ctx = fakeSessionCtx(session, YOYO_WEBID, DAN_WEBID)
 
     const children = await listContained(
       sparqlTransportFor(ctx),
@@ -676,7 +606,7 @@ describe('sparqlTransportFor — org context routes via /sparql-admin', () => {
         'application/sparql-results+json'
       )
     )
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+    const ctx = fakeSessionCtx(session, YOYO_WEBID, DAN_WEBID)
     const bindings = await sparqlTransportFor(ctx).fetchBindings('SELECT ?label WHERE {}')
     expect(bindings[0].label).toMatchObject({ termType: 'Literal', value: 'Peer', language: 'en' })
   })
@@ -698,7 +628,7 @@ describe('sparqlTransportFor — org context routes via /sparql-admin', () => {
         'application/ld+json'
       )
     )
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+    const ctx = fakeSessionCtx(session, YOYO_WEBID, DAN_WEBID)
 
     const registration = await getSocialAgentRegistration(
       sparqlTransportFor(ctx),
@@ -710,7 +640,7 @@ describe('sparqlTransportFor — org context routes via /sparql-admin', () => {
 
   test('non-ok sparql-admin response surfaces as an error with the status', async () => {
     const { session } = sparqlAdminSession(() => jsonResponse({ error: 'no' }, 403, 'text/plain'))
-    const ctx = fakeCtx(session, YOYO_WEBID, DAN_WEBID)
+    const ctx = fakeSessionCtx(session, YOYO_WEBID, DAN_WEBID)
     await expect(sparqlTransportFor(ctx).fetchBindings('SELECT ?s WHERE {}')).rejects.toThrow(
       'sparql-admin 403'
     )

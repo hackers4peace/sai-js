@@ -1,6 +1,8 @@
 import { SignJWT, exportJWK } from 'jose'
 import type { GenerateKeyPairResult } from 'jose'
 
+import { withSpan } from './tracing/shared.ts'
+import { setBodyAttribute, setTokenAttributes } from './tracing/tokens.ts'
 import type { WhatwgFetch } from './whatwg-fetch.ts'
 
 /**
@@ -14,6 +16,26 @@ export const LWS_TOKEN_TYPE_ID_JAG = 'urn:ietf:params:oauth:token-type:id-jag'
 
 /** Path of the LWS authorization server metadata resource (LWS, §Authorization Server Metadata). */
 export const LWS_CONFIGURATION_PATH = '/.well-known/lws-configuration'
+
+/**
+ * Request parameter naming the organization whose authority an
+ * admin-impersonation request invokes (the organization's UAS is addressed).
+ * It selects which admin relationship is used; it is not an assertion by the
+ * caller, and the UAS verifies it against its own authorization data.
+ */
+export const SAI_IMPERSONATE_PARAM = 'impersonate'
+
+/**
+ * Request `scope` selecting read-only admin impersonation of an organization:
+ * the caller must be an admin of the named organization through its own
+ * authorization agent, and the issued ID-JAG carries the **organization's**
+ * claim for one peer storage, narrowed to `odrl:read`.
+ *
+ * A request field, never a claim: the UAS resolves it against its own
+ * authorization data and does not copy it into the ID-JAG (a storage `scope`
+ * is minted only by the storage's own exchange).
+ */
+export const SAI_ADMIN_IMPERSONATION_SCOPE = 'urn:sai:params:oauth:scope:admin-impersonation:read'
 
 /** Path of the OAuth 2.0 Protected Resource Metadata resource (RFC 9728). */
 export const LWS_PROTECTED_RESOURCE_METADATA_PATH = '/.well-known/oauth-protected-resource'
@@ -244,25 +266,46 @@ export async function exchangeLwsAccessToken(
     subject_token: subjectToken,
     resource,
   })
-  const response = await fetch(authorizationServer.tokenEndpoint, {
-    method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
-  })
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '')
-    throw new Error(
-      `LWS token exchange failed for ${resource}: ${response.status}${detail ? ` ${detail}` : ''}`
-    )
-  }
-  const document = (await response.json()) as Record<string, unknown>
-  if (typeof document.access_token !== 'string') {
-    throw new Error(`LWS token exchange for ${resource} returned no access_token`)
-  }
-  return {
-    accessToken: document.access_token,
-    expiresIn: typeof document.expires_in === 'number' ? document.expires_in : 300,
-  }
+
+  return withSpan(
+    'sai-lws',
+    'sai.lws.exchange-access-token',
+    async (span): Promise<LwsAccessToken> => {
+      span.setAttributes({
+        'sai.lws.grant_type': LWS_TOKEN_EXCHANGE_GRANT,
+        'sai.lws.subject_token_type': LWS_TOKEN_TYPE_ID_JAG,
+        'sai.lws.resource': resource,
+        'sai.lws.audience': authorizationServer.issuer,
+        'sai.lws.client_auth_method': 'none',
+      })
+      setTokenAttributes(span, 'id-jag', subjectToken)
+      setBodyAttribute(span, 'sai.lws.request.body', body.toString())
+
+      const response = await fetch(authorizationServer.tokenEndpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      })
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '')
+        // a storage `invalid_grant` is "no token for this storage", not a crash
+        span.setAttribute('sai.lws.error', String(response.status))
+        throw new Error(
+          `LWS token exchange failed for ${resource}: ${response.status}${detail ? ` ${detail}` : ''}`
+        )
+      }
+      const document = (await response.json()) as Record<string, unknown>
+      if (typeof document.access_token !== 'string') {
+        throw new Error(`LWS token exchange for ${resource} returned no access_token`)
+      }
+      setTokenAttributes(span, 'access', document.access_token)
+      setBodyAttribute(span, 'sai.lws.response.body', JSON.stringify(document))
+      return {
+        accessToken: document.access_token,
+        expiresIn: typeof document.expires_in === 'number' ? document.expires_in : 300,
+      }
+    }
+  )
 }
 
 export interface LwsFetchOptions {

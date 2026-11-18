@@ -43,7 +43,8 @@ import {
 import type * as S from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
-import { fetchPeerDocument, peerInstanceNode, peerRegistrationOfInstance } from './peerProxy.js'
+import { ownStorageOf } from './Context.js'
+import { fetchPeerDocument, peerInstanceNode, peerRegistrationOfInstance } from './peerData.js'
 import {
   getDataAuthorization,
   containingContainer,
@@ -127,7 +128,7 @@ async function orgWhoHasAccess(
 /**
  * Org-context data-instance read: the instance (+ its registration) are
  * peer data — the admin's session holds no grants on the peer's server, so
- * both docs are fetched through `/proxy-admin` (the org's server fetches
+ * both docs are fetched with the context's storage fetch (the org's
  * with the org's session) and framed from the fetched docs. Shape trees
  * are public and stay on the admin-session factory. JSON-LD only: blob
  * instances are out of scope (their description-resource HEAD is not
@@ -141,17 +142,20 @@ async function orgContextDataInstance(
   // peer data: the instance lives on the peer's server, outside the context's
   // endpoint allowlist — resolve its registration from the grants the context
   // holds, asking the peer which registration contains the instance
-  const registrationIri =
-    (await containingContainer(ctx, iri)) ?? (await peerRegistrationOfInstance(ctx, iri))
+  const located = await peerRegistrationOfInstance(ctx, iri)
+  const registrationIri = (await containingContainer(ctx, iri)) ?? located?.id
   if (!registrationIri) {
     throw new Error(`cannot resolve the data registration of ${iri}`)
   }
+  // the grant scopes a peer read; an org-own registration lives on the
+  // context's own pod (read with the admin's own `scope: admin`)
+  const storage = located?.storage ?? ownStorageOf(ctx, registrationIri) ?? registrationIri
   const registration = await DataRegistration.fromJsonLd(
-    await fetchPeerDocument(ctx.session, ctx.webId, registrationIri),
+    await fetchPeerDocument(ctx, storage, registrationIri),
     registrationIri
   )
   const shapeTree = await loadShapeTree(registration.registeredShapeTree, ctx.session.fetch)
-  const node = await peerInstanceNode(ctx, iri, shapeTree)
+  const node = await peerInstanceNode(ctx, storage, iri, shapeTree)
   return {
     id: iri,
     shapeTreeIri: registration.registeredShapeTree,

@@ -1,6 +1,18 @@
-import { ACCESS_TOKEN_TYPE, createLwsAuthFetch } from '@elfpavlik/lws-auth'
+import {
+  ACCESS_TOKEN_TYPE,
+  ID_JAG_TOKEN_TYPE,
+  createLwsAuthFetch,
+  requestIdJag,
+} from '@elfpavlik/lws-auth'
 import type { LwsCredential } from '@elfpavlik/lws-auth'
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
+import {
+  SAI_ADMIN_IMPERSONATION_SCOPE,
+  SAI_IMPERSONATE_PARAM,
+  createLwsFetch,
+  discoverAuthorizationAgent,
+  discoverLwsAuthorizationServerMetadata,
+} from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { JwkGenerator } from '@solid/community-server'
 import { generateKeyPair } from 'jose'
@@ -36,6 +48,10 @@ export function getSharedEndpointStore(): Promise<PodEndpointStore> {
 
 export class SessionManager {
   private endpointStore?: PodEndpointStore
+  /** Cached impersonation fetch per (admin, organization, peer storage). */
+  private readonly impersonationFetches = new Map<string, Promise<WhatwgFetch>>()
+  /** Cached storage-scoped fetch per (agent, storage). */
+  private readonly storageFetches = new Map<string, Promise<WhatwgFetch>>()
 
   public constructor(
     private readonly baseUrl: string,
@@ -80,6 +96,105 @@ export class SessionManager {
     })
     await oidc.login()
     return { oidc, dpopKeyPair }
+  }
+
+  /**
+   * A fetch for one storage that presents the agent's own credential, minting
+   * `scope: owner` (the owner) or `scope: admin` (a DataRegistry admin) at that
+   * storage. Used for the org context's **own** pods: the admin's own token is
+   * read-only there, unlike an in-process org session, which the storage AS
+   * would treat as the owner (`scope: owner`, all modes).
+   */
+  public async storageFetch(webid: string, storage: string): Promise<WhatwgFetch> {
+    const key = `${webid}\n${storage}`
+    const cached = this.storageFetches.get(key)
+    if (cached) return cached
+    const created = (async (): Promise<WhatwgFetch> => {
+      const { oidc, dpopKeyPair } = await this.buildSelfIssuedSession(webid)
+      const credential: LwsCredential = {
+        issuer: this.baseUrl,
+        clientId: agentId(webid),
+        dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+        subjectTokenType: ACCESS_TOKEN_TYPE,
+        getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
+      }
+      return createLwsAuthFetch({ credential, storages: [storage] })
+    })()
+    this.storageFetches.set(key, created)
+    created.catch(() => this.storageFetches.delete(key))
+    return created
+  }
+
+  /**
+   * Read-only admin impersonation of an organization for one peer storage
+   * (org context). Both token hops happen here, server-side:
+   *
+   * 1. the admin's own UAS mints an identity-only ID-JAG for the organization's
+   *    UAS, with the admin-impersonation `scope` and the peer storage as
+   *    `resource`;
+   * 2. the organization's UAS checks the admin grant, derives the
+   *    organization's claim for that storage, narrows it to `read`, and issues
+   *    an ID-JAG as the organization;
+   * 3. the storage's authorization server trades that ID-JAG for an access
+   *    token (through `createLwsFetch`, which caches it and retries a `401`).
+   *
+   * The admin is dropped at hop 2: neither the organization's ID-JAG nor the
+   * access token names the admin, and neither reaches the caller's UI.
+   */
+  public async impersonationFetch(
+    adminWebId: string,
+    orgWebId: string,
+    storage: string
+  ): Promise<WhatwgFetch> {
+    const key = `${adminWebId}\n${orgWebId}\n${storage}`
+    const cached = this.impersonationFetches.get(key)
+    if (cached) return cached
+    const created = (async (): Promise<WhatwgFetch> => {
+      const { oidc, dpopKeyPair } = await this.buildSelfIssuedSession(adminWebId)
+      const clientId = agentId(adminWebId)
+      const organizationUas = await this.organizationUas(orgWebId)
+      const ras = await discoverLwsAuthorizationServerMetadata(storage, fetch)
+
+      // Hop 1: the admin's own UAS mints an identity-only ID-JAG for the
+      // organization's UAS. No scope here — the request scope is only
+      // meaningful at the organization's UAS (hop 2).
+      const idJag = await requestIdJag({
+        uas: this.baseUrl,
+        audience: organizationUas,
+        resource: storage,
+        subjectToken: await oidc.generateSelfIssuedAccessToken(),
+        subjectTokenType: ACCESS_TOKEN_TYPE,
+        clientId,
+        dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+      })
+      // Hop 2: the organization's UAS checks the admin grant, derives the
+      // organization's claim for this storage and narrows it to `read`.
+      const impersonated = await requestIdJag({
+        uas: organizationUas,
+        audience: ras.issuer,
+        resource: storage,
+        scope: SAI_ADMIN_IMPERSONATION_SCOPE,
+        subjectToken: idJag,
+        subjectTokenType: ID_JAG_TOKEN_TYPE,
+        clientId,
+        dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+        extraParameters: { [SAI_IMPERSONATE_PARAM]: orgWebId },
+      })
+
+      return createLwsFetch({
+        storages: [storage],
+        subjectToken: () => Promise.resolve(impersonated),
+      })
+    })()
+    this.impersonationFetches.set(key, created)
+    created.catch(() => this.impersonationFetches.delete(key))
+    return created
+  }
+
+  /** The organization's own UAS origin (its authorization agent's origin). */
+  private async organizationUas(orgWebId: string): Promise<string> {
+    const agent = await discoverAuthorizationAgent(orgWebId, fetch).catch(() => undefined)
+    return agent ? `${new URL(agent).origin}/` : this.baseUrl
   }
 
   public async getSession(webid: string, registrySetId?: string): Promise<AuthorizationAgent> {

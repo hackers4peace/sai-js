@@ -1,4 +1,5 @@
 import { INTEROP, LWS, ODRL, RDF, discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
+import { SpanStatusCode } from '@opentelemetry/api'
 import type { PodStore, StorageLocationStrategy } from '@solid/community-server'
 import {
   LwsExchangeAccessDeniedError,
@@ -9,6 +10,7 @@ import { getLoggerFor } from 'global-logger-factory'
 import { DataFactory, Store } from 'n3'
 
 import type { SaiAuthorizationManager } from './SaiAuthorizationManager.js'
+import { sharedTracer } from './tracing/otel-state.js'
 
 const { namedNode } = DataFactory
 
@@ -49,24 +51,45 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
   }
 
   public async determineScope(input: LwsTokenExchangePolicyInput): Promise<string[] | undefined> {
-    let storage: string
+    // The decision is the storage AS's authorization event: record the input,
+    // the minted scope and a denial so the token chain is observable end to end.
+    const span = sharedTracer('sai-lws').startSpan('sai.lws.exchange-scope')
+    span.setAttributes({
+      'sai.lws.resource': input.resource,
+      'sai.lws.subject_id': input.subject,
+      'sai.lws.client_id': input.client,
+      'sai.lws.subject_issuer': input.issuer,
+    })
     try {
-      storage = (await this.storageStrategy.getStorageIdentifier({ path: input.resource })).path
-    } catch {
-      throw new LwsExchangeAccessDeniedError(`${input.resource} is not a storage.`)
-    }
+      let storage: string
+      try {
+        storage = (await this.storageStrategy.getStorageIdentifier({ path: input.resource })).path
+      } catch {
+        throw new LwsExchangeAccessDeniedError(`${input.resource} is not a storage.`)
+      }
+      span.setAttribute('sai.lws.storage', storage)
 
-    // The owner's own UAS is the only client that receives the owner scope; an
-    // owner using an app client needs a normal access claim.
-    if (await this.isOwner(storage, input.subject, input.client)) {
-      return ['owner']
+      // The owner's own UAS is the only client that receives the owner scope; an
+      // owner using an app client needs a normal access claim.
+      if (await this.isOwner(storage, input.subject, input.client)) {
+        span.setAttribute('sai.lws.scope', 'owner')
+        return ['owner']
+      }
+      if (await this.isAdmin(input.resource, input.subject, input.client)) {
+        span.setAttribute('sai.lws.scope', 'admin')
+        return ['admin']
+      }
+      throw new LwsExchangeAccessDeniedError(
+        `No access claim, owner, or admin authority for ${input.resource}.`
+      )
+    } catch (error: unknown) {
+      span.setAttribute('sai.lws.denied', true)
+      span.setAttribute('sai.lws.denied_reason', (error as Error).message)
+      span.setStatus({ code: SpanStatusCode.ERROR, message: (error as Error).message })
+      throw error
+    } finally {
+      span.end()
     }
-    if (await this.isAdmin(input.resource, input.subject, input.client)) {
-      return ['admin']
-    }
-    throw new LwsExchangeAccessDeniedError(
-      `No access claim, owner, or admin authority for ${input.resource}.`
-    )
   }
 
   private async isOwner(storage: string, subject: string, client: string): Promise<boolean> {

@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'node:http'
 import { Readable } from 'node:stream'
 
-import { ODRL_ID_JAG_CONTEXT, createLwsTokenDpopProof } from '@janeirodigital/interop-utils'
+import { ODRL, ODRL_ID_JAG_CONTEXT, createLwsTokenDpopProof } from '@janeirodigital/interop-utils'
 import type {
   HttpResponse,
   JwkGenerator,
@@ -14,6 +14,7 @@ import { calculateJwkThumbprint, exportJWK, generateKeyPair, jwtVerify } from 'j
 import type { GenerateKeyPairResult } from 'jose'
 import { beforeAll, describe, expect, test, vi } from 'vitest'
 
+import { AdminImpersonationDenied } from '../src/AdminImpersonationAuthority.js'
 import { ID_JAG_JWT_TYPE, ID_JAG_TOKEN_TYPE, IdJagIssuer } from '../src/IdJagIssuer.js'
 import type { IdJagTokenHandlerArgs } from '../src/IdJagTokenHandler.js'
 import { ID_JAG_GRANT_TYPE, IdJagTokenHandler } from '../src/IdJagTokenHandler.js'
@@ -625,5 +626,146 @@ describe('IdJagTokenHandler', () => {
     const malformed = await call(handler, tokenRequest(), { dpop: 'not-a-jwt' })
     expect(malformed.status).toBe(400)
     expect(JSON.parse(String(malformed.body)).error).toBe('invalid_dpop_proof')
+  })
+})
+
+describe('IdJagTokenHandler — read-only admin impersonation', () => {
+  const ADMIN = 'https://id/dan'
+  const ADMIN_UAS = 'https://auth/.sai/agents/ZGFu'
+  const ORG = 'https://id/yoyo'
+  const PEER_STORAGE = 'https://data/bob/'
+  const ADMIN_SCOPE = 'urn:sai:params:oauth:scope:admin-impersonation:read'
+
+  /** Claimless org claim for the peer storage, as the authority returns it. */
+  const orgClaim = idJagClaim({ storage: PEER_STORAGE, assignee: ORG, actions: [ODRL.read] })
+
+  function impersonationRequest(overrides: Record<string, string> = {}): string {
+    return tokenRequest({
+      subject_token: 'id-jag',
+      subject_token_type: ID_JAG_TOKEN_TYPE,
+      resource: PEER_STORAGE,
+      scope: ADMIN_SCOPE,
+      impersonate: ORG,
+      ...overrides,
+    })
+  }
+
+  function buildImpersonationHandler(
+    authorize = vi.fn(async () => ({
+      access: orgClaim,
+      context: ODRL_ID_JAG_CONTEXT,
+      storage: PEER_STORAGE,
+      assigners: [ORG],
+      assignees: [ORG],
+    }))
+  ) {
+    const verifier = new StubIdJagVerifier(undefined, ADMIN, ADMIN_UAS)
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const handler = new TestIdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier,
+      storageOrigins: ['data', 'registry'],
+      adminImpersonationScope: ADMIN_SCOPE,
+      adminImpersonationAuthority: { authorize },
+    })
+    return { handler, authorize }
+  }
+
+  test('issues an ID-JAG as the organization with a read-only claim', async () => {
+    const { handler, authorize } = buildImpersonationHandler()
+    const captured = await call(handler, impersonationRequest())
+
+    expect(captured.status).toBe(200)
+    const { payload } = await jwtVerify(
+      JSON.parse(String(captured.body)).access_token,
+      keys.publicKey
+    )
+    // the admin is dropped: subject and client are the organization and its UAS
+    expect(payload).toMatchObject({ sub: ORG, client_id: BASE_URL, aud: DATA })
+    expect(payload.access).toBeDefined()
+    expect(JSON.stringify(payload.access)).not.toContain(ADMIN)
+    expect(payload.act).toBeUndefined()
+
+    expect(authorize).toHaveBeenCalledWith({
+      org: ORG,
+      subject: ADMIN,
+      client: ADMIN_UAS,
+      storage: PEER_STORAGE,
+    })
+  })
+
+  test('denies with invalid_grant when the authority refuses', async () => {
+    const { handler } = buildImpersonationHandler(
+      vi.fn(async () => {
+        throw new AdminImpersonationDenied(`${ADMIN} is not an admin of ${ORG}.`)
+      })
+    )
+    const captured = await call(handler, impersonationRequest())
+
+    expect(captured.status).toBe(400)
+    const body = JSON.parse(String(captured.body))
+    expect(body.error).toBe('invalid_grant')
+    expect(body.error_description).toContain('not an admin')
+  })
+
+  test('rejects a malformed request (missing resource / impersonate / claim-free subject)', async () => {
+    const { handler } = buildImpersonationHandler()
+
+    const missingResource = await call(handler, impersonationRequest({ resource: '' }))
+    expect(JSON.parse(String(missingResource.body)).error).toBe('invalid_request')
+
+    const missingOrg = await call(handler, impersonationRequest({ impersonate: '' }))
+    expect(JSON.parse(String(missingOrg.body)).error).toBe('invalid_request')
+
+    const accessTokenSubject = await call(
+      handler,
+      impersonationRequest({ subject_token_type: ACCESS_TOKEN_TYPE })
+    )
+    expect(JSON.parse(String(accessTokenSubject.body)).error).toBe('invalid_request')
+  })
+
+  test('rejects an ID-JAG subject token that carries an access claim', async () => {
+    const verifier = new StubIdJagVerifier(idJagClaim(), ADMIN, ADMIN_UAS)
+    const generator: JwkGenerator = {
+      alg: 'ES256',
+      getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+      getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+    }
+    const handler = new TestIdJagTokenHandler({
+      issuer: new IdJagIssuer(BASE_URL, generator, 300),
+      verifier,
+      storageOrigins: ['data', 'registry'],
+      adminImpersonationScope: ADMIN_SCOPE,
+      adminImpersonationAuthority: { authorize: vi.fn() },
+    })
+    const captured = await call(handler, impersonationRequest())
+    expect(JSON.parse(String(captured.body)).error).toBe('invalid_request')
+  })
+
+  test('requires an authority when the scope is configured', async () => {
+    const { handler } = buildImpersonationHandler()
+    const disabled = new TestIdJagTokenHandler({
+      issuer: new IdJagIssuer(
+        BASE_URL,
+        {
+          alg: 'ES256',
+          getPublicKey: async () => publicJwk as JWK & { alg: 'ES256' },
+          getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
+        },
+        300
+      ),
+      verifier: new StubIdJagVerifier(undefined, ADMIN, ADMIN_UAS),
+      storageOrigins: ['data', 'registry'],
+    })
+    // no scope configured: the request is not an impersonation request, so it
+    // falls into the regular ID-JAG path and needs an access claim
+    const captured = await call(disabled, impersonationRequest())
+    expect(JSON.parse(String(captured.body)).error).toBe('invalid_request')
+    expect(captured.status).toBe(400)
+    expect(handler).toBeDefined()
   })
 })

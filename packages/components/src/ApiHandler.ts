@@ -122,70 +122,135 @@ export class ApiHandler extends OperationHttpHandler {
             Effect.promise(() => this.accountService.startBootstrapAccount(accountId, handle)),
           getDataRegistries: (agentId, lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getDataRegistries(ctx, agentId, lang)
             }),
           listDataInstances: (agentId, registrationId, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return listDataInstances(ctx, agentId, registrationId, 'en')
             }),
           getApplications: (context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getApplications(ctx)
             }),
           getUnregisteredApplication: (id) =>
             Effect.promise(() => getUnregisteredApplication(session, id)),
           getSocialAgents: (lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getSocialAgents(ctx, lang)
             }),
           getRoles: (lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getRoles(ctx, lang)
             }),
           createRole: (label, members, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return createRole(ctx, label, members)
             }),
           updateRole: (id, label, members, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return updateRole(ctx, id, label, members)
             }),
           deleteRole: (id, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return deleteRole(ctx, id)
             }),
           getSocialAgentInvitations: (lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getSocialAgentInvitations(ctx, lang)
             }),
           getAuthorizationData: (agentId, lang, accessNeedGroupIri, accessRequestIri, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getDescriptions(ctx, agentId, lang, accessNeedGroupIri, accessRequestIri)
             }),
           getAuthorizations: (grantee, lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return listAuthorizations(ctx, grantee, lang)
             }),
           authorizeApp: (authorization, accessRequestIri, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return recordAuthorization(ctx, authorization, accessRequestIri)
             }),
           revokeAuthorizations: (authorizations, context) =>
             Effect.tryPromise({
               try: async () => {
-                const ctx = await resolveContext(session, context, this.endpointStore)
+                const ctx = await resolveContext(
+                  session,
+                  context,
+                  this.endpointStore,
+                  this.sessionManager
+                )
                 const result = await revokeAuthorizations(ctx, authorizations)
                 return {
                   ...(result.activityId ? { activityId: IRI.make(result.activityId) } : {}),
@@ -196,12 +261,22 @@ export class ApiHandler extends OperationHttpHandler {
             }),
           addAdmin: (agentWebId, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return addAdmin(ctx, agentWebId)
             }),
           removeAdmin: (agentWebId, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return removeAdmin(ctx, agentWebId)
             }),
           registerPushSubscription: (subscription: PushSubscription) =>
@@ -210,37 +285,72 @@ export class ApiHandler extends OperationHttpHandler {
             ),
           getResource: (id, lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return getResource(ctx, id, lang)
             }),
           shareResource: (authorization, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return shareResource(ctx, authorization)
             }),
           requestAccessUsingApplicationNeeds: (applicationId, agentId, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return requestAccessUsingApplicationNeeds(ctx, applicationId, agentId)
             }),
           requestAccessUsingAccessNeeds: (dataOwner, hasAccessNeedGroup, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return requestAccessUsingAccessNeeds(ctx, dataOwner, hasAccessNeedGroup)
             }),
           archiveAccessRequest: (request, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return archiveAccessRequest(ctx, request)
             }),
           createInvitation: (label, note, lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return createInvitation(ctx, { label, note }, lang)
             }),
           acceptInvitation: (capabilityUrl, label, note, lang, context) =>
             Effect.promise(async () => {
-              const ctx = await resolveContext(session, context, this.endpointStore)
+              const ctx = await resolveContext(
+                session,
+                context,
+                this.endpointStore,
+                this.sessionManager
+              )
               return acceptInvitation(ctx, { capabilityUrl, label, note }, lang)
             }),
         })

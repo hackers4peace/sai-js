@@ -20,7 +20,7 @@ import {
 import type * as S from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
-import { peerInstanceIris, peerInstanceNode } from './peerProxy.js'
+import { peerInstanceIris, peerInstanceNode } from './peerData.js'
 import {
   getDataRegistration as getDataRegistrationFromSparql,
   contextPod,
@@ -205,9 +205,10 @@ export const listDataInstances = async (
     } else {
       // org context — the admin's session holds no grants on the org's data
       // pod (isolation): membership comes from the context plane
-      // (`/sparql-admin?pod=`) and the instance content through
-      // `/proxy-admin` (the org's server fetches it with the org's session) —
-      // the same read `GetResource` makes (`orgContextDataInstance`).
+      // (`/sparql-admin?pod=`) and the instance content is read with the
+      // admin's own credential, which the org's storage exchange turns into
+      // the read-only `scope: admin` — the same read `GetResource` makes
+      // (`orgContextDataInstance`).
       const podUrl = contextPod(ctx, registrationId)
       if (!podUrl) {
         throw new Error(`data registration ${registrationId} is outside the context`)
@@ -216,7 +217,7 @@ export const listDataInstances = async (
       const dataRegistration = await getDataRegistrationFromSparql(transport, registrationId)
       const shapeTree = await loadShapeTree(dataRegistration.registeredShapeTree, ctx.session.fetch)
       for (const dataInstanceIri of dataRegistration.contains ?? []) {
-        const node = await peerInstanceNode(ctx, dataInstanceIri, shapeTree)
+        const node = await peerInstanceNode(ctx, podUrl, dataInstanceIri, shapeTree)
         dataInstances.push(
           DataInstance.make({
             id: IRI.make(dataInstanceIri),
@@ -265,14 +266,14 @@ export const listDataInstances = async (
           )
         }
       } else {
-        // org context — the admin's session derefs no peer document
-        // (403); the org's server fetches peer docs with the org's session
-        // via /proxy-admin. Shape trees are public (admin-session fetch).
+        // org context — the admin's session derefs no peer document (403);
+        // the context's storage fetch performs the read-only org impersonation
+        // for the grant's storage. Shape trees are public (admin-session fetch).
         const shapeTree = await loadShapeTree(accessGrant.registeredShapeTree, ctx.session.fetch)
         for await (const instanceId of peerInstanceIris(ctx, accessGrant)) {
           if (seenInstances.has(instanceId)) continue
           seenInstances.add(instanceId)
-          const node = await peerInstanceNode(ctx, instanceId, shapeTree)
+          const node = await peerInstanceNode(ctx, accessGrant.storage, instanceId, shapeTree)
           dataInstances.push(
             DataInstance.make({
               id: IRI.make(instanceId),

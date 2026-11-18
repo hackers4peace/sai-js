@@ -1482,6 +1482,248 @@ views {
     }
   }
 
+  /*
+   * Org-context peer read: read-only admin impersonation of the org (C7).
+   *
+   * Dan's UAS holds the whole chain server-side. The Admin UI only ever uses
+   * its cookie session against the RPC endpoint; no token reaches the browser.
+   * `/test/org-context.test.ts` exercises the RPC surface; the token hops are
+   * covered by `packages/components/test/{id-jag,admin-impersonation}.test.ts`.
+   */
+  dynamic view org-context-peer-read {
+    variant sequence
+    title: 'Org-context peer read — read-only admin impersonation of the org'
+
+    description '''
+      **Implemented (2026-11-18).** An admin of an org reads a peer resource
+      that the **org** — not the admin — is granted
+      (`Bob.Registry`: `t2v9cd`, `AllFromRegistry` over `data/bob/avn9hv/`, so
+      instances `n3onkx` and `gl1tch`).
+
+      Three token hops, all inside **Dan's UAS**:
+
+      1. `Dan.UAS` mints an ID-JAG for Dan with **no access claim** and the
+         requested `scope` naming the impersonation, `aud` = the org's UAS.
+      2. `YoYo.UAS` checks the admin grant, derives the **org's** claim for the
+         requested storage and narrows it to `odrl:read`, then issues an ID-JAG
+         with `sub` = the org and itself as client.
+      3. `Dan.UAS` trades that ID-JAG at **Bob's** authorization server, which
+         validates it against Bob's own grants like any other ID-JAG.
+
+      The **Admin UI is only a cookie client**: it calls the RPC endpoint of the
+      admin's UAS (`/.sai/api`). Both exchanges and the storage `GET` run
+      server-side, so neither ID-JAG nor the access token leaves Dan's UAS.
+
+      Why not the in-process org session (rejected alternative): `getSession(org)`
+      needs the org's account in *this* deployment and signs with this server's
+      key. Here the org's key stays on the org's server and the flow works
+      federated; what Dan's UAS holds is one storage, `read` only, for one
+      ID-JAG lifetime, and the deleted `/.sai/proxy-admin` endpoint is gone.
+
+      Boundaries this makes explicit:
+
+      - **`scope` is a request, not authority.** `urn:sai:admin-impersonation:read`
+        is resolved by `YoYo.UAS` against its own admin grant and never copied
+        into the token. A storage `scope` (`owner`/`admin`) is honored only from
+        the storage's own issuer (D29).
+      - **Read-only is enforced at `YoYo.UAS`** by intersecting the derived claim
+        with `odrl:read` (`AdminImpersonationAuthority.narrowToRead`); Bob's AS
+        cannot tell Dan from YoYo and never narrows. Coverage still holds at Bob
+        (`grantCoversClaim` is subset-based).
+      - **Never for the org's own pods.** There the subject would be the org, the
+        storage AS mints `scope: owner` (read/modify/create/delete), so org-own
+        reads use the admin's own token with `scope: admin` (read-only) instead.
+      - **Bob sees only the org** (D8). The admin becomes visible at the org's
+        own exchange — that is where the hidden-actor audit record lives.
+
+      `/.sai/sparql-admin?pod=` is untouched: the registry plane stays SPARQL
+      over the admin-gated endpoint. `h4p.Data.*` is Bob's storage server — AS,
+      token validation and policy engine in one process, as in the other views.
+
+      Groups are the security containers (`Dan`, `YoYo`, `Bob`) plus the
+      `h4p.Data` compound titled **Bob data**, so a step that leaves one
+      compound for another is a peer-context crossing: the two
+      `Dan.UAS → YoYo.Registry` reads stay inside the org's own plane, while the
+      exchange at the org's UAS, the exchange at Bob's AS, the owner-grant read,
+      the storage `GET` and its 200 all cross peer contexts.
+    '''
+
+    include Dan, YoYo, Bob
+    include Dan.AUI, Dan.UAS, YoYo.UAS, YoYo.Registry, Bob.Registry
+    include h4p.Data with { title 'Bob data' }, h4p.Data.LwsAuthorizationServer, h4p.Data.LwsAccessTokenValidation, h4p.Data.SaiPolicyEngine
+
+    style Dan {
+      color: green
+    }
+    style YoYo {
+      color: indigo
+    }
+    style Bob {
+      color: blue
+    }
+    style h4p.Data {
+      color: sky
+    }
+
+    Dan.AUI -> Dan.UAS 'POST /.sai/api — ListDataInstances { agentId: bob, context: yoyo } (cookie only)' {
+      notes'''
+        The Admin UI has no token of its own: an account cookie against the RPC
+        endpoint of the admin's UAS. `resolveContext` authorizes the `context`
+        and every token hop below stays in this server.
+      '''
+    }
+
+    Dan.UAS -> YoYo.Registry 'SPARQL /.sai/sparql-admin/<yoyo>?pod= — admin marker + reciprocal grants' {
+      notes'''
+        Registry plane, unchanged: membership, `reciprocalRegistration` links
+        and grant bodies come from the org's registry, not from the peer.
+      '''
+    }
+
+    Dan.UAS -> Dan.UAS 'mint ID-JAG #0 — sub=dan, client=Dan UAS, aud=YoYo UAS, no access claim' {
+      notes'''
+        `requested_token_type=…:id-jag` with `scope=urn:sai:admin-impersonation:read`
+        and `resource=<bob storage>`. Identity only: Dan's own grants cannot
+        back a claim for Bob's storage, and the request is the authority
+        question, not a claim.
+
+        `sai.token.id-jag.claims` of ID-JAG #0 in the trace (486 B, `iat` …682,
+        `exp` …982 — 300 s, no `access` key):
+
+        ```json
+        { "iss": "https://auth/", "aud": "https://auth/",
+          "sub": "https://id/dan",
+          "client_id": "https://auth/.sai/agents/aHR0cHM6Ly9pZC9kYW4",
+          "jti": "a576e257-8cc8-4816-8071-482d5eeb5288" }
+        ```
+
+        The subject credential behind it is Dan's self-issued `at+jwt`
+        (`typ`, `aud: https://auth/`, `cnf.jkt`, 3600 s), sent as
+        `subject_token_type=…:access_token` with a DPoP proof (`sai.lws.dpop_proof=true`).
+      '''
+    }
+
+    Dan.UAS -> YoYo.UAS 'POST /.well-known/lws/token — subject_token=ID-JAG #0, scope=…:admin-impersonation:read' {
+      notes'''
+        **Crosses into the org's context.** The requested scope is a *request*:
+        the UAS resolves it against its own admin grant and does not copy it out.
+
+        >[!NOTE]
+        > `org-context.test.ts` › `ListDataInstances on the peer’s granted
+        > registration lists the instances (labels)` — trace `d362ce16…`
+
+        Captured form body (335 ms client span; 332 ms in the UAS,
+        `sai.lws.admin_impersonation=true`, `sai.lws.impersonation.org=https://id/yoyo`):
+
+        ```http
+        POST https://auth/.well-known/lws/token
+        grant_type=urn:ietf:params:oauth:grant-type:token-exchange
+        &requested_token_type=urn:ietf:params:oauth:token-type:id-jag
+        &audience=https://data/
+        &resource=https://data/bob/
+        &scope=urn:sai:params:oauth:scope:admin-impersonation:read
+        &impersonate=https://id/yoyo
+        &subject_token_type=urn:ietf:params:oauth:token-type:id-jag
+        &subject_token=<ID-JAG #0>
+        &client_id=https://auth/.sai/agents/aHR0cHM6Ly9pZC9kYW4
+        ```
+
+        **ID-JAG #1** (2347 B) — `sai.token.id-jag.claims`, `uid`/`id` shortened:
+
+        ```json
+        { "iss": "https://auth/", "aud": "https://data/",
+          "sub": "https://id/yoyo", "client_id": "https://auth/",
+          "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
+          "access": [{ "type": ["odrl:Agreement"], "profile": "interop:AccessProfile",
+            "scopeOfGrant": "interop:AllFromRegistry",
+            "registeredShapeTree": "https://data/shapetrees/trees/Project",
+            "assignee": "https://id/yoyo", "action": ["odrl:read"],
+            "permission": [{ "assignee": "https://id/yoyo", "action": ["odrl:read"],
+              "target": { "owner": "https://id/bob", "storage": "https://data/bob/",
+                "type": ["interop:DataRegistration", "odrl:AssetCollection"],
+                "source": ["https://data/bob/avn9hv"],
+                "partOf": ["https://data/bob/avn9hv"] } }] }] }
+        ```
+
+        No `act`, no `/id/dan` anywhere — the admin is gone from the token, and
+        `action` is exactly `odrl:read` although Bob's grant is what supplied
+        the rest of the policy.
+      '''
+    }
+
+    YoYo.UAS -> YoYo.Registry 'AdminGrant — scopeOfAdminGrant=DataRegistry, assignee=dan, client=Dan UAS' {
+      notes'''
+        The authority for impersonation is the org's own admin grant, read at
+        mint time (same predicate `StorageExchangeAccessPolicy.isAdmin` uses at
+        a storage AS, including the own-UAS client binding). Non-admin, or an
+        admin using an app client → `invalid_grant`.
+      '''
+    }
+
+    YoYo.UAS -> YoYo.Registry 'derive the org claim — mirrored Bob→YoYo grant, narrowed to odrl:read' {
+      notes'''
+        Derived from the **org's** plane, then intersected with `odrl:read`: a
+        peer grant that also carried `modify` cannot widen the admin. Requesting
+        this for one of the org's own pods is refused, because there the storage
+        AS would mint `scope: owner`.
+      '''
+    }
+
+    YoYo.UAS -> Dan.UAS 'ID-JAG #1 — sub=yoyo, client=YoYo UAS, aud=Bob AS, access=[read]' {
+      notes'''
+        Dan is hidden from here on (D8). The token is a bearer ID-JAG for one
+        storage and one ID-JAG lifetime; it stays inside Dan's UAS.
+      '''
+    }
+
+    Dan.UAS -> h4p.Data.LwsAuthorizationServer 'POST /.well-known/lws/token — subject_token=ID-JAG #1 (Bob’s AS)' {
+      notes'''
+        **Crosses into Bob's context.** A regular LWS exchange: Bob's AS is the
+        only issuer of access tokens for Bob's storage.
+
+        Captured: the storage `GET /data/bob/avn9hv` first answers **401** (no
+        token yet), the client discovers the AS and exchanges in **137 ms**, and
+        the retry with `Authorization: Bearer` returns **200 in 103 ms**. The
+        server-side `sai.lws.verify-id-jag` takes **121 ms** — it is where
+        `OwnerAccessClaimValidator` runs the owner-grant `CONSTRUCT` on
+        `https://registry/bob/a7t2kq`.
+
+        `sai.lws.exchange-access-token` form and the resulting access token
+        (`sai.token.access.claims`): the storage's own AS issues it, and it
+        **carries the claim**, which is what authorizes the request:
+
+        ```json
+        { "iss": "https://data/", "aud": "https://data/bob/",
+          "sub": "https://id/yoyo", "client_id": "https://auth/",
+          "access": [ <the org claim from ID-JAG #1> ] }
+        ```
+
+        For the org's **own** pods the exchange is claimless instead, and
+        `sai.lws.exchange-scope` records the decision: trace
+        `677133856bd8c9758b81bb12d103c2ab` has
+        `scope=admin, storage=https://data/yoyo-na/, subject=https://id/dan`,
+        and the access token is
+        `{ "iss": "https://data/", "aud": "https://data/yoyo-na/", "sub": "https://id/dan", "scope": "admin" }`
+        — read-only, so an org-owned read never needs the impersonation.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> Bob.Registry 'getAuthorizationData — Bob→YoYo grant (OwnerAccessClaimValidator)' {
+      notes'''
+        Coverage, not equality: owner, grantee, shape tree, registration,
+        storage, scope, modes and instances. No covering grant → `invalid_grant`.
+        Revocation of Bob's grant is therefore effective at the next exchange.
+      '''
+    }
+
+    h4p.Data.LwsAuthorizationServer -> Dan.UAS '200 { access_token: bearer, sub=yoyo, aud=<bob storage>, expires_in: 300 }'
+    Dan.UAS -> h4p.Data.LwsAccessTokenValidation 'GET https://data/bob/avn9hv + Bearer'
+    h4p.Data.LwsAccessTokenValidation -> h4p.Data.SaiPolicyEngine 'credentials { agent: yoyo }'
+    h4p.Data.SaiPolicyEngine -> h4p.Data.LwsAccessTokenValidation 'decision — claim path'
+    h4p.Data.LwsAccessTokenValidation -> Dan.UAS '200 application/ld+json'
+    Dan.UAS -> Dan.AUI '200 RPC result — instances + labels (cookie session)'
+  }
+
   view lws of h4p.Data {
     title: 'LWS endpoints on a storage server'
 

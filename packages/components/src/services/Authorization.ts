@@ -50,7 +50,7 @@ import type * as S from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import { ContextError } from './Context.js'
-import { dataRegistrationContains } from './peerProxy.js'
+import { dataRegistrationContains } from './peerData.js'
 import {
   getDataRegistration as getDataRegistrationFromSparql,
   getReciprocalGrants,
@@ -190,7 +190,13 @@ async function findSocialAgentDataRegistrations(
           count:
             accessGrant.scopeOfGrant === INTEROP.SelectedFromRegistry
               ? (accessGrant.hasDataInstance?.length ?? 0)
-              : (await dataRegistrationContains(ctx, accessGrant.hasDataRegistration)).length,
+              : (
+                  await dataRegistrationContains(
+                    ctx,
+                    accessGrant.storage,
+                    accessGrant.hasDataRegistration
+                  )
+                ).length,
         })
       }
     }

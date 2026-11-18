@@ -4,12 +4,28 @@ import {
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import type { RegistrySetData } from '@janeirodigital/interop-data-model'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { INTEROP } from '@janeirodigital/interop-utils'
 
 import type { PodEndpointStore } from '../PodEndpointStore.js'
+import type { SessionManager } from '../SessionManager.js'
 
 /** The requested context is not allowed for the signed-in user. */
 export class ContextError extends Error {}
+
+/**
+ * The context's **own** pod (storage) containing the IRI, if any. Peer
+ * resources are outside this allowlist, so they are read with the read-only
+ * org impersonation instead.
+ */
+export function ownStorageOf(
+  ctx: Pick<ResolvedContext, 'endpoints'>,
+  iri: string
+): string | undefined {
+  return [...ctx.endpoints.keys()]
+    .filter((pod) => iri === pod || iri.startsWith(pod))
+    .toSorted((a, b) => b.length - a.length)[0]
+}
 
 /**
  * The resolved context a service operation runs in (§2.4 of
@@ -32,6 +48,19 @@ export type ResolvedContext = {
    * the internal account storage. Data-plane reads may only use these.
    */
   endpoints: Map<string, string>
+  /**
+   * LWS fetch for one storage, read-only for an admin acting in an org
+   * context:
+   *
+   * - personal context: the user's own session fetch;
+   * - the context's **own** pods: the admin's own credential, which the storage
+   *   exchange turns into `scope: admin` (read-only) — never an in-process org
+   *   session, which the storage would treat as the owner (`scope: owner`);
+   * - a **peer** storage: read-only impersonation of the org
+   *   (`SessionManager.impersonationFetch`), so the peer sees the org and only
+   *   ever `odrl:read`.
+   */
+  storageFetch: (storage: string) => Promise<WhatwgFetch>
 }
 
 /**
@@ -70,7 +99,8 @@ async function isAdminOf(userSession: AuthorizationAgent, orgWebId: string): Pro
 export async function resolveContext(
   userSession: AuthorizationAgent,
   context: string,
-  endpointStore: PodEndpointStore
+  endpointStore: PodEndpointStore,
+  sessionManager: SessionManager
 ): Promise<ResolvedContext> {
   if (context === userSession.webId) {
     return {
@@ -79,6 +109,7 @@ export async function resolveContext(
       webId: userSession.webId,
       userWebId: userSession.webId,
       endpoints: userSession.sparqlEndpoints,
+      storageFetch: () => Promise.resolve(userSession.fetch),
     }
   }
   if (!(await isAdminOf(userSession, context))) {
@@ -95,5 +126,11 @@ export async function resolveContext(
     webId: context,
     userWebId: userSession.webId,
     endpoints,
+    storageFetch: async (storage: string): Promise<WhatwgFetch> => {
+      const own = ownStorageOf({ endpoints } as ResolvedContext, storage)
+      return own
+        ? sessionManager.storageFetch(userSession.webId, own)
+        : sessionManager.impersonationFetch(userSession.webId, context, storage)
+    },
   }
 }

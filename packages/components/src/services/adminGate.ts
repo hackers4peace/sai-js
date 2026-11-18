@@ -10,7 +10,7 @@ import type { SessionManager } from '../SessionManager.js'
 
 /**
  * Resolve the org webId from the base64url-encoded last path segment — the
- * `/sparql-admin` / `/proxy-admin` pattern (also the `AgentIdHandler` one).
+ * `/sparql-admin` pattern (also the `AgentIdHandler` one).
  * Query/fragment are stripped first: with `OriginalUrlExtractor`'s
  * `includeQueryString` (default) `operation.target.path` carries them.
  */
@@ -24,16 +24,15 @@ export function orgWebIdFromPath(targetPath: string): string {
 }
 
 /**
- * The admin gate shared by the admin-gated endpoints (`AdminSparqlHandler`,
- * `ProxyAdminHandler`): the caller must be an **admin** of `orgWebId` — the
+ * The admin gate of the admin-gated endpoint (`AdminSparqlHandler`): the
+ * caller must be an **admin** of `orgWebId` — the
  * org's social-agent registration of the caller carries a non-empty
  * `hasAdminGrant` marker (403 otherwise); an unknown org is
  * indistinguishable from "not an admin" of it.
  *
- * Returns the **org's** session, whose credentials are legitimate on the
- * org's own resources and — as the grantee — on peers' data registrations
- * the org holds access grants for (org-context-proxy.md). No server-side
- * work is triggered for unauthenticated callers.
+ * Returns the **org's** session, used to read the org's registry dataset.
+ * Peer data no longer goes through an org session: the admin's own UAS obtains
+ * a read-only ID-JAG as the org (`SessionManager.impersonationFetch`).
  */
 export async function requireOrgAdmin(
   sessionManager: SessionManager,

@@ -108,6 +108,20 @@ export interface IdJagRequest extends TokenRequestOptions {
   dpopKeyPair: CryptoKeyPair
   clientId: string
   /**
+   * Requested `scope` (RFC 8693 request parameter, not a claim). The UAS
+   * resolves it against its own authorization data and never copies it into
+   * the ID-JAG; a storage `scope` is packed by the storage's own exchange.
+   * The admin-impersonation request uses it to name the read-only org
+   * impersonation (`SAI_ADMIN_IMPERSONATION_SCOPE`).
+   */
+  scope?: string
+  /**
+   * Extra form parameters for the request (protocol extensions the UAS
+   * defines, e.g. the organization an admin-impersonation request addresses).
+   * They are request fields only and never end up in the token as claims.
+   */
+  extraParameters?: Record<string, string>
+  /**
    * Optional ODRL `access` claim for the storage the grant is for, as compact
    * JSON-LD policies. The UAS attaches the context; the claim is valid for one
    * storage only and carries no `resource` claim.
@@ -133,6 +147,10 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
   if (request.accessClaim !== undefined) {
     parameters.access = JSON.stringify(request.accessClaim)
   }
+  if (request.scope !== undefined) {
+    parameters.scope = request.scope
+  }
+  Object.assign(parameters, request.extraParameters ?? {})
 
   return withSpan('sai-lws', 'sai.lws.request-id-jag', async (span): Promise<string> => {
     span.setAttributes({
@@ -141,6 +159,7 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
       'sai.lws.subject_token_type': subjectTokenType,
       'sai.lws.audience': request.audience,
       'sai.lws.client_auth_method': 'none',
+      ...(request.scope === undefined ? {} : { 'sai.lws.requested_scope': request.scope }),
       ...(request.resource === undefined ? {} : { 'sai.lws.resource': request.resource }),
     })
     setTokenAttributes(span, 'subject', request.subjectToken)

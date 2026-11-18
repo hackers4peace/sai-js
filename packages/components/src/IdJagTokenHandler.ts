@@ -1,6 +1,7 @@
 import {
   ODRL_ID_JAG_CONTEXT,
   SAI,
+  SAI_IMPERSONATE_PARAM,
   descriptionHasStorageType,
   fetchLwsStorageDescription,
   setBodyAttribute,
@@ -26,6 +27,8 @@ import { getLoggerFor } from 'global-logger-factory'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
 import { rewriteAccessClaim, setAccessClaimAssignee, verifyAccessClaim } from './access-claim.js'
+import type { AdminImpersonationRequestAuthority } from './AdminImpersonationAuthority.js'
+import { AdminImpersonationDenied } from './AdminImpersonationAuthority.js'
 import type { AccessClaimValidator } from './DelegatedAccessClaimValidator.js'
 import { ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 import type { IdJagIssuer } from './IdJagIssuer.js'
@@ -72,6 +75,16 @@ export interface IdJagTokenHandlerArgs {
    */
   claimValidator?: AccessClaimValidator
   /**
+   * The requested `scope` value that selects read-only admin impersonation
+   * (`urn:sai:params:oauth:scope:admin-impersonation:read`). Unset disables it.
+   */
+  adminImpersonationScope?: string
+  /**
+   * Authority check and organization claim derivation for admin impersonation.
+   * Required when {@link adminImpersonationScope} is set.
+   */
+  adminImpersonationAuthority?: AdminImpersonationRequestAuthority
+  /**
    * The path of the token endpoint, relative to this server's base URL. Used to
    * verify the `htu` claim of DPoP proofs. Defaults to `.well-known/lws/token`.
    */
@@ -111,6 +124,8 @@ export class IdJagTokenHandler extends HttpHandler {
   private readonly audienceOrigins: string[]
   private readonly tokenEndpoint: string
   private readonly claimValidator?: AccessClaimValidator
+  private readonly adminImpersonationScope?: string
+  private readonly adminImpersonationAuthority?: AdminImpersonationRequestAuthority
   private readonly deriving = new Set<string>()
 
   public constructor(args: IdJagTokenHandlerArgs) {
@@ -120,6 +135,8 @@ export class IdJagTokenHandler extends HttpHandler {
     this.audienceOrigins = [...args.storageOrigins, ...(args.authorizationServerOrigins ?? [])]
     this.tokenEndpoint = new URL(args.tokenPath ?? '.well-known/lws/token', args.issuer.issuer).href
     this.claimValidator = args.claimValidator
+    this.adminImpersonationScope = args.adminImpersonationScope
+    this.adminImpersonationAuthority = args.adminImpersonationAuthority
   }
 
   public async handle({ request, response }: HttpHandlerInput): Promise<void> {
@@ -193,7 +210,7 @@ export class IdJagTokenHandler extends HttpHandler {
         `Only ${TOKEN_TYPE_ACCESS_TOKEN} and ${ID_JAG_TOKEN_TYPE} subject tokens are supported.`
       )
     }
-    const resource = params.get('resource') ?? undefined
+    const resource = params.get('resource') || undefined
     const access = await this.accessClaim(params)
 
     span.setAttributes({
@@ -232,8 +249,16 @@ export class IdJagTokenHandler extends HttpHandler {
     // The client only names the storage; the UAS adds the grants the user has
     // for that storage and client. A client-supplied `access` claim bypasses
     // derivation and is validated against the assigner's grant registry below.
+    const requestedScope = new Set((params.get('scope') ?? '').split(/\s+/u).filter(Boolean))
+    const impersonationRequested =
+      this.adminImpersonationScope !== undefined && requestedScope.has(this.adminImpersonationScope)
+    if (impersonationRequested) {
+      this.assertImpersonationRequest({ resource, subjectTokenType, access, subject, span })
+    }
+
     let derivedAccess: VerifiedAccessClaim | undefined
     if (
+      !impersonationRequested &&
       access === undefined &&
       subjectTokenType !== ID_JAG_TOKEN_TYPE &&
       resource !== undefined &&
@@ -271,7 +296,35 @@ export class IdJagTokenHandler extends HttpHandler {
     let issuedClient = subject.client
     let issuedAccess = access ?? derivedAccess
 
-    if (subjectTokenType === ID_JAG_TOKEN_TYPE) {
+    if (impersonationRequested) {
+      const org = this.impersonationOrg(params)
+      let claim: VerifiedAccessClaim
+      try {
+        claim = await this.adminImpersonationAuthority!.authorize({
+          org,
+          subject: subject.subject,
+          client: subject.client,
+          storage: resource!,
+        })
+      } catch (error: unknown) {
+        if (AdminImpersonationDenied.isInstance(error)) {
+          throw new OAuthError('invalid_grant', error.message)
+        }
+        throw error
+      }
+      span.setAttribute('sai.lws.impersonation', true)
+      span.setAttribute('sai.lws.impersonation.org', org)
+      issuedSubject = org
+      // The organization's UAS is the client of the re-issued ID-JAG, exactly
+      // as on the C2 impersonation hop; the admin is dropped from here on.
+      issuedClient = this.issuer.issuer
+      issuedAccess = {
+        ...claim,
+        access: setAccessClaimAssignee(claim.access, org),
+        assigners: [],
+        assignees: [org],
+      }
+    } else if (subjectTokenType === ID_JAG_TOKEN_TYPE) {
       if (access !== undefined) {
         throw new OAuthError(
           'invalid_request',
@@ -370,6 +423,62 @@ export class IdJagTokenHandler extends HttpHandler {
       token_type: 'N_A',
       expires_in: this.issuer.lifetime,
     }
+  }
+
+  /** Rejects a malformed admin-impersonation request (not an unauthorized one). */
+  private assertImpersonationRequest(input: {
+    resource: string | undefined
+    subjectTokenType: string
+    access: VerifiedAccessClaim | undefined
+    subject: { access?: unknown }
+    span: import('@opentelemetry/api').Span
+  }): void {
+    if (!this.adminImpersonationAuthority) {
+      throw new OAuthError('invalid_request', 'Admin impersonation is not enabled on this server.')
+    }
+    if (input.resource === undefined) {
+      throw new OAuthError(
+        'invalid_request',
+        'Admin impersonation needs a resource (the peer storage).'
+      )
+    }
+    if (input.subjectTokenType !== ID_JAG_TOKEN_TYPE) {
+      throw new OAuthError('invalid_request', 'Admin impersonation needs an ID-JAG subject token.')
+    }
+    if (input.access !== undefined) {
+      throw new OAuthError(
+        'invalid_request',
+        'Admin impersonation cannot be combined with a request access claim.'
+      )
+    }
+    if (input.subject.access !== undefined) {
+      throw new OAuthError('invalid_request', 'The admin ID-JAG must not carry an access claim.')
+    }
+    input.span.setAttribute('sai.lws.admin_impersonation', true)
+  }
+
+  /** The organization whose authority the request invokes. */
+  private impersonationOrg(params: URLSearchParams): string {
+    const org = params.get(SAI_IMPERSONATE_PARAM)
+    if (!org) {
+      throw new OAuthError(
+        'invalid_request',
+        `Admin impersonation needs the "${SAI_IMPERSONATE_PARAM}" parameter.`
+      )
+    }
+    let url: URL
+    try {
+      url = new URL(org)
+    } catch {
+      throw new OAuthError('invalid_request', `The impersonated agent ${org} is not a WebID.`)
+    }
+    if (url.protocol !== 'https:') {
+      throw new OAuthError(
+        'invalid_request',
+        `The impersonated agent ${org} is not an https WebID.`
+      )
+    }
+    return org
   }
 
   /** Validates the claim of an incoming ID-JAG and binds it to the requested storage. */

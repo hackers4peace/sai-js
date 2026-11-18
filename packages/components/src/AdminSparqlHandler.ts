@@ -33,7 +33,7 @@ const SPARQL_QUERY_MEDIA_TYPE = 'application/sparql-query'
  * Read from the RAW request URL: the deployment's `TargetExtractor` strips
  * query strings (`includeQueryString: false` in the LDP request parser), so
  * `operation.target.path` does not carry `?pod=` — the same pitfall
- * `/proxy-admin` (`?iri=`) documents.
+ * data documents (the admin's UAS reads those with a storage fetch).
  * Parsing the path silently fell back to the org's REGISTRY pod for every
  * data-pod query (the org-context share/registration reads got an empty
  * `lws:partOf` result instead of an error).
@@ -79,7 +79,7 @@ function termToJson(term: IBindings[string]): Record<string, unknown> {
  * body as `application/sparql-query`; updates (`application/sparql-update`,
  * INSERT/DELETE/…) and other methods are rejected.
  *
- * Gate (shared with `/proxy-admin`: `services/adminGate.ts` — the caller
+ * Gate (`services/adminGate.ts` — the caller
  * must be an admin of the target org: its social-agent registration held
  * by that org carries a non-empty `hasAdminGrant` marker (403 otherwise).
  * The org itself never uses this endpoint; server-side reads go to the
@@ -139,7 +139,7 @@ export class AdminSparqlHandler extends OperationHttpHandler {
 
     // Gate first — no server-side work is triggered for unauthenticated callers.
     // Target org: base64url-encoded webId in the last path segment (the
-    // AgentIdHandler pattern); admin check shared with `/proxy-admin`.
+    // AgentIdHandler pattern); admin check shared with the other admin gate.
     const orgWebId = orgWebIdFromPath(operation.target.path)
     await requireOrgAdmin(this.sessionManager, this.credentialsExtractor, request, orgWebId)
     const endpoint = await this.resolveEndpoint(orgWebId, podFromRequestUrl(request.url))

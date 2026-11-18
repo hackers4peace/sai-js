@@ -76,6 +76,13 @@
       ]
     },
     {
+      "comment": "Read-only admin impersonation (org context): an admin of an organization may have this UAS issue an ID-JAG as that organization for one peer storage. The authority is the organization's DataRegistry-scoped AdminGrant (assignee = the admin, client = the admin's own authorization agent); the claim is derived from the organization's grants and narrowed to odrl:read. Referenced by the token handler's `adminImpersonationAuthority`.",
+      "@id": "urn:sai:default:AdminImpersonationAuthority",
+      "@type": "AdminImpersonationAuthority",
+      "endpointStore": { "@id": "urn:sai:default:PodEndpointStore" },
+      "claimValidator": { "@id": "urn:sai:default:DelegatedAccessClaimValidator" }
+    },
+    {
       "comment": "Independent UAS check (C4): an incoming delegated ID-JAG claim must match a grant the assigner issued and stores in their own grant registry before this UAS re-issues it.",
       "@id": "urn:sai:default:DelegatedAccessClaimValidator",
       "@type": "DelegatedAccessClaimValidator"
@@ -116,6 +123,11 @@
         ],
         "claimValidator": {
           "@id": "urn:sai:default:DelegatedAccessClaimValidator"
+        },
+        "comment": "Admin impersonation (org context): the requested scope selects read-only impersonation of the organization named by the `impersonate` parameter. The organization's UAS checks its AdminGrant, derives the organization's claim for the requested peer storage, narrows it to odrl:read and issues the ID-JAG as the organization — the admin is dropped from here on.",
+        "adminImpersonationScope": "urn:sai:params:oauth:scope:admin-impersonation:read",
+        "adminImpersonationAuthority": {
+          "@id": "urn:sai:default:AdminImpersonationAuthority"
         }
       }
     }

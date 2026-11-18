@@ -3,13 +3,27 @@
 > **Status:** ✅ implemented — **C0–C6 landed**; **C3 removed**; **C4 item 4
 > implemented**; **C5 implemented**; **C6 implemented** (token-carried storage
 > authorization; owner/admin `scope`; public reader; ID-JAG-only storages; no
-> runtime grant matching).
-> **Last verified:** working tree (2026-11-18) — C6 verified against
+> runtime grant matching); **C7 implemented** (read-only admin impersonation of
+> the org for peer reads; the `/.sai/proxy-admin` document proxy is removed).
+> **Last verified:** HEAD `7d970c87` (C7) + the tracing working tree (2026-11-18) — C6 verified against
 > `LwsTokenHttpHandler`/`LwsAccessTokenIssuer`, `LwsAccessTokenExtractor`,
 > `SaiPermissionsEngine`, `PublicPermissionReader`,
 > `StorageExchangeAccessPolicy`, the auth/data/registry configs, and the full
-> Dagger `/test` suite (24 files / 199 tests). Package gate: `typecheck`,
-> `check`, full `vitest` (680 passed, 26 skipped, 2 todo), components build.
+> Dagger `/test` suite (24 files) — user-run, green. **C7** verified against
+> `AdminImpersonationAuthority`, `IdJagTokenHandler`'s impersonation branch,
+> `SessionManager.{impersonationFetch,storageFetch}`, `Context.storageFetch`,
+> `services/peerData.ts`, the removal of `ProxyAdminHandler`/`peerFetch`/
+> `peerProxy`, and the Tempo traces below. Package gate: `typecheck`,
+> `check`, full `vitest` (690 passed, 26 skipped, 2 todo), components build.
+> CSS fork pinned to `ed9224991` on `lws-sai` in `package-lock.json`. **C7**
+> (admin impersonation) is green: full Dagger `/test` 24 files / 198 tests,
+> and the chain is captured in Tempo (`5bed7472daafec533800776352ae4615` peer,
+> `677133856bd8c9758b81bb12d103c2ab` org-own `scope: admin`).
+> **Scope closed (2026-11-18):** no C-item is open. The remaining entries —
+> § [Open questions](#open-questions) and § [Follow-ups (C7)](#follow-ups-c7) —
+> are separate, explicitly out-of-scope decisions (durable audit record, public
+> reader cache, notifications verification, `/sparql-admin`), plus the
+> non-goals listed in [§ Goals / non-goals](#goals--non-goals).
 > **Green gate:** package gate + **full** Dagger suite after every slice
 > ([§ Green gate](#green-gate)); Dagger is user-run.
 > **Workstream:** LWS authorization ([`lws-auth.md`](lws-auth.md)) + grants /
@@ -94,7 +108,9 @@ everywhere. C0 migrated that shape; C1–C2 added the token flow.
 
 **Non-goals (explicit follow-ups)**
 
-- Admin impersonation and removal of `ProxyAdminHandler` — future TODO.
+- ~~Admin impersonation and removal of `ProxyAdminHandler`~~ — delivered in C7
+  as **read-only** impersonation of the org for peer reads only (D35); broader
+  admin impersonation stays out of scope.
 - Replacing `/sparql-admin` — separate transport/security question.
 - Owner-mediated delegation approval/audit beyond need-based access requests —
   only if a later requirement appears.
@@ -132,7 +148,11 @@ everywhere. C0 migrated that shape; C1–C2 added the token flow.
 | Storage-AS claim validation reuses the policy-engine grant source | ✅ landed — `OwnerAccessClaimValidator` | `SaiAuthorizationManager.getAuthorizationData`, `IdJagSubjectTokenVerifier`, `SaiPermissionsEngine` | package validator tests; `/test` revocation scenario | C5; owner local registry only |
 | SPARQL endpoint topology documented for federated deployment | ✅ documented | `SaiAuthorizationManager`, `SaiPermissionsEngine`, `PodEndpointStore` | deployment docs | per-pod endpoints, not SPARQL federation |
 | 403/401 chain refresh per storage | ✅ landed — C6 | `packages/lws-auth` fetch/cache (`noToken`, retry-once) | package fetch tests; `/test` revocation scenario | `401` refreshes; storage `invalid_grant` = no token, retry tokenless once; `403` is a target/claim denial (D11) |
-| Admin impersonation / `ProxyAdminHandler` removal / `/sparql-admin` future | ⬜ open | `ProxyAdminHandler`, `peerFetch`, `peerProxy`, `AdminSparqlHandler` | future TODO | not in this plan’s implementation |
+| Read-only admin impersonation of the org for peer reads | ✅ landed — C7 | `AdminImpersonationAuthority`, `IdJagTokenHandler` (`adminImpersonationScope`), `SessionManager.impersonationFetch`, `services/peerData.ts` | package `admin-impersonation.test.ts`, `id-jag.test.ts`; `/test` `org-context.test.ts` (16) | authority = org's `DataRegistry` AdminGrant + own-UAS client; claim narrowed to `odrl:read`; peer sees the org |
+| Org-own data reads use the admin's own `scope: admin`, not an org session | ✅ landed — C7 | `Context.storageFetch`, `SessionManager.storageFetch` | package `data-registry.test.ts` | an org session would be `scope: owner` (all modes) at the org's storage |
+| `/.sai/proxy-admin` document proxy removed | ✅ landed — C7 | removed `ProxyAdminHandler`, `services/peerFetch.ts`, `services/peerProxy.ts`, the route | `/test` endpoint tests deleted | no arbitrary-IRI admin endpoint remains |
+| `/sparql-admin` replacement (registry plane) | ⬜ open | `AdminSparqlHandler` | — | registry reads stay SPARQL over the admin-gated endpoint |
+| C7 chain captured in Tempo | ✅ captured 2026-11-18 | `docs/lws-auth.c4` (`org-context-peer-read`), `IdJagTokenHandler`, `StorageExchangeAccessPolicy`, `exchangeLwsAccessToken` spans | traces `5bed7472…` (peer), `6771338…` (org-own) | hop 1/2 payloads, org claim, access-token claims, `sai.lws.exchange-scope` decision, 401→200 retry |
 | Storage authorization is token-carried only (claim or `scope: owner`/`admin`) | ✅ landed — C6 | CSS `LwsAccessTokenIssuer`/`LwsTokenHttpHandler`/`LwsAccessTokenExtractor`, `PolicyEngineReader`, `SaiPermissionsEngine`, `PublicPermissionReader` | package token/permission tests; `/test` policy-engine matrix | no runtime grant matching on data storages |
 | Exchange mints `scope` for the storage owner and `DataRegistry` admins, both with their own UAS as client | ✅ landed — C6 | `StorageExchangeAccessPolicy`, `PodStore`, `SaiAuthorizationManager` | package policy/exchange tests; `/test` owner/admin matrix | owner = full modes; admin = read-only; owner/admin + non-UAS → `invalid_grant` |
 | Public access is credential-independent (no token or any valid token) | ✅ landed — C6 | `PublicPermissionReader`, `SaiAuthorizationManager.getAuthorizationData` | package public tests; `/test` public matrix | separate read-only reader, never a claim fallback |
@@ -146,6 +166,9 @@ everywhere. C0 migrated that shape; C1–C2 added the token flow.
 | No old grant/token compatibility; atomic cutover | ✅ landed — C6 | deployments, token TTLs | — | D3/D14; no version gate |
 | Storage description advertises `sai:DataStorage` / `sai:RegistryStorage` | ✅ landed — C6 | `SaiStorageTypeDescriber`, `data.json`, `registry.json`, SAI context aliases | package describer/discovery tests; `/test` `services.test.ts` | open-world replacement for the local claimless origin list |
 | Registry exchange is ID-JAG only and claimless (ACP authorizes) | ✅ landed — C6 | `id-jag-accept-registry.json` (`copyAccessClaim: false`), `SaiStorageTypeDescriber` (`RegistryStorage`), `IdJagTokenHandler.isRegistryStorage` | package claimless/description tests; `/test` registry read | no access claim required or copied; discovery replaces the local origin allowlist |
+| Hidden-actor audit / visibility mapping | ⬜ open | `IdJagTokenHandler` (impersonation span) | — | C7 records the decision on the org's spans; no durable or owner-visible audit record yet |
+| Public reader caching/TTL | ⬜ open | `PublicPermissionReader`, `SaiPermissionsEngine.getPublicPermissions` | package public tests | one owner-registry query per requested mode; no cache yet |
+| Notification service paths under the claim/scope rule | ⬜ open (verification) | `config/overrides/lws-notification-service-paths.json` | — | tokens accepted on `.notifications/…`; claim/scope for subscriptions untested |
 
 ## Protocol decisions
 
@@ -498,7 +521,8 @@ endpoint is **not** used for delegation (C5).
 - ACME cannot validate the hidden delegatee's grant; it validates the final
   claim against its own grant to the visible subject. This is the accepted
   strict-hiding trade-off.
-- Admin impersonation remains a TODO; `ProxyAdminHandler` stays.
+- Admin impersonation remained a TODO at C2; C7 later replaced
+  `ProxyAdminHandler` with read-only impersonation of the org.
 
 **Implementation (2026-11-15)**
 
@@ -580,7 +604,9 @@ they must not be used.
   model.
 - Owner access-request endpoint: need-based requests only; delegation/revocation
   branches are removed. No owner copy/approval path for delegation.
-- Admin impersonation + `ProxyAdminHandler` removal; `/sparql-admin` future.
+- Admin impersonation + `ProxyAdminHandler` removal — **delivered in C7** as
+  read-only org impersonation for peer reads; `/sparql-admin` replacement stays
+  future.
 - DPoP-bound final access token: deferred; bearer with `aud` = storage (D32).
 - Audit/visibility mapping for hidden actors: open.
 
@@ -746,8 +772,9 @@ the subject's own registry plus reciprocal mirrors.
 - Package gate: `npm run typecheck`, full `npx vitest run` (666 passed, 26
   skipped, 2 todo), `npm run build -w @elfpavlik/sai-components`, and
   `npm run check`.
-- Full Dagger `/test`: 24 files / 196 tests passed. CSS dependency is pinned to
-  `195c682eddd5afcd2d224f34b7818ac42782e596` on the `lws-sai` branch.
+- Full Dagger `/test`: 24 files / 196 tests passed. CSS dependency is the
+  `lws-sai` branch of `elf-pavlik/CommunitySolidServer`; `package-lock.json`
+  pinned `195c682ed…` for C5 and `ed9224991…` from C6 on.
 
 ## C6 — Token-carried storage authorization (planned 2026-11-17)
 
@@ -862,7 +889,8 @@ matrix), `lws-auth.test.ts` (claimless registry; tokenless public;
   accept only the DPoP-bound access-token credential; pin
   `subject_token_type` to `…:access_token` in
   `packages/lws-auth/src/{credential,tokens}.ts` and
-  `buildSelfIssuedCredential` (the current default is `…:id_token`).
+  `buildSelfIssuedCredential`. **Done:** `requestIdJag` defaults to
+  `…:access_token` and the handler rejects `…:id_token`.
 - `packages/components/config/identity/id-jag.json` and `id-jag-accept.json`:
   set `acceptSolidOidcIssuer: false` and `additionalAudiences: []`;
   `requireRestrictedTokens: true` enforces the UAS audience. Keep the `cnf`
@@ -913,15 +941,14 @@ gets the claim, not the broad scope.
   must not be able to mint `owner`/`admin`.
 - `scope` is a storage authorization input, not an ODRL grant; do not treat it
   as a claim or look up a grant for it.
-- Current behavior (verified 2026-11-17): `findAdminModes` matches only
-  `odrl:assignee = agent`, so the engine today grants admin read with **any**
-  client; `test/policy-engine.test.ts` “admin, some agent/client” (line ~606)
-  asserts that with the public test client. C6 changes it: “admin using UAS”
-  (line ~650) stays 200, admin + other client is `invalid_grant`/denied. The
-  registry ACP already binds the admin to `agent` + `client` (own UAS) in
-  `environments/data/registry.trig`, and `org-admin-feature.md` specifies admin
-  reads “with their own UAS credentials”, so C6 brings the data engine in line
-  with ACP and the design.
+- Before C6 (verified 2026-11-17): `findAdminModes` matched only
+  `odrl:assignee = agent`, so the engine granted admin read with **any** client,
+  and `test/policy-engine.test.ts` “admin, some agent/client” asserted that with
+  the public test client. C6 changed it (verified 2026-11-18): that case is now
+  401, while “admin using UAS” stays 200. The registry ACP already binds the
+  admin to `agent` + `client` (own UAS) in `environments/data/registry.trig`,
+  and `org-admin-feature.md` specifies admin reads “with their own UAS
+  credentials”, so the data engine now matches ACP and the design.
 
 **First ID-JAG exchange (user's UAS)**
 
@@ -939,19 +966,14 @@ gets the claim, not the broad scope.
 - The only audience is the user's UAS (`aud` = UAS). The `solid` audience is
   removed from `IdTokenVerifier.additionalAudiences` and the self-issued
   `at+jwt`; no external IdP/UAS is trusted for the first hop (D33).
-- `subject_token_type` is pinned to `…:access_token`. The current client default
-  is `…:id_token` (`packages/lws-auth/src/tokens.ts`) and
-  `buildSelfIssuedCredential` does not set the type; both must be aligned so the
-  declared type matches the DPoP-bound access-token rule. The UAS handler must
-  reject `…:id_token` (the `OidcSubjectTokenVerifier` accepts both types).
-- Audience: use `requireRestrictedTokens: true` with `audience` = UAS and no
-  `additionalAudiences`. It rejects unbound tokens whose `aud` does not include
-  the UAS, but it also accepts an unbound token whose `aud` = UAS; keep the
-  `cnf`/DPoP check (and/or reject `…:id_token`) for DPoP-bound-only.
-- Current gap: `OidcSubjectTokenVerifier.verifyRestriction` accepts an unbound
-  token whose `aud` includes the UAS (`requireRestrictedTokens`). The `cnf`
-  check is what closes the DPoP gap; `requireRestrictedTokens` handles the
-  audience only.
+- `subject_token_type` is pinned to `…:access_token`: `requestIdJag` defaults to
+  it (`packages/lws-auth/src/tokens.ts`) and the UAS handler rejects
+  `…:id_token`, so the declared type matches the DPoP-bound access-token rule.
+- Audience and binding: `requireRestrictedTokens: true` with `audience` = UAS and
+  no `additionalAudiences` enforces the audience; `requireSenderConstrained`
+  enforces `cnf.jkt` (C6). `requireRestrictedTokens` alone would still accept an
+  unbound token whose `aud` = UAS, which is why the sender-constrained check
+  carries the DPoP requirement.
 - The UAS is the issuer, not a client: it mints the ID-JAG itself and never
   presents a DPoP-bound access token to a storage or another UAS. The
   impersonation hop presents an ID-JAG, not a DPoP-bound access token.
@@ -999,23 +1021,25 @@ gets the claim, not the broad scope.
 **Hazards / open**
 
 - `scope` shape is pinned (separate `owner`/`admin`, both own-UAS-bound). The
-  current engine does not check the admin's client; update
-  `test/policy-engine.test.ts` “admin, some agent/client” to the new denial and
-  keep “admin using UAS” green.
+  exchange policy checks the admin's client; `test/policy-engine.test.ts`
+  “admin, some agent/client” now expects 401 and “admin using UAS” stays 200.
 - Admin grants carry no client field; the UAS binding is an exchange-time
   check. An admin using a non-UAS client needs a normal access claim.
 - Public reader cost: one owner-registry query per request; cache per storage
   and target.
-- Service paths (`.notifications/lws/`) accept a token for any storage on the
-  server; confirm the claim/scope rule covers them.
+- Service paths: `config/overrides/lws-notification-service-paths.json` accepts
+  storage tokens on `.notifications/…` and the handlers authorize the decoded
+  topic, but no test asserts the claim/scope rule for subscriptions (open
+  question).
 - Final token is bearer (D32): replayable until expiry; keep the 300 s TTL.
   DPoP binding is a later slice, not part of C6; the storage exchange does not
   use or require DPoP.
 - Same context URI (D4): a token whose `@context` differs from the bundled
   `ODRL_ID_JAG_CONTEXT` is malformed and denied; no compact/alternate context.
-- First-hop audience (D33): only the user's UAS is `aud`; remove `solid` from
-  the config and the self-issued token. Use `requireRestrictedTokens: true` for
-  the audience; it does not enforce `cnf`, so keep the DPoP check.
+- First-hop audience (D33): only the user's UAS is `aud`; `solid` is removed from
+  the config and the self-issued token. `requireRestrictedTokens: true` covers
+  the audience and `requireSenderConstrained: true` the `cnf`/DPoP binding; both
+  are set in `id-jag.json`.
 - No Solid-OIDC issuer fallback (D34): `acceptSolidOidcIssuer: false`; trust
   ID-JAG issuers via `trustedIssuers` or `lws:OpenIdProvider` only.
 - 403 recovery: with token-carried authorization a 403 is a target/claim
@@ -1067,14 +1091,161 @@ gets the claim, not the broad scope.
   returning 500.
 - **Tests/gates.** Package `typecheck`, `check`, full `vitest` (680 passed, 26
   skipped, 2 todo), components build, CSS targeted Jest (76), and the full
-  Dagger suite (24 files / 199 tests) are green. The CSS fork needs its commit
-  and the `package-lock.json` update after review; the suite above was run
-  against the updated sibling checkout mounted into `node_modules`.
+  Dagger suite (24 files / 199 tests) were green at the time of the slice.
+- **Verification (2026-11-18, HEAD `6e337670`).** The CSS fork commit
+  `ed9224991` (`feat(lws): streamline token exchanges`) is pinned in
+  `package-lock.json`, so a fresh `npm ci` resolves
+  `LwsTokenExchangePolicy`/`copyAccessClaim`; the full Dagger `/test` suite
+  (24 files) is green user-run, and the package gate is green with `vitest`
+  684 passed / 26 skipped / 2 todo.
+
+## C7 — Read-only admin impersonation of the org for peer reads (implemented 2026-11-18)
+
+**Decision (2026-11-18, D35).** An admin of an organization may have the
+organization's UAS issue an ID-JAG **as the organization** for one peer storage,
+`read` only. This replaces the `/.sai/proxy-admin` document proxy: the admin's
+UAS now holds the whole chain server-side, so the org's key never leaves its own
+server and the flow works without co-hosting. Org-owned data keeps using the
+admin's own credential (`scope: admin`, D23) — impersonation is only for storages
+the **org** is granted.
+
+**Done when**
+
+- The org's UAS issues `sub` = the org, `client_id` = the org's UAS,
+  `aud` = the peer's AS, with the org's claim for that storage narrowed to
+  `odrl:read`; the admin is not named in the ID-JAG or the access token.
+- The authority is the org's `DataRegistry` `AdminGrant` (assignee = the admin,
+  client = the admin's own authorization agent), read at mint time; a non-admin,
+  an app client, a non-`read` grant and an org-owned storage are all refused
+  (`invalid_grant`).
+- The requested `scope` is a **request** field resolved by the UAS and never
+  copied into the token; the storage-AS `scope` stays issuer-local (D29).
+- `/.sai/proxy-admin` no longer exists; `/sparql-admin` is untouched.
+- `/test/org-context.test.ts` exercises the four RPC reads through the new
+  chain; the three endpoint tests are gone.
+
+**Depends on:** C1–C6 (claim model, coverage validation, token-carried storage
+authorization).
+
+**Green gate:** full package gate + full Dagger suite; the chain is also
+captured in Tempo (see the capture record below).
+
+**`/test` acceptance:** `org-context.test.ts` (peer reads, org-own data plane,
+share path), plus the package tests `admin-impersonation.test.ts`,
+`id-jag.test.ts`, `peer-data.test.ts`, `data-registry.test.ts`.
+
+**Touchpoints**
+
+- CSS fork: none — the storage exchange is unchanged; the new request shape is
+  resolved by SAI's own UAS handler.
+- `packages/components/src/AdminImpersonationAuthority.ts` (new),
+  `IdJagTokenHandler` (`adminImpersonationScope`/`adminImpersonationAuthority`),
+  `SessionManager.{impersonationFetch,storageFetch}`, `services/Context.ts`
+  (`storageFetch`, `ownStorageOf`), `services/peerData.ts` (new, replaces
+  `peerProxy.ts`), `ApiHandler` (`resolveContext` gets the session manager).
+- Config: `identity/id-jag.json` (authority + scope), removal of the
+  `ProxyAdminRouter` route.
+- Client: `packages/lws-auth` `requestIdJag({ scope, extraParameters })`,
+  `packages/utils` `SAI_ADMIN_IMPERSONATION_SCOPE`/`SAI_IMPERSONATE_PARAM`.
+
+### Implementation (2026-11-18)
+
+- **Authority.** `AdminImpersonationAuthority` checks three things at the
+  **org's** UAS: the storage is not the org's own (the exchange there would mint
+  `scope: owner`), the subject is a `DataRegistry` admin of the org with its own
+  authorization agent as client (the same predicate as the storage-AS
+  `scope: admin`), and the org holds a grant for the storage. It then derives the
+  **org's** claim and intersects it with `odrl:read`.
+- **Exchange.** `IdJagTokenHandler` accepts
+  `scope=urn:sai:params:oauth:scope:admin-impersonation:read` with `resource`
+  (peer storage) and `impersonate` (org webid) on a **claimless ID-JAG** subject
+  token, and issues `sub` = the org, `client_id` = the org's UAS, `aud` = the
+  peer's AS. Malformed requests are `invalid_request`; authority denials are
+  `invalid_grant`. The scope is a request field and is never copied.
+- **Client.** `SessionManager.impersonationFetch(admin, org, storage)` performs
+  both token hops server-side (minting the admin's identity-only ID-JAG, then
+  the org's narrowed ID-JAG) and wraps the storage exchange in `createLwsFetch`
+  (bearer access token, one storage, 401 retry, `invalid_grant` → no token).
+  `SessionManager.storageFetch(agent, storage)` covers the org's **own** pods
+  with the admin's own token (`scope: admin`, read-only).
+- **Data plane.** `ResolvedContext.storageFetch(storage)` picks the right fetch
+  (personal session / admin scope / org impersonation); the peer helpers moved
+  to `services/peerData.ts` and take the grant's `lws:storage`.
+  `ProxyAdminHandler`, `services/peerFetch.ts`, `services/peerProxy.ts` and the
+  `/.sai/proxy-admin` route are removed.
+- **Tests.** New package `admin-impersonation.test.ts` (6, including the
+  read-narrowing, the own-storage guard and the app-client denial) and 5 new
+  cases in `id-jag.test.ts`; `peer-data.test.ts` replaces `peer-proxy.test.ts`;
+  `test/org-context.test.ts` loses the three endpoint tests and keeps the four
+  RPC tests.
+- **Gates.** `npm run typecheck`, `npm run check`, full `vitest`
+  (690 passed, 26 skipped, 2 todo), components build, and the full Dagger
+  `/test` (24 files / 198 tests) — green, run via
+  `devbox run -- bash -lc 'dagger call test'`. The two span additions made for
+  the trace capture (`exchangeLwsAccessToken`,
+  `StorageExchangeAccessPolicy.determineScope`) are part of this tree and are
+  covered by the same gate.
+- **Captured traces (2026-11-18).** Two, via
+  `dagger call --tempo-endpoint=http://172.16.0.1:4318 test --testFile=org-context.test.ts --only=…`:
+
+  1. **Peer chain** — `ListDataInstances on the peer's granted registration
+     lists the instances (labels)`, trace
+     `5bed7472daafec533800776352ae4615` (5.9 s). Hop 1 (admin's UAS,
+     identity-only ID-JAG #0) 364 ms; hop 2 at the org's UAS 335 ms with
+     `sai.lws.admin_impersonation=true`,
+     `sai.lws.impersonation.org=https://id/yoyo`, `sub=https://id/yoyo`,
+     `client_id=https://auth/`, `action=["odrl:read"]`; Bob's exchange 137 ms
+     with `sai.lws.verify-id-jag` 121 ms (owner-grant `CONSTRUCT` on
+     `registry/bob/a7t2kq`); the first storage `GET` 401s (51 ms) and the bearer
+     retry is 200 in 103 ms. The access token's `sai.token.access.claims` now
+     show it carries the claim (`iss https://data/`, `aud …/data/bob/`,
+     `sub https://id/yoyo`).
+  2. **Org-own branch** — `ListDataInstances reads the org registration's
+     membership and labels`, trace `677133856bd8c9758b81bb12d103c2ab` (4.1 s):
+     the exchange is claimless, `sai.lws.exchange-scope` records
+     `scope=admin, storage=https://data/yoyo-na/, subject=https://id/dan`, and
+     the access token is `{iss https://data/, aud …/data/yoyo-na/,
+     sub https://id/dan, scope "admin"}` — read-only, confirming D23's first
+     path.
+
+  Both payload sets are in the `org-context-peer-read` view in
+  `docs/lws-auth.c4`.
+- **Instrumentation added for that capture.** `exchangeLwsAccessToken`
+  (`packages/utils`) now opens `sai.lws.exchange-access-token` and records the
+  form, the ID-JAG digest/claims, the response body and the decoded access-token
+  claims, matching the `@elfpavlik/lws-auth` client;
+  `StorageExchangeAccessPolicy.determineScope` now opens
+  `sai.lws.exchange-scope` with `sai.lws.storage`, the minted
+  `sai.lws.scope` (`owner`/`admin`) or `sai.lws.denied` +
+  `sai.lws.denied_reason`. Both are no-ops when tracing is off.
+- **Deployment notes found while running the suite.** The authority lives in
+  the **auth** graph, so it depends only on `PodEndpointStore` (internal pod
+  SPARQL endpoints, `ASK` for the AdminGrant) and the claim validator — not on
+  the storage policy-engine stack. `authorizationServerOrigins` must list the
+  organization's UAS origin for the first hop (the single-`auth` topology covers
+  it with `baseUrl`).
+
+### Follow-ups (C7)
+
+- **Audit record.** The org's exchange is the decision point and the spans now
+  carry org/admin/storage, but nothing durable is written — an `admin-events`
+  entry ("dan read as yoyo for /data/bob/") is still missing (also open in
+  § Open questions).
+- **Notifications.** `.notifications/…` accepts storage tokens; the claim/scope
+  rule for subscriptions is untested (a verification gap, not a known bug).
+- **Public reader caching.** `PublicPermissionReader` queries the owner registry
+  per requested mode with no cache (open since C6).
+- **`/sparql-admin`.** The registry plane still reads SPARQL over an admin-gated
+  endpoint; folding it into the token plane is a separate transport decision.
 
 ## Green gate
 
 Run from the repo root. The Dagger module is `.dagger/src/index.ts`
 (`dagger call test`); its runner env comes from [`devbox.json`](../../devbox.json):
+
+`dagger` only exists in the devbox profile, and the runner host comes from
+`devbox.json`'s `env` block — run it through `devbox run -- bash -lc '…'`, not
+from the host shell.
 
 ```bash
 export _EXPERIMENTAL_DAGGER_RUNNER_HOST="docker-container://dagger-engine-v0.21.9"
@@ -1088,6 +1259,10 @@ npm run build -w @elfpavlik/sai-components
 
 # full integration suite (user-run; devbox shell already carries the env)
 devbox run -- bash -lc 'dagger call test'
+
+# capture a slice in Tempo (OTLP on the docker gateway; see C7's capture record)
+devbox run -- bash -lc 'dagger call --tempo-endpoint=http://172.16.0.1:4318 \
+  test --testFile=org-context.test.ts --only="ListDataInstances on the peer"'
 ```
 
 Narrow a Dagger run when iterating, but **each completed slice ends with the full
@@ -1156,9 +1331,12 @@ means the claim/scope does not cover the target (or the grant was revoked; the
 next exchange returns `invalid_grant`). `invalid_grant` at a UAS is the
 revocation signal.
 
-**D12 — Admin impersonation, `ProxyAdminHandler` removal, and `/sparql-admin`
-replacement are future TODOs.** *pinned (deferred).* The proxy stays until
-explicit admin impersonation authority and client/network support exist.
+**D12 — Admin impersonation is read-only and per peer storage; the document
+proxy is gone.** *pinned; revised 2026-11-18.* An admin of an org may have the
+org's UAS issue an ID-JAG **as the org** for one peer storage, for `read` only
+(D35). `ProxyAdminHandler` and `/.sai/proxy-admin` are removed.
+`/sparql-admin` replacement stays a future TODO (it is the registry plane, not a
+document proxy).
 
 **D13 — There is no request/approval mode selection.** *resolved 2026-11-17.*
 Impersonation is the only delegation flow; need-based requests ask for source
@@ -1208,12 +1386,20 @@ A data storage evaluates the access token it issued — an ODRL `access` claim, 
 `scope` minted for the owner/admin, or a public grant — and never matches
 registry grants at request time.
 
-**D23 — Owner/admin are exchange-minted `scope`, not request-time checks.**
-*pinned 2026-11-17.* `AdminPermissionReader` is removed; the owner+UAS predicate
-moves to the exchange. Owner is `sub` = storage owner with `client_id` =
-`sub`'s authorization agent; admin is a `DataRegistry` `AdminGrant` holder with
-the same `client_id` binding. Either with a non-UAS client needs a normal
-access claim.
+**D23 — Owner/admin are token-carried, not request-time checks; two admin
+paths.** *pinned 2026-11-17; extended 2026-11-18.* `AdminPermissionReader` is
+removed and the owner+UAS predicate moves to the exchange. Owner is `sub` =
+storage owner with `client_id` = `sub`'s authorization agent (`scope: owner`,
+all modes). Admin has two paths, both read-only and both bound to the admin's
+own authorization agent as client:
+
+- **the org's own storages** — the admin's own credential, `scope: admin`
+  minted by the storage's exchange (D22);
+- **peer storages** — read-only impersonation of the org at the org's UAS
+  (D35), because the peer's AS only accepts claims the peer's grants cover and
+  those name the org as grantee.
+
+Either path with a non-UAS client needs a normal access claim.
 
 **D24 — Public access is credential-independent.** *pinned 2026-11-17.* Public
 grants grant read to any request, with no token or any valid token, and are
@@ -1242,10 +1428,15 @@ Clients treat the error as “no token for this storage”, cache it, and retry 
 request once without `Authorization` (public data). This is accepted, not a
 compatibility concern.
 
-**D29 — `scope` is a storage-AS claim, trusted only from this issuer.**
-*pinned 2026-11-17.* The claim name is `scope`; values are `owner` (all modes)
+**D29 — `scope` is a storage-AS claim, trusted only from this issuer; a `scope`
+in a token *request* is a request, never authority.** *pinned 2026-11-17;
+extended 2026-11-18.* The claim name is `scope`; values are `owner` (all modes)
 and `admin` (read-only), both bound to the subject's own UAS. `owner` wins if
-both would apply; tokens from `trustedIssuers` must not mint it.
+both would apply; tokens from `trustedIssuers` must not mint it. A UAS may
+define request scopes that select a flow it authorizes itself
+(`urn:sai:params:oauth:scope:admin-impersonation:read`, D35); such a value is
+resolved against the UAS's own authorization data and is never copied into the
+ID-JAG.
 
 **D30 — The first ID-JAG exchange uses a DPoP-bound access token.** *pinned
 2026-11-17.* The user's UAS accepts only a sender-constrained credential
@@ -1280,6 +1471,34 @@ from `IdTokenVerifier.additionalAudiences` and the self-issued `at+jwt`
 `IdJagSubjectTokenVerifier`. An ID-JAG issuer is trusted via `trustedIssuers` or
 an `lws:OpenIdProvider` service in its subject document; the `solid:oidcIssuer`
 triple is not used.
+
+**D35 — Admin impersonation of an org is read-only and scoped to one peer
+storage.** *pinned 2026-11-18.* The admin's UAS asks the **org's** UAS for an
+ID-JAG as the org:
+
+```http
+POST <org-uas>/.well-known/lws/token
+grant_type=…:token-exchange&requested_token_type=…:id-jag
+&audience=<peer AS>&resource=<peer storage>
+&scope=urn:sai:params:oauth:scope:admin-impersonation:read
+&impersonate=<org webid>&subject_token=<ID-JAG of the admin, no access claim>
+&subject_token_type=…:id-jag
+```
+
+- **Authority** is the org's own `AdminGrant` with
+  `scopeOfAdminGrant interop:DataRegistry` and `odrl:assignee` = the admin,
+  read from the org's registry data — the same predicate as the storage-AS
+  `scope: admin`, including the own-UAS client binding
+  (`AdminImpersonationAuthority`).
+- **The claim is the org's**, derived from the org's grants for that storage and
+  narrowed to `odrl:read`. A peer grant that also allows `modify` cannot widen
+  the admin, and a grant without `read` is a denial.
+- **Never for the org's own storages**: there the storage's AS would mint
+  `scope: owner` (all modes), so org-own reads keep using the admin's own
+  credential with `scope: admin` (read-only).
+- **The peer sees the org** (D8); the admin becomes visible only in the org's
+  own exchange, which is the audit point. The org ID-JAG is a bearer credential
+  for one storage and one lifetime — it stays server-side in the admin's UAS.
 
 ## Hazards / verification
 
@@ -1316,8 +1535,11 @@ triple is not used.
   must hide the delegatee; use the shared app/UAS or a pseudonymous client.
 - **403 loops:** cache retry state per storage/target; do not restart on every
   deny.
-- **Admin future:** `ProxyAdminHandler` also serves org-own data content and is
-  a network/JSON-LD boundary; impersonation only replaces its credential reason.
+- **Admin path (resolved by C7):** the arbitrary-IRI `/.sai/proxy-admin`
+  document proxy is gone. Org-own data reads use the admin's own credential
+  (`scope: admin`, read-only); peer reads use the read-only org impersonation
+  (D35). What remains admin-gated is `/sparql-admin` (registry plane), which is
+  a separate transport decision.
 - **`scope` trust:** `scope: owner`/`admin` is a bearer-visible authorization
   grant. Honor it only from the storage's own issuer (not from
   `trustedIssuers`), and never let it bypass the claim-coverage check when an
@@ -1325,27 +1547,27 @@ triple is not used.
 - **Owner ≠ owner+UAS:** an owner using an app client needs a normal access
   claim; do not widen the owner exception to “any client of the owner”.
 - **Admin semantics:** `scope: admin` is read-only and requires the admin's own
-  UAS as client. The current engine matches only `assignee` and
-  `test/policy-engine.test.ts` locks in a non-UAS client case; C6 updates it.
+  UAS as client. C6 removed the `assignee`-only matching and
+  `test/policy-engine.test.ts` now expects 401 for an admin with a non-UAS
+  client.
 - **Public reader cost and safety:** the public reader is the only remaining
   request-time grant read; cache per storage/target and keep it read-only. It
   must not become a general fallback for non-public grants.
 - **Tokenless fallback:** a storage `invalid_grant` means “no token”; an
   expired/invalid token is still a 401. Do not let a stale token silently
   degrade to anonymous.
-- **Storage subject-token removal:** dropping CID/did:key/OIDC at storages
-  breaks any remaining `createLwsFetch` caller; migrate `SessionManager` and
-  peer registry reads first. The auth service keeps only the OIDC access-token
-  and ID-JAG suites; it never had CID/did:key.
+- **Storage subject-token removal (done in C6):** storages accept only the
+  ID-JAG verifier and `SessionManager` uses the chain, so no production path
+  presents a raw ID token at a storage. The auth service keeps only the OIDC
+  access-token and ID-JAG suites; it never had CID/did:key. A remaining
+  `createLwsFetch` caller outside this repo's configs must migrate the same way.
 - **CID discovery ≠ CID credential suite:** `discoverAuthorizationAgent` and the
   CID service-document helpers are discovery, not subject-token suites. Do not
   remove them when dropping `CidSubjectTokenVerifier`.
-- **First-hop type mismatch:** the client default is `…:id_token` today
-  (`packages/lws-auth/src/tokens.ts`; `buildSelfIssuedCredential` does not set
-  it) and `OidcSubjectTokenVerifier` accepts both types. Pin `…:access_token`
-  and reject `…:id_token` at the handler so the declared type matches D30; the
-  `cnf`/DPoP check remains the actual enforcement (closing the current
-  `requireRestrictedTokens` gap for unbound tokens with `aud` = UAS).
+- **First-hop type mismatch (resolved by C6):** `requestIdJag` now defaults to
+  `…:access_token` and the UAS handler rejects `…:id_token`, so the declared type
+  matches D30. The `cnf`/DPoP check (`requireSenderConstrained`) remains the
+  actual enforcement; `requireRestrictedTokens` only covers the audience.
 - **First-hop audience:** `aud` is the user's UAS only (D33); remove `solid`
   from `IdTokenVerifier.additionalAudiences` and the self-issued `at+jwt`.
   `requireRestrictedTokens: true` enforces the audience; it does not enforce
@@ -1361,15 +1583,32 @@ triple is not used.
   malformed claim (deny), not a compact variant.
 - **No compatibility:** old grants/tokens are not supported; deployments cut
   over atomically. Short TTLs bound the overlap; do not add a version gate.
-- **Service paths:** `.notifications/lws/` accepts a token for any storage on
-  the server; confirm the claim/scope rule still covers subscriptions.
+- **Service paths:** `config/overrides/lws-notification-service-paths.json`
+  accepts storage tokens on `.notifications/…` and the handlers authorize the
+  decoded topic; the claim/scope rule for subscriptions is still unasserted
+  (see [§ Open questions](#open-questions)).
 
 ## Open questions
 
-- Whether final access claims keep the full ODRL policy or a filtered
-  single-storage subset (recommended: filter to the requested storage at the
-  final exchange).
-- Audit/visibility mapping for hidden actors.
-- Exact split of reusable LWS helpers between `packages/lws-auth` and test utils.
-- Public reader caching/TTL and whether public grants are also exposed through
-  ACP/WAC on data storages.
+**Still open**
+
+- Audit/visibility mapping for hidden actors. C7 makes the org's own exchange the
+  decision point (the `adminImpersonation` span records org, subject and
+  storage), but no admin event or durable audit record is written yet.
+- Public reader caching/TTL: `PublicPermissionReader` runs an owner-registry
+  query per requested mode and caches nothing yet; the hazards section asks for
+  a per-storage/target cache. Whether public grants are also exposed through
+  ACP/WAC on data storages is part of this.
+- Notification service paths: `.notifications/…` accepts storage tokens and the
+  handlers authorize the decoded topic, but no test asserts the claim/scope rule
+  for subscriptions.
+
+**Closed**
+
+- ~~Keep the full ODRL policy or filter a single-storage subset at the final
+  exchange?~~ Closed by D5: `verifyAccessClaim` rejects a claim whose targets
+  span storages, so a claim is already single-storage when it is copied; there
+  is nothing to filter and `copyAccessClaim` copies it verbatim.
+- ~~Exact split of reusable LWS helpers between `packages/lws-auth` and test
+  utils.~~ Closed in C5: `packages/lws-auth` has no test-utils dependency and
+  the OIDC login driver lives in `packages/test-utils/src/oidc-client.ts`.

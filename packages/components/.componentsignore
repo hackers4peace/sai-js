@@ -6,5 +6,6 @@
   "GarageAdminClientOptions",
   "GarageBucketInfo",
   "GarageKeyInfo",
-  "GarageBucketKeyPermissions"
+  "GarageBucketKeyPermissions",
+  "AdminImpersonationDenied"
 ]
