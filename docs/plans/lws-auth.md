@@ -1,7 +1,8 @@
 # LWS auth — ID-JAG exchange, `packages/lws-auth`, token-aware tracing
 
-> **Status:** 🔶 in progress — **C1–C5 landed** (2026-11-13), **D15 landed** (2026-11-16): the `auth` UAS mints audience-restricted ID-JAGs, the storages accept them next to `id_token`, `packages/lws-auth` walks the two-step chain, the whole chain is readable from Tempo, and the UI runs the chain with its **own DPoP-bound session access token** (`/.sai/id-token` retired). Remaining: the manual dev capture and the OpenWiki migration that closes the plan.
-> **Last verified:** working tree `99c208447` (CommunitySolidServer `lws-sai`, 2026-11-13) — CSS accepts DPoP-bound ID tokens and issues RFC 9068 access tokens; `createLwsFetch({ tokenSource })` and the OTel headers-only capture are the current seams.
+> **Status:** 🔶 open — **C1–C5 landed** (2026-11-13), **D15 landed** (2026-11-16), and the manual dev capture is done (2026-11-14, see C5). **Remaining to close the plan: the OpenWiki migration** (CONVENTIONS §1 — a done plan is removed and its design documented in [`openwiki/`](../../openwiki/)); nothing in C1–C5 is outstanding.
+> **Superseded in part (2026-11-16/18):** the storage credential model moved on in [`id-jag.md`](id-jag.md) C6/C7 — storages accept **only ID-JAG** (no `…:id_token` anywhere), the first-hop credential is a DPoP-bound **access token** with `aud` = the user's UAS (no `solid`), the final access token is **bearer** with the storage as its only `aud`, and storage authorization is token-carried (claim / `scope` / public). C2's "storages keep `id_token`" framing and the `aud: "solid"` credential below are **historical**.
+> **Last verified:** working tree (2026-11-18) — package gate (`typecheck`, `check`, `vitest` 690 / 26 skipped / 2 todo) and the full Dagger `/test` (24 files / 198 tests) green on CSS `ed9224991` (`lws-sai`). The C1–C5 slices themselves were verified on `99c208447` (2026-11-13).
 > **Green gate:** **after every slice** — package gates (TypeScript-direct) + the single diagram trace test (`scripts/trace-test.sh`, see *Green gates*). The full `/test` suite runs once, at the end of C5 (>10 min).
 > **Workstream:** follow-up to the closed LWS alignment phases ([`lws-followup.md`](lws-followup.md)); the modelled design is [`../lws-auth.c4`](../lws-auth.c4) and [`../../../lws-auth/oidc.c4`](../../../lws-auth/oidc.c4).
 
@@ -13,12 +14,16 @@ DPoP only on the first leg, and make the whole chain readable from Tempo.
 
 - Each storage is its own LWS authorization server (`css:config/identity/lws/default.json`,
   `issuer` = base URL; `data`/`registry` import it, `auth` does not).
-- One exchange: `POST <storage>/.well-known/lws/token` with
+- *Historical (C6 replaced it):* one exchange:
+  `POST <storage>/.well-known/lws/token` with
   `subject_token_type=…:id_token`, `resource=<storage>`; CSS verifies the subject token,
   optionally DPoP-bound (`OidcSubjectTokenVerifier.verifyRestriction`), and issues an
-  RFC 9068 `at+jwt` (`LwsAccessTokenIssuer`, 300 s).
+  RFC 9068 `at+jwt` (`LwsAccessTokenIssuer`, 300 s). Today the storage exchange is
+  ID-JAG only and the issued token is a bearer token whose only `aud` is the storage.
 - The credential the suite presents is a **self-issued `at+jwt`** (`SelfIssuedSession`):
-  `iss: https://auth/`, `aud: "solid"`, `azp`, `cnf.jkt` — signed with
+  `iss: https://auth/`, `aud: "solid"` *(historical — since C6/D33 the LWS first-hop
+  `at+jwt` carries the UAS as its only `aud`; `solid` remains only on the `.sai`
+  session token)*, `azp`, `cnf.jkt` — signed with
   `CSS_ENCODED_PRIVATE_JWK` via `EnvJwkGenerator` (`packages/components/config/overrides/jwks.json`).
 - Client discovery/caching/retry: `packages/utils/src/lws-auth.ts`
   (`parseLwsChallenge`, `discoverLwsAuthorizationServer`, `createLwsFetch`, with a
@@ -35,7 +40,7 @@ any token decoding in traces.
 | Capability / primitive | Status | Code anchors | Verified by | Notes |
 |---|---|---|---|---|
 | Storage-as-AS token exchange (RFC 8693) | ✅ landed | `CommunitySolidServer/src/identity/lws/LwsTokenHttpHandler.ts:122-153`; `src/identity/lws/LwsAccessTokenIssuer.ts:64-78` | `/test` `policy-engine.test.ts` + Tempo trace `1851eea1…` | one exchange, `aud` = storage |
-| Subject-token DPoP binding | ✅ landed | `src/identity/lws/OidcSubjectTokenVerifier.ts:162-178`; `src/identity/lws/DpopUtil.ts` | `/test` (self-issued token carries `cnf.jkt`) | `requireRestrictedTokens` still `false` |
+| Subject-token DPoP binding | ✅ landed | `src/identity/lws/OidcSubjectTokenVerifier.ts`; `src/identity/lws/DpopUtil.ts` | `/test` (self-issued token carries `cnf.jkt`) | since C6 both `requireRestrictedTokens` and `requireSenderConstrained` are `true` at the UAS |
 | Access-token audience enforcement | ✅ landed | `src/authentication/LwsAccessTokenExtractor.ts:130-145` | `/test` | exactly one `aud` == storage |
 | Client exchange seam | ✅ landed | `packages/utils/src/lws-auth.ts` (`LwsFetchOptions.tokenSource`) | package tests (`packages/utils/test/lws-auth.test.ts`) | ID-JAG drops in here |
 | ID-JAG issuer + UAS token endpoint | ✅ landed | `packages/components/src/IdJagIssuer.ts`, `IdJagTokenHandler.ts`, `config/identity/id-jag.json` (imported by `config/auth.json`, routed in `config/http/handler/default.json`) | package `test/id-jag.test.ts` (6); `/test` `lws-auth.test.ts` (4, 2026-11-13) | composes CSS's `verifyDpopProof` + `OidcSubjectTokenVerifier`; `LwsTokenHttpHandler` itself cannot be reused (private `OAuthError`/`getParameter`/`writeJson`, `verifyStorage` is own-storages-only) |
@@ -104,7 +109,11 @@ the continuity test in the same run.
 - `IdJagIssuer` mirrors `LwsAccessTokenIssuer` (same `JwkGenerator`, so the existing
   `/.oidc/jwks` serves both) but sets `typ: oauth-id-jag+jwt` and `client_id`.
 
-### C2 — storages accept `id-jag` and keep `id_token` — ✅ landed (2026-11-13)
+### C2 — storages accept `id-jag` and keep `id_token` — ✅ landed (2026-11-13) · *historical: C6 removed `id_token` at storages*
+
+> *Everything in this slice is a record of what C2 required then. `id-jag.md` C6
+> later removed the `id_token` fall-through: a storage AS now accepts only
+> `…:id-jag`, and the UAS handler rejects `…:id_token` outright (D25/D30).*
 
 **Done when:** `POST https://data/.well-known/lws/token` with
 `subject_token_type=urn:ietf:params:oauth:token-type:id-jag` and a valid ID-JAG returns
@@ -281,7 +290,7 @@ body it received; no raw token strings appear unless `OTEL_CAPTURE_RAW_TOKENS=tr
 | attribute | example |
 |---|---|
 | `sai.lws.grant_type` | `urn:ietf:params:oauth:grant-type:token-exchange` |
-| `sai.lws.requested_token_type` / `.subject_token_type` | `…:id-jag`, `…:id_token` |
+| `sai.lws.requested_token_type` / `.subject_token_type` | `…:id-jag` (the only accepted subject-token type since C6) |
 | `sai.lws.audience` / `.resource` | `https://data/`, `https://data/alice-work/k3pqsb` |
 | `sai.lws.client_auth_method` | `none` (D3) |
 | `sai.token.<subject\|id_jag\|access>.typ` / `.iss` / `.aud` / `.sub` / `.client_id` / `.exp` / `.jti` / `.cnf_jkt` | flattened, queryable |
@@ -378,8 +387,9 @@ new `/.sai/id-token` handler + `config/auth.json`.
   one ID-JAG per storage AS, both storages 200 (Alice `alice-work`, ACME `acme-rnd`,
   reusing the same ID-JAG per AS); a reload restores the session from IndexedDB and
   mints with the **same** `dpop_jkt`.
-- Remaining for the plan: the **manual dev capture** (user-run) and then the OpenWiki
-  migration (CONVENTIONS §1: a done plan is removed and its design documented there).
+- Remaining for the plan: only the **OpenWiki migration** (CONVENTIONS §1: a done plan
+  is removed and its design documented there). The manual dev capture is the entry
+  above (2026-11-14).
 
 **Notes (C5, superseded by D15):** CSS's OP does **not** issue DPoP-bound ID tokens:
 `IdentityProviderFactory.configureClaims` adds `webid`/`azp` only, and `oidc-provider`
@@ -571,8 +581,11 @@ is the only place the three-server exchange is exercised.
 
 ## Open questions
 
-1. Where does the "known RAS" list live for C1 — static config (`CSS_DATA_ORIGIN`,
-   `CSS_REG_ORIGIN`) or the registry/pod-endpoint store? Static first, store later.
+1. ~~Where does the "known RAS" list live for C1 — static config or the
+   registry/pod-endpoint store?~~ **Answered:** static origins in
+   `config/identity/id-jag.json` (`storageOrigins` `CSS_DATA_ORIGIN`/`CSS_REG_ORIGIN`,
+   plus `authorizationServerOrigins`), and the per-pod SPARQL endpoint records drive
+   everything else.
 2. ~~Do we keep `LwsTokenHandler` (`/.sai/lws-token`) after C5?~~ **Answered in C5:** deleted
    together with the server-side storage-token exchange; the browser runs the chain itself.
    **D15** retired the replacement credential endpoint (`/.sai/id-token`) too: the session's

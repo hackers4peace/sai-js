@@ -38,8 +38,10 @@ file was deleted. The post-workstream follow-ups are in
 
 | Status | Count | Plans |
 |---|---|---|
-| 🔶 in progress | 2 | `lws-auth` (C1–C5 landed: ID-JAG chain end-to-end + browser credential; manual dev capture and OpenWiki migration remain); `id-jag` (C0–C2 landed + C4 item 4; C5 implemented: owner endpoint need-based only, assigner-local link invariant, impersonation-only, exchange-time claim coverage; package + full Dagger green) |
-| ⬜ not started / design only | 12 | `grants-replication-polish`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing`, `lws-followup` |
+| ✅ done | 1 | `id-jag` (C0–C7 landed, scope closed 2026-11-18: package gate + full Dagger 24 files / 198 tests green, chain captured in Tempo) |
+| 🔶 in progress | 1 | `lws-auth` (C1–C5 landed, manual dev capture done; only the OpenWiki migration remains) |
+| ⚙️ open backlog | 1 | `lws-followup` (4 of 15 items closed/obsolete since 2026-11-13; the rest listed by kind — decision, code, external/blocked/conditional, docs) |
+| ⬜ not started / design only | 11 | `grants-replication-polish`, `webhook-subscription-bootstrap`, `registry-set-permissions`, `components-tweaks`, `specific-instance-access-requests`, `generic-auditing`, `extract-temporal-workflows`, `update-deployment`, `pod-isolation-followup`, `reconsider-n3-package`, `npm-publishing` |
 | 🧭 umbrella | 1 | `org-admin-feature` |
 | 📝 design notes | 3 | `architecture`, `fixes`, `improve-fetch-json-ld` |
 
@@ -103,18 +105,18 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 
 ### LWS authorization
 
-- `lws-auth.md` — 🔶 in progress (C1–C5 landed 2026-11-13); move the token flow to
-  ID token → **ID-JAG** (per resource authorization server) → access token, add the
-  `packages/lws-auth` client, and make the token chain readable from Tempo
-  (decoded claims + opt-in request/response bodies). DPoP stays only on the first leg;
-  `data`/`registry` keep their landed exchange as the RAS leg.
-- `lws-followup.md` — ⬜ not started; remaining LWS alignment follow-ups (grant view,
-  needs/grants profile, flat storage, docs).
-- `id-jag.md` — 🔶 C0–C2 landed + C4 item 4; C5 implemented
-  (owner endpoint need-based only, assigner-local grant/link invariant,
-  impersonation-only, exchange-time claim coverage; package + full Dagger green). Staged ODRL model migration (`assigner` = delegator,
-  `target.owner` = data owner), ID-JAG access claims, claim-first policy engine;
-  no `act`/delegation-token mode.
+- `id-jag.md` — ✅ **done, scope closed 2026-11-18**; C0–C7 landed (ODRL
+  `assigner`/`target.owner` migration, ID-JAG access claims, claim-first engine,
+  impersonation-only, token-carried storage authorization, read-only admin
+  impersonation of the org with the document proxy removed). Four explicitly
+  out-of-scope follow-ups are listed in the plan.
+- `lws-auth.md` — 🔶 in progress; C1–C5 landed and the manual dev capture is done
+  — the only remaining step is the OpenWiki migration (CONVENTIONS §1). The
+  storage-credential parts of C2 are historical: `id-jag.md` C6 moved to
+  ID-JAG-only storages and bearer final tokens.
+- `lws-followup.md` — ⚙️ open backlog; LWS alignment follow-ups (grant view,
+  needs/grants profile, flat storage/identifiers, docs/build), each item listed
+  with what it needs next.
 
 ## Full table
 
@@ -135,8 +137,9 @@ in `openwiki/architecture/federation.md`, and the domain event catalogue is in
 | `architecture.md` | 📝 design note — decided | The architectural principle: thin services/handlers, workflow-orchestrated, domain logic in `authorization-agent` | OpenWiki `services/activity-lifecycle.md`, `services/rpc-and-services.md` |
 | `fixes.md` | 📝 design note — not implemented | Remove the HTTP list-and-scan invitation lookup in `agent-registry.ts`; route the duplicate check through the SPARQL `fetchSocialAgentInvitation` | — |
 | `improve-fetch-json-ld.md` | 📝 design note — decision deferred | `fetchJsonLd` status-carrying error instead of regex-matching the message; options evaluated, not implemented | — |
-| `lws-auth.md` | 🔶 in progress — C1–C5 landed (ID-JAG issuance, storage acceptance, `packages/lws-auth`, token-aware tracing, browser credential); manual capture + OpenWiki migration remain | ID-JAG exchange: `auth` mints audience-restricted ID-JAGs from DPoP-bound ID tokens, storages accept `id-jag` and exchange it for an access token, new `packages/lws-auth` client (one ID-JAG per RAS), token-aware tracing + opt-in body capture, vuejectron redirect flow with a DPoP-bound ID token | landed CSS LWS exchange (CommunitySolidServer `lws-sai`); `packages/utils/src/lws-auth.ts` `tokenSource` seam; `lws-followup.md` |
-| `id-jag.md` | 🔶 in progress — C0–C2 landed + C4 item 4; C5 implemented (package + full Dagger green) | ODRL new shape (`assigner` = delegator, `target.owner` = data owner), full migration, ID-JAG ODRL access claim + context, claim-first policy engine, impersonation-only delegation, assigner-local projection grants; owner access-request endpoint is need-based only | C0 model migration; C1–C2 tokens; C5 endpoint narrowing/seed-link invariant; admin impersonation/ProxyAdmin removal future TODO |
+| `id-jag.md` | ✅ done — C0–C7 landed, scope closed 2026-11-18 (package gate + full Dagger 24/198 green; peer + org-own chains captured in Tempo) | ODRL shape migration (`assigner` = delegator, `target.owner` = data owner), ID-JAG access claims + bundled context, claim-first policy engine, impersonation-only delegation, assigner-local projection grants, need-based-only owner endpoint, token-carried storage authorization (`scope` owner/admin, public reader, ID-JAG-only storages), read-only admin impersonation of the org for peer reads (proxy removed) | C0–C6 slices; CSS fork `ed9224991` (`lws-sai`) |
+| `lws-auth.md` | 🔶 in progress — C1–C5 landed, manual dev capture done; only the OpenWiki migration remains | ID-JAG exchange as originally sliced: `auth` mints audience-restricted ID-JAGs, `packages/lws-auth` walks the two-step chain (one ID-JAG per RAS, one access token per storage), token-aware tracing + opt-in body capture, vuejectron redirect flow | landed CSS LWS exchange (CommunitySolidServer `lws-sai`); `lws-followup.md`; superseded in part by `id-jag.md` C6/C7 |
+| `lws-followup.md` | ⚙️ open backlog — 4 of 15 items closed/obsolete; the rest need a decision, code, an external upstream, packaging, or are conditional | LWS alignment follow-ups: grant view, needs/grants profile, flat storage/identifiers, docs/build, operational notes | closed LWS alignment phases; `id-jag.md` C0/C5/C6/C7 for what changed |
 
 ## Dependency graph
 
