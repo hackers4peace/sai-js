@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:01b2c4eb1cf4a68bff25b6a3a3024d33ab74466ba55db3e6fa58e4563608dd29",
+  "pageVersion": "sha256:f84466d39c4bf7d603602782bbe00f7e75621f2b0d6bb5bd45226527a4bee539",
   "claims": [
     {
       "id": "claim_be2a5323cad44f80802ffc275a1c5006",
-      "statement": "sai-js is a private npm workspace named interop that groups packages/*, the test integration suite, and the docs/website docs site.",
+      "statement": "sai-js is a private npm workspace named `interop` that groups `packages/*`, the `test` integration suite, and the `docs/website` docs site; the root manifest now carries no dependency overrides.",
       "evidence": [
         {
           "resource": "repo://package.json",
-          "version": "repo-file-v1:sha256:83fc27dbf871787a400ba443f0283b3fc95e84148495b24f46e9d5a52a0f04c0"
+          "version": "repo-file-v1:sha256:aae60e50ad32c4d8ef2ad5c4b8a26633d78a9b49ea94f1f6661bc4369722dcef"
         }
       ]
     },
@@ -94,11 +94,11 @@
     },
     {
       "id": "claim_420fdb34c4674663bd3342c0aa123efb",
-      "statement": "Linting and formatting use oxlint and oxfmt, and npm run typecheck runs tsgo --noEmit over the no-build packages including lws-auth under a shared strict nodenext tsconfig.",
+      "statement": "Linting and formatting use oxlint and oxfmt, and `npm run typecheck` runs `tsgo --noEmit` over the no-build packages including `lws-auth` under a shared strict nodenext tsconfig.",
       "evidence": [
         {
-          "resource": "repo://package.json",
-          "version": "repo-file-v1:sha256:83fc27dbf871787a400ba443f0283b3fc95e84148495b24f46e9d5a52a0f04c0"
+          "resource": "repo://package.json#L20-L48",
+          "version": "repo-lines-v1:sha256:1df1303dd0c098e3290983b9c45de7ac548d310cc8aa0aff0baa1668bd81dea1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NTNjNjM1MWY2NGY1YzhlYTk2ZTE1YTI4Y2E1YmQxMDdkY2NhMzliMDQ2YTE5NDhhYjcwODVlMGYxMTFiNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://tsconfig.base.json",
@@ -108,21 +108,45 @@
     },
     {
       "id": "claim_39e5de7851a9454d95981e7d4139f078",
-      "statement": "utils, lws-auth, data-model, application, authorization-agent, api-messages and test-utils are no-build TypeScript packages, while components builds to dist for Components.js and repl also builds to dist; publishing built npm artifacts remains a future goal.",
+      "statement": "`utils`, `lws-auth`, `data-model`, `application`, `authorization-agent`, `api-messages`, and `test-utils` are no-build TypeScript packages pointing at `src/index.ts`, while `components` builds to `dist` for Components.js and `repl` also builds to `dist`; publishing built npm artifacts remains a future goal.",
       "evidence": [
         {
-          "resource": "repo://packages/components/package.json#L1-L15",
-          "version": "repo-lines-v1:sha256:a548976c2adeb85b114fb34927b32b2c2cba8ab60897d3746c68bf5d5df446ca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZDlhNWMwMDNjYWIyMTFhYjBmZGMwM2Q2MDY5NjY0M2NjNTAyNjRjNjEzZGRjMzE4YTlhMzQwMDRjZGYxNzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkY2FmMzhjYWNlODgwMjE4Yjk2YjBjMGRkNTYwYzJiYTM1YWU5YTBiZWNkODAxMDZlNTJlZDc4NjIxMjI2ZGYifQ"
+          "resource": "repo://packages/components/package.json#L1-L22",
+          "version": "repo-lines-v1:sha256:290d822a6a31392fb84d39dbb894341ebcb4585cad60fcade25c6b2febe1d4a6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzZDExMjRmYjJkNzdmMDdlODQ2ZWJkZTZiMjUyYjU2OTVjZDZhYjY4YzA0NTI3MDMzMzAxMTA5NWU5ZTFiMzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiYTNjYjczYzFhYzRmYTBlNDM0NjdjYjI2NmRkZmJiZDY2MGVmYzBjNGMxOGFmNDVkZDliZmYyOWMxNDVmYTEifQ"
         },
         {
           "resource": "repo://packages/lws-auth/package.json#L1-L20",
-          "version": "repo-lines-v1:sha256:a5e6ede7eece2a077c8a7865934a992ba4553f7cbd83f1c10b3c0c6e6cac840a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3OWUzMGRlNjg1Njg3Nzc5MTA5MDBiMjQyMDU4MDA3NmFiMjA4YzBjMGIwNmJmYmUxNTQxZWIyMDFmYmRiMDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyYWJkM2U1ZTQxM2JjNWY5MDg0ZDdlNWExODU1YmU0NzI1ZDJlZjU1N2IxNzBiZjM0MTZjOWJhMGMwY2FjNjcifQ"
+          "version": "repo-lines-v1:sha256:25683a1a71c01de6f6a04ebd2a3efa699c0799225b6a51847efbe58d5ec4e486:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3OWUzMGRlNjg1Njg3Nzc5MTA5MDBiMjQyMDU4MDA3NmFiMjA4YzBjMGIwNmJmYmUxNTQxZWIyMDFmYmRiMDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyYWJkM2U1ZTQxM2JjNWY5MDg0ZDdlNWExODU1YmU0NzI1ZDJlZjU1N2IxNzBiZjM0MTZjOWJhMGMwY2FjNjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_07ad91c9b4b94e0980a0c8f197ca2986",
+      "statement": "`@elfpavlik/lws-auth` exports both `createLwsAuthFetch` (storage chain) and `createIdJagFetch` (identity-only `.sai` grants), together with `createSelfIssuedCredential` and the browser session.",
+      "evidence": [
+        {
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L216-L240",
+          "version": "repo-lines-v1:sha256:dc0c1da9d066b93c2e7fbb47620e0b28ed29d3a3e7a768f5e1f0d7add50f7a3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5ODVlMjc2MjNlNzI0YmM3ZDJmNTFlNDQzMTMxNjlhNmYyMzA0ZjQ5MDhjOGYzMWIyNDIzNTRlMTBkYmUxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwMDExMDFhM2FmMTczNzI3MDlkOGRhOWI5ZDg5NDBlNjZjNWUxMzMxMTNlZTFhMmFhNzk4N2MyN2ZhMjg1MDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZWQzN2I4MzI3YTUwZjcyZTEwNjNhYTY3ZmFkODBhMDQxNTBjYzliYzdlZGYyYmMxYWJlOWMzZmE5NTEwNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzZjVkNjI0MGUyODEyYTJlMmZlYTBhYmZlMmY3ZDZkNDQ3OWM3MDAwNjZjMTViM2IwMjI1MmU4ZjU4YTc1OTkifQ"
+        },
+        {
+          "resource": "repo://packages/lws-auth/src/index.ts",
+          "version": "repo-file-v1:sha256:5b49d1021d07d76c88625f0efde7fbe72875dfb4085c81e8443d9190600f9f47"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c3da21478384dc9aa0184673c9e4836",
+      "statement": "The components package index exports `SaiSession`, `IdJagCredentialsExtractor`, `SaiSelfIssuedAccessTokenVerifier`, and `CidIssuerResolver` so the Components.js descriptors can wire them.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/index.ts#L11-L25",
+          "version": "repo-lines-v1:sha256:a23c84861d2f412f207de35e62608e1039c399e35b86e8ed5b60ffe91c94fe98:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkOGZjMWJiOTlmYTg4YTc5MzFjOTIxYjU1ZDA3NmU2NTVhMjU5MzIxZTAyM2E4YTQyZGQ0NWJhNmUxYzJkNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxNDEyN2I4NzBlMGUzZWNkMGY0MmFkZDQzMWJhMzQ2ODM3YjBlMmQ1YjRhMmRhOTExOGVmMzIzMDYwYmViODQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyNGRlNjdlYjYwMzM2NDQxMGE5NWEzNzViYTI0MTZlNGNhMmZjZTFjOTFjYzM4NzdmNzU3NDZkNWUzY2MwZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlYmNkZTg5NzlhYmQ2ZGZiNGQ2YzI4ZDI5ZTdjZjNlN2JiNjJjOGRhYjhmMTE1MDYzMmI1YmVkNGNiNzNlYTQifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

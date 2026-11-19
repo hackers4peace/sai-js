@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:770f9f59bac99eb7c0fe97a8a130a242882e3e9e7649a47ac8e6ddc47ed3d942",
+  "pageVersion": "sha256:9f830a187234e042793372440258f3b9bd8b5d4747f60f6a9dd8e1dfd3eabffd",
   "claims": [
     {
       "id": "claim_17f3a5d2a8d547da8addcf59bb200c31",
-      "statement": "createLwsAuthFetch performs the two-step LWS chain: a DPoP-bound request to the UAS token endpoint for one ID-JAG per storage authorization server, then a bearer ID-JAG exchange at the storage for an access token, then the storage request with one retry on 401.",
+      "statement": "`createLwsAuthFetch` performs the two-step LWS chain: a DPoP-bound request to the UAS token endpoint for one ID-JAG per storage authorization server (keyed by issuer, storage, and impersonation UAS), then a bearer ID-JAG exchange at the storage for an access token, then the storage request with one retry on `401`.",
       "evidence": [
         {
-          "resource": "repo://packages/lws-auth/src/fetch.ts#L60-L160",
-          "version": "repo-lines-v1:sha256:90029be51198a7646dbfc71c9801ec47ab24b52db3920884efc79b73df0c418c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmZWFmNmM3YTMzYzM0Y2M4NTdjMWU3NWE1Y2FmOGUxNzc2NDNjZjg2ZjIwMjIwODUyYmVjN2Y5YWIwMWUwOWU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjOThiY2IxYzY3YTA2MmVlNjhkMTMzYjNjODllNmUxOTVmYWM0YjcxNzFmMDU4OWNiOGFhMTk5NzJkM2FiOGZmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxMjE2YWI4ZTc3OWMwNWM4MWE2NzA0MjNlMWUzN2M5ZDcwNDE3MWJkYjk4NDVjYzZmYmQwNjBmYWM2YmJiNzMxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxZjZmMzQ2ZTQ2NWRkYzE5YzM4ZDdiNDE5N2QyOWYxNTBhMzIzOTlhMGE1NjcyZmMxZWFhYjAzMDMyYTdjNzQ0In0"
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L77-L205",
+          "version": "repo-lines-v1:sha256:ac0e3ff09201598aca0acd8d0ed70902ec1d69c72cffa8a830e67cf1a8079429:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1MGQ2NjE1MzNiZjAwMmRhOWQ1NDkyNDRlZTgwOGFkOTk3ZDJhNjc1ODkzZmQyZjFkNjlkYjY2N2U0MTQxMTJkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI2ODFhOGZhMTllMTM3ZDVjNjRlY2FiYTM2NGRiNzdmNzc2NTRkM2JlZGZhZmNjYzk5NmUxZmNmNDg5ZGY3YmM4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4YzFkMDRkZTZlODEwZGI4MDNkYzIwODE0MGJmY2IxN2I0MzkzNDYyY2JmZjAxNTA0MmVhMWEyNWZmZjM2NmE3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzY2E3NmQzZWZmOWE1MWU1NWM3ZGU4NGU5NGI4NjYyOTk2OGU4ZDQyOWZkMWVjY2I0MGU3OTY2YWViYjk0YmIyIn0"
         }
       ]
     },
@@ -17,7 +17,7 @@
       "statement": "The ID-JAG cache is keyed by issuer, storage and impersonation UAS and renews 30 seconds before expiry; access tokens are cached per storage by createLwsFetch, and a storage 401 refreshes the token.",
       "evidence": [
         {
-          "resource": "repo://packages/lws-auth/src/fetch.ts#L100-L195",
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L107-L202",
           "version": "repo-lines-v1:sha256:07584619ca16cd61e5109e019e165ce7da10a9938477037f99f6c6bcac72f2d6:eyJzZWxlY3RlZExpbmVDb3VudCI6OTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNTgyMGFkYmIxMTQ4ODliY2UxOGJlZTY5OTA4OWQ1MmMwYTYwZTk0MTUxODg1OGIxZWY1NWVjYmExNjM4NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkZmFkOGU2ZGMxMGQxOTM3NDU2OTc4MmJlYzczN2E4MjI2NjRjMzA3NjI1NmFhYjEzNjU1ZmRkMzRlNTZlM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
@@ -38,11 +38,11 @@
     },
     {
       "id": "claim_8da5c1bc02a342df90200221dcd766ce",
-      "statement": "buildLwsFetch wires the storage fetch to the self-issued DPoP-bound credential and createLwsAuthFetch; ID-JAG is always on, so the old idJag flag and single-exchange default no longer exist.",
+      "statement": "`buildLwsFetch` wires the storage fetch to the self-issued DPoP-bound credential and `createLwsAuthFetch`; ID-JAG is always on, so the old `idJag` flag and single-exchange default no longer exist.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/builders/sessionManager.ts#L90-L116",
-          "version": "repo-lines-v1:sha256:e26d9568e92f332b3baa9e9157d127ad34dc225e567892150e556a657d948c1a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMzU1ZDEwZTAyNzhkOWFjZTk4Y2Y2M2U0NTFiYmMwYTU2ODJhM2UwZDFmNzUzMmU3MGU4OTVkOTljMzNjNzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YzdhZGExYTZjNjk3YmJlMWU1ODI4YjVmYWU4NzYzMjM4ZDk1YWNmM2NkZWRiYTA0ZTcyNDRiMjE0YTFjMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/src/builders/sessionManager.ts#L120-L143",
+          "version": "repo-lines-v1:sha256:fbf31529bbb2b5ac0ce6306d6ed5762359c3e3118e6b80c26704d105d496c922:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2OTI0MTNiMzhmYzY1YjZlNDU5OTUyNzllNzA4MDM0NjhhNTdhNjA4MTU1YzU4NTdkZDMzNGEwOTU0NWVkMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -61,24 +61,54 @@
       "statement": "HTTP body capture is opt-in through OTEL_CAPTURE_BODIES, raw JWTs require OTEL_CAPTURE_RAW_TOKENS, and captured bodies are capped and redacted by default.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/tracing/http-capture.cjs#L190-L212",
+          "resource": "repo://packages/components/src/tracing/http-capture.cjs#L193-L215",
           "version": "repo-lines-v1:sha256:84256fe568aefc2dd73f0191856e91bc2ebb59fdfe4fe1cc4f4c29790d025300:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
     {
       "id": "claim_90649b694dd242ba8c8d3d6a0de6b185",
-      "statement": "scripts/trace-test.sh runs the docs/lws-auth.c4 diagram flow through Dagger with Tempo tracing enabled as the per-slice continuity gate.",
+      "statement": "`scripts/trace-test.sh` runs the `docs/lws-auth.c4` diagram flow (the policy-engine authenticated-read case) through Dagger with Tempo tracing enabled as the per-slice continuity gate.",
       "evidence": [
         {
           "resource": "repo://scripts/trace-test.sh#L1-L50",
-          "version": "repo-lines-v1:sha256:b74253f155117781e4bedd267adfdfdea416eb93e288b860f7478b2c7c8cab8a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTVmYzA0YTgwYzk1MmY0OWNlNDE4ODYyN2M1M2IwZmJlOGM0NDA0MWI5NTJkNTkyYWNkMWRlOTk4NjE0NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1ZWFmZTMzNzhkNmVhMmIzMDk0ZjhmZmY5MzgzMzZhM2RhZmYzMzg5YmMyZDIyOThkZjMzZDUzMzBmZmJmOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "version": "repo-lines-v1:sha256:1606e0020f90cda31344623cd9d183223e3ac422b8014f43e58923eba03418ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTVmYzA0YTgwYzk1MmY0OWNlNDE4ODYyN2M1M2IwZmJlOGM0NDA0MWI5NTJkNTkyYWNkMWRlOTk4NjE0NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1ZWFmZTMzNzhkNmVhMmIzMDk0ZjhmZmY5MzgzMzZhM2RhZmYzMzg5YmMyZDIyOThkZjMzZDUzMzBmZmJmOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c42ed1698ea3459db79ba1ca1ad93ce6",
+      "statement": "`createIdJagFetch` mints one identity-only ID-JAG per resolved `.sai` audience (no `resource`, no `access` claim), sends it as a plain Bearer token, caches grants per audience until shortly before expiry, and on `401` discards the cached grant, mints a fresh one, and retries once with the cloned body.",
+      "evidence": [
+        {
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L216-L298",
+          "version": "repo-lines-v1:sha256:c2ae67ba8719451c3938cd1f6c9161a23b0baf08b1d77fbda04317afee986bb1:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5ODVlMjc2MjNlNzI0YmM3ZDJmNTFlNDQzMTMxNjlhNmYyMzA0ZjQ5MDhjOGYzMWIyNDIzNTRlMTBkYmUxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZWQzN2I4MzI3YTUwZjcyZTEwNjNhYTY3ZmFkODBhMDQxNTBjYzliYzdlZGYyYmMxYWJlOWMzZmE5NTEwNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3d7e01ad816a4c34afa5e3aecc7c820d",
+      "statement": "`createSelfIssuedCredential` mints a short-lived `at+jwt` with `iss`, `sub`, `client_id`, `aud` (defaulting to the issuer), `cnf.jkt`, `jti`, `iat`, and `exp`, caches the DPoP thumbprint, and delegates signing to the caller.",
+      "evidence": [
+        {
+          "resource": "repo://packages/lws-auth/src/credential.ts#L100-L125",
+          "version": "repo-lines-v1:sha256:5eef691519daaee2375bb5388f27162998b45a5ef7ebad37d8ca855fd8b6bd85:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmY2U1MDk1MjA3MDJjYzY5YjAwYjgzZGU3OTUwY2EyMmYwYTI0ZWQ3OTA5ZGYyYzQ1NDRmMGQ3YjI4M2MzZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5ZWJlY2RmYzg4NTJjNzQxYTFkNjM5MTA1NTEwZTc4YmZhMTdlZjM1NTE0MDA1MmUxY2M0ZWNiNjg2ZTI5MjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c8b4f2ee6bf24323892ecf53c07bb97c",
+      "statement": "HTTP body capture skips `application/x-ndjson` and `text/event-stream` responses because buffering those long-lived streams would stall the client fetch until the stream ends.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/tracing/http-capture.cjs#L30-L50",
+          "version": "repo-lines-v1:sha256:84451c32b9a86562443f62cc8cdd26f0cb3361027eb46cbbc994138e7bde90c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZGUwNjcxMjU1MzNjNzYzODlhNDIzYzkxMzM1ZDA3OTg3ZDY5MWQ0ZWU0MDVlMDkwYjRjOWMwMmQwZDA5YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3Mzc0ZjhiYjNjOWEzOGU5ZmYwZjg1ZjQ4ZDY3MzVmMzllMDkyOTk0MWQyMzFiNzg4Y2Y2MGUzMzM1ZDJkYTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1Mzk1MzdhNzZhMWU5NmYxMDE5N2M5YmRiMTlkYjVkMmNmNzE3Yjg1N2IzZTIwZjQ5MDUzMTllZDhlYWJjZDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5YjI2NTgzMzRiNzY4YjY5YzBhMjY5MTYyMjU0OTU4ZmRmNzEzZThkMDUxYjY4OGE0N2ZmZjlkNzYzNDU3NGYifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

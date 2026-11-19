@@ -1,11 +1,8 @@
 ---
 type: overview
 title: Architecture overview
-description: The sai-js monorepo, the Solid Application Interoperability specification it implements, its npm-workspace package layout, the no-build TypeScript package surface, the LWS auth client, and the Node 26/Turborepo/Vitest/oxlint toolchain.
+description: The sai-js monorepo, the Solid Application Interoperability specification it implements, its npm-workspace package layout, the no-build TypeScript package surface, the LWS auth client and `.sai` ID-JAG fetches, the dependency cleanup, and the Node 26/Turborepo/Vitest/oxlint toolchain.
 tags: [architecture, monorepo, solid, typescript, overview]
-verified:
-  - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
 sources:
   - id: openwiki-source-164e2da859b5277df81c7d94
     resource: repo://.github/workflows/ci.yml
@@ -17,8 +14,14 @@ sources:
     resource: repo://packages/authorization-agent/package.json
   - id: openwiki-source-9a0178ffa2620c135186d460
     resource: repo://packages/components/package.json
+  - id: openwiki-source-20f656c24c37f213c002731b
+    resource: repo://packages/components/src/index.ts
   - id: openwiki-source-9094757b76eda90f81711e2d
     resource: repo://packages/lws-auth/package.json
+  - id: openwiki-source-efe1f254f3d0645000dccc22
+    resource: repo://packages/lws-auth/src/fetch.ts
+  - id: openwiki-source-e72cd6d1b6db1e041d0f4221
+    resource: repo://packages/lws-auth/src/index.ts
   - id: openwiki-source-06f346a302383133b02d09e8
     resource: repo://packages/utils/package.json
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
@@ -31,7 +34,10 @@ sources:
     resource: repo://turbo.json
   - id: openwiki-source-fbadcd8591b65031efaaedce
     resource: repo://vitest.config.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Architecture overview
@@ -51,7 +57,10 @@ The two public, spec-facing modules are documented in the root `README.md`:
 
 `@elfpavlik/lws-auth` (`packages/lws-auth`) is the client-side LWS token-chain
 package used by the components/session layer and the browser example; it is not
-a spec-facing application module.
+a spec-facing application module. It owns both fetches the components layer
+needs: the two-step storage chain (`createLwsAuthFetch`) and the identity-only
+`.sai` ID-JAG fetch (`createIdJagFetch`), plus the self-issued credential helper
+(`createSelfIssuedCredential`).
 
 ## Workspace layout
 
@@ -62,7 +71,7 @@ a spec-facing application module.
 | `authorization-agent` | `packages/authorization-agent` | Agent-side module (registries, grants, authorizations) |
 | `components` | `packages/components` | HTTP handlers, service layer, Temporal workflows/activities, worker; the only workspace package that compiles Components.js descriptors to `dist` |
 | `data-model` | `packages/data-model` | JSON-LD POJO entities, ACR JSON-LD builders, bootstrap TriG templates |
-| `lws-auth` | `packages/lws-auth` | LWS client: DPoP credential → ID-JAG → storage access token, browser session, tracing |
+| `lws-auth` | `packages/lws-auth` | LWS client: DPoP credential → ID-JAG (`.sai` and storage), storage access token, self-issued credential, browser session, tracing |
 | `repl` | `packages/repl` | Command-line REPL/utility (seed, gen-jwk) |
 | `test-utils` | `packages/test-utils` | Shared seeding/fixture helpers, including per-pod Fuseki and Garage seeding |
 | `utils` | `packages/utils` | JSON-LD, SPARQL/N-Quads, notification-subscription, discovery, and fetch primitives |
@@ -113,16 +122,35 @@ Dockerized service cluster (see [Integration test suite](../testing/integration-
 
 ## The LWS credential in one paragraph
 
-Storage requests use the two-step LWS chain: the user's authorization server
-issues an ID-JAG for one storage's authorization server, and the storage
-exchanges it for a bearer access token. `packages/lws-auth` performs both legs,
-caches the ID-JAG per `(issuer, storage)` and the access token per storage, and
-exposes the same fetch to the components session layer and the browser. The
-protocol model is in [ID-JAG access claims and impersonation](id-jag-access-claims.md);
+`.sai` requests are authenticated with an ID-JAG: the user's authorization server
+mints a short-lived grant for the target `.sai` URL (or the target UAS base URL
+for `/.sai/agents/*`) in exchange for the DPoP-bound credential, and the `.sai`
+request carries that grant as a Bearer token. Storage requests use the same
+first exchange, then a second one: the UAS issues an ID-JAG for one storage's
+authorization server, and the storage exchanges it for a bearer access token.
+`packages/lws-auth` performs every leg, caches the ID-JAG per audience or
+`(issuer, storage)`, and exposes the same fetches to the components session
+layer and the browser. The `.sai` side is in
+[SAI endpoint authentication](sai-endpoint-authentication.md); the protocol
+model is in [ID-JAG access claims and impersonation](id-jag-access-claims.md);
 the client and tracing are in [LWS auth client and tracing](lws-auth.md).
+
+## Dependency changes worth knowing
+
+The manifests no longer list `@uvdsl/solid-oidc-client-browser` (the components
+browser OIDC client, replaced by `lws-auth` and `SaiSession`) and the root
+`package.json` no longer overrides `@solid/access-token-verifier` (the SAI
+configs stopped importing CSS's `dpop-bearer.json`). `@solid/access-token-verifier`
+may still appear as a transitive `@solid/community-server` dependency; removing
+that requires a CSS-side change. The components index exports the new
+authentication classes `SaiSession`, `IdJagCredentialsExtractor`,
+`SaiSelfIssuedAccessTokenVerifier`, and `CidIssuerResolver` so Components.js can
+wire them.
 
 ## Related pages
 
+- [SAI endpoint authentication](sai-endpoint-authentication.md) — the `.sai`
+  first hop.
 - [Domain-logic placement](domain-logic-placement.md) — the service/workflow/AA
   boundary.
 - [Deployment landscape](deployment-landscape.md) — the production topology.

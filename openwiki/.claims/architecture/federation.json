@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:c95cd3fb7a246f43b3189d700aa3944ff5c1a8b11eabc4ac5987a89bbdacf884",
+  "pageVersion": "sha256:2877dc747a0304e69f6bed32f6071536eb22b1f958febbfc7a957229692e6fe2",
   "claims": [
     {
       "id": "claim_2c9534d31d6c4b28bef91cfdf0a334d0",
@@ -173,10 +173,54 @@
           "version": "repo-lines-v1:sha256:37c636be86447dd38589b5b1447143281909048440e8c5d6c37fd8c37faf8081:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxZDQyZmU3N2FhZGM0ODZiMmU0MjNiZDM1NGIzNzE4ZmE1NDUwY2Y4M2Q0OGRhZTEzZjYwNmFlMGM0ODBkMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjk0NzM5NzNkOGFjOTNiZGMwMzQ5ZjYxZjcxNmY2ZmJlOWMyODQ1Y2JkMWFhNmJkMjg3MDlhMDljZDFmZmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhOTg1OTNmNjc3OGM4MDAxZjRiYTdiMzk0OGUyY2Y4YzEzNzg4ZTVjOTJkNzFkYzhiMDNmMWE1MDE3ZmY5YTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkMGZmZTVmYWQ3NDAyMjhjYzE4ZjVmZjk1YTlmMTBiZWQxMjVhMGNlNGE4MTU3YWQxMmYxMDFjYzIyZjAyOTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_d57cde11818649ff887a517f32cc46d4",
+      "statement": "An incoming ID-JAG from an untrusted issuer is accepted only after dereferencing the subject CID document, requiring `id === sub` and an `lws:OpenIdProvider` service endpoint equal to `iss`; an issuer in `trustedIssuers` skips that fetch.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/CidIssuerResolver.ts#L55-L105",
+          "version": "repo-lines-v1:sha256:a0eb972748b78a4a9c6d396f05b80bc3d2b6673c4c1f114f07d3c526d16eaf37:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlYThiMzRkYmE4MDgwMGRkYjFhNGRkNWUxZWNkNDlkYmI1OTNlZTY0YTlhZmNlZTI5MDI1M2RhMjM3OTEwYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxYmEzYmZhNDAyY2M3YWNjZmFmMjkxYjJiMGY3YzA4NzM1OWU5OGEzZjA5NjE1YTA0MjMxM2VjMjQ1NWVlOGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliODI4ZjQwMGQ5YzYwNDYwZTIwNTI3MmY1MGE1OWE0OTlkODY5MGE4YWMyNmU1ZmJkYzkzYzA0ZTY5MzlhNWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlOTQxNTM4YzlhYmRjY2ZiNWRiOTkyNGYzMWQ0OGViZDM5N2I1ZGEyZWI0MTQyZDBjMGE5MGNmNjEyYTZiODUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L130-L150",
+          "version": "repo-lines-v1:sha256:8ab28d362aaa8f316229dc30f88c9556cbc5c0409d60c3424d06addacd51d76c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNzE4YjQyMTZhZThmZjIxODE4OGZiMjg3NmE4NjBiOGM2NzZkMmMzYTRjMGQ5NGVhNGEwMGNhZjAxYWU5NzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0NjIyMjM3OGQ3MjJmMzQ4MjE4OWMzYjkxYjE0OTI1M2ZhOTFiYmIxMTRiMDkwYmU5ZTQwNjY5YTg1YTI4NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlZDdlMTFkOWVjYWZmZTFhNmZmNDQ1ZjJkYjY1NzkzMWUwZDczYTgwNWI0NDI1YmY1M2YzOTVkODgyZTg0MGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_74ebc70dd3354e4ab92c2c84e3a54c3c",
+      "statement": "The federated issuer's keys are discovered from `/.well-known/openid-configuration` (issuer must match, `jwks_uri` required) with `/.well-known/lws-configuration` as fallback, and the remote JWKS is cached per issuer.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/CidIssuerResolver.ts#L155-L215",
+          "version": "repo-lines-v1:sha256:c46b4598bca4908825e0ea8ec32c693b0c2df3b318ba4331c66f8d522ef73afb:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzMTQwNTU2ZDI1Mjk3MjQ2YzEzOWI2ZjAyNGU5YWZjMzc4NWFlY2VkYTA1OWJlZmY3YzM4MTA0ODAxM2FlODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_76247b9b786c4abab37f1f357c815045",
+      "statement": "`IdJagTokenHandler` mints ID-JAGs only for known storage/authorization-server base URLs, this UAS, `.sai` URLs under this UAS, or `.sai` URLs whose origin is a configured authorization-server origin; any other `.sai` audience is rejected as `invalid_target`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L650-L710",
+          "version": "repo-lines-v1:sha256:7c42476f8e465ad9190f7f9fe93318872fd4cb1228dc92fdbb34377491055b20:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2NWY0MjQ1N2ViNDhhM2E1OGEwY2UzYzJiZmRlODg1MGZhMTc4MzU2YzU4ZTg2Yjc3NDQ5MGFlOGVjMzFiYzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhYmJmOGRiYjAxZGI0MzkzOWE0ZGUyNzk4ZjYzOWUxZmI4MDlkNWM4ZTc3YzcxYmExZjliNDE1MDBjMTNjZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlYWYzMWMyZTIyYTY0Mzk1YTViMmQzODM1NzQ0MWQ2NWQzYjRmYmRiYjAyNDk5ODAyNjI5OWJjZTFjY2RjYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwN2I1YWM2OWYwNjc5MWNiN2FhZjQxNzU3M2I5MWQ1NmI0NGU5MGYzNDEwYzVjNmU4MWEyNjExMTdlN2YxMzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ef9876d73c3e4cddaa6e4fdd07d54882",
+      "statement": "`services/id` derives a CID document that exposes a WebID profile's `solid:oidcIssuer` as an `lws:OpenIdProvider` service with that issuer as its `serviceEndpoint`, which is the giving side of federated ID-JAG trust.",
+      "evidence": [
+        {
+          "resource": "repo://services/id/cid.ts#L21-L41",
+          "version": "repo-lines-v1:sha256:7058cc6238cdcc275200cf1878fb1f07f556b9d0a8bce30a4e5bb026757d0fc4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwMjcyMzA1OTQ0N2E1OTc4NDkxZDM2ZDAxNmExZjhmZTk0ZDJiY2VlZmQzMWViOWJiYjNhZjY0MDY3OWRiYjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOGJhMGYwYzE2YjA3N2ViMjExMGZmNjdiYjNlYTdlMmMwOGQ5NDk0ZDIxZDJmN2M0NjhlYTg4MjUwZWI1YjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzZjQyZmY0OWI0MThmZDYxNGM3NWRiMDY2M2FlYmNiMGIyM2YyYzQzY2U2MWZlZDAyNjUwMDQ3NDEwMmNlMGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkZWI5YjYxMGViNDNjYTZiNDc0YjU4NWJhOWFiZmYwNTk2ZmJhMzE3MzI2MmVlMzFhMjY1NTc1YjFhN2QzMzgifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

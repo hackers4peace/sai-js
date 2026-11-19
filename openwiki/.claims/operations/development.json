@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a0fe35c92f43d4e3163e8186f5ac47bb93daed1d3c3f233820bea2151b1bed37",
+  "pageVersion": "sha256:4549a4b8b20c0c24b6f017c07a8016f1375eef321157a0af93265baa901b006b",
   "claims": [
     {
       "id": "claim_8c7199519a8143bcb06e138d401a49f2",
@@ -135,10 +135,48 @@
           "version": "repo-lines-v1:sha256:87523417454ec9088cb16ed7de722480165af4606cfe748a2102d8d8b868378b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxNzgyYWExZTkyZDkwYTc3OTAzZGU4YzhjZTY3MjA2NjU2MTE2MDc4NmFiNGEwMGZkYmZjMzIwZGJmYWQzOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiOTFmNTRjNTAwMWQzYTYyNmViNTEyOTE1ZDFkMThiOTFmN2MyZDRiYmZlZjM1ODE1MmIwZTU3YzJmYWM4ODAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0NGYwOGI0YjFiNjU3NGFiMzdiYzM3MGQ3MWRmNWYzOWNlNTIxMGY5MGVhNTAxNzRmZTQ4NDQwNTE0MjEzNDUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_8bf94fcff46c43df813fc144c271e0ba",
+      "statement": "The `/test` suite runs through Dagger from Devbox (`dagger call --tempo-endpoint=… test`), can be narrowed with `--testFile`/`--only`, and `--tempo-endpoint` must point at the Docker host gateway because Dagger containers cannot resolve the compose `tempo` service.",
+      "evidence": [
+        {
+          "resource": "repo://.agents/skills/dagger/SKILL.md#L1-L70",
+          "version": "repo-lines-v1:sha256:abe290a4c1a571eab12768e7ff86d106fd849bab786b0e5f74c3c0f3b995fae0:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyYWI1ZWM1MTlmNDY3M2RkYmY0OTE2ZDI1ZTg3OGY3OWZlZDVhODUwMTE2NmVjZGJiOWZmNDdjOGNlYTNmMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhNWEyZWQ3YjhiNjUxNjJlYjk4Y2E0NTNiMzMzMDk4OGIwMTg4ZGVjMDRkN2YzZDQ0MjgxOGUwN2FjYWEwYmQifQ"
+        },
+        {
+          "resource": "repo://devbox.json#L1-L54",
+          "version": "repo-lines-v1:sha256:9c91b9fc9096e972464e2521cc1e8a49859b79f883d9e2c0095a2bfff1c274e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_33944a7c6be64afa84588b7067c0d402",
+      "statement": "The Dagger debugger proxy exposes inspector ports 9240 (vitest), 9229 (auth), 9230 (registry), 9231 (data), and 9235 (worker); the test runner starts with `--inspect-brk`, so it pauses before the suite runs.",
+      "evidence": [
+        {
+          "resource": "repo://.agents/skills/dagger/SKILL.md#L30-L78",
+          "version": "repo-lines-v1:sha256:d75a5de1e58a160d960e90bbcee7f055b7b474457e8957b4972f48dec1d3b131:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiODI0YWU5MTUzNjIxOWYzMGQ3Nzg5N2E1MzA4ZDIwNDBkZWFlMzc3ZmI3ODYzODU1YWFjM2Y2NTIyZTU5NmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlZTM0ZWM5ZTM2NGRlYjczMGNlYTBmMDc0MTM5NGUxNTAzYzZiNWE4ZDIwNTFkMmFkMjRhY2RjYzQyNDU3NjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlYjZjMDlhMDA0NjgxZjE2MDYyY2NlMTI1Mzc4ZGE1NTZjMDNkMzA4MThhM2U4MjQ5Mjk1NTAxMDRmMThkNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_620efeef31e945ffb56da2e56cbd9e1c",
+      "statement": "Package tests run as plain vitest (`npx vitest run packages/...`), while `devbox run -- local-css` builds a local CommunitySolidServer checkout and `devbox run -- fork-css` restores the pinned fork before running Dagger.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L1-L16",
+          "version": "repo-lines-v1:sha256:53e528fd7530b6baa6f0f1590033577034e6016e06de42e1be02be0063d08cf4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYWQ1MTk4OTU5MDYzZWMwZDYzZGVkNGI0NmI1ODliYjgyOWI3YzUyOWYzZTM5ZGUyYTBiOGFmMjNjY2MxMjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmNjhiMmEwYzE3NTgwOTNlNGUwNWYwYWQ1ODdjYzM4MDI4NjQ5OTYzMGE3MmIwNmYxMjZjYzhjNjE2ZWE0OGEifQ"
+        },
+        {
+          "resource": "repo://devbox.json#L30-L54",
+          "version": "repo-lines-v1:sha256:2c0dbb715fcdf13619f9912e8cc459e91afd3d9ced2761da86072ecf9f3beaa4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2MjRmYTYyMDQwNDcwN2JkZDEwZDY5Y2Y1OWJiZTJmMTUzZTliZDZiMDI2NzFmYWQ1NDgwYWYyOTJmZTRiMzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyMGU5MmIzMzMyNWNhYjYwZjk3N2JhYThmYWNkNjhiOTE5ODcxZTJhY2RiZGViNTVkMjYzNjBlZDVjMGZjZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

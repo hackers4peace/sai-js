@@ -1,7 +1,7 @@
 ---
 type: index
 title: Quickstart
-description: Task-routing map of the sai-js wiki — architecture, data model, service layer, activity pipeline, Temporal workflows, revocation and grant projections, grant reuse, UI, testing, and operations pages at a glance.
+description: Task-routing map of the sai-js wiki — architecture, `.sai` authentication, data model, service layer, activity pipeline, Temporal workflows, revocation and grant projections, grant reuse, UI, testing, and operations pages at a glance.
 tags: [quickstart, index, navigation]
 sources:
   - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
@@ -14,18 +14,22 @@ sources:
     resource: repo://packages/components/src/ApiHandler.ts
   - id: openwiki-source-759ab06bf1f6a0b228effe16
     resource: repo://packages/components/src/IdJagTokenHandler.ts
+  - id: openwiki-source-56e7dcd44fb9baa1be3d7400
+    resource: repo://packages/components/src/SaiSession.ts
   - id: openwiki-source-3e8f48f62968e08a27cd3572
     resource: repo://packages/components/src/services/Account.ts
+  - id: openwiki-source-ce3937bfbcfbea447784ab6a
+    resource: repo://packages/components/src/SessionManager.ts
   - id: openwiki-source-431ff780c51bd57ac5545ec1
     resource: repo://packages/components/src/StorageExchangeAccessPolicy.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
     resource: repo://README.md
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Quickstart
@@ -42,6 +46,7 @@ Use this map to find the page for the topic you need.
 | See the production landscape | [Deployment landscape](architecture/deployment-landscape.md) |
 | Understand per-pod storage and isolation | [Per-pod storage and isolation](architecture/storage-isolation.md) |
 | Understand the LWS/ID-JAG token model | [ID-JAG access claims and impersonation](architecture/id-jag-access-claims.md) |
+| Authenticate `.sai` endpoints (ID-JAG, sessions, audiences) | [SAI endpoint authentication](architecture/sai-endpoint-authentication.md) |
 | Understand the LWS client and tracing | [LWS auth client and tracing](architecture/lws-auth.md) |
 | Understand org admins and contexts | [Organization admin model](architecture/org-admin.md) |
 | Understand registry ACP scoping | [Registry permissions and admin scoping](architecture/registry-permissions.md) |
@@ -62,6 +67,7 @@ Use this map to find the page for the topic you need.
 | Set up local development | [Local development environment](operations/development.md) |
 | Deploy and observe | [Production deployment and observability](operations/deployment.md) |
 | Run the test suite | [Integration test suite](testing/integration-tests.md) |
+| Run package tests or the Dagger suite locally | [Local development environment](operations/development.md) |
 | Inspect the supporting services | [Auxiliary services](integrations/auxiliary-services.md) |
 
 ## Core flow in one line
@@ -82,3 +88,8 @@ requests are authorized by the LWS token the client presents (an ODRL access
 claim, `scope: owner`/`admin`, or a public grant), not by a per-request grant
 registry read; see
 [ID-JAG access claims and impersonation](architecture/id-jag-access-claims.md).
+
+`.sai` requests use a second, narrower chain: the agent's UAS mints an
+identity-only ID-JAG for the target `.sai` URL and the request carries it as a
+Bearer token; the DPoP credential never reaches a `.sai` route or a storage. See
+[SAI endpoint authentication](architecture/sai-endpoint-authentication.md).

@@ -4,6 +4,8 @@ title: Integration test suite
 description: The Dagger-driven integration suite — seeded environments/data, per-test re-seed, the waitForQuiescence/awaitGrantCompletion race-prevention helpers, and what each test file verifies.
 tags: [testing, dagger, vitest, integration, race-prevention]
 sources:
+  - id: openwiki-source-11050270ee18c3cf0befcc2d
+    resource: repo://.agents/skills/dagger/SKILL.md
   - id: openwiki-source-a8a954b9de2bc6c0b4ca5044
     resource: repo://.dagger/src/index.ts
   - id: openwiki-source-6028df227cf0c5e36d839191
@@ -26,16 +28,26 @@ sources:
     resource: repo://packages/components/test/check-equivalence-activity.test.ts
   - id: openwiki-source-88e59fc8baf4f02379e91f1d
     resource: repo://packages/components/test/check-equivalence.test.ts
+  - id: openwiki-source-14f016a08950d02c04fe8380
+    resource: repo://packages/components/test/cid-issuer-resolver.test.ts
   - id: openwiki-source-9b409abe21ade962fb73ed30
     resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-23684c4afa0b096bb7c0aa5d
     resource: repo://packages/components/test/durable-webhook-emitter.test.ts
   - id: openwiki-source-d86eb75db262e88d8237c824
     resource: repo://packages/components/test/grants-workflow.test.ts
+  - id: openwiki-source-5c8daa4a401350389ed2802c
+    resource: repo://packages/components/test/id-jag-credentials-extractor.test.ts
+  - id: openwiki-source-468c0b6b6d320c9192f23507
+    resource: repo://packages/components/test/id-jag.test.ts
   - id: openwiki-source-015d2f3faf2ecfac16eafb8e
     resource: repo://packages/components/test/reciprocal-mirror.test.ts
   - id: openwiki-source-c4ce6c0448c661ad179c011a
     resource: repo://packages/components/test/reciprocal-sync.test.ts
+  - id: openwiki-source-db0c82dfb6330be67f3f0dfc
+    resource: repo://packages/components/test/sai-self-issued-access-token-verifier.test.ts
+  - id: openwiki-source-ea587af8d26862f6d98de647
+    resource: repo://packages/components/test/url.test.ts
   - id: openwiki-source-81028398d49b5413dde247f1
     resource: repo://packages/test-utils/src/fuseki.ts
   - id: openwiki-source-ddee6cdb17da2778a3b56d4c
@@ -56,10 +68,10 @@ sources:
     resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Integration test suite
@@ -83,6 +95,15 @@ function runs a Temporal-reachability wait before `vitest run
 --no-file-parallelism` (and accepts `--tempo-endpoint` so Dagger runs can export
 OTLP to a host Tempo). `test/proxy.js` forwards local ports to the debug
 services.
+
+Run it from Devbox (the Dagger runner host variable is set there, not in a
+plain shell) — `devbox run -- bash -lc 'dagger call
+--tempo-endpoint=http://172.16.0.1:4318 test'`; use `--testFile=…` and
+`--only=…` to narrow a run without rebuilding the cluster, and
+`proxy-service … up --ports …` to attach the debugger. The details and the
+inspector port map are in the repository's `dagger` skill
+([`.agents/skills/dagger/SKILL.md`](../../.agents/skills/dagger/SKILL.md)) and
+[Local development environment](../operations/development.md).
 
 ## Seed and per-test reset
 
@@ -254,9 +275,25 @@ the black-box `/test` suite may not.
 
 ## Package-level LWS and org-context tests
 
-- `packages/components/test/id-jag.test.ts` and
-  `id-jag-subject-token-verifier.test.ts` — ID-JAG issuance/verification, typ
-  pinning, audience checks.
+- `packages/components/test/id-jag.test.ts` — ID-JAG issuance and token-handler
+  audience policy: storage/UAS base URLs, the auth base URL, `.sai` interaction
+  URLs under it, `.sai` URLs of configured peer UASs, and rejection of
+  lookalikes and unknown peers.
+- `id-jag-subject-token-verifier.test.ts` — ID-JAG verification, `typ` pinning,
+  exact audiences for storages, `audiencePrefix` for the auth verifier, and the
+  trusted-issuer vs CID paths.
+- `id-jag-credentials-extractor.test.ts` — the `.sai` extractor: verified
+  subject→agent mapping, optional access claim, and no claim on a request
+  without a Bearer token (the public fallback).
+- `sai-self-issued-access-token-verifier.test.ts` — first-hop token: `at+jwt`
+  pinning, DPoP key binding, issuer/audience, HTTPS identifiers, and the
+  access-token subject type.
+- `cid-issuer-resolver.test.ts` — CID document parsing (JSON and Turtle), the
+  `lws:OpenIdProvider` endpoint match, `id === sub`, JWKS discovery via OIDC
+  then LWS metadata, and the fail-closed cases.
+- `url.test.ts` — `saiAudience` (agent discovery vs full request URL),
+  `isWithinBaseUrl` (lookalike origins, sibling paths, malformed URLs), and
+  `isSaiUrl`.
 - `access-claim.test.ts`, `grant-policy.test.ts`, and
   `policy-engine-claim.test.ts` — claim parsing, coverage semantics, and the
   claim-first policy engine.
@@ -267,6 +304,9 @@ the black-box `/test` suite may not.
 - `peer-data.test.ts` — peer document and instance reads through the storage
   fetch.
 - `lws-live.test.ts` — live LWS metadata/discovery behavior.
+- `http-capture.test.ts` — token/body capture, redaction, and the exclusion of
+  `application/x-ndjson` / `text/event-stream` bodies so a stream is never
+  buffered by the capture wrapper.
 
 ## Coverage
 

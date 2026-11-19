@@ -1,11 +1,8 @@
 ---
 type: architecture
 title: Federation constraints
-description: The single-deployment shortcuts the SAI implementation still relies on — per-pod storage, peer discovery, local pod ownership, the org registry-set link, and one notification path — the reciprocal mirror and admin impersonation that have landed, and what must keep working when servers split.
-tags: [architecture, federation, storage, discovery, org-context, webhooks, mirror]
-verified:
-  - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+description: The single-deployment shortcuts the SAI implementation still relies on — per-pod storage, peer discovery, local pod ownership, the org registry-set link, and one notification path — the federated ID-JAG issuer resolution through subject CID documents, the reciprocal mirror and admin impersonation that have landed, and what must keep working when servers split.
+tags: [architecture, federation, storage, discovery, org-context, webhooks, mirror, id-jag]
 sources:
   - id: openwiki-source-0531e8ebff475ca0a556fc29
     resource: repo://packages/authorization-agent/src/grant-generation.ts
@@ -15,8 +12,14 @@ sources:
     resource: repo://packages/components/config/overrides/emitter.json
   - id: openwiki-source-90c157df451973113a63b968
     resource: repo://packages/components/src/AdminImpersonationAuthority.ts
+  - id: openwiki-source-d5b18f1bbc300c60de0dee27
+    resource: repo://packages/components/src/CidIssuerResolver.ts
   - id: openwiki-source-06025454564b63e0817ca135
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
+  - id: openwiki-source-95310ca3c4786b5a5c369581
+    resource: repo://packages/components/src/IdJagSubjectTokenVerifier.ts
+  - id: openwiki-source-759ab06bf1f6a0b228effe16
+    resource: repo://packages/components/src/IdJagTokenHandler.ts
   - id: openwiki-source-09198068dc92d7c890b3e305
     resource: repo://packages/components/src/services/peerData.ts
   - id: openwiki-source-c4233c9bce7ccb07d3edd54a
@@ -33,7 +36,12 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
   - id: openwiki-source-4b9eeba4dd0aabcf86743edc
     resource: repo://packages/components/src/temporal/workflows/webhook-delivery.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+  - id: openwiki-source-04f6a81cd8f58552c8dfc86f
+    resource: repo://services/id/cid.ts
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Federation constraints
@@ -51,7 +59,8 @@ federation lands.
 | --- | --- | --- | --- |
 | 1 | One shared SPARQL store | Dev/test and the NixOS/Podman stack use one Fuseki dataset per registry/data pod plus a dedicated `id` dataset, resolved through `PodEndpointStore` with **no default fallback**. The C4 model still says Oxigraph; see [Deployment landscape](deployment-landscape.md) and [Per-pod storage and isolation](storage-isolation.md). | The old cross-graph grant query (`GRAPH ?g {?s interop:hasStorage <storage>}` over every graph) no longer sees other owners' grants. The per-pod replacement is two lookups: the resource's data-pod dataset for the resource graph (`SaiPermissionsEngine`), and the storage owner's registry-pod dataset for grants (`SaiAuthorizationManager` via `podStore.getOwners` → `registryId(owner)`). |
 | 1a | Reciprocal mirrors | `updateReciprocalMirror` writes the peer's reciprocal registration and the grants it links into the context's own registry-pod dataset. The mirror is **seeded on both invitation legs** — `establishReciprocal` (inviter) and `acceptInvitation` (acceptor) — before their activity completes, and afterwards refreshed **only** by the per-peer delegated-grants consumer (`processDelegatedGrantsUpdated`, workflow id `delegated-grants:<webId>:<peerId>`): each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration`, then regenerates the delegated grants from the fresh mirror, then completes the activity. The mirror is the input to delegated-grant generation, not a UI cache. | The mirror is the **only** source for grants the peer issued to us once stores are split; freshness is eventually consistent and depends on webhook delivery. A delivery that never arrives, or a pair whose mirror was never written, is repaired by the reconciliation sweep's local completeness arm (see [Authorization revocation and grant projections](authorization-revocation.md)); the cutover backfill and drift scan are **not implemented** (issue #108). A `404`/`410` on the peer's registration is terminal (the replica is dropped and the activity completes without regenerating); every other failure keeps retrying, and after the 5-attempt cap a permanently unreadable peer leaves the activity `pending` (issue #112). Unregister propagation (`deleteReciprocalMirror`) is implemented but still has no caller. |
-| 2 | UAS/storage discovery uses the global `fetch` | `SaiPermissionsEngine` and the peer-data layer call `discoverAuthorizationAgent(agent, fetch)` / `fetchJsonLd` with the global fetch; storage-description discovery does the same. | Peers' WebID profiles and storage descriptions must be reachable and DNS-resolvable. Revisit when servers are actually split across hosts. |
+| 2 | Discovery uses the global `fetch` | `SaiPermissionsEngine` and the peer-data layer call `discoverAuthorizationAgent(agent, fetch)` / `fetchJsonLd` with the global fetch; storage-description discovery does the same. ID-JAG verification is the exception: `CidIssuerResolver` takes an injectable fetch and dereferences the subject CID document plus the issuer's key metadata itself. | Peers' WebID profiles, CID documents, issuer metadata, and storage descriptions must be reachable and DNS-resolvable. A federated grant fails closed when its subject document or JWKS cannot be read. |
+| 2a | ID-JAG issuer trust spans servers | A verifier accepts an issuer from `trustedIssuers` or, for a federated `iss`, from the subject's controlled identifier document (`lws:OpenIdProvider` service endpoint equal to `iss`). | The issuing UAS must publish a CID document for the subject (`services/id` derives `lws:OpenIdProvider` from `solid:oidcIssuer`) and a discoverable JWKS; otherwise the grant is rejected. |
 | 3 | Pod/storage ownership is local | The storage exchange policy and the `?pod=` gate decide "owner of this storage" via the local `podStore.getOwners` / endpoint records. | A data server must mirror remote org ownership or resolve it on the wire (e.g. via the org's agent-id document / registry set). |
 | 4 | The org's Authorization Agent serves the registry-set link | The org's AA may live on a different server than the admin's; it serves the org's agent-id document and the admin-only `Link: <registrySet>; rel="interop:hasRegistrySet"` header, and runs the org's Activity Registry workflows. The admin's AA performs the UI interactions. | This is the **intended** federation shape for the registry plane: the header carries the authoritative RegistrySet IRI across servers. |
 | 5 | One notification path | The org's Activity Registry webhook reaches `ActivityWebhookHandler`; admin channels are forward-only (keyed by the admin's webId), so org-context events reach the admin's own stream without dispatching workflows. Registry and data webhook delivery is durable through `DurableWebhookEmitter` and the `webhook-delivery` Temporal queue. | Cross-server webhook delivery is durable; **channel provisioning is not implemented** for real deployments (issue #113). Without it, a fresh account has no handler subscription and the sweep is the only dispatcher. |
@@ -109,6 +118,44 @@ and no peer-owned grant deletion: reconciliation computes the local closure and
 deletes it with the owner session ([`grants.ts`](../../packages/components/src/temporal/workflows/grants.ts)).
 The mirror is still the **source** for grants a peer issued to us; that is the
 one cross-server direction the mirror exists for.
+
+## Federated ID-JAG issuer resolution
+
+An incoming ID-JAG may be minted by a UAS other than this deployment. The
+verifier resolves that trust on the wire, per grant, without a static peer list
+([`CidIssuerResolver.ts`](../../packages/components/src/CidIssuerResolver.ts),
+[`IdJagSubjectTokenVerifier.ts`](../../packages/components/src/IdJagSubjectTokenVerifier.ts)):
+
+1. If `trimTrailingSlashes(iss)` is in `trustedIssuers`, the issuer is local:
+   no subject document is fetched. This is the `.sai` interaction case too, where
+   `aud` is a full request URL and therefore differs from `iss`.
+2. Otherwise the verifier dereferences `sub` with
+   `Accept: application/ld+json, application/json;q=0.9, text/turtle;q=0.8, application/cid`.
+   A non-200 response is a rejection, not a retry.
+3. The document `id` must equal `sub`. A compact `application/cid`/plain-JSON
+   document is read directly (`service[]` with `type`/`serviceEndpoint`); JSON-LD
+   and Turtle go through the `RepresentationConverter`.
+4. A service with type `https://www.w3.org/ns/lws#OpenIdProvider` must exist and
+   its `serviceEndpoint` (CID `cid:serviceEndpoint` or DID
+   `did:serviceEndpoint`) must equal `iss` after trailing-slash normalization.
+   There is no `solid:oidcIssuer` fallback and no WebID/Solid-OIDC path.
+5. The issuer's key set comes from OIDC discovery
+   (`/.well-known/openid-configuration`, which must name the same `issuer` and a
+   `jwks_uri`) with the LWS metadata (`/.well-known/lws-configuration`) as
+   fallback; the remote JWKS is cached per issuer.
+
+Every failure (unreachable document, wrong `id`, no `lws:OpenIdProvider`
+service, endpoint mismatch, missing JWKS) is a `400` rejection of the grant.
+The giving side of this contract is the `services/id` CID derivation: a WebID
+profile's `solid:oidcIssuer` becomes a `did:service` of type
+`lws:OpenIdProvider` whose endpoint is that issuer
+([`services/id/cid.ts`](../../services/id/cid.ts)).
+
+`.sai` audiences follow the same split. `IdJagTokenHandler` accepts, as a
+minting audience, a known storage/authorization-server base URL, the UAS itself,
+any `.sai` URL under this UAS, or a `.sai` URL whose origin is in
+`authorizationServerOrigins` (configured peer UASs). Any other `.sai` URL is an
+`invalid_target`.
 
 ## Admin peer reads
 

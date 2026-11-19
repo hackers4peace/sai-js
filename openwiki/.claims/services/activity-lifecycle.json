@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:546f2e11d8a9620f1695b2c07a2cb358d0d1fed4735ad25d2152a212aa2fc8b2",
+  "pageVersion": "sha256:510ef2be208f41885e0ec354d05839aa17ace69aa11ed7e700ae721dbd59bf16",
   "claims": [
     {
       "id": "claim_2dbdd57724204bb28552ccc4b24a6ea5",
@@ -14,11 +14,11 @@
     },
     {
       "id": "claim_38da0b28dc0641ac92ec5b06d5824101",
-      "statement": "ActivityWebhookHandler.handle acts only on Add notifications with an object, forwards to the events bus before dispatch, and routes owner channels to workflow dispatch while non-owner (admin) channels return 200 forwarding-only.",
+      "statement": "`ActivityWebhookHandler.handle` acts only on `Add` notifications with an object, loads the activity with the channel's session, forwards to the events bus before dispatch, and routes owner channels to workflow dispatch while non-owner (admin) channels return 200 forwarding-only.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L92-L131",
-          "version": "repo-lines-v1:sha256:f37f8cad0869e291608efddc3b86d0f4a647ca8f5322b9faa49735547a1583ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOTk4ZDA1ZDg1YTE4NTk2ZDc5YTliZmFjYmVmNTFjYmUwMmRhZWVjYjU2NDgwNzAyZTJjNGQ4MmI4ZDI4MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExN2NmMmZhOTBlZTM4OGM1ODVkOGJiZTU3MzQ5OTZkMmY0NGQ4NDFiMjdjZmUyZmI1MjY3ZDQ3ZDNjYzQ5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwYTlmNWVkMzI1NWJjYTRiNDZkYzNmMTNhNDZiODI0MTEzN2RjNzdiMDAxN2Y5OGMzNGU1ODdmMzNlMGYyZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMDM2MmY4ZmNlZjBkMWNhZjc5MjIxZGRiZjM5NTBjZmJmMzAyNzU0ZWFiYjE3ZDM2OWZhNDk1ODBjMDBiNDAifQ"
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L90-L142",
+          "version": "repo-lines-v1:sha256:d669bfd9aef8b61a3cabcbc8d8d2881cdc1063d43e87d4992cd7aa60d1b368bd:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlZDNkMzczYTExMWRjY2FjYjZiOThlMTJjNDI1ZmI4NjFlOTdiMDYwMGNiNzhkYjkyYzYzY2Q5MmE1ZDc3NTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ODgzMTkxYWY5OWI2YjllOTA3NWUzOTczMjU5YWMxNWJlMzc5ZTFhYWI3ZTc5MjgzNDc0ODU2N2NkYWYxYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2OGM0ZTY3NTViMjI5OWExNzdhODUyMzVlZDc3OWRhMGI0OGMxYjEyMTY2YTc1MmZiYzAyYzI0NmY3YmI3YzQifQ"
         }
       ]
     },
@@ -27,7 +27,7 @@
       "statement": "The owner-versus-observer decision compares session.registrySet.hasActivityRegistry.id to the channel topic, so an admin subscription forwards but does not run workflows.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L118-L127",
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L133-L142",
           "version": "repo-lines-v1:sha256:7ed144b4c42161b5566aa3158c0774f9ce88c1f649687e8b4015e9dccf19cc80:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkNDMyMGM3OGQ4NmU4NjlkZWVmNTkyZjc4OTg5MTM2ZmMzNWNjOWIxYjBiMzZiODE2NjZmODNhOTFhZmQzMzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlZDNkMzczYTExMWRjY2FjYjZiOThlMTJjNDI1ZmI4NjFlOTdiMDYwMGNiNzhkYjkyYzYzY2Q5MmE1ZDc3NTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1MTgxODc0ZThiNmI2YWEzZTgzYmYyNjE0YmFmOTEwNzkzZDcxNDIyNDg5ZmM2ZWM1NTQ2YjcyOTU2MTk4MjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2OGM0ZTY3NTViMjI5OWExNzdhODUyMzVlZDc3OWRhMGI0OGMxYjEyMTY2YTc1MmZiYzAyYzI0NmY3YmI3YzQifQ"
         }
       ]
@@ -109,7 +109,7 @@
       "statement": "The AgentRegistrationAdded activity is dispatched to the establishReciprocal workflow on the reciprocal-registration task queue.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L237-L240",
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L252-L255",
           "version": "repo-lines-v1:sha256:ef69a87d1e9f751d50429629413a16d1e0c5744b8a81f3dce283625103ac620e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJhNDZhNmYyNmUwZjYxM2NmNGE5OTE5ZjMyMmIwMWVlM2M3YzE3NWFlMDU3ZjI0MjJjM2FiZmY1MzQ5ODYyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2RkYWRiZTlmMGI2ZjBjNjkzNzFlZWJmMjg5OGFiOWM2Njc0OTZkMDAzOTVmZWQ1MDc1YTVmZGYzZjhlZTQ3NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ5N2ZmYTA3YjcwOTFjOTE4N2RlYjQxMDJjYmEyY2Q5MjNlYjUwYjY4MDQ5NDc3MTE3ZDk3MWM4YmNhMTlkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTNjMTU3NTA2ZWUwOTE1NTUzNDAyODNjZTU3YjRiZWZjYTVkZGI3NjRjN2ViMWEyYjQwNWExMDg4ZGFiYzFlMCJ9"
         }
       ]
@@ -251,7 +251,7 @@
       "statement": "AuthorizationRevoked is produced by the RevokeAuthorizations service and consumed by one processAuthorizationRevoked run per activity, started by the webhook handler and re-driven by the reconcile sweep, with no per-grantee consumer.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L270-L286",
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L285-L301",
           "version": "repo-lines-v1:sha256:84434643b1e1b20a6417b9c2c91d6aaa9988b902d6aa0a6aa324e3e692e1bbd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwNDE5NTQ2YzRkMTdhZGY1NGY4NDc4OTczZjEwMzg2NDVmYzBiMTk1Zjk5MzNiNjg3OWJkMjY4ZmRmODEwY2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5MDBjN2ZjNDQwMGY2MmUyOWQ3NjVkM2NiMjA4ZjUyOGJhMTJiYjdjYmZhM2Q2ZTkxY2YyNzY2ZjNjYTNiN2EifQ"
         },
         {
@@ -263,10 +263,24 @@
           "version": "repo-lines-v1:sha256:9874d324ba28368c4b9f193e541a55e9b0f268473c120f3d23cce4e756c7b8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhY2M0NTg4ZjQyMzA4MTYyZGExMmE3YThmNWVhZWFlMjA5YWY2OWMzYjM3ZGU3MDQyNjA2MjcxYzRiOWU2YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDczNjU1N2RmZjcwZmMxYzcyMjUwZjFiY2UzY2M1ZTA1NzQ5ZjI0OTAxYjFlOTI1MmIxYzNkYTIzOTdiNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_16008151cbb94b128ab0ebfde8264fc6",
+      "statement": "When a queued `Add` names a source activity that returns `404`, the handler answers `410 Gone`; the delivery activity treats `410` as non-retryable, so a delivery orphaned by a seed/reset cannot keep the activity pending.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L106-L122",
+          "version": "repo-lines-v1:sha256:36e6d87b6c59980c56066b3a2f54abeb7a96ec5805f435e227d4c5c14dec4377:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2MTU0YThiZjgyYWM3MjdmMDJlZWIwMjlmZGFkNDVmZjFmOGRlM2E3ZTJjYjVjOTgzNjY0OWMwZDQwMTI2NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyMTFhY2UyMTNhMzU2NDY4Nzk2MGZiNjMyMzQwZjVjMDg0OTlhYWNlY2QwM2YwYWZkNDQ5YTNhY2ViZTllYjIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts",
+          "version": "repo-file-v1:sha256:042dd6ad99a3c53ac5f5762d3ac7008cd4ec35b5ceb9d2845157c645b24ebe1d"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

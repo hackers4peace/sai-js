@@ -5,8 +5,10 @@ description: Design decisions that are recorded but not implemented — creation
 tags: [design, backlog, auditing, access-requests, n3, refactoring]
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 sources:
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
   - id: openwiki-source-39263cf4b989bfbe674c72c0
     resource: repo://packages/api-messages/src/effect.ts
   - id: openwiki-source-fc4b5fd3338ed5d4ced2af52
@@ -31,7 +33,7 @@ sources:
     resource: repo://packages/utils/src/namespaces.ts
   - id: openwiki-source-863d51dc4bd9535a1e557732
     resource: repo://packages/utils/test/match.test.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 ---
 
 # Deferred and open designs
@@ -40,6 +42,10 @@ This page records design decisions that are **not implemented** so they do not
 get mistaken for current behavior. Each section states what exists today, what
 was decided or recommended, and where the work is tracked. The GitHub issue
 numbers refer to `hackers4peace/sai-js`; they are not API contracts.
+
+The repository keeps its design notes in this wiki now: the former
+`docs/plans/` tree and `docs/plan.md` were deleted once their content landed in
+code and pages, so links below point at wiki pages rather than plan files.
 
 ## 1. Generic creation-metadata auditing
 
@@ -107,6 +113,13 @@ caller remains. Tracked as issue #115.
 [`components/src/services/ReciprocalMirror.ts`](../../packages/components/src/services/ReciprocalMirror.ts),
 [`test-utils/src/fuseki.ts`](../../packages/test-utils/src/fuseki.ts)).
 
+This inventory is unaffected by the authentication cleanup: the browser OIDC
+client `@uvdsl/solid-oidc-client-browser` is gone from
+`packages/components/package.json`, and the root `@solid/access-token-verifier`
+override is gone from `sai-js/package.json`, but no `n3` manifest changed (see
+[SAI endpoint authentication](sai-endpoint-authentication.md) for that
+migration).
+
 `fetch-sparql-endpoint` keeps `n3` in `node_modules` regardless, so removing
 direct manifests is dependency hygiene, not a functional requirement. The
 recommended option is a **partial drop**: swap `Store`/`DataFactory` to
@@ -154,3 +167,13 @@ The same boundary discussion covers moving residual SAI rules out of components
 | `n3` reduction | direct dependency in six packages; partial drop recommended | #128 |
 | Temporal extraction | all Temporal code still in components; cycle decision open | #136 |
 | Residual components logic | engine predicates, admin marker, admin-grant materialization, plane `findRegistration` | #104–#107 |
+
+## Related pages
+
+- [Architecture overview](overview.md) — package topology and the dependency
+  changes already made.
+- [Domain-logic placement](domain-logic-placement.md) — service/workflow/AA
+  boundary.
+- [Federation constraints](federation.md) — what is still single-deployment.
+- [Authorization revocation and grant projections](authorization-revocation.md)
+  — reconciliation/backfill behavior.

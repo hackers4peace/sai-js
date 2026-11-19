@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:3886a2b97d10b314d1f51be3a289256d952d952994aa0e0aa099b1a23d6bcb6c",
+  "pageVersion": "sha256:943eff6b4d1c216da699cba2beb2e54f09e2ae8c78a53912c67df68ec6668803",
   "claims": [
     {
       "id": "claim_cdb927c3d0174925b70f73d9558c35a0",
@@ -54,11 +54,11 @@
     },
     {
       "id": "claim_d155b6b2f5e34bda934c182b7a14a045",
-      "statement": "SessionManager builds an owner-scoped podUrl-to-endpoint allowlist from the owner's endpoint records and passes it to AuthorizationAgent.build as sparqlEndpoints; a session whose registry-pod endpoint is missing throws rather than falling back.",
+      "statement": "`SessionManager.getSession` builds an owner-scoped podUrl-to-endpoint allowlist from the owner's endpoint records and passes it to `AuthorizationAgent.build` as `sparqlEndpoints`; a session whose registry-pod endpoint is missing throws rather than falling back.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/SessionManager.ts#L205-L250",
-          "version": "repo-lines-v1:sha256:56c77bf08963154a584af2b5d0b1c9b61ebc1577c64812d5b4362c8ae06e1151:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZmU5MDVmNzRkNWI2MWM5MGQ4YWViZDg0NTU0NTk4N2IyOTA4MDFiNmM1NjBjZjdhZGNmMDRhNmU4MTJkZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyYjc0NzhlYmRmM2RlZWFmOTNmNjAwNmZjYzhiZjllOWFjYjBjYTBmOWY2MDhlODU0Y2U3NTIxNDM2MGYzMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "resource": "repo://packages/components/src/SessionManager.ts#L186-L228",
+          "version": "repo-lines-v1:sha256:f6164600d8c28d856caec143fff901c2a13f5e73398b503b0d11173b1c71ef4c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiZjE3YmQwZGY4MjJlNDhjMTdmMjhhMDliNGM3ZWU3NDcxYTU1NTY0ZDNkMGE5MzJjZDg5OTBiNzA3N2I1ZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NzVlOTRhOTA0YWM0OWIzMTU0ZDQ2NzJhNjZlODYyOWI4NmRhYzc0ZTNlMjkzN2JlNjkyN2FlM2RhMTFjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyZGQ2ZDUwYzg1ZGY5MWQ3ZGI5YjJjZDU5YTU3ODhmOTE1MGM5MjI3ODJhY2MzYzNmYzE0ZjhkMzk3ZDg1NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
         }
       ]
     },
@@ -133,10 +133,24 @@
           "version": "repo-lines-v1:sha256:62b68144b8a73d806addb341311f76a110a8f7eca1bd94a46bd87d6d28ae0aba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4NWQ3MWVkMDdjZGY0N2QxYmQyNWY0YWFmYWI5NDQzMzZhNTRmYzFhZTA5YWYyMmE1OWUyMzBmODM5NTU5MzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzM2M0ZTk4NGE2YmJiMTA2YWU5YTVkYzFhMjAxYTI2N2I5NGM4YmIxMGJhMjczZmE0OGMzMDdiN2VkZDcyM2IifQ"
         }
       ]
+    },
+    {
+      "id": "claim_887ecc3779d945db92e47b6f143a17b4",
+      "statement": "Session requests are routed by URL: `.sai` URLs and same-origin auth URLs use the ID-JAG fetch, while data and registry requests use `createLwsAuthFetch` seeded with exactly the owner's pod URLs plus the registry pod, so neither the credential nor a `.sai` grant is sent to a storage.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiSession.ts#L40-L52",
+          "version": "repo-lines-v1:sha256:a545d6ab41bfdc8edcb4ae69053e6bf724bf7e4d7166f1ba80f23892e01d67e2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhZTlhMWRkNDM0NWE1NjgxYWE3YjE2NmNhYzA3OGU4MjI5Mzg5MWIyNDQyZDAyOGZlMzhhM2FlODY5ODk2MzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/SessionManager.ts#L204-L226",
+          "version": "repo-lines-v1:sha256:d20e2493af75b54bd16b92bcf7da245acf2524cdc54674f039e1300bbd63fa6c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4NDRmOWI4N2ViYWU5ZjBhNzRmMjQ1NWEwMDcyMDM1ZTZkNzBkMzlmOTRhY2U2MWU5ODFhMTQxYjQwMDk1MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZmJmOGJiOWZiZDgzNDA4MDEwNjJjOGQwOWEzMGViNTRjY2M3NDExYmQ0NDc4ODNlNzk2YzdiZDdkNWIyMTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllNTAwM2Y2ZGUxMDMwZjRiN2QyYzdiYzM2NTliMDRjNTVhMWY3MGUzNWY3MDBhMTI0NGQ3NzJmYjhiZTRiYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE3YTQwNWY2MzdiYzI5Mjc0MjdlODc5MDJkM2UyYzE3MTkxYzkxNjkzM2NhODQyZWM3MjkxYTkyNmEzZjIxYzQifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

@@ -1,13 +1,17 @@
 ---
 type: operations
 title: Local development environment
-description: The Docker Compose dev stack (auth, registry, data, worker, ui, vuejectron, router, dns, temporal, fuseki, garage, tempo, grafana), wildcard *.docker DNS via dnsmasq, mkcert TLS, Node 26, and the per-pod devbox seed workflow.
-tags: [operations, docker, development, dns, mkcert, devbox]
+description: The Docker Compose dev stack (auth, registry, data, worker, ui, vuejectron, router, dns, temporal, fuseki, garage, tempo, grafana), wildcard *.docker DNS via dnsmasq, mkcert TLS, Node 26, the per-pod devbox seed workflow, and the vitest/Dagger test loop with the debugger proxy.
+tags: [operations, docker, development, dns, mkcert, devbox, testing, dagger]
 sources:
+  - id: openwiki-source-11050270ee18c3cf0befcc2d
+    resource: repo://.agents/skills/dagger/SKILL.md
   - id: openwiki-source-a8a954b9de2bc6c0b4ca5044
     resource: repo://.dagger/src/index.ts
   - id: openwiki-source-4835a4ac60ade4980988746a
     resource: repo://.env
+  - id: openwiki-source-8037e2358a2c4f9b2c722a11
+    resource: repo://AGENTS.md
   - id: openwiki-source-09746815d483fcef938cf59c
     resource: repo://devbox.json
   - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
@@ -24,10 +28,10 @@ sources:
     resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-8dce2ce795a3d6ab234dc34d
     resource: repo://packages/repl/cmd.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Local development environment
@@ -95,6 +99,45 @@ The Dagger test harness binds the `registry` and `data` services to Temporal
 and runs a Temporal-reachability wait before vitest. That gate prevents the
 durable webhook emitter from paying the Temporal connect timeout on the first
 webhook in a test run.
+
+## Tests
+
+Package tests run directly on the host with vitest:
+
+```bash
+npx vitest run packages/components/test/id-jag.test.ts
+npx vitest run packages/lws-auth
+```
+
+The end-to-end suite under `/test` runs through Dagger and is invoked from
+Devbox so `_EXPERIMENTAL_DAGGER_RUNNER_HOST` is set
+([`.agents/skills/dagger/SKILL.md`](../../.agents/skills/dagger/SKILL.md),
+[Integration test suite](../testing/integration-tests.md)):
+
+```bash
+devbox run -- bash -lc \
+  'dagger call --tempo-endpoint=http://172.16.0.1:4318 test'
+```
+
+`--tempo-endpoint` exports traces to the compose Tempo service (use the Docker
+host gateway `172.16.0.1`; Dagger containers cannot resolve `tempo`). Narrow a
+run with `--testFile="org-context.test.ts roles.test.ts"` and
+`--only="<test name>"`. The full suite takes about 11 minutes. `devbox run --
+local-css` builds a local CommunitySolidServer checkout and passes it as
+`--css`; `devbox run -- fork-css` restores the pinned fork (`npm ci`) first.
+
+For a failing test, `dagger call ... proxy-service --test-file=<file> up --ports ...`
+exposes the test runner and the service processes on inspector ports (9240
+vitest, 9229 auth, 9230 registry, 9231 data, 9235 worker), for example
+`19229` etc. when the compose stack already holds the originals. The suite
+starts paused (`--inspect-brk`), so resume it before expecting tests to run.
+
+## Related pages
+
+- [Integration test suite](../testing/integration-tests.md) — fixtures, reseed,
+  and what each test file covers.
+- [Architecture overview](../architecture/overview.md) — the workspace layout.
+- [Production deployment](deployment.md) — NixOS/Podman.
 
 The dev URL→IRI mapping is in `environments/dev/map.json`; the production
 equivalent is the NixOS/Podman deployment documented in

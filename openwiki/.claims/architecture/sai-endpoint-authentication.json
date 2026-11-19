@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:d7a8591ee66a55e6d5ab3a76e52c43961a5ff3862eeb18718055513ae655a02a",
+  "claims": [
+    {
+      "id": "claim_21521641a33d48c8b5244024f0cbd92c",
+      "statement": "`.sai` requests are authenticated with an identity-only ID-JAG that the agent's own UAS mints from the DPoP-bound credential; the `.sai` request carries the grant as a plain Bearer token and no DPoP proof.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiSession.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:3b3d56b7052bf1d5f0e116cb81c2a6dd86281de7dd26930dbed8a673e518f2f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzNjA5Y2UxZjkxZDlmYzY1OWFkNDFkYWYwMGI3MGQyMTE1MDk0YTUwZjdmMTlkZTczMDE3ZTM1YmRkNzUwNGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiZTFlYWNjNWI3MTNhNDk1MTMxYzg3ZWUyNTgwYTU1NjA5MTI0MGYwYjdlMTNhMzk0MzE2ZDAwZGU3ZTdkMjUifQ"
+        },
+        {
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L216-L298",
+          "version": "repo-lines-v1:sha256:c2ae67ba8719451c3938cd1f6c9161a23b0baf08b1d77fbda04317afee986bb1:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5ODVlMjc2MjNlNzI0YmM3ZDJmNTFlNDQzMTMxNjlhNmYyMzA0ZjQ5MDhjOGYzMWIyNDIzNTRlMTBkYmUxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZWQzN2I4MzI3YTUwZjcyZTEwNjNhYTY3ZmFkODBhMDQxNTBjYzliYzdlZGYyYmMxYWJlOWMzZmE5NTEwNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9171ba6605a6429cbdd1f8e089c8da5b",
+      "statement": "The `.sai` ID-JAG audience is the target UAS origin for `/.sai/agents/*` and the full request URL (including query) for every other `.sai` route.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/util/url.ts#L40-L50",
+          "version": "repo-lines-v1:sha256:7146ae588c61d59ecbb4e2212e7c55079205bdc00d0e7e811d2365dbdeb19bce:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/test/url.test.ts#L1-L25",
+          "version": "repo-lines-v1:sha256:5c531a6a7ccac1fc6a099d229ef68783d8c69796fbe8a6c0e1f9b439936af0f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3MGE2N2Y0OWQ5Mzk3MTA0MmRjNTk1YzA5ZjMyMWNjNzZlZTE5NjNiNTkyNWFiNzMxNDQ3N2EzM2M0ZDhjM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxZjk1ZTZhOTRjY2Q1OTUwZjY2ZDcwNGEzZjhkOGZkZDRlZjZmZWFjYThlNzQ3NjRhZTBjNWJjN2NjMTA3ZDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2aa8cf73958549a99a48acf6e6bf44ae",
+      "statement": "Both `SaiSession.authFetch` and `SessionManager.getSession` route any `.sai` URL or same-origin auth URL through `createIdJagFetch`, and everything else through the two-step storage fetch.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiSession.ts#L40-L52",
+          "version": "repo-lines-v1:sha256:a545d6ab41bfdc8edcb4ae69053e6bf724bf7e4d7166f1ba80f23892e01d67e2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhZTlhMWRkNDM0NWE1NjgxYWE3YjE2NmNhYzA3OGU4MjI5Mzg5MWIyNDQyZDAyOGZlMzhhM2FlODY5ODk2MzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/SessionManager.ts#L186-L228",
+          "version": "repo-lines-v1:sha256:f6164600d8c28d856caec143fff901c2a13f5e73398b503b0d11173b1c71ef4c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiZjE3YmQwZGY4MjJlNDhjMTdmMjhhMDliNGM3ZWU3NDcxYTU1NTY0ZDNkMGE5MzJjZDg5OTBiNzA3N2I1ZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NzVlOTRhOTA0YWM0OWIzMTU0ZDQ2NzJhNjZlODYyOWI4NmRhYzc0ZTNlMjkzN2JlNjkyN2FlM2RhMTFjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyZGQ2ZDUwYzg1ZGY5MWQ3ZGI5YjJjZDU5YTU3ODhmOTE1MGM5MjI3ODJhY2MzYzNmYzE0ZjhkMzk3ZDg1NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cbe9799a7c86474193adde81dc6626a6",
+      "statement": "`IdJagCredentialsExtractor` handles only Bearer tokens and maps a verified ID-JAG to `agent.webId`/`client.clientId`/`issuer.url`; the `PublicCredentialsExtractor` fallback in the same waterfall keeps anonymous `.sai/agents` discovery working.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/ldp/authentication/id-jag.json",
+          "version": "repo-file-v1:sha256:f915c942d9a226454f1ebd903ef376f283e1dfbd1b8395165b29b891c6ac9a7a"
+        },
+        {
+          "resource": "repo://packages/components/src/IdJagCredentialsExtractor.ts#L23-L56",
+          "version": "repo-lines-v1:sha256:51c410fe51ef8324f1f08b4b4f02c99ab79b44087b332272f191da28df9ed3a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMDg1N2MwYmYxZGJmMzNiOTI5YWVmYWI3MDM3NWM1MWI2OWNlMjA3Y2NmY2IxYTc3MGY1YTg5YmMxNzFhYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwOTY0NzE5ZGYxMTliOGM3NDI3NjllMzNmMjhkY2ZhOTMxNTZmNDM1OGU5MTBkNDE4ZGU4Y2MyMjk4YWEyMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_79afc533a2f54a9c870e33de1d87e114",
+      "statement": "The auth `.sai` verifier pins `typ` to `oauth-id-jag+jwt` before reading claims, accepts any audience URL under its base-URL prefix (same origin, normalized path), and trusts an issuer through `trustedIssuers` or the subject CID document before verifying the signature and temporal claims.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L110-L160",
+          "version": "repo-lines-v1:sha256:28277a198d6d4fdfa4f1c5b65f0a32c1a52596a0081f12f9b7067185db090b8d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlMjc3NDFjMzgxMWE3YjRmMWJlMzQwY2FhYzJmZjIzODMyYjcyNDA4YjNiYTVhOGJjNDBhNjc5M2JjMThmZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2NzAzMTZjMGUxMTY5Y2EzNzA2NzQyNzc5MThmMzQ4NGQ2ZTVjNzMxM2I4YjI4NzdjNjQ5NzAxMGExNmE4NjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNzlmNjZkZTFhMGY2NmIwZWU2MzVhNDc5OTI2MTJhMzZkMjA2YWEyMzcxODY0M2E4ZTFjMDQxYzM5YTNkZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjZTAzYWU0Yjg2YjBiMGYyMTY3MTJmZTczZDMzMDAyYWUyNjBiYjQxYTAyNjMyZGZjMzUxZDJlNzhkMmEyNzUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L184-L200",
+          "version": "repo-lines-v1:sha256:9a2e6f4aeb83ab3fe624dff0aa88232ede75ccacdece49adac8a8f525c3f8612:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOGJhNGEwYTVmNzBlNzk5MDRmZmViYTU3MzRkY2RkOTEzNjI3NDg4ODE4MzgyZmE1NTFmYTdkNTA2MWU5ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhOTI5M2ZkODA1NGI2ZTQ3MjQ4MzczZjM5ZjRkZDc3ODAwMTA1ZWI3NTgzNDg2ODcyNTQyODVjZDEyODJiNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4ZDk0NjhmYTBlNWE5OTVmMjFlZWYyMTdlN2Y4MzU2OTgyZTlkODYyMWIxZWZmMjZiNDgxNjBmN2I1YWExMzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a790d38269a04f70a3d3e35c85f08c75",
+      "statement": "The self-issued first-hop credential is an `at+jwt` with `iss`/`aud` = the UAS, `sub` = the agent's SAI/CID URI, `client_id`/`azp` = `agentId(webid)`, and `cnf.jkt`; the local verifier requires a DPoP proof for that key and the UAS `JwkGenerator` signature, with no OIDC discovery.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiSelfIssuedAccessTokenVerifier.ts#L55-L118",
+          "version": "repo-lines-v1:sha256:1474efc81bfb5e2c2ddcea25bebdb8400c1d9babe45acf202179eaa9302906ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NDcwYzZlN2Q2ZjZkODM4NTg5OTAyNTc1MTY1Mjc3MjYwMzRiZDQwM2UyZTBlY2QxMWQzZGI1MGZiODlkMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1NjNiOTdkNTdkNTk0YjcwMjBhMWMzZmYxNmNhYmE0N2YwYmMyZGMwNzJjOGI4OTI2YTMyMGYwZWM2YzQ3ZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/util/selfIssuedCredential.ts#L10-L66",
+          "version": "repo-lines-v1:sha256:69664cab86d24a0b79ab425cd38ba03e12e8588e409d8d10cc434c55def27668:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMTM4NjdkZTkxNWNiMjc5NTUxNTU1OGFhN2NmMmVlYjYzOTFlNDcxZDFjNGYyOWFkNGU0MGZiMTc2OWI2NmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhMTlkYmRkMTQzYjY0MDQ5YTcxMWUwMzM3NmMyNDI1NTgxMDcxZjg1MDFhMDZhY2NiNzM4NjY1MjgwZTg4NWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_047aa3328bea41cf82f8511121ea588e",
+      "statement": "The UAS token endpoint accepts either an incoming ID-JAG or the local self-issued access token through `IdJagSubjectTokenWaterfall`, whose members are the incoming `IdJagSubjectTokenVerifier` and `SaiSelfIssuedAccessTokenVerifier`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/identity/id-jag.json#L30-L70",
+          "version": "repo-lines-v1:sha256:69be12fc16a9cd4ebf65bb1a6c4276299e7a763ab9045d8af37db0a7ab649cee:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5YWIyNGYwZmM1NzA3YmMyZjc3ZWQyMzgzMjg4YTIxZWEzYWVlY2JiMjc5ZGYxOGFmNjdlYmM5MGMxYWMzNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MjIzOWIxYmQ4MmI4NWVkNTBjMThhYmU2YjhlOTk3ODc1NWRhYzZmZDgwNDA5MjRjOGE4ODBjNTJmMDY1ZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkNzUyYTQyMWE0YTMwZjliYWFmNDk1NmIwOTc2YzE2ZjVlMDg0MjFmZGM5MzllNWFkZWI2ZDhiZTRlOWE2ZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkYjZhMjVmZGI3OTBmMWJmMWRiZDRiN2E2ODY5MmRkNjc3OWIwNDM0NGNlZjkzYjRlYWQ0ZTU5M2UwMzFjMDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f46d7d86327f418e9a6f0d1852d428d7",
+      "statement": "Authenticated `.sai` routes use the default credentials extractor, while `.sai/api` and `.sai/events` authenticate with the account cookie and the activity/reciprocal webhook routes verify no sender credential (the `sendTo` path is the capability URL).",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/http/handler/default.json#L155-L215",
+          "version": "repo-lines-v1:sha256:ecde640433274259f1aec2d63b9195e0ac2433574a70262de103607a79a9bffa:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5Y2E4OTFiZmY3YWMxZjdjZWFhZTQwZWYwNTEwNjZiZTllZmU0N2I0ZTQyODFlODZjMzE5YmUyYzU1ZWJjZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlMzE3MWMwN2E1ZGVkN2NjYjg1ODU4Y2M2YTIyMGM0ZjZhMjYxMGI0OTgwZDhiZTY2ZGYzOTQ2ZGFmOTZkODQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzZjA4OGFlY2ViZmQyZjQ4ZTQzYTA3OGUxYzM5YjIyNGI3MDI2ZWMxYTJlMDRiZjQ4NDllMGE1MGIyY2NkOTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMzhhNGYzZGY1MzFhNzYzMjZmMTJkYzg1MDgzN2E0NmNmZGMwZDk0MzAyMTM2MTBjMjhiM2Q2ODJhZmM0OTgifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T23:03:01.178Z"
+  }
+}

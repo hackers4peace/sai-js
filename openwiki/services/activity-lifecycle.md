@@ -38,10 +38,10 @@ sources:
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Activity outbox and events pipeline
@@ -194,7 +194,13 @@ channel's session, then **forwards to the events bus before dispatch** so every
 `Add` emits a line. Owner versus observer is decided by
 `session.registrySet.hasActivityRegistry?.id === channel.topic`: a non-owner
 (admin) channel returns 200 forwarding-only; the owner channel proceeds to
-`dispatch`.
+`dispatch`. See [Organization admin model](../architecture/org-admin.md).
+
+A queued `Add` can name an activity that no longer exists — a seed/reset removes
+it before the delivery lands. That is permanent, so a `404` while loading the
+activity is re-thrown as `410 Gone` instead of a retryable failure: the delivery
+workflow does not retry it and the activity cannot keep a later run from
+reaching quiescence.
 
 ## Durable webhook delivery
 

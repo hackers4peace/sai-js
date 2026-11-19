@@ -16,6 +16,8 @@ sources:
     resource: repo://packages/components/src/SaiAuthorizationManager.ts
   - id: openwiki-source-9cd6e2280365d84a6828353d
     resource: repo://packages/components/src/SaiPermissionsEngine.ts
+  - id: openwiki-source-56e7dcd44fb9baa1be3d7400
+    resource: repo://packages/components/src/SaiSession.ts
   - id: openwiki-source-3e8f48f62968e08a27cd3572
     resource: repo://packages/components/src/services/Account.ts
   - id: openwiki-source-452244fad48fe4fdb39195dd
@@ -30,10 +32,10 @@ sources:
     resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-5fb2d11486c54acb71821300
     resource: repo://packages/utils/src/sparql-update.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Per-pod storage and isolation
@@ -127,6 +129,21 @@ The registry-pod endpoint is required — a session without it throws
 worker and test harness (`buildSessionManager()`), the manager lazily builds a
 shared `PodEndpointStore` from Postgres; only an unavailable Postgres is
 tolerated.
+
+The same method chooses the fetch per request
+([`SessionManager.ts`](../../packages/components/src/SessionManager.ts)):
+
+- any `.sai` URL, on this or another UAS, or any URL under the auth base URL →
+  `createIdJagFetch({ credential, audience: saiAudience })`, i.e. a Bearer
+  ID-JAG (see [SAI endpoint authentication](sai-endpoint-authentication.md));
+- everything else → `createLwsAuthFetch({ credential, storages: [...pods,
+  registryPodUrl] })`, the two-step storage chain, so the credential and its
+  ID-JAGs never reach a data or registry storage.
+
+`SaiSession` exposes the same routing for contexts that build a session without
+an `AuthorizationAgent`. Neither path widens the endpoint allowlist: the
+storage fetch is seeded with exactly the owner's pod URLs plus the registry
+pod.
 
 `AuthorizationAgent` (`packages/authorization-agent/src/authorization-agent.ts`)
 keeps that map and exposes `resolveEndpoint(iri)` (longest pod-URL prefix) and

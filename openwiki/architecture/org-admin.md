@@ -3,9 +3,6 @@ type: architecture
 title: Organization admin model
 description: How SAI marks an organization admin with AdminAuthorization/AdminGrant, resolves personal and org contexts, exposes the registry-set link, forwards org events to admin channels, and enforces admin access on the data plane.
 tags: [org-admin, authorization, grants, contexts, acp, webhooks]
-verified:
-  - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
 sources:
   - id: openwiki-source-c18acf0c50387f2e5ea026d1
     resource: repo://packages/components/src/ActivityWebhookHandler.ts
@@ -29,7 +26,10 @@ sources:
     resource: repo://packages/data-model/src/context.ts
   - id: openwiki-source-2efbd3f6886bb62ccfb8efaf
     resource: repo://packages/data-model/src/social-agent-registration.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # Organization admin model
@@ -126,6 +126,13 @@ the **org's** stream. Each admin gets a **separate webhook channel per
 - the owner channel keeps dispatching workflows; admin channels are
   **forward-only**, so they never take over dispatch
   ([`ActivityWebhookHandler.ts`](../../packages/components/src/ActivityWebhookHandler.ts)).
+
+Both channel kinds share the same loading rule before forwarding: when the `Add`
+names an activity the channel's session can no longer read (`404`, for example
+after a re-seed or reset), the handler answers `410 Gone` instead of retrying.
+That is a permanent outcome for a queued delivery, so the delivery workflow does
+not retry it and the admin stream is not fed a phantom activity. See
+[Activity outbox and events pipeline](../services/activity-lifecycle.md).
 
 Channel provisioning for real deployments is **not implemented yet**: dev/test
 pre-seeds the channels, and the bootstrap/healing design is issue #113.

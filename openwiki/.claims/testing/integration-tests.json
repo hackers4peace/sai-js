@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:444c75b82b3693e7aa5ac93b02410167bf329f34580d97698b75f034bde6974a",
+  "pageVersion": "sha256:b1846cf637cc0e8dff155bcbba7600c94cc7bccbfc95834e296f8a0fb100639c",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
@@ -297,10 +297,62 @@
           "version": "repo-lines-v1:sha256:f0d235e2b50a4fd660e584438c765b13aecb6a5920016aed39d9fdcc29e6c879:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NWZjZDRlMGU1OWY4YzJmOWVmY2VjNDQ1ZjFhODhiYzZjMjU3N2IxMGNhNDM0ZDc4MTAzOTljNDcyOTk5M2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MGM1ZDNkYzNhNzczMDc5M2M4OTI3OTQ4YjU1OTY2NDIwN2Y3OWJhODc3NzNjMjE1MDA0NDMxOTYyZmQ0ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_8397612f5a814d64996c47df78e065fd",
+      "statement": "The `/test` suite runs from Devbox as `dagger call --tempo-endpoint=… test` with optional `--testFile` and `--only` filters, and `--tempo-endpoint` exports OTLP to the host Tempo service.",
+      "evidence": [
+        {
+          "resource": "repo://.agents/skills/dagger/SKILL.md#L1-L30",
+          "version": "repo-lines-v1:sha256:9797c6225a738c31b3fcdce2ae04122cedc47d08842023ef0a8fed505c0231cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiODI0YWU5MTUzNjIxOWYzMGQ3Nzg5N2E1MzA4ZDIwNDBkZWFlMzc3ZmI3ODYzODU1YWFjM2Y2NTIyZTU5NmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1NDA2MWFiN2E3ODY3NGI1ODFjY2YxNjU3NjdhYjliMjlmYmUwZjYxNTFmNjZiY2VlYzljMDEzNzY1MmIzZTkifQ"
+        },
+        {
+          "resource": "repo://.dagger/src/index.ts",
+          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
+        }
+      ]
+    },
+    {
+      "id": "claim_fceb1f6f9d6c433fa7a349bed3b4c782",
+      "statement": "Component tests pin the `.sai` extractor (verified subject mapping, optional access claim, public fallback for non-Bearer requests) and the first-hop verifier (`at+jwt` type, DPoP key binding, issuer/audience, HTTPS identifiers, access-token subject type).",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/id-jag-credentials-extractor.test.ts#L20-L70",
+          "version": "repo-lines-v1:sha256:f00c0b13854ac7848b03bc4068bb6e3d4fe036ad6315475de7a9cbe5c9c7b09e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1YmU5MTU4Mzg4OGY4ZWZiN2M3OWQ5YTdjNGFlNWU0Y2MxOGVkNGExMGRmYzg5YmFhZjBmY2ZiNTNiZDEyYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3OTVmYzQyMzc0NDkzNzVlZmRmMDQ0ODFiMzg0MjdjNzU1YjIxMWYxMzM4NDY1ZTQ3YjRjNDI5MmQyNjE3MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyYzdlNzM0MGQxYWVhNGM0YWQyYmRlY2Y1ODY3MTk3OGU5NzU4ZjY3NzFhY2E3MzAzMmNhNmMyYTQ3YjRiZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
+        },
+        {
+          "resource": "repo://packages/components/test/sai-self-issued-access-token-verifier.test.ts#L70-L145",
+          "version": "repo-lines-v1:sha256:06839f036a67f51ffec478255ee0d06be26146f71c8209416f8e21dccd9c6a5d:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5MzdkMzY5OGMyNDlmYjc3YjNlYjk1YzQ5MjMxYzI3ODJmNjQ1NTQ4MGRjMjYyMTU1MjM4N2I5YjY1MTU1NDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3OTVmYzQyMzc0NDkzNzVlZmRmMDQ0ODFiMzg0MjdjNzU1YjIxMWYxMzM4NDY1ZTQ3YjRjNDI5MmQyNjE3MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyMGNlNWM0YmM5NGNmMTQ0MjVjOWM3YjkwMmQ2YzdiZGVkMzQxNmFhMGVjMWE3MjAxYzU2MTZlOWU3OWI1ZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9a983a3a7d4d46ac8961c5f24c92b698",
+      "statement": "CID issuer resolution is tested for both compact JSON and Turtle documents, the `lws:OpenIdProvider` endpoint match, OIDC-then-LWS JWKS discovery, and every fail-closed case; the URL helpers are tested against lookalike origins, sibling paths, and malformed URLs.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/cid-issuer-resolver.test.ts#L40-L188",
+          "version": "repo-lines-v1:sha256:c7f452fb50ee270c5893e788858bd82f577cd1e32e9b3c92355eef3d56e15deb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJhOWJlNTRiYTc4NDg4NDkxMTZmNzU1NjYxYWEyZTliNjYyYjY3YmY1NDhlYjM2MTdhOGM5OWYyM2Y1OTY3YzQ0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://packages/components/test/url.test.ts#L1-L50",
+          "version": "repo-lines-v1:sha256:2595086735eddb5e0746ea1ec1e2e62b44726ef0795985f6025a9d4f7cdbb3f9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3MGE2N2Y0OWQ5Mzk3MTA0MmRjNTk1YzA5ZjMyMWNjNzZlZTE5NjNiNTkyNWFiNzMxNDQ3N2EzM2M0ZDhjM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9ac73f05dc084540967c56abafe5ff3c",
+      "statement": "Token-handler tests cover the `.sai` audience policy: this auth base URL and its interaction URLs, configured peer UAS `.sai` URLs, and rejection of unknown peers and lookalike origins.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/test/id-jag.test.ts#L270-L325",
+          "version": "repo-lines-v1:sha256:313f66b5bd735ed18a16fd9cbe203c108d86fbfa4afd483b4dc312a84b99df75:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1YTQxZmE5MDEyMTNmNzI1NWE3OTgzOWNjYjNkMzE1YzBkNWNkY2IxYWY1MTAwZjQyM2QzYzk2NWIxMTU3OTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmNDNhMzQyOTQxNGY1N2E0ODgyNjNlOWU5OGQyZjdjOGNiOGNjZTNmNWJhZWY5NWJhNjg1ZDQzNDAxNjI3YmUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

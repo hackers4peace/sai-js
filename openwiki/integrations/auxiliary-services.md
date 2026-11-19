@@ -23,6 +23,8 @@ sources:
     resource: repo://packages/components/config/identity/id-jag-accept.json
   - id: openwiki-source-d6371e3a800240d46c2e1c59
     resource: repo://packages/components/config/identity/id-jag.json
+  - id: openwiki-source-7ea752831793ac76b987c08d
+    resource: repo://packages/components/config/ldp/authentication/id-jag.json
   - id: openwiki-source-0b475136796d3c6391256850
     resource: repo://packages/components/config/overrides/emitter.json
   - id: openwiki-source-9f577882ea0b12c6f9a793ba
@@ -39,10 +41,10 @@ sources:
     resource: repo://services/id/server.ts
   - id: openwiki-source-ba7d0112a176643ef8b07b66
     resource: repo://shapetrees/functions/%5Bcollection%5D/%5Bname%5D.js
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 
@@ -80,7 +82,10 @@ The service installs permissive CORS and exposes two routes:
 `solid:oidcIssuer` becomes a `lws:OpenIdProvider` `did:service`, and
 `interop:hasAuthorizationAgent` becomes an `interop:AuthorizationAgent`
 `did:service`. `toCidDocument` frames the reasoned graph with the
-`https://www.w3.org/ns/cid/v1` context.
+`https://www.w3.org/ns/cid/v1` context. That `lws:OpenIdProvider` service is
+the giving side of federated ID-JAG trust: `CidIssuerResolver` dereferences the
+subject document and requires the service endpoint to equal the grant's `iss`
+(see [Federation constraints](../architecture/federation.md#federated-id-jag-issuer-resolution)).
 
 ## Community Solid Server configs (`services/css`)
 
@@ -91,8 +96,8 @@ moved out. The deployable instance wrappers now live in
 import the `css:config/http/server-factory/http.json` base plus a
 `sai:config/*.json` graph from the components package:
 
-- `auth.json` → `sai:config/auth.json` (Solid-OIDC identity provider + LWS
-  ID-JAG issuer).
+- `auth.json` → `sai:config/auth.json` (Solid-OIDC identity provider, LWS
+  ID-JAG issuer, and the `.sai` ID-JAG credentials extractor).
 - `registry.json` → `sai:config/registry.json` (ACP-protected registry server).
 - `data.json` → `sai:config/data.json` (SAI policy-engine data server).
 
@@ -101,9 +106,22 @@ These wrappers are thin; the authoritative config graphs live under
 copies from `environments/css/` instead.
 
 The LWS identity configuration is split across
-`packages/components/config/identity/`: `id-jag.json` (the UAS issuer),
-`id-jag-accept.json` (UAS accept), `id-jag-accept-data.json` (data storage
-accept), and `id-jag-accept-registry.json` (claimless registry accept).
+`packages/components/config/identity/`: `id-jag.json` (the UAS: ID-JAG issuer,
+first-hop `SaiSelfIssuedAccessTokenVerifier`, incoming-ID-JAG verifier, admin
+impersonation authority, token router), `id-jag-accept.json` (storage base
+accept plus the LWS metadata advertisement), `id-jag-accept-data.json` (data
+storage: owner-claim validator and the exchange access policy), and
+`id-jag-accept-registry.json` (claimless registry accept).
+
+Resource authentication differs per server. The auth server imports
+`sai:config/ldp/authentication/id-jag.json`, which replaces CSS's
+`css:config/ldp/authentication/dpop-bearer.json`: it wires
+`IdJagCredentialsExtractor` over an `IdJagSubjectTokenVerifier` with
+`audiencePrefix = baseUrl`, plus a `PublicCredentialsExtractor` fallback for
+anonymous `.sai/agents` discovery. Data and registry keep
+`css:config/ldp/authentication/lws.json`; their token exchanges accept ID-JAG
+subject tokens only. See
+[SAI endpoint authentication](../architecture/sai-endpoint-authentication.md).
 
 ### Components.js customization
 
@@ -129,9 +147,11 @@ accessors, `HybridDataAccessor`), the auth/permission set (`SessionManager`,
 `SaiAuthorizationManager`, `SaiPermissionsEngine`, `CustomWebIdStore`), the
 activity/events set (`ActivityWebhookHandler`, `EventsHandler`,
 `NdjsonNotification`, `DurableWebhookEmitter`), the access-request/grant
-handlers, the LWS identity/exchange classes (`IdJagTokenHandler`,
-`IdJagSubjectTokenVerifier`, `StorageExchangeAccessPolicy`,
-`AdminImpersonationAuthority`), and the account/Garage components.
+handlers, the LWS identity/exchange classes (`SaiSession`,
+`IdJagCredentialsExtractor`, `SaiSelfIssuedAccessTokenVerifier`,
+`CidIssuerResolver`, `IdJagTokenHandler`, `IdJagSubjectTokenVerifier`,
+`StorageExchangeAccessPolicy`, `AdminImpersonationAuthority`), and the
+account/Garage components.
 
 Notification wiring differs per server: **auth** imports
 `css:config/http/notifications/disabled.json`; **registry** and **data** import

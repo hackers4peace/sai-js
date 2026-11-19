@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:f821a5c8137766805c8ed7a635e3f39972e34ab7246276db2e62e680104237e1",
+  "pageVersion": "sha256:83145baed6a47981f0a436a1ba2769e59c1a2e9e5b0b28e9ef0eb0462059442c",
   "claims": [
     {
       "id": "claim_838ec0665352496899af1af26367759c",
@@ -38,11 +38,15 @@
     },
     {
       "id": "claim_a3aa88b1a2fe4b34af0cfadc756b4016",
-      "statement": "A storage authorization server accepts only ID-JAG subject tokens, pins the typ header before reading claims, requires aud to name that server, verifies the issuer signature and temporal claims, and reuses the OIDC trust model.",
+      "statement": "A storage authorization server accepts only ID-JAG subject tokens, pins the `typ` header before reading claims, requires the exact `aud` of that server, and verifies issuer trust through `trustedIssuers` or the subject CID document before checking the signature and temporal claims.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L60-L100",
-          "version": "repo-lines-v1:sha256:d1555c9589129df4f3d9e951ca0af2b2971cae73d338fcfe74f289d17a636c90:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMjliMDkwNjMzYzk1ZGMxYjg4MzJkMTcwNmI4ZDhiNGMxZDQ5NjVlMDRhOTY1YzNmNDI1Zjg3OWUzMTYwNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWQxYTI0NGRhMDI3NzI1Y2EyZDEyMzkzYjBhYWY3YTU2OGQ1YzY1NDFiYzhkOGI5NGI2ZDVjMDViZjljZGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3ZmNhODJiODgzZmRlNDYyN2I0MWFlM2RlNDI1NGJiNTBmNTFiNGUxNWNhYTQ2Y2JmOWIxZWUxMDU1NDM0NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1M2UwY2UxZDVmYjViNTM0ZmEwYTUyYzAwM2UyMjIyNDdhZDM3Yjg3MmIwYTM3ZTg5ZjhkMTVhMzI5Y2U3YjMifQ"
+          "resource": "repo://packages/components/config/ldp/authentication/id-jag.json",
+          "version": "repo-file-v1:sha256:f915c942d9a226454f1ebd903ef376f283e1dfbd1b8395165b29b891c6ac9a7a"
+        },
+        {
+          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L180-L205",
+          "version": "repo-lines-v1:sha256:6bbbd221ab1983cde5f8e8175c5553e85443e97810498d5c15cac5e6b1c69aa9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlOTM2NDg3N2UzN2Q0MGQwM2Y3Y2FlOThkYjc2MmFjYWRmNDYxN2FiZTBkNGVmNGY2NjM0OWY0MmJlNDk5NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhMmMzY2Y1Y2FjMjAyNGZkN2ZkN2Y1YjhmNWNiYWQyMDg1YjYzMmVkZGE2MzI4MThjMTc2YjE4NjlmZjMyNjAifQ"
         }
       ]
     },
@@ -75,7 +79,7 @@
       "statement": "Storage authorization is token-carried: a claim is the authority, a claimless exchange gets scope owner (all modes) only for the storage owner with their own UAS, scope admin (read-only) only for a DataRegistry AdminGrant with the same UAS, and any other claimless exchange is invalid_grant.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L250-L330",
+          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L253-L333",
           "version": "repo-lines-v1:sha256:2a25c0b8bdccaddb9a804c01ffebcb009bada1a09dbb84ee74b8437dc8000aca:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljNjFhZGY1YWMwOWNhYWYzNDdjMDE2NjRjNDQ4YmYwNWVmOTVkZDg2NmEyMDAzNjI4ZGY2YjczNDZiODdjNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MTkxOWZhNjMzODMyMjc4YWE3MGU0M2IwODE5NWRmNDUzMzVkMWI5ZDI3OTQ2YzFiYTdkZjgwYWE0ZjFlZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNkMDlhOGJiM2I0MTc3MmQwNzczYmM2Y2ZiMjkwNjYwMGIzMmZkYmVkMGZjYzAwYTFmZWY5MjNkYjUwYTZlNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YmNjYTM3MzhlMDYxNzUyMzVlZmMxYjA1YmNiMWJlOTgzZjA1MGRhNjkwNGFmOWIzYmFlMGRjNWY4MDVkZGEifQ"
         },
         {
@@ -103,7 +107,7 @@
           "version": "repo-lines-v1:sha256:c98a0daf014c230d7702b8f8447e9c6583e9bd06597105223bb813e90503b77f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiMzM4ZTkwNjdhMzUyNmQxNzUyOTIxY2E4Nzc1NTU0Njc1ZDE2NjdlNWE1Nzk5Mzc2NWViZTQ3YWYyNGFmNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkMDk2MWIzNjFmZWJlN2M4OTY4Y2E2ZDcwNzc0YjNhYTVjNWNhNWVlOTA3MzQ3ZGQyODdjMzU4MDdjYjc1YjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3ZjRkMjhjODFjNmFmN2RjNDZjNmMxZWExNmMwYjQ5ZWJhNzM1MzkzZmY4YzNiNDA2ZGJjNWUwYzEzZTBjZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYmFiZjNmZGI1NTQ2ODkwZTMwZTc1ODIwMGJkMzE2YjJlOTdiNjcwMmYyMzBkMGRhMmMxZTk4ZTQ0OWM1ZDkifQ"
         },
         {
-          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L300-L330",
+          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L303-L333",
           "version": "repo-lines-v1:sha256:8d4449f6706d3cce3c497704a2077cf1a84f0bd3e6c13b8f7a9fa7a4114a6c5f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjODdjMzJiMTI5ZGFkZGU2YmU1N2M3ODU1ODQzMWVlNDZmZDU5MzAzNDg0MTM0NWY0ODFjOGQwYWZlYjUzNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MTkxOWZhNjMzODMyMjc4YWE3MGU0M2IwODE5NWRmNDUzMzVkMWI5ZDI3OTQ2YzFiYTdkZjgwYWE0ZjFlZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2MjM0YjRjOTE3ZmFhM2E4NzdlODBkMDdjMmM1OTQ1MmM2MmUyZGY4NTYxNWY4NWU3ZjM3ODJiYmI0ZGQ4YWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YmNjYTM3MzhlMDYxNzUyMzVlZmMxYjA1YmNiMWJlOTgzZjA1MGRhNjkwNGFmOWIzYmFlMGRjNWY4MDVkZGEifQ"
         }
       ]
@@ -121,10 +125,52 @@
           "version": "repo-lines-v1:sha256:d5128cb8f26ab7c60655a5ae858f6c6ef0d1bb677c847a02b0f43156ea1e4909:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjEyNTk4ZjQyZGVlZGQ0MDNlNGQ2OWNkZWU2YzI3YzM4YmEwZmFkYzE0NmQxNmY5ZjU1YjU2ZWIxZGY3MDAwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzkwNzI5MTBkNjFkZGQ1MmZiODU3M2Y2MGVmMTJkMjhkODc0MmQ0OWJmZjJjZWJlMDBlMmE1ZGQ4NzIwODU4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWZhMmNmNTY1MTNkOWZiYmVlYTFmNDhjNjk3ZDYzMmQxOWVjZDIyZTY0Yzk3MmJmNjIzYWU4MTliOWIwYTNiNSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_c532e04fde0d4d6295b377f74cd19da4",
+      "statement": "A `.sai` ID-JAG is identity-only (no `resource`, no `access` claim), cached per resolved audience, sent as a plain Bearer token, and re-minted once after a `401`; the audience is the full request URL except `/.sai/agents/*`, which uses the target UAS origin.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/util/url.ts#L30-L50",
+          "version": "repo-lines-v1:sha256:1e245bd65df1b3c3fba4d87bd5a8158b2e5a31dc808b9d4e87c40c7a13836ca6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkMDRiYWI2ZWY4YTJiMjY5MDdiY2I2OGViOWU3MTIxMmJlMDA3ODZmMGQ5NzI0YTYyMjNhYjFiNTNhMTk0OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L216-L298",
+          "version": "repo-lines-v1:sha256:c2ae67ba8719451c3938cd1f6c9161a23b0baf08b1d77fbda04317afee986bb1:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5ODVlMjc2MjNlNzI0YmM3ZDJmNTFlNDQzMTMxNjlhNmYyMzA0ZjQ5MDhjOGYzMWIyNDIzNTRlMTBkYmUxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZWQzN2I4MzI3YTUwZjcyZTEwNjNhYTY3ZmFkODBhMDQxNTBjYzliYzdlZGYyYmMxYWJlOWMzZmE5NTEwNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_30d065e6cb524d1ba3451a5ac29a3204",
+      "statement": "The auth `.sai` ID-JAG verifier accepts any audience URL under its configured base URL (same origin and base path, trailing slash normalized) while storage verifiers accept only their exact audience.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/ldp/authentication/id-jag.json",
+          "version": "repo-file-v1:sha256:f915c942d9a226454f1ebd903ef376f283e1dfbd1b8395165b29b891c6ac9a7a"
+        },
+        {
+          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L184-L200",
+          "version": "repo-lines-v1:sha256:9a2e6f4aeb83ab3fe624dff0aa88232ede75ccacdece49adac8a8f525c3f8612:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOGJhNGEwYTVmNzBlNzk5MDRmZmViYTU3MzRkY2RkOTEzNjI3NDg4ODE4MzgyZmE1NTFmYTdkNTA2MWU5ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhOTI5M2ZkODA1NGI2ZTQ3MjQ4MzczZjM5ZjRkZDc3ODAwMTA1ZWI3NTgzNDg2ODcyNTQyODVjZDEyODJiNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4ZDk0NjhmYTBlNWE5OTVmMjFlZWYyMTdlN2Y4MzU2OTgyZTlkODYyMWIxZWZmMjZiNDgxNjBmN2I1YWExMzkifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/util/url.ts#L13-L29",
+          "version": "repo-lines-v1:sha256:8774e58831a883c427a52775ad7ae844771beb2511c8027d0b51009ee313edfb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmMDcwNzhkMWQzNGRmZWUwOTc1MDM2NzQ3YmQ3NTEyNWM1NzdkZDZiZGNkY2RlYzYwZjI3MzJkNTZmYjA0MzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2NDVlMDFkMDUzMzM5OGUxMmY3ZjJmNjgzODUwNTkwMGQ1MGE5YWUyZDM1NTg3MmM5YjgyYzdjZTA2YTI5MjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1a0cfe19a3634928aab8de48483c574c",
+      "statement": "The first-hop SAI access token is verified locally as an `at+jwt` whose `iss` and `aud` are this UAS, whose `cnf.jkt` equals the DPoP proof key thumbprint, and whose signature uses the local `JwkGenerator` key; no OIDC discovery or subject-document lookup is involved.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiSelfIssuedAccessTokenVerifier.ts#L55-L118",
+          "version": "repo-lines-v1:sha256:1474efc81bfb5e2c2ddcea25bebdb8400c1d9babe45acf202179eaa9302906ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NDcwYzZlN2Q2ZjZkODM4NTg5OTAyNTc1MTY1Mjc3MjYwMzRiZDQwM2UyZTBlY2QxMWQzZGI1MGZiODlkMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1NjNiOTdkNTdkNTk0YjcwMjBhMWMzZmYxNmNhYmE0N2YwYmMyZGMwNzJjOGI4OTI2YTMyMGYwZWM2YzQ3ZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:82a13a7700d76c90c1334cbe3fa070254f7b9e4ff30281d1f07bc0df29273cfd",
+  "pageVersion": "sha256:f7677dd10a395df6bb98204ac966b72e51c2f24d5c70a36baa5974221528410d",
   "claims": [
     {
       "id": "claim_0e4484375c454f34b8e816272980e350",
@@ -53,8 +53,8 @@
       "statement": "n3 remains a direct dependency of six workspace packages and is still used for RDF/JS stores and factories plus the reciprocal-mirror N-Quads writer and the test/seed TriG parser.",
       "evidence": [
         {
-          "resource": "repo://packages/components/package.json#L60-L70",
-          "version": "repo-lines-v1:sha256:77e1f85188916e244486ab6a0c8c8a25a1512f7fe723c00ada55e0289c17f1da:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhMDI4MDk3MWM3MzJlOTRlN2Y4OWY4MjliMDFjNWJiZjAxODBiMjY5MjI4YjgyNDI0MTFkYWY1NjQxYmY0OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyMzM3MTJlYmFlOTM0M2VmZDZlMGMwMTc0ZGJhZDE3MWZmNWU3YmU4MDhmMTU5MDg0NjUzZjAyNjk3OGU3NDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYjBhMWU1NDYxZjAxNTZmZGI1YWE2MjRiOWM4YjQ1NmY5MTY2ZGNiMDFmZjJkMTVmZGFjZWZiMThkNTg5ODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiNTRmZTEyMWVlN2ZkY2QwZGUyMzMyY2VlZjk4NDRlNDM1NGZhMmU5NmQyOWI3N2I1OWFiYjE0YmIxNzE5Y2YifQ"
+          "resource": "repo://packages/components/package.json#L60-L69",
+          "version": "repo-lines-v1:sha256:0832bcf06f9e2a0e26f23e5fd2de2b731d124cca0fdd2988a1ec70498f905874:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4OWIwZTU4NDQxOGIzZGY0MjQyOGE3YmYyY2Y0MmQwODViZjc3OWFiNzIwMTg3ZjBhZjcyNWJhMTI2NjIzZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyMzM3MTJlYmFlOTM0M2VmZDZlMGMwMTc0ZGJhZDE3MWZmNWU3YmU4MDhmMTU5MDg0NjUzZjAyNjk3OGU3NDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYjBhMWU1NDYxZjAxNTZmZGI1YWE2MjRiOWM4YjQ1NmY5MTY2ZGNiMDFmZjJkMTVmZGFjZWZiMThkNTg5ODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiNTRmZTEyMWVlN2ZkY2QwZGUyMzMyY2VlZjk4NDRlNDM1NGZhMmU5NmQyOWI3N2I1OWFiYjE0YmIxNzE5Y2YifQ"
         },
         {
           "resource": "repo://packages/components/src/services/ReciprocalMirror.ts#L10-L16",
@@ -86,17 +86,31 @@
       "evidence": [
         {
           "resource": "repo://packages/components/src/services/ReciprocalMirror.ts#L40-L55",
-          "version": "repo-lines-v1:sha256:1e1ee91d9dd3da8ea1fbf48068603b23897fc776dbb4ba360452d2b008964d06:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4ODhhNWQxNTgxYzEwZjZkZTg1Yzk1YWZkZjU0NjZhYjVkY2RhMzIxYmZiZDdhOGI3ZTA5NmYxMDcyZGZhMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiMTU0ZmRiNDFkMmZmNmJhNzg4NTFiODhmMTRiZjg4YzRhMTE3MzY4NGVjMjhlMjg2NGUyYzQ1YTg5OWNhYjEifQ"
+          "version": "repo-lines-v1:sha256:6b9f7635fd26488395bd25f5e0d0eefecca9777418bd7916278495ffbd59584b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4ODhhNWQxNTgxYzEwZjZkZTg1Yzk1YWZkZjU0NjZhYjVkY2RhMzIxYmZiZDdhOGI3ZTA5NmYxMDcyZGZhMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiMTU0ZmRiNDFkMmZmNmJhNzg4NTFiODhmMTRiZjg4YzRhMTE3MzY4NGVjMjhlMjg2NGUyYzQ1YTg5OWNhYjEifQ"
         },
         {
           "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L231-L245",
           "version": "repo-lines-v1:sha256:e2b3b22dccc0f0f5093660ff3d503a4191aedfdffb1aa63e2cb8c8aeff3cbd0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiOGFjMzZhN2ZmY2NhNmQxYTY3ZTI0ZTJhMDdlMmY5MDdlZTRkMWI0MjJiZjg2OTU0ZmViNmZlODNjNTdlMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0ZDc0NDk0MGIyY2I4NzE3M2Y3MWYxYzA3OTQxOWQ3ZWIzNjBlMmY2YjdjNGNiN2Y1NDhiYmVmYzVhMDRiOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyNmZlMDFjODBkYmNmMjRkZGM4NTJkMmVlN2MwNGQzZjVhZjY4Yjk0ZWU1ZTQ3ZDk5OTM4YzY3MTM3OWQzMDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkMDY5ZDM5ODRlMjUwYjIyNDRhNmNkZjk5MTdhMTc5N2JlNjcwYjM5NWMwZDYxNjM2MzMwNDQxY2M5ZDI2OGIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_ab1ffa4e8ef849e1ac59660526ea5b6f",
+      "statement": "The browser OIDC client `@uvdsl/solid-oidc-client-browser` was removed from `packages/components` and the root workspace manifest no longer overrides `@solid/access-token-verifier`; the `n3` dependency inventory is unchanged by that cleanup.",
+      "evidence": [
+        {
+          "resource": "repo://package.json",
+          "version": "repo-file-v1:sha256:aae60e50ad32c4d8ef2ad5c4b8a26633d78a9b49ea94f1f6661bc4369722dcef"
+        },
+        {
+          "resource": "repo://packages/components/package.json#L55-L70",
+          "version": "repo-lines-v1:sha256:70d2be9c5f7a272c04b2fc86d53d33a1af3700ae913776b660010cef0ebcd1bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyYjZkYWZiMzBlMDliZGMyYzYxYzc1NGI3ZjE0ZmY4YThiYjQ4Mzk1MDJhNGFlNzg3NDVkNjc3Y2EwYzI0MjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0MmQzNTZlMGJhMGZiMTc0NTA0ZDFkYmE3ODgzYTU0OTYyZjM4ZjVjMTMxYmFhYjMyNzAyMGMxNmVlZjM3N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxZjgwMzY4MWJjMzZkNmEyYjVhNDUxYTYwZWM2Y2MyZjMzZDJlOWYyNmMxODRjNTNkM2NiZjRhZDljN2E2MjgifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

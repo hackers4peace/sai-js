@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b1f60278457b641a2659a5c2da10216c66f18b7413e6193c52e2d1967a8b83a1",
+  "pageVersion": "sha256:8d2383abc15840dec4d8dfed69812e0d22958081044d1ea7003b2da420f4e75a",
   "claims": [
     {
       "id": "claim_0b97b522438c41f6b1d20f9ebba9164d",
@@ -126,7 +126,7 @@
     },
     {
       "id": "claim_9137f211d7144df19e325f337743e1bd",
-      "statement": "The LWS identity configuration is split into an issuer config, a UAS accept config, a data-storage accept config, and a claimless registry accept config.",
+      "statement": "The LWS identity configuration is split across `id-jag.json` (UAS issuer, first-hop verifier, incoming-ID-JAG verifier, impersonation, token router), `id-jag-accept.json` (storage base accept and LWS metadata), `id-jag-accept-data.json` (data storage claim validation and exchange policy), and `id-jag-accept-registry.json` (claimless registry accept).",
       "evidence": [
         {
           "resource": "repo://packages/components/config/identity/id-jag-accept-data.json",
@@ -138,17 +138,55 @@
         },
         {
           "resource": "repo://packages/components/config/identity/id-jag-accept.json",
-          "version": "repo-file-v1:sha256:046be9a736976ba3f6bae1a6da84e41c24d356e6248cdfb461160ac531a26086"
+          "version": "repo-file-v1:sha256:ff76b0a59dbd1c59b9598ce66e87d6f6502c65e0b0dec4c89fd0de1af996f5a1"
         },
         {
           "resource": "repo://packages/components/config/identity/id-jag.json",
-          "version": "repo-file-v1:sha256:913a1fd845214244c30cbdce356936f8d0a2273bbe252ff98d5815b66b8bdbe9"
+          "version": "repo-file-v1:sha256:e3f7020c45dd931997209ae4bbb129b6d518c6ccae3ef6c1f5ee3f6c5617a18f"
+        }
+      ]
+    },
+    {
+      "id": "claim_51658746f7924c3980a9205a275d0657",
+      "statement": "The auth server imports `sai:config/ldp/authentication/id-jag.json` (replacing CSS's `dpop-bearer.json`), while the data and registry servers still import `css:config/ldp/authentication/lws.json` for resource authentication.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/auth.json#L1-L30",
+          "version": "repo-lines-v1:sha256:a50f53f2dea9bb434e385c9d873c34513e41d048035821046f737d464690ec22:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1MTE1M2MwMmVmMzc0YTZiNzE1NGQ3NjQ0YzlkM2VhY2ViNmE1ZGNkOTZlNzU2ZTQzYTg2YWZmOTI0MjE4MWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxOTgxMGJiNWIyZjdiMzE0MThjZTg1ZDJiMjNlYjQxNGFhMDIzNmM1ZjAxNDE3Njk4ZDY4OGJhMWEyYzM3YmIifQ"
+        },
+        {
+          "resource": "repo://packages/components/config/data.json#L7-L52",
+          "version": "repo-lines-v1:sha256:b3d42a16c2e027484ac757e26afc0e02894a8bf75b7c822e3bfea8483d62ce05:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyM2Q0NDg5MGEwODJmNjVhNzZlNTNiMjUzNzU1ZGUzN2VhNDUxMzIyZDE1MjU2YTkwY2M1NzQ4MzgwYjllN2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NzY1MDhlNmZmOTQwNmQwMWY0NTQyNWZkODkyMDgyMWRlZjE2Mzc3OTlhOGI3ZTM3NTc1YzRkMTVmYzA3N2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4MzdjNWE2MGIzOTgzYTJkN2VhOTFmZWE5MWYyMWIzYTg3YjQ1MDFlMDE3MjhiNTc0ZTMxNGU2YzQzZTMyYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5NDk1YzVhMDI3MzNjN2EyNjljOWIzZjU3ZmJjMDg2OThlNWQxOGRjZTE1OWFiZTYyYjU5ODAyNDA5MjkwOTMifQ"
+        },
+        {
+          "resource": "repo://packages/components/config/registry.json#L7-L48",
+          "version": "repo-lines-v1:sha256:19d5741452ee0ee0fbb670ec4270b424f1367d12e419bf21ea533f5efec52bf0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyM2Q0NDg5MGEwODJmNjVhNzZlNTNiMjUzNzU1ZGUzN2VhNDUxMzIyZDE1MjU2YTkwY2M1NzQ4MzgwYjllN2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NzY1MDhlNmZmOTQwNmQwMWY0NTQyNWZkODkyMDgyMWRlZjE2Mzc3OTlhOGI3ZTM3NTc1YzRkMTVmYzA3N2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4MzdjNWE2MGIzOTgzYTJkN2VhOTFmZWE5MWYyMWIzYTg3YjQ1MDFlMDE3MjhiNTc0ZTMxNGU2YzQzZTMyYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwZDE0NzIwMGExMTgzODk1YmI0MWRiNjBlZjVkM2FiYjM4MWM2ZmE5NTljMGQ0MWRjMTkwMTYyMTZmODY5MDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_17712d567e674bf7b21eddc0051e234e",
+      "statement": "The auth `.sai` credentials extractor is a `CachedHandler` over a `StatusWaterfallHandler` of `IdJagCredentialsExtractor` (with an `IdJagSubjectTokenVerifier` whose `audiencePrefix` and `trustedIssuers` are the base URL) and `PublicCredentialsExtractor`.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/ldp/authentication/id-jag.json",
+          "version": "repo-file-v1:sha256:f915c942d9a226454f1ebd903ef376f283e1dfbd1b8395165b29b891c6ac9a7a"
+        }
+      ]
+    },
+    {
+      "id": "claim_ca477251a5e9423c95ebb8eaf8751a4d",
+      "statement": "The id service derives a CID `lws:OpenIdProvider` service from each profile's `solid:oidcIssuer`, which `CidIssuerResolver` later uses to authenticate a federated ID-JAG issuer.",
+      "evidence": [
+        {
+          "resource": "repo://services/id/cid.ts#L12-L41",
+          "version": "repo-lines-v1:sha256:fde803402e8fd6c265bcda0800033f7b0db5355cce78aa8bdb5f6cbb2d8bc5f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjOGJhMGYwYzE2YjA3N2ViMjExMGZmNjdiYjNlYTdlMmMwOGQ5NDk0ZDIxZDJmN2M0NjhlYTg4MjUwZWI1YjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkODBkNjViNzhlMDhiODUyMjI3N2RjMWE2NmFiNjYxYjBmNDBmZmZlYmFiMWFhZTEyYThkNmUzNDY0NTlkYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkZWI5YjYxMGViNDNjYTZiNDc0YjU4NWJhOWFiZmYwNTk2ZmJhMzE3MzI2MmVlMzFhMjY1NTc1YjFhN2QzMzgifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-19T23:03:01.178Z"
   }
 }

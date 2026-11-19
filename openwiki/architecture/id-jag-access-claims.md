@@ -1,12 +1,11 @@
 ---
 type: architecture
 title: ID-JAG access claims and impersonation
-description: The ODRL grant/claim shape, the two-step ID-JAG token chain, claim-first policy evaluation, token-carried storage authorization, public reads, and read-only admin impersonation of an organization.
-tags: [lws, id-jag, odrl, authorization, tokens, impersonation]
-verified:
-  - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+description: The ODRL grant/claim shape, the ID-JAG chain (self-issued DPoP credential → ID-JAG → `.sai` Bearer or storage access token), the audience rules, issuer trust via `trustedIssuers` or the subject CID document, claim-first policy evaluation, token-carried storage authorization, public reads, and read-only admin impersonation of an organization.
+tags: [lws, id-jag, odrl, authorization, tokens, impersonation, audience]
 sources:
+  - id: openwiki-source-7ea752831793ac76b987c08d
+    resource: repo://packages/components/config/ldp/authentication/id-jag.json
   - id: openwiki-source-16341e95816f0eee56f18c8a
     resource: repo://packages/components/src/access-claim.ts
   - id: openwiki-source-90c157df451973113a63b968
@@ -23,13 +22,22 @@ sources:
     resource: repo://packages/components/src/PublicPermissionReader.ts
   - id: openwiki-source-9cd6e2280365d84a6828353d
     resource: repo://packages/components/src/SaiPermissionsEngine.ts
+  - id: openwiki-source-a24c81b10d95a3487bf81305
+    resource: repo://packages/components/src/SaiSelfIssuedAccessTokenVerifier.ts
   - id: openwiki-source-431ff780c51bd57ac5545ec1
     resource: repo://packages/components/src/StorageExchangeAccessPolicy.ts
+  - id: openwiki-source-a3ed434feeefa2b8b44177fa
+    resource: repo://packages/components/src/util/url.ts
   - id: openwiki-source-6b6976370d0cdcf6bd57cad3
     resource: repo://packages/data-model/src/grant.ts
+  - id: openwiki-source-efe1f254f3d0645000dccc22
+    resource: repo://packages/lws-auth/src/fetch.ts
   - id: openwiki-source-260c4466022f2f059867cfd5
     resource: repo://packages/utils/src/odrl-id-jag-context.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-19T23:03:01.178Z
 ---
 
 # ID-JAG access claims and impersonation
@@ -89,23 +97,43 @@ expanded as JSON-LD; `sub`, `aud`, `iss`, and `exp` are OAuth claims and are not
 treated as RDF ([`access-claim.ts`](../../packages/components/src/access-claim.ts)).
 
 `IdJagIssuer` mints a token with `typ: oauth-id-jag+jwt`, `iss` = the UAS,
-`aud` = the requested resource authorization server, `sub` = WebID,
-`client_id` = `azp`, `jti`, and a 300 s default lifetime
-([`IdJagIssuer.ts`](../../packages/components/src/IdJagIssuer.ts)). It is signed
-with the same Solid-OIDC key published at `/.oidc/jwks`.
+`aud` = the requested target, `sub` = WebID, `client_id` = `azp`, `jti`, and a
+300 s default lifetime ([`IdJagIssuer.ts`](../../packages/components/src/IdJagIssuer.ts)).
+It is signed with the same Solid-OIDC key published at `/.oidc/jwks`; the key is
+a signing mechanism, not a Solid-OIDC subject-token path.
 
-## 3. The two-step chain
+Two grant shapes share that envelope:
+
+- **Identity-only** — a `.sai` grant: no `resource`, no `access`, audience is
+  either the full request URL (one-time interactions) or the target UAS base URL
+  (`/.sai/agents/*`). See
+  [SAI endpoint authentication](sai-endpoint-authentication.md).
+- **Claim-bearing** — a storage grant: `resource` = the storage, plus the ODRL
+  `access` claim when the exchange needs one.
+
+## 3. The chain
 
 ```text
-user's UAS (auth)                    storage AS (data / registry)
-  DPoP-bound access token  ──►  ID-JAG (one storage)  ──►  bearer access token
-  (aud = the UAS only)           (aud = the storage)        (aud = the storage)
+owner's UAS (auth)                 target UAS / storage AS
+  DPoP-bound access token  ──►  ID-JAG  ──►  .sai request (Bearer ID-JAG)
+  (aud = the UAS)
+
+  ID-JAG (aud = storage AS)  ──►  storage access token (Bearer)
 ```
 
+The `.sai` hop and the storage hop use the same first exchange and the same
+grant: the DPoP credential is only presented to its own UAS, never to a `.sai`
+route or a storage.
+
 - The first hop accepts a **DPoP-bound access token** (the IdP/UAS access token
-  or the SAI self-issued `at+jwt`), not an ID token.
-- The UAS issues one ID-JAG per resource authorization server. Storage
-  exchanges accept only ID-JAG subject tokens
+  or the SAI self-issued `at+jwt`), not an ID token. `SaiSelfIssuedAccessTokenVerifier`
+  checks the self-issued token locally (`typ: at+jwt`, `iss`/`aud` = this UAS,
+  `cnf.jkt` = DPoP proof thumbprint, signature by the local `JwkGenerator`).
+- `.sai` requests then carry the **ID-JAG as a plain Bearer token**
+  (`IdJagCredentialsExtractor`); no DPoP proof is sent on that hop.
+- A storage request uses a second ID-JAG whose `aud` is the storage's
+  authorization-server issuer. Storage exchanges accept only ID-JAG subject
+  tokens
   ([`IdJagSubjectTokenVerifier.ts`](../../packages/components/src/IdJagSubjectTokenVerifier.ts)).
 - The storage trades the ID-JAG for a **bearer** access token whose only `aud`
   is the storage. The registry storage is ID-JAG-only and **claimless**: ACP
@@ -113,6 +141,32 @@ user's UAS (auth)                    storage AS (data / registry)
   (`config/identity/id-jag-accept-registry.json`).
 - The final access token is self-contained for storage authorization; there is
   no runtime grant matching on data storages.
+
+### Audience rules
+
+`IdJagSubjectTokenVerifier` has two audience modes
+([`IdJagSubjectTokenVerifier.ts`](../../packages/components/src/IdJagSubjectTokenVerifier.ts),
+[`util/url.ts`](../../packages/components/src/util/url.ts)):
+
+| Verifier | Mode | Accepted `aud` |
+|---|---|---|
+| auth `.sai` (`config/ldp/authentication/id-jag.json`) | `audiencePrefix = baseUrl` | any URL under the auth base URL: same origin, path equal to or under the base path (trailing slash normalized). This covers one-time interaction URLs and the target UAS base URL; a lookalike origin such as `https://auth.evil/` is rejected |
+| data / registry storage (`id-jag-accept.json`) | exact | the verifier's own audience, i.e. the storage AS issuer |
+| UAS token endpoint (`identity/id-jag.json`) | no prefix (issuer side) | `IdJagTokenHandler.verifyAudience` decides what may be minted: storage/UAS base URLs, this UAS, `.sai` URLs under this UAS, and `.sai` URLs of configured peer UAS origins |
+
+A prefix audience deliberately allows an ID-JAG minted for one auth `.sai` URL
+to be presented at another auth `.sai` URL. Per-interaction replay protection
+would need an exact audience there.
+
+### Issuer trust
+
+Trust is `iss`-based, not `aud`-based. `trustedIssuers` (config) is compared
+after trailing-slash normalization; a hit skips any subject-document fetch. A
+federated `iss` must be designated by the subject's controlled identifier
+document as its `lws:OpenIdProvider`, and the issuer's JWKS is discovered from
+OIDC metadata (LWS metadata fallback). There is no `solid:oidcIssuer`, WebID, or
+Solid-OIDC subject-token fallback; the details are in
+[Federation constraints](federation.md#federated-id-jag-issuer-resolution).
 
 ## 4. Claim-first policy evaluation
 
@@ -185,13 +239,19 @@ chain.
 ## 8. Configuration and tests
 
 - Identity configs: `packages/components/config/identity/id-jag.json`
-  (issuer), `id-jag-accept.json` (UAS accept), `id-jag-accept-data.json` and
-  `id-jag-accept-registry.json` (storage accept; the registry one is claimless).
+  (issuer, first-hop `SaiSelfIssuedAccessTokenVerifier`, incoming-ID-JAG verifier,
+  admin impersonation), `id-jag-accept.json` (storage base accept),
+  `id-jag-accept-data.json` and `id-jag-accept-registry.json` (storage
+  specializations; the registry one is claimless).
+- `.sai` authentication config: `config/ldp/authentication/id-jag.json` wires
+  `IdJagCredentialsExtractor` with an `IdJagSubjectTokenVerifier` whose
+  `audiencePrefix` is the auth base URL, plus a `PublicCredentialsExtractor`
+  fallback; `config/auth.json` imports it instead of CSS's `dpop-bearer.json`.
 - Policy engine: `config/policy/engine.json` wires `SaiAuthorizationManager`,
   `SaiPermissionsEngine`, `StorageExchangeAccessPolicy`,
   `OwnerAccessClaimValidator`, and `PublicPermissionReader`.
-- Packages: `packages/components/test/{id-jag,id-jag-subject-token-verifier,access-claim,grant-policy,policy-engine-claim,storage-exchange-access-policy,admin-impersonation}.test.ts`;
-  `packages/lws-auth/test/{tokens,fetch,session,browser}.test.ts`;
+- Packages: `packages/components/test/{id-jag,id-jag-subject-token-verifier,id-jag-credentials-extractor,sai-self-issued-access-token-verifier,cid-issuer-resolver,url,access-claim,grant-policy,policy-engine-claim,storage-exchange-access-policy,admin-impersonation}.test.ts`;
+  `packages/lws-auth/test/{tokens,fetch,session,browser,credential}.test.ts`;
   integration: `/test/lws-auth.test.ts`, `/test/impersonation.test.ts`,
   `/test/policy-engine.test.ts`, `/test/org-context.test.ts`.
 
@@ -200,6 +260,11 @@ Open design work is tracked as issues #116 (admin audit record), #117
 (`/sparql-admin` transport decision).
 
 ## 9. Related pages
+
+- [SAI endpoint authentication](sai-endpoint-authentication.md) — the `.sai`
+  first hop and its route-specific audiences.
+- [Federation constraints](federation.md) — federated issuer resolution through
+  CID documents.
 
 - [LWS auth client and tracing](lws-auth.md) — the client package and spans.
 - [Organization admin model](org-admin.md) — the admin marking and contexts.
