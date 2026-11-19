@@ -32,24 +32,19 @@
       }
     },
     {
-      "comment": "Verifies the first-hop authentication credential at this UAS. `trustedIssuers` is this server, so the subject document is not dereferenced. Only a sender-constrained access token is accepted: the OpenID provider's access token or the self-issued `at+jwt`, both with `aud` = this server and `cnf.jkt` from DPoP. `requireSenderConstrained` rejects an unbound token even with the right audience; `requireRestrictedTokens` enforces the audience; `additionalAudiences` is empty (no `solid`) and the Solid-OIDC issuer fallback is disabled.",
+      "comment": "Verifies the first-hop authentication credential at this UAS locally: a self-issued `at+jwt` with `iss` = this UAS, `aud` including this UAS, `cnf.jkt` matching the DPoP proof, and a signature made with this UAS's JwkGenerator key. No OIDC discovery, no subject document, no WebID/Solid-OIDC, and no CID suite.",
       "@id": "urn:sai:default:IdTokenVerifier",
-      "@type": "OidcSubjectTokenVerifier",
-      "converter": {
-        "@id": "urn:solid-server:default:RepresentationConverter"
+      "@type": "SaiSelfIssuedAccessTokenVerifier",
+      "issuer": {
+        "@id": "urn:solid-server:default:variable:baseUrl"
       },
-      "trustedIssuers": [
-        {
-          "@id": "urn:solid-server:default:variable:baseUrl"
-        }
-      ],
-      "additionalAudiences": [],
-      "acceptSolidOidcIssuer": false,
-      "requireRestrictedTokens": true,
-      "requireSenderConstrained": true
+      "jwkGenerator": {
+        "@id": "urn:solid-server:default:JwkGenerator"
+      },
+      "clockTolerance": 60
     },
     {
-      "comment": "Accepts an incoming ID-JAG at a UAS for the C2 impersonation hop (Bob -> YoYo). The signature/audience/claim are verified before the handler re-issues it under the visible subject.",
+      "comment": "Accepts an incoming ID-JAG at a UAS for the C2 impersonation hop (Bob -> YoYo). The signature/audience/claim are verified before the handler re-issues it under the visible subject. A local issuer skips the subject document; a federated issuer is resolved through the subject CID document's `lws:OpenIdProvider` service.",
       "@id": "urn:sai:default:IdJagSubjectTokenVerifier",
       "@type": "IdJagSubjectTokenVerifier",
       "converter": {
@@ -60,7 +55,6 @@
           "@id": "urn:solid-server:default:variable:baseUrl"
         }
       ],
-      "acceptSolidOidcIssuer": false,
       "clockTolerance": 60
     },
     {
@@ -124,7 +118,7 @@
         "claimValidator": {
           "@id": "urn:sai:default:DelegatedAccessClaimValidator"
         },
-        "comment": "Admin impersonation (org context): the requested scope selects read-only impersonation of the organization named by the `impersonate` parameter. The organization's UAS checks its AdminGrant, derives the organization's claim for the requested peer storage, narrows it to odrl:read and issues the ID-JAG as the organization — the admin is dropped from here on.",
+        "comment": "Admin impersonation (org context): the requested scope selects read-only impersonation of the organization named by the `impersonate` parameter. The organization's UAS checks its AdminGrant, derives the organization's claim for the requested peer storage, narrows it to odrl:read and issues the ID-JAG as the organization — the admin is dropped from here on. Audiences: storage/UAS base URLs, `.sai` URLs under this UAS, and `.sai` URLs of configured peer UASs (agent discovery uses their base URL).",
         "adminImpersonationScope": "urn:sai:params:oauth:scope:admin-impersonation:read",
         "adminImpersonationAuthority": {
           "@id": "urn:sai:default:AdminImpersonationAuthority"

@@ -54,6 +54,13 @@ interface CachedGrant {
   expiresAt: number
 }
 
+/** A request with a Bearer token, keeping every other header. */
+function withBearer(request: Request, token: string): Request {
+  const headers = new Headers(request.headers)
+  headers.set('authorization', `Bearer ${token}`)
+  return new Request(request, { headers })
+}
+
 /** An OAuth error response with `error: invalid_grant`. */
 function isInvalidGrant(error: unknown): boolean {
   return (
@@ -192,4 +199,100 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
       }
     },
   })
+}
+
+export interface IdJagFetchOptions {
+  /** The user's authentication credential. */
+  credential: LwsCredential
+  /**
+   * Resolve the ID-JAG audience for a request URL.
+   * - the full request URL for one-time `.sai` interactions
+   * - the target UAS base URL for `/.sai/agents/*`
+   */
+  audience: string | ((requestUrl: string) => string)
+  /** Underlying fetch for the `.sai` requests. */
+  fetch?: WhatwgFetch
+  /** Underlying fetch for the token requests (tests inject a fake). */
+  tokenFetch?: WhatwgFetch
+  /** Renew an ID-JAG this many milliseconds before it expires. Defaults to 30s. */
+  renewalMargin?: number
+  /** Clock, injectable for tests. */
+  now?: () => number
+}
+
+/**
+ * `fetch` that authenticates `.sai` requests with an **ID-JAG** instead of the
+ * DPoP-bound authentication credential.
+ *
+ * The DPoP credential is only presented to the user's UAS in the token
+ * exchange that mints the ID-JAG; the `.sai` request itself carries the
+ * resulting audience-constrained grant as a plain Bearer token. The grant has
+ * no `resource` claim: it is identity-only.
+ *
+ * One grant is cached per resolved audience until shortly before it expires.
+ * A `401` response discards the cached grant, mints a fresh one and retries the
+ * request once (the body is cloned for the retry).
+ */
+export function createIdJagFetch(options: IdJagFetchOptions): WhatwgFetch {
+  const { credential } = options
+  const baseFetch = options.fetch ?? (globalThis.fetch as WhatwgFetch)
+  const tokenFetch = options.tokenFetch ?? baseFetch
+  const now = options.now ?? (() => Date.now())
+  const renewalMargin = options.renewalMargin ?? 30_000
+  const resolveAudience: (requestUrl: string) => string =
+    typeof options.audience === 'string' ? () => String(options.audience) : options.audience
+
+  const grants = new Map<string, CachedGrant>()
+  const pending = new Map<string, Promise<string>>()
+
+  async function idJag(audience: string): Promise<string> {
+    const cached = grants.get(audience)
+    if (cached && cached.expiresAt > now() + renewalMargin) return cached.token
+
+    const inFlight = pending.get(audience)
+    if (inFlight) return inFlight
+
+    const promise = (async (): Promise<string> => {
+      const token = await requestIdJag({
+        uas: credential.issuer,
+        audience,
+        // The `.sai` grant is identity-only: no resource and no access claim.
+        subjectToken: await credential.getSubjectToken(),
+        subjectTokenType: credential.subjectTokenType,
+        clientId: credential.clientId,
+        dpopKeyPair: credential.dpopKeyPair,
+        fetch: tokenFetch,
+      })
+      grants.set(audience, {
+        token,
+        expiresAt: jwtExpiresAt(token) ?? now() + 300_000,
+      })
+      return token
+    })()
+    pending.set(audience, promise)
+    try {
+      return await promise
+    } finally {
+      pending.delete(audience)
+    }
+  }
+
+  return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const request = new Request(input, init)
+    // Keep an unused copy for the post-challenge retry: the body of `request`
+    // is consumed by the first attempt.
+    const retry = request.clone()
+    const audience = resolveAudience(request.url)
+
+    const token = await idJag(audience)
+    const response = await baseFetch(withBearer(request, token))
+    if (response.status !== 401) return response
+
+    // The grant may have been rejected because it expired or was revoked:
+    // mint a fresh one instead of reusing the cached token.
+    grants.delete(audience)
+    pending.delete(audience)
+    const fresh = await idJag(audience)
+    return baseFetch(withBearer(retry, fresh))
+  }
 }

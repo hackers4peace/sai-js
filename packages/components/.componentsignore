@@ -7,5 +7,10 @@
   "GarageBucketInfo",
   "GarageKeyInfo",
   "GarageBucketKeyPermissions",
-  "AdminImpersonationDenied"
+  "AdminImpersonationDenied",
+  "SaiSession",
+  "SelfIssuedCredential",
+  "CidIssuerResolver",
+  "WhatwgFetch",
+  "JWTVerifyGetKey"
 ]

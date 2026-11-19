@@ -2,7 +2,7 @@ import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { beforeAll, describe, expect, test } from 'vitest'
 
 import type { LwsCredential } from '../src/credential.ts'
-import { createLwsAuthFetch } from '../src/fetch.ts'
+import { createIdJagFetch, createLwsAuthFetch } from '../src/fetch.ts'
 import { ACCESS_TOKEN_TYPE, ID_JAG_TOKEN_TYPE } from '../src/tokens.ts'
 import { createFakeFetch, formBody, json, makeJwt } from './helpers.ts'
 
@@ -334,5 +334,133 @@ describe('createLwsAuthFetch', () => {
       const authorization = request.headers.get('authorization')
       if (authorization) expect(authorization).toMatch(/^Bearer access-/u)
     }
+  })
+})
+
+describe('createIdJagFetch', () => {
+  const AGENT = 'https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ'
+  const ACCESS_REQUEST = 'https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9hbGljZQ'
+
+  function createSaiWorld(options: { staleFirst?: string } = {}) {
+    let counter = 0
+    const grants: string[] = []
+    const world = createFakeFetch((url, request): Response | undefined => {
+      if (url.href === UAS_TOKEN && request.method === 'POST') {
+        const audience = formBody(request).get('audience') ?? ''
+        counter += 1
+        const grant = `id-jag-${counter}:${audience}`
+        grants.push(grant)
+        return json({
+          issued_token_type: ID_JAG_TOKEN_TYPE,
+          access_token: grant,
+          token_type: 'N_A',
+          expires_in: 300,
+        })
+      }
+      if (url.pathname.startsWith('/.sai/')) {
+        const authorization = request.headers.get('authorization') ?? ''
+        if (options.staleFirst && authorization.includes(options.staleFirst)) {
+          options.staleFirst = undefined
+          return new Response(undefined, { status: 401 })
+        }
+        return new Response('ok', { status: 200 })
+      }
+    })
+    return { ...world, grants }
+  }
+
+  test('mints one identity-only ID-JAG per resolved audience', async () => {
+    const world = createSaiWorld()
+    const fetch = createIdJagFetch({
+      credential: createCredential(),
+      audience: (url) =>
+        new URL(url).pathname.startsWith('/.sai/agents/') ? 'https://auth/' : url,
+      fetch: world.fetch,
+    })
+
+    expect((await fetch(AGENT)).status).toBe(200)
+    expect((await fetch(ACCESS_REQUEST)).status).toBe(200)
+
+    const grantRequests = world.requests.filter(isGrantRequest)
+    expect(grantRequests.map((request) => formBody(request).get('audience'))).toEqual([
+      'https://auth/',
+      ACCESS_REQUEST,
+    ])
+    for (const request of grantRequests) {
+      expect(formBody(request).get('resource')).toBeNull()
+      expect(formBody(request).get('access')).toBeNull()
+    }
+
+    const saiRequests = world.requests.filter(
+      (request) => request.url === AGENT || request.url === ACCESS_REQUEST
+    )
+    expect(saiRequests.map((request) => request.headers.get('authorization'))).toEqual([
+      `Bearer ${world.grants[0]}`,
+      `Bearer ${world.grants[1]}`,
+    ])
+  })
+
+  test('caches the grant per audience until it expires', async () => {
+    const world = createSaiWorld()
+    const fetch = createIdJagFetch({
+      credential: createCredential(),
+      audience: (url) => url,
+      fetch: world.fetch,
+      now: () => Date.now(),
+    })
+
+    await fetch(ACCESS_REQUEST)
+    await fetch(ACCESS_REQUEST)
+    await fetch(AGENT)
+
+    expect(
+      world.requests.filter(isGrantRequest).map((request) => formBody(request).get('audience'))
+    ).toEqual([ACCESS_REQUEST, AGENT])
+  })
+
+  test('mints a fresh grant and retries once on 401', async () => {
+    const world = createSaiWorld({ staleFirst: 'id-jag-1:' })
+    const fetch = createIdJagFetch({
+      credential: createCredential(),
+      audience: (url) => url,
+      fetch: world.fetch,
+    })
+
+    const response = await fetch(ACCESS_REQUEST)
+    expect(response.status).toBe(200)
+    expect(world.grants).toHaveLength(2)
+    expect(world.requests.filter(isGrantRequest)).toHaveLength(2)
+
+    const saiRequests = world.requests.filter((request) => request.url === ACCESS_REQUEST)
+    expect(saiRequests).toHaveLength(2)
+    expect(saiRequests.map((request) => request.headers.get('authorization'))).toEqual([
+      `Bearer ${world.grants[0]}`,
+      `Bearer ${world.grants[1]}`,
+    ])
+  })
+
+  test('uses the token fetch for the exchange and the base fetch for the grant', async () => {
+    const world = createSaiWorld()
+    const tokenFetch = createFakeFetch((url, request) => {
+      if (url.href === UAS_TOKEN && request.method === 'POST') {
+        return json({
+          issued_token_type: ID_JAG_TOKEN_TYPE,
+          access_token: 'id-jag-from-token-fetch',
+          token_type: 'N_A',
+          expires_in: 300,
+        })
+      }
+    })
+    const fetch = createIdJagFetch({
+      credential: createCredential(),
+      audience: (url) => url,
+      fetch: world.fetch,
+      tokenFetch: tokenFetch.fetch,
+    })
+
+    await fetch(ACCESS_REQUEST)
+    expect(tokenFetch.requests.filter(isGrantRequest)).toHaveLength(1)
+    expect(world.requests.filter(isGrantRequest)).toHaveLength(0)
+    expect(world.grants).toHaveLength(0)
   })
 })

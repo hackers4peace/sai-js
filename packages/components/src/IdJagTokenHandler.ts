@@ -33,6 +33,7 @@ import type { AccessClaimValidator } from './DelegatedAccessClaimValidator.js'
 import { ID_JAG_TOKEN_TYPE } from './IdJagIssuer.js'
 import type { IdJagIssuer } from './IdJagIssuer.js'
 import { sharedTracer } from './tracing/otel-state.js'
+import { isWithinBaseUrl } from './util/url.js'
 
 /** The grant type of OAuth 2.0 Token Exchange (RFC 8693), the only one this endpoint supports. */
 export const ID_JAG_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:token-exchange'
@@ -121,7 +122,8 @@ export class IdJagTokenHandler extends HttpHandler {
 
   private readonly issuer: IdJagIssuer
   private readonly verifier: SubjectTokenVerifier
-  private readonly audienceOrigins: string[]
+  private readonly storageOrigins: string[]
+  private readonly authorizationServerOrigins: string[]
   private readonly tokenEndpoint: string
   private readonly claimValidator?: AccessClaimValidator
   private readonly adminImpersonationScope?: string
@@ -132,7 +134,8 @@ export class IdJagTokenHandler extends HttpHandler {
     super()
     this.issuer = args.issuer
     this.verifier = args.verifier
-    this.audienceOrigins = [...args.storageOrigins, ...(args.authorizationServerOrigins ?? [])]
+    this.storageOrigins = args.storageOrigins
+    this.authorizationServerOrigins = args.authorizationServerOrigins ?? []
     this.tokenEndpoint = new URL(args.tokenPath ?? '.well-known/lws/token', args.issuer.issuer).href
     this.claimValidator = args.claimValidator
     this.adminImpersonationScope = args.adminImpersonationScope
@@ -648,9 +651,10 @@ export class IdJagTokenHandler extends HttpHandler {
   }
 
   /**
-   * Requires the requested audience to be one of the storages this server issues
-   * ID-JAGs for: an `aud` a client can pick freely would make the grant as
-   * replayable as the credential it replaced.
+   * Requires the requested audience to be one this server may issue ID-JAGs for:
+   * a known storage/UAS base URL, a `.sai` interaction URL under this auth
+   * service, or a `.sai` URL of a configured peer UAS. An `aud` a client can
+   * pick freely would make the grant as replayable as the credential it replaced.
    */
   private async verifyAudience(audience: string): Promise<void> {
     let url: URL
@@ -662,18 +666,42 @@ export class IdJagTokenHandler extends HttpHandler {
         `${audience} is not a valid authorization server identifier.`
       )
     }
-    if (url.protocol !== 'https:' || url.pathname !== '/' || url.search !== '' || url.hash !== '') {
+    if (url.protocol !== 'https:' || url.hash !== '') {
+      throw new OAuthError('invalid_target', `${audience} needs to be an https audience URL.`)
+    }
+
+    // Storage and authorization-server base URLs (the existing exact set).
+    if (url.pathname === '/') {
+      if (
+        url.search === '' &&
+        (this.matchesOrigin(
+          [...this.storageOrigins, ...this.authorizationServerOrigins],
+          audience
+        ) ||
+          this.matchesOrigin([this.issuer.issuer], audience))
+      ) {
+        return
+      }
       throw new OAuthError(
         'invalid_target',
-        `${audience} needs to be the https issuer identifier (the base URL) of a resource authorization server.`
+        `${audience} is not a storage or authorization server known to this server.`
       )
     }
-    if (!this.matchesOrigin(this.audienceOrigins, audience)) {
-      throw new OAuthError(
-        'invalid_target',
-        `${audience} is not a storage known to this authorization server.`
-      )
+
+    // `.sai` interaction URLs: under this auth service, or on a configured peer
+    // UAS. Agent discovery uses the peer UAS base URL (the branch above).
+    if (
+      url.pathname.startsWith('/.sai/') &&
+      (isWithinBaseUrl(audience, this.issuer.issuer) ||
+        this.matchesOrigin(this.authorizationServerOrigins, audience))
+    ) {
+      return
     }
+
+    throw new OAuthError(
+      'invalid_target',
+      `${audience} is not a storage, authorization server, or trusted .sai service known to this server.`
+    )
   }
 
   /**

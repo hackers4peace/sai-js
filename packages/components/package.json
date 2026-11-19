@@ -57,7 +57,6 @@
     "@temporalio/interceptors-opentelemetry-v2": "^1.24.0",
     "@temporalio/worker": "^1.24.0",
     "@temporalio/workflow": "^1.24.0",
-    "@uvdsl/solid-oidc-client-browser": "^0.2.1",
     "asynchronous-handlers": "^1.0.2",
     "effect": "^3.10.8",
     "fetch-sparql-endpoint": "^6.2.0",

@@ -39,6 +39,9 @@ function isCapturableContentType(contentType) {
   if (typeof contentType !== 'string' || contentType.length === 0) return false
   const value = contentType.split(';')[0].trim().toLowerCase()
   if (value.includes('octet-stream')) return false
+  // Long-lived stream formats: cloning/buffering their body stalls the client
+  // fetch until the stream ends (notification streams never do).
+  if (value.includes('x-ndjson') || value.includes('event-stream')) return false
   if (value.startsWith('application/') || value.startsWith('text/')) return true
   return value.endsWith('+json') || value.endsWith('+xml')
 }

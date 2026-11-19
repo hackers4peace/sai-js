@@ -62,9 +62,8 @@ export type { SparqlTransport }
  * Send a SPARQL query to the org's `/sparql-admin` endpoint via HTTP
  * `QUERY`, authenticated as the admin (the caller's own session — the only
  * session the admin's server holds). `QUERY` is the safe, read-only method
- * (draft-ietf-httpapi-safe-methods-wg); it is DPoP-verifiable since
- * `@solid/access-token-verifier` 2.1.2 added it to its `REQUEST_METHOD`
- * whitelist.
+ * (draft-ietf-httpapi-safe-methods-wg); the request is authenticated with the
+ * session's ID-JAG (Bearer), not DPoP.
  */
 async function adminSparqlQuery(
   adminSession: AuthorizationAgent,

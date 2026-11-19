@@ -73,10 +73,10 @@ function termToJson(term: IBindings[string]): Record<string, unknown> {
  * Query-only SPARQL endpoint for org admins (org-context-sparql.md §2.2).
  *
  * Route `/.sai/sparql-admin/<base64url-org-webid>`, speaking the HTTP
- * `QUERY` method only (safe, read-only — draft-ietf-httpapi-safe-methods-wg;
- * DPoP-verifiable since `@solid/access-token-verifier` 2.1.2 added QUERY to
- * its `REQUEST_METHOD` whitelist). The SPARQL query travels in the request
- * body as `application/sparql-query`; updates (`application/sparql-update`,
+ * `QUERY` method only (safe, read-only — draft-ietf-httpapi-safe-methods-wg).
+ * The route is authenticated with an ID-JAG (Bearer); DPoP is only used at
+ * the first ID-JAG exchange. The SPARQL query travels in the request body as
+ * `application/sparql-query`; updates (`application/sparql-update`,
  * INSERT/DELETE/…) and other methods are rejected.
  *
  * Gate (`services/adminGate.ts` — the caller

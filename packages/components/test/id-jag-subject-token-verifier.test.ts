@@ -76,6 +76,21 @@ class TestVerifier extends IdJagSubjectTokenVerifier {
   }
 }
 
+/** A verifier whose subject CID document and issuer keys are local. */
+class FederatedVerifier extends IdJagSubjectTokenVerifier {
+  public constructor(fetchImpl: typeof fetch) {
+    super({
+      converter: {} as RepresentationConverter,
+      trustedIssuers: [],
+      fetch: fetchImpl,
+    })
+  }
+
+  protected async getKeySet(): Promise<JWTVerifyGetKey> {
+    return keys.publicKey as unknown as JWTVerifyGetKey
+  }
+}
+
 class StubIdTokenVerifier extends SubjectTokenVerifier {
   public async canHandle({ tokenType }: SubjectTokenVerifierInput): Promise<void> {
     if (tokenType !== ID_TOKEN_TYPE) {
@@ -294,5 +309,84 @@ describe('IdJagSubjectTokenVerifier', () => {
         audience: RESOURCE_AS,
       })
     ).resolves.toMatchObject({ subject: WEBID })
+  })
+
+  test('accepts any audience URL under the configured auth prefix', async () => {
+    const verifier = new TestVerifier({ audiencePrefix: UAS })
+    await expect(
+      verifier.handleSafe(
+        input(await makeGrant({ aud: 'https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9hbGljZQ' }))
+      )
+    ).resolves.toMatchObject({ subject: WEBID })
+    await expect(
+      verifier.handleSafe(
+        input(await makeGrant({ aud: 'https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ' }))
+      )
+    ).resolves.toMatchObject({ subject: WEBID })
+
+    // URL-aware: a lookalike origin is not under the auth prefix.
+    await expect(
+      verifier.handleSafe(input(await makeGrant({ aud: 'https://auth.evil/.sai/grants/x' })))
+    ).rejects.toThrow(BadRequestHttpError)
+  })
+
+  test('keeps exact audience validation without a prefix', async () => {
+    const verifier = new TestVerifier()
+    await expect(
+      verifier.handleSafe(input(await makeGrant({ aud: 'https://auth/.sai/grants/x' })))
+    ).rejects.toThrow(BadRequestHttpError)
+  })
+
+  test('verifies a federated issuer through the subject CID document', async () => {
+    const issuer = 'https://other-uas.example/'
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            id: WEBID,
+            service: [
+              {
+                type: 'https://www.w3.org/ns/lws#OpenIdProvider',
+                serviceEndpoint: issuer,
+              },
+            ],
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } }
+        )
+    )
+    const verifier = new FederatedVerifier(fetchImpl as unknown as typeof fetch)
+
+    await expect(
+      verifier.handleSafe(input(await makeGrant({ iss: issuer })))
+    ).resolves.toMatchObject({ subject: WEBID, issuer })
+    expect(fetchImpl).toHaveBeenCalledWith(WEBID, {
+      headers: {
+        accept: 'application/ld+json, application/json;q=0.9, text/turtle;q=0.8, application/cid',
+      },
+    })
+  })
+
+  test('rejects a federated issuer the CID document does not designate', async () => {
+    const issuer = 'https://other-uas.example/'
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            id: WEBID,
+            service: [
+              {
+                type: 'https://www.w3.org/ns/lws#OpenIdProvider',
+                serviceEndpoint: 'https://third.example/',
+              },
+            ],
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } }
+        )
+    )
+    const verifier = new FederatedVerifier(fetchImpl as unknown as typeof fetch)
+
+    await expect(verifier.handleSafe(input(await makeGrant({ iss: issuer })))).rejects.toThrow(
+      'does not designate'
+    )
   })
 })

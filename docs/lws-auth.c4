@@ -14,7 +14,8 @@
  *     packages/components/config/{data,registry}.json import css:config/identity/lws/default.json
  *     packages/components/config/auth.json does NOT (auth is only the OIDC provider)
  *     packages/utils/src/lws-auth.ts        (client-side discovery + exchange)
- *     packages/components/src/SelfIssuedSession.ts, builders/sessionManager.ts
+ *     packages/components/src/SaiSession.ts, builders/sessionManager.ts;
+ *     packages/lws-auth/src/credential.ts, src/fetch.ts
  *
  * The landscape lives in architecture.c4 (h4p.*), the per-user stacks in
  * temporal.c4 (Alice, Bob, App); this file only adds the LWS-specific parts.
@@ -79,20 +80,40 @@ model {
   }
 
   extend h4p.Auth {
+    component SaiRoutes '.sai routes' 'Bearer ID-JAG' {
+      description '''
+        `.sai/agents/*`, `.sai/access-requests/*`, `.sai/grants/*`,
+        `.sai/invitations/*`, `.sai/sparql-admin/*`, `.sai/reciprocal-webhook/*`.
+
+        `IdJagCredentialsExtractor` (`config/ldp/authentication/id-jag.json`)
+        accepts `Authorization: Bearer <ID-JAG>` and leaves anonymous requests
+        to `PublicCredentialsExtractor` (so `.sai/agents` discovery still works).
+        `.sai/api` and `.sai/events` keep the account cookie.
+
+        The `IdJagSubjectTokenVerifier` instance has `audiencePrefix = baseUrl`:
+        any `aud` under `https://auth/` is accepted (URL-aware origin + path,
+        never raw `startsWith`). A local `iss` is trusted and skips the CID
+        lookup; a federated `iss` is resolved through the subject CID document.
+      '''
+    }
+
     component SelfIssuedCredential 'Self-issued credential' 'at+jwt' {
       description '''
-        `SelfIssuedSession` (`packages/components/src/SelfIssuedSession.ts`) with
+        `createSelfIssuedCredentialWithJwk` (`packages/components/src/util/selfIssuedCredential.ts`),
+        composed into `SaiSession` (`packages/components/src/SaiSession.ts`) with
         `EnvJwkGenerator(CSS_ENCODED_PRIVATE_JWK)`.
 
-        `typ: at+jwt`, `iss: https://auth/`, `aud: "solid"`, `sub`/`webid` = agent,
-        `client_id`/`azp` = client, `cnf.jkt` = DPoP key thumbprint.
+        `typ: at+jwt`, `iss: https://auth/`, `aud` = this UAS by default,
+        `sub` = the agent's SAI/CID URI, `client_id`/`azp` = the client (the
+        agent's Authorization Agent), `cnf.jkt` = DPoP key thumbprint. There is
+        no `webid` claim and no `solid` audience.
 
         This — not an OpenID Connect ID Token — is what the suite and the
         authorization agents present as `subject_token`
-        (`subject_token_type=…:id_token`), signed in-process with the shared key.
-        The **UI** presents its own session access token instead
-        (`…:access_token`, `aud` = `https://auth/`, `cnf.jkt` = the session key);
-        the UAS mints no credentials of its own (`lws-auth` D15).
+        (`subject_token_type=…:access_token`), signed in-process with the shared
+        key. DPoP is used only for this first exchange. The **UI** presents its
+        own session access token instead (`…:access_token`, `aud` = `https://auth/`,
+        `cnf.jkt` = the session key); the UAS mints no credentials of its own.
       '''
     }
 
@@ -101,9 +122,21 @@ model {
         `IdJagRouter` + `IdJagTokenHandler`, `POST /.well-known/lws/token`.
 
         **Exchange 1 of 2.** `requested_token_type=…:id-jag`,
-        `subject_token_type=…:id_token`, `audience=<resource AS>`, with a DPoP
-        proof for the credential's `cnf.jkt`. Mints one ID-JAG per resource
-        authorization server and never a storage access token.
+        `subject_token_type=…:access_token`, `audience=<target>`, with a DPoP
+        proof for the credential's `cnf.jkt`. Mints one ID-JAG and never a
+        storage access token.
+
+        Audiences are route-specific:
+        - storage/UAS base URL for a storage exchange and for
+          `/.sai/agents/*` (the target UAS base URL);
+        - the full `.sai` request URL for one-time interactions
+          (`access-requests`, `grants`, `invitations`, `sparql-admin`,
+          `reciprocal-webhook`), validated by the auth service as a URL under
+          its base-URL prefix;
+        - configured peer UASs for their `.sai` URLs.
+
+        The `.sai` ID-JAG is identity-only: no `resource`, no ODRL access claim.
+        `.sai` requests carry it as a plain Bearer token; DPoP stops here.
 
         The UAS advertises no `/.well-known/lws-configuration` (`auth.json`
         imports no `css:config/identity/lws/default.json`), so clients use this
@@ -116,10 +149,11 @@ model {
     component WebIdDocument 'WebID / CID document' 'id' {
       description '''
         `https://id/alice` — the dereferenceable `sub` of the subject token. It
-        carries `solid:oidcIssuer <https://auth/>`
-        (`packages/data-model/src/templates/WebId.ts`), which is how the storage
-        learns which OpenID Provider to trust. LWS's own
-        `lws:OpenIdProvider` service link is not used by SAI fixtures.
+        carries the LWS `lws:OpenIdProvider` service whose `serviceEndpoint` is
+        `https://auth/` (`services/id/cid.ts` derives it from the profile; the
+        registry fixtures carry it explicitly). That service — not a
+        `solid:oidcIssuer` triple — is how another UAS resolves a federated
+        ID-JAG issuer. A locally trusted issuer skips the document entirely.
       '''
     }
   }
@@ -330,7 +364,8 @@ views {
         notes'''
           [LWS OIDC — Authentication Credential Validation](https://w3c.github.io/lws-protocol/lws10-authn-openid/#validation):
           the document's `id` MUST equal `sub` and name the issuer as its
-          `OpenIdProvider` (or, for Solid-OIDC tokens, `solid:oidcIssuer`).
+          `OpenIdProvider`. A locally trusted issuer skips this document; there
+          is no `solid:oidcIssuer` fallback on the SAI path.
         '''
       }
       h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'fetch server metadata + JWKS' {
@@ -465,14 +500,16 @@ views {
       notes'''
         `token_endpoint` = `https://data/.well-known/lws/token`,
         `jwks_uri` = `https://data/.well-known/lws/jwks`,
-        `subject_token_types_supported` = [`jwt`, `id_token`, `id-jag`] (C2).
+        `subject_token_types_supported` = [`id-jag`] (C2/C6: SAI storages
+        accept only ID-JAG subject tokens).
       '''
     }
 
     h4p.Auth.SelfIssuedCredential -> App.UI 'self-issued at+jwt' {
       notes'''
-        `iss: https://auth/`, `aud: "solid"`, `webid`, `azp`, `cnf.jkt` — signed
-        with the UAS key. Recorded as `sai.token.subject.*` on the client span.
+        `iss: https://auth/`, `aud: https://auth/` (the UAS), `sub` = the
+        agent's CID URI, `azp` = the client, `cnf.jkt` — signed with the UAS key.
+        Recorded as `sai.token.subject.*` on the client span.
       '''
     }
 
@@ -480,7 +517,7 @@ views {
       notes'''
         ```http
         grant_type=urn:ietf:params:oauth:grant-type:token-exchange
-        &subject_token_type=urn:ietf:params:oauth:token-type:id_token
+        &subject_token_type=urn:ietf:params:oauth:token-type:access_token
         &subject_token=<at+jwt>
         &resource=https://data/alice-work/
         ```
@@ -495,7 +532,8 @@ views {
       h4p.Data.LwsAuthorizationServer -> h4p.WebID.WebIdDocument 'GET https://id/alice (deref sub)' {
         notes'''
           `sub` is not in `trustedIssuers` of the storage → the document is
-          dereferenced and `solid:oidcIssuer` must name the token's `iss`.
+          dereferenced and its `lws:OpenIdProvider` service must name the
+          token's `iss`.
         '''
       }
       h4p.Data.LwsAuthorizationServer -> h4p.Auth.OP 'GET /.well-known/openid-configuration'
@@ -542,8 +580,8 @@ views {
    * 2b. The two-step chain (C1–C4), read off trace 48e23f27… (2026-11-13): the
    *     credential is exchanged at the **user's** authorization server for one
    *     ID-JAG per storage AS (`aud`), and each storage trades its grant for a
-   *     bearer access token. Opt-in today via
-   *     `buildLwsFetch(webid, clientId, { idJag: true })`.
+   *     bearer access token. The same chain backs `SaiSession`; the first
+   *     hop is the only DPoP hop.
    */
   dynamic view lws-authorization-id-jag {
     title: 'LWS authorization (implemented, ID-JAG)'
@@ -1081,8 +1119,9 @@ views {
       Federated, the incoming ID-JAG's `sub` is Bob and its `iss` is **Bob's** UAS.
       `IdJagSubjectTokenVerifier` dereferences `https://id/bob` and requires the
       document to designate that issuer as its OpenID provider
-      (`lws:OpenIdProvider` with `serviceEndpoint` = `iss`, or `solid:oidcIssuer`),
-      so YoYo's UAS never trusts a claim just because it arrived over TLS.
+      (`lws:OpenIdProvider` with `serviceEndpoint` = `iss`), so YoYo's UAS never
+      trusts a claim just because it arrived over TLS. There is no
+      `solid:oidcIssuer` fallback.
 
       ```http
       GET https://id/bob
@@ -1722,6 +1761,36 @@ views {
     h4p.Data.SaiPolicyEngine -> h4p.Data.LwsAccessTokenValidation 'decision — claim path'
     h4p.Data.LwsAccessTokenValidation -> Dan.UAS '200 application/ld+json'
     Dan.UAS -> Dan.AUI '200 RPC result — instances + labels (cookie session)'
+  }
+
+  dynamic view sai-id-jag {
+    title: '.sai ID-JAG (route-specific audiences)'
+
+    description '''
+      `.sai` requests are authenticated with an identity-only ID-JAG. The
+      DPoP-bound self-issued credential is presented once, at the UAS token
+      endpoint; the `.sai` request itself is a plain Bearer request.
+    '''
+
+    include App.UI
+    include h4p.Auth, h4p.Auth.SelfIssuedCredential, h4p.Auth.OP
+    include h4p.Auth.IdJagTokenEndpoint, h4p.Auth.SaiRoutes
+    include h4p.WebID.WebIdDocument
+    include h4p.Data, h4p.Data.LwsAuthorizationServer
+
+    App.UI -> h4p.Auth.IdJagTokenEndpoint 'mint ID-JAG — DPoP subject token, aud = full .sai URL or target UAS base URL'
+
+    h4p.Auth.IdJagTokenEndpoint -> App.UI 'ID-JAG — identity only, no resource, no access claim'
+
+    App.UI -> h4p.Auth.SaiRoutes 'GET/POST /.sai/... — Bearer ID-JAG'
+
+    h4p.Auth.SaiRoutes -> h4p.Auth.SaiRoutes 'local iss: trustedIssuers → verify with local key, skip CID'
+
+    h4p.Auth.SaiRoutes -> h4p.WebID.WebIdDocument 'federated iss: dereference sub CID → lws:OpenIdProvider'
+
+    h4p.Auth.SaiRoutes -> h4p.Auth.OP 'federated iss: OIDC discovery + JWKS'
+
+    App.UI -> h4p.Data.LwsAuthorizationServer 'storage request → ID-JAG → bearer access token (createLwsAuthFetch)'
   }
 
   view lws of h4p.Data {

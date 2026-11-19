@@ -44,8 +44,5 @@
       "oxlint --fix --no-error-on-unmatched-pattern",
       "oxfmt --no-error-on-unmatched-pattern"
     ]
-  },
-  "overrides": {
-    "@solid/access-token-verifier": "github:elf-pavlik/access-token-verifier#6640d34d4446a3b2c1c5d94cefca019f53332b15"
   }
 }

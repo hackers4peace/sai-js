@@ -106,7 +106,22 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
 
     if (requestBody.type === 'Add' && requestBody.object) {
       const session = await this.sessionManager.getSession(channel.webId)
-      const activity = await ActivityRegistry.loadActivity(requestBody.object, session.fetch)
+      let activity: Awaited<ReturnType<typeof ActivityRegistry.loadActivity>>
+      try {
+        activity = await ActivityRegistry.loadActivity(requestBody.object, session.fetch)
+      } catch (error: unknown) {
+        // A seed/reset can remove the source activity while a delivery is
+        // already queued in Temporal. That is permanent: retrying it only
+        // keeps the activity pending and stalls the next test's quiescence.
+        const status = (error as { response?: { status?: number } }).response?.status
+        if (
+          status === 404 ||
+          (error instanceof Error && /failed to fetch .*: 404$/u.test(error.message))
+        ) {
+          throw new HttpError(410, 'GoneHttpError', `Unknown activity: ${requestBody.object}`)
+        }
+        throw error
+      }
 
       // Forward to the events bus BEFORE dispatch — every Add produces a line,
       // including grantee activities (whose branch returns 200 early below).

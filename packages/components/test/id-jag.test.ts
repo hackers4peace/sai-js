@@ -276,6 +276,50 @@ describe('IdJagTokenHandler', () => {
     expect(JSON.parse(String(captured.body)).error).toBe('invalid_target')
   })
 
+  test('accepts the auth base URL and `.sai` interaction URLs under it', async () => {
+    const { handler } = buildHandler()
+
+    const agent = await call(handler, tokenRequest({ audience: BASE_URL }))
+    expect(agent.status).toBe(200)
+
+    for (const audience of [
+      'https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9hbGljZQ',
+      // Query parameters are part of the full request URL (the org admin
+      // SPARQL endpoint carries `?pod=`).
+      'https://auth/.sai/sparql-admin/aHR0cHM6Ly9pZC95b3lv?pod=https%3A%2F%2Fdata%2Fyoyo-eu%2F',
+    ]) {
+      const interaction = await call(handler, tokenRequest({ audience }))
+      expect(interaction.status, audience).toBe(200)
+    }
+  })
+
+  test('accepts `.sai` audiences of configured peer UASs only', async () => {
+    const { handler } = buildHandler({
+      storageOrigins: ['data', 'registry'],
+      authorizationServerOrigins: ['https://peer.example/'],
+    })
+
+    for (const audience of [
+      'https://peer.example/',
+      'https://peer.example/.sai/grants/aHR0cHM6Ly9pZC9hbGljZQ',
+      'https://peer.example/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ',
+    ]) {
+      const captured = await call(handler, tokenRequest({ audience }))
+      expect(captured.status, audience).toBe(200)
+    }
+
+    const unrelated = await call(
+      handler,
+      tokenRequest({ audience: 'https://untrusted.example/.sai/grants/x' })
+    )
+    expect(unrelated.status).toBe(400)
+    expect(JSON.parse(String(unrelated.body)).error).toBe('invalid_target')
+
+    // URL-aware comparison: a lookalike origin is not the auth base URL.
+    const lookalike = await call(handler, tokenRequest({ audience: 'https://auth.evil/.sai/x' }))
+    expect(lookalike.status).toBe(400)
+  })
+
   test('only answers token exchange requests that ask for an ID-JAG', async () => {
     const { handler } = buildHandler()
 

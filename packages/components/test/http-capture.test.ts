@@ -40,6 +40,9 @@ describe('isCapturableContentType', () => {
     expect(isCapturableContentType(undefined)).toBe(false)
     expect(isCapturableContentType('image/png')).toBe(false)
     expect(isCapturableContentType('application/octet-stream')).toBe(false)
+    // long-lived streams must never be buffered by the response capture
+    expect(isCapturableContentType('application/x-ndjson')).toBe(false)
+    expect(isCapturableContentType('text/event-stream')).toBe(false)
   })
 })
 

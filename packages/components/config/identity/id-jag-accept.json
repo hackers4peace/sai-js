@@ -7,12 +7,11 @@
   "import": [],
   "@graph": [
     {
-      "comment": "Accepts an ID-JAG as the only subject token of a storage's token exchange (C6). The grant is `aud`-restricted to this authorization server, so a grant minted for another storage is useless here. The issuer is trusted through `trustedIssuers` or an `lws:OpenIdProvider` service; the Solid-OIDC `solid:oidcIssuer` fallback is disabled (D34).",
+      "comment": "Accepts an ID-JAG as the only subject token of a storage's token exchange (C6). The grant is `aud`-restricted to this authorization server exactly, so a grant minted for another storage is useless here. The issuer is trusted through `trustedIssuers` or the subject CID document's `lws:OpenIdProvider` service; there is no Solid-OIDC `solid:oidcIssuer` fallback (D34).",
       "@id": "urn:sai:default:IdJagSubjectTokenVerifier",
       "@type": "IdJagSubjectTokenVerifier",
       "converter": { "@id": "urn:solid-server:default:RepresentationConverter" },
       "trustedIssuers": [{ "@id": "urn:solid-server:default:variable:baseUrl" }],
-      "acceptSolidOidcIssuer": false,
       "clockTolerance": 60
     },
     {

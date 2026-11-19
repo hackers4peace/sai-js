@@ -1,0 +1,35 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/asynchronous-handlers/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "Verifies the ID-JAGs presented as Bearer tokens on `.sai` routes. The audience is accepted when it is any URL under this auth service's base URL: one-time interactions use the full request URL, `/.sai/agents/*` uses the target UAS base URL. The issuer is this UAS (`trustedIssuers`), so the CID subject-document lookup is skipped; a federated issuer is resolved through the subject CID document. No Solid-OIDC/WebID fallback and no first-hop CID suite.",
+      "@id": "urn:sai:default:AuthIdJagSubjectTokenVerifier",
+      "@type": "IdJagSubjectTokenVerifier",
+      "converter": { "@id": "urn:solid-server:default:RepresentationConverter" },
+      "trustedIssuers": [{ "@id": "urn:solid-server:default:variable:baseUrl" }],
+      "audiencePrefix": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "clockTolerance": 60
+    },
+    {
+      "comment": "Credentials for `.sai` routes: an ID-JAG as a plain Bearer token (DPoP is only used at the first ID-JAG exchange), or no credentials. The Public fallback keeps anonymous `/.sai/agents` discovery working.",
+      "@id": "urn:solid-server:default:CredentialsExtractor",
+      "@type": "CachedHandler",
+      "source": {
+        "@type": "StatusWaterfallHandler",
+        "handlers": [
+          {
+            "@type": "IdJagCredentialsExtractor",
+            "verifier": { "@id": "urn:sai:default:AuthIdJagSubjectTokenVerifier" },
+            "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" }
+          },
+          { "@type": "PublicCredentialsExtractor" }
+        ]
+      }
+    }
+  ]
+}

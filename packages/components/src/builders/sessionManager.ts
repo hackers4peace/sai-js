@@ -1,73 +1,113 @@
 import type {
   LwsAuthFetchOptions,
-  LwsCredential,
   LwsImpersonationOptions,
+  SelfIssuedCredential,
 } from '@elfpavlik/lws-auth'
-import { ACCESS_TOKEN_TYPE, createLwsAuthFetch } from '@elfpavlik/lws-auth'
+import { createIdJagFetch, createLwsAuthFetch } from '@elfpavlik/lws-auth'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
-import { type GenerateKeyPairResult, generateKeyPair } from 'jose'
 
 import { EnvJwkGenerator } from '../EnvJwkGenerator.js'
-import { SelfIssuedSession } from '../SelfIssuedSession.js'
+import { SaiSession } from '../SaiSession.js'
 import { SessionManager } from '../SessionManager.js'
+import { createSelfIssuedCredentialWithJwk } from '../util/selfIssuedCredential.js'
 import { agentId } from '../util/uriTemplates.js'
+import { saiAudience } from '../util/url.js'
 
 export function buildSessionManager(): SessionManager {
   const jwkGenerator = new EnvJwkGenerator(process.env.CSS_ENCODED_PRIVATE_JWK)
   return new SessionManager(process.env.CSS_BASE_URL, jwkGenerator, process.env.CSS_REG_ORIGIN, 60)
 }
 
+interface BuiltCredential {
+  /** The self-issued, DPoP-bound credential of the agent's own UAS. */
+  credential: SelfIssuedCredential
+  dpopKeyPair: CryptoKeyPair
+  /** The credential's `iss` — the user's authorization server (UAS). */
+  issuer: string
+  /** The credential's `azp`/`client_id`. */
+  clientId: string
+}
+
 /**
- * The self-issued session plus its DPoP key pair — the pairing `SessionManager`
- * uses: the ID token is the LWS subject token, and the key pair signs both the
- * token's `cnf` and the proof at the token endpoint.
+ * The self-issued session credential plus its DPoP key pair — the pairing
+ * `SessionManager` uses: the credential is the LWS subject token, and the key
+ * pair signs both the token's `cnf` and the proof at the token endpoint.
  *
  * Exported because callers that do the token exchange themselves (the LWS
  * `packages/lws-auth` flow, `/test` `lws-auth.test.ts`) need both halves: the
  * credential and the key that proves possession of it at the UAS.
  */
+async function buildCredential(
+  webid: string,
+  clientId?: string,
+  expiration = 60
+): Promise<BuiltCredential> {
+  const baseUrl = process.env.CSS_BASE_URL
+  const jwkGenerator = new EnvJwkGenerator(process.env.CSS_ENCODED_PRIVATE_JWK)
+  const resolvedClientId = clientId ?? agentId(webid)
+
+  const credential = await createSelfIssuedCredentialWithJwk({
+    issuer: baseUrl,
+    subject: webid,
+    clientId: resolvedClientId,
+    jwkGenerator,
+    // `expiration` is in minutes, the token lifetime in seconds.
+    lifetime: expiration * 60,
+  })
+
+  return {
+    credential,
+    dpopKeyPair: credential.dpopKeyPair,
+    issuer: baseUrl,
+    clientId: resolvedClientId,
+  }
+}
+
+function createSession(
+  credential: SelfIssuedCredential,
+  storageFetch = createLwsAuthFetch({ credential })
+): SaiSession {
+  return new SaiSession(
+    credential,
+    createIdJagFetch({ credential, audience: saiAudience }),
+    storageFetch
+  )
+}
+
 export async function buildSelfIssuedCredential(
   webid: string,
   clientId?: string,
   expiration = 60
-): Promise<{
-  oidc: SelfIssuedSession
-  dpopKeyPair: GenerateKeyPairResult
-  /** The credential's `iss` — the user's authorization server (UAS). */
-  issuer: string
-  /** The credential's `azp`/`client_id`. */
-  clientId: string
-}> {
-  const baseUrl = process.env.CSS_BASE_URL
-
-  const jwkGenerator = new EnvJwkGenerator(process.env.CSS_ENCODED_PRIVATE_JWK)
-
-  const privateKey = await jwkGenerator.getPrivateKey()
-  const publicKey = await jwkGenerator.getPublicKey()
-
-  const dpopKeyPair = await generateKeyPair('ES256')
-  const resolvedClientId = clientId ?? agentId(webid)
-
-  const oidc = new SelfIssuedSession({
-    webid,
-    clientId: resolvedClientId,
-    issuer: baseUrl,
-    expiresIn: expiration * 60 * 1000,
-    privateKey,
-    publicKey,
-    dpopKeyPair,
-  })
-  await oidc.login()
-  return { oidc, dpopKeyPair, issuer: baseUrl, clientId: resolvedClientId }
+): Promise<
+  BuiltCredential & {
+    /** The `.sai` session (compatibility name: the credential used to be a session). */
+    oidc: SaiSession
+    /** The `.sai` session. */
+    session: SaiSession
+  }
+> {
+  const built = await buildCredential(webid, clientId, expiration)
+  const session = createSession(built.credential)
+  // `oidc` stays as an alias until the callers migrate to `session`.
+  return { ...built, oidc: session, session }
 }
 
+/** The `.sai` session of `webid`; kept as an alias for the former OIDC session. */
 export async function buildOidcSession(
   webid: string,
   clientId?: string,
   expiration = 60
-): Promise<SelfIssuedSession> {
-  const { oidc } = await buildSelfIssuedCredential(webid, clientId, expiration)
-  return oidc
+): Promise<SaiSession> {
+  return (await buildSelfIssuedCredential(webid, clientId, expiration)).session
+}
+
+/** The `.sai` session of `webid`. */
+export async function buildSaiSession(
+  webid: string,
+  clientId?: string,
+  expiration = 60
+): Promise<SaiSession> {
+  return buildOidcSession(webid, clientId, expiration)
 }
 
 export interface BuildLwsFetchOptions {
@@ -94,20 +134,7 @@ export async function buildLwsFetch(
   clientId?: string,
   options: BuildLwsFetchOptions = {}
 ): Promise<WhatwgFetch> {
-  const {
-    oidc,
-    dpopKeyPair,
-    issuer,
-    clientId: resolvedClientId,
-  } = await buildSelfIssuedCredential(webid, clientId)
-  const credential: LwsCredential = {
-    issuer,
-    clientId: resolvedClientId,
-    // jose generates WebCrypto keys here; oauth4webapi needs the raw pair
-    dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
-    subjectTokenType: ACCESS_TOKEN_TYPE,
-    getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
-  }
+  const { credential } = await buildCredential(webid, clientId)
   return createLwsAuthFetch({
     credential,
     ...(options.accessClaim ? { accessClaim: options.accessClaim } : {}),

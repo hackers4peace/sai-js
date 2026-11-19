@@ -1,10 +1,10 @@
 import {
   ACCESS_TOKEN_TYPE,
   ID_JAG_TOKEN_TYPE,
+  createIdJagFetch,
   createLwsAuthFetch,
   requestIdJag,
 } from '@elfpavlik/lws-auth'
-import type { LwsCredential } from '@elfpavlik/lws-auth'
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import {
   SAI_ADMIN_IMPERSONATION_SCOPE,
@@ -15,15 +15,14 @@ import {
 } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { JwkGenerator } from '@solid/community-server'
-import { generateKeyPair } from 'jose'
-import type { GenerateKeyPairResult } from 'jose'
 
 import { buildAccountLoginStorage } from './builders/accountLoginStorage.js'
 import { CustomWebIdStore } from './CustomWebIdStore.js'
 import { PodEndpointStore } from './PodEndpointStore.js'
 import type { SparqlEndpointRecord } from './PodEndpointStore.js'
-import { SelfIssuedSession } from './SelfIssuedSession.js'
+import { createSelfIssuedCredentialWithJwk } from './util/selfIssuedCredential.js'
 import { agentId, registryId } from './util/uriTemplates.js'
+import { isSaiUrl, isWithinBaseUrl, saiAudience } from './util/url.js'
 
 /**
  * Shared lazy endpoint store for contexts without config injection (the worker
@@ -79,23 +78,17 @@ export class SessionManager {
     return getSharedEndpointStore().catch(() => undefined)
   }
 
-  private async buildSelfIssuedSession(
+  private async buildCredential(
     webid: string
-  ): Promise<{ oidc: SelfIssuedSession; dpopKeyPair: GenerateKeyPairResult }> {
-    const privateKey = await this.jwkGenerator.getPrivateKey()
-    const publicKey = await this.jwkGenerator.getPublicKey()
-    const dpopKeyPair = await generateKeyPair('ES256')
-    const oidc = new SelfIssuedSession({
-      webid,
-      clientId: agentId(webid),
+  ): Promise<Awaited<ReturnType<typeof createSelfIssuedCredentialWithJwk>>> {
+    return createSelfIssuedCredentialWithJwk({
       issuer: this.baseUrl,
-      expiresIn: this.expiration * 60 * 1000,
-      privateKey,
-      publicKey,
-      dpopKeyPair,
+      subject: webid,
+      clientId: agentId(webid),
+      jwkGenerator: this.jwkGenerator,
+      // `expiration` is in minutes, the token lifetime in seconds.
+      lifetime: this.expiration * 60,
     })
-    await oidc.login()
-    return { oidc, dpopKeyPair }
   }
 
   /**
@@ -110,14 +103,7 @@ export class SessionManager {
     const cached = this.storageFetches.get(key)
     if (cached) return cached
     const created = (async (): Promise<WhatwgFetch> => {
-      const { oidc, dpopKeyPair } = await this.buildSelfIssuedSession(webid)
-      const credential: LwsCredential = {
-        issuer: this.baseUrl,
-        clientId: agentId(webid),
-        dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
-        subjectTokenType: ACCESS_TOKEN_TYPE,
-        getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
-      }
+      const credential = await this.buildCredential(webid)
       return createLwsAuthFetch({ credential, storages: [storage] })
     })()
     this.storageFetches.set(key, created)
@@ -150,8 +136,8 @@ export class SessionManager {
     const cached = this.impersonationFetches.get(key)
     if (cached) return cached
     const created = (async (): Promise<WhatwgFetch> => {
-      const { oidc, dpopKeyPair } = await this.buildSelfIssuedSession(adminWebId)
-      const clientId = agentId(adminWebId)
+      const credential = await this.buildCredential(adminWebId)
+      const clientId = credential.clientId
       const organizationUas = await this.organizationUas(orgWebId)
       const ras = await discoverLwsAuthorizationServerMetadata(storage, fetch)
 
@@ -162,10 +148,10 @@ export class SessionManager {
         uas: this.baseUrl,
         audience: organizationUas,
         resource: storage,
-        subjectToken: await oidc.generateSelfIssuedAccessToken(),
+        subjectToken: await credential.getSubjectToken(),
         subjectTokenType: ACCESS_TOKEN_TYPE,
         clientId,
-        dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+        dpopKeyPair: credential.dpopKeyPair,
       })
       // Hop 2: the organization's UAS checks the admin grant, derives the
       // organization's claim for this storage and narrows it to `read`.
@@ -177,7 +163,7 @@ export class SessionManager {
         subjectToken: idJag,
         subjectTokenType: ID_JAG_TOKEN_TYPE,
         clientId,
-        dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
+        dpopKeyPair: credential.dpopKeyPair,
         extraParameters: { [SAI_IMPERSONATE_PARAM]: orgWebId },
       })
 
@@ -198,7 +184,7 @@ export class SessionManager {
   }
 
   public async getSession(webid: string, registrySetId?: string): Promise<AuthorizationAgent> {
-    const { oidc, dpopKeyPair } = await this.buildSelfIssuedSession(webid)
+    const credential = await this.buildCredential(webid)
 
     // per-pod endpoint registry (openwiki/architecture/storage-isolation.md): the
     // owner's records from the internal account storage are the session's
@@ -215,30 +201,23 @@ export class SessionManager {
       throw new Error(`no registry-pod SPARQL endpoint for ${webid} (${registryPodUrl})`)
     }
 
-    // The `.sai` API of this server keeps the Solid-OIDC DPoP session; data and
+    // `.sai` requests are authenticated with an ID-JAG (D34); data and
     // registry storages accept only ID-JAG subject tokens, so their requests go
     // through the two-step LWS chain: the self-issued DPoP-bound access token
     // becomes one ID-JAG per storage authorization server, and the storage
     // exchanges it for a bearer access token (C6). The worker is the owner's
     // own UAS, so a claimless data exchange can mint `scope: owner`; the
     // registry exchange is claimless and authorized by ACP.
-    const dpopFetch = oidc.authFetch.bind(oidc) as WhatwgFetch
-    const credential: LwsCredential = {
-      issuer: this.baseUrl,
-      clientId: agentId(webid),
-      // jose generates WebCrypto keys here; oauth4webapi needs the raw pair
-      dpopKeyPair: dpopKeyPair as unknown as CryptoKeyPair,
-      subjectTokenType: ACCESS_TOKEN_TYPE,
-      getSubjectToken: () => oidc.generateSelfIssuedAccessToken(),
-    }
+    const authorizationFetch = createIdJagFetch({ credential, audience: saiAudience })
     const lwsFetch = createLwsAuthFetch({
       credential,
       storages: [...sparqlEndpoints.keys(), registryPodUrl],
     })
     const sessionFetch: WhatwgFetch = (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-      const authBase = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`
-      return url.startsWith(authBase) ? dpopFetch(input, init) : lwsFetch(input, init)
+      return isSaiUrl(url) || isWithinBaseUrl(url, this.baseUrl)
+        ? authorizationFetch(input, init)
+        : lwsFetch(input, init)
     }
 
     return AuthorizationAgent.build(webid, agentId(webid), registryPodUrl, {
