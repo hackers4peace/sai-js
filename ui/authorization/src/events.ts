@@ -5,13 +5,13 @@ import { getRuntimeConfig } from './runtime-config'
 /**
  * Client for the always-open NDJSON event stream (`GET /.sai/events`),
  * driven by the activity lifecycle (pending → done) on the auth server
- * (see docs/plans/refactor-ui.md).
+ * (see openwiki/ui/authorization-ui.md).
  *
  * - connects with the account cookie, like the RPC calls in store/core.ts
  * - parses NDJSON lines and dispatches completion-driven store refreshes
  * - auto-reconnects with backoff on error/close; heartbeat-timeout detection
  * - on first open and every reconnect triggers a full store refresh (the
- *   server never replays missed events — docs/plans/refactor-ui.md §5)
+ *   server never replays missed events — openwiki/ui/authorization-ui.md)
  */
 
 export interface ActivityEvent {

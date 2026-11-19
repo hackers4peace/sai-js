@@ -87,7 +87,7 @@ export interface BuildLwsFetchOptions {
  * Every storage request goes through the two-step ID-JAG chain in
  * `@elfpavlik/lws-auth`: the credential is exchanged at the user's authorization
  * server for one ID-JAG per storage authorization server, and each storage
- * trades its grant for an access token. See `docs/plans/lws-auth.md` C3.
+ * trades its grant for an access token. See `openwiki/architecture/lws-auth.md`.
  */
 export async function buildLwsFetch(
   webid: string,

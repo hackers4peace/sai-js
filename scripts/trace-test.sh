@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run the diagram trace test (docs/lws-auth.c4) through Dagger with Tempo tracing on.
 #
-# This is the per-slice continuity gate for docs/plans/lws-auth.md: it is the flow that
+# This is the continuity gate for openwiki/architecture/lws-auth.md: it is the flow that
 # produced trace 1851eea1… in that diagram, so it must stay green after every slice
 # (the old single exchange remains the default until the last slice).
 #

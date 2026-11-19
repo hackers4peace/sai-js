@@ -50,7 +50,7 @@ import type { Quad } from 'n3'
  * `generateDelegatedAccessGrants` reads it without any peer dereference and
  * raises `MirrorIncompleteError` when a reciprocal-linked graph is absent, and
  * webhook delivery is the only refresh path (the drift scan/backfill in
- * `docs/plans/pod-isolation-followup.md` A1 is the recovery for missed ones).
+ * `openwiki/architecture/storage-isolation.md` A1 is the recovery for missed ones).
  */
 
 const fetcher = new SparqlEndpointFetcher()

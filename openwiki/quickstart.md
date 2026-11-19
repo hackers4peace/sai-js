@@ -12,16 +12,20 @@ sources:
     resource: repo://packages/components/src/ActivityWebhookHandler.ts
   - id: openwiki-source-92862eeddb750415b0a0a89f
     resource: repo://packages/components/src/ApiHandler.ts
+  - id: openwiki-source-759ab06bf1f6a0b228effe16
+    resource: repo://packages/components/src/IdJagTokenHandler.ts
   - id: openwiki-source-3e8f48f62968e08a27cd3572
     resource: repo://packages/components/src/services/Account.ts
+  - id: openwiki-source-431ff780c51bd57ac5545ec1
+    resource: repo://packages/components/src/StorageExchangeAccessPolicy.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
     resource: repo://README.md
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Quickstart
@@ -37,6 +41,12 @@ Use this map to find the page for the topic you need.
 | Understand the repo and packages | [Architecture overview](architecture/overview.md) |
 | See the production landscape | [Deployment landscape](architecture/deployment-landscape.md) |
 | Understand per-pod storage and isolation | [Per-pod storage and isolation](architecture/storage-isolation.md) |
+| Understand the LWS/ID-JAG token model | [ID-JAG access claims and impersonation](architecture/id-jag-access-claims.md) |
+| Understand the LWS client and tracing | [LWS auth client and tracing](architecture/lws-auth.md) |
+| Understand org admins and contexts | [Organization admin model](architecture/org-admin.md) |
+| Understand registry ACP scoping | [Registry permissions and admin scoping](architecture/registry-permissions.md) |
+| Understand the service/workflow/AA boundary | [Domain-logic placement](architecture/domain-logic-placement.md) |
+| Find deferred designs and open decisions | [Deferred and open designs](architecture/deferred-designs.md) |
 | Understand cross-server/federation assumptions | [Federation constraints](architecture/federation.md) |
 | Understand grant reuse and equivalence | [Grant equivalence and reuse](architecture/grant-reuse.md) |
 | Understand revocation and grant projections | [Authorization revocation and grant projections](architecture/authorization-revocation.md) |
@@ -67,4 +77,8 @@ Storage is **per pod**: one Fuseki dataset per registry/data pod and one Garage
 bucket per data pod, resolved through the `PodEndpointStore` (see
 [Per-pod storage and isolation](architecture/storage-isolation.md)). New
 accounts are provisioned asynchronously by the `bootstrapAccount` Temporal
-workflow; `startBootstrapAccount` returns the WebID immediately.
+workflow; `startBootstrapAccount` returns the WebID immediately. Data-storage
+requests are authorized by the LWS token the client presents (an ODRL access
+claim, `scope: owner`/`admin`, or a public grant), not by a per-request grant
+registry read; see
+[ID-JAG access claims and impersonation](architecture/id-jag-access-claims.md).

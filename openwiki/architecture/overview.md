@@ -1,8 +1,11 @@
 ---
 type: overview
 title: Architecture overview
-description: The sai-js monorepo, the Solid Application Interoperability specification it implements, its npm-workspace package layout, the no-build ESM/JSR package surface, and the Node 26/Turborepo/Vitest/oxlint toolchain.
+description: The sai-js monorepo, the Solid Application Interoperability specification it implements, its npm-workspace package layout, the no-build TypeScript package surface, the LWS auth client, and the Node 26/Turborepo/Vitest/oxlint toolchain.
 tags: [architecture, monorepo, solid, typescript, overview]
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 sources:
   - id: openwiki-source-164e2da859b5277df81c7d94
     resource: repo://.github/workflows/ci.yml
@@ -14,6 +17,8 @@ sources:
     resource: repo://packages/authorization-agent/package.json
   - id: openwiki-source-9a0178ffa2620c135186d460
     resource: repo://packages/components/package.json
+  - id: openwiki-source-9094757b76eda90f81711e2d
+    resource: repo://packages/lws-auth/package.json
   - id: openwiki-source-06f346a302383133b02d09e8
     resource: repo://packages/utils/package.json
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
@@ -26,10 +31,7 @@ sources:
     resource: repo://turbo.json
   - id: openwiki-source-fbadcd8591b65031efaaedce
     resource: repo://vitest.config.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 ---
 
 # Architecture overview
@@ -47,6 +49,10 @@ The two public, spec-facing modules are documented in the root `README.md`:
 - **Solid Applications** — `@janeirodigital/interop-application` (`packages/application`), the top-level module for applications conforming to SAI.
 - **Solid Authorization Agent** — `@janeirodigital/interop-authorization-agent` (`packages/authorization-agent`), the top-level module for authorization agents.
 
+`@elfpavlik/lws-auth` (`packages/lws-auth`) is the client-side LWS token-chain
+package used by the components/session layer and the browser example; it is not
+a spec-facing application module.
+
 ## Workspace layout
 
 | Area | Path | Role |
@@ -54,8 +60,9 @@ The two public, spec-facing modules are documented in the root `README.md`:
 | `api-messages` | `packages/api-messages` | `@effect/rpc` + effect Schema wire contract between UI and service |
 | `application` | `packages/application` | Client-side application module and grant traversal |
 | `authorization-agent` | `packages/authorization-agent` | Agent-side module (registries, grants, authorizations) |
-| `components` | `packages/components` | HTTP handlers, service layer, Temporal workflows/activities, worker; the only workspace package that compiles to `dist` for Components.js |
+| `components` | `packages/components` | HTTP handlers, service layer, Temporal workflows/activities, worker; the only workspace package that compiles Components.js descriptors to `dist` |
 | `data-model` | `packages/data-model` | JSON-LD POJO entities, ACR JSON-LD builders, bootstrap TriG templates |
+| `lws-auth` | `packages/lws-auth` | LWS client: DPoP credential → ID-JAG → storage access token, browser session, tracing |
 | `repl` | `packages/repl` | Command-line REPL/utility (seed, gen-jwk) |
 | `test-utils` | `packages/test-utils` | Shared seeding/fixture helpers, including per-pod Fuseki and Garage seeding |
 | `utils` | `packages/utils` | JSON-LD, SPARQL/N-Quads, notification-subscription, discovery, and fetch primitives |
@@ -72,36 +79,51 @@ The `data-model` package is the dependency-free anchor: `application` and
 
 ## Package and publishing shape
 
-The public packages — `utils`, `data-model`, `application`,
-`authorization-agent`, `api-messages`, and `test-utils` — are **no-build ESM**
-packages: `main`, `types`, and `exports` all point at `src/index.ts`, the
-`files` list ships `src/`, and the runtime imports use explicit `.ts`
-extensions. They are published directly from TypeScript (the JSR-oriented
-layout), so consuming them requires a runtime that executes TypeScript.
+The no-build TypeScript packages — `utils`, `lws-auth`, `data-model`,
+`application`, `authorization-agent`, `api-messages`, and `test-utils` — point
+`main`, `types`, and `exports` at `src/index.ts`, ship `src/`, and use explicit
+`.ts` extensions. They run directly on Node 26 (type stripping) from the
+workspace; publishing them as built npm artifacts is a future goal (issue #129),
+not a deployment prerequisite.
 
 `components` is the exception: it keeps a `tsc` build to `dist/` because
 Components.js needs generated component descriptors (`dist/components/`), and
-the `worker`/CSS entrypoints run the compiled JavaScript. `repl` also builds to
-`dist`. The `authorization-agent` and `application` packages are the two
-intended dependents-facing modules named in the README (`interop-application`
-and `interop-authorization-agent`).
+the worker/CSS entrypoints run the compiled JavaScript. `repl` also builds to
+`dist`.
 
 ## Build and test tooling
 
 - **Turborepo** drives `build`, `test`, `clean`, and `dev` across workspaces.
   `test` depends on `build` and is never cached; `build` outputs to `dist/**`.
 - **Vitest 5** is the unit/integration runner. The root `vitest.config.ts` uses
-  the `test.projects: ['packages/*']` form (it replaced the removed
-  `vitest.workspace.ts`); the `test/` suite keeps its own configuration.
+  the `test.projects: ['packages/*']` form; the `test/` suite keeps its own
+  configuration.
 - **oxlint** and **oxfmt** replaced Biome: `npm run check` runs
   `oxlint . && oxfmt --check .`, and lint-staged applies both on commit.
 - **TypeScript** is configured through a shared `tsconfig.base.json` with
   `strict`, `module`/`moduleResolution: nodenext`,
   `allowImportingTsExtensions`, and `erasableSyntaxOnly`; `npm run typecheck`
-  runs `tsgo --noEmit` over the no-build packages.
+  runs `tsgo --noEmit` over the no-build packages, including `lws-auth`.
 - **Node.js 26** is the supported runtime (README, `devbox.json`, CI, and the
   Nix images all pin 26), and npm 11 is the package manager.
 
 The two test layers are distinct: per-package unit tests under `packages/*/test`
 run locally, while the Dagger-driven end-to-end suite under `test/` requires the
 Dockerized service cluster (see [Integration test suite](../testing/integration-tests.md)).
+
+## The LWS credential in one paragraph
+
+Storage requests use the two-step LWS chain: the user's authorization server
+issues an ID-JAG for one storage's authorization server, and the storage
+exchanges it for a bearer access token. `packages/lws-auth` performs both legs,
+caches the ID-JAG per `(issuer, storage)` and the access token per storage, and
+exposes the same fetch to the components session layer and the browser. The
+protocol model is in [ID-JAG access claims and impersonation](id-jag-access-claims.md);
+the client and tracing are in [LWS auth client and tracing](lws-auth.md).
+
+## Related pages
+
+- [Domain-logic placement](domain-logic-placement.md) — the service/workflow/AA
+  boundary.
+- [Deployment landscape](deployment-landscape.md) — the production topology.
+- [LWS auth client and tracing](lws-auth.md) — the token-chain client.

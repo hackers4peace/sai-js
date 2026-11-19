@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1578f22a3cdc4a8ac5bf097bff24702b7990434bdf22a0a66efd6453e79deb50",
+  "claims": [
+    {
+      "id": "claim_6e07f2bb67f240a78095fb19ff815b9d",
+      "statement": "Activity-first flows keep HTTP/RPC handlers thin — they decode and write the activity — while processAuthorizationGranted materializes the embedded authorizations, fans out per grantee, and completes the activity in Temporal.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ApiHandler.ts#L176-L199",
+          "version": "repo-lines-v1:sha256:f2a19a8bcfd2bb2393fca3ea53327259712866ef2ab427c79c1ff7a60ef2308d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5MjQ4NTZjY2EwZTEwYTY1Mzk2MTZlOGJmYjk2ZmY3NjY1YTA5ZTU3ZTIxM2IzZDQ2YTgwYTBmYjJmODI2ZmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2NDk1MDU4MjEwNzhkOTE2ZjcwYTQzMDNhYjg5YjQxYzUzMmU5MGM0NmRlYzMzZWYwMWFmNzA3OWYzNDE2ZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0MzUyMTEzNjFiZjVjNDA0NjUwYzY1NDQwMzY0YzU0YzQ2N2ExZTRlOGM2Y2RhYTcwMjdiOTY5OTQwOTM3MmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NGNlYzEwNGE0MTA0NzhmNGZkYjNjNGUxNGZlMTZiYmM0OWY1OTdkZTIyNDdhNTYzYWU2ZTRkYzlhMWQzOTkifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L303-L326",
+          "version": "repo-lines-v1:sha256:99bd658f030049ae77938d92c8ab83b553815357b6fe1dd21fb012b25da59ea9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ZTdkYTM3ZmE4ZWYwMTIxMTEyM2JkOWNjNDM3YWM1Y2FjODI4NjNiODY2YmIyMmY2M2ZiYTZhOTNmYjM1NzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyNjg1ZGNjZWUxYWU4NjEzNWNkYjJlNDc1ZGIwNDUyZGI3YjAxNmUzYjgzMWIzZmY4MjVmNjAxNjYyY2ZiYTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3NzRkMTUxNmEzNWEzNTE3YTQwYTAwNmNjNTQwYzFkMjAxNmFlMzEzYzMxMjJkZmZjMGQ1NDk2M2U4YzVjYzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f101943209014f1ebd9585faba48d7db",
+      "statement": "The authorization-agent owns SAI scope and grant-generation rules (matchesScope, buildNestedDataAuthorizations, dataInstanceIrisForGrant and the generation chain), and components supplies data and transport without reimplementing those rules.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/authorization.ts#L140-L200",
+          "version": "repo-lines-v1:sha256:209bd099a57f2f998539913551eab2509a3e740afc301129aa51ac7f67263e60:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyMDUzZmY2ZThhMGJiMWYwY2JmZTNhNjcyY2NkYWFkNjZjYjE5OGNhYmYxYzJkNTkxYTU2ZDE0NTcwZjA0NjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhMzUxZWI4ODU2OWRmMzE4ZWRjYjRlMTdlMWJkZDljNWM0MDc1OTBlYTExNWRlZjM3ZmNkODRjNjA0OTllNWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhNTc1ZDVhZjEzYWZiY2EwYWI2NGY0YzhhYTNlNjUwZTM4ODBjYWE5OGNiOGZmZjI0ZmFhMGE4Mjg3ODY5MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1YzVkNWY5NjE0NzcyZTdkNDk5OTZiNzk5ZGVlM2M4OTY1MjE4NGYyMjY2YmUxOWZjYWMxMmNlNzAxYjk1YjUifQ"
+        },
+        {
+          "resource": "repo://packages/authorization-agent/src/grant-generation.ts#L45-L65",
+          "version": "repo-lines-v1:sha256:d1e5da5c6e0b6f2b2c7806264e4e1453d54818487c4ea981074988097fa58b43:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTFiYjU3Y2IyMDk5OTMyYzI1NDZlN2RkYTQwNjc1NDE2YTRiNzYyMzhjYTFjYWRlNDljOTVmNzhjOTBhMWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlMDNiY2Y4NTg4NDRjOWQ4ZGMwNGM4YzNkOGJhOGQxNTBkY2JjNTcxOTMyYjE3OTI5NDIxOTYyMzI0ZmY1N2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5NmJkMDcyNzAzNjdmM2RiMDdmZjUzMmM5ZDU5NjQ5ZTc5NTIyYzNlMzQwNjNlNDljNzUwMzYxZGI5YjNlNzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_07b5e84dadc0438eb1138aeb53556bd6",
+      "statement": "Registry CRUD and completion helpers still live in components, including markActivitiesDone and revokeGrantClosure, rather than being owned by the authorization-agent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L481-L500",
+          "version": "repo-lines-v1:sha256:1e4653ca8db95bb55960716c5e12fecbcc3e954606c37fbd9cf9e0d8530676a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZWFlYTc2ZTNjMzNiOTc4OWVkMzJjZTJiNTI1MjJiOTJmNWRlZjZjNGZkYmRhYzhmNmRiNWNlNjkwNDc2ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3NDJjZjFlOGQzYTQyY2Q3NWI5YWI3NzUzNjJhNTk2MDYxYjNmZDZkZDZhMzk2NjU1N2Y3NmEzYjNmYzQyOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5OTk2YzA3YjlhNDYxNWQxNjgwNjhjNzcxNjM3ODBhNzZlNzc0ZWY2Nzg5MzVhOGVjMjkyYWEyOWNjMTRiMjQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L944-L960",
+          "version": "repo-lines-v1:sha256:269d5331779b2fbe217e561721f22cfc78dd41945795acf88c2b37199770222b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMGFhMTdjODgzODlhMmQxM2U1MmJlNDljY2E1YjA3OTU1YWIxNDNkMGM1Y2FiZjkyYmJkYzljNDE2Njc5MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmOWU5ZWViMGYyNDdhNGNkYzdlODE5NDUxMGNlOGM4Nzg3OGI3OGZjYzQ1YzMwMDBjZTlhNTIyMGY2MjVjZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b4fa645b4d2d489dac77de8d2bf30ef7",
+      "statement": "The synchronous shareDataInstance session method remains in the authorization-agent but has no production caller; the activity-first workflow path is the live sharing implementation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/authorization-agent.ts#L957-L985",
+          "version": "repo-lines-v1:sha256:8925caa93ed215f63382c49fea9cac4954a1bc68b28ccf6ac71702f65a1cd751:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlOTA2NGE1NTYxMDFjMmI1YmVlZTMzMmZkMjA3MjFiODJlZTliZDg1NDNjZTBjNjcyMThiNzRiZmVjYWMxMWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyNTNjMDI5OGI0ZGFiYzVjNjkxOWM4M2YzNTU5YTRhY2E5NWI3ZmY4NDZkYzViZmUwYWM0MWFkZjM4ODk0OTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkNGFjNGEyZmFmMTI3MDU5MjY1MDI2MGRjMDRjYTM1NzJkMWE0NmIzZTM1YjU0MzQ0NGE5ZGE2MmQwODcxZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fb67d3004f464223966454a15bb176a0",
+      "statement": "SaiPermissionsEngine still implements the grant-evaluation predicates (findGrant, registration/resource/inherited modes, and the parent chain) inside components, while the authorization-agent owns only the sibling scope and validity rules.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L297-L370",
+          "version": "repo-lines-v1:sha256:e67683cff611e657f1d2e380495ab6759b908b54c7c4f30faffaf4c6f157d675:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNTg0ZDA1ZGJhYWM4NTU0Yjk2ZGYzMmEzMTU3MTQzNjY0NGZkNWMyZTkyNWU1ODM2ZTFlNmEzZDlkMTc4ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3OWRkZGNiZDRjMDU3ZTkyMDNlMDYzNGZmMGNjMWQ1MzNhYjAzZmUwOTliMTQ3Njc0YzdkYmQyYWU1ZWU0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4N2Y3NGI4YmVlMzQ1OTI5NDZlNGFkMWFjYzJlZWMyNzA5OGI4OTAwZGQzMDliNzJmZWI2MGFjMGM1NmI1ODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzZDJjODI1YTA0YjZmMmE5OWFiMTliMDhiOTk1YjljNTllZWIwYzAwOGQ1Mjc3ODRhMmMxMmI5MjZiMmRhMmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2a8c50eefd7f4b0ca67a958401af8117",
+      "statement": "The hasAdminGrant admin-marker rule is implemented independently in Context.isAdminOf, adminGate.requireOrgAdmin, AgentIdHandler, and SocialAgentRegistry.buildSocialAgentProfile.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AgentIdHandler.ts#L95-L110",
+          "version": "repo-lines-v1:sha256:04b4d62debbf32f669092f46e91a58d4e5966d33194f655a13b351642713b122:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllYWEyODcwNmYyMDkyYWZkNzYzOWYyYzhmNWVjYjI5ZDhhY2Q0Nzk4MjMxMmRkNjAxODI4MDhhMDZmYmFlMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMWZjY2QzYjdhMmU5YWZkOWE4YzQ3ZWIzODMwN2RiYmYzMDUxZWExZGQ2MjA3OTFjNTJlMjA5NzAxYmE2YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhYjNiMzA4MTRhYTU5NWNiYjFhNmQ2YTRjNjQxMzk5MjM4YzBlNTRjYTM0OWM1NjA2MWQ5MzAxYWMwNTQ0ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjZWVhOTAyN2ExNTBhNmQzN2E0YTUwZTIyZDAyZjA3YjUyNzc0MjMxY2RhY2I1ODFhYTk3MTgzOTQ5ZTQ5ODgifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/Context.ts#L72-L87",
+          "version": "repo-lines-v1:sha256:ffdd36c9efebbb2df6ba08f46ed2cdee04340a01518a0d59ef71fa265c3885ad:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwOGNiMzVlMzRkNThiZWIzNjA0NDIwODkwZmM2NDkzMGY0YjE4OTcxMzJkZDE5YzQ0YzhlYjM1N2ZlY2M4ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhYzk3MzE0ODQ4ZjAzMDdmNmJhNDI0M2QwYjc1YTEwN2MxZmQ3MGEzY2QwMWY2OTYzOTM4YzlhODNmMzhlYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhY2NkMTg5YzFhYmI5MWM0NzUzZTA3MGMzNzRkYzEyYWI3Yjk4NWU5NGY0NjY5OTI5N2UyM2QxYzMyYWY4OWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2NDNiOTBjMGY5ZmNiMWI0OWU2OTRjNjUzMTgwMGRiNGZkOWQzZDFkYTk2MjE0MWNjMzBlYWVhNzJlNWUyMmMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/SocialAgentRegistry.ts#L109-L145",
+          "version": "repo-lines-v1:sha256:f9595450a013593a038690308c5624781b51bb5261ac49d24310f69b3fa29d5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxMDZjOWI1NWQ1YTk2OTE0YTZjNDBlNjNiN2Q0Y2NhODg1ODk3ZGNiZmZjNTYxZDBhNTcxZjVmOTRiNGJiZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyOWZiZTcxMWYwYmVhYzgxNGVlYjRlNmMyNmE0ZmUyZjJkODg4NjI0YTY5Mzc1ZmEzZjhmMDkyY2Y2M2I5ODQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEyYThjOTM3ZGVjNGUyN2E2OWI4NzlkOWJhZDA3YmYwNjgyYjAxM2FiZDlkZmVlNjE2YmI3ODExMTczMGIxZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiM2JiMzlkYWU3Nzk0ZTBmYmY3YjZlNDBkMGEzODc1ODhkYmQyODYyNTg5YzExMDFkODJlYmJkMzY5ZDY1OTYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/adminGate.ts#L37-L60",
+          "version": "repo-lines-v1:sha256:a96a2a185e02e4c00bf0ae9b3df3f52bda6f79ef37f70eff0bda5953c7e27b92:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NmZiZTg4YWIwN2VhZWExMTliZGFjMjJhOTI0ZTA1OTQyZDc1ODhmMmFmYWI5ZGMyZGMwZjNhNjQ3YzZkMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1MGY2NGUwNDEzMTFlZDcyYTBhOWZkMGVlNmY4ZDkxMDczODQ1YTczYzNiODc4MTNhYmFjMzk4MTc5ZWI1NGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3a4247848483487288402bd3d1e102f9",
+      "statement": "AdminGrant payload materialization (one RegistrySet marker plus one read-only DataRegistry grant per data registry) still lives in components' buildAdminGrants rather than in the authorization-agent's grant-generation layer.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/admin.ts#L154-L187",
+          "version": "repo-lines-v1:sha256:702af0dd764f53ba1f78d86bf212c0d38ce85a9edc562e903a4d80d1238391e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyYTk4MzBkMmQ2NWNlOGUxNDc2ZjYxMTM3Mzg2ZmJmOWExMzk5N2ZhNzY5Njc0ZWI5MzFlZWYzMDI3YTcyYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyMjliYWI3ZThiNDc0NTlkMWZiOTIwYTgwM2Y1ODRjZmRhNTFjYjY1NjRjZThiYjAwNjFmMjNlOTQ4NWFkNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5ZjJhNjA5NmY3ZmQ2OGU5YzU5MzZjMzBjYzFhMTQyZTAyZjBmMzI4NGU1NWVkYmRhZjg5OGY3NTgzZTY2YjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_11068deba3c14ad4890f9a0a2fca2dfb",
+      "statement": "getExistingGrants and replaceAccessGrantsOnRegistration still resolve registrations through the HTTP AgentRegistry.findRegistration instead of the registry-plane session reader.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L372-L395",
+          "version": "repo-lines-v1:sha256:b57bafae2d4e43440f387f41c0b7a7572613e3cae2d8224f0a88b73266362373:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzNGU5OGFjMWQxYzNiOWUzYWYxYmNlMDVlNTRiYjkyYzY1OGQ0NWUyMGY5MDkxZDFkYTA3YzNkY2UwZjc2OWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxZWI4ZDkyNjY4ZTljMjdmYzg4MzdjY2YxYjZiNjdjNjM5NDIyN2ZmZmUxYTEyMGVlYzRhOTI2NDkwMzcwMTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzYWUzZjMzMmRlMzVmMmJkMGU2ODYxMzEyY2MzYjFlYzU3NDA5NGFmNDY1NDAyYzc5NDY4NDU1MjlmOWU1NDIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L736-L745",
+          "version": "repo-lines-v1:sha256:f86803a459c71f27a3825d43420c6c6061ec09c0b98134ed06190c224811a4a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1YTE0MzU1OTNhNTJhZjA1NDA3ZmY1YjJmZDM5ZmU1NmI2Njk4MjM1ZGMwOTQ1OGMxNTY0NTc4Y2JkM2UwNWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiOThlOTA2NjEyNGViYjkyYTg4Zjg0M2Q2NjAzMTM0Yjk2MjEwNzAwMDU0NWJmNzY2MjQwMjg5MjQ4NDRlODciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZGI3MDg1Yjg2YWM3ZjBlNmQ4ZTI1Y2FkMGRhOTRlNjM5OWYyODdiZGEwZGEyZGMzMjEzNjVlMzI3ZWYxOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlODY5NmJmNmE4OTU3NTY1NDVhYjM4N2E0NjI4N2NlYmQxZDYyNTE2NmI4MjMxZmRiNTYxZWY4YzQ3NjVhYmEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
+  }
+}

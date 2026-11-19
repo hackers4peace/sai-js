@@ -17,7 +17,7 @@ import { useCoreStore } from '@/store/core'
 const coreStore = useCoreStore()
 
 // keep the /.sai/events stream open while signed in — full refresh on
-// (re)connect + completion-driven refreshes (see docs/plans/refactor-ui.md)
+// (re)connect + completion-driven refreshes (see openwiki/ui/authorization-ui.md)
 watch(
   () => coreStore.userId,
   (userId) => {

@@ -5,10 +5,24 @@ openwiki_generated: true
 sources:
   - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
     resource: repo://docker-compose.yaml
+  - id: openwiki-source-8169aa450996f0b8a9862376
+    resource: repo://environments/nixos/css/auth.json
+  - id: openwiki-source-e5f8a0cac36da91da7917137
+    resource: repo://environments/nixos/css/data.json
+  - id: openwiki-source-bba5db1bb86d0fd2b799b1ce
+    resource: repo://environments/nixos/css/registry.json
   - id: openwiki-source-5fefaeafd9642c4813d1f6df
     resource: repo://packages/components/config/auth.json
   - id: openwiki-source-6f14021836b9ccaba51777f5
     resource: repo://packages/components/config/data.json
+  - id: openwiki-source-438b94ee2607f9c6e64c4d2e
+    resource: repo://packages/components/config/identity/id-jag-accept-data.json
+  - id: openwiki-source-a9c43aea3eb1d2da760525f4
+    resource: repo://packages/components/config/identity/id-jag-accept-registry.json
+  - id: openwiki-source-ab81fc1fccab12168220657a
+    resource: repo://packages/components/config/identity/id-jag-accept.json
+  - id: openwiki-source-d6371e3a800240d46c2e1c59
+    resource: repo://packages/components/config/identity/id-jag.json
   - id: openwiki-source-0b475136796d3c6391256850
     resource: repo://packages/components/config/overrides/emitter.json
   - id: openwiki-source-9f577882ea0b12c6f9a793ba
@@ -19,22 +33,16 @@ sources:
     resource: repo://packages/components/src/index.ts
   - id: openwiki-source-55f67d07018be4b3c4161eb1
     resource: repo://packages/components/src/temporal/queues.ts
-  - id: openwiki-source-c4c901bbae020feec3d29213
-    resource: repo://services/css/auth.json
-  - id: openwiki-source-e78a59eda6a92be12d4886a5
-    resource: repo://services/css/data.json
-  - id: openwiki-source-56517036d15dfae3226d9dbd
-    resource: repo://services/css/registry.json
   - id: openwiki-source-04f6a81cd8f58552c8dfc86f
     resource: repo://services/id/cid.ts
   - id: openwiki-source-2fd7b9e9b2c7414ea65e9cc2
     resource: repo://services/id/server.ts
   - id: openwiki-source-ba7d0112a176643ef8b07b66
     resource: repo://shapetrees/functions/%5Bcollection%5D/%5Bname%5D.js
-generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-21T01:32:20.770Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 
@@ -76,18 +84,26 @@ The service installs permissive CORS and exposes two routes:
 
 ## Community Solid Server configs (`services/css`)
 
-`services/css` pins `@solid/community-server` 8.0.0-alpha.2 and
-`@elfpavlik/sai-components` and provides three instance configs that import the
-`css:config/http/server-factory/http.json` base plus a `sai:config/*.json`
-graph from the components package:
+`services/css` is the private package that pins `@solid/community-server`
+8.0.0-alpha.2 and `@elfpavlik/sai-components`; its own instance JSON files were
+moved out. The deployable instance wrappers now live in
+`environments/nixos/css/` (production) and `environments/css/` (dev), and they
+import the `css:config/http/server-factory/http.json` base plus a
+`sai:config/*.json` graph from the components package:
 
-- `auth.json` → `sai:config/auth.json` (the Solid-OIDC identity provider).
-- `registry.json` → `sai:config/registry.json` (the ACP-protected registry server).
-- `data.json` → `sai:config/data.json` (the SAI policy-engine data server).
+- `auth.json` → `sai:config/auth.json` (Solid-OIDC identity provider + LWS
+  ID-JAG issuer).
+- `registry.json` → `sai:config/registry.json` (ACP-protected registry server).
+- `data.json` → `sai:config/data.json` (SAI policy-engine data server).
 
-These `services/css/*.json` files are thin wrappers; the authoritative config
-graphs live under `packages/components/config/`. The Docker Compose stack mounts
-near-identical copies from `environments/css/` instead.
+These wrappers are thin; the authoritative config graphs live under
+`packages/components/config/`. The Docker Compose stack mounts near-identical
+copies from `environments/css/` instead.
+
+The LWS identity configuration is split across
+`packages/components/config/identity/`: `id-jag.json` (the UAS issuer),
+`id-jag-accept.json` (UAS accept), `id-jag-accept-data.json` (data storage
+accept), and `id-jag-accept-registry.json` (claimless registry accept).
 
 ### Components.js customization
 
@@ -112,8 +128,10 @@ CSS itself: the storage/routing set (`PodEndpointStore`, the routed SPARQL/S3
 accessors, `HybridDataAccessor`), the auth/permission set (`SessionManager`,
 `SaiAuthorizationManager`, `SaiPermissionsEngine`, `CustomWebIdStore`), the
 activity/events set (`ActivityWebhookHandler`, `EventsHandler`,
-`NdjsonNotification`, `DurableWebhookEmitter`), the delegation handlers, and the account/Garage
-components.
+`NdjsonNotification`, `DurableWebhookEmitter`), the access-request/grant
+handlers, the LWS identity/exchange classes (`IdJagTokenHandler`,
+`IdJagSubjectTokenVerifier`, `StorageExchangeAccessPolicy`,
+`AdminImpersonationAuthority`), and the account/Garage components.
 
 Notification wiring differs per server: **auth** imports
 `css:config/http/notifications/disabled.json`; **registry** and **data** import

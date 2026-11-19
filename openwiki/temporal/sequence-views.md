@@ -12,18 +12,16 @@ sources:
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
-  - id: openwiki-source-9e7488ce272b5af0500c0557
-    resource: repo://packages/components/src/services/GrantReplica.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
   - id: openwiki-source-fabda8691f79a477b70b0c57
     resource: repo://packages/components/src/temporal/workflows/reciprocal.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Sequence and discovery flows
@@ -89,9 +87,9 @@ The dynamic views follow a fixed set of authoring conventions:
   then `updateDelegatedGrants` (finding the affected authorizations, fanning out
   grant updates and a **batched** delegation request per data owner), then
   writes the completion — so `done` means the mirror is current. The
-  regeneration reuses an equivalent delegated subtree and only requests
-  delegation for what changed; newly issued grants are echoed back and stored
-  as the issuer-side replica (see
+  regeneration reuses an equivalent local delegated subtree and only creates
+  what changed; delegated grants are stored in the assigner's own grant
+  registry (see
   [Grant equivalence and reuse](../architecture/grant-reuse.md)). If the peer
   deleted its registration of us (`404`/`410`), the drain skips the regeneration
   and completes anyway (terminal).
@@ -144,8 +142,8 @@ side each run `syncReciprocalMirror` as their last step before
   `processAuthorizationRevoked`, which deletes the DataAuthorizations, expands
   a role grantee to its members, and runs `reconcileGrantsForGrantee` per
   affected grantee — the projection GC removes the now-undesired grants
-  (own-registry C1 closure, or the `AccessRevocation` boundary for peer-owned
-  grants plus the replica drop) — then completes. Re-revoking an already
+  through the owner-session C1 closure over the context's own grant registry —
+  then completes. Re-revoking an already
   removed selection is a no-op success. See
   [Authorization revocation and grant projections](../architecture/authorization-revocation.md).
 - `authorization-revocation-sweep` — the scheduled `reconcileActivities`

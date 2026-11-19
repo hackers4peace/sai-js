@@ -8,6 +8,8 @@ sources:
     resource: repo://.dagger/src/index.ts
   - id: openwiki-source-6028df227cf0c5e36d839191
     resource: repo://environments/data/registry.trig
+  - id: openwiki-source-eaba5824f0a401694d9d16c1
+    resource: repo://environments/temporal/dynamicconfig/development-sql.yaml
   - id: openwiki-source-8550437c8cb83e5ccf36217b
     resource: repo://packages/authorization-agent/test/get-reciprocal-grants.test.ts
   - id: openwiki-source-e00ad90a057384916ebd690e
@@ -26,8 +28,6 @@ sources:
     resource: repo://packages/components/test/check-equivalence.test.ts
   - id: openwiki-source-9b409abe21ade962fb73ed30
     resource: repo://packages/components/test/delegated-grants.test.ts
-  - id: openwiki-source-7cee32971e9a12bcc4227ff9
-    resource: repo://packages/components/test/delegation-request.test.ts
   - id: openwiki-source-23684c4afa0b096bb7c0aa5d
     resource: repo://packages/components/test/durable-webhook-emitter.test.ts
   - id: openwiki-source-d86eb75db262e88d8237c824
@@ -36,12 +36,8 @@ sources:
     resource: repo://packages/components/test/reciprocal-mirror.test.ts
   - id: openwiki-source-c4ce6c0448c661ad179c011a
     resource: repo://packages/components/test/reciprocal-sync.test.ts
-  - id: openwiki-source-d77d926740b2005b17a2a4e1
-    resource: repo://packages/components/test/revocation-errors.test.ts
   - id: openwiki-source-81028398d49b5413dde247f1
     resource: repo://packages/test-utils/src/fuseki.ts
-  - id: openwiki-source-900a2d8c960b090aaf5dc614
-    resource: repo://temporal/dynamicconfig/development-sql.yaml
   - id: openwiki-source-ddee6cdb17da2778a3b56d4c
     resource: repo://test/authorization-revocation.test.ts
   - id: openwiki-source-212161fae9d7487f1c2449de
@@ -52,8 +48,6 @@ sources:
     resource: repo://test/federation-mirror.test.ts
   - id: openwiki-source-1bc7541f22daab19be8ab8ba
     resource: repo://test/invitation.test.ts
-  - id: openwiki-source-b7181b4d7359d016a13b092d
-    resource: repo://test/package.json
   - id: openwiki-source-6996f47c4d119fbaf101afe4
     resource: repo://test/roles.test.ts
   - id: openwiki-source-11c141224a72985968f722ac
@@ -62,10 +56,10 @@ sources:
     resource: repo://test/share.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Integration test suite
@@ -144,13 +138,12 @@ opened *before* the trigger, because neither replays.
 
 The black-box suite does **not** read replica graphs while asserting a product
 outcome. `roles.test.ts` and `share.test.ts` assert instead on the authoritative
-sides: the grantor's own registration links the grant (local), the grant body is
-read with the **data owner's** session (the grantor for source grants, the peer
-owner for delegated ones — where the authoritative copy lives), and the
-grantee-facing result comes from `ListDataRegistries` with the grantee's context
-(the RPC behind the UI's "data of <peer> that I can see" view). That RPC is
-served from the grantee's replica, so it is polled with `waitFor`: replication is
-webhook-driven and can lag the barrier's registration `Update`.
+sides: the grantor's own registration links the grant (local), the source grant
+body is read with the data owner's session, and the grantee-facing result comes
+from `ListDataRegistries` with the grantee's context (the RPC behind the UI's
+"data of <peer> that I can see" view). That RPC can be served from the grantee's
+mirror, so it is polled with `waitFor`: replication is webhook-driven and can lag
+the barrier's registration `Update`.
 
 `test/util.ts` also exposes `localMirror(session, peerId)` — it resolves the
 peer's registration of `session.webId` through the reading side's own SPARQL
@@ -174,10 +167,9 @@ The invitation suite additionally asserts both legs of a **runtime-created** pai
 (no seeded relationship) are mirrored once their completion activity is done —
 the runtime counterpart to the fixture backfill.
 
-No test writes the reciprocal mirror. The grant-reuse end-to-end test does
-trigger the real issuance path, which writes the separate **issuer-side grant
-replica**; that replica is read only through the equivalence activity and is
-not asserted directly.
+No test writes the reciprocal mirror. Delegated grants are local projections
+and are asserted through the grantor's own registry and the grantee-facing RPC,
+not through a separate issuer-side replica.
 
 The Temporal default activity retry policy is `maximumAttempts: 1`, but the
 webhook-delivery and reciprocal workflows set explicit retry policies. The
@@ -214,13 +206,6 @@ the black-box `/test` suite may not.
   a `404` on a *linked grant* stays retryable and keeps the replica;
   `401`/`403`/`500`/network reject; a registration without a reciprocal link is
   a no-op.
-- `packages/components/test/delegation-request.test.ts` asserts that
-  `requestDelegations` sends one `interop:AccessRequest` POST per data-owner
-  group, parses the echoed finalised grants, writes the issuer-side replica
-  (one named graph per grant, parent reverse child edge, best effort on
-  failure) and returns every assigned IRI; it also no-ops on an empty group,
-  rejects a mixed `dataOwner` batch, surfaces a non-200, and rejects a
-  malformed response without writing a partial replica.
 - `packages/components/test/check-equivalence.test.ts` covers the pure
   comparison: field equality and set normalization, ignored ids/derived links,
   flat and embedded tree builders (order, n-depth, missing child, orphan,
@@ -234,16 +219,12 @@ the black-box `/test` suite may not.
   workflow contract: a non-empty result skips storing/requesting and re-links
   every reused IRI (parents + children) in the full-set registration PATCH; the
   projection GC (partial replacement, deny as the empty desired set, own-registry
-  orphan scan, peer-owned removal through the boundary plus replica drop,
-  missing bodies), and `revokeGrants` deleting the closure before the
-  owner-side registration PATCH.
+  orphan scan, missing bodies), and delete-before-create ordering through the
+  owner-session closure.
 - `packages/components/test/authorization-revocation-workflow.test.ts` asserts
   the revocation workflow's order — delete the DataAuthorizations, resolve the
   grantee kind, reconcile each expanded grantee, complete — including role-member
   fan-out.
-- `packages/components/test/revocation-errors.test.ts` covers the
-  `AuthorizationRevocationFailure` RPC schema and the HTTP status/JSON body per
-  typed revocation code.
 - `packages/authorization-agent/test/grant-chain.test.ts` covers the chain
   predicate and closure: scope/mode/instance coverage, multi-hop chains, cycle
   rejection, replacement re-anchoring, and `invalidGrantsAfterRemoval`.
@@ -271,7 +252,24 @@ the black-box `/test` suite may not.
   `inheritsFromGrant` edge, and that registration bodies are found in `meta:`
   graphs.
 
+## Package-level LWS and org-context tests
+
+- `packages/components/test/id-jag.test.ts` and
+  `id-jag-subject-token-verifier.test.ts` — ID-JAG issuance/verification, typ
+  pinning, audience checks.
+- `access-claim.test.ts`, `grant-policy.test.ts`, and
+  `policy-engine-claim.test.ts` — claim parsing, coverage semantics, and the
+  claim-first policy engine.
+- `storage-exchange-access-policy.test.ts` — owner/admin scope minting and
+  claimless denials.
+- `admin-impersonation.test.ts` — the read-only org impersonation authority.
+- `admin-sparql-endpoint.test.ts` — `?pod` ownership resolution and 403s.
+- `peer-data.test.ts` — peer document and instance reads through the storage
+  fetch.
+- `lws-live.test.ts` — live LWS metadata/discovery behavior.
+
 ## Coverage
+
 
 Each `/test` file verifies one protocol surface: `access-request.test.ts` (need-based
 requests), `account-creation.test.ts` (bootstrap workflow provisioning),
@@ -284,11 +282,11 @@ including the inherited child, plus the empty case),
 DataAuthorizations, the derived grants, and the registration projection are
 gone; a re-revoke is a no-op success),
 `check-equivalence.test.ts` (two-run identical IRIs for source and delegated
-grants), `delegation-endpoint.test.ts` (issuance echo; revocation idempotency,
-mixed-owner refusal, unknown-grant refusal, and multi-hop closure),
-`federation-mirror.test.ts` (replica contents, the only replica-reading file),
-`invitation.test.ts` (personal + org invitation), `key-scoping.test.ts`,
-`org-context.test.ts` (admin org context + proxy/sparql-admin),
+grants), `federation-mirror.test.ts` (mirror contents, the only replica-reading
+file), `impersonation.test.ts` (read-only admin impersonation),
+`invitation.test.ts` (personal + org invitation), `key-scoping.test.ts`
+(per-pod S3 key isolation), `lws-auth.test.ts` (the two-storage ID-JAG chain),
+`org-context.test.ts` (admin org context + `/sparql-admin`),
 `personal-admin.test.ts` (AddAdmin/RemoveAdmin + ACR),
 `policy-engine.test.ts` (WAC/ACP matrix), `reciprocal-webhook.test.ts`,
 `reconciliation.test.ts` (sweep arms + seed subtree reuse), `roles.test.ts`,
@@ -311,9 +309,10 @@ CSS SPARQL-backend `dcterms:modified` metadata corruption). Iterators
 (`findAuthorizationsForAgent`, `dataAuthorizations`) have no 404/410 tolerance
 yet.
 
-The explicit **SPARQL cross-pod isolation** and **mirror-freshness** end-to-end
-cases are still to be added; they are tracked in
-[`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md). The
-mirror-freshness case can lean on the consumer's ordering: `done` on a
-`DelegatedGrantsUpdated` activity now implies the mirror write happened, so an
-assertion after the barrier needs no extra polling.
+The remaining **mirror-freshness**, unregister-deletion, backfill/drift-scan,
+and S3 orphan/account-deletion cases are tracked as issue #131. Cross-pod S3
+key isolation (`key-scoping.test.ts`), the admin `?pod=` ownership gate, and the
+reconciliation mirror arms already exist. The mirror-freshness case can lean on
+the consumer's ordering: `done` on a `DelegatedGrantsUpdated` activity implies
+the mirror write happened, so an assertion after the barrier needs no extra
+polling.

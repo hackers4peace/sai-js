@@ -42,10 +42,10 @@ sources:
     resource: repo://packages/data-model/src/registry-set.ts
   - id: openwiki-source-12dd5601be4d1b21ac977892
     resource: repo://packages/data-model/src/templates/index.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Data model entities
@@ -164,7 +164,7 @@ Access Control Resources are built as **JSON-LD**, not Turtle.
 
 - `agentRegistrationAcrJsonLd({ id, owner, peer })` — the owner
   (read/write/control) plus peer (read) ACR for an agent registration.
-- `dataGrantAcrJsonLd({ id, resource, owner, grantor?, peer?, client? })` — the
+- `accessGrantAcrJsonLd({ id, resource, owner, grantor?, peer?, client? })` — the
   owner full-access ACR plus optional delegating-grantor read and peer/client
   read matchers.
 - `rewriteFullAdminAccess(doc, acrId, matchers)` — a pure function that removes
@@ -177,8 +177,8 @@ crosses a Turtle boundary. The remaining `packages/data-model/src/templates/`
 exports are the **bootstrap TriG** fragments used when provisioning an account:
 
 - `RegistrySet.ts` — the registry set plus its registry containers.
-- `WebId.ts` — the WebID profile (issuer, authorization agent, delegation
-  issuance endpoint).
+- `WebId.ts` — the WebID profile (issuer, authorization agent, access-request
+  and access-grant services).
 - `DataRegistry.ts` — the data registry/storage descriptor.
 - `types.ts` — the shared `AgentAndClient` type.
 

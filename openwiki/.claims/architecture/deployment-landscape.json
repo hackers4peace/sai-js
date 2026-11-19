@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:434ac35ac9dcc4b3d035b0572dbf901172fd2bd0360fd8f8c6e5fe2945829a50",
+  "pageVersion": "sha256:e1b9c4e76681f46e77f50c16a8bcaaf39d1f6b33301b51eda605f0d39fa532d3",
   "claims": [
     {
       "id": "claim_39d5e1b3e8f54ba3a7092311e5f2b49f",
@@ -83,33 +83,19 @@
       ]
     },
     {
-      "id": "claim_76ac2fa2167948fbbd426cfcae4e8443",
-      "statement": "The production NixOS/Podman configuration declares an oxigraph container and a sai-oxigraph sparql facade, and passes CSS_SPARQL_ENDPOINT=http://sparql/sparql to the CSS servers.",
-      "evidence": [
-        {
-          "resource": "repo://nix/podman.nix#L123-L149",
-          "version": "repo-lines-v1:sha256:6110e2aba7ce8bea50ea8fed2bc0ee2be4b290afeaea245988470b74f1309b5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzNWM1ZjY0NjJkMTJiOGIwZjdmMWNhOTNmY2EyNWMzMGIwNjE3Mzk3ZDkyNzM5YjI4NzdhMjVkNjJjNDM3ODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZWNkZWZhODkwNzdiMWRiMDQ3NDVkZjc3ZDc1ZjVlZGQyNWFlMDQ2ZDU1ZmRiY2VjMDQwY2E2NDRiY2VmMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkZmRhZTczMzg1MTFhYjlkOTE0NWEwZjc2MWYxNTk5OWViNmM4YzhiMDY1Y2UwNjgxNDNlZjlkZTQ2Nzc2NGIifQ"
-        },
-        {
-          "resource": "repo://nix/podman.nix#L268-L330",
-          "version": "repo-lines-v1:sha256:745e1fd7cf77ea3e9dda16e766ac2bc7d4ec033dc55c9157029af3c54236d8c5:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkYWMzNTE4NDE2NDUzNWViNTRmN2RhMzRiMDA2MzQ1NTAyYmRiZWM3NWQ4ZjViYWU0ZjE1YjRhMjNjMDE3ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhNzcxMjc5MzhmNmExMzlhMjc1ODE5YmJkYTE4M2NiYzAxYWZjODllYmU1YmUzMjVkZjUwN2UyMDhhYzQ5ZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyM2YxMGIzZWE0ZjM0NDNkNmQ0YjFhYzI2NzRiZjAyZmVhNGM5OWZmNTc5MjA4Y2IxM2MwMmFiMTIyZTQ1MDMifQ"
-        }
-      ]
-    },
-    {
       "id": "claim_4901c3c031e64cf694b5269536651492",
       "statement": "The dev/test Docker Compose stack runs a Fuseki service with an admin API and a Garage service, and gives the worker the Garage admin endpoint/token plus the bucket-less S3 endpoint, so storage provisioning is per-pod rather than a shared endpoint.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L185-L190",
+          "resource": "repo://docker-compose.yaml#L186-L191",
           "version": "repo-lines-v1:sha256:5440349e097b9feca87256bf1c29b658fd0546bf2f9d16e1da0daa5273dd8ccd:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDM5NmMwNmM2MjczOTJmNzk3MTk2YzExYjk5MTJmMmU2OTdmMTk1YTAzOWMwNTBhODljZDE4YWQ2MTMwNDgzNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkxOGNiM2JmMTE0ODBiYjkzNjgxY2Q0MWU0NTZhMzNjMzk5MjhiOWY4YjgwMWExYzU1NTg4MTdiZGRhZjRmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNiOTc3MzRjMTU0NTU1ZWExYjRlZjA5ODY1M2E0Njk1ZTEyMDRmNmI4NWQ4YmZlNjI5YzU2MmQ4Y2I1MWIzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQxMzBjYjljODczN2M2NTliNDgwYmNkZDI1MmMxNzM3YTMzMjYwZWMzNWVlMGZjYWQ4MzVjZTgwNGEzZWQ1YyJ9"
         },
         {
-          "resource": "repo://docker-compose.yaml#L383-L396",
+          "resource": "repo://docker-compose.yaml#L384-L397",
           "version": "repo-lines-v1:sha256:f3eba9a52354fb1eed866c547f648b31a21bf4f0670e325a2cd2366ec5a14bc0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiOWI5ZTQ4NWFkMTExNTFjNjQxZWY5OTg5ZDVmMDIwYTI3Y2UzNTQwMTc1ZjE0OTQxYzY0ZTFjYTM1ZDE2NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMTZlZDIzOWEzNjUxYjUwNzljMGU0ZTdmMDc4NDRlYTMyOWM4NzYyOGJmOWZjYzQ2MzY3NzMzZjVlMWU5M2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkNzQwNmM4MWQwM2Q3YjcyZWUxYzMxYmIwYTFlOTQyYTllOTI2YmFjNTE5YWYwODBhOTI5ZTNmNTBlMDI1MWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5MDU5MGU1NDhkZDA4Mzg5Y2E3ZGU3NTgwODc0ZjNjYmQ1NzVkNjdjNWJlNzRiZjM4YjMyMjkyMjhjNzkyM2IifQ"
         },
         {
-          "resource": "repo://docker-compose.yaml#L443-L456",
+          "resource": "repo://docker-compose.yaml#L447-L460",
           "version": "repo-lines-v1:sha256:5d2f905f4f1734f9649ab114457bde6c66ce0d6be9295215ebf202a9cff3d9e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MGFlZDI3YzkzYWMzMjY4ZDFlYzk1ZTEyNTQ4YzQwYzI0NDlhZDRkZDE3NDJjYTk0YWY5OTE3YzJiYWVmMmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxM2Y0ZDk2NjFlOWQyYzNlMWEyODllNTgzMjI5OWJlYTE0Y2RiNjRiZjg4NjYxZGY3MTdiMTJmYTAyZDAxMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwNjgwYmVhM2YwZjI1MjRmMWVjZWVlODg1MjA1NjY0NzI3NjM2ZTBiNjhiNWNmNmQxZDQxYWViMDgxMTJjMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlZmZkNmE5ZDBiMzE1NWQyNmFmYzFhOTQxZmQ1YTE0YzM3NDA2NzBkN2ZiOTc3MWIyYzA0MGNkMGExMGI1Y2EifQ"
         }
       ]
@@ -133,8 +119,8 @@
       "statement": "The NixOS/Podman registry and data containers set TEMPORAL_ADDRESS=temporal:7233, so both CSS servers can reach Temporal for durable webhook delivery.",
       "evidence": [
         {
-          "resource": "repo://nix/podman.nix#L307-L341",
-          "version": "repo-lines-v1:sha256:2b7f18df4dfec9d03dc55fa783b42d493084b2e6f844d5af2dbb61bba6bd970c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3NzRlMmE0NjJkYWE2ZTRlZDljNjZjYzAzYWIwZWRlYWEzZGFjMjk0ODZmMWY0ODMzM2YwNDgxZTVlZTE1YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmNzM1MTBkM2VkZTkwOWYxYmQzZWFhNjI3YTZmMDY5MGMwMGUxNWQwMDkyZGY2OWUyNjRkOTUyYjk4ZWVjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDhjZTliYzU5MjVlZjNmNTdlMDlkMjczYzU3YzNhZTEyNmE1ZjIyMjI2MDJkYWQzNTZjMjhhNzFmODk2OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiM2FhYTg2YmYzMWRlN2NmMjY5ZmI0Yzg1Mzk4YTdjNjBjOGEzZjAxYWFlZTk5NDljMTgwYTk1OTAxOTY5NWIifQ"
+          "resource": "repo://nix/podman.nix#L312-L343",
+          "version": "repo-lines-v1:sha256:d38e587bc943e4e6cb026761132607202d7499389e4883c9d437f3b07173da92:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3NzRlMmE0NjJkYWE2ZTRlZDljNjZjYzAzYWIwZWRlYWEzZGFjMjk0ODZmMWY0ODMzM2YwNDgxZTVlZTE1YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1NWQxODg5ZmYwZjdkNDBhNzI3M2UwNjBhODIyMjBmZTc2NzAyOGJhODZlM2QyZDA3YzNkMGNlMTRjMzVkZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDhjZTliYzU5MjVlZjNmNTdlMDlkMjczYzU3YzNhZTEyNmE1ZjIyMjI2MDJkYWQzNTZjMjhhNzFmODk2OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExYzUyMGJjMzA4ZTgyOTFhOTllMmFhNzY5YjE3YTdhM2ViNmRkZTY5MDllNWY1OTczY2FkN2FlMWE2NzJkZTkifQ"
         }
       ]
     },
@@ -143,8 +129,12 @@
       "statement": "The Docker Compose registry and data services include the shared temporal environment anchor, giving both services TEMPORAL_ADDRESS=temporal:7233.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L101-L141",
-          "version": "repo-lines-v1:sha256:8286a43dd51a48eb48d98e239061eaa28596ea039dc1b59b946b04c8636fda22:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNzQ2MzM0ZmRiZDY1MTMyMzlmMTMyNmRiOGI2MTI3NTdiNWIzMmMwODA4YjUwODFhOTkzN2Y2NTMzYjhkYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiYjQyNzkzNzdhZGUyNjZlNmI5ODgyMGVhMzllNzkwODI4ZjIxMjhhMWFlNDI0ODQ0ZDdjNjhmMTMyNTBkYmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNjAyNTA4NmFhZDU5ZTk4MTY3NTM5NWVhMzJiOWM4MzIyMzJjNjRiYWZkYTEzNDE1Y2RkNzdkZjlmOTViMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1Nzc4YTkxY2M5OGI4YWIwNDI4N2MxNjMwM2U3MWY4MDdhYzNhZWYwNjQ3M2MxY2NmNzUxNjQ3ODgyNjdmYjQifQ"
+          "resource": "repo://docker-compose.yaml#L105-L107",
+          "version": "repo-lines-v1:sha256:563ef7c53712fad67f4640c141e774832cf937636a5bdfd8ff5d60f0183180ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWRlNTJhOTU3N2U0NzRmYTFmZjVhNzc1ZWJjY2ZkMmVjMmNkMmUxNzRlODg1ZDg5NGE3MDVlMDlkNGNiMjQzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTlmZDNhNjUyOTJjZmZhMmMwYWJhZDQ1MmMxYjEyZWZhNzE3MzU3YjY3ZTY4MGE1MThlNzBhNTUzMTlhOGQxNiJ9"
+        },
+        {
+          "resource": "repo://docker-compose.yaml#L146-L148",
+          "version": "repo-lines-v1:sha256:25c1b0f7693b71aac6142b3623a81d09f028231f439f76c7eaff1a7cbee267e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JiNDI3OTM3N2FkZTI2NmU2Yjk4ODIwZWEzOWU3OTA4MjhmMjEyOGExYWU0MjQ4NDRkN2M2OGYxMzI1MGRiYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU3NzhhOTFjYzk4YjhhYjA0Mjg3YzE2MzAzZTcxZjgwN2FjM2FlZjA2NDczYzFjY2Y3NTE2NDc4ODI2N2ZiNCJ9"
         }
       ]
     },
@@ -179,10 +169,38 @@
           "version": "repo-lines-v1:sha256:9fe1553f2add1442d691d6f6824eb61d7af12d07711c8388b8a19272e1997430:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTg4YzU2NTU0OTZkOWRkZmEyNDY0OGVmMDViMTEyYjUxYWRiYjljYTNjYmY2ZDE3MmJiMjY2NTJhNTZlOWRkNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ3NWU5NGE5MDRhYzQ5YjMxNTRkNDY3MmE2NmU4NjI5Yjg2ZGFjNzRlM2UyOTM3YmU2OTI3YWUzZGExMWM1MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjEwMDRiNTk0YjQwYjc0ODc1ZGM3MTc0YjNkNTViNTQ1ZDQ5NGU1M2I3MjQwNTdlNThjMDJhYmVlYmEzMzQwMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWU4MzQwNmZhY2E2ZDE0ZGU3Mzg2YjYxYTVhYjViNTdlY2VjMzhhMDRjZjQxNmMzNDExYzdjMWU1NjU4ZWExMyJ9"
         }
       ]
+    },
+    {
+      "id": "claim_7bc779d7f9534802a9172123c62c0a92",
+      "statement": "The NixOS/Podman stack declares Fuseki and Garage containers, points the id service at the Fuseki id dataset, and sets the data service's S3 region to garage; the old oxigraph/sparql containers are absent.",
+      "evidence": [
+        {
+          "resource": "repo://nix/podman.nix#L123-L150",
+          "version": "repo-lines-v1:sha256:2a2d4ef2268a3cdac79be3b7d37f8608e7575ac307b008dbeb182e4cc37d4bae:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4MjQwOWRlZGZhNjRlMmM3ZTNlZWRlZWEzOGM4MjQxMjVkMjA0MTExNTIwMGI1ZDg3MDgyYzY3MzFiZmY5NTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4YmU5YzQwMzdmNWJkM2UwY2YwYjI4Y2JiMTVhNjg5MTcwMTIzZWMxMmM4MGM0YmI3YTRhM2M4ZmQyYjk5YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZWNkZWZhODkwNzdiMWRiMDQ3NDVkZjc3ZDc1ZjVlZGQyNWFlMDQ2ZDU1ZmRiY2VjMDQwY2E2NDRiY2VmMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3NGRkNTA5OGFiMmM3NDEzZDEzYTQ0YWFiOWE4NTQ1ZjdlODRkMWYzYTQ5YTczYjM5N2YyYjZjYjBjMWVlODQifQ"
+        },
+        {
+          "resource": "repo://nix/podman.nix#L312-L345",
+          "version": "repo-lines-v1:sha256:c97231d17fb109fbbde314fbec81121f0815525accdcd8703695cbf691d713ce:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3NzRlMmE0NjJkYWE2ZTRlZDljNjZjYzAzYWIwZWRlYWEzZGFjMjk0ODZmMWY0ODMzM2YwNDgxZTVlZTE1YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzNkYzczMWU3ZDA3YjFmMGMwNWNmZWJkN2UxOTIyMDIzZTYwNzdiYzBhZTdiYTMwMTQ4ZjUwODMzYTI1YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDhjZTliYzU5MjVlZjNmNTdlMDlkMjczYzU3YzNhZTEyNmE1ZjIyMjI2MDJkYWQzNTZjMjhhNzFmODk2OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwODFiMmNkOTViYjViNTRlMDJhYzMwNjMyMjhjYjNiZDc0NTI4Yjc5M2Y5OTNjNjQwOGNiOTcyY2RkMDk5OTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62cb834d51ec408fb6ce66661c0b5af1",
+      "statement": "The LikeC4 deployment model still declares a shared Quadstore with oxigraph technology even though the NixOS/Podman configuration now uses per-pod Fuseki datasets and Garage.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture.c4#L30-L36",
+          "version": "repo-lines-v1:sha256:8c191b90fe6d52ece808732e7994167c391050cd4c00402c2e50ea8c386dc33d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmJlNjIwYjc0MzRhZWRmMTMzZWY4NjU1ZWMxYjJhNGIyNzM5NGU5ZGY2ODBmNTY4ODBmNWFkOTFkN2I1OWY0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjU3NzE1OTExZDVkOTRjNDVkNTU0NzViMDY4Y2RmNTE5NzM5MmMwOWM0NzZhNDFkMDZhNWYxYjNjODZjM2UwYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmUzZGRiZTZmZDY4N2RiMzIzNmIwNDM4ZGJmNGUxMzg3MDk2MDAxMjc2ZjM4MGYzOTZlOGQ2Y2Y0YzFhMzQ5NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGFiNzUyMmVlODdlNGRhMjAyMjY5NzhjYmQ4MzE5MjJkYTBhYTFkMDU2NzE0N2JhYTQxZTkyMjU4Nzk4ZDVlYSJ9"
+        },
+        {
+          "resource": "repo://nix/podman.nix#L123-L135",
+          "version": "repo-lines-v1:sha256:6b8a20a115c294d3905fb477a348f14016e72c3cd537766e93e30474c5c2658c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4MjQwOWRlZGZhNjRlMmM3ZTNlZWRlZWEzOGM4MjQxMjVkMjA0MTExNTIwMGI1ZDg3MDgyYzY3MzFiZmY5NTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZWNkZWZhODkwNzdiMWRiMDQ3NDVkZjc3ZDc1ZjVlZGQyNWFlMDQ2ZDU1ZmRiY2VjMDQwY2E2NDRiY2VmMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyYTllNDMwYzdiNDNhNDc0Nzc5NTRjYTdjYjNjZDM5ZGVkODhkNjkxNzI2NDAyN2NmMzQ1M2NiZDUyYjI0MTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-21T01:32:20.770Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

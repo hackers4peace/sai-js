@@ -2,7 +2,7 @@ import type { GrantData } from '@janeirodigital/interop-data-model'
 
 /**
  * Pure grant-tree equivalence for `checkEquivalence`
- * (docs/plans/check-equivalence.md).
+ * (openwiki/architecture/grant-reuse.md).
  *
  * A grant's identity is its **subtree**: a parent and all of its descendants
  * are equivalent only as a whole — a child is never reused under a new parent.

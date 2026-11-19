@@ -14,20 +14,20 @@ sources:
     resource: repo://docker-compose.yaml
   - id: openwiki-source-35d51428d97e66241738b5cf
     resource: repo://environments/css/fuseki.config.ttl
+  - id: openwiki-source-a43675e6c1806ed5f51b1407
+    resource: repo://environments/dev/scripts/mkcert.sh
   - id: openwiki-source-012f2c78e3b1446dfc35803f
     resource: repo://Makefile
-  - id: openwiki-source-ccdcdbc048f49246514e9069
-    resource: repo://mkcert.sh
   - id: openwiki-source-55f67d07018be4b3c4161eb1
     resource: repo://packages/components/src/temporal/queues.ts
   - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
     resource: repo://packages/components/src/workers/main.ts
   - id: openwiki-source-8dce2ce795a3d6ab234dc34d
     resource: repo://packages/repl/cmd.ts
-generated: { by: "pi", at: "2026-10-21T01:32:20.770Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-21T17:33:35.590Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Local development environment
@@ -71,11 +71,11 @@ Traefik's Docker provider routes by hostname from static certs under
 
 dnsmasq maps every `*.docker` name to the Traefik container IP
 `172.16.0.250` (`.env` `DMQ_GLOBAL=address=/docker/172.16.0.250`), and app
-containers point their resolver at `172.16.0.253`. `mkcert.sh` reads
+containers point their resolver at `172.16.0.253`. `environments/dev/scripts/mkcert.sh` reads
 `TLS_DOMAINS` and generates a wildcard certificate into
 `traefik/certs/cert.pem` via `make cert-install`, so `https://auth.docker`,
 `https://*.data.docker`, `https://ui.auth.docker`, and friends work locally.
-macOS users add bridge routes with `docker-mac-routes-add.sh`.
+macOS users add bridge routes with `environments/dev/scripts/docker-mac-routes-add.sh`.
 
 ## Build, run, seed
 

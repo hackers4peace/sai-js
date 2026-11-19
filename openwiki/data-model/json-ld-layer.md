@@ -10,8 +10,8 @@ sources:
     resource: repo://packages/authorization-agent/src/sparql.ts
   - id: openwiki-source-5f3a5827ade0bebc11f29499
     resource: repo://packages/data-model/src/context.ts
-  - id: openwiki-source-82fe23672fc8cac2a228f590
-    resource: repo://packages/utils/src/container.ts
+  - id: openwiki-source-3b88bc37e6fa2b59ef014117
+    resource: repo://packages/utils/src/identifier-strategy.ts
   - id: openwiki-source-d900b4364e5e03dbadc6c83e
     resource: repo://packages/utils/src/jsonld.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
@@ -20,10 +20,10 @@ sources:
     resource: repo://packages/utils/src/sparql-update.ts
   - id: openwiki-source-228968b8fb4f70750899249e
     resource: repo://packages/utils/src/whatwg-fetch.ts
-generated: { by: "pi", at: "2026-10-21T12:54:01.599Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-21T12:54:01.599Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # JSON-LD read/write layer
@@ -120,10 +120,12 @@ sniffs the raw doc's `@type` and picks a frame per class:
 
 ## Container creation
 
-`createContainer(id, fetch, doc)` PUTs an empty container first (CSS ignores
-the body), then `applyPatch`es the **JSON-LD document** serialized as
-`INSERT DATA { ... }` onto the discovered description resource. The
-container-creating callers route through it.
+Container creation goes through the storage identifier strategy
+(`identifier-strategy.ts`): the strategy returns a creation plan (a POST with the
+LWS `Container` link, or a description-resource patch), and `createResource`
+executes it. A POST plan requires a server-assigned `Location` equal to the
+minted identifier; a description plan uses `applyPatch` with the JSON-LD body
+serialized as `INSERT DATA`. There is no `createContainer` helper anymore.
 
 ## Fetch boundary
 

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:770f9f59bac99eb7c0fe97a8a130a242882e3e9e7649a47ac8e6ddc47ed3d942",
+  "claims": [
+    {
+      "id": "claim_17f3a5d2a8d547da8addcf59bb200c31",
+      "statement": "createLwsAuthFetch performs the two-step LWS chain: a DPoP-bound request to the UAS token endpoint for one ID-JAG per storage authorization server, then a bearer ID-JAG exchange at the storage for an access token, then the storage request with one retry on 401.",
+      "evidence": [
+        {
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L60-L160",
+          "version": "repo-lines-v1:sha256:90029be51198a7646dbfc71c9801ec47ab24b52db3920884efc79b73df0c418c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmZWFmNmM3YTMzYzM0Y2M4NTdjMWU3NWE1Y2FmOGUxNzc2NDNjZjg2ZjIwMjIwODUyYmVjN2Y5YWIwMWUwOWU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjOThiY2IxYzY3YTA2MmVlNjhkMTMzYjNjODllNmUxOTVmYWM0YjcxNzFmMDU4OWNiOGFhMTk5NzJkM2FiOGZmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxMjE2YWI4ZTc3OWMwNWM4MWE2NzA0MjNlMWUzN2M5ZDcwNDE3MWJkYjk4NDVjYzZmYmQwNjBmYWM2YmJiNzMxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxZjZmMzQ2ZTQ2NWRkYzE5YzM4ZDdiNDE5N2QyOWYxNTBhMzIzOTlhMGE1NjcyZmMxZWFhYjAzMDMyYTdjNzQ0In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_b73b1f018652411d8abf1b830bd1e47d",
+      "statement": "The ID-JAG cache is keyed by issuer, storage and impersonation UAS and renews 30 seconds before expiry; access tokens are cached per storage by createLwsFetch, and a storage 401 refreshes the token.",
+      "evidence": [
+        {
+          "resource": "repo://packages/lws-auth/src/fetch.ts#L100-L195",
+          "version": "repo-lines-v1:sha256:07584619ca16cd61e5109e019e165ce7da10a9938477037f99f6c6bcac72f2d6:eyJzZWxlY3RlZExpbmVDb3VudCI6OTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNTgyMGFkYmIxMTQ4ODliY2UxOGJlZTY5OTA4OWQ1MmMwYTYwZTk0MTUxODg1OGIxZWY1NWVjYmExNjM4NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkZmFkOGU2ZGMxMGQxOTM3NDU2OTc4MmJlYzczN2E4MjI2NjRjMzA3NjI1NmFhYjEzNjU1ZmRkMzRlNTZlM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_38a9f6bf3b6745cc89e86005612d7f10",
+      "statement": "createBrowserSession implements redirect login with PKCE and optional DPoP, persists the session, refreshes the access token with a renewal margin, and retries a request once after refresh on 401.",
+      "evidence": [
+        {
+          "resource": "repo://packages/lws-auth/src/session.ts#L120-L220",
+          "version": "repo-lines-v1:sha256:8e3ecc77357c24ab5939e533d9877504989fb233b198536e3df579dcfb4743ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3ODYxZmNlMGFiNGM2N2U2YWE1YTk2OTUyMmY5ZTcwYjk4N2JiYjQzMDYyYTJlOTQ4YzI5ZTJhNDAyNzliN2NiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmMTdjMDIyN2Y3MzlhOWE0YzhmNTk2ZmZjMjQwNmE0Y2VhMzFhZWYxZGI2MDljNjdiNDY2M2M4OTZmOTEwOGY0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmZDAwY2JlMTFkOWJhYzhjYTViYjRkZjU5YWI3OGE0N2RmNTMwMTMyNDQ3YTI3NzQ1ZTlmZWJhMTY2ZTVhZmNmIn0"
+        },
+        {
+          "resource": "repo://packages/lws-auth/src/session.ts#L300-L360",
+          "version": "repo-lines-v1:sha256:eb340ca6038807a8b6d045c5f109e2ac01075731c6f38dc5c86f11f2452a7b3e:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzZjFiMjVjMjdmYzY5YTQxMTQ3ZjE2ZjUzYmJhOGQxZjllOGJjNzY4NWU1MzM0ZWQyYTQwYjYxMmJlZmRhMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNzg2YTgwZTg3Yjc4NDQyNjc2OGMwNDk0YmNmNWNkZDhmYjM1YzViY2ZlNjhhOWE2MzU1MWM0MTAzNmEyOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1NmJhMTc4NDE3M2FkZWI1MTZjMmYxYTU0ZmNhMDkyMjYyOTkxYzM1NTZkMDQ1NGM0MjNkZGZlOGE5Mjg4ZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8da5c1bc02a342df90200221dcd766ce",
+      "statement": "buildLwsFetch wires the storage fetch to the self-issued DPoP-bound credential and createLwsAuthFetch; ID-JAG is always on, so the old idJag flag and single-exchange default no longer exist.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/builders/sessionManager.ts#L90-L116",
+          "version": "repo-lines-v1:sha256:e26d9568e92f332b3baa9e9157d127ad34dc225e567892150e556a657d948c1a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMzU1ZDEwZTAyNzhkOWFjZTk4Y2Y2M2U0NTFiYmMwYTU2ODJhM2UwZDFmNzUzMmU3MGU4OTVkOTljMzNjNzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YzdhZGExYTZjNjk3YmJlMWU1ODI4YjVmYWU4NzYzMjM4ZDk1YWNmM2NkZWRiYTA0ZTcyNDRiMjE0YTFjMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_05346da9871743a8bce0749c1212ba50",
+      "statement": "The LWS chain emits sai.lws.request-id-jag, issue-id-jag, exchange-access-token, and verify-id-jag spans, each carrying decoded token attributes under sai.token.<role>.* when token capture is enabled.",
+      "evidence": [
+        {
+          "resource": "repo://packages/utils/src/tracing/tokens.ts#L70-L130",
+          "version": "repo-lines-v1:sha256:ed7470db6225c8aa7a6ba252ccb7699998d5cdc9d668d083b769657df2f52f93:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkZTkwY2JlZGZlMGZkMmFkNmVlMTE4MGE3NmRiNWM5YTgzMmFmNGZiMWFjYWZlZGM5MTIyZGFhZDYwNzYyZDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4ODA5YjQ5NmFiMjJhMzJmZWY1OWFhMDZhMjY4MWNkYTU1M2NmZDNjYTkzM2NmZjAzY2NhZDQ0MWUzY2FkODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_95d27b6bda0a4d69968213320eef725a",
+      "statement": "HTTP body capture is opt-in through OTEL_CAPTURE_BODIES, raw JWTs require OTEL_CAPTURE_RAW_TOKENS, and captured bodies are capped and redacted by default.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/tracing/http-capture.cjs#L190-L212",
+          "version": "repo-lines-v1:sha256:84256fe568aefc2dd73f0191856e91bc2ebb59fdfe4fe1cc4f4c29790d025300:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_90649b694dd242ba8c8d3d6a0de6b185",
+      "statement": "scripts/trace-test.sh runs the docs/lws-auth.c4 diagram flow through Dagger with Tempo tracing enabled as the per-slice continuity gate.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/trace-test.sh#L1-L50",
+          "version": "repo-lines-v1:sha256:b74253f155117781e4bedd267adfdfdea416eb93e288b860f7478b2c7c8cab8a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTVmYzA0YTgwYzk1MmY0OWNlNDE4ODYyN2M1M2IwZmJlOGM0NDA0MWI5NTJkNTkyYWNkMWRlOTk4NjE0NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1ZWFmZTMzNzhkNmVhMmIzMDk0ZjhmZmY5MzgzMzZhM2RhZmYzMzg5YmMyZDIyOThkZjMzZDUzMzBmZmJmOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
+  }
+}

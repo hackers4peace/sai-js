@@ -38,10 +38,10 @@ sources:
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Activity outbox and events pipeline
@@ -142,7 +142,7 @@ dispatches on the class:
 | `AdminAuthorizationGranted` | `Admin.addAdmin` | `processAdminAuthorizationGranted` on `create-grants` — records the AA at the pre-minted id, `createAdminGrants`, `syncAdminAcr`, completes |
 | `AdminAuthorizationRevoked` | `Admin.removeAdmin` | `processAdminAuthorizationRevoked` on `create-grants` — deletes the AA at `object.id`, `revokeAdminGrants`, `syncAdminAcr`, completes |
 | `NeedBasedAccessRequestSent` | `ShareResource.requestAccessUsingApplicationNeeds` / `requestAccessUsingAccessNeeds` | `processNeedBasedAccessRequest` on `create-grants` — forwards to the data owner's issuance endpoint |
-| `NeedBasedAccessRequestReceived` | `GrantIssuanceHandler` (owner's issuance endpoint) | `processNeedBasedAccessRequestReceived` on `create-grants` — PUTs the immutable AccessRequest |
+| `NeedBasedAccessRequestReceived` | `AccessRequestHandler` → `acceptNeedBasedAccessRequest` (owner's endpoint) | `processNeedBasedAccessRequestReceived` on `create-grants` — PUTs the immutable AccessRequest |
 | `AccessRequestGranted` | `detectGrantedRequests` (child of `updateDelegatedGrants`) | **terminal** — no workflow/completion |
 | `AccessRequestArchived` | `Authorization.archiveAccessRequest` | **terminal** — no workflow/completion |
 | `DelegatedGrantsUpdated` | `ReciprocalWebhookHandler` (peer `Update`) | per-peer `processDelegatedGrantsUpdated` consumer on `create-grants` (start-or-signal, workflow id `delegated-grants:<webId>:<peerId>`). Each drain runs the `syncReciprocalMirror` child workflow on `reciprocal-registration` first, then `updateDelegatedGrants`, then writes the completions. A **terminal** sync (`404`/`410` on the peer's registration) skips the regeneration and still completes — a peer that unregistered us must not stay `pending` forever. |
@@ -263,8 +263,9 @@ state line) and parses each line with `toStore`.
   `pending`/`done` pair, so receivers must tolerate duplicate `Add`s.
 - `AgentRegistrationAdded` stuck-pending on permanent failure — the sweep skips
   it (no `accountId` in its payload).
-- `GrantIssuanceHandler` bypasses the outbox (starts `storeGrant` directly), so
-  the data owner's UI gets no event for incoming delegated grants.
+- There is no delegation-issuance endpoint anymore, so there is no outbox
+  bypass on the data-owner side: delegated grants are projections written by
+  the assigner's workflow.
 
 ## Reconciliation backstop
 

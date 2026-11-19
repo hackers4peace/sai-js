@@ -114,7 +114,7 @@ export interface IdJagTokenHandlerArgs {
  *
  * This is deliberately not CSS's `LwsTokenHttpHandler`: that one only accepts
  * `resource` values that are storages *hosted by the same server*, and it only
- * issues `at+jwt` access tokens. See `docs/plans/lws-auth.md` C1.
+ * issues `at+jwt` access tokens. See `openwiki/architecture/id-jag-access-claims.md`.
  */
 export class IdJagTokenHandler extends HttpHandler {
   protected readonly logger = getLoggerFor(this)

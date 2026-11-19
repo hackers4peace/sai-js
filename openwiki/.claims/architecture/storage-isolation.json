@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:e9ad522ae644b2ff6615380bfeb752b1ce37d81b005d6d1c9c9bc1bb87eafa16",
+  "pageVersion": "sha256:3886a2b97d10b314d1f51be3a289256d952d952994aa0e0aa099b1a23d6bcb6c",
   "claims": [
     {
       "id": "claim_cdb927c3d0174925b70f73d9558c35a0",
@@ -54,21 +54,21 @@
     },
     {
       "id": "claim_d155b6b2f5e34bda934c182b7a14a045",
-      "statement": "SessionManager builds an owner-scoped `podUrl -> endpoint` allowlist from the owner's endpoint records and passes it to AuthorizationAgent.build as `sparqlEndpoints`; a session whose registry-pod endpoint is missing throws rather than falling back.",
+      "statement": "SessionManager builds an owner-scoped podUrl-to-endpoint allowlist from the owner's endpoint records and passes it to AuthorizationAgent.build as sparqlEndpoints; a session whose registry-pod endpoint is missing throws rather than falling back.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/SessionManager.ts#L84-L98",
-          "version": "repo-lines-v1:sha256:a4af702ef19929eada0f322590233cdf54795073b56109ff771508f973ad9ea0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmNzUwMzcwZmQzN2NmMjljODljYzRjZDI5OGVjYjg4YzQ4MGMwZTE5Mzg1OWM4ZjNlZWJmM2Q2YmM1NWIxM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3Nzk1MTA3MDEwNTZiZGRhZDEzZjYyY2M4MzlhMjEwM2RiYjM0OGI2OWUzMDNlM2ZjNTZhMDFkYmFkMDE3ZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBmNzc2NWZkNGFjZGJmZTNlMTZmNzMzNjdhM2NiZjE3NmI0NGQxYjA5YmRkZTE4ZDhlODJlNGFiNzNjZjNjYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiOTRlYjFlZjhiZGNiZWRlYjM1OWRkNDg3ZjBlNWFlMmRlY2VlYWEyOTc5YzQxYzM2ODEwN2U5NmJmMzZkZWUifQ"
+          "resource": "repo://packages/components/src/SessionManager.ts#L205-L250",
+          "version": "repo-lines-v1:sha256:56c77bf08963154a584af2b5d0b1c9b61ebc1577c64812d5b4362c8ae06e1151:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZmU5MDVmNzRkNWI2MWM5MGQ4YWViZDg0NTU0NTk4N2IyOTA4MDFiNmM1NjBjZjdhZGNmMDRhNmU4MTJkZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyYjc0NzhlYmRmM2RlZWFmOTNmNjAwNmZjYzhiZjllOWFjYjBjYTBmOWY2MDhlODU0Y2U3NTIxNDM2MGYzMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
     },
     {
       "id": "claim_f0c1936ba6a7417fa501d42fcc340ac1",
-      "statement": "ResolvedContext carries an `endpoints` allowlist: the personal context reuses the session's sparqlEndpoints, while the org context reads the org's own records via endpointStore.findSparqlByWebId so the admin cannot widen the scope.",
+      "statement": "ResolvedContext carries an endpoints allowlist: the personal context reuses the session's sparqlEndpoints, while the org context reads the org's own records via endpointStore.findSparqlByWebId so the admin cannot widen the scope.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Context.ts#L67-L95",
-          "version": "repo-lines-v1:sha256:dc1485dffa51154ccdd08a5652326182c6466a18084bb14ac9706fb93568e326:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWFlZmYwOTJmMzFmMTAxZmJiNTdlNWMzNTkyZTI4MTZlY2QyMjA3Mjg0MjFmNGE3Njc5OTk2NWQ5ODUxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4ZmNjZjQ2OGU4NjNkM2MyYzI5NGU2YTRkMzg5YmI4ZjJlZTYzZGRlYzljZDNkZDJjMzMxYmRhMTQwZGUzMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "resource": "repo://packages/components/src/services/Context.ts#L105-L130",
+          "version": "repo-lines-v1:sha256:c2c0dd73bb13f549816d89439a86added98753cdadf5d5b5f7a4d7d2a32402b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNGJiOGRkMWJkOWNiNzgyNTQ2YzJmODNmYjVmM2ExMjEzYWQ1YzJlMWY1OWJhNmMyOWFhNDQzZmVmYjk2YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwOTIzYmY5YWY1ODhkZGMzYjc2ZGRmMjMwMDIyZTk1ZDczZjhjZjlhYWZlYTA3N2JhNzk2YjQ2YzExZjFlY2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0NjQzZTgyZWNlZTU4YjE0ZGVmODFmMTdhYTE3MjI3NGY3OWY4ZjBjMWMzNDM0NTMzZjU4ZDU3ZDc3MzgyNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1MmZiMmQ4YTE4ZjBjNjExNTFhMDgyNzc4MmU3ZTQ4N2NjZWNhYWU2MTE1MDQ4NGEwNmJiZDdjZGFiOTk2MWIifQ"
         }
       ]
     },
@@ -77,7 +77,7 @@
       "statement": "Because grants live in the owner's registry pod, SaiAuthorizationManager resolves the storage owner's registry-pod SPARQL endpoint from the pod's base URL and owner WebID; an unknown pod or owner yields no grants (deny) and a store outage propagates.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/SaiAuthorizationManager.ts#L43-L60",
+          "resource": "repo://packages/components/src/SaiAuthorizationManager.ts#L48-L65",
           "version": "repo-lines-v1:sha256:c8b3528f1a80b8972202f9472d87bac3cad73d9c223a9c710cec2c5a82fee672:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhNmI5ZjdkMWNiY2RjNmJhZmVkZDNmYTBiMGQ4YzM1OWIyYzkwYWY5MmRkNzA0YmVhZTM0ODY2YTFhZWFmOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZjk4ZWRiYzVkZmFhMDg1ZmI1M2E1YmU2NDFmOWI4MGVhZmUzOWJmOWIzMzdiZWQzMzZhZjM1YzE0YWRkNmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OGUzYmI0ZTc0MDExOTU2NzJlOTIyZDZlNGZkOTE2OWRjODcwMzZjZjI0MzY1NTYzYWI5YzVmZjVkN2NjYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiZmI1ZTNhNGJkYzAwYWJhNjliMDJmMThkODhkZmJhMDllZDFjNmNhZTI5MGE0Y2JmMjhhNmZkMGE4Y2NlY2MifQ"
         }
       ]
@@ -87,11 +87,11 @@
       "statement": "SaiPermissionsEngine resolves the resource's own data-pod SPARQL endpoint (via StorageLocationStrategy plus findSparqlByPodUrl) to read the resource graph, returning no result when the resource is not under a pod.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L320-L340",
+          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L456-L476",
           "version": "repo-lines-v1:sha256:2cfe767291c5f46bd41946bf689add6fac5dfcf7499265835b6ce44c74ec48d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3Y2VhNWYyNGE4YzkyOGU5NDgxYWVhODRkOTI0NmE3YTQ3NWQyMTg0Y2U5Njg4NWFkM2FjMGZjNmVkMGNkMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwZWU5ZTkxZmY3ODg2MmE0MDA0ZGMwNWE4NTNkN2U4OGIzYjUyZjNmY2ZiNmZhN2M5MjMxOWNjNGM4ZmVlNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5M2RjOWQ0NGM3OWFjNmI3YTQ5ZTU1ZjU1YTdiZWVlMGRkYjU5ZWI1M2FmNjU5ZjUwOGZlMDU1MmE3NzFiYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkMzVhNDFjOTQyOTc1NmNjOTE5YTNiMTlkYmJiMDg3ZmVjZTJlZmJhOWRjODQxNzM5YmJhYjMwMThmNDUxYWIifQ"
         },
         {
-          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L41-L50",
+          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L70-L79",
           "version": "repo-lines-v1:sha256:fb53cc411bf2ed817bf13022147a87524860d27012bc8d19a70fccb03572155f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyNGUzZDZlYmIzN2U3YzEwZmFhYzE1NzQ2YTQyODdjZjU4OTBiZmZkMWI3YzVlMTA4NDk2OGQ3YjU4YTgzNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkYWVmNTRlYTUyNDQ1NTAwYTE5YmEzYjgzODg2ZjlkZGNiNmI4Zjg0NjNlZjc4YjdmYjAwOTg0YmYxYmM2YTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY2YWRiY2QwMGM2MDEwY2NjOTIyM2IyZWE3MzdkNDYxZTQyOTFjM2JiMWNhOWRmNzg0MGUwYTRhNDNjZWFmNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjODM5M2E0YjBkODExOGE5NTBlMzg2MTI2MzJlNzU5ZmM0N2RmOWFjNTg3ZDUxYzYzNTg3ZDBiNDZiNmJkNjAifQ"
         }
       ]
@@ -101,7 +101,7 @@
       "statement": "The bootstrapAccount workflow runs five ordered, find-first activities: createFusekiDatasets, createObjectBucket (Garage bucket plus a scoped key with compensation), writeEndpointRecords, postBootstrapTriG, and writeAccountRecords.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/account.ts#L110-L196",
+          "resource": "repo://packages/components/src/temporal/activities/account.ts#L112-L198",
           "version": "repo-lines-v1:sha256:16053f56a541533d45f503fefc021b0e9fb1e58c64c7f47ac11b204d5fd94015:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNzU1YzU4ZDU2OTYyZGNmNzgwZjM2Y2Q5YmYxMjk5OWI0ODQ4YmEzMzU0NzQzMDNiY2I2NDRiNjExOTM3OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyNjZlNjg2ZGJiZWRmMTc5ZDE0MGVkYTcyM2FlMDJlMjNiMTk0MDNhMDUzMjM2NjkwZDgzNTljMjViY2RhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1ZGMyMzM2ZGEyOTI0MWNiOWI0NzcyNTEzMDdmY2I5NTJhYzI1NGIzY2M2NWJkNDQ3OGVlMDlmOTE1YjMwNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNWE5NGI1ZTY4MDc2MDY4YzJlMDcyNDFkOWY4MGNjMGMyMTdjYzc3YTExN2E1N2FiOGUzZDY3ODMwMDhjOTIifQ"
         },
         {
@@ -112,21 +112,31 @@
     },
     {
       "id": "claim_69398b6e99e942bca14f21ea1796961b",
-      "statement": "AccountService.startBootstrapAccount derives the account IRIs, starts the account-bootstrap workflow with the stable workflowId `account-bootstrap:<accountId>` on the create-grants queue, and returns the WebID immediately; the worker registers the account activities on that same queue.",
+      "statement": "AccountService.startBootstrapAccount derives the account IRIs, starts the account-bootstrap workflow with the stable workflowId account-bootstrap:<accountId> on the create-grants queue, and returns the WebID immediately; the worker registers the account activities on that same queue.",
       "evidence": [
         {
           "resource": "repo://packages/components/src/services/Account.ts#L49-L75",
-          "version": "repo-lines-v1:sha256:69880899e1040e8e9289b8420b178c78877ea9165b379130769b94c9721ce2ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "version": "repo-lines-v1:sha256:7cadb876f9f9426cb106f75db8bd0acdf020a484cb21201f44e5a7cdf5c76460:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNWQwODE4Yjk1NWY2YmY2NDZmY2VmMTNiMGE4ZTkyMmM1MWI3OTg5YmY4ZjJhNDkzYzFiZGQzMDk0YjYxYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
         },
         {
-          "resource": "repo://packages/components/src/workers/main.ts#L57-L72",
-          "version": "repo-lines-v1:sha256:459c66f3ab06b14c3f644449e6e43f84810f3ab8d45bea2ab3a1a6914a22777c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkNTgzNmE0ZTUzNDM3NjBlNDUyYjdjMDYxYzgxNWEzY2NiZDc4MGE5ODg4YTY1MjM3YzllMGI1YTZiY2UxZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NzhlMjUwM2I4Y2YzN2EwNmY3ZDZmMGEzYTZiNmZlMzU2OTFmYmNhYjUwYjg3NzVjYWI2ZmFiYzcxYzU5MmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMDA0YjU5NGI0MGI3NDg3NWRjNzE3NGIzZDU1YjU0NWQ0OTRlNTNiNzI0MDU3ZTU4YzAyYWJlZWJhMzM0MDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxMDA0YjU5NGI0MGI3NDg3NWRjNzE3NGIzZDU1YjU0NWQ0OTRlNTNiNzI0MDU3ZTU4YzAyYWJlZWJhMzM0MDIifQ"
+          "resource": "repo://packages/components/src/workers/main.ts#L65-L90",
+          "version": "repo-lines-v1:sha256:a1d10e2f0e82049359ad6f511a300cfc51a14bbb372833ffa1c50f1a878ceb4f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyYmFlNThiNGY5ZjQ3NjIwZmZjYjIwNmI0ZDMyNGNlMTg0NmY0ZDVhNjg1ZjU0MTM5Nzg2ZWJlOGNmZTBiMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2YjlhYmYwYmEyZTFiOTFjN2Q4N2EyODM2NDE3MTU1NzU2NjIyYjBlZjljYzEzNmFlYTY4NWU3NGIzYjE4MjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmOWRlMzk1MWMxYWM1MjY2ZjcxMDdhZmQ5NjA3MDE0YWVlNGVhNWUxZWE2ZTAwZTJjNmZkNTg2OGJlMDI1NDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzOTY5ZDhiOWE5NzliZjNmNjE3YzAwYjI3ZGVhMDYyYzUzMzNkMmYyMTFjZmZhYzk1MTQ0YzkzNDEyODQ1MjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9db91784640b4ef89909c0db24d46537",
+      "statement": "insertPatch and deletePatch wrap toNQuads output directly in INSERT DATA/DELETE DATA; a named-graph document therefore produces four-term N-Quads lines without GRAPH-block normalization or an explicit rejection.",
+      "evidence": [
+        {
+          "resource": "repo://packages/utils/src/sparql-update.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:62b68144b8a73d806addb341311f76a110a8f7eca1bd94a46bd87d6d28ae0aba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4NWQ3MWVkMDdjZGY0N2QxYmQyNWY0YWFmYWI5NDQzMzZhNTRmYzFhZTA5YWYyMmE1OWUyMzBmODM5NTU5MzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzM2M0ZTk4NGE2YmJiMTA2YWU5YTVkYzFhMjAxYTI2N2I5NGM4YmIxMGJhMjczZmE0OGMzMDdiN2VkZDcyM2IifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-18T21:45:34.463Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:436ef37ba88a8228e27d48047c51ac6f68b42d47cdabc0ca349e6ae9a8eeccf0",
+  "pageVersion": "sha256:5aa270c9b3385b043366e04fa47ba64e3e67e38375e2367d049f234a1a82a9fb",
   "claims": [
     {
       "id": "claim_3b287ef42f2043e1a0d19ff409c2bba9",
@@ -37,12 +37,12 @@
       "statement": "The events client opens GET /.sai/events with cookie auth, runs fullRefresh on first connect and every reconnect, and handleActivity refreshes the relevant store per activity class filtered by actor === currentContext().",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/events.ts#L174-L182",
-          "version": "repo-lines-v1:sha256:710f52b2550cac29592eb2a728969c715709fa99bbc5b1fbd87d24a6fb10169b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA5YjAzZjZiYWRiNmExMDU2MzFiYWRlZDRlYTg3MjVkN2EwODgyMzM2ZjE5MDQ2ZjM5YTViYWIzMDE2MjMxOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZjNDkxNWE2ZmI0NWFiZTI3YjliYTA1NjRlMGYwZjM1YmJiNTk0ZTUxMGMxMzRmMjQ0NzRkODVkNDgzYTg3ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDc4NjU2YzJhMzg0ODJmZDE1ZjY4Yjg0OGQ4ZWFmMDg3NjUxNjI3ZTEyYjZmNjQ4OTIyZDRjZDk5NjQ4OWU2MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjc3NzYzMjE0YzgxY2Y4YThiNTFkZDRmODQzMjIzNjVjYWUxMWEzNWM1ZjIwYWMxNDRiMTAzYjNmYTM0MjZkMyJ9"
+          "resource": "repo://ui/authorization/src/events.ts#L174-L195",
+          "version": "repo-lines-v1:sha256:991e2f6a5f96b587da462dbfed0b6a74346dcf3c103be9f2ba7bf72f2b83f99d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlNzY1YzE1ZTEyM2QzYjc1MTI1MjllOWIyMjkyNGUwNTk5NDM1MTFmOGE2ZjU5NDMxZGRkODMzMmExNmUxMzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlNzc0ZmMyMTY0YzIxNWI0YjE4YjdhNjM5ODg1MDU2NTQ4ODlmZDgxY2UzODY5YTI1OGUxM2VmYjA0MDg4M2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2YzdmYmM3ZDBhNjZiMWUzYzY2N2YxYTUyOTk4NWVkMGI3MjVkMWRmMThiZDhiZjk4Mzc2OTU2YTBjNDc0ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxMTcwNTJmYjM5MGRjNzQzMTA1YTA0MzZiOTU0YTRlZmNhOWZmYTdlNzdhNjZhMDRiNDE3ZTA5OGQ5YTUwMGYifQ"
         },
         {
-          "resource": "repo://ui/authorization/src/events.ts#L48-L70",
-          "version": "repo-lines-v1:sha256:4b80af79cb789feece173f030da8c483d85af2a8935d715447f6badb3784949d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlNjM0NjBkZGJkNTFkZTNlY2I4MmMwOGNiNjY4MmFhNWQwZDQ3ZWMwMTgwNjE5ODg2Y2ZmZGQ1ZGM5ZTYyM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzMGRiYThhNjljZWY4MjE1NDI4Zjg1NGZmZTBjMTI4ZjgzYmYzMTJlZWY1NzZlYzgwNjhlODYyMTRkOTZiMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5N2ViODM1ZDNkMWEzODdlNjNhNjE3MDQ2NWZlNWI2NDg4YWQzODc0NWU5YjgzNzIyY2EyNWYwZjJmNTljNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2NTk1NGIxZTcxMmEzYzcyYWYxMGFmYzQzYjhjNTEyMmI0MDUxMjIyNmE4MzgxMTRjZDc1OWFhMzAxNmFlMTEifQ"
+          "resource": "repo://ui/authorization/src/events.ts#L48-L110",
+          "version": "repo-lines-v1:sha256:007043bdfd5b3aff97c95cb92bee12018ff344d35faa031a50b8d5e5a08ca7ea:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlNjM0NjBkZGJkNTFkZTNlY2I4MmMwOGNiNjY4MmFhNWQwZDQ3ZWMwMTgwNjE5ODg2Y2ZmZGQ1ZGM5ZTYyM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlNzEyOTJjZDkxNzI5MWFiMWQyZGMwZDcyMzYxN2MwOGQzOTY4OTE0ZjQyZTY0ODI3NDFmM2M5NDY1ZTA5YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5N2ViODM1ZDNkMWEzODdlNjNhNjE3MDQ2NWZlNWI2NDg4YWQzODc0NWU5YjgzNzIyY2EyNWYwZjJmNTljNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwNmU2MTNkY2FhM2FlYWQwYTM1NDQ1NDk3MGU2ODI5YTQ5YzgzYzM2ODUxZDE5MTNhMTc3OGE3NmEyM2M2ZTgifQ"
         }
       ]
     },
@@ -51,12 +51,12 @@
       "statement": "The app store holds the registry caches and the per-grantee authorizationList, exposes currentContext(), clears the authorization list and reverts the context on a failed switchContext, with most actions passing currentContext() as the RPC context argument.",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/store/app.ts#L186-L203",
-          "version": "repo-lines-v1:sha256:089323f040ad38aab902727097ec3454f6af0e05a3ab6a882f5a68e6c485a8f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjMDhjYjdiODU0OTI2NGYxNWIyNGMyM2EzOTJiOTQ2YjM0ODM1ZTMyMDg1NGUwYWM1YTA1MzNjNTZjOWMzNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjNWUzMTVmN2U5YmY2MjZlMjIxZGE4MjQwZDY4MGU3MWU4ZDdiNGY1YzI0ZDhkYzUxN2UxNzAyYzQ3MTA1OTgifQ"
+          "resource": "repo://ui/authorization/src/store/app.ts#L195-L215",
+          "version": "repo-lines-v1:sha256:dea9cd1f09d6919a6ccbb3e1b89aadab4fe2b2b4bd44b3aaa66a0efe55fe275a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkNzhjNGE5NTNiNDIwMGM0NjRhOGU4Y2NmNTZiMmQzZDNmNWI4YjZhNmJlN2FmOGRlNTllN2QwZTc3NGIyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyYzc3MWQ4MmQ0ZTllNGFmZTc5YWIzYjEwZTllNjI0ZmFiZjUyMjUxYTJiOWIwNzFkYmIxNjdmNDEwNmMzMDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxMGE5NGQ3ZTE0OTNiNWUwYWRiZDUwZjYxZmY2NTFkNmIzOWE1ODI5OTIyODExZDk4OWFhMWFhM2EyYmM1NTAifQ"
         },
         {
-          "resource": "repo://ui/authorization/src/store/app.ts#L38-L57",
-          "version": "repo-lines-v1:sha256:5e921f1f20ae3846e5ad5ec3e0511ab52da78ec049da6d05287f6e3dac9ca924:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyM2M5ZDA3ZWMwMDg1ZjMwMjNmM2ZhM2FiMWFjNGViNTc3YmVmNGVlODlkZDViN2E4ZTdhODlkYWM0YjcwNmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyY2NjYTQ2ZjNkNjkyNTI5NDNjMTE0OGQzMjMzZTAwY2Y2MjRjM2Q1OTRjOTYzZmM1NjI3NTgwNDA4YWNjOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4NDE0ZDI4ZjU2ZTgzNzdlNTk4MzFjNDFiOWJhNWY4NjhiNDcwMmE0OGU1ZWZlYjBhOTkyMTUyM2NhNWYxNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4MzgzNThhYTNhZjIyYzY1Yzk4ODlmOGZjOTdkNzc1MGQ1YTkzMWI2ZWJmNzkyMmJjZDY1NzU2OGM3ZGVjMWEifQ"
+          "resource": "repo://ui/authorization/src/store/app.ts#L38-L70",
+          "version": "repo-lines-v1:sha256:d8839801525471bc6213355a8333d3f7f1ba9fd33c4e3fa5b8efd607aa2f17fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyM2M5ZDA3ZWMwMDg1ZjMwMjNmM2ZhM2FiMWFjNGViNTc3YmVmNGVlODlkZDViN2E4ZTdhODlkYWM0YjcwNmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwNmMxZDljMjlkM2VkMmQ0ZGYwZTg5ZTE1MGE2MDU4ODI0M2E0ODUzYmVkNDI0YmY1NzBmNTI1ZGQyZTRiOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4NDE0ZDI4ZjU2ZTgzNzdlNTk4MzFjNDFiOWJhNWY4NjhiNDcwMmE0OGU1ZWZlYjBhOTkyMTUyM2NhNWYxNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhMDVhNDMxYTA5Mjk0MWVjZTc1YmY0ZmVjNDk2MzM3YTJhYzU1MGY1NDc3NDRhZDNhNGZjODE1ZjhmZjkwNjcifQ"
         }
       ]
     },
@@ -75,7 +75,7 @@
       "statement": "The UI events client runs a connection state machine: on first open and every reconnect it runs a full store refresh (the server never replays), reconnects with exponential backoff from 1s to 30s, and aborts silent connections via a heartbeat watchdog.",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/events.ts#L157-L185",
+          "resource": "repo://ui/authorization/src/events.ts#L166-L194",
           "version": "repo-lines-v1:sha256:fa68ed8d9d1f8b2cd6ccd3a3a9555ad0ff5eb18574c410855bb1f7d85da2da0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ZDM0YjE3ZGM0NmE0NTBjZjk1MzZhODliMWI2OGQ4NGJmMjMxYjdmMTVhMjk2OGFlODAxYTM3MDA0NjhiNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmNThkMDEyZjZjNTJmMThkYmE2NmQyZTQ2YjI3MTQ0ZGFhZjRkZGRhOTdjZjMzMzI3NDUzZTVmYWY2ODYxMjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwMjM4NTBhMDE2N2E4ZmMyYzgzM2U2NGE0ZjI4NGU2YWQwOGNjNTcyNzU5NGI5MGEzNTVlYmY1NDFiNjA0MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0YWNiZWJmNTVhZjVlMjg3YTMzMzJiY2MwZWI5MWI4N2RhN2RmOTIyMTBkZGNmY2E0ZTc4OTljOGRhZTRmMjYifQ"
         },
         {
@@ -113,8 +113,8 @@
       "statement": "Selection toggles descendants with a parent checkbox, marks partially selected parents indeterminate, supports select-all, disables Revoke when empty, and requires confirmation before calling the authorization-level revoke RPC.",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/views/Authorizations.vue#L150-L226",
-          "version": "repo-lines-v1:sha256:bcc7ffbb5da00431d715a55586d81c3f022c73bb18a23116ce699f91bab23bd9:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhOTU5MWM1YjZiY2U1OGQ5NDI4ZWI0ZDY0MTU5NjRhZjBhZjBmOGZmNzhmODE5YWQ3NzM5ZTMzNDNhMmFiNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNzRlZGYwZmY4NmNhNGNiN2U0YzA2OTIyM2M0MGFhMDE4Yzc1ZTdjOTc3NGUzN2NlNWY1Njc0MzRlYTMxMmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjOGNkNWUyNGNhMjhkNTIyZTFiYTkxMzJmNWRkOTViOTE1YWI3NzJhODRjN2UxOWFhNGUwNTlkYmNjYTJlNjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzZGY3MmYyOTFlMzFlZWRhMmM5NGMyNjUxMWQwNDYyN2JhZWRmYmU0NmQxZDlkZjM0MWRiZGZlM2U1NDgzNWEifQ"
+          "resource": "repo://ui/authorization/src/views/Authorizations.vue#L149-L230",
+          "version": "repo-lines-v1:sha256:2ef79977426aea71069199ae92a17b848eb67b53c42c57af12698eeec1741531:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3YWQ4ZGEyM2JiM2IwNGM0NzMyY2ZjYTE5Nzk1ZGE0NDFjNTAwMTlkYjM5NmMwNmUxMzk0MmY5Nzc5MmMyNmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyYTcxZGVkNDIzMDRkZDUwYzg2MTczYzc5OGRjZWY4MTdjNTk5NTA0MzBiZWRlMzQ0OTVhMzE2NDBmZjg2YTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhYTc1OWY2MzVmZGE4NDgyNjQ0ODhjYjE5MjMxZmEwODQzM2Q4NDkwNTJjMjg3NWI0NzVhNDcyMzlkY2NkZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5Y2YwMTgyZjQxYmQ4NTNkNTQxZWQzMDAxNDViNTg5OTMzMzg4MDdkNmJmMjE3OGRhZDQzMDE5YjFjOTQ4NGYifQ"
         }
       ]
     },
@@ -123,12 +123,12 @@
       "statement": "The store's revokeAuthorizations action calls the RevokeAuthorizations RPC, claims the returned activityId as an AuthorizationRevoked activity, and eagerly refreshes the list and peer/app lists; a typed failure code is shown in the view.",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/store/app.ts#L328-L338",
-          "version": "repo-lines-v1:sha256:0a5675281d7a244fc85d53a84b01f5214d56d76816d5e1fa3452a094e7c2598c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZTU3OTZkZDZkYzM0MWY1YzZjMGNjYTA2ZmZlNTQxMTIwOTQxYjJiNGIzYTk1NTI1NjQxODM1Y2FjYjA0NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0NjRiZTRjYzgzMTFmNDAyNGRjNTRkOWIxMWRhMDE5ZTg5MDIwOTgwNDRkOGZhNjA5NDI1YjE2ODFlMmY0ODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2N2ZkZDk5NGI0NTc3OGM5Y2E5YjQ0N2U0N2MyMTM5YTAxMTc1MWI5ZmNiZTY0OTFhNzE5NzFkNWMyM2Q2MjUifQ"
+          "resource": "repo://ui/authorization/src/store/app.ts#L350-L370",
+          "version": "repo-lines-v1:sha256:1d85ae9fefc11864f35d8cb89db3d2e94e7e8008495123b2478c6bc5a6ea3143:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZTU0OTlmY2IwYWY2OGYwNTA0YjNkZjRhMzM5ZGUwYTAyMmM5M2Y0ODUxZmNkYTVjZmNlMjk0ODVmODFiZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2OTg0MmIzYTk3NWI3MTY2YjkwZTA2NTkxYmQyMTYxZjkxOTg5NjIwZjFmMmIyYThiM2RmNTRiMGJkNzM5YzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0NjRiZTRjYzgzMTFmNDAyNGRjNTRkOWIxMWRhMDE5ZTg5MDIwOTgwNDRkOGZhNjA5NDI1YjE2ODFlMmY0ODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ0YWZhYzI3MTcwNWM2OGY1Mjg4MzAzYmY0Yjk0ODE0NWMwYWVlYmYzNGZlOTBjODQ1ZmRkNmQ1MGY1ZjFhYjcifQ"
         },
         {
-          "resource": "repo://ui/authorization/src/views/Authorizations.vue#L209-L225",
-          "version": "repo-lines-v1:sha256:7539ba112a44af3eb35f60d031f1b6f3e6757ec65707dc29aca198e7bd5d2740:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhZWE3OTJiYTVmNzA5YmNiYmQ5M2MyYzcwNDA5MjZjYTNiOWI5Zjg5NmU2ODhjYmYyYzNlMDA1Y2ZkZDM5N2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4ZmZkZmRjMGY4YmI2ODUzODFjZjBhMTQ5NjIwYjk2MWRjZjNhMDg3MTA3Y2Y4OGE4NTYwYWFkODczYjA2OTkifQ"
+          "resource": "repo://ui/authorization/src/views/Authorizations.vue#L197-L230",
+          "version": "repo-lines-v1:sha256:7bfcd680f78bbf4cd29c89c1442fd67660512d178cf11ac0ec5bd9479f768847:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0ZjVmNGExYzQ1ZWJjMGRmY2YyM2ZhNTNiN2I5ZWVkZTE5NTBmZDVkODJjNzc3MDgwNzFhYjcyMzhmZDYzMWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyYTcxZGVkNDIzMDRkZDUwYzg2MTczYzc5OGRjZWY4MTdjNTk5NTA0MzBiZWRlMzQ0OTVhMzE2NDBmZjg2YTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0MGQzMWRmZTY2ODU3NGEwMzlhZDAyZmIxZGNlYjg5MjI5OTQ3NzE2Y2YyMmViODlkNDRkNmI0ZjdkNDZkN2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5Y2YwMTgyZjQxYmQ4NTNkNTQxZWQzMDAxNDViNTg5OTMzMzg4MDdkNmJmMjE3OGRhZDQzMDE5YjFjOTQ4NGYifQ"
         }
       ]
     },
@@ -137,14 +137,14 @@
       "statement": "The events handler refreshes both the application and social-agent lists on an AuthorizationGranted or AuthorizationRevoked done row for the owning context.",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/events.ts#L90-L101",
-          "version": "repo-lines-v1:sha256:2cd28ce26e0b6ad34f972ecf4b60ff8ab0363b6e17839dae133ff048b1ea9110:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMjQ4NDczNjA5NDA4NWZhM2Y3Mzk1M2NiY2U2ZDBiNTJlYzFmMjY0NWYyNDQ1MGVkMjRmY2ZjMTMzZDM0N2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlNzEyOTJjZDkxNzI5MWFiMWQyZGMwZDcyMzYxN2MwOGQzOTY4OTE0ZjQyZTY0ODI3NDFmM2M5NDY1ZTA5YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzMjg4Y2FhNWE3NWM4N2I2MDI4NWI2M2QyNGM0OTYwNDY2ZWMyYzJkMzI3YTdkYWFiNzdkZWM1NDQ1YjZlMGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwNmU2MTNkY2FhM2FlYWQwYTM1NDQ1NDk3MGU2ODI5YTQ5YzgzYzM2ODUxZDE5MTNhMTc3OGE3NmEyM2M2ZTgifQ"
+          "resource": "repo://ui/authorization/src/events.ts#L90-L110",
+          "version": "repo-lines-v1:sha256:58bbc9a4444cd87678ad438ca2421d0b86e14ce18189a91635715e75924f6883:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlNzEyOTJjZDkxNzI5MWFiMWQyZGMwZDcyMzYxN2MwOGQzOTY4OTE0ZjQyZTY0ODI3NDFmM2M5NDY1ZTA5YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOGJiMDRlOTI3OWY1YmQ2ZDJmMTkwNTU0YzkxMmI1ZDcyZGUxNTBiNWNlZWJlZDBjZjk2MTczMjI0MWEyY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwNmU2MTNkY2FhM2FlYWQwYTM1NDQ1NDk3MGU2ODI5YTQ5YzgzYzM2ODUxZDE5MTNhMTc3OGE3NmEyM2M2ZTgifQ"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-22T04:35:20.186Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

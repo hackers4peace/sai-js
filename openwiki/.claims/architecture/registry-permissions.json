@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:471938329a64c1f17c76a22b4356e08f71a7107c004362a8aa70a5b2bf6c2122",
+  "claims": [
+    {
+      "id": "claim_40159922917c4b2ab043138e6c325951",
+      "statement": "The YoYo registry-set ACR wires #fullAdminAccess under both acp:accessControl and acp:memberAccessControl, so the admin matcher covers every sub-registry container and its members.",
+      "evidence": [
+        {
+          "resource": "repo://environments/data/registry.trig#L1312-L1329",
+          "version": "repo-lines-v1:sha256:e2ed0b8de4bd5915705c29f1af021aa67a4df1dec06b35effb5594e143bfef20:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NmVlYTljMmRjZTg5ZTIzOTZhODMyZjc0ZGQ3MzI3ZDM5Y2Q3NzVmYTgwMTE5MjQ4ZTIyOTJjNzYxMDA0M2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkMjIzY2JmOWNmNzcwY2FlYTY4NjU2ZmEwNjAzN2YyYTg1NGQzMWI2NDNiNjRkNjY1MDdmYTExN2FkYmM1MTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhYzdhNTNhZmVjZThkYmIwODE5YjYwZjJiNmRmNDcwYjk4MWJiM2UwMjNhODIxNDQzY2E1YjViMjFlMDIzY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1ZjM3YTUwOGJmNzEyOGMzOTlkM2RkNGY0NGJlNjIxZjEyNTBiOGI4YzE5ZTM1ODc3ZGM2OTA5MzFlYjNlZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fa2dcef2f8ed4fefa69b8bb169c2553d",
+      "statement": "The seeded YoYo DataGrants p7n2vx and t5m8qr have their own ACRs with fullOwnerAccess and peerReadAccess instead of relying on registry-set inheritance.",
+      "evidence": [
+        {
+          "resource": "repo://environments/data/registry.trig#L1857-L1876",
+          "version": "repo-lines-v1:sha256:3159d33e94258dcfd26804540bf2dc021592d2f96a21e6f2b7e6ff6e8d4312fd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjY2RiOWI4MTAwY2RlYTc3NjEzYjYxNjMwOWQ4MGE3NWQ3MjAwMjI5ZTNlNjg5YWQ3YTk4MGU5YTE0NDgyYjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1MGViZDE3YWU1YTMwMzJmNTgzZWNlYTA5YTA1MmYzNjdkMzE1Yjg0YzhhYzRjOTc0MjQwMzg5ZmYwMmYwYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFjMTAxMGQzNDY2OGUyNTkwOThmOWVmNWZhZTBlYWMzYjMyYTBjMjlkYmUzMmE3YTAyZTM0NmY2MDlmNTM4MmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjNWExNWVkYTg4NjhiMGM2ZjU2YjdhYjk3NTUyY2M4MzMxOTk4YmM3N2QwZmYyNzlkYWZiNzg2OGE3MWYwOGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ad4aeda24e346519287c9b056e2597a",
+      "statement": "AdminGrant resources and their ACRs are written by the org's own session in the org's GrantRegistry; the admin's UAS does not write grant resources.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/admin.ts#L189-L225",
+          "version": "repo-lines-v1:sha256:23a5fe1c99b0f4003fb6a2c5d8585b2240d7c116a9a9e5783fcb95d5c941aa70:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkY2EzMWMwN2M5OTI0MWMwMTM2OTVkYjhiMjM4MDc0YmQ5NmQwNTBmODVjYTQ1OGU5NmNhYmJmZmQxOGE1NDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NzBhZTg5ZTkyNjA1NDQyZTRhOTcyZmIzNjU0N2Y3M2U2OWYxMjEwOWI2NzU5Y2FjY2UwN2IxNTEwOGYyMGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI0NmMyYWZlODE4OTE0ZmRlNjdkN2MyOGRiZWY5ZDc5OWY1NTQwMGRiN2Y3ZmY3M2RmY2EwMmJhZjNmMDYzMGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzZGM2MDU3ZTMyMDBjODgyY2NmMDM3MWZkYjQ0NjFkOTY5NGI4MzkyZTJkNDRhMzJkNWU1M2U2OTc1YjgwYmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a4bc0f390fcd44f1b5f2de6740bdb1f6",
+      "statement": "Data-registry enforcement uses SPARQL over the storage owner's registry-pod dataset and exchange-minted owner/admin scopes, not an admin HTTP fetch of grant resources.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiAuthorizationManager.ts#L58-L100",
+          "version": "repo-lines-v1:sha256:f9e4949df0978f41e2f3bfcb35163011d7e5f54b0f3af99377380d726233b743:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmNWZmYTlmOGEwYzU2MmJiYWY4YTNlZWUxNWM1YWNiNzAzMzA2NWNlMGY5NjA0OTA4ZTcwZmFjMDQ0NmRkNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MzYwYmQyNzMyY2QzMGFiNGQzNWQ2NjJmOGVhNWIyOWYwNDljOGQ2NjJjNDU5ZDk4N2ZiYTQ5NjQyMzE5OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZDM5ZmQwZmM1NWE2YmM2OTkzMTZiZGNhNjY1MGFkODIzMDMxOWJmOTRhNTYwNGNhMjMyMTJiMzRmYmJjNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNjJjNWUyYjc0MDgyYTI4NWRiZTExOGNlNzU1NjE4N2MxMzY2ZDc3MmJlZGY1YTY5OWRlYjllNDViNmNjMGIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/StorageExchangeAccessPolicy.ts#L60-L110",
+          "version": "repo-lines-v1:sha256:4117764298f52933d9a9604cc58cbb6591d0ff73dcabef00384600800a455ba8:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMjg1Mjg4NjE5MzczOGUwY2U1OGExN2ZjYzdiMzgxMzhiNGIyYTg2OGRmMjNiYTQ2Yzk5MjU2OTNkZGNiZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5ZmVjYTU3N2YyNThjMGI2MTkyMzJiZWJmYmI4MjVlZTUyNzk3NjFjODZhZWUzNGM2NGRhNmExY2YwMzExZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxODY4NmU1NDNiNGYzYTA5MDUxZTA1MWRkZTIyYmZhOWM3ZmZmODFiYmQxMzhmNmM5ZDBiYzdhNWVlMGU5MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3YjYxMDZjY2ZmYzIyY2IwNWZkYjIzOTk0MmZiMmIzY2M2Y2ViZTllYzlhYmJhYWM4YTI2ZGFmYTQ1ODY5NzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_652a9843bc9144989d4f2d4cd6a16955",
+      "statement": "The ActivityRegistry exposes activity creation as appending an immutable activity resource, matching its append-only log semantics rather than arbitrary Read+Write+Control of registry members.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/activity-registry.ts#L40-L60",
+          "version": "repo-lines-v1:sha256:ec038e66859d955972f5b6543d0e70a8fb58f4997cca6ff66f159cce6652c41d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1NmVkNzcyZmI3MTlkMDFiYTI2ZDcyMmZkNWViMTNiN2E5YmUyYzE2ZmJiMjBlOWJjOGUzYjYwNjE2ZDk1YTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ZDM2NGEwMzk4NDA2YjhlOTYzOGJhYWM2ZjY0YmE4Y2JkNzNhM2NiZGUxYTFhNzEwYWI1MzY1ZGE0ZDkzMDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxN2Q0ZmY3NzlhOGZkMDczZjZmYjY0OTM3NzRmOWQzZThmNWI3MGM3YWE2YzMyMzE0YzIzZDVkZDY4NmVkZjMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
+  }
+}

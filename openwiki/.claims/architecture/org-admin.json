@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:07854d73e5cecd0caea5040a2a657eaed4703b12f7fb2c11c71f1f818cb939c0",
+  "claims": [
+    {
+      "id": "claim_35059e54a3364d9fba2032482c9b9191",
+      "statement": "An org admin is marked by an AdminAuthorization plus an AdminGrant: one RegistrySet-scoped marker linked from the org's registration of the admin via hasAdminGrant, and one read-only DataRegistry-scoped grant per data registry.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/admin.ts#L154-L187",
+          "version": "repo-lines-v1:sha256:702af0dd764f53ba1f78d86bf212c0d38ce85a9edc562e903a4d80d1238391e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyYTk4MzBkMmQ2NWNlOGUxNDc2ZjYxMTM3Mzg2ZmJmOWExMzk5N2ZhNzY5Njc0ZWI5MzFlZWYzMDI3YTcyYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyMjliYWI3ZThiNDc0NTlkMWZiOTIwYTgwM2Y1ODRjZmRhNTFjYjY1NjRjZThiYjAwNjFmMjNlOTQ4NWFkNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5ZjJhNjA5NmY3ZmQ2OGU5YzU5MzZjMzBjYzFhMTQyZTAyZjBmMzI4NGU1NWVkYmRhZjg5OGY3NTgzZTY2YjcifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/src/context.ts#L80-L90",
+          "version": "repo-lines-v1:sha256:ace4ea908633c731a4f9962546299cc7ef45b2a2765c0090a7d32e92ed5dcfb3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiNjFiOGNlZjAyMzI5NTJhNTc1Y2QxYzJmY2Y5ODczNWQwMDg3OWMxNTlkYzExNmY3OGY1NDYzN2RjODNkNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZWM4YjUzMzE5NTdiMzQyZjM5YTc0N2MwODllNzdiOTE1NTc1MTY0NGZhZDBmMjM4MDE0ZTFhNWUyOThkN2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkYWM3ODRmYTRmYTVmZDVmNjJhMThkNjMxMDQwY2FlN2ZmMGYzZWU2MTVlNDI0MGRhNTk5NDRmOTM4ZTk5YjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0MWI0YWUyNTY5OTZjZTAyNzc5NmRhODI2NjgyZDRhZTI2YzUxY2NhMzZmNWI2NDkwOWI1OTgyM2EyZTc5YmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_92465d4fc33c408087bd17d0c59a40b6",
+      "statement": "The admin-marker rule is a non-empty hasAdminGrant link on a SocialAgentRegistration, exposed by getAdminGrantIris.",
+      "evidence": [
+        {
+          "resource": "repo://packages/data-model/src/social-agent-registration.ts#L10-L55",
+          "version": "repo-lines-v1:sha256:77b97560a53c8af8138a60a9264a52e62298863eeadab0cd8b84692cdb4af92c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyNjEwNzBmMjg3Mzk1NzNjNzM0YWY5MzZjYmEzMmQzYWJmZTRhNGRkM2MyYzM2OTBkYzI4ZWI4NGFkZjk4ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmZTZlYThjN2FjYmVkZmU2NGEyYmU2YTc0NjFiMDgyNjcxYTU1YTNiNjJhNzNjYWRiNTYzMjdkMzIzODM0NDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fed0bc3b0e5c43fe846d9f34f3df03b4",
+      "statement": "AddAdmin and RemoveAdmin are activity-first: the RPC writes an AdminAuthorizationGranted/Revoked activity with the AdminAuthorization embedded, and the workflow materializes or deletes the authorization, grants, and ACR rewrite before completing; the org-context last-admin guard refuses removal of the final admin.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/Admin.ts#L27-L110",
+          "version": "repo-lines-v1:sha256:aa65b3091cd2815be9c385ea9b489ada317da24c1ef85d0f0e70293613ee2f28:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3OTljN2Q4NzQ4NTRmODJjNGE4OWU2NDE0MTFlZWYzZjk1NzVhNGE5YmIwNjhhOTdhZjRjYzI2ODY3ODBjNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3YTk5NGIxNDQ3YmE1OTAyNmIwOWFlNzhjMjIzY2E3MzliZGJlYmVmN2Q0MjkzOTQ1MDhlMDZkODc4ZjVlNjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1NjU3Yjc1MGI5MjhhYjU1NTBjNDZkN2UzYWIwMzgxODk2YTNlYzkyNzU5MjYyZDMyOTkyYzdmMjJhM2YyNjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3YjZiMmQ0ZTk2ZTA1ZDE0MGQzZTAzMTE4YTk0YTg0ODIxNGVlNTkwMTVmNDdlZjRmNTU3OTk4ZTgzNDljZjIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/admin.ts#L56-L149",
+          "version": "repo-lines-v1:sha256:ef7eccc0085ed398f7e1497067033a72bd0b8958479d222ee77c26e3d04272c7:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlOTE0NWQ2MmJlNDJkYjI3M2M3YWRhOWVlOTA3ZDE1YjUzMzRhNzVjZTMyMjI3ZjBiOTU2NTQyYTg5ODI4MjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWU1OTQwMzllZDUzMGQwMzNlYWU5ZDAxOGE1YTQwMDhlMDMyZTdjYzZkMDcyYTFjMmUxOWQyZWI1YzlhMTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_40d3d58d21924f83981f28f4fa3d56e4",
+      "statement": "syncAdminAcr derives the registry-set fullAdminAccess matcher set from the current admin list, is idempotent, and removes the control and its wiring when the admin list is empty.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/admin.ts#L300-L332",
+          "version": "repo-lines-v1:sha256:b9512bd551495bd473fd7a0b7b0ee90a9557ed8bbf2e613285b0f0beb74e84d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3OWU1M2YwNzIzYjFhODhlOWI1ZDhlZDNmY2E2NjZhYTMyMWQyMWM2NDQ0ZDQyOGNkZmUwZWQ4MGU3ZjJhOTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_74ad75cfee964018886f97010fb300b9",
+      "statement": "resolveContext allows the personal context unconditionally but permits an org context only when the caller holds a non-empty hasAdminGrant on the org's registration; the org registry set is resolved from the admin-only hasRegistrySet link without building a second session.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AgentIdHandler.ts#L90-L110",
+          "version": "repo-lines-v1:sha256:1227e85724da947cae0932248351702836969f9b9f9a58215ac170bc828702e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkOTgyMGFiNzZmNzExNWE2NDJkZjU0ZWVmNWM5NzQyZDcwMDE5YjdhNTVmMTM0Njg3NDdiMjlkMjExNWFhYzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMWZjY2QzYjdhMmU5YWZkOWE4YzQ3ZWIzODMwN2RiYmYzMDUxZWExZGQ2MjA3OTFjNTJlMjA5NzAxYmE2YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0NzU2N2ZhMjU4NGIyMDgxZDA3MzE1N2JmMTRkYmRiNjQ2NjdlMmRiY2RiMDljYTgxYjgyMGJkOThlNDIwOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjZWVhOTAyN2ExNTBhNmQzN2E0YTUwZTIyZDAyZjA3YjUyNzc0MjMxY2RhY2I1ODFhYTk3MTgzOTQ5ZTQ5ODgifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/Context.ts#L70-L110",
+          "version": "repo-lines-v1:sha256:6da3ce58d8265bebc10e1164688b74249daf93a4c11f88291024f7389d5b1003:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmYjQ0NDhiMzY5YmEyN2NmMzdiZTljNzA4ZjcwYjM1MWE3YWQ1MjAwODIyNmM3ZTkzM2RjNDFjYTliZmJmYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzOTM3M2YzMTRiZmZkMGRhNWQwODNkMTQyZDY2MzU2MzgxZTc0YWE4ODk0YWZhNGFhNWE2ZDJiMzZmOWIyYzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1ZDQ3OWZmNjIyMTdhYTM4OTA3OWRiNGE1NWViYTNmZmEzYjc0YzU3MzEzOGVjMDlhNGRkMDE5MmM1N2NmYjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjOTdhNjNlZDMxNGY2OTdhMTZkOWJiNjc2YWYzZDNhYWIyY2I4NDkxOTY4NWEyZjRhYmNiMTYyMjczZWRhNjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3cab770578c04d6bbb550f9501def2e0",
+      "statement": "requireOrgAdmin gates the org-context read endpoints by loading the org's session, finding the caller's registration, and requiring a non-empty hasAdminGrant marker.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/adminGate.ts#L30-L60",
+          "version": "repo-lines-v1:sha256:1d421e3f77a7ec7ceef0109a29b9c93328e11afdd6ce2c160597fb559a1a9efc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlMjM2NTY1ZGRhN2U3YzIxOWY4NWY5NTA0MmM3ZGYzNmMyMjlkNTQ3YzkyYjRjZmI2NThjZDA4ZjQxNjg3MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiOGFjZDMzOTkzM2JjYzNlMzBiMGVkNWFiMGUzNDcyZjBjODYzMTVlYWM3ZmNlYmRhOWNhMTU2MDdhOGQyNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d1fc635aecaf41a496eddf13470a805e",
+      "statement": "Admin activity channels are separate per (admin, org), keyed to the admin's webId, and forward-only: the owner channel dispatches workflows while admin channels only forward events to the admin's stream.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L100-L130",
+          "version": "repo-lines-v1:sha256:fa9173a0d122faa95365cb079759e6d3921d1ae4c849155e1ca813051080ad52:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2MDM0ZjAzMWQ3OTliOGIzYWE5MmQxZDNhNTlmZGI0NDBkZGY3MWY3ZTQwYTU2YzNkYjM4NmU4ZWMzNzBhNWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExYzNjYWRhOGU2NGFiOWU1OWIyZjExZTQ0ODNmYWRhOTQ0Y2Q5MjUzZGVhOWQ1ZjkxMjYwZDEzZjk3ZWJmZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MmI1MzhiYTNkYTg0MDQ2MDk1MjA1NjQ4ZDM1N2I4NzdhYjU4ZTkwZjU4ZjliMWVkZGU4MzIyOWI2ZjFiYzYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L459-L480",
+          "version": "repo-lines-v1:sha256:9515bff2a48fd71a7dbc55c25c78224056dd3eacb712a8ab6612d8e1c4b0085d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjN2JmYzcwNDdlZjEyMWY2MDg2MjE3NDc4MWVhYTNhZTYzNmNjODc1MDY3NTgxODYzNGRlZmY0MzczZDUyMGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2YWU2ZjYxZWUxZDA0Mjg1MTdiZDhkYTg2OWU3OTUyMjczMWMxZjMxNzdhZWI5MjZkZTQzM2IyZDJmNWUzZGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhOTI5M2ZkODA1NGI2ZTQ3MjQ4MzczZjM5ZjRkZDc3ODAwMTA1ZWI3NTgzNDg2ODcyNTQyODVjZDEyODJiNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhNzgyZTI3ODBlZTM0ZWRkMGQ2ZTFkOWI0ZjhkNWQ1N2U0NWNmNjlhYWYxNjg1YzRhOTViY2JjNzFkYzg0MmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c76d82e5872c4db8b5283fe95bf6c777",
+      "statement": "Data-plane admin access is token-carried: the storage exchange mints read-only scope admin for a DataRegistry AdminGrant and the admin's own UAS, and peer reads use read-only org impersonation rather than a document proxy.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AdminImpersonationAuthority.ts#L60-L120",
+          "version": "repo-lines-v1:sha256:c98a0daf014c230d7702b8f8447e9c6583e9bd06597105223bb813e90503b77f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiMzM4ZTkwNjdhMzUyNmQxNzUyOTIxY2E4Nzc1NTU0Njc1ZDE2NjdlNWE1Nzk5Mzc2NWViZTQ3YWYyNGFmNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkMDk2MWIzNjFmZWJlN2M4OTY4Y2E2ZDcwNzc0YjNhYTVjNWNhNWVlOTA3MzQ3ZGQyODdjMzU4MDdjYjc1YjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3ZjRkMjhjODFjNmFmN2RjNDZjNmMxZWExNmMwYjQ5ZWJhNzM1MzkzZmY4YzNiNDA2ZGJjNWUwYzEzZTBjZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYmFiZjNmZGI1NTQ2ODkwZTMwZTc1ODIwMGJkMzE2YjJlOTdiNjcwMmYyMzBkMGRhMmMxZTk4ZTQ0OWM1ZDkifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/StorageExchangeAccessPolicy.ts#L60-L110",
+          "version": "repo-lines-v1:sha256:4117764298f52933d9a9604cc58cbb6591d0ff73dcabef00384600800a455ba8:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMjg1Mjg4NjE5MzczOGUwY2U1OGExN2ZjYzdiMzgxMzhiNGIyYTg2OGRmMjNiYTQ2Yzk5MjU2OTNkZGNiZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5ZmVjYTU3N2YyNThjMGI2MTkyMzJiZWJmYmI4MjVlZTUyNzk3NjFjODZhZWUzNGM2NGRhNmExY2YwMzExZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxODY4NmU1NDNiNGYzYTA5MDUxZTA1MWRkZTIyYmZhOWM3ZmZmODFiYmQxMzhmNmM5ZDBiYzdhNWVlMGU5MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3YjYxMDZjY2ZmYzIyY2IwNWZkYjIzOTk0MmZiMmIzY2M2Y2ViZTllYzlhYmJhYWM4YTI2ZGFmYTQ1ODY5NzcifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
+  }
+}

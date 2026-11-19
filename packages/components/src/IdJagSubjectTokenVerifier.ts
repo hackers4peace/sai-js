@@ -69,7 +69,7 @@ export interface IdJagSubjectTokenVerifierArgs {
  * Extends {@link OidcSubjectTokenVerifier} because the trust model is the same
  * one the OIDC authentication suite uses (dereference `sub`, find the issuer,
  * verify with its JWKS); only the claim names and the pinned `typ` differ.
- * See `docs/plans/lws-auth.md` C2.
+ * See `openwiki/architecture/id-jag-access-claims.md`.
  */
 export class IdJagSubjectTokenVerifier extends OidcSubjectTokenVerifier {
   private readonly trustedIssuerSet: Set<string>

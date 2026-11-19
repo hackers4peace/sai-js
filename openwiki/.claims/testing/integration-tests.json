@@ -1,18 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:7f48f0fa19b416eb2f73a6dcb06198a7c05c4659f2ff5c50a0d04d1a9264fb1a",
+  "pageVersion": "sha256:444c75b82b3693e7aa5ac93b02410167bf329f34580d97698b75f034bde6974a",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
-      "statement": "The integration suite runs under Dagger via `npm run dagger:test` = `vitest run --no-file-parallelism`, executing one test file at a time in the test container.",
+      "statement": "The integration suite runs under Dagger via npm run dagger:test = vitest run --no-file-parallelism, executing one test file at a time in the test container.",
       "evidence": [
         {
-          "resource": "repo://.dagger/src/index.ts#L447-L530",
-          "version": "repo-lines-v1:sha256:c26d3785d301f3f597196cef3ec6d36e77d23145ac452543c73101de2aaa8554:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5NzlhMTdjMWQwOGYxOThjOTEwNzJmZWIzNjQzMzQyMTg3M2NiMzU0OTYxYmE1ZDVkYzQ1YmRkYzk2ODgwNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlNWZkZDY2MWM0ZDBmMDcxNzE4NDMyMDM4MjM3OWVkYWM3YjNkN2ZiM2ExNTdhNWRkYjdiYmQ4ZjM3MjAxZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxZTI3NTcwMTQxNzViNGNkYzAxNTkxNGM5N2FlMmFhZDA2MWVjNWNkOGRkNzUzMzk5ZjUwYTdkMTcyZTIyMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NTYyYjY3M2YzMzZmMjFmMTNkNzc3YWQwNTMyYTRkOWFhMjgxYTJmZTUzOGJlYTgxYTQ5NjQ0YTcyYTAzMjQifQ"
-        },
-        {
-          "resource": "repo://test/package.json#L8-L8",
-          "version": "repo-lines-v1:sha256:34833d5949c03a40ca952491610a6659644b3aa466362f799020dbf1981547db:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjk2YmY1ZjczN2ZhOTQ3ZTQ3MzRmNGIxZjJkY2FmMTA0OGU1MzAzMjQxZjFjYWUyNWFkOWJjNTJmOGRmNTJkYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTMyZTVkY2Y3ZDM2Y2U5NTczMzhlZGEyODUxMjRlYmM5ZmFhZGI4YWVmYjUzMDg3N2Y5OTRlNTRjZGQ2OTFmNSJ9"
+          "resource": "repo://.dagger/src/index.ts",
+          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
         }
       ]
     },
@@ -35,12 +31,12 @@
       "statement": "environments/data/registry.trig seeds every party's RegistrySet, registrations, and ACRs, while environments/data/kv.json seeds accounts, cookies, and pre-wired activityWebhook/reciprocalWebhook channels.",
       "evidence": [
         {
-          "resource": "repo://environments/data/registry.trig#L1-L12",
-          "version": "repo-lines-v1:sha256:7366e5510867df950e3168452ca8ae1329132601412a87c074fc4652aeda7bbc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MDgxMGU3Y2U0ODE3NWEyYzY5ZmM3ZTViNDRiY2E3NDkwZGI5NzUyYzlhMTdkZWFlYjAxN2NkMWE5NTUyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1M2JmZGNhYzJmMjE3YTE0M2ViNDc0OWZiODUzZjExNTFlYTY0MzViMjAzYThmNDU5ZDMyYjcxNjEyYzhmNTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMjdmOTVjN2YzZmU4YmI4NzI2ZTAwZmJjNDc4NTJlNDYwNmUwODdiMTRiYTU4ZGNjMGQyYzcxYjMxN2FiZDgifQ"
+          "resource": "repo://environments/data/registry.trig",
+          "version": "repo-file-v1:sha256:21ea742c103e616321fcb69787da022798fe31d1c9a90e5f886762ae41a3fae9"
         },
         {
-          "resource": "repo://test/setup.ts#L69-L75",
-          "version": "repo-lines-v1:sha256:248401c355e6a35b0661ddd810dcf6b957e300b5f646844184f45da879fce884:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjljMGNiY2JmMzE1ZGFhZjYwYTlkOGI4ZjVhODFmZGY3NzNiNGY3MDA0Y2Y2MTI1YmU0NDFhNWNmNzRiMWE3NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzg0MTJjZjAzYmIxY2UxZjdkMmE3ZDc0Y2VhMTg1NzI0YzVkYWM1NzZjMTFmYWY0ZjU0ODNlMmYxM2I1OTJhZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNjZjkxMDBjMjkxMTVjOTAyMjQxZDg1NmY3ZjNhM2ZlNTEzNjY2NGIzYTAzOGU2NDNhMTRjNmMwNjZiNjE5YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWMyYmM1ZDI5YTBhMzRkNzcyNGE4MWI3Nzg0NGYxMTk3N2Y4ZDg5MjExMGZiZWYxNGUwOGQ1MjAwYzE5NjRkYyJ9"
+          "resource": "repo://test/setup.ts",
+          "version": "repo-file-v1:sha256:987289a1f8bbde8783854a22c41af71a04e52ec2ccaa7c93aba306fb72f8caa4"
         }
       ]
     },
@@ -49,7 +45,7 @@
       "statement": "waitForQuiescence waits until none of the webIds has pending activities for two consecutive polls, treating a transient registry 500 as unsettled.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L270-L312",
+          "resource": "repo://test/util.ts#L375-L417",
           "version": "repo-lines-v1:sha256:aa9986ea32cc81773e7bac1da8b400cdfd6f7da59d81eb222810f87b3a0fa6ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDg2YzlkYzEwY2U0NjZkNDAwYzU3ZjhiNjA2YWRlZmEyZTQwOGJjNzY0NTE3NzNmZDJjNDRlMzM4MzMxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGU2NzRmMzZhMzYwMmQ0NzY2ZGE3M2RmNjJkNzFmZjljM2JlYzAwMGJmODVkMGQ1YjAzMjlhMTdhOGJhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyMDU3ZjZmOGI1YWUzYTEwMzIxYzMwMTRhMTE0YWM0ZGUxMmE5NWY0YmRmZGRkZTA1M2VmZTVmOWM2NmY1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMzg3YjUwYjg4ZTVhZmM3YmJkMjdhNGMxYjJiN2M1NjVkMWY2ODkzM2Q2NGY5MWQwOTk2NzE1MDgxZWFmMjMifQ"
         }
       ]
@@ -59,7 +55,7 @@
       "statement": "awaitGrantCompletion is the listen-first barrier: it opens the registration notification stream, runs one RPC trigger, awaits the registration Update, then waits for quiescence because the Update fires mid-chain before the parent workflow's completion tail.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L315-L329",
+          "resource": "repo://test/util.ts#L420-L434",
           "version": "repo-lines-v1:sha256:e1b08cd5303499cda169cda607ac490afbec9d413863eacc4510c952247dff78:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZGY5NGI2Zjk1M2M0YmViYzYzMTJjMGVkNDFiYTY3ZjkwMGRjYWU0ZDlhMmMyOTIwZTliYzc5NzUxYWU0NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2NTI2NjNhZDlkNTY0NjJmZmVjZTBhOTVhMGRjYzU2ZWZmY2JjYzY0NjJjMWQzMzI4MzJjMGIwY2IyNTc0MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1MzljZjY4NWU5OGIzZGQyZGY2YTZhZTk2NjJhNWRmNWQ0YjJjODM3ZjQ2ZWM1OGU3NmMxNDUxMzAzODBiZTUifQ"
         }
       ]
@@ -69,8 +65,8 @@
       "statement": "Temporal activity retries are disabled in the dev dynamic config (history.defaultActivityRetryPolicy maximumAttempts 1), making workflow failures one-shot.",
       "evidence": [
         {
-          "resource": "repo://temporal/dynamicconfig/development-sql.yaml#L7-L12",
-          "version": "repo-lines-v1:sha256:e8706552bd2202b4f83a61ca3ecee3637ae0444c4a3599ff90345c1050704876:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhmZGZhZmFiZTk0Y2E5OWZjMzEwODZiZTA2YzU5NzUwMzRlY2RhYjA3ZTlmMTkyODYyNjFiYzUxNTc5ZWFjNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDk5Mjg4MmU3NTIzMWY4MDQ2YmNlOTAwNzczMDVmZWFlODY0MGM1ZjdkYWE2NGFmZDk0NWZhODQ5NmQ2YjRmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTM5NzQ0MDNlNmM2OTUzN2RhM2JjYzM1ZDMxZTUwN2U0NjE3ZGY2YmZmNzFmYzcyYmRiMmU5OGNjMTc3NjI1ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+          "resource": "repo://environments/temporal/dynamicconfig/development-sql.yaml",
+          "version": "repo-file-v1:sha256:0d67f6069430a7549f3f7c3f30b3b126900dd8b0e9de6689455f0ede47963fc1"
         }
       ]
     },
@@ -79,12 +75,8 @@
       "statement": "Integration tests observe changes through listen-first NDJSON streams: openNotificationStream reads the CSS streaming notification channel, whose lines are expanded JSON-LD, and must be opened before the triggering action because there is no replay.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L24-L29",
-          "version": "repo-lines-v1:sha256:a2ee1684a905a6d5bc61ce67c14fc6ec3878f676f02efbdc801d22ee1519c9fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRlNzEzMTU2ZGZiOWFiZjQ3N2Y3M2FkZmFkYTViNjcyNjRmZmJlODRiZWU1N2QxMWUzZGIzOTc4NGNiZjNjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2IxMmVmOWEwMmJiYTE3NjA5Mzg2ZWM3MTZiODVkNDI0NDQwZmEyNDM3M2EwMzMxOGRhOWFkMzA4OGZmY2FkYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjdhZTAyMTYyZGE3YWVmNmM1MDczMzAyYmRjNzlmZjY4Mzk2MWMzYjE2NzA4ZTBhN2Y0ODJhZGJmOWI4ZGZlYiJ9"
-        },
-        {
-          "resource": "repo://test/util.ts#L118-L134",
-          "version": "repo-lines-v1:sha256:8003026d029aedae7fab49399e328798d5dfccb49a4f10881ce052727f9fd07b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZjZkMzBjYzc5NDMyZjYyNTEwZmU2OTIxNjY4MzY2YzRhYWZkMjE4NTliZTg0NjNlZmYzMDM1OTQwZThlYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3MjBkNWEzNGQwMjQ2ZTdmNzc4NTJiNjM0Y2UzN2EyZGI2N2I1MzhjMjE3OTJjNjk0NGEzZWFmOGU4NDZlZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1NGZhNWRlZjBlOWY2ZGM5YTQ0ZDlkNjcwMTQ5OWIzZWViYjNlNzc4NmExYjE1ZWE5MWMyZjA0YzE5ZGRmNTMifQ"
+          "resource": "repo://test/util.ts",
+          "version": "repo-file-v1:sha256:08f42102cb3f1df7e5e9cbc4450c4c434e64be14c8bd3ab29070f2a5ebbcdaa5"
         }
       ]
     },
@@ -93,26 +85,22 @@
       "statement": "The Dagger registry and data service factories bind Temporal, and the test command runs a Temporal-reachability wait before vitest.",
       "evidence": [
         {
-          "resource": "repo://.dagger/src/index.ts#L375-L434",
-          "version": "repo-lines-v1:sha256:08c8b499b54c697dc434115872b094631798b98c08401cffcf9befafc84934f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlODg5ZTZmMmJiMzcxODQzZmI4NTlhNWJhZDFlYWNiZTNkNTY2MDEyMzgwNTI0YzU5ZTVmMzFkNmNiMjA0ODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YWE1MTc1ZDcwOTRlZDRiZDVhZGU1OTIyNGViMzU5MTA2ZTU0OTZjZmY5NjExNDJmZmJlMjE1N2VhZDMxM2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4YmRhZDE1OGM3YWU0NmIwOTg4NTFjMmFiZTk0NjA2NWQ3MjY2MmMwZWEwYWI3MWY0MWM3OGUxZDEwMmMxZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViZThiM2Q0ZmEzYjFhZGRhNmViOTU3MTJjZjFiMDI0MjU2ZjFjN2Y3ZjJiOWM2MGRkM2E4NTVhMzA1ZTMxNDkifQ"
-        },
-        {
-          "resource": "repo://.dagger/src/index.ts#L511-L529",
-          "version": "repo-lines-v1:sha256:5de789030eb1a05417a07c09232dfcb7bad404cf2480bacab62bd8e7d96893a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0NTQzZTc3OTcwODU3YzAyNTY2OTFiNGFhZWViMzYwYWNhYjk0YzMzNDE1NmQ4YTk1YjViMDUxYjlhNmYxMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4YWRmYmRhNjlhNjA4NmUzMWFhMDEzYTEyMDRkMTk5MzE4ZjU0OTZmZmFiNTQxYzcyOWZmNTg3YmJkZmZlMGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkZmVmNzgxMjY1ZGYwYWUwNDk3NTJiZTRjZTk2NGJlZDhlYzQ4ZGRiZDlmZTFiMjAxNDExZjdjMTU5YjllNTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0MjNlN2RjMTM5ZTU3NjgxYTM4MzkyOWI3OWU4M2ViYTdkODc5MDA2Y2FiYzcxOTk4MGZjMTAwNDllMTdhNTYifQ"
+          "resource": "repo://.dagger/src/index.ts",
+          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
         }
       ]
     },
     {
       "id": "claim_10c3b5de630941308354086a8569600b",
-      "statement": "roles.test.ts and share.test.ts do not read replica graphs: they assert the grantor's registration link, the grant body read with the data owner's session, and the grantee-facing ListDataRegistries result, polling the RPC because replication is webhook-driven.",
+      "statement": "roles.test.ts and share.test.ts do not read mirror graphs: they assert the grantor's registration link, the grant body read with the data owner's session, and the grantee-facing ListDataRegistries result, polling the RPC because replication is webhook-driven.",
       "evidence": [
         {
-          "resource": "repo://test/roles.test.ts#L32-L95",
-          "version": "repo-lines-v1:sha256:8f910c0783ba411188dac137944b1f1555afebe56eab2d91eb044e0deddf82cd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2OWRlMTE2YWExOTRlZDE0Y2ZhNzE4OGEwYmYyMGE4ZWU5YjA2OGM0ZmZjOWQ1M2M5MGVhZjU1ZTI5NTM5MDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNGUyMWIxOWU5YjBhN2JlODI1MjE0NTFhZjZmMWFhNjQxYWYyYTJkOGJmMmNmZmI0MGFkMDlhZTgwZTZlODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlYmQ2NDUwYWExZTU5NGVhZDQ5OWRjMjk5ZDNmMDdlOTdlYjlhYzFmODQxMTIyZTk5MzAwMTg0YTM3OWUxM2MifQ"
+          "resource": "repo://test/roles.test.ts",
+          "version": "repo-file-v1:sha256:c3b18de44eead6104ee846e59f6e2e13e0285239dd49295889ac657bea34974b"
         },
         {
-          "resource": "repo://test/share.test.ts#L63-L100",
-          "version": "repo-lines-v1:sha256:49454ddedbadd2b0690eebb238a22bf39efe29b82a24e5b96b5931e38dc9c107:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1ZGJiMDI0MjEwN2E5MGQ0NmMwZTRjOWEyZjA0MzU3ZjM3OWMxMDAyZmM3YmQ5NDUzY2YzOTdiMDlmNzNmMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjMTI4Mzg1ZTI3M2Q2YmE1NzdjZTA1NzMzMDYyNmY4NzM5Y2U0NGI2ZGNjNTFiODkyOTRkMDU1YjY3ZmQ0NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
+          "resource": "repo://test/share.test.ts",
+          "version": "repo-file-v1:sha256:7142782738c7f6360b4d4f6c11f108fc0647df0de0cc92ec20126b72523d3915"
         }
       ]
     },
@@ -131,16 +119,16 @@
       "statement": "The Temporal dev default activity retry policy is maximumAttempts 1, while webhook-delivery sets an explicit 10-attempt transient retry policy and stops on permanent 4xx responses.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts#L9-L36",
-          "version": "repo-lines-v1:sha256:2765fb316bd9980cbf1cc55b90c50f854eef90562b80644edc11ce9886ec40b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1Mzc1Y2VmZDdmYzA2Y2ZlYmE2YzlmZjNjNGQ1NzRlNzIyYzZjYWNjNjg3MmIyMjU4MTZjMTY4NDIzYjQ0ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNGExMGUwNjM2NThmNzk2ZmY1YmZlNzg0ZmQ5ZDVlODM0MGNhN2FjMWJlYjRlNjZiNzNjNTMwYmE5MTJhMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0MTY3MGE0ZDkyMjYwZjA0ZTYyMmQ4ZmY1ZWJjYWZiMjQ1MGUxNzQ5YTZiOWE3YmNhZjM3ZWNhYmJkYjY3ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "resource": "repo://environments/temporal/dynamicconfig/development-sql.yaml",
+          "version": "repo-file-v1:sha256:0d67f6069430a7549f3f7c3f30b3b126900dd8b0e9de6689455f0ede47963fc1"
         },
         {
-          "resource": "repo://packages/components/src/temporal/workflows/webhook-delivery.ts#L5-L12",
-          "version": "repo-lines-v1:sha256:be51aa3bce98af45b032251a5e4c3f18f3c7896a407be4f68c5ff758062300ba:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWI1YWY0ZGVlZjQ3MzBiMjkxNzNhYzdjMDlhMTRmZWY2MmE1YTk5MTc1NWE0Yjk2OGM4NTgxNTQwN2UzMGEwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzExZWNhYjdhMzQ5Yjg1NmNhN2VhMzNkODgwODI5NTU5ZTJiYTQ1ZTg4N2U4OWExODVkZTYyY2U0ZTlkOTEzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjU2NTcyYTAyNWVhNjVjOTM2MzBiY2ZkYWMyMmIwZDZlZDkzODZjNmFlYzQwMTEyYjcwNTFmMmRlYzVjYWI4MiJ9"
+          "resource": "repo://packages/components/src/temporal/activities/webhook-delivery.ts",
+          "version": "repo-file-v1:sha256:042dd6ad99a3c53ac5f5762d3ac7008cd4ec35b5ceb9d2845157c645b24ebe1d"
         },
         {
-          "resource": "repo://temporal/dynamicconfig/development-sql.yaml#L8-L12",
-          "version": "repo-lines-v1:sha256:00697c1bf42998303271dcfe5e0f4e851242c6020f827a38a1972d0bb86abaad:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcyNjNhZGFkNWZkZThmOGM3Njc5NjdiOGViZjk2OGZiM2JlMjYxNjViMjY0NjhlODBhMmFlMzRmZWMxMjNhZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDk5Mjg4MmU3NTIzMWY4MDQ2YmNlOTAwNzczMDVmZWFlODY0MGM1ZjdkYWE2NGFmZDk0NWZhODQ5NmQ2YjRmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2JjMGU1NDM5M2JiMzAzODI0MzM2ODJlM2VmNDAwZTk5YTA1YmYxYTUyMWQ2NDE4Mjc2ZWQ5MDI0ZGMzNTMxMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+          "resource": "repo://packages/components/src/temporal/workflows/webhook-delivery.ts",
+          "version": "repo-file-v1:sha256:f74f77be542cb8839786d3437ebcb270843efa527c056cb33bbc592ded43c19c"
         }
       ]
     },
@@ -163,7 +151,7 @@
           "version": "repo-lines-v1:sha256:e7a4e0f7ff66eb84013f61c1cccbec7a179034ee0244ac61107d86ee715c6c39:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNTVhMjY3YjVhZGNiOTNiYjRiNTc5OTFhMjg0YzdlNzg4ZWEzZjg5ZGI3MjYxYjE2ZGY1ZDlkN2EzYzhmNDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1Njc0NWQ3MTIwYWJkODM2YWIzNzc0ZGQxOTM1N2MwOTRkZjgyNWExY2VjMWYyMDI4ZmZmZmI2ODA0ZDdlNjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhZDViYTE0ODUxMjUzMDc3OTMzYTdmMDgyMDMxNjNmZDRmOWUxNTdhNjlmNmE0MDg1NWVkN2QzMjVkZTQxMDUifQ"
         },
         {
-          "resource": "repo://test/util.ts#L96-L110",
+          "resource": "repo://test/util.ts#L178-L192",
           "version": "repo-lines-v1:sha256:3e378041f78c53deece58a0fcd3cab47f90246f803c89ab39e6a13f065776667:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MDhlM2Y4NGUyODJlNTZjNmQ0MWExMTliZDQ2MzUyNzk1OWU1ODkyMGQ5YWQ5MDc4NjQyNWYyYjVhOWFlYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0ZWQ3OTY3YWY4N2NkMDczZDVjNmI1M2Q5NmYyYzI5ZTRiYzZmMDVmZmQyZWZjZjFkNzRiNGE3MWEyMTQwNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4YzYzOTg3Yjk3MTZmOGYxNzZhNmY0MTA4MzhmOTI0MTJlYzczZDJjMzU3MTI1MmRjN2FhMzlkYWZjMjIxYzUifQ"
         }
       ]
@@ -183,8 +171,8 @@
       "statement": "delegated-grants.test.ts mocks @temporalio/workflow and asserts the consumer's ordered contract (replicate, regenerate, complete), burst coalescing, mid-flight re-drain with a fresh mirror, the idle no-op, the peer-gone case completing without regeneration, the sweep's drift arm re-deriving every registered grantee, the mirror-completeness repair running before the drift pass, and the forced start-or-signal used by reconcilePeerMirrors.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/delegated-grants.test.ts#L174-L369",
-          "version": "repo-lines-v1:sha256:9d5f0904cf7178f2ba459d2ee0b42d44452db8273d49c00869a213ec9c20539a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4Y2I1Njc4NTY0MDM3MGU4NmU2MzBlY2QyYTliZjM2ZGM3NmY4NTA5OGM2NzQzYWRmYWM2NjdjZjQ2OTIyOTZmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MTFiMzc0YWM0NTA4MTQwOGI5YjgzMzFiYjliYjE3MzhiYzNjYzEwM2YxYWYyMTFkNjY1MmI3OGRhMTczNDUxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/delegated-grants.test.ts",
+          "version": "repo-file-v1:sha256:3537a918a4d63b7d5d96d17a4bd11563e659088c282ec0f6d8321714df96d1d7"
         }
       ]
     },
@@ -203,32 +191,28 @@
       "statement": "grant-generation.test.ts serves a mirror-only fake transport with a deps.fetch stub that throws on any call, proving delegated-grant generation performs no peer dereference, and pins both MirrorIncompleteError kinds plus child-grant delegation through the parent's reverse inheritsFromGrant edge.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/test/grant-generation.test.ts#L30-L200",
-          "version": "repo-lines-v1:sha256:6f059a83ed67791a9f597d3929d18c48e453c023c81088db783cd5792ffd629e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTdiNWI1YjQ4N2MyMGRiZmNlZWQ5ZjZlNDZmOTVkM2E0ZWJjMDAyMGRjYTMwNDFkZmE4Y2NlYjA1MjRmMWQ4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjNjNkNTM1Y2UzODA2M2Q2YjRjNTFkOGMzODZhN2Y5YjNlNTgwYTE0YTEwYzA3YjE5OGRmYWYxOWM5M2EzYmZlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiMjc2YTgyNmM0YjMyZmE4NmE0NmM4YzlhZjFlOTE2YjI3NjdlMGQxMGRlZDE3OTkzY2U5ZTEyMDQ4NmEzOTM0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhZDkyODEzMjg4MDkzYzM1YTZkNWEzODI0MDc0ODNmOWRkYmU3YWU5ZDFmM2RmODgyMDVmNGUzM2VkMjMzNzQ0In0"
+          "resource": "repo://packages/authorization-agent/test/grant-generation.test.ts",
+          "version": "repo-file-v1:sha256:bc35c2f118eb1e8d7416ec58f5cea7aa9b0eb96ab22f90c9fc9363398c8dc338"
         }
       ]
     },
     {
       "id": "claim_e3099cad08ff4f3ba86169e804d4dc8e",
-      "statement": "federation-mirror.test.ts is the only black-box file that reads replica graphs: it asserts a seeded pair starts with a complete replica (every linked grant body resolves) and that a grant write converges the replica to the peer's authoritative link set with the grant semantics the delegation path needs.",
+      "statement": "federation-mirror.test.ts is the only black-box file that reads mirror graphs: it asserts a seeded pair starts with a complete mirror and that a grant write converges the mirror to the peer's authoritative link set with the grant semantics the delegation path needs.",
       "evidence": [
         {
           "resource": "repo://test/federation-mirror.test.ts",
-          "version": "repo-file-v1:sha256:7a5d012d0723dcc9323f144f2c5505b884aa161bb7d59fa1f35c5825dc158f94"
+          "version": "repo-file-v1:sha256:e46d359262606ca9fe57980f79bc3694e574d237b43ccf32a67413ad11d2c130"
         }
       ]
     },
     {
       "id": "claim_27b5adf568c342fcb9b8d5158102dda9",
-      "statement": "test/util.ts provides the shared black-box helpers rpcCall (unwraps the Effect RPC envelope: HTTP 200 plus Success) and localMirror (resolves the peer's registration of session.webId through the reading side's own SPARQL plane, so a missing replica fails loudly).",
+      "statement": "test/util.ts provides the shared black-box helpers rpcCall (unwraps the Effect RPC envelope: HTTP 200 plus Success) and localMirror (resolves the peer's registration of session.webId through the reading side's own SPARQL plane, so a missing mirror fails loudly).",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L41-L72",
-          "version": "repo-lines-v1:sha256:c1414dbe1257e50d39d4ea321cdb40b41f9359e5b563a6afde7da035bcf6ed64:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1ZmQ4MGIwZmQwMTcxM2U0MTQ5Zjk2NmZjN2ViOTRiN2U4ZDk4MmVjNzU0ZTBmZTZiOWQ0NDRmNDdjYjUyMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlMTc5ZmQxYzFlNzkzODY0NmNlZDBjOTE1ZjRlMTQzNjIxY2UyM2VkNjNmMDA5MWZkMDc5ZDllNTJmNWY1YzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjZDExNWE4YTk4ZGQwZTk4YTM0ODRmOGQzOTczOTVhMjhmZDAxNTIwZTkxMmMxNDk3N2Q4ZDczNjZmMmFlOTUifQ"
-        },
-        {
-          "resource": "repo://test/util.ts#L69-L83",
-          "version": "repo-lines-v1:sha256:a627b3336d1c1a22b56e122e425bbd6bded78379404a01926a29f5e42f1d354a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllYzY4NDExMGQyYTYwOWNlY2ZkZjhmZDIwMzljYjM4MTFhZWZiYWVhNjIzYjg2YTMwODcyMmI3NDYwZWEzZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5OGRkMGUxYjlkMDllNTUxZDJlM2I5OGRjNWQzNzQ2MzY3MDZlYTdiMWZhNWE2MzRiZTA5MDRlY2I0ZGQ5YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiMjBmYWRjYWUyOGY1ZDJlY2YwZjYyMjY4ZDJiM2I3ZWQ5MjJjOGEyNDI3ZGYxZjM0NGVhZTljZDljYmE1Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+          "resource": "repo://test/util.ts",
+          "version": "repo-file-v1:sha256:08f42102cb3f1df7e5e9cbc4450c4c434e64be14c8bd3ab29070f2a5ebbcdaa5"
         }
       ]
     },
@@ -237,18 +221,8 @@
       "statement": "reciprocal-sync.test.ts pins the mirror sync's failure classification: 404/410 on the reciprocal drops the replica and reports peerGone, a 404 on a linked grant stays retryable and keeps the replica, 401/403/500 and network errors reject, and a registration without a reciprocal link is a no-op.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/reciprocal-sync.test.ts#L1-L115",
-          "version": "repo-lines-v1:sha256:e95853bba648f3e56cd6f958b18bfe82d93679b0b937ae3af094eb25321b2db3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjEwM2U1NDIxMDYyOTRkMmNjZDA1NmFhYzRjZDhjMmVmZGQ4M2IwNzdhMzllYzViNWI0M2U4MzA5ZTE0ODEwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
-        }
-      ]
-    },
-    {
-      "id": "claim_127d143ace2e45c1af219cc30d403ec0",
-      "statement": "delegation-request.test.ts asserts that requestDelegations sends one AccessRequest POST per data-owner group, parses the echoed finalised grants, writes the issuer-side replica (one named graph per grant with the parent reverse child edge, best effort on failure) and returns every assigned IRI; it also no-ops on an empty group, rejects a mixed dataOwner batch, surfaces a non-200, and rejects a malformed response without writing a partial replica.",
-      "evidence": [
-        {
-          "resource": "repo://packages/components/test/delegation-request.test.ts#L1-L173",
-          "version": "repo-lines-v1:sha256:be8c0feb40ce6ad2b6c266f3957d97338eb38794b2b17be8ac93c1d35925f4d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTczLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyOGM5ZDY4Yzg2NzgxNTFkZTg0ODUyM2ZlNzA1ZTM2ZTE3MDdmNzU5ZDEyYTAyMTE5ZGNkMzM5MDlkNjE5ODE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/reciprocal-sync.test.ts",
+          "version": "repo-file-v1:sha256:33d59cedaaaf5d932a0bfcfebe8a4418483a2947e1a9e97213515aae85ebb9fc"
         }
       ]
     },
@@ -257,40 +231,40 @@
       "statement": "registration-links.test.ts and get-reciprocal-grants.test.ts pin the batched replica reads: one query for link presence or distinct grant owners, and two queries for the reciprocal's full grant list with bodies skipped when absent.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/test/get-reciprocal-grants.test.ts#L1-L152",
-          "version": "repo-lines-v1:sha256:1173d2c32e5b8fe8ed1b578a5cab63e31a5aeb775d08fe5c4a6d472be1875b08:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmN2I1NjViZjQ2NjY1ZWVmZWJhYmZlNDUzZGU3OGFiNTJiYjViM2IzOGY4OWJjZDhiOTBjNjE5MjEwNzliYTM3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/authorization-agent/test/get-reciprocal-grants.test.ts",
+          "version": "repo-file-v1:sha256:307d6439dc8c0fc72a1ceb7a8b0706a83f5b0881a048a606a697753f394d7ea3"
         },
         {
-          "resource": "repo://packages/authorization-agent/test/registration-links.test.ts#L1-L124",
-          "version": "repo-lines-v1:sha256:3d2ac1d7b277122c3dfd3ba6d0cada1c66199dfd39e8e30d3611ada4c9b1387c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyOGM5ZDY4Yzg2NzgxNTFkZTg0ODUyM2ZlNzA1ZTM2ZTE3MDdmNzU5ZDEyYTAyMTE5ZGNkMzM5MDlkNjE5ODE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/authorization-agent/test/registration-links.test.ts",
+          "version": "repo-file-v1:sha256:a3e88b28058739c86e7a3d13bcbc9b065ac8610504532be1db33bd67cf5c610c"
         }
       ]
     },
     {
       "id": "claim_158569c4c6d2415fa55482e1db75fe21",
-      "statement": "The black-box check-equivalence suite runs regeneration twice — once for a source pair (seeded acme → alice, which keeps g4yhtm and re-links its child wpqyds) and once for a delegated pair (alice → test client, where the first run issues and the second reuses) — asserting identical registration IRIs.",
+      "statement": "The black-box check-equivalence suite runs regeneration twice — once for a source pair and once for a delegated pair — asserting identical registration IRIs.",
       "evidence": [
         {
-          "resource": "repo://test/check-equivalence.test.ts#L96-L121",
-          "version": "repo-lines-v1:sha256:b6d584b58bd9d923a4d9f53c555b469dbaaa4309c14d38b55e5ae8bffbb1d378:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZjNkNjJmZTljNzQ4NmM1MDZmNzRhYWIwNjI3ZmM5MDhkN2ZhNDQzNGMxYmQwZWFkMDEyMmIwNjU3ODcyNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2YTY3Y2NmOGYwYjZhODZlMDdmMGUyMjVkMzY3NjlmYjNiOWM2OGFmMjEyMTAwYzgzODdkOGI5M2EwODYwMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://test/check-equivalence.test.ts",
+          "version": "repo-file-v1:sha256:95512cedc7e83900a9e3474faf5ae4aadbd85fceacafde52a79e04f2e705cc40"
         }
       ]
     },
     {
       "id": "claim_67b36959111e427c888a7d261c186a7e",
-      "statement": "Package-level tests pin the reuse and GC contract: pure field/tree/pairing comparison, the activity's local-only body loading with fail-closed missing children and delegated index addressing, the workflow's value-based skip plus full-set re-link of reused parents and children, the projection GC cases (replace, deny, orphan scan, peer-owned boundary removal, missing bodies), and revokeGrants' closure-before-projection ordering.",
+      "statement": "Package-level tests pin the reuse and GC contract: pure field/tree/pairing comparison, the activity's local-only body loading with fail-closed missing children and delegated index addressing, the workflow's value-based skip plus full-set re-link of reused parents and children, the projection GC cases (replace, deny, orphan scan, missing bodies), and delete-before-create ordering through the local closure.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/check-equivalence-activity.test.ts#L153-L341",
-          "version": "repo-lines-v1:sha256:0e000802ae504bbfe2ef50501d10bff06e45235421e6547ea0a75243693ad9df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTg5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2NjFkZmI3OWMzZDI4MGUxMDg0ZTVlYWJhOTQ2MWRlZDJlZDg3ODVkNDk4ZGY5OTJkMmRiZGJjOTI1ODEyOThhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjYzMxMDUzOTg2YTllNDJlY2VhODE4Y2QxYjc1OTcwYjUxNjQwZTk3OTEzOTNhMDY0MWY1ODdmMGU2ZWZlYjBiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/check-equivalence-activity.test.ts",
+          "version": "repo-file-v1:sha256:e6591628a1a2f8591df920b7f73d6a10f6973a01629332f9813618643634f24b"
         },
         {
-          "resource": "repo://packages/components/test/check-equivalence.test.ts#L69-L186",
-          "version": "repo-lines-v1:sha256:7797f22f0dad211e867be20af4d98e41068b8f6b8d5377d70a2d3a606b5bc4a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NGJlN2FhMGY3N2U1MzdmMDBiZjU3YmNjMGU4ZmUzMjY2MzAxNGE1MGJlYWI5OWMzOWY4NWI0NGM3MzVkMTFmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJiMjM1MjU4OWMzNGQzYzYwNjg1OTMxYjZlY2M0ZDUwOTkxYTdjNTZjOGZiYTI4OTQxMTQ2NTc2OTAyNzJjYWMzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzYjEwNWU0NmY0Nzk1Njc4MmVmMjM3YmViOWI4NWQ5ZjUzNGU4NzRmOWZjNWE3ZTAxZjc5ODNmZGU4ZjkxNzVhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzYzI0NDM4MThhZTA0NWM3OTE4NTFmNjQwYWQ0NmIzZmM5ZTAxMWQ5MDA4NjY3NzJlYjQ0ZmYzYTFhZmZmMTUwIn0"
+          "resource": "repo://packages/components/test/check-equivalence.test.ts",
+          "version": "repo-file-v1:sha256:6b9be44d0d7977285093641d91db6865665bd72c5c5e1e690d7989313756dcfd"
         },
         {
-          "resource": "repo://packages/components/test/grants-workflow.test.ts#L121-L377",
-          "version": "repo-lines-v1:sha256:4f6b0f52ae60dc218edd5f3de20326dda55b9bc92938840ba39c3d292fe4677c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjU3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0MTYwZTllZmY4NWEyNzIzMDkwOGJhZGQwYzU1ZjFjMWRhNzUwYzhkOTk2YTY1Y2UzNmZjYWY0MDY1M2U2ZjhkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkOTUxYjcxYjA1ZTE5N2RlYmMwNDcwNjAwM2E3YjlkZDY4YTEzMjRmNWNhN2VhNzAyN2Q3NTBlNDk4MjU5OTQ2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://packages/components/test/grants-workflow.test.ts",
+          "version": "repo-file-v1:sha256:c1feeee17c857070c536bac1bb965db7c826dc2bcf481dae5ca427320b1f4db2"
         }
       ]
     },
@@ -299,18 +273,8 @@
       "statement": "The authorization-revocation workflow test asserts the order delete authorizations → resolve grantee kind → reconcile each expanded grantee → complete, including role-member fan-out.",
       "evidence": [
         {
-          "resource": "repo://packages/components/test/authorization-revocation-workflow.test.ts#L79-L127",
-          "version": "repo-lines-v1:sha256:0705f8203365e80a041999c7dfc20318db07f522460d7a19d9fd43cf9fdaeb10:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZjYwNDg0YjVlYTYwNzNmMTA4YzI4NWM2OTMzMzQxMzZhMWI3OTE5ZmY4YTU5ODgwNDc1ZWIwZDdmZjRlMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ZDNjZjFjMDJiYjVhNmU1OGQzYTA4OGVmMTMxNzI0YzRiMDY0ODU0MDY3N2U5YjI4Njc1YzBjOWE1NmVjZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_0fb01418dc71427f8b6156582fbc9c1c",
-      "statement": "revocation-errors.test.ts covers the AuthorizationRevocationFailure RPC schema and the HTTP status and JSON body for each typed revocation error code.",
-      "evidence": [
-        {
-          "resource": "repo://packages/components/test/revocation-errors.test.ts#L1-L59",
-          "version": "repo-lines-v1:sha256:0a2f6e51854feb669b9b2c97c9d71b57ac971862e0e90dcb15b8442a9e9aebf9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3MTBiODk0N2M0N2VjNjA3OGJkOWM5NTBhNzczMGY3MDQ5NGZiNGEyOTg3NDQ5NTBlMmQzMzA3OWQxODA3YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://packages/components/test/authorization-revocation-workflow.test.ts",
+          "version": "repo-file-v1:sha256:1fdb48f144bb8db93c10cc20fc570ce04eb5904c13175129fa74dff4d33b9018"
         }
       ]
     },
@@ -319,8 +283,8 @@
       "statement": "The black-box revocation suite revokes the seeded parent and child, waits for the AuthorizationRevoked completion, then asserts the DataAuthorizations, derived grants, and registration projection are gone; a second revoke returns an empty authorization list with no activityId.",
       "evidence": [
         {
-          "resource": "repo://test/authorization-revocation.test.ts#L42-L74",
-          "version": "repo-lines-v1:sha256:ba9101538fa06df49b1c22574b8a6bb50f3691d4ab972e5aad4f516ed601fd8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhMjk1ODgyNDZlOWFiOWRiZjIxODRlYmQ1MWM4YWQ4YzczZjNkMzA4NjZjZGJjNzRiOTMxMzNkM2UwZjEzNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxZmRhNzQ2ODRkYjU4MDhkMTZkODQ4MDFmOGI5MDYyNzYzZmQ0NDBhNWM4NmRhNDYzMjA1ZWY0MWJhZmJiYmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzYjYyNzlhOTU2NjcwMzBiYjEwZjNjOGYyNzQ0NzVkM2YyMTUwMzk3MzA5ZWIxYjBiZDgwMjczYzQwMDdhYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxYjIwODJhZGQ5YTI5ZTA2MmU2MGQ0NmRiYTFlMWY3YzUzYTBlMDUwYjg4MTE4YzExMDIxOGJjY2UwNTUyZDAifQ"
+          "resource": "repo://test/authorization-revocation.test.ts",
+          "version": "repo-file-v1:sha256:4ff94fb39bbcd8fe1738b240fbd50581d9ef20135ef6b836cb1650e8ab1861df"
         }
       ]
     },
@@ -336,7 +300,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-22T04:35:20.186Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0bbb422e37bcff3de06a90b7acec2a273f489c4fde2537974b6533e1bb038912",
+  "pageVersion": "sha256:a0fe35c92f43d4e3163e8186f5ac47bb93daed1d3c3f233820bea2151b1bed37",
   "claims": [
     {
       "id": "claim_8c7199519a8143bcb06e138d401a49f2",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://docker-compose.yaml",
-          "version": "repo-file-v1:sha256:2ceeb4c6c7ffa0fe6b1f9948a631c40f28417addc9f5966f6f58b09d1b14a111"
+          "version": "repo-file-v1:sha256:112733bfaf4fedd45b2384ecbe1931cf81a5b7d2281d43645a2a5e107096a479"
         }
       ]
     },
@@ -28,15 +28,15 @@
     },
     {
       "id": "claim_432cd65caa794e8eabe2119d83591117",
-      "statement": "mkcert.sh generates the wildcard TLS certificate for the TLS_DOMAINS set into traefik/certs, driven by the `make cert-install` target.",
+      "statement": "environments/dev/scripts/mkcert.sh generates the wildcard TLS certificate for the TLS_DOMAINS set into traefik/certs, driven by the make cert-install target.",
       "evidence": [
         {
           "resource": "repo://Makefile#L131-L133",
-          "version": "repo-lines-v1:sha256:2b76a903a756b047eae365f9b6f97d48fab2ab3fdd33f46bc6f7ef8610d45a98:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODk5M2JhMWFkZDFmNmQ0YmU0MjcyYjY3MTBjNDE1MTNjZjRhYmU5MGYzOWUwMmE5YTNiOTBiMDIwZGQ4NjljZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2VjNzY4YWMzMTBmZDZiYTA4YzBkOTllOTZlYmFkMDdlMTU2ZmZmMzdlNTE1MDZmNDEwZTE2MThmMzQxZjI2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZlZDM5MjVkYTk0MjNjMTFhZWI4OGI1MjYyODNiZDMzNThhNGYwMjhjZjRjMTE3Mjc5ZWU3OGJhZDVlYjhlNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTVlZmY2NTFjODE1N2Q0ZDRkYzk3NzA0NmNkNjNkZTExZmIwMTk0NTkyMjJhZjc4Yjg3ZjE0NGRlM2I4MThjMyJ9"
+          "version": "repo-lines-v1:sha256:e721999f7000f1f3b6c9683ac808e24a3c14ebc6fca70ffec9c2d78a5659bba4:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODk5M2JhMWFkZDFmNmQ0YmU0MjcyYjY3MTBjNDE1MTNjZjRhYmU5MGYzOWUwMmE5YTNiOTBiMDIwZGQ4NjljZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2VjNzY4YWMzMTBmZDZiYTA4YzBkOTllOTZlYmFkMDdlMTU2ZmZmMzdlNTE1MDZmNDEwZTE2MThmMzQxZjI2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZlZDM5MjVkYTk0MjNjMTFhZWI4OGI1MjYyODNiZDMzNThhNGYwMjhjZjRjMTE3Mjc5ZWU3OGJhZDVlYjhlNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTVlZmY2NTFjODE1N2Q0ZDRkYzk3NzA0NmNkNjNkZTExZmIwMTk0NTkyMjJhZjc4Yjg3ZjE0NGRlM2I4MThjMyJ9"
         },
         {
-          "resource": "repo://mkcert.sh#L46-L48",
-          "version": "repo-lines-v1:sha256:71bdd61b4ba4c8425f9f19a2b336e085c8690208472ace7f466cf005769d9888:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTNiNTIxZTczY2E1ZTZhNTZkMDkzMjE2MDY3ZTExM2Y2ZTA3ZmU4MDg0OGIzZTQ1NDAyODAxODE2MDMwYzZkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODkyZjM5YWIwM2RmNGEyNmY4ODgwNTU2ZDE3NDdmMDMwZGNmNGQ1OWQ0Mjk4ZmQyYzU2NTQwNzM2MDgwZDY4YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGVjNjZlZmNkM2MyOTQ1M2Y5MTY0ZTgwZDMyZjM4OWQ2Y2I2MDhhNWQ3YzIwMzY2ZWY4MTE2YjE4OTU1YWM4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWZjYWM1ODRiZGM3NzllNGYwMmIxOWUzN2IwMzMyMjU4NWNiNjcxZTA2MTFmNjc0MzQ2MzJiYTRiMjAzZDQwMSJ9"
+          "resource": "repo://environments/dev/scripts/mkcert.sh#L1-L65",
+          "version": "repo-lines-v1:sha256:4d3c151d46d13fe989cc86a3df988b30d670a6643d130624f22c5f7f9f54fda4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTVmYzA0YTgwYzk1MmY0OWNlNDE4ODYyN2M1M2IwZmJlOGM0NDA0MWI5NTJkNTkyYWNkMWRlOTk4NjE0NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0MDMyMDNkZDVhMDg2N2ViMTRkMTA0ZWU4YTczNzMwYmQ3MmRkOWFkOTJlNzhkOTk2YTZkYmEwYTVkY2ZjMDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -52,11 +52,11 @@
     },
     {
       "id": "claim_1f91cfa55fa644e08e0364aa6d6d74a4",
-      "statement": "Seeding is a devbox script that runs `node packages/repl/cmd.ts -- seed-env` rather than a Make target.",
+      "statement": "Seeding is a devbox script that runs node packages/repl/cmd.ts -- seed-env rather than a Make target.",
       "evidence": [
         {
-          "resource": "repo://devbox.json#L32-L36",
-          "version": "repo-lines-v1:sha256:11e070ee15e175d3f03013182d395ef9220fdc68cfe473d98fe602af77526be6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTA4ZjFiMzE4ODdjZTRlYTY2ZTQ4MjcyN2IxNjkxZTEwNGYyNWZlMTNhZmJiNWNkNzNiMjQ2MTEyNGQzOTNlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzUxYzYxZmNjYzNlZmRhNzIxM2E1ZjU1MDcwNTAwY2RiZmNhMzNlNTc4NDM5ODI1Yjk2ZjBmZmRiODkyMzQ0NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGY3MzlhMDZjMWNiYjEyNDRlMzM2M2QzOGJjZjlmYTUwY2U4NGZlZDM5OWMyMTkzYTNjN2YwOGQ1OTkxOGIyYSJ9"
+          "resource": "repo://devbox.json#L30-L38",
+          "version": "repo-lines-v1:sha256:73e240b849b5b150c484a4feb5f4a84f9a3f97b75662e7d8c240d67205505309:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTYyNGZhNjIwNDA0NzA3YmRkMTBkNjljZjU5YmJlMmYxNTNlOWJkNmIwMjY3MWZhZDU0ODBhZjI5MmZlNGIzMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDg3MDAxZWM4NjE3ODIxM2JjMmFjMDZkMzI2ZjVmZmQ3MTBjY2ExMWE2NzQxYzg4MjdmNGMxZTNiMDg2MzMwMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTIwZTkyYjMzMzI1Y2FiNjBmOTc3YmFhOGZhY2Q2OGI5MTk4NzFlMmFjZGJkZWI1NWQyNjM2MGVkNWMwZmNlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWY0YzIzNWExZWVmYWE2MzM2Mjk2N2YxMmRlMDk5NzI3MTRhMjQ1N2MzNTk2ZTBmMTkwZGI1YzhiNTFiZDU0NiJ9"
         }
       ]
     },
@@ -65,11 +65,11 @@
       "statement": "In dev the worker alone holds the Garage admin endpoint and token plus the bucket-less S3 endpoint, while the data server receives only CSS_S3_REGION and resolves each pod's bucket and credentials from its objectEndpoint record.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L139-L141",
+          "resource": "repo://docker-compose.yaml#L146-L148",
           "version": "repo-lines-v1:sha256:25c1b0f7693b71aac6142b3623a81d09f028231f439f76c7eaff1a7cbee267e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JiNDI3OTM3N2FkZTI2NmU2Yjk4ODIwZWEzOWU3OTA4MjhmMjEyOGExYWU0MjQ4NDRkN2M2OGYxMzI1MGRiYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU3NzhhOTFjYzk4YjhhYjA0Mjg3YzE2MzAzZTcxZjgwN2FjM2FlZjA2NDczYzFjY2Y3NTE2NDc4ODI2N2ZiNCJ9"
         },
         {
-          "resource": "repo://docker-compose.yaml#L173-L183",
+          "resource": "repo://docker-compose.yaml#L183-L193",
           "version": "repo-lines-v1:sha256:e9e9305110df9251aea52f0e514f82844362c050f4ca15c48f0b2019be12c4b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNzQ2MzM0ZmRiZDY1MTMyMzlmMTMyNmRiOGI2MTI3NTdiNWIzMmMwODA4YjUwODFhOTkzN2Y2NTMzYjhkYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiMGUyMGNlMmYxYzYwNWRhZWJkOWU4ODFmMTJiODc4ZTA2NzkxM2M3NTFiZjY0OTYyMGFlOTc4ODkzY2VjMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNjAyNTA4NmFhZDU5ZTk4MTY3NTM5NWVhMzJiOWM4MzIyMzJjNjRiYWZkYTEzNDE1Y2RkNzdkZjlmOTViMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxZmVlNzYyNDIwYTkzZGUwNmUwMjc1M2U2Y2ZiZGU1NmEzYzQxZWI3Y2U5NDg2NDMyNDhjNTc0YzI2M2FjNDEifQ"
         },
         {
@@ -83,8 +83,8 @@
       "statement": "The seed command splits the fixture per pod with splitFixtureByPod, provisions one Garage bucket and key per data pod through the admin API with seedObjectEndpoints, writes the resulting endpoint records and KV fixture to Postgres, and loads each per-pod dataset into Fuseki.",
       "evidence": [
         {
-          "resource": "repo://packages/repl/cmd.ts#L218-L260",
-          "version": "repo-lines-v1:sha256:c2bdb3d32f608fe752cc869c2a442198cf69580ca17939844c98fa66cb9e2fe1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3MTE1YWZmYjY2ZDY1N2RiY2U1YzViNjg5ZDYyMGNjZDUyYjliYzc2OGU0ZmQzNDllZGUzZTY4ZDk4MGZmOTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5NTViMDEwZDcyNjc5YjE2YjMzZDY2NTJmOGU2YjE2NDVjNjVkYWViZTcwNjg1YjVlNDU5ZjUzZjdiNDIyMzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyNjAzODc0NWNhNzg4ODcyNDIzYTlhYTgzNzA2MTdhMDM2OTA3NGNhMGQzNTg3MDdlMWExYWM1NjYxZGMyMGYifQ"
+          "resource": "repo://packages/repl/cmd.ts#L182-L230",
+          "version": "repo-lines-v1:sha256:e221b70f5f900d757d5d221c783e87a2845f206d27d83b71d2720e8c87fab69c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2MGQ3YjkxMWNlODcyYWY3ZjIwYzkwYjlhYjA2MmIyMzUwYTliYjlkNGVjNzNlMDVkYTI3YWQ4YmVlZDkyYTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZTU2MTEwYjEwZDFiZGU3ZDU0OGQ2ZjU1OTNjOGI3ZDllMmU3NGY4ZWFkNWM1OTgzZDcxZGVmMGFiZmM3YzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5MzBlZjk2MjI4M2Y2OWUyMGQ3ZjMzYzY4N2JlYzE2ZWFiNDBhOGEwOWU0ZWI0NmQ5ZjgzNWI5Yjg3Zjc0OTYifQ"
         }
       ]
     },
@@ -103,12 +103,12 @@
       "statement": "The Compose registry and data services include the shared temporal environment anchor and therefore receive TEMPORAL_ADDRESS along with auth and worker.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L101-L141",
-          "version": "repo-lines-v1:sha256:8286a43dd51a48eb48d98e239061eaa28596ea039dc1b59b946b04c8636fda22:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNzQ2MzM0ZmRiZDY1MTMyMzlmMTMyNmRiOGI2MTI3NTdiNWIzMmMwODA4YjUwODFhOTkzN2Y2NTMzYjhkYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiYjQyNzkzNzdhZGUyNjZlNmI5ODgyMGVhMzllNzkwODI4ZjIxMjhhMWFlNDI0ODQ0ZDdjNjhmMTMyNTBkYmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhNjAyNTA4NmFhZDU5ZTk4MTY3NTM5NWVhMzJiOWM4MzIyMzJjNjRiYWZkYTEzNDE1Y2RkNzdkZjlmOTViMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1Nzc4YTkxY2M5OGI4YWIwNDI4N2MxNjMwM2U3MWY4MDdhYzNhZWYwNjQ3M2MxY2NmNzUxNjQ3ODgyNjdmYjQifQ"
+          "resource": "repo://docker-compose.yaml#L105-L107",
+          "version": "repo-lines-v1:sha256:563ef7c53712fad67f4640c141e774832cf937636a5bdfd8ff5d60f0183180ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWRlNTJhOTU3N2U0NzRmYTFmZjVhNzc1ZWJjY2ZkMmVjMmNkMmUxNzRlODg1ZDg5NGE3MDVlMDlkNGNiMjQzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTlmZDNhNjUyOTJjZmZhMmMwYWJhZDQ1MmMxYjEyZWZhNzE3MzU3YjY3ZTY4MGE1MThlNzBhNTUzMTlhOGQxNiJ9"
         },
         {
-          "resource": "repo://docker-compose.yaml#L61-L62",
-          "version": "repo-lines-v1:sha256:264a0b2bcc5cee87505bb7b3610b0af4957d32b159d7c972094ab18dfcb589a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBkZmEzODcxZTA2ZTc3NzNkZTJkM2I0ZTQ5NWI2ZjFlM2Q2NDQ5OGFlZGZlY2I0NzFiZTBhN2EzZWQxMzM1MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzEzZDAzZmIxZDMyNTk2N2Y3MDk3NDNiMTQxYTc0NmM2ZTM0MGM4MjdmMDY4NmI0Y2NjMjA5YTkxMDZhNTgwOSJ9"
+          "resource": "repo://docker-compose.yaml#L146-L148",
+          "version": "repo-lines-v1:sha256:25c1b0f7693b71aac6142b3623a81d09f028231f439f76c7eaff1a7cbee267e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NDYzMzRmZGJkNjUxMzIzOWYxMzI2ZGI4YjYxMjc1N2I1YjMyYzA4MDhiNTA4MWE5OTM3ZjY1MzNiOGRiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JiNDI3OTM3N2FkZTI2NmU2Yjk4ODIwZWEzOWU3OTA4MjhmMjEyOGExYWU0MjQ4NDRkN2M2OGYxMzI1MGRiYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE2MDI1MDg2YWFkNTllOTgxNjc1Mzk1ZWEzMmI5YzgzMjIzMmM2NGJhZmRhMTM0MTVjZGQ3N2RmOWY5NWIyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU3NzhhOTFjYzk4YjhhYjA0Mjg3YzE2MzAzZTcxZjgwN2FjM2FlZjA2NDczYzFjY2Y3NTE2NDc4ODI2N2ZiNCJ9"
         }
       ]
     },
@@ -117,12 +117,8 @@
       "statement": "The Dagger registry and data service factories bind the Temporal service, and the test command waits for a reachable Temporal before running vitest.",
       "evidence": [
         {
-          "resource": "repo://.dagger/src/index.ts#L375-L434",
-          "version": "repo-lines-v1:sha256:08c8b499b54c697dc434115872b094631798b98c08401cffcf9befafc84934f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlODg5ZTZmMmJiMzcxODQzZmI4NTlhNWJhZDFlYWNiZTNkNTY2MDEyMzgwNTI0YzU5ZTVmMzFkNmNiMjA0ODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YWE1MTc1ZDcwOTRlZDRiZDVhZGU1OTIyNGViMzU5MTA2ZTU0OTZjZmY5NjExNDJmZmJlMjE1N2VhZDMxM2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4YmRhZDE1OGM3YWU0NmIwOTg4NTFjMmFiZTk0NjA2NWQ3MjY2MmMwZWEwYWI3MWY0MWM3OGUxZDEwMmMxZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViZThiM2Q0ZmEzYjFhZGRhNmViOTU3MTJjZjFiMDI0MjU2ZjFjN2Y3ZjJiOWM2MGRkM2E4NTVhMzA1ZTMxNDkifQ"
-        },
-        {
-          "resource": "repo://.dagger/src/index.ts#L511-L529",
-          "version": "repo-lines-v1:sha256:5de789030eb1a05417a07c09232dfcb7bad404cf2480bacab62bd8e7d96893a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0NTQzZTc3OTcwODU3YzAyNTY2OTFiNGFhZWViMzYwYWNhYjk0YzMzNDE1NmQ4YTk1YjViMDUxYjlhNmYxMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4YWRmYmRhNjlhNjA4NmUzMWFhMDEzYTEyMDRkMTk5MzE4ZjU0OTZmZmFiNTQxYzcyOWZmNTg3YmJkZmZlMGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkZmVmNzgxMjY1ZGYwYWUwNDk3NTJiZTRjZTk2NGJlZDhlYzQ4ZGRiZDlmZTFiMjAxNDExZjdjMTU5YjllNTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0MjNlN2RjMTM5ZTU3NjgxYTM4MzkyOWI3OWU4M2ViYTdkODc5MDA2Y2FiYzcxOTk4MGZjMTAwNDllMTdhNTYifQ"
+          "resource": "repo://.dagger/src/index.ts",
+          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
         }
       ]
     },
@@ -142,7 +138,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-21T17:33:35.590Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

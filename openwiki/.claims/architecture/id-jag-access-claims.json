@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:f821a5c8137766805c8ed7a635e3f39972e34ab7246276db2e62e680104237e1",
+  "claims": [
+    {
+      "id": "claim_838ec0665352496899af1af26367759c",
+      "statement": "The canonical grant is an ODRL policy where assigner is the delegator, assignee the delegatee, and target.owner the data owner; a source grant has assigner equal to the owner and a delegated grant has the delegator as assigner.",
+      "evidence": [
+        {
+          "resource": "repo://packages/data-model/src/grant.ts#L9-L50",
+          "version": "repo-lines-v1:sha256:b81399e39e7d03926db31b5cccdeb975772e327ba6ebca11c7d6469993fb76ab:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMzg3MDUzOTk2ZDljYzkzYmVjMTAwOTNjMzAyMzgyN2M0MmIyYTZjMGZmNzM5MGFmMzE2NWQ2MmFiNDAwNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2ZTkyOTUwZWFjYWNlNjI2NmJhZTE1MjgzZWU4ODI0MmFjMDlkOGNkNmIzYTg3MGYzNjNmMzQ2ODEwYTQ5MDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3YTA0YmEwZjM1ODNkMmQ5YjgyMzZhZDU2Mzg0Y2EzY2NmNWMxNzY0NTI1OTFiZDEyZTAyMzYxZGI3YzYxYzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhYjFkZDBmZTEyNTRhOGI4YmIyMGVhZjEzZTY1NWUwYTYxYjA2MTZlMmRkY2E1N2RiOGE3YWI4M2Y3YTE3OTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_94d34ca246fb447a827436ff9a616fc4",
+      "statement": "The ID-JAG and access token share the ODRL_ID_JAG_CONTEXT URI with a locally bundled copy; only the access subtree is expanded as JSON-LD, while sub, aud, iss and exp remain OAuth claims.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/access-claim.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:afab7245da33eaed3ddeee3d43704ff2c430a89f9edc676d80b4250235a025c6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhODY2ZTZjZTU5Y2U2YzExYTRjMWNiYzFlNTEzZGQ1NWMyOGRiOWRmY2M0MjgwOTY3ZmM4OGIzMWQ0NTQzNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyNWExZmMzYTUzZDEwNjc1MTA3MTYzMzRiOGFlNThjY2NlYjU5MGM2NWMwZDU1YmM4YjFhNzRlNzg1ODZiOGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzN2E1NjhmYWRmYjkwYWEwZGM4MGFkZmQ4NmU2OGI2MTEwYzM1MzNmN2IxZDIzYjM0MTU4NWEzZDVhZjlhYzIifQ"
+        },
+        {
+          "resource": "repo://packages/utils/src/odrl-id-jag-context.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:8df10d03155809508389b86ef758fab1c28ae0baab27f8fa529700131d4fdeab:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmYjg0NWViYjYwZTVmNTZmMGU5YzYwODlkODRjZWU4MTZmZWYwYzhiOGVhOWMzMDllZTlmMWIyNmFkN2Q4YzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4OWFkYTRjNGU5NDRiZmZkOTYxM2UyNWE3MjJmZGY5YzY3NjAwYzBjMzM2ZDk3NDQ5NWQ5MmEzOGM5MzRjMjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwMzYwMjcyZGFjOWIyMTI3NWVjNWY2NmM0ZDgwMTdlZDNlYjU5YTA4OTI1MzYyMTJmMTA1MzY2ODlkNjI2M2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5fa6ab1af4640c9b3ffb7174687308c",
+      "statement": "The UAS issues an ID-JAG with typ oauth-id-jag+jwt, iss set to the UAS, aud set to one resource authorization server, subject and client_id, a jti, and a 300-second default lifetime, signed by the Solid-OIDC key.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagIssuer.ts#L54-L101",
+          "version": "repo-lines-v1:sha256:d14a9c3387a96a3ba91dce2d3be3192db586887ae33d9e322fcdbe7df161597d:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyOWY0NGZhYWRlYTJjN2MyMjBkZTM1Njc2MDUzOWE0ZmRiMDMwZWI0MTBiZjgyZDA5NjQ0ZTE0Y2IzYWEzZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1ZDE1N2QyZjkzZjg5OGU5Y2VlZTRiN2VjNzVmMzAxZDY1MTY1ZDdmYjhlNDk3ODk1YjUyNjhmMWY1YjY1YjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a3aa88b1a2fe4b34af0cfadc756b4016",
+      "statement": "A storage authorization server accepts only ID-JAG subject tokens, pins the typ header before reading claims, requires aud to name that server, verifies the issuer signature and temporal claims, and reuses the OIDC trust model.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagSubjectTokenVerifier.ts#L60-L100",
+          "version": "repo-lines-v1:sha256:d1555c9589129df4f3d9e951ca0af2b2971cae73d338fcfe74f289d17a636c90:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMjliMDkwNjMzYzk1ZGMxYjg4MzJkMTcwNmI4ZDhiNGMxZDQ5NjVlMDRhOTY1YzNmNDI1Zjg3OWUzMTYwNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWQxYTI0NGRhMDI3NzI1Y2EyZDEyMzkzYjBhYWY3YTU2OGQ1YzY1NDFiYzhkOGI5NGI2ZDVjMDViZjljZGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3ZmNhODJiODgzZmRlNDYyN2I0MWFlM2RlNDI1NGJiNTBmNTFiNGUxNWNhYTQ2Y2JmOWIxZWUxMDU1NDM0NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1M2UwY2UxZDVmYjViNTM0ZmEwYTUyYzAwM2UyMjIyNDdhZDM3Yjg3MmIwYTM3ZTg5ZjhkMTVhMzI5Y2U3YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_01a028f619764225958d127d832c581f",
+      "statement": "The policy engine checks an access claim before a scope: a claim yields exactly its claim permissions, owner scope yields all modes, admin scope yields read-only, and a token with a claim never falls back to registry matching.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiPermissionsEngine.ts#L85-L115",
+          "version": "repo-lines-v1:sha256:39dff18d562580982de38e747e6be0ee84c559efd4604bde64ed5d288d510f43:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNzQ1ODhkOWE5ZGQ0YjhhNWU2NmM1ZTkyZDVmYWY2MjAxMWNhN2M5NDA4OWQwOTU0ZGRiOTI5MDUyODM2YjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhNjkwZWQ0NmZlYjM2NzY5NzgyNDQ1ZTVkNmRjYzI2YTA4ODNiNGE1MzNlYjQ1M2QwNTRjYzRjYzQ2NjJjYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5Y2JmZjAwMDRjODgwY2QxM2E1N2UzZTVkODBiNTlmY2VlMTg4YTAxYjBkNWJlYzk1N2I5NTM0NjE1MTQ3OGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJlMjBjM2EyMTNlNjczODYyODkyYTg2ZmUyNjdjOGUxMjk3MGI5ZjRkNTBlMzU3NGVkMzI5NmY0Yzc3ZThjZTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_48050bb7bf9241049f43434ebdde09ad",
+      "statement": "Claim validation is coverage rather than equality: a delegation or claim may narrow scope, actions, and selected instances, but every claim field must stay within the backing grant.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/access-claim.ts#L40-L120",
+          "version": "repo-lines-v1:sha256:c1059143225253242d3dd7b979b67898f6a856c5d8d35b8c7eae37c00bd7f592:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyNWExZmMzYTUzZDEwNjc1MTA3MTYzMzRiOGFlNThjY2NlYjU5MGM2NWMwZDU1YmM4YjFhNzRlNzg1ODZiOGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM2ZDQ5NmI0YWU4NmIzOWFmZGVhY2NkN2UxZjAxYmE4Zjg2MDczMzAxZTJkYjU4ZmM1MmUwZmYyZmJmMGIwZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2ODdlNTI5NDc1YmYyZjFlNDEyMTY0NTJjZWM1YWQ3NDYzNjNiOGFlN2UxNDU2MGQ5NDhmNmFhNTdjMWQ0YmMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/grant-policy.ts#L55-L97",
+          "version": "repo-lines-v1:sha256:f8a14487ac3cd45a42c644db30e0854d45b9a664ca2bfcc217a0f6001c4d759d:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2NWFhZWE2MDdhNDk0MWJjNzRhYTM1YTg0MWI5YTdiNmJlYTNhMzc5NTI4N2UyZGViZTk5ZmE4NzEwN2U3NTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1cd9237201964d8fb08ab6c1de792bd9",
+      "statement": "Storage authorization is token-carried: a claim is the authority, a claimless exchange gets scope owner (all modes) only for the storage owner with their own UAS, scope admin (read-only) only for a DataRegistry AdminGrant with the same UAS, and any other claimless exchange is invalid_grant.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L250-L330",
+          "version": "repo-lines-v1:sha256:2a25c0b8bdccaddb9a804c01ffebcb009bada1a09dbb84ee74b8437dc8000aca:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljNjFhZGY1YWMwOWNhYWYzNDdjMDE2NjRjNDQ4YmYwNWVmOTVkZDg2NmEyMDAzNjI4ZGY2YjczNDZiODdjNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MTkxOWZhNjMzODMyMjc4YWE3MGU0M2IwODE5NWRmNDUzMzVkMWI5ZDI3OTQ2YzFiYTdkZjgwYWE0ZjFlZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNkMDlhOGJiM2I0MTc3MmQwNzczYmM2Y2ZiMjkwNjYwMGIzMmZkYmVkMGZjYzAwYTFmZWY5MjNkYjUwYTZlNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YmNjYTM3MzhlMDYxNzUyMzVlZmMxYjA1YmNiMWJlOTgzZjA1MGRhNjkwNGFmOWIzYmFlMGRjNWY4MDVkZGEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/StorageExchangeAccessPolicy.ts#L60-L110",
+          "version": "repo-lines-v1:sha256:4117764298f52933d9a9604cc58cbb6591d0ff73dcabef00384600800a455ba8:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMjg1Mjg4NjE5MzczOGUwY2U1OGExN2ZjYzdiMzgxMzhiNGIyYTg2OGRmMjNiYTQ2Yzk5MjU2OTNkZGNiZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5ZmVjYTU3N2YyNThjMGI2MTkyMzJiZWJmYmI4MjVlZTUyNzk3NjFjODZhZWUzNGM2NGRhNmExY2YwMzExZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxODY4NmU1NDNiNGYzYTA5MDUxZTA1MWRkZTIyYmZhOWM3ZmZmODFiYmQxMzhmNmM5ZDBiYzdhNWVlMGU5MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3YjYxMDZjY2ZmYzIyY2IwNWZkYjIzOTk0MmZiMmIzY2M2Y2ViZTllYzlhYmJhYWM4YTI2ZGFmYTQ1ODY5NzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ec457c0b181a402ea5755c7d834de599",
+      "statement": "Public grants are credential-independent and handled by a separate read-only PublicPermissionReader: a public read works with no token or any valid token and is never used as a claim fallback.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/PublicPermissionReader.ts#L1-L39",
+          "version": "repo-lines-v1:sha256:7c47d4adec38c3b8bf0d4b21b8de130596f67b602492537147caafc63328ff89:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxYWVjMjEwNTNkN2QzODM2OGZlZDk0NzI0OTE1OWE1ZWEzMTM0OGM4NmM1YzBjOThlMGQ3NGM0MjZjZDU1NTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_edb6a02a926845f78e8e0a99469ce387",
+      "statement": "Read-only admin impersonation derives an organization claim from the org's DataRegistry AdminGrant, requires the admin's own UAS as client, narrows the claim to odrl:read, and presents the org rather than the admin to the peer; org-own storages are rejected because they would mint owner scope.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AdminImpersonationAuthority.ts#L60-L120",
+          "version": "repo-lines-v1:sha256:c98a0daf014c230d7702b8f8447e9c6583e9bd06597105223bb813e90503b77f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiMzM4ZTkwNjdhMzUyNmQxNzUyOTIxY2E4Nzc1NTU0Njc1ZDE2NjdlNWE1Nzk5Mzc2NWViZTQ3YWYyNGFmNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkMDk2MWIzNjFmZWJlN2M4OTY4Y2E2ZDcwNzc0YjNhYTVjNWNhNWVlOTA3MzQ3ZGQyODdjMzU4MDdjYjc1YjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3ZjRkMjhjODFjNmFmN2RjNDZjNmMxZWExNmMwYjQ5ZWJhNzM1MzkzZmY4YzNiNDA2ZGJjNWUwYzEzZTBjZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYmFiZjNmZGI1NTQ2ODkwZTMwZTc1ODIwMGJkMzE2YjJlOTdiNjcwMmYyMzBkMGRhMmMxZTk4ZTQ0OWM1ZDkifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L300-L330",
+          "version": "repo-lines-v1:sha256:8d4449f6706d3cce3c497704a2077cf1a84f0bd3e6c13b8f7a9fa7a4114a6c5f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjODdjMzJiMTI5ZGFkZGU2YmU1N2M3ODU1ODQzMWVlNDZmZDU5MzAzNDg0MTM0NWY0ODFjOGQwYWZlYjUzNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MTkxOWZhNjMzODMyMjc4YWE3MGU0M2IwODE5NWRmNDUzMzVkMWI5ZDI3OTQ2YzFiYTdkZjgwYWE0ZjFlZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2MjM0YjRjOTE3ZmFhM2E4NzdlODBkMDdjMmM1OTQ1MmM2MmUyZGY4NTYxNWY4NWU3ZjM3ODJiYmI0ZGQ4YWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YmNjYTM3MzhlMDYxNzUyMzVlZmMxYjA1YmNiMWJlOTgzZjA1MGRhNjkwNGFmOWIzYmFlMGRjNWY4MDVkZGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_49d405c41871431f8272b8a82fa3b608",
+      "statement": "Revocation for token-carried authorization is eventual: the exchange validates at exchange time and never re-reads owner grants per request, so revocation is bounded by the ID-JAG and access-token lifetimes (about 5.5 minutes at the 300-second lifetime).",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagIssuer.ts#L54-L60",
+          "version": "repo-lines-v1:sha256:e63b2ddf53b367ecccfa256ac8cc17ba5fffb1b8221212d26f37309d908b4d93:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTI5ZjQ0ZmFhZGVhMmM3YzIyMGRlMzU2NzYwNTM5YTRmZGIwMzBlYjQxMGJmODJkMDk2NDRlMTRjYjNhYTNlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzkzNTQ1NDkxNTI1NjYxMDZkYjE3ZDNjNGU4YWY2ZTU2ZDFiMDBjZWYyNzc4ZmE3OWQ3MDE3YTcwMmQ4ZDZhZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTVkMTU3ZDJmOTNmODk4ZTljZWVlNGI3ZWM3NWYzMDFkNjUxNjVkN2ZiOGU0OTc4OTViNTI2OGYxZjViNjViMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2ViN2E2ODMyY2MxNTI0NDc3MzRjMThhMzhmZDBhNTMyMmI0ZTI2NDIxNjIwNTA5NjQ3M2E1ZjM4NzY1ODA2YSJ9"
+        },
+        {
+          "resource": "repo://packages/components/src/StorageExchangeAccessPolicy.ts#L24-L32",
+          "version": "repo-lines-v1:sha256:d5128cb8f26ab7c60655a5ae858f6c6ef0d1bb677c847a02b0f43156ea1e4909:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjEyNTk4ZjQyZGVlZGQ0MDNlNGQ2OWNkZWU2YzI3YzM4YmEwZmFkYzE0NmQxNmY5ZjU1YjU2ZWIxZGY3MDAwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzkwNzI5MTBkNjFkZGQ1MmZiODU3M2Y2MGVmMTJkMjhkODc0MmQ0OWJmZjJjZWJlMDBlMmE1ZGQ4NzIwODU4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWZhMmNmNTY1MTNkOWZiYmVlYTFmNDhjNjk3ZDYzMmQxOWVjZDIyZTY0Yzk3MmJmNjIzYWU4MTliOWIwYTNiNSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
+  }
+}

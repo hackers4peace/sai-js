@@ -3,9 +3,6 @@ type: architecture
 title: Per-pod storage and isolation
 description: How dev/test storage is isolated per pod — one Fuseki dataset per registry/data pod, one Garage bucket and key per data pod, the typed PodEndpointStore records, the routed SPARQL/S3 and hybrid accessors, session/context endpoint allowlists, permission-engine endpoint resolution, reciprocal mirrors, and the account-bootstrap workflow.
 tags: [architecture, storage, fuseki, garage, sparql, s3, isolation]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-18T21:45:34.463Z
 sources:
   - id: openwiki-source-6de19f62f4df5fc517fa9ac5
     resource: repo://packages/components/src/HybridDataAccessor.ts
@@ -31,16 +28,20 @@ sources:
     resource: repo://packages/components/src/temporal/workflows/account.ts
   - id: openwiki-source-23ba2a7bbe5efb6e2d77954d
     resource: repo://packages/components/src/workers/main.ts
-generated: { by: "pi", at: "2026-10-18T21:45:34.463Z" }
+  - id: openwiki-source-5fb2d11486c54acb71821300
+    resource: repo://packages/utils/src/sparql-update.ts
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Per-pod storage and isolation
 
-The dev/test cluster no longer points every service at one shared quadstore.
-The **isolation unit is the pod**: each registry pod (a registry set) and each
-data pod (a data storage) gets its own Fuseki dataset, and each data pod gets
-its own Garage bucket and access key. The production NixOS/Podman config has not
-followed this migration and still runs a single Oxigraph — see
+The dev/test cluster and the NixOS/Podman production configuration both use
+per-pod storage: each registry pod (a registry set) and each data pod (a data
+storage) gets its own Fuseki dataset, and each data pod gets its own Garage
+bucket and access key. The C4 model still says Oxigraph; see
 [Deployment landscape](deployment-landscape.md).
 
 Two consequences shape the whole codebase:
@@ -220,7 +221,6 @@ The dev/test environment pre-declares the fixture pods in
 
 The landed per-pod design still leaves mirror backfill/drift scan, unregister
 mirror deletion, external admin endpoint discovery, S3 orphan/account-deletion
-cleanup, and the cross-pod/mirror-freshness tests — tracked in
-[`pod-isolation-followup.md`](../../docs/plans/pod-isolation-followup.md). The
-production Nix/podman/OCI cutover and hardening are in
-[`update-deployment.md`](../../docs/plans/update-deployment.md).
+cleanup, and the cross-pod/mirror-freshness tests (issues #108, #131, #133). The
+production Nix/podman/OCI cutover and hardening are issues #109 and #114; the
+named-graph patch guard is issue #132.

@@ -8,8 +8,6 @@ sources:
     resource: repo://packages/components/src/DurableWebhookEmitter.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
-  - id: openwiki-source-9e7488ce272b5af0500c0557
-    resource: repo://packages/components/src/services/GrantReplica.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
     resource: repo://packages/components/src/services/ShareResource.ts
   - id: openwiki-source-b3f53b3cc2943909883f8582
@@ -40,10 +38,10 @@ sources:
     resource: repo://packages/components/test/delegated-grants.test.ts
   - id: openwiki-source-81127af59080ceff3a2cde89
     resource: repo://packages/data-model/src/index.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Temporal workflows and activities
@@ -96,13 +94,12 @@ exception: the emitter and worker share the exported
 
 ## Workflow catalog
 
-- `grants.ts` — `storeGrant`, `revokeGrants` (owner-side delete + registration
-  projection patch), `processDelegatedGrantsUpdated` (the per-peer
-  start-or-signal consumer), `createGrantsForAuthorization`,
+- `grants.ts` — `processDelegatedGrantsUpdated` (the per-peer start-or-signal
+  consumer), `reconcilePeerMirrors`, `createGrantsForAuthorization`,
   `processAuthorizationGranted`, `processGranteeAuthorization`,
   `updateDelegatedGrants`, `createRole`, `processRoleMembershipChange`,
-  `processRoleDeletion`, `reconcileActivities`, `reconcilePeerMirrors`,
-  `reconcileGrantsForGrantee` (with the `createGrantsForAgent` delegate), and
+  `processRoleDeletion`, `reconcileActivities`, `reconcileGrantsForGrantee`
+  (with the `createGrantsForAgent` delegate), and
   `processAuthorizationRevoked`.
 - `admin.ts` — `createAdminGrants`, `revokeAdminGrants`, `syncAdminAcr`, and
   the `processAdminAuthorizationGranted/Revoked` orchestrators.
@@ -181,24 +178,13 @@ idempotent, and the activity's own completion is the barrier.
   result — `reusedSourceIds`, `reusedDelegatedIndexes`, `reusedExisting` —
   because activity results cross Temporal's data converter: ids and array
   positions survive, object identity does not. The workflow deletes the
-  non-reused grants **before** creating anything (own registry through the C1
-  closure, peer-owned through the `AccessRevocation` boundary plus the replica
-  drop), stores only the non-reused source grants, requests only the non-reused
-  delegated grants **batched per data owner** (one `requestDelegations` POST per
-  peer, because the issuance endpoint requires a single `dataOwner` and
-  validates the batch), and rewrites the registration as
+  non-reused grants **before** creating anything through the owner-session C1
+  closure, stores only the non-reused source grants, stores only the non-reused
+  delegated grants in the assigner's own registry, and rewrites the registration as
   `[...newGrantIds, ...reusedExisting]` — parents **and** children, since the
   PATCH replaces the full link set. See
   [Grant equivalence and reuse](../architecture/grant-reuse.md) and
   [Authorization revocation and grant projections](../architecture/authorization-revocation.md).
-- **Issuance echo and the issuer-side replica** — the issuance endpoint echoes
-  the finalised grants (parents and children). `requestDelegations` writes each
-  echoed body into the context's own SPARQL endpoint (`storeGrantReplica`, one
-  `GRAPH <grantIri>` per grant; parent documents keep the reverse
-  `inheritsFromGrant` edges) and returns the ids. The write is best effort: the
-  grants are already issued, so failing the activity would retry the POST and
-  mint duplicates; a missing body only disables reuse (fail closed) until the
-  next issuance or regeneration repopulates it.
 - **Role routing** — `findRoleUsage` delegates to `session.findRoleUsage`,
   which returns `usedAsGrantee` plus `affectedGrantees`; the membership/deletion
   workflows route role-as-grantee to the changed members and role-as-dataOwner
@@ -218,7 +204,7 @@ source-of-truth mutation: it deletes the carried DataAuthorizations (404
 tolerant), resolves the grantee kind and expands a role to its members, runs
 `reconcileGrantsForGrantee` for each affected grantee, and completes last. The
 chain closure for downstream delegated grants happens at each data owner inside
-that reconciliation (own registry) or at the peer boundary. The webhook handler
+that reconciliation in the same grant registry. The webhook handler
 starts it once per activity; the sweep re-drives stranded activities through the
 same workflow.
 

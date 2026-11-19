@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:82a13a7700d76c90c1334cbe3fa070254f7b9e4ff30281d1f07bc0df29273cfd",
+  "claims": [
+    {
+      "id": "claim_0e4484375c454f34b8e816272980e350",
+      "statement": "The creation-metadata terms registeredBy, registeredWith, registeredAt, and updatedAt survive only as vocabulary and test fixtures; no production writer or consumer remains after setTimestampsAndAgents was removed.",
+      "evidence": [
+        {
+          "resource": "repo://packages/utils/src/namespaces.ts#L85-L115",
+          "version": "repo-lines-v1:sha256:b9855f059130c906deacfcec3c17061bf9ff3dd76544dae399b904db837b564c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhMDA3MDczNDNlMjczY2ZiODcyZmJiMTdlNjA1ZDQ0MzA1YjkzMWZiOTllN2I5Y2NhMDVhOTNiMmM1OTY1NTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZDdkNDM3MjRlNTY4MmE0ZTkwZDcyMTc2ZThhMDI0ZGNlYTliNjUzMmIwOTU2OTIxMTczMzBiNGQwOTA3YTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlNjc5MDc3NmE5Y2IzZGQwZTVkMzcyNTU5Y2Y0YjVmNjY4YmY4ZjlkZTEyZjBmM2Y4MDM4OGU2NTA5ZTNhY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwNTA1ZjlmMDQ3NmNmN2ZmOGUxZGFlMTZlZTYzMzQxZjZmODNkOGVlYTE1NDBhOGZjOGQ3N2FlZDJlZjc1NjMifQ"
+        },
+        {
+          "resource": "repo://packages/utils/test/match.test.ts#L10-L25",
+          "version": "repo-lines-v1:sha256:a1f159aa0dc118ceaad4140a5e96d07b9451042983a0f91e323f21b106fe6560:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmMmUwMjZmNjNkNTAyODlkY2EzZDQ5YzQyY2FhNDhkODIxODBmZTY2MTVmOGYyNWUxMzhjOWE2ZDA3ZTNiMDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4Zjc5ZGUyNmQzNmY4MTE3YTMwMWFhNzM1MDhiOGNiMWJiZjE0NGE4ZDc5ODJhZTdiNjUwMDg4N2UzYzQyZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ2OWFlMDAyYTAyZmU3ODU5ZmIzM2E1YmM1NGFmNWQxZjE3YWE5OGNjOTJmZGU5MmM4NGJmNWI3M2NlMDk0NDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_08aaa6a665a34683bf0f38c6d3b62160",
+      "statement": "The RPC AccessNeedData carries an optional hasDataInstance, but the data-model AccessNeedData does not and the structure-based granting pipeline has no specific-instance branch or request-side caller.",
+      "evidence": [
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L560-L570",
+          "version": "repo-lines-v1:sha256:d6cf7e18a4a66aaa54c313b36cf9ddabd82d11bf5873f9a2c682b3cdffb6419f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiZTZlYzI3YjZhZWJjZjRhOWYxNDQwNmU3NDkzNzljYTU1YmQ0NDYxNWMxNjdjZGIyZTZmY2Y1ZDdmZDQzOGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwODZjYjQwOGJjYmE0Y2M0NzI4MjNlNjFlYjlhNGYxMzljYmIzMWRlOTgzMzI2YmJlNzVhY2FiZWM3NGRjNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmOWYxYTdhOTAwNDE0OTlkNDdiYmIwMzkyOWM0YTBiOGZmZDlkYjhiYzUxZTFkNmQ5ZGIzODc3OThhMjZlMzIifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/src/access-need.ts#L5-L20",
+          "version": "repo-lines-v1:sha256:fcd2b4040e7204a9366c46f1e82df8820d1d0eb80ca51a2afb27b4a233e68a94:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyZDEyNDI0YmU4YzUyZGMwODEwZGFmYjE4NWU0ZjVmODE3OTVlMmE2ZDhkNzQ3NzY3ZmQ0NmRjYzRmMjFmZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MjdkMTE1NWU1YTU1YThjMzgxYWVhYmI5MzdmOTcyNWQxNjZkOGRkNDhhMThhODNlNGU1NzNlM2QwYzNjZWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmMzMwMTJkMGNmMzVhMjk1ZDM4ZDgyZGI5NjVhNTE3NzBkOTkyMWVkZjI5NzhhZDc0MjhlOTFlOGEzMjZlZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkMmNhMWEwOTgwMjkxNjcyMzdlMmY4ZmE1OWIzOWY3MGFjNmQ2YmI4MzMyZjkyYzZhNmVhMWVkYWUwNTBjYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2418472c74614b4692babd839ca0336c",
+      "statement": "The invitation accept path uses the SPARQL reader, while the write-path duplicate check in addSocialAgentInvitation still uses the HTTP list-and-scan socialAgentInvitations/findSocialAgentInvitation twin.",
+      "evidence": [
+        {
+          "resource": "repo://packages/authorization-agent/src/agent-registry.ts#L189-L205",
+          "version": "repo-lines-v1:sha256:5d41d6f38f1f3ec563a89df3691b7e046d63d50d2157fb2fd76f7fc9bb8a6cea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjYzYxZTFiNWEzNDY0NDk5NzI3NGI5ZTEzM2M5MTA4NjhhNjQ0OWNmYzIyMjBhNzg3MWZjMDYxNWRjZGIxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3OTdkNjNmMmE4NmVhYmI5MzdmZmZmNDJkZmM3ZWZiNzM0YzIyZmNmZDU3ZDFjNmY3ODYyYTJjYjUzZGZlYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2NzNjODlkMjgwZTAwOWU5YzgxNmZlYWI0MGE5MDZjOGYxMGY3NTFmMTM2Y2RhNmJhZmVkMzNjMmNkNTg2ZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwNDU1MjgwMTY0ZGQzN2M3YjY5NzQ4ODU4NzY0MmY4ZTdkMDQ4MWEwY2YwOGJmMWYyYjU1MWIzY2JhODU0OTIifQ"
+        },
+        {
+          "resource": "repo://packages/authorization-agent/src/agent-registry.ts#L71-L115",
+          "version": "repo-lines-v1:sha256:70e49730f0f480cd5f223f174a9ddd691a6cc6bcf58dc57a22e13df7f2b62352:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzMGUzZmFkNzRlNTU2YTEyZjgwMTA2NjBiOTNhZmEyNWJhYjc0YmYwODQ1ZWFiYmE0ZjI3OTc2Y2Y2YzIwNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjOWJkMzEzZjk3YzY0M2IyMmE2MmQ5NDEwZTI2ZDNiMzkzN2QwMWFiOWVkNWFkZGI3ZDYxNjdiYjFhOGY1OGQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/InvitationHandler.ts#L38-L48",
+          "version": "repo-lines-v1:sha256:e7cde09a82caac2af096f573962ac1e60a55d3fdfe75a1f517210275a50a2d47:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiY2ZhY2VmNDhiMGM0NmIxMzBjYTEyYTFlMWNjMGUwMWEyZmUzNzdiM2E4NmYyNDc1OTcwYmM0MjQ2MmEyZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhZjU3ZjNlN2U2NmNjM2Y1NmEwY2MwMDUzZWU5MzE3MWY2MzM0ZTM0OThmOWVmMzYwYTM3MWNiNWNjMTRlZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjMjdiN2UyYzA2MzJiMmRmNjU1MTM4ZWQ5NTEwMWQwNmQ0ZjRjZTcyYzY2YzgxYjk3MjQyNzZjYjFlZWUyMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2MTA3NjM3NzI1NGFhNTdlYjViZjdkNmExNzgyZDQzZDRiNTQ3ZDNkNTljMDk4MTQ1MjRjYmQyNjFmOGMwZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_94d498d739c942a7b1948723742e0ec8",
+      "statement": "n3 remains a direct dependency of six workspace packages and is still used for RDF/JS stores and factories plus the reciprocal-mirror N-Quads writer and the test/seed TriG parser.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/package.json#L60-L70",
+          "version": "repo-lines-v1:sha256:77e1f85188916e244486ab6a0c8c8a25a1512f7fe723c00ada55e0289c17f1da:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhMDI4MDk3MWM3MzJlOTRlN2Y4OWY4MjliMDFjNWJiZjAxODBiMjY5MjI4YjgyNDI0MTFkYWY1NjQxYmY0OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyMzM3MTJlYmFlOTM0M2VmZDZlMGMwMTc0ZGJhZDE3MWZmNWU3YmU4MDhmMTU5MDg0NjUzZjAyNjk3OGU3NDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYjBhMWU1NDYxZjAxNTZmZGI1YWE2MjRiOWM4YjQ1NmY5MTY2ZGNiMDFmZjJkMTVmZGFjZWZiMThkNTg5ODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiNTRmZTEyMWVlN2ZkY2QwZGUyMzMyY2VlZjk4NDRlNDM1NGZhMmU5NmQyOWI3N2I1OWFiYjE0YmIxNzE5Y2YifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/services/ReciprocalMirror.ts#L10-L16",
+          "version": "repo-lines-v1:sha256:86fdefc534bafa1b2362551485ddaf82c1f6a4fa2e6dbf3215b58a530cb044cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzMzODcwNTM5OTZkOWNjOTNiZWMxMDA5M2MzMDIzODI3YzQyYjJhNmMwZmY3MzkwYWYzMTY1ZDYyYWI0MDA3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWNmZDYwYWFjYjdjNWFmMTc4ZGI5OTEzODI1YzRjMGQ3YjhmZGRkNzZiZjMzNmRhMDE4OTBhMjM3NzcxZDgxYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWUwNDQ1OWFlM2RlMGYxNjYyNDEzYThkOTY4MTZkMjExMmQ2ZGFlMzRjNGNiOTVkNWQxZDY1YTQ0MWI1ZjJjYSJ9"
+        },
+        {
+          "resource": "repo://packages/test-utils/src/fuseki.ts#L1-L2",
+          "version": "repo-lines-v1:sha256:e72b2efeca15a98b87be932834b8b280a5cb8c7dd17e8577ec39e7309d403a6e:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWFiOWI1ZDFlYjA0ZTU1ODE4Y2UzMjkzNGI2MWU4ZjdhM2NlOWUyMDg4YjBmYWZjZmQ5N2JiY2FjODliNmFkZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjM0NDk2MTVkMzY5YTA4ZDg2MGUzNDY3MTMxNThhYzZlYWYxZTU4MGI2NzBjYjlhODk3MDM2YjdjNDJkODE3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTJmYmIzODFmMWFmMGFjNGFjZGUxMmM2ZmNmZWJhYTA2ZTE4ODYzYjEzZTU5MTcxY2VlM2E1YjAxMGRjZjMwZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2f0f07513ec74653ab17914992e74195",
+      "statement": "All Temporal workflows and activities still live under packages/components/src/temporal and are imported by component handlers, and no packages/temporal-workflows package exists; the extraction is constrained by a components-to-workflows import cycle.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/ActivityWebhookHandler.ts#L40-L60",
+          "version": "repo-lines-v1:sha256:bbc0c818373c4df5a33cad61d9959d2fb54c6d025ef5a15b5ecf760e95d26bc5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1NDhlMzZjODZjZWJhYWQzMDA3MDhjNWM5NGQzYTJiMjQ1MzRhNTMyYzA5NmQ3MWU5YzVmODUxNzIzODE0MWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4NTU0YjNjYzg1Zjg5MzMzNGZmYzdlNDNjN2UxYTA0ZWI5NmRiZDNhODEyYzFlYTJlMTA2MjQ2MjE3MTY5ZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc3ODk4MWM2NTViMTNkMWEwYmI5NTU2MGRkZDI3NDMwNTdiMGM3Y2NjOWU2YTJiMjM1N2E0ODY2YWEyYTFkNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4YWE2NjA4YzUwMTAyZDcxNTUzM2U1ZDhkMzQwMmQyNzViMjNiMzZkMzJlNDRlNzIxMTk5ZmM3ZjU5NmQ1NDIifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/workflows/grants.ts#L1-L80",
+          "version": "repo-lines-v1:sha256:d4064a18ec94eb74c3d1d77d564fdedab3827fdd957b36fffc84bcc37ad8a280:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxYjdmOTA3OGU5ZTRlMWE0OWRiZDk4MmZiZmIxYWU5ZmVlMzU5NDlhNjhhNTdiN2FiNWE4NGE5ZDcyZTA1MmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3YTZlODU0MjIyYzkxNjM1ZGY4NDRlMmRjZmJkZjFmNTY5MGFhZWRmZTM0MjE2ODA5NzA0NjExODBhM2U5NWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzNmI1MDQ2NTM5MTAzOWUzNDJhOTk5MGU2YzZkMGZiOTNkMWUyN2ZlNmI5OGI1NzkxMmI2Y2FhZGRmYWY3M2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_05ba42e391ca4e4281855953ad41e755",
+      "statement": "Reciprocal-mirror drift scanning and live-registration backfill are not implemented, and deleteReciprocalMirror exists as an activity without a workflow caller.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/services/ReciprocalMirror.ts#L40-L55",
+          "version": "repo-lines-v1:sha256:1e1ee91d9dd3da8ea1fbf48068603b23897fc776dbb4ba360452d2b008964d06:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4ODhhNWQxNTgxYzEwZjZkZTg1Yzk1YWZkZjU0NjZhYjVkY2RhMzIxYmZiZDdhOGI3ZTA5NmYxMDcyZGZhMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiMTU0ZmRiNDFkMmZmNmJhNzg4NTFiODhmMTRiZjg4YzRhMTE3MzY4NGVjMjhlMjg2NGUyYzQ1YTg5OWNhYjEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/temporal/activities/reciprocal.ts#L231-L245",
+          "version": "repo-lines-v1:sha256:e2b3b22dccc0f0f5093660ff3d503a4191aedfdffb1aa63e2cb8c8aeff3cbd0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiOGFjMzZhN2ZmY2NhNmQxYTY3ZTI0ZTJhMDdlMmY5MDdlZTRkMWI0MjJiZjg2OTU0ZmViNmZlODNjNTdlMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0ZDc0NDk0MGIyY2I4NzE3M2Y3MWYxYzA3OTQxOWQ3ZWIzNjBlMmY2YjdjNGNiN2Y1NDhiYmVmYzVhMDRiOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyNmZlMDFjODBkYmNmMjRkZGM4NTJkMmVlN2MwNGQzZjVhZjY4Yjk0ZWU1ZTQ3ZDk5OTM4YzY3MTM3OWQzMDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkMDY5ZDM5ODRlMjUwYjIyNDRhNmNkZjk5MTdhMTc5N2JlNjcwYjM5NWMwZDYxNjM2MzMwNDQxY2M5ZDI2OGIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
+  }
+}

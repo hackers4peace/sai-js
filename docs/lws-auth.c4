@@ -652,7 +652,7 @@ views {
   }
 
   /*
-   * 3. C2 impersonation (`docs/plans/id-jag.md`): the app names a storage and
+   * 3. Impersonation (`openwiki/architecture/id-jag-access-claims.md`): the app names a storage and
    *    Bob's UAS derives the claim from the delegated grant it holds; the next
    *    UAS re-issues it under the VISIBLE actor (YoYo) — Bob, the client's
    *    identity in the claim, the actor chain and the original claim ids all

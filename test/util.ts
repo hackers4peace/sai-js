@@ -415,7 +415,7 @@ export async function waitForQuiescence(
  * workflow), while the parent workflow's `activityCompleted` write — its
  * tail — is still pending; proceeding right then races the test's next
  * activity write against that tail in the same activity container (CSS
- * SPARQL-backend concurrent-write corruption, docs/plans).
+ * SPARQL-backend concurrent-write corruption, openwiki/testing/integration-tests.md).
  */
 export async function awaitGrantCompletion(
   authFetch: typeof fetch,

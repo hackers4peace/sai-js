@@ -33,7 +33,7 @@ export interface IdJagAccessClaim {
  * existing `/.oidc/jwks` publishes the key the storages verify against — no new
  * trust setup on the storage side.
  *
- * See `docs/plans/lws-auth.md` C1.
+ * See `openwiki/architecture/id-jag-access-claims.md`.
  */
 export class IdJagIssuer {
   /** The identifier of this authorization server, used as `iss`. */

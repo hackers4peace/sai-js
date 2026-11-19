@@ -6,7 +6,7 @@
   "import": [],
   "@graph": [
     {
-      "comment": "Mints the ID-JAGs (Identity Assertion JWT Authorization Grants) the storages' authorization servers trade for access tokens. Signed with the Solid-OIDC key, so the existing `/.oidc/jwks` publishes the verification key. See docs/plans/lws-auth.md C1.",
+      "comment": "Mints the ID-JAGs (Identity Assertion JWT Authorization Grants) the storages' authorization servers trade for access tokens. Signed with the Solid-OIDC key, so the existing `/.oidc/jwks` publishes the verification key. See openwiki/architecture/id-jag-access-claims.md.",
       "@id": "urn:sai:default:IdJagIssuer",
       "@type": "IdJagIssuer",
       "issuer": {

@@ -14,7 +14,7 @@ import type { BrowserCredential, BrowserSession, DecodedJwt } from '@elfpavlik/l
  * signs an `at+jwt` in-process with `CSS_ENCODED_PRIVATE_JWK` and names
  * `agentId(webId)` as the client. That is the *UAS-side agent* credential: no
  * app, no sign-in, and `client_id` never names a client. This helper runs what
- * the UI runs (docs/plans/lws-auth.md C5), using the product code in
+ * the UI runs (openwiki/architecture/lws-auth.md), using the product code in
  * `packages/lws-auth` for everything that is not a browser:
  *
  *   1. `createBrowserSession` — OIDC discovery, the authorization code flow
@@ -28,7 +28,7 @@ import type { BrowserCredential, BrowserSession, DecodedJwt } from '@elfpavlik/l
  * The session's **access token** is the LWS credential: the OP issues it with
  * `aud` = its own identifier (`iss`) and `cnf.jkt` of the session key, so the
  * app presents it as a `…:access_token` subject token at the UAS and proves
- * possession of the key. See `docs/plans/lws-auth.md` C5/D15.
+ * possession of the key. See `openwiki/architecture/lws-auth.md`.
  */
 
 const ISSUER = process.env.CSS_BASE_URL ?? 'https://auth/'

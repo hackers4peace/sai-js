@@ -11,7 +11,7 @@ import { decodeJwt, decodeProtectedHeader } from 'jose'
 import { describe, expect, test } from 'vitest'
 
 /*
- * The LWS authorization chain (docs/plans/lws-auth.md):
+ * The LWS authorization chain (openwiki/architecture/lws-auth.md):
  *
  *  C1 — the UAS (`auth`) exchanges an ID token, sender-constrained to a DPoP
  *       key, for an ID-JAG whose `aud` is one specific storage's authorization

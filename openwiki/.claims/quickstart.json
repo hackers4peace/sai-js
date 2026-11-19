@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:19b7d3348424fa8ddd76a14bf75f4bd458f3cf6decd664c7d19d087cb9ec603c",
+  "pageVersion": "sha256:fef23b2dc8ae5d601cb8d1d2db6a20e0bd17c2cc66b51324c119896fd052d730",
   "claims": [
     {
       "id": "claim_128945ceebdb43de9c58258b39f648ac",
       "statement": "sai-js is a TypeScript monorepo implementing the Solid Application Interoperability specification, exposing application and authorization-agent packages as its intended dependents.",
       "evidence": [
         {
-          "resource": "repo://README.md#L7-L14",
-          "version": "repo-lines-v1:sha256:482b474879f51cbaf7610f150ac8c34a26d18e75594faed9f265b4312bd03a45:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2E3ZTQ0NDEyM2Q0MGM3MGM2ZWIyOTQyYzkxZDUyZjJhNmE4MGM2Y2NkYjg5M2M3N2VkMTYyNzVhMmRkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQzZTlkYzhhOThlYzQ4YWZlZjRiNjkxY2YyZjA0OGUyY2VkODkwMGY3NWEwMTcxNzg3YWMzNThmMzE5NTAyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZkOWIwYjUxMDA5NjU2MTdlNjc1OTQ5ZTZhNWI5MzIzZDc1YWIwMTYwMjdiZTY4NmU2ZjJiMzExMDI2ZWY4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjdmMzIwMTgyZWE5YjEwYTNhNTE0OTlkOWI1YzY3MzkxYTE1Y2ZiNWFmNDIxOTBmMWFjYjU2MjI2NTVhYWIwOSJ9"
+          "resource": "repo://README.md#L7-L25",
+          "version": "repo-lines-v1:sha256:7bbc8a0ea19e1bf7e9b88a39cdf0688ba48d1525bd18631328ab39fe6180ee57:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhNzNhN2U0NDQxMjNkNDBjNzBjNmViMjk0MmM5MWQ1MmYyYTZhODBjNmNjZGI4OTNjNzdlZDE2Mjc1YTJkZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkODI2N2M4Yzg0YmYzYzE1NDk5YTYyZTY4N2E0YThiNzdiMjc4OWZhNDY2Yzc0ZWE5NTc1YjhmMmJiM2NhYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmZDliMGI1MTAwOTY1NjE3ZTY3NTk0OWU2YTViOTMyM2Q3NWFiMDE2MDI3YmU2ODZlNmYyYjMxMTAyNmVmODAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwNjdhMDU5MGIxOWEwZDEwZWE5Y2M1YjNlNGY5NmU5M2JlMTg5MzEyOGU5MTkyYTZhN2M4MWEwMWRlOWI1MmQifQ"
         }
       ]
     },
@@ -17,7 +17,7 @@
       "statement": "The repository's npm workspaces group the packages under packages/*, the test integration suite under test, and the docs website under docs/website.",
       "evidence": [
         {
-          "resource": "repo://package.json#L36-L40",
+          "resource": "repo://package.json#L37-L41",
           "version": "repo-lines-v1:sha256:5934d45330c12219bb1fdbbe8b5f3ca1b5d5f7086d01f9539743a5eef276a6b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRhZWViY2I3ZGEwOWIzYTdjOTU4YzE0OWMxNmJiYmY5MTYxMmVjNjFkNDQyN2IzZWUxZTYzMjJhOGYyYmEwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0ZDhjMDczNDI5ODkzMTAxNTc2ZDg4ZDk5MTI3ZTg5ZDY4OTFkM2IxN2U4OWRmMDJlYzlhZTcwNzA1ZDhiZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2UwMzc0MDM1NzYxMWRkNzVmZGEzNWIwMjdkOGZjMmQ5MDJkYTZkMDQ2YWVlYTJiZDg0ODY1NjI4MTkyNzY4YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU2NGRjMmU1OGNhYjdkYjgyMjk5YmNlOTIyYjM3ZDQ1MDljODhjYmRmMGIwMjVkM2ZlMjFiMjhjMjAwYmFiNSJ9"
         }
       ]
@@ -27,12 +27,12 @@
       "statement": "Dev/test storage is per pod (one Fuseki dataset per registry/data pod and one Garage bucket per data pod, resolved through the endpoint store) and new accounts are provisioned asynchronously by the bootstrapAccount Temporal workflow started by startBootstrapAccount.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L374-L387",
-          "version": "repo-lines-v1:sha256:f3eba9a52354fb1eed866c547f648b31a21bf4f0670e325a2cd2366ec5a14bc0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiOWI5ZTQ4NWFkMTExNTFjNjQxZWY5OTg5ZDVmMDIwYTI3Y2UzNTQwMTc1ZjE0OTQxYzY0ZTFjYTM1ZDE2NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMTZlZDIzOWEzNjUxYjUwNzljMGU0ZTdmMDc4NDRlYTMyOWM4NzYyOGJmOWZjYzQ2MzY3NzMzZjVlMWU5M2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkNzQwNmM4MWQwM2Q3YjcyZWUxYzMxYmIwYTFlOTQyYTllOTI2YmFjNTE5YWYwODBhOTI5ZTNmNTBlMDI1MWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5MDU5MGU1NDhkZDA4Mzg5Y2E3ZGU3NTgwODc0ZjNjYmQ1NzVkNjdjNWJlNzRiZjM4YjMyMjkyMjhjNzkyM2IifQ"
+          "resource": "repo://docker-compose.yaml",
+          "version": "repo-file-v1:sha256:112733bfaf4fedd45b2384ecbe1931cf81a5b7d2281d43645a2a5e107096a479"
         },
         {
           "resource": "repo://packages/components/src/services/Account.ts#L49-L75",
-          "version": "repo-lines-v1:sha256:69880899e1040e8e9289b8420b178c78877ea9165b379130769b94c9721ce2ab:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "version": "repo-lines-v1:sha256:7cadb876f9f9426cb106f75db8bd0acdf020a484cb21201f44e5a7cdf5c76460:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGQxZDA3ZjI1NDM4ZWQzYjU1MmQxODIwMGE4MzY3ZWE1YjJkMWQ4YzVmZWU3MzZlYTU0NmZjZmM5ODJiZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNWQwODE4Yjk1NWY2YmY2NDZmY2VmMTNiMGE4ZTkyMmM1MWI3OTg5YmY4ZjJhNDkzYzFiZGQzMDk0YjYxYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiODM4ODZkMDg5NzFmOGI1ZWQwYmE3ZDkzNjNmODQ0M2UyOGU4YzgyMWE4ZTljZmQ0M2JhMWIxNjZiNWQzMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
         }
       ]
     },
@@ -46,17 +46,31 @@
         },
         {
           "resource": "repo://packages/components/src/ApiHandler.ts#L119-L130",
-          "version": "repo-lines-v1:sha256:cdb64d083e5b3738d60bb8d6f818cc456eca73ebf624831a103b6e7d8124e0ae:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxYWFmZWQ0ZWFjN2YxNjlmZjBlM2I1NGFkNjBjMmM0OTVhZDk5Yjk4MzZlOGUwZmZkZmRmOWI5MmExYmNmZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkNTFmMTFhNGYwZjUxODJlZTc3YjBmNjNjNGM0ZTVkNTM1M2VkMWFmMzU3ZDM4NGRmNTM2ODgyYWFiYjAwZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmYTkzYjc0NmFmZmY0OGJmYzk5NGUzN2QxYzhkOTg4M2RhYjhmMDY3NWZhNjMzNzAzNmIxNzU1YjI3ZjAzMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlODI0YzYwMDA0ZTVmMTNjMTlhYzBiZjM5Mzk2MmNlNWU4OWU5M2QxMjNhZmY5MzA3Yzg5ZDQ4ODU2MTM5NmQifQ"
+          "version": "repo-lines-v1:sha256:91edfb079d2501afc54ca086e52390eb8b612c4edfe7d8662a0eb72321236c2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4ZTU4MDk3MjRmOGJlZmJkYjRlNzk4YjAyNGYxMjI4ZDc4Mjc0YTljNDgyODUwYmNjOWZhNGViNmRlZTliMjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkNGZjMzFkMzc1MWQ3NTM0Mzc0NTdhODFmN2NlNTYyZjI4NmQwMWIwZGMyMGFlNmNmNThmZWQ2YTkwZGJjYWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1MGVjY2I4NDE4OWE4MDBiZWU3NDRiNTYzMDY2MjIyNmE5YjgyMTBkMmY1MTBiOGYyYWFhYjQ2NGU5Y2I4MmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5ODQ4MzMwYWEzZjYzYzdkZTkwMTVlNDAxMWYyZTJlZTRmMGZiYjU0NGYyNWIyZjI5YzI5OTY2NWI3MzU4NzUifQ"
         },
         {
-          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L1073-L1090",
-          "version": "repo-lines-v1:sha256:17c40ffaa5b257f769ea1e651e54386810e019f31d7b6410b855c856697077e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyMTMxZTM4ZjZkNjI4YTQ5NDU3NDQ3MjMxNWM4NGM3ZDFhYjQ1NjUxM2ZlNGYwNDM0ZmI0NDliYTRjMTY5MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MGM1ZDNkYzNhNzczMDc5M2M4OTI3OTQ4YjU1OTY2NDIwN2Y3OWJhODc3NzNjMjE1MDA0NDMxOTYyZmQ0ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
+          "resource": "repo://packages/components/src/temporal/activities/grants.ts#L944-L960",
+          "version": "repo-lines-v1:sha256:269d5331779b2fbe217e561721f22cfc78dd41945795acf88c2b37199770222b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMGFhMTdjODgzODlhMmQxM2U1MmJlNDljY2E1YjA3OTU1YWIxNDNkMGM1Y2FiZjkyYmJkYzljNDE2Njc5MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmOWU5ZWViMGYyNDdhNGNkYzdlODE5NDUxMGNlOGM4Nzg3OGI3OGZjYzQ1YzMwMDBjZTlhNTIyMGY2MjVjZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_69a275a873cf45f8b260db47405cd00f",
+      "statement": "Data-storage authorization is token-carried: the storage validates an ODRL access claim or an exchange-minted owner/admin scope, and public grants are a separate request-time reader, not a per-request grant registry lookup.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/IdJagTokenHandler.ts#L250-L330",
+          "version": "repo-lines-v1:sha256:2a25c0b8bdccaddb9a804c01ffebcb009bada1a09dbb84ee74b8437dc8000aca:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljNjFhZGY1YWMwOWNhYWYzNDdjMDE2NjRjNDQ4YmYwNWVmOTVkZDg2NmEyMDAzNjI4ZGY2YjczNDZiODdjNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MTkxOWZhNjMzODMyMjc4YWE3MGU0M2IwODE5NWRmNDUzMzVkMWI5ZDI3OTQ2YzFiYTdkZjgwYWE0ZjFlZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNkMDlhOGJiM2I0MTc3MmQwNzczYmM2Y2ZiMjkwNjYwMGIzMmZkYmVkMGZjYzAwYTFmZWY5MjNkYjUwYTZlNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YmNjYTM3MzhlMDYxNzUyMzVlZmMxYjA1YmNiMWJlOTgzZjA1MGRhNjkwNGFmOWIzYmFlMGRjNWY4MDVkZGEifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/StorageExchangeAccessPolicy.ts#L24-L32",
+          "version": "repo-lines-v1:sha256:d5128cb8f26ab7c60655a5ae858f6c6ef0d1bb677c847a02b0f43156ea1e4909:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjEyNTk4ZjQyZGVlZGQ0MDNlNGQ2OWNkZWU2YzI3YzM4YmEwZmFkYzE0NmQxNmY5ZjU1YjU2ZWIxZGY3MDAwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzkwNzI5MTBkNjFkZGQ1MmZiODU3M2Y2MGVmMTJkMjhkODc0MmQ0OWJmZjJjZWJlMDBlMmE1ZGQ4NzIwODU4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWZhMmNmNTY1MTNkOWZiYmVlYTFmNDhjNjk3ZDYzMmQxOWVjZDIyZTY0Yzk3MmJmNjIzYWU4MTliOWIwYTNiNSJ9"
         }
       ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-22T04:35:20.186Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

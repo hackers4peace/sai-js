@@ -12,7 +12,7 @@ import { decodeJwt } from 'jose'
 import { describe, expect, test } from 'vitest'
 
 /*
- * C2 impersonation (docs/plans/id-jag.md):
+ * Impersonation (openwiki/architecture/id-jag-access-claims.md):
  *
  *   App --at+jwt-->
  *   Bob's UAS --ID-JAG(aud=YoYo's UAS, claim YoYo -> Bob)-->

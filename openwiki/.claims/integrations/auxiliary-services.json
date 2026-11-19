@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a12b05c4de662798c528d25f810833954dba104c316d91ac5a8af62cf07e1b25",
+  "pageVersion": "sha256:b1f60278457b641a2659a5c2da10216c66f18b7413e6193c52e2d1967a8b83a1",
   "claims": [
     {
       "id": "claim_0b97b522438c41f6b1d20f9ebba9164d",
@@ -27,26 +27,26 @@
       "statement": "toCidDocument derives a CID with an n3 Reasoner that maps solid:oidcIssuer to an lws:OpenIdProvider did:service and interop:hasAuthorizationAgent to an interop:AuthorizationAgent did:service.",
       "evidence": [
         {
-          "resource": "repo://services/id/cid.ts#L14-L37",
-          "version": "repo-lines-v1:sha256:8a51164b6a1714d9aecbd0f707e02c7f7adcb9f3eb539c1aa0e6b65c2032ac46:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGVjYTRmNGQ0OThiZGFhNTg2ZDE1OGZjZjZmMzFkZDM1MDczZTAwNDU4ZGQ5YWQ1M2RmNTM3ZDA1MDE0MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNTA1ODQxOWVhODlhM2EyMzY5OGEwNWQ2MzRjMjEzM2I1ZGQ0Yjc3YWVhZTQwOWE1Njg1ZDk5NGUzZWRiZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4Zjk5MWNkNTA4ZjlmNzdmNjEzMzI3Y2NhMWE3NjAxNjQ0ZTllYjVjNmYyMzViMzlhOTdiODVhZWY1YjYzYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzYzViNzBkMzAwNzY2NjczZjFhNTJkZDY1M2E4YzkwNGI0NzA2NThkZmU0ZjhkMjg5Y2I2NzA3Y2I5YTk0MjYifQ"
+          "resource": "repo://services/id/cid.ts#L10-L45",
+          "version": "repo-lines-v1:sha256:fe26613c1d2cb6ec14354562e29f0c08f17468f9b7610d2cdac857db309ae3c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMzIyZTllMDA2YmYwMGQzMzYyZDM0MGE0NzY4ZmE5ZTZmYzkzN2NlMmFlNzhiZDc3OWY0YWUxMmM0MThlZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBkYmUzNzBhNTI3MmJkOGVkOWZkMjlmZmVmOTEwOGZhOTYyMDYzMWQyODY3YmJkMmY1NWEyMDI4ZDhmYjQ1MmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNjIzZjM4Yjc2OTYxYzliMDQzOTYxYmE5NGM3ZDAzYTdiMTM4M2EwYWQwZTdmNTAxZTRjN2RjODdkODEwYzMifQ"
         }
       ]
     },
     {
       "id": "claim_3a0d9aabeb6740098b8c16c40dfebf0c",
-      "statement": "The services/css instance configs are thin wrappers that import the css:config/http/server-factory/http.json base plus a sai:config/*.json graph from the components package for auth, registry, and data.",
+      "statement": "The deployable CSS instance wrappers live in environments/nixos/css (and environments/css for dev); they import the css:config/http/server-factory/http.json base plus a sai:config/*.json graph from the components package for auth, registry, and data.",
       "evidence": [
         {
-          "resource": "repo://services/css/auth.json#L6-L7",
-          "version": "repo-lines-v1:sha256:b705c855f7732e4ba0dcd6a3c2e8212f905960ef3745747665367ec17aa01816:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0ZDhjMDczNDI5ODkzMTAxNTc2ZDg4ZDk5MTI3ZTg5ZDY4OTFkM2IxN2U4OWRmMDJlYzlhZTcwNzA1ZDhiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTc1NGUxMTBmZjc4NTUyOWRiMDE0MDM4MzUzMDc3NmI5Zjk5MDEwNDQ5ZDUwYmIzNzMzZTUzODAxNmVjODE1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTkxOTNiMDcwMGQ2ODZjZGIxMGFkNGQwZGFhMDMxYmZkN2M1NDYyZmUwMGEwMjBlYWFmYmZmYjgwZWYzOTJkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGIxMzg3NzM5YjhlZWIzZWEwZTBkYjRkZGFiY2IwODQ5Y2ZiMjQ2Zjg1ZWE3Mjk3MGZlZWM4NTcwN2VjODI2MyJ9"
+          "resource": "repo://environments/nixos/css/auth.json#L1-L10",
+          "version": "repo-lines-v1:sha256:13a5d4479d0bf85867ad9999baa0b0e31bde66e48f4c0ead4b90dd8563b15eec:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1OWQ5ZWE3MTkzYjcxZDZiZjA4MjFlYTk2MjFiZmQ4NDMzNDMyNDUxNThjZWJiN2UxZTM4NDY1ZDYwNjk4YjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkNzFjODA4MzJjOTkwMjg2NmEzMWQ2Yzc5Yjg1OTBhYjBkZGFkMDJjMGVjMzIzYWFmMjk1N2FhNDcwZTczNTgifQ"
         },
         {
-          "resource": "repo://services/css/data.json#L6-L9",
-          "version": "repo-lines-v1:sha256:a55843859e4e79f3400dcd40a0db8d953dce37bfd30c26ce817776a112ba3bb4:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0ZDhjMDczNDI5ODkzMTAxNTc2ZDg4ZDk5MTI3ZTg5ZDY4OTFkM2IxN2U4OWRmMDJlYzlhZTcwNzA1ZDhiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWNlN2JiNTQ0YzIwMTkzNjViN2NhNzNmZDFmNTAwMmNhNzFhNzEzZWU4NTkzNTJhMjM0Yjc5M2M5MWVmY2RlMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTkxOTNiMDcwMGQ2ODZjZGIxMGFkNGQwZGFhMDMxYmZkN2M1NDYyZmUwMGEwMjBlYWFmYmZmYjgwZWYzOTJkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTg4YWJkNzM4MDYzMzkwYjYwNmUxMWI1ZjUxYzU4YjllYjQ4MWYwYWQyNDQ5ODg3MzE3MmQ5NjY0MmQ1MGJjOSJ9"
+          "resource": "repo://environments/nixos/css/data.json#L1-L12",
+          "version": "repo-lines-v1:sha256:fa857789bfc59ad812925108d0385e672789a3f0ea31e43a22bd0d3905d48d9a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2MTdlODAwZDcwNTAzZDYzMTg4NzYzYmZiYmM2OTUyMDBlN2E1OGFmOTY0ZGIwOWQzMTgwZjEyMWFmMjg4ZDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         },
         {
-          "resource": "repo://services/css/registry.json#L6-L7",
-          "version": "repo-lines-v1:sha256:d666a050ed6b16cba79c002a12dc2db5a913c436aaa821aa948c4c2b63718a0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0ZDhjMDczNDI5ODkzMTAxNTc2ZDg4ZDk5MTI3ZTg5ZDY4OTFkM2IxN2U4OWRmMDJlYzlhZTcwNzA1ZDhiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFjOWRmMTMzMWIyM2M4YWFlMmFkNGYwYTFiMjYxOWI1NTY2ZGNjYmNlZTVhNzhjZTYzN2E3OGQxNmRlNGFiOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTkxOTNiMDcwMGQ2ODZjZGIxMGFkNGQwZGFhMDMxYmZkN2M1NDYyZmUwMGEwMjBlYWFmYmZmYjgwZWYzOTJkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQ2MTg3NmQzYzcyOGQyYjZmOTg3MzRlMzY3NmM4MjE5MTZkOGM0ZmExYzZkNDM2NGExMGJkYmRkMWMzMGIzYiJ9"
+          "resource": "repo://environments/nixos/css/registry.json#L1-L9",
+          "version": "repo-lines-v1:sha256:2acddedb045e687e79098e4c5023e3caefc972116d30cef36466b2f64da2c9c9:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     },
@@ -69,7 +69,7 @@
       "statement": "The id service reads WebID profiles from the Fuseki `id` dataset via CSS_ID_SPARQL_ENDPOINT (dev compose sets it to http://fuseki:3030/id/sparql), separate from the per-pod registry/data datasets.",
       "evidence": [
         {
-          "resource": "repo://docker-compose.yaml#L431-L431",
+          "resource": "repo://docker-compose.yaml#L432-L432",
           "version": "repo-lines-v1:sha256:a7472e8ac3a7e4236d09320d459eee5f66ce4bb8ba5017789b19c08b81b2dafc:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTc0NzJlOGFjM2E3ZTQyMzZkMDkzMjBkNDU5ZWVlNWY2NmNlNGJiOGJhNTAxNzc4OWIxOWMwOGI4MWIyZGFmYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTc0NzJlOGFjM2E3ZTQyMzZkMDkzMjBkNDU5ZWVlNWY2NmNlNGJiOGJhNTAxNzc4OWIxOWMwOGI4MWIyZGFmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzZkMmFhNDFmODUxMjM0MTYyMDRlMDYzOGY4OGE5M2FkN2NiNGE4NWQ1ZjNkMTY1NzRhZWM2YTllMzFmZDRiYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM2MWEwNDIzYjM1MTNhMDM1M2ZlODUxOTAwOTRkZGUyNWI2ZjM3MjA5NzQwNDdlY2VmNDgyNjY1NWJmZmQ5YSJ9"
         },
         {
@@ -83,16 +83,16 @@
       "statement": "Auth imports the disabled CSS notification config, while registry and data import css:config/http/notifications/all.json, sai:config/http/notifications/ndjson.json, and sai:config/overrides/emitter.json.",
       "evidence": [
         {
-          "resource": "repo://packages/components/config/auth.json#L20-L22",
-          "version": "repo-lines-v1:sha256:6203e334371cc181813e4f38393dae011d26ba372a9de8aa3ab2bfd008ca6adb:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjE5NGMxODQ0MDE4MzEyMzJkOGFjYjY4YzJiZTA5NzExZDkyMzU4ZjRiNzRkY2ZlNmZmNDQ3MWIwZjU2YmI1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzEyZDdhMWE5YzVhMWE2OWUwNGI1MWViZWE0NDk2ODBkOWJhM2QzOWU3YjM1ZjUwNGIzMzI4MDg2ZWRlN2ExYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE2NjA0OTcyZGE5ODBkODUzZjkxYzFhMWE5NWExNjZkNzQ4MTQ4ODI1MzgzZjhjMDg2NjFiMDk4NjIyZTU5NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzBmZWU0NGUzODE4ZjEwMmRkMDUyZTAyZTQ3ZWJhNDc3MGVjNzAzNTNhNDc0NTM4YjExNTNlNjExOGNmY2FiNSJ9"
+          "resource": "repo://packages/components/config/auth.json#L10-L20",
+          "version": "repo-lines-v1:sha256:ac7053a1823c4cbfc6f85f7ba0cc756e59183a34f5cfb18df10dc76558aad088:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlMTI3YjIyNGE1NGI3YTkyNDU5OTk0OGRmNzQzNTQ4M2FmOThlN2UxYzljNTkyYmZlODM5OWQ0ZGViN2EyZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmZWI1YTVkZDI3MzdmZDNjZjEyMjZiZTYwNGUzNTlkYjM1OWRlYjY1ZDM4Mjg4MzQ4NmZmZjA5MzMyZmIxOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNmUxZGNjZjkyZTAwNGMxZDllZTg2NDI2YzY5ZWM3ZjgzMzljMTliZDBkNDgwODZkZTU2YzQ0MzVlNmFjYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyMDNlMzM0MzcxY2MxODE4MTNlNGYzODM5M2RhZTAxMWQyNmJhMzcyYTlkZThhYTNhYjJiZmQwMDhjYTZhZGIifQ"
         },
         {
-          "resource": "repo://packages/components/config/data.json#L44-L49",
-          "version": "repo-lines-v1:sha256:f65a89eff0243c6861d2b1fd6977b59c9a0740dc554daea19abc7c56f6c15c13:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTQzZjE4OWM2Mzc0N2E0Njk4ZjNkZDljNjc3MmU0OTQ5YTI3YmE2MzE2MGJhMTcxYzViMzIwODJmYWY3MTFiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzhjZTllMjUwMmY2Mjk0ZTNkNGEzODAwMTI1MWZjYTM1NWY3MDhiN2ZlYTZkNGRjZDM0M2Y5ZDMyYTU2N2ViNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGFhZGQzMzhlNGU0N2E2OWI5ZGUyOTc1NmM3ODM4NGRkZTMyZDFjMGE5ZjIzMTZlZTk1NzAyZTE0NmUyNzgyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTdmNjk5NmUzYjE1ZGZiNDM4NjMwMDFjNzJkM2E1MzlkZTcwZTM4ZTJhOWVkMjBkZTU5MTEwNGE4Mjg2NGY2NiJ9"
+          "resource": "repo://packages/components/config/data.json#L10-L20",
+          "version": "repo-lines-v1:sha256:647570c77e1770b4f6e4cef2c6f8b84204c44504ccd7a561ab45a356cbf68f1b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlMTI3YjIyNGE1NGI3YTkyNDU5OTk0OGRmNzQzNTQ4M2FmOThlN2UxYzljNTkyYmZlODM5OWQ0ZGViN2EyZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZDBjNzEwYTlhNjRlYjFkOTM0YzBkZmZkYmU1ZDY1ODE1Y2Y0Mzc1OTg3MWVhNDNmNWI3MTQ4ODhhZTE0YjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNmUxZGNjZjkyZTAwNGMxZDllZTg2NDI2YzY5ZWM3ZjgzMzljMTliZDBkNDgwODZkZTU2YzQ0MzVlNmFjYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwODdjN2I4YmFlZWRjNTcyYjcwMzlkODcxMzQyZmNlZTE4ZTI5NWU2MmUzY2U1OTEwYjRkNGZmZDkyN2NkMDUifQ"
         },
         {
-          "resource": "repo://packages/components/config/registry.json#L13-L43",
-          "version": "repo-lines-v1:sha256:8efa28bc28e14e17fc74aa14fa88ddb6937708e9c533b0d7b6494ff0a1e4126d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMzU5NGQ4Mjc0NWMxMGI4NmFlMjM5MzgzZTRiNTU4ODA2YjBjYWFjOGZhYTYxNGQ4OTJhNjI4ODE4NzVmYmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmZjc2MjZkNGNmNmY1OGZmNzBmYTljMDY3ZTU5MDBiYWM3NjM2MmRkNzYxMzhkYmRlYjFiNTQzOTg2YmViZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiMzUwYmUzNjQ2NjE2Zjk1YmZhZTc5MWE5YTg5M2FmNDQ2ZmIyNjkwMjU5YTA4YzFjNjAyMzViZTU2ZjM2NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzOTcxNTYyNTMwZDUyODFiMWI5ZmY4NGE1YmIxYWYyMzk5NTU1ODY0YzVhYTgzZjRiNmMwZjE4MDZiNzUzNzgifQ"
+          "resource": "repo://packages/components/config/registry.json#L10-L20",
+          "version": "repo-lines-v1:sha256:f7e8b5291a62d143aeb25584d73e062a228dba1e1c796e6253d1474af757e822:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlMTI3YjIyNGE1NGI3YTkyNDU5OTk0OGRmNzQzNTQ4M2FmOThlN2UxYzljNTkyYmZlODM5OWQ0ZGViN2EyZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MDcyYjk2MjNiMTRmMGQxYzRlN2VmMmViOTg2ZGY2ZWYxZDVmZmRhN2UxNTcyNjk4NzY1YTk3ZDkxNmNlYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNmUxZGNjZjkyZTAwNGMxZDllZTg2NDI2YzY5ZWM3ZjgzMzljMTliZDBkNDgwODZkZTU2YzQ0MzVlNmFjYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZTE4ZGFhMTY2NjZiNzFmZGY4ZjVhNzJlMWZiZGI0NDk5M2IxMjVhZjRlNjQxMTg3Y2RhMDg0MTNlZjBjMGQifQ"
         }
       ]
     },
@@ -123,10 +123,32 @@
           "version": "repo-lines-v1:sha256:6847784df029b69c7ce781235b6377e1b7d97d2ba5ae161c957aa3cdc519b2de:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmNiNmEyOTlkOGQ1ZDIyOTIyMDEyYWMzZjM1MjcyYWQzOGUyNzU5NGVlNWMwYzUyYWU4YTFiZjJjMzFhYWY0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQzYzQ5NDNlYjEwZDQzZWVjM2I5YTRiNjE3YjI3NTQ1Nzk1YjFlYWNmMzg5NTU5MGQzNjE4YTM2Y2JmZjBkMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_9137f211d7144df19e325f337743e1bd",
+      "statement": "The LWS identity configuration is split into an issuer config, a UAS accept config, a data-storage accept config, and a claimless registry accept config.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/identity/id-jag-accept-data.json",
+          "version": "repo-file-v1:sha256:bec73af00e1af475f4408be6f504b7103006102d68c5550e4d13fe85a3666421"
+        },
+        {
+          "resource": "repo://packages/components/config/identity/id-jag-accept-registry.json",
+          "version": "repo-file-v1:sha256:63c5c05dc0a698a468182f6956a030798ca7ecd579d3458b573b5e9ffae6d990"
+        },
+        {
+          "resource": "repo://packages/components/config/identity/id-jag-accept.json",
+          "version": "repo-file-v1:sha256:046be9a736976ba3f6bae1a6da84e41c24d356e6248cdfb461160ac531a26086"
+        },
+        {
+          "resource": "repo://packages/components/config/identity/id-jag.json",
+          "version": "repo-file-v1:sha256:913a1fd845214244c30cbdce356936f8d0a2273bbe252ff98d5815b66b8bdbe9"
+        }
+      ]
     }
   ],
   "verification": {
-    "by": "openwiki/0.7.2",
-    "at": "2026-10-21T01:32:20.770Z"
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-19T00:32:33.147Z"
   }
 }

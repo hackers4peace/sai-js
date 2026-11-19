@@ -30,7 +30,7 @@ const { invitationAcceptance, reciprocalRegistration, reciprocalWebhook } = prox
 // from the cap comes from the delegated-grants consumer (its next drain syncs
 // again) or the reconcile sweep, which restarts that consumer
 // (openwiki/architecture/federation.md); a permanent 403 stays pending, see
-// docs/plans/update-deployment.md.
+// openwiki/operations/deployment.md.
 const { syncReciprocalMirror: syncMirrorActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
   retry: {

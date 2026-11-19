@@ -80,7 +80,7 @@ function isInvalidGrant(error: unknown): boolean {
  * are cached per storage by `createLwsFetch` itself (one token serves every
  * request to that storage).
  *
- * `docs/plans/lws-auth.md` C3; the credential is never sent to a storage.
+ * See `openwiki/architecture/lws-auth.md`; the credential is never sent to a storage.
  */
 export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
   const { credential } = options

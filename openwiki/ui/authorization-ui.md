@@ -24,8 +24,8 @@ sources:
     resource: repo://ui/authorization/vite.config.ts
 generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
 verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-22T04:35:20.186Z
+  - by: openwiki/0.7.3
+    at: 2026-11-19T00:32:33.147Z
 ---
 
 # Authorization UI
