@@ -4,14 +4,17 @@ Only user can stage/unstage and commit with git. Agent can use git commands only
 
 ### Tests
 
-Only user can run tests in /test they use dagger setup in /.dagger.
-Agent can run vitest tests in /packages
+Agent may run package tests with `npx vitest run packages/...` and the Dagger integration suite under `/test` through Devbox. Read the `dagger` skill for the Dagger commands, Tempo endpoint, and debugger proxy workflow.
 
 Test data comes from
 /environments/data
 
 For dev environment URLs are mapped with
 /environments/dev/map.json
+
+## Skills
+
+- `dagger` (`.agents/skills/dagger/SKILL.md`, `/skill:dagger`): run the Dagger suite and attach the debugger proxy.
 
 <!-- CODEGRAPH_START -->
 
