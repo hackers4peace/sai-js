@@ -1,3 +1,4 @@
+import { Resource, Tracer } from '@effect/opentelemetry'
 import { Etag, HttpPlatform } from '@effect/platform'
 import * as NodeContext from '@effect/platform-node/NodeContext'
 import { RpcSerialization, RpcServer } from '@effect/rpc'
@@ -43,6 +44,7 @@ import {
 } from './services/ShareResource.js'
 import { acceptInvitation, getSocialAgents } from './services/SocialAgentRegistry.js'
 import type { SessionManager } from './SessionManager'
+import { temporalPluginConfig } from './tracing/otel-state.js'
 import type { UiPushSubscriptionStore } from './UiPushSubscriptionStore.js'
 
 export class ApiHandler extends OperationHttpHandler {
@@ -388,11 +390,15 @@ export class ApiHandler extends OperationHttpHandler {
         Etag.layer,
         NodeContext.layer
       )
+      const tracingLayer = temporalPluginConfig()
+        ? Layer.provide(Tracer.layerGlobal, Resource.layer({ serviceName: 'sai-uas' }))
+        : Layer.empty
       const rpcHandler = RpcServer.toWebHandler(rpcGroup, {
         layer: Layer.mergeAll(
           rpcHandlers.pipe(Layer.provide(SaiServiceLive)),
           RpcSerialization.layerNdjson,
-          platformLayer
+          platformLayer,
+          tracingLayer
         ),
         spanPrefix: 'sai.rpc',
       })
