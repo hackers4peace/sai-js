@@ -1,7 +1,7 @@
 import { Postgres } from '@janeirodigital/interop-test-utils'
 import { describe, expect, test } from 'vitest'
 
-import { rpcPayload, waitFor } from './util'
+import { parseRpcResult, rpcPayload, waitFor } from './util'
 
 // ──────────────────────────────────────────────────────────────────────────
 // Account creation — the signup black box.
@@ -80,12 +80,11 @@ async function createAccountCookie(email: string, password: string): Promise<str
 async function rpc(cookie: string, request: Record<string, unknown>): Promise<any> {
   const response = await fetch(rpcEndpoint, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify(rpcPayload(request)),
+    headers: { 'content-type': 'application/ndjson', cookie },
+    body: rpcPayload(request),
   })
   expect(response.status).toBe(200)
-  const [result] = (await response.json()) as any[]
-  return result
+  return parseRpcResult(await response.text())
 }
 
 /** SPARQL ASK against a dataset, straight at Fuseki. */

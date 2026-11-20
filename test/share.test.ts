@@ -10,7 +10,7 @@ const loadGrant = loader(Grant.fromJsonLd)
 
 import { describe, expect, test } from 'vitest'
 
-import { awaitGrantCompletion, rpcCall, rpcPayload, waitFor } from './util'
+import { awaitGrantCompletion, parseRpcResult, rpcCall, rpcPayload, waitFor } from './util'
 
 describe('share resource', () => {
   const aliceId = 'https://id/alice'
@@ -37,26 +37,23 @@ describe('share resource', () => {
       const response = await fetch('https://auth/.sai/api', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/ndjson',
           Cookie: aliceCookie,
         },
-        body: JSON.stringify(
-          rpcPayload({
-            _tag: 'ShareResource',
-            authorization: {
-              applicationId,
-              resource,
-              agents: [kimId],
-              accessMode: [readMode],
-              children: [],
-            },
-            context: aliceId,
-          })
-        ),
+        body: rpcPayload({
+          _tag: 'ShareResource',
+          authorization: {
+            applicationId,
+            resource,
+            agents: [kimId],
+            accessMode: [readMode],
+            children: [],
+          },
+          context: aliceId,
+        }),
       })
       expect(response.status).toBe(200)
-      const body = await response.json()
-      const { _tag, value } = body[0]
+      const { _tag, value } = parseRpcResult(await response.text())
       expect(_tag).toBe('Success')
       expect(value).toEqual(expect.objectContaining({ callbackEndpoint: 'https://test-client' }))
     })

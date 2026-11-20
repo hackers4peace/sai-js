@@ -12,12 +12,11 @@ import { describe, expect, test } from 'vitest'
 import {
   containedIris,
   needBasedAccessRequestPayload,
+  parseRpcResult,
   rpcPayload,
   waitForNeedBasedAccessRequestReceivedCompletion,
   waitForNeedBasedAccessRequestSentCompletion,
 } from './util'
-
-const rpcEndpoint = 'https://auth/.sai/api'
 
 const aliceId = 'https://id/alice'
 const bobId = 'https://id/bob'
@@ -108,24 +107,21 @@ function expectRequestShape(
 
 describe('request access (sent side)', () => {
   test('bob sends a need-based access request to alice via the access-needs RPC', async () => {
-    const response = await fetch(rpcEndpoint, {
+    const response = await fetch('https://auth/.sai/api', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/ndjson',
         Cookie: bobCookie,
       },
-      body: JSON.stringify(
-        rpcPayload({
-          _tag: 'RequestAccessUsingAccessNeeds',
-          dataOwner: aliceId,
-          hasAccessNeedGroup: accessNeedGroup,
-          context: bobId,
-        })
-      ),
+      body: rpcPayload({
+        _tag: 'RequestAccessUsingAccessNeeds',
+        dataOwner: aliceId,
+        hasAccessNeedGroup: accessNeedGroup,
+        context: bobId,
+      }),
     })
     expect(response.status).toBe(200)
-    const body = await response.json()
-    const { _tag, value } = body[0]
+    const { _tag, value } = parseRpcResult(await response.text())
     expect(_tag).toBe('Success')
     // the pending ack — the `InvitationAcceptedMessage` shape: the requester
     // mints no real id (the owner does, receive-side phase), so only the
@@ -240,23 +236,21 @@ describe('request access (receive side)', () => {
   })
 
   test('full sequence — the RPC leg converges on the stored request', async () => {
-    const response = await fetch(rpcEndpoint, {
+    const response = await fetch('https://auth/.sai/api', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/ndjson',
         Cookie: bobCookie,
       },
-      body: JSON.stringify(
-        rpcPayload({
-          _tag: 'RequestAccessUsingAccessNeeds',
-          dataOwner: aliceId,
-          hasAccessNeedGroup: accessNeedGroup,
-          context: bobId,
-        })
-      ),
+      body: rpcPayload({
+        _tag: 'RequestAccessUsingAccessNeeds',
+        dataOwner: aliceId,
+        hasAccessNeedGroup: accessNeedGroup,
+        context: bobId,
+      }),
     })
     expect(response.status).toBe(200)
-    const { _tag, value } = (await response.json())[0]
+    const { _tag, value } = parseRpcResult(await response.text())
     expect(_tag).toBe('Success')
     expect(value).toEqual({ accepted: true, activityId: expect.any(String) })
 

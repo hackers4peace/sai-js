@@ -8,42 +8,20 @@ import {
   containedIris,
   accessGrants,
   needBasedAccessRequestPayload,
+  parseRpcResult,
+  rpcCall,
+  rpcPayload as encodeRpc,
   waitForActivityCompletion,
   waitForNeedBasedAccessRequestReceivedCompletion,
 } from './util'
 
-const rpcEndpoint = 'https://auth/.sai/api'
 // TODO: import
 const clientId = 'https://data/test-client/public/id'
 const accessNeedGroup = 'https://data/test-client/public/access-needs#need-group-pm'
 const bobId = 'https://id/bob'
 
 function rpcPayload(authorization: unknown) {
-  return [
-    {
-      request: { _tag: 'AuthorizeApp', authorization, context: bobId },
-      headers: {},
-      traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-      spanId: '685581075752b8a2',
-      sampled: true,
-    },
-  ]
-}
-
-async function rpcCall(payload: unknown, cookie: string) {
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: cookie,
-    },
-    body: JSON.stringify(payload),
-  })
-  expect(response.status).toBe(200)
-  const body = await response.json()
-  const result = body[0]
-  expect(result._tag, `RPC failed: ${JSON.stringify(result, null, 2)}`).toBe('Success')
-  return result.value
+  return encodeRpc({ _tag: 'AuthorizeApp', authorization, context: bobId })
 }
 
 describe('get authorization data', () => {
@@ -51,33 +29,24 @@ describe('get authorization data', () => {
   const aliceCookie = 'css-account=8187358a-2072-4dce-9c76-24caffcc84a4'
   const lang = 'en'
 
-  const payload = [
-    {
-      request: {
-        _tag: 'GetAuthoriaztionData',
-        agentId: clientId,
-        lang,
-        context: aliceId,
-      },
-      headers: {},
-      traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-      spanId: '685581075752b8a2',
-      sampled: true,
-    },
-  ]
+  const payload = encodeRpc({
+    _tag: 'GetAuthoriaztionData',
+    agentId: clientId,
+    lang,
+    context: aliceId,
+  })
 
   test('responds with authorization data', async () => {
-    const response = await fetch(rpcEndpoint, {
+    const response = await fetch('https://auth/.sai/api', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/ndjson',
         Cookie: aliceCookie,
       },
-      body: JSON.stringify(payload),
+      body: payload,
     })
     expect(response.status).toBe(200)
-    const body = await response.json()
-    const { _tag, value } = body[0]
+    const { _tag, value } = parseRpcResult(await response.text())
     expect(_tag).toBe('Success')
     expect(value).toEqual(expect.objectContaining({ id: clientId }))
     expect(value.accessNeedGroup).toEqual(
@@ -267,29 +236,21 @@ describe('approve a need-based access request', () => {
 
     // the authorization data resolves from the EMBEDDED group in the request
     // (accessRequestIri) — no client-id doc, no reciprocal registration
-    const getDataResponse = await fetch(rpcEndpoint, {
+    const getDataResponse = await fetch('https://auth/.sai/api', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Cookie: aliceCookie },
-      body: JSON.stringify([
-        {
-          request: {
-            _tag: 'GetAuthoriaztionData',
-            agentId: bobId,
-            lang: 'en',
-            accessRequestIri: requestIri,
-            context: aliceId,
-          },
-          headers: {},
-          traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-          spanId: '685581075752b8a2',
-          sampled: true,
-        },
-      ]),
+      headers: { 'Content-Type': 'application/ndjson', Cookie: aliceCookie },
+      body: encodeRpc({
+        _tag: 'GetAuthoriaztionData',
+        agentId: bobId,
+        lang: 'en',
+        accessRequestIri: requestIri,
+        context: aliceId,
+      }),
     })
     expect(getDataResponse.status).toBe(200)
-    const dataBody = await getDataResponse.json()
-    expect(dataBody[0]._tag).toBe('Success')
-    const authorizationData = dataBody[0].value
+    const dataResult = parseRpcResult(await getDataResponse.text())
+    expect(dataResult._tag).toBe('Success')
+    const authorizationData = dataResult.value
     expect(authorizationData).toEqual(
       expect.objectContaining({
         id: bobId,
@@ -365,35 +326,27 @@ describe('approve a need-based access request', () => {
     expect(bobRegistration).toBeDefined()
     await awaitGrantCompletion(aliceSession.fetch, bobRegistration!.id, [aliceId], async () => {
       const granted = await rpcCall(
-        [
-          {
-            request: {
-              _tag: 'AuthorizeApp',
-              accessRequestIri: requestIri,
-              authorization: {
-                grantee: bobId,
-                accessNeedGroup: accessNeedGroup.id,
-                dataAuthorizations: [
-                  {
-                    accessNeed: accessNeedGroup.hasAccessNeed[0].id,
-                    scope: 'AllFromAgent',
-                    dataOwner: aliceId,
-                  },
-                  {
-                    accessNeed: accessNeedGroup.hasAccessNeed[0].hasInheritingNeed[0].id,
-                    scope: 'Inherited',
-                  },
-                ],
-                granted: true,
+        encodeRpc({
+          _tag: 'AuthorizeApp',
+          accessRequestIri: requestIri,
+          authorization: {
+            grantee: bobId,
+            accessNeedGroup: accessNeedGroup.id,
+            dataAuthorizations: [
+              {
+                accessNeed: accessNeedGroup.hasAccessNeed[0].id,
+                scope: 'AllFromAgent',
+                dataOwner: aliceId,
               },
-              context: aliceId,
-            },
-            headers: {},
-            traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-            spanId: '685581075752b8a2',
-            sampled: true,
+              {
+                accessNeed: accessNeedGroup.hasAccessNeed[0].hasInheritingNeed[0].id,
+                scope: 'Inherited',
+              },
+            ],
+            granted: true,
           },
-        ],
+          context: aliceId,
+        }),
         aliceCookie
       )
       // activity-first (step 2): pending ack — the workflow materializes the

@@ -11,6 +11,9 @@ import { describe, expect, test } from 'vitest'
 import {
   awaitGrantCompletion,
   accessGrants,
+  parseRpcResult,
+  rpcCall,
+  rpcPayload,
   waitFor,
   waitForQuiescence,
   waitForRoleCreatedCompletion,
@@ -26,8 +29,6 @@ import {
  * buildOidcSession / buildSessionManager).
  */
 
-const rpcEndpoint = 'https://auth/.sai/api'
-
 const danId = 'https://id/dan'
 // NOTE: the account cookie VALUE is the `accounts/cookies/<value>` key in kv.json,
 // NOT the accountId — dan's account is 9f137c45-…, its cookie is 4f8fe6e4-…
@@ -38,54 +39,25 @@ const aliceCookie = 'css-account=8187358a-2072-4dce-9c76-24caffcc84a4'
 const yoyoId = 'https://id/yoyo'
 const yoyoRegistrySet = 'https://registry/yoyo/'
 
-function rpcPayload(request: unknown) {
-  return [
-    {
-      request,
-      headers: {},
-      traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-      spanId: '685581075752b8a2',
-      sampled: true,
-    },
-  ]
-}
-
-/** Resolve a RPC to its value; any non-Success outcome throws with the body. */
-async function rpcCall<T>(payload: unknown, cookie: string): Promise<T> {
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: cookie,
-    },
-    body: JSON.stringify(payload),
-  })
-  if (!response.ok) {
-    throw new Error(`RPC failed with ${response.status}: ${await response.text()}`)
-  }
-  const body = await response.json()
-  const result = body[0]
-  if (result._tag !== 'Success') {
-    throw new Error(`RPC failed: ${JSON.stringify(result)}`)
-  }
-  return result.value as T
-}
-
 /** The RPC must reject (unallowed context / guard) — accepts ProtocolError and Failure shapes. */
-async function expectRpcError(payload: unknown, cookie: string): Promise<void> {
-  const response = await fetch(rpcEndpoint, {
+async function expectRpcError(payload: string, cookie: string): Promise<void> {
+  const response = await fetch('https://auth/.sai/api', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/ndjson',
       Cookie: cookie,
     },
-    body: JSON.stringify(payload),
+    body: payload,
   })
   if (!response.ok) return // server-side error (defect → HTTP error)
-  const body = await response.json()
-  const result = body[0]
-  if (result._tag === 'Success') {
-    throw new Error(`expected RPC error, got Success: ${JSON.stringify(result.value)}`)
+  try {
+    const result = parseRpcResult(await response.text())
+    if (result._tag === 'Success') {
+      throw new Error(`expected RPC error, got Success: ${JSON.stringify(result.value)}`)
+    }
+  } catch (err) {
+    // A Defect is an expected RPC error; rethrow only our own success assertion.
+    if (err instanceof Error && err.message.startsWith('expected RPC error')) throw err
   }
 }
 
@@ -354,31 +326,28 @@ describe('org context — sharing the org’s own data (2.4 write path)', () => 
 
     // the registration Update + the workflow tail are the completion signal
     await awaitGrantCompletion(yoyoSession.fetch, regForBob.id, [yoyoId, bobId], async () => {
-      const response = await fetch(rpcEndpoint, {
+      const response = await fetch('https://auth/.sai/api', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/ndjson',
           Cookie: danCookie,
         },
-        body: JSON.stringify(
-          rpcPayload({
-            _tag: 'ShareResource',
-            authorization: {
-              applicationId,
-              resource: ghost,
-              agents: [bobId],
-              accessMode: [readMode],
-              // a child need forces the child-registration read on the org's
-              // data pod (the pre-fix path guessed it from the instance URI)
-              children: [{ shapeTree: taskShapeTree, accessMode: [readMode] }],
-            },
-            context: yoyoId,
-          })
-        ),
+        body: rpcPayload({
+          _tag: 'ShareResource',
+          authorization: {
+            applicationId,
+            resource: ghost,
+            agents: [bobId],
+            accessMode: [readMode],
+            // a child need forces the child-registration read on the org's
+            // data pod (the pre-fix path guessed it from the instance URI)
+            children: [{ shapeTree: taskShapeTree, accessMode: [readMode] }],
+          },
+          context: yoyoId,
+        }),
       })
       expect(response.status).toBe(200)
-      const body = await response.json()
-      const { _tag, value } = body[0]
+      const { _tag, value } = parseRpcResult(await response.text())
       expect(_tag).toBe('Success')
       expect(value).toEqual(expect.objectContaining({ callbackEndpoint: 'https://test-client' }))
     })

@@ -349,40 +349,10 @@ export class ApiHandler extends OperationHttpHandler {
         }
         headers.set(key, Array.isArray(value) ? value.join(', ') : value)
       }
-      // The current UI uses the @effect/rpc NDJSON protocol. The integration
-      // tests still post the old array envelope; adapt it here until they move.
-      const isLegacyJson = !String(httpRequest.headers['content-type'] ?? '').includes(
-        'application/ndjson'
-      )
-      let rpcBody = requestBody
-      if (isLegacyJson) {
-        const legacy = JSON.parse(requestBody) as Array<{
-          request: { _tag: string } & Record<string, unknown>
-          headers?: Record<string, string>
-          traceId?: string
-          spanId?: string
-          sampled?: boolean
-        }>
-        rpcBody = legacy
-          .map((entry, index) => {
-            return `${JSON.stringify({
-              _tag: 'Request',
-              id: String(index),
-              tag: entry.request._tag,
-              payload: entry.request,
-              headers: Object.entries(entry.headers ?? {}),
-              traceId: entry.traceId,
-              spanId: entry.spanId,
-              sampled: entry.sampled,
-            })}\n`
-          })
-          .join('')
-        headers.set('content-type', 'application/ndjson')
-      }
       const rpcRequest = new Request(new URL(operation.target.path, 'http://localhost'), {
         method: operation.method,
         headers,
-        body: operation.method === 'GET' || operation.method === 'HEAD' ? undefined : rpcBody,
+        body: operation.method === 'GET' || operation.method === 'HEAD' ? undefined : requestBody,
       })
 
       const platformLayer = Layer.mergeAll(
@@ -405,31 +375,8 @@ export class ApiHandler extends OperationHttpHandler {
 
       try {
         const response = await rpcHandler.handler(rpcRequest)
-        let responseText = await response.text()
-        let responseType = response.headers.get('content-type') ?? 'application/json'
-        if (isLegacyJson) {
-          const responses = responseText
-            .split('\n')
-            .filter(Boolean)
-            .map((line) => {
-              const message = JSON.parse(line) as {
-                _tag: string
-                exit?: { _tag: string; value?: unknown; cause?: { message?: string } }
-              }
-              if (message._tag !== 'Exit') return message
-              if (message.exit?._tag === 'Success') {
-                return { _tag: 'Success', value: message.exit.value }
-              }
-              const failureMessage = message.exit?.cause?.message ?? JSON.stringify(message.exit)
-              console.error('RPC failure', failureMessage)
-              return {
-                _tag: 'Failure',
-                message: failureMessage,
-              }
-            })
-          responseText = JSON.stringify(responses)
-          responseType = 'application/json'
-        }
+        const responseText = await response.text()
+        const responseType = response.headers.get('content-type') ?? 'application/ndjson'
         if (span.isRecording()) {
           span.setAttribute('sai.rpc.response', responseText)
         }

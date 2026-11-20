@@ -30,19 +30,20 @@ export interface NotificationStream {
 }
 
 /**
- * Wrap an RPC request in the sai-api-messages protocol envelope (one call per
- * batch; trace/span are stable convenience values).
+ * Encode one tagged request as an @effect/rpc NDJSON Request message.
  */
-export function rpcPayload(request: unknown) {
-  return [
-    {
-      request,
-      headers: {},
-      traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-      spanId: '685581075752b8a2',
-      sampled: true,
-    },
-  ]
+let rpcRequestId = 0
+
+export function rpcPayload(request: unknown): string {
+  const tag = (request as { _tag?: string })._tag
+  if (!tag) throw new Error('RPC request must have a _tag')
+  return `${JSON.stringify({
+    _tag: 'Request',
+    id: String(++rpcRequestId),
+    tag,
+    payload: request,
+    headers: [],
+  })}\n`
 }
 
 const WIRE_CONTEXT = [
@@ -128,6 +129,28 @@ export function needBasedAccessRequestPayload({
 
 const RPC_ENDPOINT = 'https://auth/.sai/api'
 
+/** Decode the first Exit message from an @effect/rpc NDJSON response. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the RPC envelope is untyped at the wire
+export function parseRpcResult<T = any>(
+  body: string
+): { _tag: 'Success'; value: T } | { _tag: 'Failure'; message: string } {
+  const messages = body
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line) as Record<string, any>)
+  const exit = messages.find((message) => message._tag === 'Exit')
+  if (!exit) {
+    const defect = messages.find((message) => message._tag === 'Defect')
+    if (defect) throw new Error(`RPC defect: ${defect.defect?.message ?? JSON.stringify(defect)}`)
+    throw new Error(`RPC response has no Exit: ${body}`)
+  }
+  if (exit.exit?._tag === 'Success') return { _tag: 'Success', value: exit.exit.value }
+  return {
+    _tag: 'Failure',
+    message: exit.exit?.cause?.message ?? JSON.stringify(exit.exit),
+  }
+}
+
 /**
  * Call the RPC endpoint with an account cookie and unwrap the Effect RPC
  * envelope (asserts HTTP 200 + `Success`, returns `value`) — the same public
@@ -135,22 +158,21 @@ const RPC_ENDPOINT = 'https://auth/.sai/api'
  * surface rather than internal reads.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the RPC envelope is untyped at the wire
-export async function rpcCall<T = any>(payload: unknown, cookie: string): Promise<T> {
+export async function rpcCall<T = any>(payload: string, cookie: string): Promise<T> {
   const response = await fetch(RPC_ENDPOINT, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/ndjson',
       Cookie: cookie,
     },
-    body: JSON.stringify(payload),
+    body: payload,
   })
   if (response.status !== 200) throw new Error(`rpc failed with HTTP ${response.status}`)
-  const body = (await response.json()) as { _tag: string; value?: unknown; message?: string }[]
-  const result = body[0]
-  if (result?._tag !== 'Success') {
-    throw new Error(`rpc returned ${result?._tag}: ${result?.message ?? 'no message'}`)
+  const result = parseRpcResult<T>(await response.text())
+  if (result._tag !== 'Success') {
+    throw new Error(`rpc returned Failure: ${result.message}`)
   }
-  return result.value as T
+  return result.value
 }
 
 /**

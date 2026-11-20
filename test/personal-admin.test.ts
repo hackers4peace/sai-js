@@ -12,7 +12,7 @@ import {
 } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
-import { awaitEvent, containedIris, openEventsStream } from './util'
+import { awaitEvent, containedIris, openEventsStream, rpcCall, rpcPayload } from './util'
 
 /**
  * Phase 5 of org-admin-feature.md — personal-context add/remove: a REGULAR
@@ -36,45 +36,10 @@ import { awaitEvent, containedIris, openEventsStream } from './util'
  *   access), instead of refusing and leaving the activity pending.
  */
 
-const rpcEndpoint = 'https://auth/.sai/api'
-
 const kimId = 'https://id/kim'
 const kimCookie = 'css-account=77b0674a-1f3b-4c78-a7d9-0b2e3f4a5b6c'
 const aliceId = 'https://id/alice'
 const aliceCookie = 'css-account=8187358a-2072-4dce-9c76-24caffcc84a4'
-
-function rpcPayload(request: unknown) {
-  return [
-    {
-      request,
-      headers: {},
-      traceId: '13c2035f72f45c1ebbf13b055b7dc526',
-      spanId: '685581075752b8a2',
-      sampled: true,
-    },
-  ]
-}
-
-/** Resolve a RPC to its value; any non-Success outcome throws with the body. */
-async function rpcCall<T>(payload: unknown, cookie: string): Promise<T> {
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: cookie,
-    },
-    body: JSON.stringify(payload),
-  })
-  if (!response.ok) {
-    throw new Error(`RPC failed with ${response.status}: ${await response.text()}`)
-  }
-  const body = await response.json()
-  const result = body[0]
-  if (result._tag !== 'Success') {
-    throw new Error(`RPC failed: ${JSON.stringify(result)}`)
-  }
-  return result.value as T
-}
 
 /** The registry owner an activity belongs to — its actor (as:actor, plain IRI). */
 function activityOwner(activity: { actor?: string }): string | undefined {
