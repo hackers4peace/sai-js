@@ -8,7 +8,7 @@
     "jaq@latest",
     "ducker@latest",
     "pgcli@latest",
-    "github:dagger/nix/4a39fb35b724a8f85c254fa1513fa0ffc17162e7#packages.x86_64-linux.dagger",
+    "github:dagger/nix/f01f6dd5264e96540cf0ed21c7fcc8cd743fb97d#packages.x86_64-linux.dagger",
     "nixos-anywhere@latest",
     "nix-prefetch-docker@latest",
     "skopeo@latest",
@@ -21,7 +21,7 @@
     "oxigraph@latest"
   ],
   "env": {
-    "_EXPERIMENTAL_DAGGER_RUNNER_HOST": "docker-container://dagger-engine-v0.21.9"
+    "_EXPERIMENTAL_DAGGER_RUNNER_HOST": "docker-container://dagger-engine-v0.21.12"
   },
   "shell": {
     "init_hook": [

@@ -175,9 +175,9 @@
       "last_modified": "2026-10-10T12:58:50Z",
       "resolved": "github:NixOS/nixpkgs/ca1659429c950a11a565b5764e37a1b704e17ec8?lastModified=1791637130&narHash=sha256-TuvwvSjJrpqyIYdjhQ7Wu%2BADVfeOpO2Um21%2FV7TOubw%3D"
     },
-    "github:dagger/nix/4a39fb35b724a8f85c254fa1513fa0ffc17162e7#packages.x86_64-linux.dagger": {
-      "last_modified": "2026-08-26T13:45:59Z",
-      "resolved": "github:dagger/nix/4a39fb35b724a8f85c254fa1513fa0ffc17162e7?lastModified=1787751959&narHash=sha256-IY0FDSvjme7YH%2FUwQJNasYLEd9Ryw25urF3ZxsH3WJM%3D#packages.x86_64-linux.dagger"
+    "github:dagger/nix/f01f6dd5264e96540cf0ed21c7fcc8cd743fb97d#packages.x86_64-linux.dagger": {
+      "last_modified": "2026-11-17T21:16:52Z",
+      "resolved": "github:dagger/nix/f01f6dd5264e96540cf0ed21c7fcc8cd743fb97d?lastModified=1794950212&narHash=sha256-lBwmtCMIeM3GWg85TXDvsOqXVum%2Fqe5BWnEp7ynaSiU%3D#packages.x86_64-linux.dagger"
     },
     "jaq@latest": {
       "last_modified": "2026-10-08T19:21:32Z",

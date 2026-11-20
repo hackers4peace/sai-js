@@ -2,7 +2,7 @@
   "name": "interop",
   "private": true,
   "devDependencies": {
-    "@dagger.io/dagger": "^0.19.10",
+    "@dagger.io/dagger": "^0.21.12",
     "@solid/community-server": "github:elf-pavlik/CommunitySolidServer#lws-sai",
     "@types/node": "^26.6.6",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
