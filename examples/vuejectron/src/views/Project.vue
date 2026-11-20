@@ -4,7 +4,7 @@
       <h3>
         Tasks
         <v-btn
-          v-if="appStore.canAddTasks(appStore.currentProject['@id']!)"
+          v-if="canAddTasks"
           size="small"
           color="surface-variant"
           variant="text"
@@ -21,7 +21,7 @@
             <v-card-title>{{ task.prefLabel }}</v-card-title>
             <v-card-actions>
               <v-btn
-                v-if="appStore.canUpdate(task['@id']!)"
+                v-if="taskPermissions[task['@id']!]?.update"
                 size="small"
                 color="surface-variant"
                 variant="text"
@@ -29,7 +29,7 @@
                 @click="editTask(task)"
               />
               <v-btn
-                v-if="appStore.canDelete(task['@id']!)"
+                v-if="taskPermissions[task['@id']!]?.delete"
                 size="small"
                 color="surface-variant"
                 variant="text"
@@ -43,7 +43,7 @@
       <h3>
         Files
         <v-btn
-          v-if="appStore.canAddFiles(appStore.currentProject['@id']!)"
+          v-if="canAddFiles"
           size="small"
           color="surface-variant"
           variant="text"
@@ -60,7 +60,7 @@
       <h3>
         Images
         <v-btn
-          v-if="appStore.canAddImages(appStore.currentProject['@id']!)"
+          v-if="canAddImages"
           size="small"
           color="surface-variant"
           variant="text"
@@ -99,7 +99,7 @@
 <script lang="ts" setup>
 import { LdSet } from '@ldo/ldo'
 import { computedAsync } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import InputDialog from '@/components/InputDialog.vue'
@@ -118,6 +118,53 @@ const dialog = ref(false)
 const selectedTask = ref<Task | null>(null)
 
 const appStore = useAppStore()
+
+const projectId = computed(() => appStore.currentProject?.['@id'])
+const canAddTasks = computedAsync(async () => {
+  try {
+    return projectId.value ? await appStore.canAddTasks(projectId.value) : false
+  } catch {
+    return false
+  }
+}, false)
+const canAddFiles = computedAsync(async () => {
+  try {
+    return projectId.value ? await appStore.canAddFiles(projectId.value) : false
+  } catch {
+    return false
+  }
+}, false)
+const canAddImages = computedAsync(async () => {
+  try {
+    return projectId.value ? await appStore.canAddImages(projectId.value) : false
+  } catch {
+    return false
+  }
+}, false)
+
+const taskPermissions = reactive<Record<string, { update: boolean; delete: boolean }>>({})
+const taskIds = computed(() =>
+  Array.from(appStore.currentProject?.hasTask ?? []).map((task) => task['@id']!)
+)
+watch(
+  taskIds,
+  async (ids) => {
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const [update, remove] = await Promise.all([
+            appStore.canUpdate(id),
+            appStore.canDelete(id),
+          ])
+          taskPermissions[id] = { update, delete: remove }
+        } catch {
+          taskPermissions[id] = { update: false, delete: false }
+        }
+      })
+    )
+  },
+  { immediate: true }
+)
 
 const imageUrls = computedAsync(async () =>
   Promise.all(appStore.currentProject?.hasImage?.map(({ '@id': id }) => appStore.dataUrl(id)) || [])

@@ -1,1 +1,1 @@
-export type WhatwgFetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>
+export type WhatwgFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>

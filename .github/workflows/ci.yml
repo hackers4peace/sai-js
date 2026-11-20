@@ -49,7 +49,7 @@ jobs:
           - project: ui/authorization
             command: npm run build
           - project: examples/vuejectron
-            command: npm run build:vite
+            command: npm run build
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
