@@ -22,6 +22,6 @@
     "effect": "^3.10.8"
   },
   "devDependencies": {
-    "@types/web-push": "^3.6.1"
+    "@types/web-push": "^3.6.4"
   }
 }

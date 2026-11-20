@@ -65,13 +65,13 @@ export interface SparqlTransport {
   fetchTriples(query: string): Promise<DatasetCore>
 }
 
-async function arrayifyStream<T>(stream: NodeJS.ReadableStream): Promise<T[]> {
+async function arrayifyStream<T>(stream: unknown): Promise<T[]> {
   const items: T[] = []
   // fetch-sparql-endpoint declares its streams as raw node streams; at
   // runtime they are object-mode Readables emitting bindings/quads, so
   // for-await collects the emitted values (same semantics as CSS
   // `arrayifyStream`'s `events.on(stream, 'data')`).
-  for await (const item of stream) items.push(item as T)
+  for await (const item of stream as AsyncIterable<T>) items.push(item)
   return items
 }
 
