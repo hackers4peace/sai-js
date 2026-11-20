@@ -77,7 +77,7 @@ export async function toGraphBlocks(nquads: string): Promise<string> {
       writer.addQuads(
         graphQuads.map((quad) => DataFactory.quad(quad.subject, quad.predicate, quad.object))
       )
-      writer.end((error, result) => (error ? reject(error) : resolve(result)))
+      writer.end((error, result) => (error ? reject(error) : resolve(result ?? '')))
     })
     blocks.push(graph ? `GRAPH <${graph}> {\n${triples}}` : triples)
   }

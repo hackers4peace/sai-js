@@ -21,7 +21,7 @@
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^2.12.1",
     "@temporalio/client": "^1.26.0",
-    "fetch-sparql-endpoint": "^6.2.0",
+    "fetch-sparql-endpoint": "^7.3.0",
     "jose": "^6.2.18",
     "vitest": "^5.1.1"
   },

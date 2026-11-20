@@ -45,14 +45,14 @@
   "dependencies": {
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "jsonld": "^9.0.0",
-    "n3": "^1.23.1",
+    "n3": "^2.13.12",
     "ts-mixer": "^6.0.3",
     "typescript-memoize": "^1.1.1"
   },
   "devDependencies": {
     "@janeirodigital/interop-test-utils": "^1.0.0-rc.31",
-    "@rdfjs/types": "^1.1.0",
+    "@rdfjs/types": "^2.0.1",
     "@types/jsonld": "^1.5.15",
-    "@types/n3": "^1.21.1"
+    "@types/n3": "^1.26.6"
   }
 }

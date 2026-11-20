@@ -44,12 +44,9 @@
   },
   "dependencies": {
     "@janeirodigital/interop-data-model": "^1.0.0-rc.31",
-    "@janeirodigital/interop-utils": "^1.0.0-rc.31",
-    "n3": "^1.23.1"
+    "@janeirodigital/interop-utils": "^1.0.0-rc.31"
   },
   "devDependencies": {
-    "@janeirodigital/interop-test-utils": "^1.0.0-rc.31",
-    "@rdfjs/types": "^1.1.0",
-    "@types/n3": "^1.21.1"
+    "@janeirodigital/interop-test-utils": "^1.0.0-rc.31"
   }
 }

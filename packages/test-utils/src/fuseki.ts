@@ -77,7 +77,7 @@ function quadsToTrig(quads: Quad[]): Promise<string> {
   return new Promise((resolve, reject) => {
     const writer = new Writer({ format: 'TriG' })
     writer.addQuads(quads)
-    writer.end((error, result) => (error ? reject(error) : resolve(result)))
+    writer.end((error, result) => (error ? reject(error) : resolve(result ?? '')))
   })
 }
 
