@@ -89,6 +89,17 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+    // The UI has its own lockfile and links packages/api-messages by source.
+    // Force both sides of that link onto the UI's Effect copies so the
+    // nominal Effect/RPC types and runtime tags are not duplicated.
+    dedupe: [
+      'effect',
+      '@effect/rpc',
+      '@effect/rpc-http',
+      '@effect/platform',
+      '@effect/platform-browser',
+      '@effect/opentelemetry',
+    ],
     extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
   },
   server: {

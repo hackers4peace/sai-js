@@ -5,6 +5,7 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
@@ -14,7 +15,10 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "effect": ["node_modules/effect"],
+      "effect/*": ["node_modules/effect/*"],
+      "@effect/*": ["node_modules/@effect/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],

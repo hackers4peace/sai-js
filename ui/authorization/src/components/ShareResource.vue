@@ -156,7 +156,7 @@ const potentialGrantees = computed(() =>
   )
 )
 
-function rolesOf(agentId: string) {
+function rolesOf(agentId: S.Schema.Type<typeof IRI>) {
   return rolesWithAccess.value.filter(({ members }) => members.includes(agentId))
 }
 
