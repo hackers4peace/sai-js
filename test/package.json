@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "rdf-vocabulary": "^1.0.1",
-    "s3mini": "^0.9.5"
+    "s3mini": "^1.0.3"
   }
 }

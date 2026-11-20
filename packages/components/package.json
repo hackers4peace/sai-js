@@ -41,7 +41,6 @@
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "@janeirodigital/sai-api-messages": "^1.0.0-rc.31",
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/core": "^2.12.1",
     "@opentelemetry/exporter-trace-otlp-http": "^0.223.2",
     "@opentelemetry/instrumentation-http": "^0.223.2",
     "@opentelemetry/instrumentation-undici": "^0.32.0",
@@ -65,16 +64,12 @@
     "jose": "^6.2.18",
     "n3": "^2.13.12",
     "postgres": "^4.1.1",
-    "rdf-vocabulary": "^1.0.1",
-    "s3mini": "^0.9.5",
-    "web-push": "^3.6.6"
+    "s3mini": "^1.0.3",
+    "web-push": "^4.0.0"
   },
   "devDependencies": {
-    "@inrupt/solid-client-authn-core": "^2.5.0",
     "@types/n3": "^1.26.6",
     "@types/web-push": "^3.6.4",
-    "componentsjs-generator": "^4.3.0",
-    "fs-extra": "^10.1.0",
-    "set-cookie-parser": "^2.7.2"
+    "componentsjs-generator": "^4.3.0"
   }
 }

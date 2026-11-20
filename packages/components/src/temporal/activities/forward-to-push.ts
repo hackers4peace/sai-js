@@ -1,4 +1,5 @@
-import webpush, { type SendResult } from 'web-push'
+import * as webpush from 'web-push'
+import type { SendResult } from 'web-push'
 
 webpush.setVapidDetails(
   process.env.CSS_PUSH_SENDER!,
