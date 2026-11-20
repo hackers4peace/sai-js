@@ -2,10 +2,10 @@ import type { Schema } from 'shexj'
 
 /**
  * =============================================================================
- * TaskSchema: ShexJ Schema for Task
+ * taskSchema: ShexJ Schema for Task
  * =============================================================================
  */
-export const TaskSchema: Schema = {
+export const taskSchema: Schema = {
   type: 'Schema',
   shapes: [
     {

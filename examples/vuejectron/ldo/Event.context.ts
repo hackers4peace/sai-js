@@ -2,10 +2,10 @@ import type { LdoJsonldContext } from '@ldo/ldo'
 
 /**
  * =============================================================================
- * EventContext: JSONLD Context for Event
+ * eventContext: JSONLD Context for Event
  * =============================================================================
  */
-export const EventContext: LdoJsonldContext = {
+export const eventContext: LdoJsonldContext = {
   type: {
     '@id': '@type',
     '@isCollection': true,

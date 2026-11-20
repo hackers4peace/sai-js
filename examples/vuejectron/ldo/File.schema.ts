@@ -2,10 +2,10 @@ import type { Schema } from 'shexj'
 
 /**
  * =============================================================================
- * FileSchema: ShexJ Schema for File
+ * fileSchema: ShexJ Schema for File
  * =============================================================================
  */
-export const FileSchema: Schema = {
+export const fileSchema: Schema = {
   type: 'Schema',
   shapes: [
     {

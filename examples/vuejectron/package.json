@@ -6,16 +6,16 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "build:ldo": "ldo build --input ./shapes --output ./ldo"
+    "build:ldo": "ldo build --input ./shapes --output ./ldo && ../../node_modules/.bin/oxfmt ./ldo"
   },
   "dependencies": {
     "@elfpavlik/lws-auth": "file:../../packages/lws-auth",
     "@janeirodigital/interop-application": "file:../../packages/application",
     "@janeirodigital/interop-data-model": "file:../../packages/data-model",
     "@janeirodigital/interop-utils": "file:../../packages/utils",
-    "@ldo/connected": "1.0.0-alpha.32",
-    "@ldo/connected-solid": "1.0.0-alpha.32",
-    "@ldo/ldo": "1.0.0-alpha.32",
+    "@ldo/connected": "^1.0.0-alpha.53",
+    "@ldo/connected-solid": "^1.0.0-alpha.53",
+    "@ldo/ldo": "^1.0.0-alpha.53",
     "@mdi/font": "^7.4.47",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^2.12.1",
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@babel/types": "^8.1.2",
-    "@ldo/cli": "1.0.0-alpha.32",
+    "@ldo/cli": "^1.0.0-alpha.53",
     "@rdfjs/types": "^2.0.1",
     "@types/jsonld": "^1.5.13",
     "@types/node": "^26.6.6",

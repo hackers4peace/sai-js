@@ -2,10 +2,10 @@ import type { Schema } from 'shexj'
 
 /**
  * =============================================================================
- * ProjectSchema: ShexJ Schema for Project
+ * projectSchema: ShexJ Schema for Project
  * =============================================================================
  */
-export const ProjectSchema: Schema = {
+export const projectSchema: Schema = {
   type: 'Schema',
   shapes: [
     {

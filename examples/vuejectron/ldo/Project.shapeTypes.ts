@@ -1,7 +1,7 @@
 import type { ShapeType } from '@ldo/ldo'
 
-import { ProjectContext } from './Project.context'
-import { ProjectSchema } from './Project.schema'
+import { projectContext } from './Project.context'
+import { projectSchema } from './Project.schema'
 import type { Project } from './Project.typings'
 
 /**
@@ -14,7 +14,7 @@ import type { Project } from './Project.typings'
  * Project ShapeType
  */
 export const ProjectShapeType: ShapeType<Project> = {
-  schema: ProjectSchema,
+  schema: projectSchema,
   shape: 'https://shapetrees.hackers4peace.net/shapes/Project',
-  context: ProjectContext,
+  context: projectContext,
 }

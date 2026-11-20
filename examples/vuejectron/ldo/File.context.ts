@@ -2,10 +2,10 @@ import type { LdoJsonldContext } from '@ldo/ldo'
 
 /**
  * =============================================================================
- * FileContext: JSONLD Context for File
+ * fileContext: JSONLD Context for File
  * =============================================================================
  */
-export const FileContext: LdoJsonldContext = {
+export const fileContext: LdoJsonldContext = {
   type: {
     '@id': '@type',
     '@isCollection': true,

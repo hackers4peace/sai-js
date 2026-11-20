@@ -1,7 +1,7 @@
 import type { ShapeType } from '@ldo/ldo'
 
-import { FileContext } from './File.context'
-import { FileSchema } from './File.schema'
+import { fileContext } from './File.context'
+import { fileSchema } from './File.schema'
 import type { File } from './File.typings'
 
 /**
@@ -14,7 +14,7 @@ import type { File } from './File.typings'
  * File ShapeType
  */
 export const FileShapeType: ShapeType<File> = {
-  schema: FileSchema,
+  schema: fileSchema,
   shape: 'https://shapetrees.hackers4peace.net/shapes/File',
-  context: FileContext,
+  context: fileContext,
 }

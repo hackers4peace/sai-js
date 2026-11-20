@@ -1,7 +1,7 @@
 import type { ShapeType } from '@ldo/ldo'
 
-import { TaskContext } from './Task.context'
-import { TaskSchema } from './Task.schema'
+import { taskContext } from './Task.context'
+import { taskSchema } from './Task.schema'
 import type { Task } from './Task.typings'
 
 /**
@@ -14,7 +14,7 @@ import type { Task } from './Task.typings'
  * Task ShapeType
  */
 export const TaskShapeType: ShapeType<Task> = {
-  schema: TaskSchema,
+  schema: taskSchema,
   shape: 'https://shapetrees.hackers4peace.net/shapes/Task',
-  context: TaskContext,
+  context: taskContext,
 }

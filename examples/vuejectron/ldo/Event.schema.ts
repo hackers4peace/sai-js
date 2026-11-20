@@ -2,10 +2,10 @@ import type { Schema } from 'shexj'
 
 /**
  * =============================================================================
- * EventSchema: ShexJ Schema for Event
+ * eventSchema: ShexJ Schema for Event
  * =============================================================================
  */
-export const EventSchema: Schema = {
+export const eventSchema: Schema = {
   type: 'Schema',
   shapes: [
     {
