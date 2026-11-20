@@ -39,13 +39,13 @@ devbox run -- bash -lc \
 
 The proxy exposes:
 
-| Port | Process |
-|---|---|
-| 9240 | vitest |
-| 9229 | auth |
+| Port | Process  |
+| ---- | -------- |
+| 9240 | vitest   |
+| 9229 | auth     |
 | 9230 | registry |
-| 9231 | data |
-| 9235 | worker |
+| 9231 | data     |
+| 9235 | worker   |
 
 Use the alternate host ports (`19229` and so on) when the dev compose stack already holds the originals.
 

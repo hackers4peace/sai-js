@@ -8,6 +8,8 @@
     "composite": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "strict": true,
     "jsx": "preserve",
     "sourceMap": false,

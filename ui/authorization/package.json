@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:vite": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -13,7 +14,7 @@
     "@effect/rpc": "^0.44.13",
     "@effect/rpc-http": "^0.42.13",
     "@fluent/bundle": "^0.18.0",
-    "@janeirodigital/sai-api-messages": "^1.0.0-rc.31",
+    "@janeirodigital/sai-api-messages": "file:../../packages/api-messages",
     "@mdi/font": "7.3.67",
     "@opentelemetry/exporter-trace-otlp-http": "^0.222.0",
     "@opentelemetry/sdk-trace-base": "^2.11.0",

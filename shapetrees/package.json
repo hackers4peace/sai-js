@@ -11,7 +11,7 @@
   "devDependencies": {
     "jsonld": "^9.0.0",
     "n3": "^2.1.2",
-    "vitest": "^3.2.4",
+    "vitest": "^5.1.1",
     "wrangler": "^4.63.0"
   }
 }

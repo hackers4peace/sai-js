@@ -78,14 +78,14 @@ export type CidDocument = {
  * the cid context locally — no network fetch.)
  */
 export async function toCidDocument(triples: Iterable<Quad>): Promise<CidDocument | undefined> {
-  const dataset = new Store(triples)
+  const dataset = new Store([...triples])
   new Reasoner(dataset).reason(rulesDataset)
   const frame = {
     '@context': CID_CONTEXT,
     '@explicit': true,
     service: { '@embed': '@always' },
   }
-  const framed = (await jsonld.frame(await jsonld.fromRDF(dataset), frame, {
+  const framed = (await jsonld.frame(await jsonld.fromRDF([...dataset]), frame, {
     documentLoader,
   })) as { service?: CidService | CidService[] }
   // the cid context declares no `@container: '@set'` on `service`, so a single

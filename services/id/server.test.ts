@@ -25,7 +25,7 @@ beforeAll(async () => {
   vi.stubEnv('ID_ORIGIN', idOrigin)
   vi.stubEnv('DOC_ORIGIN', docOrigin)
   vi.stubEnv('CSS_ID_SPARQL_ENDPOINT', sparqlEndpoint)
-  app = (await import('./server')).default
+  app = (await import('./server.ts')).default
 })
 
 afterAll(() => {

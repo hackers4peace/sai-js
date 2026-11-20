@@ -33,7 +33,10 @@
     "typecheck": "for p in utils lws-auth data-model application authorization-agent api-messages test-utils repl; do tsgo --noEmit -p packages/$p/tsconfig.json || exit 1; done",
     "publish:npm": "turbo run publish:npm --filter='./packages/*' --concurrency=1"
   },
-  "packageManager": "npm@11.3.0",
+  "engines": {
+    "node": ">=26"
+  },
+  "packageManager": "npm@11.20.0",
   "workspaces": [
     "packages/*",
     "test",
