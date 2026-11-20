@@ -11,7 +11,7 @@ pkgs.buildNpmPackage {
 
   nodejs = pkgs.nodejs_26;
 
-  npmDepsHash = "sha256-KvsOsjbHuruxtWl6o8ZzRX99uqGJs1wRzUE+50VB1WY=";
+  npmDepsHash = "sha256-+e7EnR7bqMIeDFKOw4ZmyTyB7upqg2TealJXguyKvyU=";
 
   dontNpmBuild = true;
 

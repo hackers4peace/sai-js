@@ -9,14 +9,14 @@
   "main": "http.ts",
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.8",
+    "@hono/node-server": "^2.1.11",
     "@janeirodigital/interop-utils": "file:../../packages/utils",
     "@jeswr/pretty-turtle": "^1.8.2",
     "fetch-sparql-endpoint": "^7.3.0",
-    "hono": "^4.11.4",
+    "hono": "^4.13.19",
     "jsonld": "^9.0.0",
     "n3": "^2.13.12"
   },
