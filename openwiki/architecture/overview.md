@@ -77,7 +77,7 @@ needs: the two-step storage chain (`createLwsAuthFetch`) and the identity-only
 | `utils` | `packages/utils` | JSON-LD, SPARQL/N-Quads, notification-subscription, discovery, and fetch primitives |
 | services | `services/id`, `services/css`, `services/worker` | WebID/CID service, CSS instance configs, worker package |
 | UI | `ui/authorization` | Vue authorization console |
-| examples | `examples/plenary`, `examples/vuejectron` | Demo applications |
+| examples | `examples/vuejectron` | Demo application |
 | shapetrees | `shapetrees` | Cloudflare shape-tree worker |
 | environments | `environments/` | CSS configs, seed data, dev URL map |
 | nix | `nix/` | NixOS/Podman production deployment |
