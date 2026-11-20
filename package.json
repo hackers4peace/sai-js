@@ -9,14 +9,14 @@
     "husky": "^9.1.7",
     "jest-rdf": "^2.0.0",
     "likec4": "^1.61.0",
-    "lint-staged": "^15.4.3",
-    "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0",
-    "rimraf": "^6.0.1",
-    "tslib": "^2.8.1",
-    "turbo": "^2.3.4",
+    "lint-staged": "^17.6.1",
+    "oxfmt": "^0.79.0",
+    "oxlint": "^1.94.0",
+    "rimraf": "^6.1.4",
+    "tslib": "^2.9.1",
+    "turbo": "^2.11.13",
     "typescript": "^5.7.3",
-    "vitest": "^5.0.3"
+    "vitest": "^5.1.1"
   },
   "scripts": {
     "prepare": "if [ \"$CI\" != \"true\" ]; then husky; fi",

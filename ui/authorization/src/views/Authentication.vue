@@ -48,15 +48,13 @@
             <dt>ID</dt>
             <dd>
               <v-chip :color="chipColor" variant="flat"
-                >https://<span class="handle">{{ handle }}</span
-                >.{{ config.idOrigin }}</v-chip
+                >https://<span class="handle">{{ handle }}</span>.{{ config.idOrigin }}</v-chip
               >
             </dd>
             <dt>Pod</dt>
             <dd>
               <v-chip :color="chipColor" variant="flat"
-                >https://<span class="handle">{{ handle }}</span
-                >.{{ config.dataOrigin }}</v-chip
+                >https://<span class="handle">{{ handle }}</span>.{{ config.dataOrigin }}</v-chip
               >
             </dd>
           </dl>

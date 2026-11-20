@@ -10,8 +10,8 @@
   },
   "devDependencies": {
     "jsonld": "^9.0.0",
-    "n3": "^2.1.2",
+    "n3": "^2.13.12",
     "vitest": "^5.1.1",
-    "wrangler": "^4.63.0"
+    "wrangler": "^4.165.0"
   }
 }
