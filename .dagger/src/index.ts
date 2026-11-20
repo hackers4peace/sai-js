@@ -263,7 +263,9 @@ export class SaiJs {
       .withEnvVariable('DB_PORT', '5432')
       .withEnvVariable('SAI_RUN_ID', runId)
       .withDirectory('/scripts', scripts)
-      .withExec(['/bin/sh', '/scripts/setup-postgres.sh'])
+      // Include runId in the exec args as well as the env: Dagger 0.21.12 can
+      // otherwise serve a cached setup run against a fresh Postgres service.
+      .withExec(['/bin/sh', '-c', `echo ${runId} && exec /bin/sh /scripts/setup-postgres.sh`])
       .sync()
 
     const temporal = dag
@@ -298,7 +300,7 @@ export class SaiJs {
       .withEnvVariable('DEFAULT_NAMESPACE', 'default')
       .withEnvVariable('SAI_RUN_ID', runId)
       .withDirectory('/scripts', scripts)
-      .withExec(['/bin/sh', '/scripts/create-namespace.sh'])
+      .withExec(['/bin/sh', '-c', `echo ${runId} && exec /bin/sh /scripts/create-namespace.sh`])
       .sync()
 
     return temporal
