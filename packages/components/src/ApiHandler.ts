@@ -1,19 +1,20 @@
-import { RpcRouter } from '@effect/rpc'
+import { Etag, HttpPlatform } from '@effect/platform'
+import * as NodeContext from '@effect/platform-node/NodeContext'
+import { RpcSerialization, RpcServer } from '@effect/rpc'
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { withSpan } from '@janeirodigital/interop-utils'
-import { IRI, SaiService, router } from '@janeirodigital/sai-api-messages'
-import { context as otelContext, isSpanContextValid, trace } from '@opentelemetry/api'
+import { IRI, SaiService, rpcGroup, rpcHandlers } from '@janeirodigital/sai-api-messages'
 import {
   BasicRepresentation,
   ForbiddenHttpError,
   InternalServerError,
-  OkResponseDescription,
   OperationHttpHandler,
+  ResponseDescription,
   SOLID_HTTP,
   readableToString,
 } from '@solid/community-server'
 import type { CookieStore, WebIdStore } from '@solid/community-server'
-import type { OperationHttpHandlerInput, ResponseDescription } from '@solid/community-server'
+import type { OperationHttpHandlerInput } from '@solid/community-server'
 import { Effect, Layer } from 'effect'
 import { getLoggerFor } from 'global-logger-factory'
 import type { PushSubscription } from 'web-push'
@@ -42,7 +43,6 @@ import {
 } from './services/ShareResource.js'
 import { acceptInvitation, getSocialAgents } from './services/SocialAgentRegistry.js'
 import type { SessionManager } from './SessionManager'
-import { withEffectTracing } from './tracing/effect-tracer.js'
 import type { UiPushSubscriptionStore } from './UiPushSubscriptionStore.js'
 
 export class ApiHandler extends OperationHttpHandler {
@@ -57,7 +57,10 @@ export class ApiHandler extends OperationHttpHandler {
   ) {
     super()
   }
-  public async handle({ operation }: OperationHttpHandlerInput): Promise<ResponseDescription> {
+  public async handle({
+    operation,
+    request: httpRequest,
+  }: OperationHttpHandlerInput): Promise<ResponseDescription> {
     // Manual active RPC span: the outgoing client spans (CID / data /
     // registry / shapetrees hops) nest under it. No-op when tracing is off.
     return withSpan('sai-components', 'sai.rpc.handle', async (span) => {
@@ -85,31 +88,10 @@ export class ApiHandler extends OperationHttpHandler {
         }
       }
 
-      const requestBody = JSON.parse(await readableToString(operation.body.data))
-      // capture the full incoming RPC payload (all request envelopes) on
-      // this span — same shape as the request snippets in the dynamic
-      // views (docs/temporal.c4); recording-only guard keeps the stringify
-      // cost off non-sampled runs, and it sits BEFORE the envelope
-      // trace-rewrite below so it reflects the wire request as received
+      const requestBody = await readableToString(operation.body.data)
       if (span.isRecording()) {
-        span.setAttribute('sai.rpc.request', JSON.stringify(requestBody))
+        span.setAttribute('sai.rpc.request', requestBody)
       }
-      // make the @effect/rpc envelope carry the REAL trace: RpcRouter uses
-      // req.traceId/req.spanId as the Effect span's explicit ExternalSpan
-      // parent — the envelope placeholders would collapse every Effect span
-      // into one pseudo-trace. Rewrite from the active OTel span
-      // (sai.rpc.handle) when tracing is recording.
-      const rpcSpan = trace.getSpan(otelContext.active())
-      if (rpcSpan && isSpanContextValid(rpcSpan.spanContext())) {
-        const rpcContext = rpcSpan.spanContext()
-        for (const entry of requestBody) {
-          entry.traceId = rpcContext.traceId
-          entry.spanId = rpcContext.spanId
-          entry.sampled = true
-        }
-      }
-      const rpcMethod = requestBody[0]?.request?._tag
-      if (rpcMethod) span.setAttribute('sai.rpc.method', rpcMethod)
 
       const SaiServiceLive = Layer.succeed(
         SaiService,
@@ -355,21 +337,105 @@ export class ApiHandler extends OperationHttpHandler {
             }),
         })
       )
-      const rpcHandler = RpcRouter.toHandlerNoStream(router)
-
-      const program = Effect.gen(function* () {
-        return yield* rpcHandler(requestBody)
-      }).pipe(Effect.provide(SaiServiceLive))
-      const payload = await Effect.runPromise(withEffectTracing(program, 'sai-uas'))
-      // capture the RPC response / return value on the same span (the
-      // @effect/rpc response envelope: {_tag: 'Success'|'Failure', …})
-      if (span.isRecording()) {
-        span.setAttribute('sai.rpc.response', JSON.stringify(payload))
+      const headers = new Headers()
+      for (const [key, value] of Object.entries(httpRequest.headers)) {
+        if (value === undefined) continue
+        if (
+          ['host', 'connection', 'content-length', 'transfer-encoding'].includes(key.toLowerCase())
+        ) {
+          continue
+        }
+        headers.set(key, Array.isArray(value) ? value.join(', ') : value)
       }
+      // The current UI uses the @effect/rpc NDJSON protocol. The integration
+      // tests still post the old array envelope; adapt it here until they move.
+      const isLegacyJson = !String(httpRequest.headers['content-type'] ?? '').includes(
+        'application/ndjson'
+      )
+      let rpcBody = requestBody
+      if (isLegacyJson) {
+        const legacy = JSON.parse(requestBody) as Array<{
+          request: { _tag: string } & Record<string, unknown>
+          headers?: Record<string, string>
+          traceId?: string
+          spanId?: string
+          sampled?: boolean
+        }>
+        rpcBody = legacy
+          .map((entry, index) => {
+            return `${JSON.stringify({
+              _tag: 'Request',
+              id: String(index),
+              tag: entry.request._tag,
+              payload: entry.request,
+              headers: Object.entries(entry.headers ?? {}),
+              traceId: entry.traceId,
+              spanId: entry.spanId,
+              sampled: entry.sampled,
+            })}\n`
+          })
+          .join('')
+        headers.set('content-type', 'application/ndjson')
+      }
+      const rpcRequest = new Request(new URL(operation.target.path, 'http://localhost'), {
+        method: operation.method,
+        headers,
+        body: operation.method === 'GET' || operation.method === 'HEAD' ? undefined : rpcBody,
+      })
 
-      const doc = JSON.stringify(payload)
-      const representation = new BasicRepresentation(doc, operation.target, 'application/json')
-      return new OkResponseDescription(representation.metadata, representation.data)
+      const platformLayer = Layer.mergeAll(
+        HttpPlatform.layer.pipe(Layer.provide(NodeContext.layer)),
+        Etag.layer,
+        NodeContext.layer
+      )
+      const rpcHandler = RpcServer.toWebHandler(rpcGroup, {
+        layer: Layer.mergeAll(
+          rpcHandlers.pipe(Layer.provide(SaiServiceLive)),
+          RpcSerialization.layerNdjson,
+          platformLayer
+        ),
+        spanPrefix: 'sai.rpc',
+      })
+
+      try {
+        const response = await rpcHandler.handler(rpcRequest)
+        let responseText = await response.text()
+        let responseType = response.headers.get('content-type') ?? 'application/json'
+        if (isLegacyJson) {
+          const responses = responseText
+            .split('\n')
+            .filter(Boolean)
+            .map((line) => {
+              const message = JSON.parse(line) as {
+                _tag: string
+                exit?: { _tag: string; value?: unknown; cause?: { message?: string } }
+              }
+              if (message._tag !== 'Exit') return message
+              if (message.exit?._tag === 'Success') {
+                return { _tag: 'Success', value: message.exit.value }
+              }
+              const failureMessage = message.exit?.cause?.message ?? JSON.stringify(message.exit)
+              console.error('RPC failure', failureMessage)
+              return {
+                _tag: 'Failure',
+                message: failureMessage,
+              }
+            })
+          responseText = JSON.stringify(responses)
+          responseType = 'application/json'
+        }
+        if (span.isRecording()) {
+          span.setAttribute('sai.rpc.response', responseText)
+        }
+        const representation = new BasicRepresentation(responseText, operation.target, responseType)
+        return new ResponseDescription(
+          response.status,
+          representation.metadata,
+          representation.data
+        )
+      } finally {
+        await rpcHandler.dispose()
+      }
     })
   }
 }

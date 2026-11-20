@@ -34,15 +34,15 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@effect/cli": "^0.73.2",
-    "@effect/platform": "^0.94.3",
-    "@effect/platform-node": "^0.104.1",
+    "@effect/cli": "^0.77.2",
+    "@effect/platform": "^0.97.4",
+    "@effect/platform-node": "^0.108.4",
     "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.31",
     "@janeirodigital/interop-data-model": "^1.0.0-rc.31",
     "@janeirodigital/interop-test-utils": "^1.0.0-rc.31",
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "@paralleldrive/cuid2": "^3.3.0",
-    "effect": "^3.19.16",
+    "effect": "^3.22.5",
     "jose": "^6.2.18"
   }
 }

@@ -1,4 +1,4 @@
-import { Rpc, RpcRouter } from '@effect/rpc'
+import { Rpc, RpcGroup } from '@effect/rpc'
 import { Context, Effect, pipe } from 'effect'
 import * as S from 'effect/Schema'
 import type { PushSubscription } from 'web-push'
@@ -1211,177 +1211,90 @@ export class SaiService extends Context.Tag('SaiService')<
   }
 >() {}
 
-export const router = RpcRouter.make(
-  Rpc.effect(GetWebId, () =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getWebId()
-    })
-  ),
-  Rpc.effect(CheckHandle, ({ handle }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.checkHandle(handle)
-    })
-  ),
-  Rpc.effect(BootstrapAccount, ({ handle }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.bootstrapAccount(handle)
-    })
-  ),
-  Rpc.effect(RegisterPushSubscription, ({ subscription }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.registerPushSubscription(subscription)
-    })
-  ),
-  Rpc.effect(ListApplications, ({ context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getApplications(context)
-    })
-  ),
-  Rpc.effect(GetUnregisteredApplication, ({ id }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getUnregisteredApplication(id)
-    })
-  ),
-  Rpc.effect(
-    GetAuthoriaztionData,
-    ({ agentId, lang, accessNeedGroupIri, accessRequestIri, context }) =>
-      Effect.gen(function* () {
-        const saiService = yield* SaiService
-        return yield* saiService.getAuthorizationData(
+export const rpcGroup = RpcGroup.make(
+  Rpc.fromTaggedRequest(GetWebId),
+  Rpc.fromTaggedRequest(CheckHandle),
+  Rpc.fromTaggedRequest(BootstrapAccount),
+  Rpc.fromTaggedRequest(RegisterPushSubscription),
+  Rpc.fromTaggedRequest(ListApplications),
+  Rpc.fromTaggedRequest(GetUnregisteredApplication),
+  Rpc.fromTaggedRequest(GetAuthoriaztionData),
+  Rpc.fromTaggedRequest(ListAuthorizations),
+  Rpc.fromTaggedRequest(GetResource),
+  Rpc.fromTaggedRequest(ListSocialAgents),
+  Rpc.fromTaggedRequest(ListSocialAgentInvitations),
+  Rpc.fromTaggedRequest(ListRoles),
+  Rpc.fromTaggedRequest(CreateRole),
+  Rpc.fromTaggedRequest(UpdateRole),
+  Rpc.fromTaggedRequest(DeleteRole),
+  Rpc.fromTaggedRequest(ListDataRegistries),
+  Rpc.fromTaggedRequest(ListDataInstances),
+  Rpc.fromTaggedRequest(RequestAccessUsingApplicationNeeds),
+  Rpc.fromTaggedRequest(RequestAccessUsingAccessNeeds),
+  Rpc.fromTaggedRequest(ArchiveAccessRequest),
+  Rpc.fromTaggedRequest(CreateInvitation),
+  Rpc.fromTaggedRequest(AcceptInvitation),
+  Rpc.fromTaggedRequest(ShareResource),
+  Rpc.fromTaggedRequest(AuthorizeApp),
+  Rpc.fromTaggedRequest(RevokeAuthorizations),
+  Rpc.fromTaggedRequest(AddAdmin),
+  Rpc.fromTaggedRequest(RemoveAdmin)
+)
+
+export const rpcHandlers = rpcGroup.toLayer(
+  Effect.gen(function* () {
+    const saiService = yield* SaiService
+    return {
+      GetWebId: () => saiService.getWebId(),
+      CheckHandle: ({ handle }) => saiService.checkHandle(handle),
+      BootstrapAccount: ({ handle }) => saiService.bootstrapAccount(handle),
+      RegisterPushSubscription: ({ subscription }) =>
+        saiService.registerPushSubscription(subscription),
+      ListApplications: ({ context }) => saiService.getApplications(context),
+      GetUnregisteredApplication: ({ id }) => saiService.getUnregisteredApplication(id),
+      GetAuthoriaztionData: ({ agentId, lang, accessNeedGroupIri, accessRequestIri, context }) =>
+        saiService.getAuthorizationData(
           agentId,
           lang,
           accessNeedGroupIri,
           accessRequestIri,
           context
-        )
-      })
-  ),
-  Rpc.effect(ListAuthorizations, ({ grantee, lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getAuthorizations(grantee, lang, context)
-    })
-  ),
-  Rpc.effect(GetResource, ({ id, lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getResource(id, lang, context)
-    })
-  ),
-  Rpc.effect(ListSocialAgents, ({ lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getSocialAgents(lang, context)
-    })
-  ),
-  Rpc.effect(ListSocialAgentInvitations, ({ lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getSocialAgentInvitations(lang, context)
-    })
-  ),
-  Rpc.effect(ListRoles, ({ lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getRoles(lang, context)
-    })
-  ),
-  Rpc.effect(CreateRole, ({ label, members, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.createRole(label, members, context)
-    })
-  ),
-  Rpc.effect(UpdateRole, ({ id, label, members, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.updateRole(id, label, members, context)
-    })
-  ),
-  Rpc.effect(DeleteRole, ({ id, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.deleteRole(id, context)
-    })
-  ),
-  Rpc.effect(ListDataRegistries, ({ agentId, lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.getDataRegistries(agentId, lang, context)
-    })
-  ),
-  Rpc.effect(ListDataInstances, ({ agentId, registrationId, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.listDataInstances(agentId, registrationId, context)
-    })
-  ),
-  Rpc.effect(RequestAccessUsingApplicationNeeds, ({ applicationId, agentId, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.requestAccessUsingApplicationNeeds(applicationId, agentId, context)
-    })
-  ),
-  Rpc.effect(RequestAccessUsingAccessNeeds, ({ dataOwner, hasAccessNeedGroup, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.requestAccessUsingAccessNeeds(dataOwner, hasAccessNeedGroup, context)
-    })
-  ),
-  Rpc.effect(ArchiveAccessRequest, ({ request, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.archiveAccessRequest(request, context)
-    })
-  ),
-  Rpc.effect(CreateInvitation, ({ label, note, lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.createInvitation(label, note, lang, context)
-    })
-  ),
-  Rpc.effect(AcceptInvitation, ({ capabilityUrl, label, note, lang, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.acceptInvitation(capabilityUrl, label, note, lang, context)
-    })
-  ),
-  Rpc.effect(ShareResource, ({ authorization, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.shareResource(authorization, context)
-    })
-  ),
-  Rpc.effect(AuthorizeApp, ({ authorization, accessRequestIri, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.authorizeApp(authorization, accessRequestIri, context)
-    })
-  ),
-  Rpc.effect(RevokeAuthorizations, ({ authorizations, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.revokeAuthorizations(authorizations, context)
-    })
-  ),
-  Rpc.effect(AddAdmin, ({ webId, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.addAdmin(webId, context)
-    })
-  ),
-  Rpc.effect(RemoveAdmin, ({ webId, context }) =>
-    Effect.gen(function* () {
-      const saiService = yield* SaiService
-      return yield* saiService.removeAdmin(webId, context)
-    })
-  )
+        ),
+      ListAuthorizations: ({ grantee, lang, context }) =>
+        saiService.getAuthorizations(grantee, lang, context),
+      GetResource: ({ id, lang, context }) => saiService.getResource(id, lang, context),
+      ListSocialAgents: ({ lang, context }) => saiService.getSocialAgents(lang, context),
+      ListSocialAgentInvitations: ({ lang, context }) =>
+        saiService.getSocialAgentInvitations(lang, context),
+      ListRoles: ({ lang, context }) => saiService.getRoles(lang, context),
+      CreateRole: ({ label, members, context }) => saiService.createRole(label, members, context),
+      UpdateRole: ({ id, label, members, context }) =>
+        saiService.updateRole(id, label, members, context),
+      DeleteRole: ({ id, context }) => saiService.deleteRole(id, context),
+      ListDataRegistries: ({ agentId, lang, context }) =>
+        saiService.getDataRegistries(agentId, lang, context),
+      ListDataInstances: ({ agentId, registrationId, context }) =>
+        saiService.listDataInstances(agentId, registrationId, context),
+      RequestAccessUsingApplicationNeeds: ({ applicationId, agentId, context }) =>
+        saiService.requestAccessUsingApplicationNeeds(applicationId, agentId, context),
+      RequestAccessUsingAccessNeeds: ({ dataOwner, hasAccessNeedGroup, context }) =>
+        saiService.requestAccessUsingAccessNeeds(dataOwner, hasAccessNeedGroup, context),
+      ArchiveAccessRequest: ({ request, context }) =>
+        saiService.archiveAccessRequest(request, context),
+      CreateInvitation: ({ label, note, lang, context }) =>
+        saiService.createInvitation(label, note, lang, context),
+      AcceptInvitation: ({ capabilityUrl, label, note, lang, context }) =>
+        saiService.acceptInvitation(capabilityUrl, label, note, lang, context),
+      ShareResource: ({ authorization, context }) =>
+        saiService.shareResource(authorization, context),
+      AuthorizeApp: ({ authorization, accessRequestIri, context }) =>
+        saiService.authorizeApp(authorization, accessRequestIri, context),
+      RevokeAuthorizations: ({ authorizations, context }) =>
+        saiService.revokeAuthorizations(authorizations, context),
+      AddAdmin: ({ webId, context }) => saiService.addAdmin(webId, context),
+      RemoveAdmin: ({ webId, context }) => saiService.removeAdmin(webId, context),
+    }
+  })
 )
 
-export type UiRpcRouter = typeof router
+export type UiRpcRouter = typeof rpcGroup

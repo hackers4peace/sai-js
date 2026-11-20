@@ -36,7 +36,7 @@ pkgs.buildNpmPackage {
 
   nodejs = pkgs.nodejs_26;
 
-  npmDepsHash = "sha256-dT3uypU8uTgpAMWxwcgRiqPSXTwkqL9lqEHn1RQeOMg=";
+  npmDepsHash = "sha256-ycnLNi+qzhJLHzYWc9LYGwIE+xLcWDsoAlzG5BwfVAI=";
   makeCacheWritable = true;
 
   # NOTE: `@solid/community-server` is now a git dependency whose `prepare`

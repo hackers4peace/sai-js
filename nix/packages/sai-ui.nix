@@ -32,7 +32,7 @@ pkgs.buildNpmPackage {
 
   nodejs = pkgs.nodejs_26;
 
-  npmDepsHash = "sha256-v619fMb5b/01kY7PrYiI37ZWKFF4TF8ItuZMH3TIDv0=";
+  npmDepsHash = "sha256-WB+B+LgUO1BeiLoEFPYdMeeGsQEiQvlZOYwb28K20KM=";
   makeCacheWritable = true;
   npmRebuildFlags = [ "--ignore-scripts" ];
 
