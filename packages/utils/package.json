@@ -48,7 +48,6 @@
     "jose": "^6.2.18",
     "jsonld": "^9.0.0",
     "n3": "^2.13.12",
-    "postgres": "^3.4.7",
     "rdf-vocabulary": "^1.0.1"
   },
   "devDependencies": {

@@ -64,7 +64,7 @@
     "global-logger-factory": "^1.0.0",
     "jose": "^6.2.18",
     "n3": "^2.13.12",
-    "postgres": "^3.4.7",
+    "postgres": "^4.1.1",
     "rdf-vocabulary": "^1.0.1",
     "s3mini": "^0.9.5",
     "web-push": "^3.6.6"

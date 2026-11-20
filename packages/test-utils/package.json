@@ -46,7 +46,8 @@
     "@elfpavlik/lws-auth": "0.1.0",
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "jsonld": "^9.0.0",
-    "n3": "^2.13.12"
+    "n3": "^2.13.12",
+    "postgres": "^4.1.1"
   },
   "devDependencies": {
     "@rdfjs/types": "^2.0.1",
