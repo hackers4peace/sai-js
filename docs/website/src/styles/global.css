@@ -230,43 +230,43 @@ main {
   max-width: var(--prose-width);
 }
 
-.prose :global(h2) {
+.prose h2 {
   font-size: 1.25rem;
   margin: 0 0 0.75em;
   font-weight: 600;
 }
 
-.prose :global(p) {
+.prose p {
   margin: 0 0 1em;
   color: var(--text-secondary);
 }
 
-.prose :global(p:last-child) {
+.prose p:last-child {
   margin-bottom: 0;
 }
 
-.readme-md :global(h1) {
+.readme-md h1 {
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 0.75em;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
-.readme-md :global(a) {
+.readme-md a {
   color: var(--color-primary);
 }
-.readme-md :global(a:hover) {
+.readme-md a:hover {
   text-decoration: underline;
 }
-.readme-md :global(h2) {
+.readme-md h2 {
   font-size: 1.2rem;
   margin: 1.5em 0 0.6em;
 }
-.readme-md :global(h3) {
+.readme-md h3 {
   font-size: 1.05rem;
   margin: 1.25em 0 0.5em;
 }
-.readme-md :global(img) {
+.readme-md img {
   max-width: 100%;
   height: auto;
   vertical-align: middle;
@@ -287,7 +287,7 @@ main {
   display: block;
   margin: 0 auto;
 }
-.readme-md :global(pre) {
+.readme-md pre {
   padding: 0.75em 1em;
   overflow: auto;
   font-size: 0.85rem;
@@ -296,11 +296,11 @@ main {
   border-radius: 6px;
   margin: 0 0 1em;
 }
-.readme-md :global(ul) {
+.readme-md ul {
   margin: 0 0 1em;
   padding-left: 1.4em;
 }
-.readme-md :global(hr) {
+.readme-md hr {
   border: 0;
   border-top: 1px solid var(--border-color);
   margin: 1.5em 0;

@@ -13,10 +13,10 @@
     "clean": "rm -rf .astro dist node_modules/.vite"
   },
   "devDependencies": {
-    "likec4": "^1.59.3"
+    "likec4": "^1.61.0"
   },
   "dependencies": {
-    "astro": "^5.0.0",
-    "marked": "^15.0.0"
+    "astro": "^7.4.13",
+    "marked": "^18.2.1"
   }
 }

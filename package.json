@@ -8,7 +8,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "husky": "^9.1.7",
     "jest-rdf": "^2.0.0",
-    "likec4": "^1.59.3",
+    "likec4": "^1.61.0",
     "lint-staged": "^15.4.3",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
