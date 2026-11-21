@@ -1,5 +1,7 @@
 {
-  "buildCommand": "vite build && node scripts/vercel.js",
+  "installCommand": "npm install && npm install --prefix examples/vuejectron",
+  "buildCommand": "cd examples/vuejectron && npx --no-install vite build && node scripts/vercel.js",
+  "outputDirectory": "examples/vuejectron/dist",
 
   "rewrites": [
     {

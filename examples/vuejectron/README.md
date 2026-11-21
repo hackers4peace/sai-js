@@ -56,6 +56,17 @@ pnpm lint
 
 See [Configuration Reference](https://vitejs.dev/config/).
 
+## Deployment (Vercel)
+
+The example depends on the workspace packages in `packages/` through `file:`
+links. Configure the Vercel project with the **repository root** as its Root
+Directory; the checked-in `vercel.json` then installs both the workspace and the
+example, builds `examples/vuejectron`, and publishes its `dist` directory.
+
+Keeping the Root Directory at `examples/vuejectron` breaks the links, because
+Vercel builds from a separate work directory where `../../packages` does not
+exist.
+
 ## Tracing (optional)
 
 `public/config.json` controls the browser OpenTelemetry SDK per deployment:

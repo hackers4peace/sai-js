@@ -2,6 +2,8 @@ import { existsSync, unlinkSync } from 'node:fs'
 import { extname, join, resolve } from 'node:path'
 import { URL, fileURLToPath } from 'node:url'
 
+const dirname = fileURLToPath(new URL('.', import.meta.url))
+
 // Plugins
 import vue from '@vitejs/plugin-vue'
 // Utilities
@@ -39,12 +41,12 @@ export default defineConfig({
       name: 'exclude-config',
       apply: 'build',
       closeBundle() {
-        const configPath = resolve(__dirname, 'dist/config.json')
+        const configPath = resolve(dirname, 'dist/config.json')
         if (existsSync(configPath)) {
           unlinkSync(configPath)
           console.log('✓ Removed config.json from dist')
         }
-        const idPath = resolve(__dirname, 'dist/id.jsonld')
+        const idPath = resolve(dirname, 'dist/id.jsonld')
         if (existsSync(idPath)) {
           unlinkSync(idPath)
           console.log('✓ Removed id.jsonld from dist')
@@ -58,7 +60,7 @@ export default defineConfig({
           if (req.url && !extname(req.url)) {
             const extensions = ['.jsonld', '.ttl']
             for (const ext of extensions) {
-              const filePath = join(__dirname, 'public', req.url + ext)
+              const filePath = join(dirname, 'public', req.url + ext)
               if (existsSync(filePath)) {
                 req.url += ext
                 break
