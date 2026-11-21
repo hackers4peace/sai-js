@@ -757,13 +757,18 @@ export type OpenSentAccessRequest = {
   dataOwner: string
   /** the request's registered shape trees (need-group intersection) */
   shapeTrees: string[]
+  /**
+   * Requested data instances per shape tree (`interop:hasDataInstance` on the
+   * need). Absent for shape-tree-only requests.
+   */
+  instancesByShapeTree?: Record<string, string[]>
 }
 
 export async function getOpenSentAccessRequests(
   transport: SparqlTransport
 ): Promise<OpenSentAccessRequest[]> {
   const query = `
-SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree WHERE {
+SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree ?instance WHERE {
   GRAPH ?g {
     ?sent a <${INTEROP.NeedBasedAccessRequestSent}> ;
           <${AS.object}> ?request .
@@ -774,6 +779,7 @@ SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree WHERE {
              <${INTEROP.hasAccessNeedGroup}> ?needGroup .
     ?needGroup <${INTEROP.hasAccessNeed}> ?need .
     ?need <${INTEROP.registeredShapeTree}> ?shapeTree .
+    OPTIONAL { ?need <${INTEROP.hasDataInstance}> ?instance }
   }
   # still open — no granted/archived activity referencing the same snapshot
   FILTER NOT EXISTS {
@@ -795,7 +801,15 @@ SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree WHERE {
       dataOwner: b.dataOwner.value,
       shapeTrees: [],
     }
-    entry.shapeTrees.push(b.shapeTree.value)
+    const shapeTree = b.shapeTree.value
+    if (!entry.shapeTrees.includes(shapeTree)) entry.shapeTrees.push(shapeTree)
+    if (b.instance) {
+      const instances = entry.instancesByShapeTree ?? {}
+      const byTree = instances[shapeTree] ?? []
+      if (!byTree.includes(b.instance.value)) byTree.push(b.instance.value)
+      instances[shapeTree] = byTree
+      entry.instancesByShapeTree = instances
+    }
     byRequest.set(key, entry)
   }
   return [...byRequest.values()]
@@ -851,27 +865,51 @@ SELECT DISTINCT ?request ?grantee WHERE {
  * best-effort match (§3.3): `grantedBy` (the owner) + per-grant
  * `registeredShapeTree`.
  */
+export interface GranteeGrant {
+  grant: string
+  grantedBy: string
+  shapeTree: string
+  /** the grant policy's `interop:scopeOfGrant` */
+  scope?: string
+  /** selected instances (`SelectedFromRegistry` only) */
+  instances?: string[]
+}
+
 export async function getAccessGrantsForGrantee(
   transport: SparqlTransport,
   webId: string
-): Promise<{ grant: string; grantedBy: string; shapeTree: string }[]> {
+): Promise<GranteeGrant[]> {
   const query = `
-SELECT DISTINCT ?grant ?grantedBy ?shapeTree WHERE {
+SELECT DISTINCT ?grant ?grantedBy ?shapeTree ?scope ?source WHERE {
   GRAPH ?g {
     ?grant a <${LWS.AccessGrant}> ;
            <${LWS.access}> ?policy .
     ?policy <${INTEROP.registeredShapeTree}> ?shapeTree ;
            <${ODRL.permission}> ?permission .
+    OPTIONAL { ?policy <${INTEROP.scopeOfGrant}> ?scope }
     ?permission
       <${ODRL.assignee}> <${webId}> ;
       <${ODRL.target}> ?target .
     ?target <${INTEROP.dataOwner}> ?grantedBy .
+    OPTIONAL { ?target <${ODRL.source}> ?source }
   }
 }`
   const bindings = await transport.fetchBindings(query)
-  return bindings.map((b) => ({
-    grant: b.grant.value,
-    grantedBy: b.grantedBy.value,
-    shapeTree: b.shapeTree.value,
-  }))
+  const byGrant = new Map<string, GranteeGrant>()
+  for (const b of bindings) {
+    const key = b.grant.value
+    const entry = byGrant.get(key) ?? {
+      grant: key,
+      grantedBy: b.grantedBy.value,
+      shapeTree: b.shapeTree.value,
+    }
+    if (b.scope) entry.scope = b.scope.value
+    if (b.source && b.scope?.value === INTEROP.SelectedFromRegistry) {
+      const instances = entry.instances ?? []
+      if (!instances.includes(b.source.value)) instances.push(b.source.value)
+      entry.instances = instances
+    }
+    byGrant.set(key, entry)
+  }
+  return [...byGrant.values()]
 }

@@ -1,7 +1,7 @@
-import { ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
+import { ACCESS_ACTIONS, INTEROP, withContext } from '@janeirodigital/interop-utils'
 import { describe, test } from 'vitest'
 
-import { AccessNeed } from '../../src'
+import { AccessNeed, dataModelContext } from '../../src'
 import { expect } from '../expect'
 import { docFromGraphs } from './helpers'
 
@@ -38,5 +38,32 @@ describe('AccessNeed framing', () => {
       children: [],
       descriptionLanguages: ['en', 'es'],
     })
+  })
+})
+
+describe('request-projection fields', () => {
+  test('frames requested instances and a registration', async () => {
+    const instance1 = 'https://data/alice-home/n1'
+    const instance2 = 'https://data/alice-home/n2'
+    const registration = 'https://data/alice-home/x1n3cm'
+    const doc = withContext(dataModelContext, {
+      id: NEED_IRI,
+      type: [INTEROP.AccessNeed],
+      registeredShapeTree: 'https://data/shapetrees/trees/Project',
+      accessMode: [ACCESS_ACTIONS.read],
+      required: INTEROP.AccessRequired,
+      hasDataInstance: [instance1, instance2],
+      hasDataRegistration: registration,
+    })
+    const need = await AccessNeed.fromJsonLd(doc, NEED_IRI)
+    expect(need.hasDataInstance).toEqual([instance1, instance2])
+    expect(need.hasDataRegistration).toBe(registration)
+  })
+
+  test('leaves instance/registration fields absent on a shape-tree need', async () => {
+    const doc = await docFromGraphs([ACCESS_NEEDS_GRAPH])
+    const need = await AccessNeed.fromJsonLd(doc, NEED_IRI)
+    expect(need.hasDataInstance).toBeUndefined()
+    expect(need.hasDataRegistration).toBeUndefined()
   })
 })

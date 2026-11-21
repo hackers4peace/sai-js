@@ -1,4 +1,4 @@
-import { INTEROP, discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
+import { INTEROP, LWS, discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
 import type { WebIdStore } from '@solid/community-server'
 import { LwsStorageDescriber } from '@solid/community-server'
 import type { LwsStorageDescriberInput } from '@solid/community-server'
@@ -57,7 +57,10 @@ export class SaiAccessServiceDescriber extends LwsStorageDescriber {
       {
         type: 'AccessRequestService',
         serviceEndpoint: `${origin}/.sai/access-requests/${segment}`,
-        conformsTo: [INTEROP.AccessProfile],
+        // the request endpoint also accepts the plain LWS ODRL request shape
+        // (w3c/lws-protocol#303); `interop:AccessProfile` is the SAI
+        // sub-profile with the access-need extensions
+        conformsTo: [LWS.AccessProfile, INTEROP.AccessProfile],
       },
       {
         type: 'AccessGrantService',

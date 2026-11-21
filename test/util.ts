@@ -80,10 +80,36 @@ export function needBasedAccessRequestPayload({
 }): string {
   const policies: Array<Record<string, unknown>> = []
   const addNeed = (need: Record<string, any>, parentId?: string): void => {
-    const permissionId = `urn:uuid:${crypto.randomUUID()}`
-    const targetId = `urn:uuid:${crypto.randomUUID()}`
     const needId = need.id as string
-    policies.push({
+    const action = ((need.accessMode as string[] | undefined) ?? []).map(
+      (mode) => COMPACT_ACTIONS[mode] ?? mode
+    )
+    const instances = (need.hasDataInstance as string[] | undefined) ?? []
+    const registration = need.hasDataRegistration as string | undefined
+    const permission = (
+      type: string[],
+      source: string[],
+      partOf?: string
+    ): Record<string, unknown> => {
+      const permissionId = `urn:uuid:${crypto.randomUUID()}`
+      const targetId = `urn:uuid:${crypto.randomUUID()}`
+      return {
+        id: permissionId,
+        uid: permissionId,
+        assigner: grantedBy,
+        assignee: grantee,
+        action,
+        target: {
+          type,
+          id: targetId,
+          uid: targetId,
+          owner: dataOwner,
+          source,
+          ...(partOf ? { partOf: [partOf] } : {}),
+        },
+      }
+    }
+    const policy: Record<string, unknown> = {
       type: [
         'Request',
         'AccessNeed',
@@ -95,26 +121,23 @@ export function needBasedAccessRequestPayload({
       uid: needId,
       profile: 'AccessProfile',
       accessNeedGroup: group.id,
+      registeredShapeTree: need.registeredShapeTree,
       ...(parentId ? { inheritsFromNeed: parentId } : {}),
-      permission: [
-        {
-          id: permissionId,
-          uid: permissionId,
-          assigner: grantedBy,
-          assignee: grantee,
-          action: ((need.accessMode as string[] | undefined) ?? []).map(
-            (action) => COMPACT_ACTIONS[action] ?? action
-          ),
-          target: {
-            type: ['AssetCollection', 'st:ShapeTree'],
-            id: targetId,
-            uid: targetId,
-            owner: dataOwner,
-            source: [need.registeredShapeTree],
-          },
-        },
-      ],
-    })
+    }
+    if (instances.length) {
+      policy.scopeOfGrant = 'SelectedFromRegistry'
+      policy.permission = instances.map((instance) =>
+        permission(['Asset'], [instance], registration)
+      )
+    } else if (registration) {
+      policy.scopeOfGrant = 'AllFromRegistry'
+      policy.permission = [permission(['AssetCollection', 'DataRegistration'], [registration])]
+    } else {
+      policy.permission = [
+        permission(['AssetCollection', 'st:ShapeTree'], [need.registeredShapeTree]),
+      ]
+    }
+    policies.push(policy)
     for (const child of (need.hasInheritingNeed as Array<Record<string, any>> | undefined) ?? []) {
       addNeed(child, needId)
     }
@@ -384,7 +407,18 @@ async function pendingActivitiesFor(
       workItems.push(activity)
     }
   }
-  return workItems.filter((activity) => !completed.has(activity.id))
+  // Terminal resolution activities are outcomes, not work items: by design
+  // they never get an `ActivityCompleted` (see activity-lifecycle.md).
+  const TERMINAL_ACTIVITY_CLASSES = new Set([
+    'AccessRequestGranted',
+    'AccessRequestArchived',
+    'AuthorizationDenied',
+  ])
+  return workItems.filter(
+    (activity) =>
+      !completed.has(activity.id) &&
+      !activity.type.some((type) => TERMINAL_ACTIVITY_CLASSES.has(type))
+  )
 }
 
 /**
@@ -409,14 +443,20 @@ export async function waitForQuiescence(
   )
   const deadline = Date.now() + timeout
   let settled = 0
+  let pendingDetail: string[] = []
   while (Date.now() < deadline) {
     const pending = await Promise.all(
-      sessions.map(async ([, session]) => (await pendingActivitiesFor(session))?.length)
+      sessions.map(async ([, session]) => pendingActivitiesFor(session))
     )
     // an unreadable registry (transient container-listing 500) counts as NOT
     // settled — keep polling; only two consecutive clean zero-pending reads settle
-    const unreadable = pending.some((count) => count === undefined)
-    const total = unreadable ? -1 : pending.reduce((sum, count) => sum + (count ?? 0), 0)
+    const unreadable = pending.some((list) => list === undefined)
+    const total = unreadable ? -1 : pending.reduce((sum, list) => sum + (list?.length ?? 0), 0)
+    pendingDetail = pending.flatMap((list, index) =>
+      (list ?? []).map(
+        (activity) => `${webIds[index]}: ${activity.id} [${activity.type.join(', ')}]`
+      )
+    )
     if (total === 0) {
       settled += 1
       if (settled >= settle) return
@@ -425,7 +465,10 @@ export async function waitForQuiescence(
     }
     await new Promise((resolve) => setTimeout(resolve, interval))
   }
-  throw new Error(`workflows did not settle within ${timeout}ms for: ${webIds.join(', ')}`)
+  throw new Error(
+    `workflows did not settle within ${timeout}ms for: ${webIds.join(', ')}` +
+      (pendingDetail.length ? `\npending: ${pendingDetail.join('\n')}` : '')
+  )
 }
 
 /**

@@ -1,4 +1,5 @@
 import type { OpenSentAccessRequest } from '@janeirodigital/interop-authorization-agent'
+import { INTEROP } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import { matchGrantedRequests } from '../src/temporal/activities/access-request.js'
@@ -10,7 +11,8 @@ import { matchGrantedRequests } from '../src/temporal/activities/access-request.
 const sentRequest = (
   id: string,
   dataOwner: string,
-  shapeTrees: string[]
+  shapeTrees: string[],
+  instancesByShapeTree?: Record<string, string[]>
 ): OpenSentAccessRequest => ({
   sent: `https://registry/bob/sent-${id}`,
   request: `urn:uuid:${id}`,
@@ -18,12 +20,15 @@ const sentRequest = (
   grantedBy: 'https://id/bob', // the requester — `=== grantee` on self-requests
   dataOwner,
   shapeTrees,
+  ...(instancesByShapeTree ? { instancesByShapeTree } : {}),
 })
 
-const grant = (grantedBy: string, shapeTree: string) => ({
+const grant = (grantedBy: string, shapeTree: string, scope?: string, instances?: string[]) => ({
   grant: `https://registry/${grantedBy === 'https://id/alice' ? 'alice' : 'x'}/g`,
   grantedBy,
   shapeTree,
+  ...(scope ? { scope } : {}),
+  ...(instances ? { instances } : {}),
 })
 
 describe('matchGrantedRequests — best-effort intersection of §3.1 × §3.2', () => {
@@ -63,6 +68,48 @@ describe('matchGrantedRequests — best-effort intersection of §3.1 × §3.2', 
     ]
     const grants = [grant('https://id/alice', 'https://data/shapetrees/trees/Task')]
     expect([...matchGrantedRequests(requests, grants)]).toEqual(['urn:uuid:r1'])
+  })
+
+  test('instance-scoped requests require every requested instance', () => {
+    const tree = 'https://data/shapetrees/trees/Project'
+    const requests = [
+      sentRequest('r1', 'https://id/alice', [tree], {
+        [tree]: ['https://data/alice/n1', 'https://data/alice/n2'],
+      }),
+    ]
+    // a different selected instance is not enough
+    expect([
+      ...matchGrantedRequests(requests, [
+        grant('https://id/alice', tree, INTEROP.SelectedFromRegistry, ['https://data/alice/n3']),
+      ]),
+    ]).toEqual([])
+    // one of two requested instances is not enough
+    expect([
+      ...matchGrantedRequests(requests, [
+        grant('https://id/alice', tree, INTEROP.SelectedFromRegistry, ['https://data/alice/n1']),
+      ]),
+    ]).toEqual([])
+    // two selected-instance grants union to the requested set
+    expect([
+      ...matchGrantedRequests(requests, [
+        grant('https://id/alice', tree, INTEROP.SelectedFromRegistry, ['https://data/alice/n1']),
+        grant('https://id/alice', tree, INTEROP.SelectedFromRegistry, ['https://data/alice/n2']),
+      ]),
+    ]).toEqual(['urn:uuid:r1'])
+    // a broader scope covers the set
+    expect([
+      ...matchGrantedRequests(requests, [grant('https://id/alice', tree, INTEROP.AllFromRegistry)]),
+    ]).toEqual(['urn:uuid:r1'])
+  })
+
+  test('an instance-scoped request is not closed by a legacy scopeless grant', () => {
+    const tree = 'https://data/shapetrees/trees/Project'
+    const requests = [
+      sentRequest('r1', 'https://id/alice', [tree], {
+        [tree]: ['https://data/alice/n1'],
+      }),
+    ]
+    expect([...matchGrantedRequests(requests, [grant('https://id/alice', tree)])]).toEqual([])
   })
 
   test('none granted on empty grants; multiple requests resolve independently', () => {

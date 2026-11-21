@@ -72,6 +72,10 @@ const accessNeedFields = {
     label: S.String,
   }),
   parent: S.optional(IRI),
+  /** Requested instances (request approvals only). */
+  dataInstances: S.optional(S.Array(IRI)),
+  /** Requested registration (registration-scoped requests only). */
+  dataRegistration: S.optional(IRI),
 }
 
 interface AccessNeed extends S.Struct.Type<typeof accessNeedFields> {

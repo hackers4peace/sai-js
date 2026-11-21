@@ -8,7 +8,9 @@ import { ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
 import {
   BadRequestHttpError,
   ForbiddenHttpError,
+  RepresentationMetadata,
   ResponseDescription,
+  SOLID_HTTP,
 } from '@solid/community-server'
 
 import type { SessionManager } from './SessionManager.js'
@@ -16,10 +18,17 @@ import type { SessionManager } from './SessionManager.js'
 /** The request-to-be, before the owner mints its real id. */
 export type NeedBasedAccessRequestInput = Omit<EmbeddedNeedBasedAccessRequest, 'id'>
 
-function strings(value: unknown): string[] {
+export function values(value: unknown): string[] {
+  if (typeof value === 'string') return [value]
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
     : []
+}
+
+function record(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === 'object' && value !== null
+    ? (value as Record<string, unknown>)
+    : undefined
 }
 
 /** Normalize the compact action terms the frozen payload may carry. */
@@ -30,12 +39,255 @@ const ACTION_ALIASES: Record<string, string> = {
   delete: ACCESS_ACTIONS.delete,
   'odrl:read': ACCESS_ACTIONS.read,
   'odrl:modify': ACCESS_ACTIONS.modify,
+  'odrl:create': ACCESS_ACTIONS.create,
   'lws:create': ACCESS_ACTIONS.create,
   'odrl:delete': ACCESS_ACTIONS.delete,
+  'http://www.w3.org/ns/odrl/2/create': ACCESS_ACTIONS.create,
 }
 
-function accessModes(value: unknown): string[] {
-  return strings(value).map((action) => ACTION_ALIASES[action] ?? action)
+const KNOWN_ACTIONS = new Set<string>(Object.values(ACCESS_ACTIONS))
+
+/** Normalize and validate the access actions of one or more permissions. */
+export function accessModes(value: unknown): string[] {
+  const actions = values(value)
+  if (actions.length === 0) {
+    throw new BadRequestHttpError('access need permission has no action')
+  }
+  const modes = actions.map((action) => {
+    const normalized = ACTION_ALIASES[action] ?? action
+    if (!KNOWN_ACTIONS.has(normalized)) {
+      throw new BadRequestHttpError(`unsupported access action ${action}`)
+    }
+    return normalized
+  })
+  return [...new Set(modes)]
+}
+
+/**
+ * Match a target type by its compact term, prefixed term, or full IRI. The
+ * LWS/source payloads mix `Asset`, `odrl:Asset`, and the ODRL IRI.
+ */
+export function targetHasType(types: readonly string[], term: string, iri: string): boolean {
+  return types.some(
+    (value) =>
+      value === term ||
+      value === iri ||
+      value.endsWith(`#${term}`) ||
+      value.endsWith(`/${term}`) ||
+      value.endsWith(`:${term}`)
+  )
+}
+
+function targetOf(permission: Record<string, unknown>): Record<string, unknown> {
+  const target = record(permission.target)
+  if (!target) throw new BadRequestHttpError('access need permission has no target')
+  return target
+}
+
+function targetTypes(target: Record<string, unknown>): string[] {
+  return values(target.type)
+}
+
+function targetSources(target: Record<string, unknown>): string[] {
+  return values(target.source)
+}
+
+function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>[] {
+  const raw = policy.permission
+  const list = Array.isArray(raw) ? raw : raw ? [raw] : []
+  if (list.length === 0) throw new BadRequestHttpError('access need has no permission')
+  return list.map((permission) => {
+    const parsed = record(permission)
+    if (!parsed) throw new BadRequestHttpError('invalid access need permission')
+    return parsed
+  })
+}
+
+/** ODRL constraints have no SAI needs representation yet. */
+function rejectConstraints(
+  policy: Record<string, unknown>,
+  permissions: readonly Record<string, unknown>[]
+): void {
+  if (
+    policy.constraint !== undefined ||
+    permissions.some((permission) => permission.constraint !== undefined)
+  ) {
+    throw new BadRequestHttpError(
+      'ODRL constraints are not supported by the SAI access request profile'
+    )
+  }
+}
+
+const ODRL_ASSET = 'http://www.w3.org/ns/odrl/2/Asset'
+const ODRL_ASSET_COLLECTION = 'http://www.w3.org/ns/odrl/2/AssetCollection'
+const SHAPE_TREE = 'https://www.w3.org/ns/shapetrees#ShapeTree'
+
+function isAssetTarget(target: Record<string, unknown>): boolean {
+  return targetHasType(targetTypes(target), 'Asset', ODRL_ASSET)
+}
+
+function isCollectionTarget(target: Record<string, unknown>): boolean {
+  return targetHasType(targetTypes(target), 'AssetCollection', ODRL_ASSET_COLLECTION)
+}
+
+function isShapeTreeTarget(target: Record<string, unknown>): boolean {
+  return targetHasType(targetTypes(target), 'ShapeTree', SHAPE_TREE)
+}
+
+function isRegistrationTarget(target: Record<string, unknown>): boolean {
+  return targetHasType(targetTypes(target), 'DataRegistration', INTEROP.DataRegistration)
+}
+
+interface ParsedPolicy {
+  id: string
+  types: string[]
+  registeredShapeTree: string
+  required: boolean
+  accessMode: string[]
+  inheritsFromNeed?: string
+  group?: string
+  assignee: string
+  assigner: string
+  owner?: string
+  hasDataInstance?: string[]
+  hasDataRegistration?: string
+}
+
+function parsePolicy(
+  policy: Record<string, unknown>,
+  requesterWebId: string,
+  expectedDataOwner?: string
+): ParsedPolicy {
+  const permissions = permissionsOf(policy)
+  rejectConstraints(policy, permissions)
+
+  const assigners = new Set<string>()
+  const assignees = new Set<string>()
+  const owners = new Set<string>()
+  for (const permission of permissions) {
+    const target = targetOf(permission)
+    const assigner = permission.assigner
+    const assignee = permission.assignee
+    if (typeof assigner !== 'string' || assigner !== requesterWebId) {
+      throw new BadRequestHttpError('invalid requester')
+    }
+    if (typeof assignee !== 'string' || assignee !== assigner) {
+      throw new BadRequestHttpError('invalid grantedBy/grantee')
+    }
+    assigners.add(assigner)
+    assignees.add(assignee)
+    if (typeof target.owner === 'string') owners.add(target.owner)
+    else if (expectedDataOwner) {
+      throw new BadRequestHttpError('invalid dataOwner')
+    }
+  }
+  if (assigners.size !== 1 || assignees.size !== 1) {
+    throw new BadRequestHttpError('inconsistent authorization assignee/assigner')
+  }
+  const owner = expectedDataOwner ?? [...owners][0]
+  if (expectedDataOwner && owners.size > 0 && !owners.has(expectedDataOwner)) {
+    throw new BadRequestHttpError('invalid dataOwner')
+  }
+
+  const instanceTargets = permissions.filter((permission) => isAssetTarget(targetOf(permission)))
+  const collectionTargets = permissions.filter((permission) =>
+    isCollectionTarget(targetOf(permission))
+  )
+  if (instanceTargets.length > 0 && collectionTargets.length > 0) {
+    throw new BadRequestHttpError('access need mixes instance and collection targets')
+  }
+  if (instanceTargets.length === 0 && collectionTargets.length === 0) {
+    throw new BadRequestHttpError('access need target is neither an Asset nor an AssetCollection')
+  }
+
+  const types = values(policy.type)
+  const required = targetHasType(types, 'AccessRequired', INTEROP.AccessRequired)
+  const id =
+    (typeof policy.uid === 'string' && policy.uid) ||
+    (typeof policy.id === 'string' && policy.id) ||
+    `urn:uuid:${crypto.randomUUID()}`
+
+  if (instanceTargets.length > 0) {
+    const registeredShapeTree = policy.registeredShapeTree
+    if (typeof registeredShapeTree !== 'string' || !registeredShapeTree) {
+      throw new BadRequestHttpError('instance access needs require registeredShapeTree')
+    }
+    const instances = [
+      ...new Set(instanceTargets.flatMap((permission) => targetSources(targetOf(permission)))),
+    ]
+    if (instances.length === 0) {
+      throw new BadRequestHttpError('instance access need has no source instance')
+    }
+    const registrations = [
+      ...new Set(instanceTargets.flatMap((permission) => values(targetOf(permission).partOf))),
+    ]
+    if (registrations.length > 1) {
+      throw new BadRequestHttpError('instance access need spans multiple registrations')
+    }
+    return {
+      id,
+      types,
+      registeredShapeTree,
+      required,
+      accessMode: [
+        ...new Set(instanceTargets.flatMap((permission) => accessModes(permission.action))),
+      ],
+      inheritsFromNeed: policy.inheritsFromNeed as string | undefined,
+      group: policy.accessNeedGroup as string | undefined,
+      assignee: [...assignees][0],
+      assigner: [...assigners][0],
+      ...(owner ? { owner } : {}),
+      hasDataInstance: instances,
+      ...(registrations[0] ? { hasDataRegistration: registrations[0] } : {}),
+    }
+  }
+
+  const registrations = [
+    ...new Set(
+      collectionTargets
+        .filter((permission) => isRegistrationTarget(targetOf(permission)))
+        .flatMap((permission) => targetSources(targetOf(permission)))
+    ),
+  ]
+  if (registrations.length > 1) {
+    throw new BadRequestHttpError('access need spans multiple registrations')
+  }
+  const shapeTrees = [
+    ...new Set(
+      collectionTargets
+        .filter((permission) => isShapeTreeTarget(targetOf(permission)))
+        .flatMap((permission) => targetSources(targetOf(permission)))
+    ),
+  ]
+  if (registrations.length > 0 && shapeTrees.length > 0) {
+    throw new BadRequestHttpError('access need mixes registration and shape-tree targets')
+  }
+  if (shapeTrees.length > 1) {
+    throw new BadRequestHttpError('access need spans multiple shape trees')
+  }
+  const declaredShapeTree = policy.registeredShapeTree as string | undefined
+  if (declaredShapeTree && shapeTrees[0] && declaredShapeTree !== shapeTrees[0]) {
+    throw new BadRequestHttpError('access need shape tree does not match its target')
+  }
+  const registeredShapeTree = declaredShapeTree ?? shapeTrees[0]
+  if (!registeredShapeTree) {
+    throw new BadRequestHttpError('access need has no registeredShapeTree')
+  }
+  return {
+    id,
+    types,
+    registeredShapeTree,
+    required,
+    accessMode: [
+      ...new Set(collectionTargets.flatMap((permission) => accessModes(permission.action))),
+    ],
+    inheritsFromNeed: policy.inheritsFromNeed as string | undefined,
+    group: policy.accessNeedGroup as string | undefined,
+    assignee: [...assignees][0],
+    assigner: [...assigners][0],
+    ...(owner ? { owner } : {}),
+    ...(registrations[0] ? { hasDataRegistration: registrations[0] } : {}),
+  }
 }
 
 /**
@@ -44,7 +296,7 @@ function accessModes(value: unknown): string[] {
  */
 export function isOdrlNeedBasedAccessRequest(value: unknown): value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null) return false
-  const types = strings((value as Record<string, unknown>).type)
+  const types = values((value as Record<string, unknown>).type)
   return (
     (types.includes(INTEROP.NeedBasedAccessRequest) || types.includes('NeedBasedAccessRequest')) &&
     Array.isArray((value as Record<string, unknown>).access)
@@ -54,58 +306,46 @@ export function isOdrlNeedBasedAccessRequest(value: unknown): value is Record<st
 /**
  * Map the frozen needs request policies back to the embedded need-group
  * representation the owner-side activity and workflow materialize. Need IDs,
- * shape trees, and inherited children ride the ODRL policies; the wire does
- * not carry envelope-level `grantee`/`grantedBy`/`dataOwner`.
+ * shape trees, requested instances/registrations, and inherited children ride
+ * the ODRL policies; the wire does not carry envelope-level
+ * `grantee`/`grantedBy`/`dataOwner`.
  */
 export function needBasedAccessRequestFromOdrl(
   message: Record<string, unknown>,
   requesterWebId: string,
   expectedDataOwner?: string
 ): NeedBasedAccessRequestInput {
-  const policies = Array.isArray(message.access)
-    ? (message.access as Record<string, unknown>[])
-    : []
+  const rawPolicies = Array.isArray(message.access) ? message.access : []
+  const policies = rawPolicies.map((policy) => {
+    const parsed = record(policy)
+    if (!parsed) throw new BadRequestHttpError('invalid access policy')
+    return parsed
+  })
   if (policies.length === 0) {
     throw new BadRequestHttpError('access request has no access policies')
   }
-  const nodes = policies.map((policy) => {
-    const permission = (
-      Array.isArray(policy.permission) ? policy.permission[0] : policy.permission
-    ) as Record<string, unknown> | undefined
-    const target = (permission?.target as Record<string, unknown> | undefined) ?? {}
-    const types = strings(policy.type)
-    return {
-      id: (policy.uid ?? policy.id) as string,
-      type: types,
-      registeredShapeTree: (policy.registeredShapeTree ??
-        (Array.isArray(target.source) ? target.source[0] : target.source)) as string,
-      required: types.includes(INTEROP.AccessRequired) || types.includes('AccessRequired'),
-      accessMode: accessModes(permission?.action),
-      inheritsFromNeed: policy.inheritsFromNeed as string | undefined,
-      group: policy.accessNeedGroup as string | undefined,
-      assignee: permission?.assignee as string,
-      assigner: permission?.assigner as string,
-      owner: target.owner as string | undefined,
-    }
-  })
-  const first = nodes[0]
-  if (!first.assigner || first.assigner !== requesterWebId) {
-    throw new BadRequestHttpError('invalid requester')
+  const nodes = policies.map((policy) => parsePolicy(policy, requesterWebId, expectedDataOwner))
+  const groups = [...new Set(nodes.map((node) => node.group).filter(Boolean))]
+  if (groups.length > 1) {
+    throw new BadRequestHttpError('access request has multiple access need groups')
   }
-  if (first.assignee !== first.assigner) {
-    throw new BadRequestHttpError('invalid grantedBy/grantee')
-  }
-  if (expectedDataOwner && first.owner !== expectedDataOwner) {
+  const owners = [...new Set(nodes.map((node) => node.owner).filter(Boolean))]
+  if (expectedDataOwner && owners.length > 0 && !owners.includes(expectedDataOwner)) {
     throw new BadRequestHttpError('invalid dataOwner')
   }
-  const groupId = first.group ?? `urn:uuid:${crypto.randomUUID()}`
+  const dataOwner = expectedDataOwner ?? owners[0]
+  if (!dataOwner) throw new BadRequestHttpError('invalid dataOwner')
+
+  const groupId = groups[0] ?? `urn:uuid:${crypto.randomUUID()}`
   const childrenOf = (id: string) => nodes.filter((node) => node.inheritsFromNeed === id)
-  const toNeed = (node: (typeof nodes)[number]): Record<string, unknown> => ({
+  const toNeed = (node: ParsedPolicy): Record<string, unknown> => ({
     id: node.id,
     type: [INTEROP.AccessNeed],
     registeredShapeTree: node.registeredShapeTree,
     required: node.required ? INTEROP.AccessRequired : INTEROP.AccessOptional,
     accessMode: node.accessMode,
+    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance } : {}),
+    ...(node.hasDataRegistration ? { hasDataRegistration: node.hasDataRegistration } : {}),
     ...(childrenOf(node.id).length ? { hasInheritingNeed: childrenOf(node.id).map(toNeed) } : {}),
   })
   const group: NeedBasedAccessRequestGroup = {
@@ -115,11 +355,16 @@ export function needBasedAccessRequestFromOdrl(
   }
   return {
     type: [INTEROP.NeedBasedAccessRequest],
-    grantee: first.assignee,
-    grantedBy: first.assigner,
-    dataOwner: first.owner!,
+    grantee: nodes[0].assignee,
+    grantedBy: nodes[0].assigner,
+    dataOwner,
     hasAccessNeedGroup: group,
   }
+}
+
+export interface AcceptNeedBasedAccessRequestOptions {
+  /** LWS requires a `Location` header on a successful request POST. */
+  location?: boolean
 }
 
 /**
@@ -134,7 +379,8 @@ export async function acceptNeedBasedAccessRequest(
   sessionManager: SessionManager,
   message: NeedBasedAccessRequestInput,
   requesterWebId: string,
-  expectedDataOwner?: string
+  expectedDataOwner?: string,
+  options: AcceptNeedBasedAccessRequestOptions = {}
 ): Promise<ResponseDescription> {
   // the client-is-requester's-UAS check ran in the handler (403);
   // self-requests only — grantee === grantedBy === the authenticated agent
@@ -185,5 +431,8 @@ export async function acceptNeedBasedAccessRequest(
     },
     activity
   )
-  return new ResponseDescription(202)
+  if (!options.location) return new ResponseDescription(202)
+  const metadata = new RepresentationMetadata()
+  metadata.set(SOLID_HTTP.terms.location, requestId)
+  return new ResponseDescription(202, metadata)
 }

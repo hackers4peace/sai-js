@@ -46,10 +46,28 @@ export async function forwardNeedBasedAccessRequest(
   ]
   const policies: Record<string, unknown>[] = []
   const addNeed = (need: Record<string, unknown>, parentId?: string) => {
-    const permissionId = `urn:uuid:${crypto.randomUUID()}`
-    const targetId = `urn:uuid:${crypto.randomUUID()}`
     const needId = need.id as string
-    policies.push({
+    const action = (need.accessMode as string[]) ?? []
+    const instances = (need.hasDataInstance as string[] | undefined) ?? []
+    const registration = need.hasDataRegistration as string | undefined
+    const permission = (type: string[], source: string[], partOf?: string) => {
+      const permissionId = `urn:uuid:${crypto.randomUUID()}`
+      const targetId = `urn:uuid:${crypto.randomUUID()}`
+      return {
+        uid: permissionId,
+        assigner: input.request.grantedBy,
+        assignee: input.request.grantee,
+        action,
+        target: {
+          type,
+          uid: targetId,
+          owner: input.request.dataOwner,
+          source,
+          ...(partOf ? { partOf: [partOf] } : {}),
+        },
+      }
+    }
+    const policy: Record<string, unknown> = {
       type: [
         'Request',
         'AccessNeed',
@@ -60,21 +78,25 @@ export async function forwardNeedBasedAccessRequest(
       accessNeedGroup: input.request.hasAccessNeedGroup.id,
       registeredShapeTree: need.registeredShapeTree,
       ...(parentId ? { inheritsFromNeed: parentId } : {}),
-      permission: [
-        {
-          uid: permissionId,
-          assigner: input.request.grantedBy,
-          assignee: input.request.grantee,
-          action: (need.accessMode as string[]) ?? [],
-          target: {
-            type: ['AssetCollection', 'st:ShapeTree'],
-            uid: targetId,
-            owner: input.request.dataOwner,
-            source: [need.registeredShapeTree],
-          },
-        },
-      ],
-    })
+    }
+    if (instances.length) {
+      // SelectedFromRegistry: one Asset permission per instance, matching the
+      // grant shape. The registration is an advisory `partOf` hint.
+      policy.scopeOfGrant = 'SelectedFromRegistry'
+      policy.permission = instances.map((instance) =>
+        permission(['Asset'], [instance], registration)
+      )
+    } else if (registration) {
+      // registration-scoped request (plain LWS AssetCollection target): all
+      // instances of that registration
+      policy.scopeOfGrant = 'AllFromRegistry'
+      policy.permission = [permission(['AssetCollection', 'DataRegistration'], [registration])]
+    } else {
+      policy.permission = [
+        permission(['AssetCollection', 'st:ShapeTree'], [need.registeredShapeTree as string]),
+      ]
+    }
+    policies.push(policy)
     for (const child of (need.hasInheritingNeed as Record<string, unknown>[] | undefined) ?? []) {
       addNeed(child, needId)
     }
@@ -142,18 +164,39 @@ export async function materializeNeedBasedAccessRequest(
  * The `grant.grantee` anchor is bound at QUERY level
  * (`getAccessGrantsForGrantee` — grants arriving for this requester), so a
  * per-grant check is redundant here: requests made by this requester always
- * carry `grantedBy === requester` (self-requests included). Returns the
- * snapshot ids of the requests to close.
+ * carry `grantedBy === requester` (self-requests included). For
+ * instance-scoped needs the union of the grants for that shape tree must
+ * cover every requested instance; partial grants leave the request open.
+ * Returns the snapshot ids of the requests to close.
  */
 export function matchGrantedRequests(
   requests: OpenSentAccessRequest[],
-  grants: Array<{ grant: string; grantedBy: string; shapeTree: string }>
+  grants: Array<{
+    grant: string
+    grantedBy: string
+    shapeTree: string
+    scope?: string
+    instances?: string[]
+  }>
 ): Set<string> {
   const granted = new Set<string>()
   for (const r of requests) {
-    const covered = grants.some(
-      (g) => g.grantedBy === r.dataOwner && r.shapeTrees.includes(g.shapeTree)
-    )
+    const covered = r.shapeTrees.some((shapeTree) => {
+      const matching = grants.filter(
+        (g) => g.grantedBy === r.dataOwner && g.shapeTree === shapeTree
+      )
+      if (matching.length === 0) return false
+      const requested = r.instancesByShapeTree?.[shapeTree] ?? []
+      // a shape-tree-only request keeps the existing best-effort semantics
+      if (requested.length === 0) return true
+      // a broader grant covers the selected set; SelectedFromRegistry grants
+      // are unioned because one request may be satisfied by several grants
+      if (matching.some((g) => g.scope !== undefined && g.scope !== INTEROP.SelectedFromRegistry)) {
+        return true
+      }
+      const available = new Set(matching.flatMap((g) => g.instances ?? []))
+      return requested.every((instance) => available.has(instance))
+    })
     if (covered) granted.add(r.request)
   }
   return granted

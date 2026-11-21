@@ -18,6 +18,19 @@ export type AccessNeedData = AccessNeedId & {
   children: AccessNeedData[]
   /** Languages used by description sets in the access needs document. */
   descriptionLanguages: string[]
+  /**
+   * Requested data instances (`interop:hasDataInstance`).
+   *
+   * Only request projections use it — a client-id/access-need-group document
+   * normally carries none. It is optional so a plain access need (shape-tree
+   * scope) remains unchanged.
+   */
+  hasDataInstance?: string[]
+  /**
+   * The requested data registration, when the request is registration-scoped
+   * rather than shape-tree or instance scoped. Request projections only.
+   */
+  hasDataRegistration?: string
 }
 
 // ──────────────────────────
@@ -47,5 +60,9 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedDa
     required: node.required === INTEROP.AccessRequired,
     children: [],
     descriptionLanguages: await documentValues(doc, id, INTEROP.usesLanguage),
+    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as string[] } : {}),
+    ...(node.hasDataRegistration
+      ? { hasDataRegistration: node.hasDataRegistration as string }
+      : {}),
   }
 }

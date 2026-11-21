@@ -30,7 +30,10 @@ describe('main', () => {
         expect.objectContaining({
           type: 'AccessRequestService',
           serviceEndpoint: `https://auth/.sai/access-requests/${segment(bobId)}`,
-          conformsTo: ['http://www.w3.org/ns/solid/interop#AccessProfile'],
+          conformsTo: [
+            'https://www.w3.org/ns/lws#AccessProfile',
+            'http://www.w3.org/ns/solid/interop#AccessProfile',
+          ],
         }),
         expect.objectContaining({
           type: 'AccessGrantService',

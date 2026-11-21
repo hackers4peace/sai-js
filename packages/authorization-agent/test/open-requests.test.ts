@@ -75,6 +75,47 @@ describe('getOpenSentAccessRequests', () => {
     ])
   })
 
+  test('groups requested instances under their shape tree', async () => {
+    const queries: string[] = []
+    const transport = capturingTransport(
+      [
+        {
+          sent: term('https://registry/bob/sent1'),
+          request: term('urn:uuid:r1'),
+          grantee: term('https://id/bob'),
+          grantedBy: term('https://id/bob'),
+          dataOwner: term('https://id/alice'),
+          shapeTree: term('https://data/shapetrees/trees/Project'),
+          instance: term('https://data/alice/n1'),
+        },
+        {
+          sent: term('https://registry/bob/sent1'),
+          request: term('urn:uuid:r1'),
+          grantee: term('https://id/bob'),
+          grantedBy: term('https://id/bob'),
+          dataOwner: term('https://id/alice'),
+          shapeTree: term('https://data/shapetrees/trees/Project'),
+          instance: term('https://data/alice/n2'),
+        },
+      ],
+      queries
+    )
+    const result = await getOpenSentAccessRequests(transport)
+    expect(result).toEqual([
+      expect.objectContaining({
+        request: 'urn:uuid:r1',
+        shapeTrees: ['https://data/shapetrees/trees/Project'],
+        instancesByShapeTree: {
+          'https://data/shapetrees/trees/Project': [
+            'https://data/alice/n1',
+            'https://data/alice/n2',
+          ],
+        },
+      }),
+    ])
+    expect(queries[0]).toContain('interop#hasDataInstance')
+  })
+
   test('carries the open guard — FILTER NOT EXISTS over BOTH resolution classes referencing the same snapshot id', async () => {
     // contract test: a regression dropping the guard would list resolved
     // requests forever (the "never clears" cause); the SPARQL engine does the
@@ -154,5 +195,40 @@ describe('getAccessGrantsForGrantee', () => {
     // the requester is INJECTED as the grantee anchor (§3.2 — the match is
     // grant.grantee ↔ request.grantedBy, never grant.grantedBy)
     expect(queries[0]).toContain('<https://id/bob>')
+  })
+
+  test('returns the grant scope and selected instances for SelectedFromRegistry', async () => {
+    const queries: string[] = []
+    const transport = capturingTransport(
+      [
+        {
+          grant: term('https://registry/alice/g1'),
+          grantedBy: term('https://id/alice'),
+          shapeTree: term('https://data/shapetrees/trees/Project'),
+          scope: term('http://www.w3.org/ns/solid/interop#SelectedFromRegistry'),
+          source: term('https://data/alice/n1'),
+        },
+        {
+          grant: term('https://registry/alice/g1'),
+          grantedBy: term('https://id/alice'),
+          shapeTree: term('https://data/shapetrees/trees/Project'),
+          scope: term('http://www.w3.org/ns/solid/interop#SelectedFromRegistry'),
+          source: term('https://data/alice/n2'),
+        },
+      ],
+      queries
+    )
+    const result = await getAccessGrantsForGrantee(transport, 'https://id/bob')
+    expect(result).toEqual([
+      {
+        grant: 'https://registry/alice/g1',
+        grantedBy: 'https://id/alice',
+        shapeTree: 'https://data/shapetrees/trees/Project',
+        scope: 'http://www.w3.org/ns/solid/interop#SelectedFromRegistry',
+        instances: ['https://data/alice/n1', 'https://data/alice/n2'],
+      },
+    ])
+    expect(queries[0]).toContain('interop#scopeOfGrant')
+    expect(queries[0]).toContain('odrl/2/source')
   })
 })

@@ -408,6 +408,8 @@ function needToEmbedded(need: AccessNeedData): Record<string, unknown> {
     registeredShapeTree: need.registeredShapeTree,
     required: need.required ? INTEROP.AccessRequired : INTEROP.AccessOptional,
     accessMode: need.accessMode,
+    ...(need.hasDataInstance?.length ? { hasDataInstance: need.hasDataInstance } : {}),
+    ...(need.hasDataRegistration ? { hasDataRegistration: need.hasDataRegistration } : {}),
     hasInheritingNeed: need.children.map(needToEmbedded),
   }
 }

@@ -21,6 +21,11 @@ import {
   isOdrlNeedBasedAccessRequest,
   needBasedAccessRequestFromOdrl,
 } from './need-based-access-request.js'
+import {
+  isPlainLwsAccessRequest,
+  plainLwsAccessRequestToNeedBased,
+} from './plain-lws-access-request.js'
+import { plainLwsTargetResolver } from './plain-lws-target-resolver.js'
 import type { SessionManager } from './SessionManager.js'
 
 /** The JSON-LD media type the access request endpoint requires. */
@@ -104,6 +109,31 @@ export class AccessRequestHandler extends OperationHttpHandler {
         needBasedAccessRequestFromOdrl(message, credentials.agent.webId, owner),
         credentials.agent.webId,
         owner
+      )
+    }
+    if (isPlainLwsAccessRequest(message)) {
+      // plain LWS ODRL request (w3c/lws-protocol#303 shape): map its
+      // Asset/AssetCollection targets to the embedded need model. The SAI
+      // preconditions stay in force — requester's UAS client and a registered
+      // social agent — because LWS permits additional server authorization
+      // policy.
+      const sai = await this.sessionManager.getSession(owner)
+      const registration = await sai.findSocialAgentRegistration(credentials.agent.webId)
+      if (!registration) {
+        throw new ForbiddenHttpError('agent is not registered with the data owner')
+      }
+      const input = await plainLwsAccessRequestToNeedBased(
+        message,
+        credentials.agent.webId,
+        owner,
+        plainLwsTargetResolver(sai)
+      )
+      return acceptNeedBasedAccessRequest(
+        this.sessionManager,
+        input,
+        credentials.agent.webId,
+        owner,
+        { location: true }
       )
     }
     throw new BadRequestHttpError('expected a need-based access request')

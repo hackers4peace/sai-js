@@ -91,20 +91,42 @@ export function accessModesCover(
   return required.every((mode) => available.has(mode))
 }
 
-/** For a selected downstream scope, the upstream must include the instances. */
-export function instancesCover(upstream: GrantData, downstream: GrantData): boolean {
-  if (downstream.scopeOfGrant !== INTEROP.SelectedFromRegistry) return true
+/**
+ * Whether a grant scope/instance set covers the requested instances.
+ *
+ * A broader scope (`All`, `AllFromAgent`, `AllFromRole`, `AllFromRegistry`)
+ * covers every instance of the matching registration; a
+ * `SelectedFromRegistry` grant covers exactly its `hasDataInstance` set. Used
+ * by grant-chain validity and by the requester-side open-request detector
+ * (`matchGrantedRequests`), which unions several grants for one request.
+ */
+export function selectedInstancesCover(
+  scopeOfGrant: string,
+  hasDataInstance: readonly string[] | undefined,
+  requested: readonly string[]
+): boolean {
+  if (requested.length === 0) return true
   if (
-    upstream.scopeOfGrant === INTEROP.All ||
-    upstream.scopeOfGrant === INTEROP.AllFromAgent ||
-    upstream.scopeOfGrant === INTEROP.AllFromRole ||
-    upstream.scopeOfGrant === INTEROP.AllFromRegistry
+    scopeOfGrant === INTEROP.All ||
+    scopeOfGrant === INTEROP.AllFromAgent ||
+    scopeOfGrant === INTEROP.AllFromRole ||
+    scopeOfGrant === INTEROP.AllFromRegistry
   ) {
     return true
   }
-  if (upstream.scopeOfGrant !== INTEROP.SelectedFromRegistry) return false
-  const available = new Set(upstream.hasDataInstance ?? [])
-  return (downstream.hasDataInstance ?? []).every((instance) => available.has(instance))
+  if (scopeOfGrant !== INTEROP.SelectedFromRegistry) return false
+  const available = new Set(hasDataInstance ?? [])
+  return requested.every((instance) => available.has(instance))
+}
+
+/** For a selected downstream scope, the upstream must include the instances. */
+export function instancesCover(upstream: GrantData, downstream: GrantData): boolean {
+  if (downstream.scopeOfGrant !== INTEROP.SelectedFromRegistry) return true
+  return selectedInstancesCover(
+    upstream.scopeOfGrant,
+    upstream.hasDataInstance,
+    downstream.hasDataInstance ?? []
+  )
 }
 
 /**

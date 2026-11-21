@@ -412,6 +412,7 @@ interface Registration {
   agent: string
   scope: Scope
   count: number
+  shapeTree: string
 }
 
 // TODO: add proper type from sai-api-messages
@@ -426,6 +427,7 @@ function buildRegistrationsIndex(
         agent: agent.id,
         scope: 'all',
         count: registration.count!,
+        shapeTree: registration.shapeTree,
       }
     }
   }
@@ -482,8 +484,69 @@ function setScopeForAgents(scope: PropagatingScope): void {
   }
 }
 
+/**
+ * Apply the requested scope of a pending access request: preselect the
+ * specific instances (or the registration) the requester asked for, instead
+ * of defaulting the owner's whole data set to `all`. The owner can still
+ * widen or narrow the selection before authorizing.
+ */
+async function applyRequestedSelections(): Promise<void> {
+  const requested = props.authorizationData.accessNeedGroup.needs.filter(
+    (need) => need.dataInstances?.length || need.dataRegistration
+  )
+  if (requested.length === 0) return
+
+  // a specific request is not an implicit "all of my data" grant
+  topLevelScope.value = 'agent'
+  setScopeForAgents('none')
+  panelsOpened.value = ['top']
+
+  const wantedByRegistration = new Map<string, Set<string>>()
+  const wholeRegistration = new Set<string>()
+  for (const need of requested) {
+    const candidates = Object.values(registrationsIndex).filter(
+      (registration) =>
+        registration.shapeTree === need.shapeTree.id &&
+        (!need.dataRegistration || registration.id === need.dataRegistration)
+    )
+    for (const registration of candidates) {
+      if (need.dataInstances?.length) {
+        const wanted = wantedByRegistration.get(registration.id) ?? new Set<string>()
+        for (const instance of need.dataInstances) wanted.add(instance)
+        wantedByRegistration.set(registration.id, wanted)
+      } else {
+        wholeRegistration.add(registration.id)
+      }
+    }
+  }
+
+  for (const registration of Object.values(registrationsIndex)) {
+    const agent = agentsIndex[registration.agent]
+    if (!agent) continue
+    if (wholeRegistration.has(registration.id)) {
+      agent.scope = 'some'
+      registration.scope = 'all'
+      continue
+    }
+    const wanted = wantedByRegistration.get(registration.id)
+    if (!wanted) continue
+    agent.scope = 'some'
+    registration.scope = 'some'
+    try {
+      await loadDataInstances(registration.agent, registration.id, false)
+    } catch {
+      // the requested target is not readable in this context; leave the
+      // registration unselected for the owner to choose
+      continue
+    }
+    for (const instance of findRegistrationDataInstances(registration.id)) {
+      if (wanted.has(instance.id)) instance.selected = true
+    }
+  }
+}
+
 // TODO: make propagation independent of DOM
-onMounted(() => {
+onMounted(async () => {
   initRolesIndex()
   // set default to current user (they may not own data in this authorization,
   // e.g. approving an access request in an org context)
@@ -496,6 +559,7 @@ onMounted(() => {
     }
     panelsOpened.value = ['top']
   }
+  await applyRequestedSelections()
 })
 
 watch(topLevelScope, (newScope) => {

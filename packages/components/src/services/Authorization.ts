@@ -115,6 +115,12 @@ const formatAccessNeed = async (
       label: await shapeTreeLabelFor(accessNeed.registeredShapeTree),
     },
     parent: accessNeed.inheritsFromNeed ? IRI.make(accessNeed.inheritsFromNeed) : undefined,
+    ...(accessNeed.hasDataInstance
+      ? { dataInstances: accessNeed.hasDataInstance.map((instance) => IRI.make(instance)) }
+      : {}),
+    ...(accessNeed.hasDataRegistration
+      ? { dataRegistration: IRI.make(accessNeed.hasDataRegistration) }
+      : {}),
     children: accessNeed.children
       ? await Promise.all(
           accessNeed.children.map((child) =>
@@ -227,6 +233,10 @@ function accessNeedFromEmbedded(node: Record<string, unknown>, parentId?: string
     required: node.required === INTEROP.AccessRequired,
     children,
     descriptionLanguages: [],
+    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as string[] } : {}),
+    ...(node.hasDataRegistration
+      ? { hasDataRegistration: node.hasDataRegistration as string }
+      : {}),
   }
 }
 

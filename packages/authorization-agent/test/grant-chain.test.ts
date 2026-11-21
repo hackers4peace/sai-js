@@ -8,6 +8,7 @@ import {
   grantCovers,
   instancesCover,
   invalidGrantsAfterRemoval,
+  selectedInstancesCover,
   isGrantValid,
   scopeCovers,
 } from '../src/grant-chain.js'
@@ -148,6 +149,31 @@ describe('access-mode and instance coverage', () => {
     expect(instancesCover(selected12, selected1)).toBe(true)
     expect(instancesCover(selected1, selected12)).toBe(false)
     expect(instancesCover(selected12, selected3)).toBe(false)
+  })
+})
+
+describe('selectedInstancesCover', () => {
+  test('a broader scope covers any requested set', () => {
+    for (const scope of [
+      INTEROP.All,
+      INTEROP.AllFromAgent,
+      INTEROP.AllFromRole,
+      INTEROP.AllFromRegistry,
+    ]) {
+      expect(selectedInstancesCover(scope, undefined, ['i1', 'i2'])).toBe(true)
+    }
+  })
+
+  test('SelectedFromRegistry requires a superset', () => {
+    expect(selectedInstancesCover(INTEROP.SelectedFromRegistry, ['i1', 'i2'], ['i1'])).toBe(true)
+    expect(selectedInstancesCover(INTEROP.SelectedFromRegistry, ['i1'], ['i1', 'i2'])).toBe(false)
+    expect(selectedInstancesCover(INTEROP.SelectedFromRegistry, [], ['i1'])).toBe(false)
+  })
+
+  test('an empty request is always covered; unknown scopes fail closed', () => {
+    expect(selectedInstancesCover(INTEROP.SelectedFromRegistry, [], [])).toBe(true)
+    expect(selectedInstancesCover(INTEROP.Inherited, ['i1'], ['i1'])).toBe(false)
+    expect(selectedInstancesCover('unknown', [], ['i1'])).toBe(false)
   })
 })
 
