@@ -57,6 +57,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 26.x
+      # The projects below consume workspace packages through `file:` links whose
+      # main/types point at src, so their deps and @types must exist at the root.
+      - name: Install root workspace dependencies
+        run: npm ci
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ matrix.project }}
