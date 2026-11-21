@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:564d55d119d9e658580385de283a5e5dec0dd2ab3640cc9eb5ec0627260cf482",
+  "pageVersion": "sha256:2aa732abf688fd3273378939decff18b362085302027b54c15e109778d7f95a0",
   "claims": [
     {
       "id": "claim_0a654c6996364fdfbb807d9a29b08709",
@@ -47,7 +47,7 @@
       "statement": "GrantData carries the tree fields inheritsFromGrant (written on the child) and the framed reverse hasInheritingGrant; delegationOfGrant was removed, and delegated-chain validity is a match-based predicate rather than a stored pointer.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L150-L235",
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L172-L257",
           "version": "repo-lines-v1:sha256:33b9d3c74f7f157a266d384e70f89aa47819cb1c7bf3cc00077b334169383cd1:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0YTgxMDNjNTRjZDY1ZjJiNzZhYjkwMDRhN2NjZjNkY2NjZTA2N2ZhNmJkNjEyMjk1NjY5NzQyYjA2Y2NjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZThlNWRkNjgwMGYwMmJjYmI2MjczYzBiMDg5NjM3YTg3NTk1OGNkZGMzNmYxYzc5OWQ2MzBjMmE4NDYxYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxN2U3ZjJiYWYzNTk3MTk1OWE2ZGUwMTYyZDhiZjgyNzYxNGU1MDU5YmZkYjczMTFiOTYyZjYzMDI3Mjk0NjUifQ"
         },
         {
@@ -227,10 +227,46 @@
           "version": "repo-lines-v1:sha256:9874d324ba28368c4b9f193e541a55e9b0f268473c120f3d23cce4e756c7b8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhY2M0NTg4ZjQyMzA4MTYyZGExMmE3YThmNWVhZWFlMjA5YWY2OWMzYjM3ZGU3MDQyNjA2MjcxYzRiOWU2YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDczNjU1N2RmZjcwZmMxYzcyMjUwZjFiY2UzY2M1ZTA1NzQ5ZjI0OTAxYjFlOTI1MmIxYzNkYTIzOTdiNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_a2575d08cbd944e2ac12c8cb960148c1",
+      "statement": "AccessNeedData carries optional hasDataInstance[] and hasDataRegistration fields that only request projections populate; framing a normal access-needs document leaves both undefined, so shape-tree needs keep their previous shape.",
+      "evidence": [
+        {
+          "resource": "repo://packages/data-model/src/access-need.ts#L10-L30",
+          "version": "repo-lines-v1:sha256:74c0e9a086df1da14dad37665a9f75014e945f9bfc38b3b65a4a3c7ebb7f303c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyNGNkZDhjM2M4NWU4YjY4N2U4OWZkNzE4MjQ1MDQzNmZjOWVjNGE1MzQ3MzVlNzY4ZTJhY2I3YmNlMDk3ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwYzMzZjVjNzliYTJmZmIwZGY0MGU3NGQxM2QwMWIxZGMxZjQ3YzkwYWNkZWExMWViMjk3Zjg2OWY1ZTk1NmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYTM0M2Y5MjZiNmVhYjQxNTY4YTg1MzQ3M2E1ZTgyY2E1OTFkM2IxOGFjZTkxOGY0ODllZThkNGQwYjNmYTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1MzdmOGQ3M2FjMjY5ZDZlNDQ5ODgwYjMwZDE2ZTM5ZGRhOGE3YWI3ODZjNWE1NDk4YWVmODFkYWM5N2M3MjQifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/src/access-need.ts#L55-L68",
+          "version": "repo-lines-v1:sha256:bc2f3c23fd5417afa0321574f09b2478f43714a19d87aaa0b157f4da884a8936:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4ODUzODVmMTE1MGI5MGYzNGVkNTg3OTY2ZTFiYzAwYWMzODA1Y2QxYTFkMDMzMGMzYjdjY2M3MGQ4MjMyMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiMzMwMWU0ZDEwZmFlZmQ4M2IyYzZiMzRiMWU0YjU1YjEzNzg2OTI2NDFlMTM2NWVkZjQ1YWUyYWZmODk3NjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/test/framing/access-need.test.ts#L44-L69",
+          "version": "repo-lines-v1:sha256:b7d5717d699822fb21ac7f2048e535fa773b19f48281f08daf231d2a7bd600d7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwMjhkYjQ4ZWJlY2Q0NzIyYzhlNTE1NGY2MTc4NzBiYTIzZmFjMDNiYzcwODQ4ZmQ2ZjE4NTFkNTAxMWZmZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlZjBiOWRjMmI1ZTFiOWFiZWNiZjJmMTAxNWE0NTIzY2IyYTc1MWVlZDgyNDQyYTBhNzA4ODBmZmNhZjliZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_153e9b29dcee4f109bf439fa306f6398",
+      "statement": "DataAuthorizationData and GrantData both carry an optional hasDataInstance (a set on grants and their context term), and a SelectedFromRegistry grant is generated with one Asset permission per instance, each naming that instance as the target source and the registration as partOf.",
+      "evidence": [
+        {
+          "resource": "repo://packages/data-model/src/data-authorization.ts#L10-L41",
+          "version": "repo-lines-v1:sha256:ed8d11c1e6b9368e90925cf3931604cd056b49ad234db1f2b5446e22924f51ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwNDcyNWRlZTMyYjNhMDZlNGYxNWVmYjBmNjU0NTliNmQ1OGMyN2M3MTUxMzc2Yjg3ZTg4OTk3MTQ1YmUwMzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NDE2ZTA5Zjc4YmEzMTZjMDMyNTY4MjEzYjg1NWVlNzU2ZTQxNTY1ZDkxOGYwOTUxOWM4MWZkNjIwZjQwNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYTM0M2Y5MjZiNmVhYjQxNTY4YTg1MzQ3M2E1ZTgyY2E1OTFkM2IxOGFjZTkxOGY0ODllZThkNGQwYjNmYTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5NDM1NWJkMmJiNDcwOWFjOTllZTc0Y2UyZGM5MTE4NWIzMjBjMDQ4M2MwZGZlYzJmYzBjNDM5ZjczMWE5ZWMifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/src/grant.ts#L322-L340",
+          "version": "repo-lines-v1:sha256:5d687aec6089d26945cf606ee4e9465e489606b41b0aeeecc088197e8185face:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNGM0ZjMyZGVjYjA1Nzg4OGM0M2JiNWRhNWMwYzExMGM4MTE1NjQxY2UwY2U1MTY4NjZlMTVlNzRkM2MxM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3M2MxNmIxMjAxNjU5YjM3NjNhNzYzYmVlZDEwNzQ3ZTBjZTlkZTRkOTk4ZGU0NDFkODQxY2M0NzI1ZWViNzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliNjA5ZDM5MTRiYjFjZjdiYmEzMzgxY2QzMjY0NzNmNmJlYWU4M2M1NTJiZDFlMTc0ZDE0NjJiY2MxODk4YzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwZTM3YzQyZWY3ZDVjYjc3ODcxZWFkNzgzOGJmODNmNGM3ODYxMWE2Mzk5MWQ5ODczYTQyYTgyZmU1YThmM2YifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/src/grant.ts#L60-L90",
+          "version": "repo-lines-v1:sha256:2f54f2a527ae9f19a295420142eaf9ca47e3fb5c2c1d5b9d5811584e1ad273cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5ZjI3Y2EzZGI3ODg2NzZjMzcyNTAwZmQ0YTBiN2RhMmFjNzk3NTY0MGU3OGQzYTFjYWZjMTZhNzRiYWM2NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MDY1ZWY5ZjdhZTU1NGI5OWMwNWQ3OTFiMjM2OGFiMDUxNTVhNzEzZTk2ZmNkYWE2OGQzODcyYTkzMWY4OTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1OTMwMWE2OTEwNzhkNTNiMDE3MzIzNWE5MTM0NDUzZDQ2OWZjYmEyNGY5MTJkNDRkZWE0YTAyNTgxNTc2MTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyODIyMDQ4NDgzYjgzMjgwNTE0OGZhNDQ0ZTJlYTRmNzcwY2VkYWMyY2JkYzQyYjMzODk3MmEzNDU1ZjcwYzYifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

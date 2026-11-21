@@ -18,10 +18,10 @@ sources:
     resource: repo://packages/components/src/services/Context.ts
   - id: openwiki-source-20e9ce588a1e0e4469c2c993
     resource: repo://packages/components/src/services/RoleRegistry.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # RPC contract and service layer
@@ -69,13 +69,20 @@ the typed `AuthorizationRevocationFailure` union (`empty-selection`,
 `not-a-data-authorization`, `mixed-grantee`, `unauthorized`) and returns an
 optional `activityId` plus the expanded authorization IRIs. The service surface
 is the `SaiService`
-`Context.Tag` interface, and the exported `router` is
-`RpcRouter.make(...)` mapping each tagged request to a method that pulls
-`SaiService` from the Effect context. Output IRIs are unbranded `S.String` on
+`Context.Tag` interface, and the contract exports `rpcGroup` — an `RpcGroup.make`
+over `Rpc.fromTaggedRequest(...)` for every operation — plus the
+`rpcGroup.toLayer(...)` handler map that pulls `SaiService` from the Effect
+context. Output IRIs are unbranded `S.String` on
 the wire; `IRI` is a `S.brand('IRI')` used for internal typing only. Names use
 `id` (not `iri`), and a `Message` suffix marks RPC projections wherever a name
 would collide with the data-model type. The `AuthorizeApp` request returns an
 `AuthorizationGrantedMessage` as its success type.
+
+Instance scope rides the same contract. `AccessNeed` carries optional
+`dataInstances` and `dataRegistration` (populated for request approvals only),
+and `DataAuthorization` carries the same two fields for the approval response;
+the `RequestAccessUsingAccessNeeds` payload keeps `hasAccessNeedGroup` as
+`S.Unknown` because the embedded need group is validated on the owner side.
 
 ## The entrypoint (`ApiHandler`)
 
@@ -85,8 +92,11 @@ the linked webId via `webIdStore`, and obtains the user's `AuthorizationAgent`
 session from `sessionManager`. It then parses the RPC envelope, rewrites the
 envelope `traceId/spanId` from the active OpenTelemetry span, builds a
 `SaiServiceLive = Layer.succeed(SaiService, ...)` where each method resolves
-the request context and delegates to a service function, and finally runs
-`RpcRouter.toHandlerNoStream(router)` inside `Effect.provide`.
+the request context and delegates to a service function, and finally serves the
+RPC over the NDJSON protocol with
+`RpcServer.toWebHandler(rpcGroup, { layer: ... })`, where the layer merges
+`rpcHandlers`, `RpcSerialization.layerNdjson`, the HTTP/node platform, and the
+OpenTelemetry tracer when tracing is configured.
 
 Its constructor now takes a **`PodEndpointStore`** (not a raw SPARQL endpoint):
 every `resolveContext` call receives it, so the service layer resolves per-pod

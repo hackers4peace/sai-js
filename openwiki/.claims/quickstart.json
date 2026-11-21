@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:95b70abf1af1b8ff822a0867de32f907ce66b9b5bc756928440972c72e34e969",
+  "pageVersion": "sha256:d26b74ebd31be4dfd6ec4036022b94f911bc871ec1de7ae6bce0ebd8190e416c",
   "claims": [
     {
       "id": "claim_128945ceebdb43de9c58258b39f648ac",
@@ -17,7 +17,7 @@
       "statement": "The repository's npm workspaces group the packages under packages/*, the test integration suite under test, and the docs website under docs/website.",
       "evidence": [
         {
-          "resource": "repo://package.json#L37-L41",
+          "resource": "repo://package.json#L39-L43",
           "version": "repo-lines-v1:sha256:5934d45330c12219bb1fdbbe8b5f3ca1b5d5f7086d01f9539743a5eef276a6b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRhZWViY2I3ZGEwOWIzYTdjOTU4YzE0OWMxNmJiYmY5MTYxMmVjNjFkNDQyN2IzZWUxZTYzMjJhOGYyYmEwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0ZDhjMDczNDI5ODkzMTAxNTc2ZDg4ZDk5MTI3ZTg5ZDY4OTFkM2IxN2U4OWRmMDJlYzlhZTcwNzA1ZDhiZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2UwMzc0MDM1NzYxMWRkNzVmZGEzNWIwMjdkOGZjMmQ5MDJkYTZkMDQ2YWVlYTJiZDg0ODY1NjI4MTkyNzY4YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU2NGRjMmU1OGNhYjdkYjgyMjk5YmNlOTIyYjM3ZDQ1MDljODhjYmRmMGIwMjVkM2ZlMjFiMjhjMjAwYmFiNSJ9"
         }
       ]
@@ -45,7 +45,7 @@
           "version": "repo-lines-v1:sha256:1d76d8967f51aa5818eea0ebc66c0c5d21c4e901a92277a7f02643d413518e73:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiMTg3ZjdhN2Q5MDA0NmZhMzgwMjBkMmU5MTJjMjc0YTZlN2JjNDBlYmY2YmNhNTQ3YjQ3ZjFjNjBhMmNhZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViMzljZTgxZTI5MDUwN2Y0M2Q4MjdlNTZkMWU3YmZkMmNkN2Q2YjU1ZTdjMDdlNTNjNThlNjUwOWNiYTg2M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MmI1MzhiYTNkYTg0MDQ2MDk1MjA1NjQ4ZDM1N2I4NzdhYjU4ZTkwZjU4ZjliMWVkZGU4MzIyOWI2ZjFiYzYifQ"
         },
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L119-L130",
+          "resource": "repo://packages/components/src/ApiHandler.ts#L103-L114",
           "version": "repo-lines-v1:sha256:91edfb079d2501afc54ca086e52390eb8b612c4edfe7d8662a0eb72321236c2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4ZTU4MDk3MjRmOGJlZmJkYjRlNzk4YjAyNGYxMjI4ZDc4Mjc0YTljNDgyODUwYmNjOWZhNGViNmRlZTliMjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkNGZjMzFkMzc1MWQ3NTM0Mzc0NTdhODFmN2NlNTYyZjI4NmQwMWIwZGMyMGFlNmNmNThmZWQ2YTkwZGJjYWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1MGVjY2I4NDE4OWE4MDBiZWU3NDRiNTYzMDY2MjIyNmE5YjgyMTBkMmY1MTBiOGYyYWFhYjQ2NGU5Y2I4MmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5ODQ4MzMwYWEzZjYzYzdkZTkwMTVlNDAxMWYyZTJlZTRmMGZiYjU0NGYyNWIyZjI5YzI5OTY2NWI3MzU4NzUifQ"
         },
         {
@@ -85,6 +85,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T23:03:01.178Z"
+    "at": "2026-11-21T20:00:43.833Z"
   }
 }

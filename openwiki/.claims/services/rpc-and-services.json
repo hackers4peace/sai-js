@@ -1,40 +1,40 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b8f3a0b027cddf29bb8b7ad5e6e6c7657cef850f65853087f8754e0be4a143a8",
+  "pageVersion": "sha256:0173decb479de075768ec35e5084fb456836d1785bedc62dd309b1eafea8682d",
   "claims": [
     {
       "id": "claim_dab50ed8b3754de2ab938bdffc459a8d",
-      "statement": "packages/api-messages declares every operation as an S.TaggedRequest with effect Schema payload/success types and failure S.Never, exposes the SaiService Context.Tag interface, and builds the RPC router with RpcRouter.make.",
+      "statement": "packages/api-messages declares every operation as an S.TaggedRequest with effect Schema payload/success types and failure S.Never, exposes the SaiService Context.Tag interface, and exports rpcGroup built with RpcGroup.make over Rpc.fromTaggedRequest plus its rpcGroup.toLayer handler map.",
       "evidence": [
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L1096-L1105",
-          "version": "repo-lines-v1:sha256:2b4478088a991e2a30430d936b06c8c11d7abeb4f191da5670b4495f9166d88b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0ZGM5YjQ2MzQyNDBkOTVhMTQ3NzQ1MTA4Y2YxNmQwNjk1OTEyMGZlMDI1MDViNWE2MjMzY2ZkMzJlMWUzOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0Yjk1NDg0MDY2Y2RkZjZhODFkYjYwMjNmMzJiYjJkZDQ3YzY1NTMxYzhhZDA4YTVjMmVkZmI5OTI5ZGI0YWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYTgzOTRkYzkwOTI4YjQ2NjkzMDVmNjQyMzNiYzJmMmE2YzIwNWQ0Nzk5YzVmNTI1ZmM2ZGE1MWMyYzQwYTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkZTFlZTM0MjBmNjAzZjFkZTkzYmI5OGJkOGIxMDNkODY3NzJkNmM3OTYzODI0YTEwMDFmZTViY2U3NTBiOTAifQ"
+          "resource": "repo://packages/api-messages/src/effect.ts#L1096-L1103",
+          "version": "repo-lines-v1:sha256:a73846219343a5f413a8fa42db09a38ce6b4dc74009e5159d64578b88f8f4f76:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzYzNWVlZjkyYmVkNGNjMzQwYzQ4OTVkZDU3ZDM0ZDY5MTkzODcxOWFiNzgxZmQyNmI1NDkxMDk5YjUzNWY0ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ5YWEwOGQyMzkyYjMxN2ZkYjI0NDViNThiMmNhZGQ0NjdlYWNmYjE3OTcxZGUyODllNDZhNjIyMGY1N2EwMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzVmYjMxNWE0ZjE4ODRhNzg4YTVkMGM2MmExMzIyNzBmNWQ2YmMyYzE4YTcxZTdjODRjNzllNzJiMzYzOWY5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGIxMGE2NDU4NjU0ZDZiMmIyZmRhOTJhYTMxMTMzZmM4NTAxOGMyZDg1NzZmMDQ2ZDM1YmFmMTU3YTkxYzQ3MCJ9"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L1214-L1223",
-          "version": "repo-lines-v1:sha256:7cd174d8e289a6619f18b04f1c36d6899d774bfcc0f29c50e4057768b87de4e4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmMjEwOWJjZGU3NGU2NzE3ZGNkNTU1N2E2MDBkODZhZGY0MjI0Yzk4NjM4OTUyM2Q4NzIxZGE1OTU2MDNjOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMDY2ZWQ5ZWQ3YjU0NWRiYzJkNGQxYTFjMDkzYTViZTU4ZDMzYTE2ZWU5ODlmMGUyOGE2M2IyNzU5NGI3MDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1YTljYWY0MzJiYjZiNTkxMGEzOTAxM2ViZTI3ZTFkODQwNWU2ZWE3ZWU0NmJmNTRmMWMxODEyNGJiYzA2YmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4MDdkNDM1OWI4MDgyMWNmMDM2N2E1Mjg5YjViMTJiZGQ4ZjQ0ZDBkNTM1NTY0NzFjMTlmMTU5MjY0ZTY4NzYifQ"
+          "resource": "repo://packages/api-messages/src/effect.ts#L1218-L1246",
+          "version": "repo-lines-v1:sha256:a1ed59cf67ac0ece29940608766d756923e8c803a0cda4e167a49b98ef37d6ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiMjM2NmMzOWFhODU3ODE0MjBiN2JiOTllNzU3Y2MyYTUyZjE5ZjI3OTUxOWEyYjdmMDk0MmM1MDdkZTU5MmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZmJhMDUyN2MzOTUzYzRiNmUwZTViNTczOWJhODM2MTJmODA1M2JjZGM5NDY2NzMwMTkzY2QxZDU5MGI0MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1YTljYWY0MzJiYjZiNTkxMGEzOTAxM2ViZTI3ZTFkODQwNWU2ZWE3ZWU0NmJmNTRmMWMxODEyNGJiYzA2YmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3OWIyNzIxNWM0ODA5NDY2YzlhNTBjMzUxZGVlMjJhMzE2YWY2ODM3NjU5MGU4ZTkxNzA5NTM3MGYzN2Y0OTUifQ"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L797-L797",
-          "version": "repo-lines-v1:sha256:5be747ba06b51ab6a1577483ef9199e47d5924fc000faa1f9113577b5c77d7c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJlNzQ3YmEwNmI1MWFiNmExNTc3NDgzZWY5MTk5ZTQ3ZDU5MjRmYzAwMGZhYTFmOTExMzU3N2I1Yzc3ZDdjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJlNzQ3YmEwNmI1MWFiNmExNTc3NDgzZWY5MTk5ZTQ3ZDU5MjRmYzAwMGZhYTFmOTExMzU3N2I1Yzc3ZDdjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDk3OTU0MWUzNDdkMTllMWU5OWE0MGQwNWI1OTA2NWRmZmMxODEwNWZhNDAxMmRlZjAwMjg4YWJlZTYyODYwMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjc0MjQzMWE4MmUwZGI4NjZmYjA5YWE0MDBkODRiY2QxNjUzNThlNDc2OTQ3ZDdhZTVjNDE4OTI4YjBjZTU1NSJ9"
+          "resource": "repo://packages/api-messages/src/effect.ts#L1248-L1302",
+          "version": "repo-lines-v1:sha256:a878b11be9962c21fffa98cfec87a72f4854371a3a01f393be9574174712ffca:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwZWI0ZjI1YTI2ZGViYjI4YWRiNDM2OTc2NTBkOWMwOWZkM2IyOWU5OTA5NzYyOWQ1OWNlNjZlMTFhMzI0MzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZmJhMDUyN2MzOTUzYzRiNmUwZTViNTczOWJhODM2MTJmODA1M2JjZGM5NDY2NzMwMTkzY2QxZDU5MGI0MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5MTg5NjVkYWU2YTY3MTEwYzJlYmJkNzM2NGMxM2I0N2MwYzQyZWNmNTJlNzFmMWQ4OTY3YTY2ODA4ZTUzZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4MGQ4Y2I0ODVkOTgzY2M3NjcxM2M5OTU0OTlmOGE5M2NjZjFiYmNiMzAzMWViNjA3Yjg1NjRmYjNmOWFmOGYifQ"
         }
       ]
     },
     {
       "id": "claim_bd406c2db2dd44c7b2e5924880df5131",
-      "statement": "ApiHandler resolves the account from the css-account cookie, finds the linked webId, obtains the user AuthorizationAgent session, and runs RpcRouter.toHandlerNoStream over a SaiService layer built per request.",
+      "statement": "ApiHandler resolves the account from the css-account cookie, finds the linked webId, obtains the user AuthorizationAgent session, and serves the RPC through RpcServer.toWebHandler over a per-request SaiService layer.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L121-L135",
-          "version": "repo-lines-v1:sha256:da9522c6ee5948bdcae4ef3c2e08f3df796664413b9b5da3eba4833da02b095c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkMWFiYWI2NGE0NzdjYjM4MDgxNjE3NWEyZjUzYTdlM2ZhYmNlYzU0MDE1ZDg3YmY1OTA3NjFkYTJjNmRjMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzODZkMjNhMTkwMWU5NDJjMWEyNzEyZTQ5NWYyZDI4ZWMwNjM1YjJmYWZlNzIwNjNjOGNiZDIzODViZWRkYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyZWE5NmJkNzQ4ZDJlMDFkZDliNjgzZWMxNGQ0NTQ5M2RjMTdlZjcyNTRjODg1YzI4Yzk3NmZjMzZjMjdlNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5ZTQyNzA0NDM2ZTJmZWJmYTg1NmFhNjQ2ZTE0ODQxNzQzN2Y2ZDk2NGYwMzU4OWRlOWIxYzZhMThkYmFhOTUifQ"
+          "resource": "repo://packages/components/src/ApiHandler.ts#L366-L378",
+          "version": "repo-lines-v1:sha256:80089b21e15b1e19aeca04d50a254901dae0c2bfb50b7e80a61fd729c6775c67:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiYmVkYjRhZGRiMGE3OTk2M2JmYjBkOGRkOThmZWVlMmM4MjQ0NDMyOGVmNTQzMjViYTcwODFlZjgyM2JhMzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YmEyYWY1ZWYwNGIyNjIwOWEyNzFlMDRlZDk0YTM1ZTQ0NjdjMDljODRjNGU0MWU1ZGQ5YTdjNzQ5ZjYzNmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkMzI2YmU2OTUwYmQ3M2FjMjgzMzgzZmFiNTcxNDA2MjhlYjE1MzBhMzZhN2Q2NDBlMmI4MTU3YmYwNjY2ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3NDY4MWI2OWJlN2I5MGFmZjc5NTdmYTliODQ0ZTA3M2RlN2YxNDE5NGFiMmUzZGVjMjU1MjQ5YWM4NjExYzIifQ"
         },
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L245-L260",
-          "version": "repo-lines-v1:sha256:07ed0268d5d6312b90d6c0f9b9ed1230907fc0de07fdb34245b4fecee7a3b997:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ODYyZDIwZTY3ZWU4ZmIzM2ZhNDI1ZTZiNDY3YmM2MmZhMzFjY2Q4YTM4NjdmYjYyZDMwMmE4M2UyMTE5MDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0ZGE2MzM0YTRmM2EyMDRjMWUzYjY4NGMzODQ3OTg2ODRlOGE3MmY4MjljZjYyNTA1Y2M2NDMwZmRlMTZhODMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljZDM3NWM0OGQyM2Q3N2UwMGQxMDgzYWE0YjIxMTIzYTFhMjcwMGM4NzcwYjRkNDkwNWU3YWQ4MDE1YzhkZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwZTg1Y2JiOGVhODY3MDY4OWFhOTUyMzZhMmRlYWFlMGFhYzAxMmIxOGJkMjU5ODlhZjg5MGJlZWRmMzM5ZjkifQ"
+          "resource": "repo://packages/components/src/ApiHandler.ts#L62-L96",
+          "version": "repo-lines-v1:sha256:7bc7e537fde045ded0310f70acd2c6e3fb75a9fb736f48df269787d0eda04e6e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMjhiY2FlZjBmOGE0YTg2OTFiM2I2ZjhkYWVlMzVmYmU4OWZlYmYzZGI3NDY1ZWE2Y2ZlNWZhZmMzODI1YTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmOThiYjIyZWVjODg1YmVmYWQxMGVmODc0Mzc1MGUxNGY1ZDAyNGJiZjMxYTI2M2NlNmE1NWY0YWUyMzRiNDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ZDRkMGNiMzI5Mzc1MGZjYmE3MTYzZWU0MzAyY2FlNmI0ODI4MGIxOGQ3ZDMxYmRjN2VhYzcxMjUyMGQ2YWIifQ"
         },
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L48-L70",
-          "version": "repo-lines-v1:sha256:7299f5fefa30fb9e01a8a9c17bc4e230dc6fb21248d6080bbd535196b92b5e8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjc5MjAyY2FlOGE5MGZjYjYzZjQ0NDRjNDYwNzRjY2Y5OWNhNGE2YzQzNDg4MDA4ZDYxNzhlZDNiZTk0YzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllY2E2NmNiMjljZDEyZWM5ZmM4MTRkMDQyZmY3NDhhYWQ2MWE5YTA5NzJkMDJlYmE1MGU2N2Y2MjdiZDQwOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjNWUzYTdjYTU1MDIyYzNiNjhjMTM3NjRkYmNmOTRiNDc2Y2RkNjA3ZmU5ZWQzZmU4NzNmMmEyNmVkYTc3NjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmMWFhYzc3NDJkMTRmOWU0NTQ0MjUyMTM4MDY4ZmQ2YzAwMTQ0NDliMDYyOWU3NzQ5NmYwOGQ2YzA4ODE3ZjUifQ"
+          "resource": "repo://packages/components/src/ApiHandler.ts#L98-L100",
+          "version": "repo-lines-v1:sha256:589fcf54bf8163f0213df2116272438b923b7bd5bb846f68f5414bc36a66bfe6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTU0NmEyYWEyMWMwZTNmNTUwMTQwY2Q0YjcxZDhkMzI5Y2QyYTk4MjgwMjkzN2FhYWNmYTk3YjE2YWVjNDZkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzNiN2JkZDczZThhNWViZmUzYmY3YTU0NGM4YTQ1ZWMwYzA3N2NiZjY3ZjU0OWRjNTRkYTRmNjAwZjZiMzc3OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTE4MTUzMzMwNDhmM2JlNjhjODVhMzczYjc1MjhhODkxNDUxYTgwZDU4OTc2NjlhYjUxYzY3MmNiZTI5YWFhZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmU2YjM0M2YzOWQ4YjU1ZTk0NmM0ZjUwODM4M2U3MDI2ODVlZDNiYTk2N2Q2MjFiYmY4NWE4NWVjMzkwMDBlMyJ9"
         }
       ]
     },
@@ -77,15 +77,15 @@
       "statement": "The AuthorizeApp request returns an AuthorizationGrantedMessage as its success type; the AccessAuthorization schema is exported as AuthorizationList, which is the success type of ListAuthorizations.",
       "evidence": [
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L1044-L1055",
+          "resource": "repo://packages/api-messages/src/effect.ts#L1048-L1059",
           "version": "repo-lines-v1:sha256:82b9e69bf976f5ea4996a34c04c1cb2ad65dae405c7e0c377db93b60772e0877:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3YWM1YTAwNDZhY2FiMWYyNjg1YmQxZTVjYzEwZWYzZDZlNzYwNmE4NmY3YzhmMGMyZDM1YmU1YWI1MThjM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1ODlmMjViNjQ0Mzk4NDU3MjZmOTM0YjQ2Mzg3Yjk0ODRkNDgyZWJkMWRkMTYwMmQ1MGIwMzIzNWVmN2NjMGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4NDk5MDE4OWFhOGZhODUwNWU2MmNiZjYwN2Q1MzBhMWUwY2YyZmFhMDkyZmNhZmJiYjVhZTcxNTFmNzQ1NjgifQ"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L794-L795",
+          "resource": "repo://packages/api-messages/src/effect.ts#L798-L799",
           "version": "repo-lines-v1:sha256:cc4d5b74fe83ef90470195ee15925640203c6c18ac319e0688eaddea6e6e3210:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2U5MGFjYzBkNDQ0MWMyNjEwYjU3ZjcwMmNjOWU3MmRmN2I3ODBiYmEyNTljYmFiMDExMmMyYWVhMjNlNDQxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzRmZWJhODlhMTAwNGZhMDBmNDdjNTY1MTgwNTJhMjJkY2ZmOGEyMmMxYjZmMWRiMWY0NmI0YzU0MDM0OGY4MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWU2NjE4ZTZkODRlMmZjOWIxMGNhZTAxMzhkMWViMGZhODA4YmIyZDk3Yjk3MWQzMWY4MDk3YWZkMGQ3NmIzOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI1MjY0ZjFhYjU4NzU2NzllYzYzZjFjYTQxMzgwNzZlOTZjYzJlYWM3MjA3MTA2ODY1YjIyMzIyMTQ0NmUxNCJ9"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L861-L870",
+          "resource": "repo://packages/api-messages/src/effect.ts#L865-L874",
           "version": "repo-lines-v1:sha256:2bc34b0b733a4f2b848ba6962fba69ea811877df032de632e21e15fffd038248:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NDJjZGU1MWNmZjY5NDE3ZTU4NWFlMzdhOThiNzQ1OGRiOWU2ZWI3Nzk4OGMxMDEzZmU5YWMyYjViMjE4NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5ZWU0NGM3ZTI1MzI3YWRjMWNlNzcxZDdjNzBlNjU2NDVlMjA5NmU1YzE1YzgwZGNjNDU0ZTJiZjNkYzY0OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiNTlkNjY1N2Q5NDkyNDJkMDM3MWY1YWExNjcwMjRlN2RlOGJhZTI1ZWJlNGVmNjMxNThmNjhlYzhlNDA0YTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlZThhMDVhNWVjMDY0NDlhYzAxOTY0MzE2MWUxMWE3ODgyMjA0ZDc1ODkwOGExYWY2MDg3MzkzM2I2ZTBkMmIifQ"
         }
       ]
@@ -105,12 +105,12 @@
       "statement": "ApiHandler's constructor takes a PodEndpointStore and threads it into every resolveContext call, including the authorization listing and revocation handlers, so request handling resolves per-pod endpoints rather than one shared store.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L177-L199",
-          "version": "repo-lines-v1:sha256:77f41fd1c3fe02901788663e06f3f68d8a7ea359bd2a1f4b447e3a4640aec27f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzODZkMjNhMTkwMWU5NDJjMWEyNzEyZTQ5NWYyZDI4ZWMwNjM1YjJmYWZlNzIwNjNjOGNiZDIzODViZWRkYjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2NDk1MDU4MjEwNzhkOTE2ZjcwYTQzMDNhYjg5YjQxYzUzMmU5MGM0NmRlYzMzZWYwMWFmNzA3OWYzNDE2ZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzZTFmNzc2Yzk4MDBkM2YyM2ViZWI3MzQ1MGIyMDIyNTlhYjg4Nzg2OGQwZWYxNmUxYmNiYjQyZDhlZjU4OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NGNlYzEwNGE0MTA0NzhmNGZkYjNjNGUxNGZlMTZiYmM0OWY1OTdkZTIyNDdhNTYzYWU2ZTRkYzlhMWQzOTkifQ"
+          "resource": "repo://packages/components/src/ApiHandler.ts#L105-L115",
+          "version": "repo-lines-v1:sha256:3574e709c32201e037080275a9e9db6875abc0e596be171c2ce6220ab15d4083:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkMWFiYWI2NGE0NzdjYjM4MDgxNjE3NWEyZjUzYTdlM2ZhYmNlYzU0MDE1ZDg3YmY1OTA3NjFkYTJjNmRjMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczY2IxYWMxYzYzMDU2YmFmNWE5MWEzMDk4YTlhMjQzYTE4MDRkNTE0Y2I2NmY2ZDAzNzNjMzI5N2U2NDg0NjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyZWE5NmJkNzQ4ZDJlMDFkZDliNjgzZWMxNGQ0NTQ5M2RjMTdlZjcyNTRjODg1YzI4Yzk3NmZjMzZjMjdlNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MmFiOGViYTRiNDY3ODJjZDMwYjhkMDRiOTVjZGJjMTIwYzUzNDljMzRhMWZkNGY5ZWQxNGZiOGVjMWVhYjMifQ"
         },
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L48-L70",
-          "version": "repo-lines-v1:sha256:7299f5fefa30fb9e01a8a9c17bc4e230dc6fb21248d6080bbd535196b92b5e8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjc5MjAyY2FlOGE5MGZjYjYzZjQ0NDRjNDYwNzRjY2Y5OWNhNGE2YzQzNDg4MDA4ZDYxNzhlZDNiZTk0YzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllY2E2NmNiMjljZDEyZWM5ZmM4MTRkMDQyZmY3NDhhYWQ2MWE5YTA5NzJkMDJlYmE1MGU2N2Y2MjdiZDQwOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjNWUzYTdjYTU1MDIyYzNiNjhjMTM3NjRkYmNmOTRiNDc2Y2RkNjA3ZmU5ZWQzZmU4NzNmMmEyNmVkYTc3NjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmMWFhYzc3NDJkMTRmOWU0NTQ0MjUyMTM4MDY4ZmQ2YzAwMTQ0NDliMDYyOWU3NzQ5NmYwOGQ2YzA4ODE3ZjUifQ"
+          "resource": "repo://packages/components/src/ApiHandler.ts#L52-L59",
+          "version": "repo-lines-v1:sha256:ceddda9fd554be2dafb0efc39f4fd1a84e5551677e97bde9047f171ba4f3c58b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmE1ZGY4MjY4YTlmNzAwMzg5NDUxNzk1NDQ3ZGViNTJlNGQyMGI3NTEyMzI2MmFhNzI1MDYwZGRlZmIxOTZmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmIxODdmN2E3ZDkwMDQ2ZmEzODAyMGQyZTkxMmMyNzRhNmU3YmM0MGViZjZiY2E1NDdiNDdmMWM2MGEyY2FlNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2M3Y2RiYTk3NjY2MzUxODg4ODBmOGJhMTU5YTE0MGFjMmZmNjc4M2JmNTUxOTAxMTcyZTYyZGZhZWQ5YmJkNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzU4N2Q0NGJkMDQ3OWU1MjlkNWFmMzRkZjA1MWMyM2E3MTQ1OTQ0OWJjNWMyMGZmNmNjYWMwMWRiYjZlOGIzMCJ9"
         }
       ]
     },
@@ -129,7 +129,7 @@
       "statement": "AccountService.startBootstrapAccount derives the account's IRIs, starts the bootstrapAccount Temporal workflow on the create-grants queue and returns the WebID immediately; ApiHandler.bootstrapAccount delegates to it.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L121-L128",
+          "resource": "repo://packages/components/src/ApiHandler.ts#L105-L112",
           "version": "repo-lines-v1:sha256:4c895b1462dff67a67c8c5a236554caa62da4da3f75285e09ccf8a6682d5f3f6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmQxYWJhYjY0YTQ3N2NiMzgwODE2MTc1YTJmNTNhN2UzZmFiY2VjNTQwMTVkODdiZjU5MDc2MWRhMmM2ZGMyZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzRkZWJjNzc0ODMxMWQ0YzQ4MWI4NDg2NzU2NzEwNWI2YzhlNzQzZWJjMDFmMzkyYTIzZWY0ZWU4ZmY4MjM3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODJlYTk2YmQ3NDhkMmUwMWRkOWI2ODNlYzE0ZDQ1NDkzZGMxN2VmNzI1NGM4ODVjMjhjOTc2ZmMzNmMyN2U2ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWE2YTIyMDQxMTQyMzZlNmU0ZTY5NDg4ZmI4YmRhOWUyYjNhYzEzOTlhZThjYzZjYzAyZGQyM2YyODFiMjIzMyJ9"
         },
         {
@@ -157,18 +157,36 @@
       "statement": "ApiHandler's getAuthorizations method resolves the context and calls listAuthorizations, while revokeAuthorizations runs the producer in Effect.tryPromise and converts its typed errors with toAuthorizationRevocationFailure.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/ApiHandler.ts#L183-L199",
+          "resource": "repo://packages/components/src/ApiHandler.ts#L167-L183",
           "version": "repo-lines-v1:sha256:fc39fc07ba9a198a9d79deed069f5db830622290ece861d469b29644cd2cf3ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhNTBhMDYyOGRkMmRmYWRlNDcxMzRhYzRkZmVkN2Y0NDI3ZGFhZWNkYjA1MDkxMjM0YzU4ZTJhNmU4NDJiNDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2NDk1MDU4MjEwNzhkOTE2ZjcwYTQzMDNhYjg5YjQxYzUzMmU5MGM0NmRlYzMzZWYwMWFmNzA3OWYzNDE2ZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4NGNlYzEwNGE0MTA0NzhmNGZkYjNjNGUxNGZlMTZiYmM0OWY1OTdkZTIyNDdhNTYzYWU2ZTRkYzlhMWQzOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NGNlYzEwNGE0MTA0NzhmNGZkYjNjNGUxNGZlMTZiYmM0OWY1OTdkZTIyNDdhNTYzYWU2ZTRkYzlhMWQzOTkifQ"
         },
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L450-L575",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L460-L585",
           "version": "repo-lines-v1:sha256:160607c3183d6b6067a2240be2af0a07bb749b9833be5f8818ac0d09dc102bb2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkZWYxZDBhZGFiYmRjNjllYzlkZTBiY2RmMTUwZjdlYTM1NjAwZGI5YzQwYWQ5MWQwN2EwZGIyN2YyMDdkZWM0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyNmU3MTE5NDViZjUwMDE3YTg5ZWVjOTc4ODljYzg1N2Y0ODUzOWU4MmVlNTM0MzgyMzYyN2RkMDIzY2Y1NTJmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5NTJmOWJkZTM1OGIyOWI5NDdmY2EwMDU3ZmFhN2EyN2Q3NGEwYTQ3ZTZkNjc5ODU5OTI4YTI5NmE5Y2NiYjU0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5NTNhMmJjYjZmMzI4NTUxMTA1YzJmMTEyODRmNTZjY2FmNjI5ZTM2ZGQwZTI3NDc4MThmZDAyMjMxZjlmOGVmIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_3400930e6c7f4ea9a807bcc3d57ced78",
+      "statement": "Instance scope is part of the RPC contract: AccessNeed and DataAuthorization each carry optional dataInstances/dataRegistration fields, while RequestAccessUsingAccessNeeds passes hasAccessNeedGroup as S.Unknown because the embedded need group is only validated by the owner.",
+      "evidence": [
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L70-L78",
+          "version": "repo-lines-v1:sha256:683f1cefe21398beb1a81701f69ae25d886625cbe31af942edf233205e792cfa:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTA4ZDg0NjA3Y2E2ZTg5ODg5NjY0ZDAyNjAwY2U0OTIxNjNjOTVjOWEwMDQ1MjA0N2FmOTcxY2JlMTJjYWE1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjBhMGM2Y2FiZWNjNmQ1ZWVhNzI5MjRlZDllYzg2MDU0NmEzYjExNjY5N2EyYjZjYjE2OWE4YmUwNTlkYTEzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWI5NWQ1NDg2NzVjNjk3NDdlOGZjOWVlYzc5NGRkZGEwNTA2N2NlM2I1Nzc4MzIzMjExZGYyZDJkZTFhYjAxMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmJiNjI1NjZkZWUwODYwODYyYTJhZDc3YmIzM2Q4M2QxNzhlMDQ4ZGJiY2VmYmVmODA3YmU1ZGIzYWRlNjliMiJ9"
+        },
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L755-L763",
+          "version": "repo-lines-v1:sha256:edad6db33120e4f467a037aea1e9dfa50c7f0f6ff836c99ab31673f702364d51:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODU4MGI3NjUxOGRhZTk3OWZhZWJkMDIzNjdhMjkyOTJhNTBkOTc2MDkyMjUxYTM4YTZjZTMwODgwYmE0MjgyNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODU4MGI3NjUxOGRhZTk3OWZhZWJkMDIzNjdhMjkyOTJhNTBkOTc2MDkyMjUxYTM4YTZjZTMwODgwYmE0MjgyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGVjYjExNWRmYWNmYWUzNTRhNmJkOWM0OThjNzI0MDdjYTg0OWNjYjJkNDViZWZkNTJjMDQ5NDQ4MGE3Mjc4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzBjNTI0YjljNmM4NzE5MjZiYmZkNjI1YzA4YWFlNWQ2ODdkNzNiZTRjM2E3MTZmNTExZGUxZmQ2ZjA5ZjhiNiJ9"
+        },
+        {
+          "resource": "repo://packages/api-messages/src/effect.ts#L986-L999",
+          "version": "repo-lines-v1:sha256:f0b764701d45973ab3c9b3106c52281deceb518bdc3238ff483adad89b2840da:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1MDgxZjcwOGVhYTdkNjgzZDcwOGU0MzU1NGRhOWQ1ZjJlYTJmMjYwMjk1OTI1ZTYxODQ3ZDQyMjgzYTk5M2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0ODJjNWM1MmUzODEyMWE1ZTg2MWUxOTVhMGE5ODFkYTc4N2ZjODcxMDEyMGNiMzJhNzI0ZTkxYzhkYzNjOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiOWM5MTQ2MzU3NTgwZGVkZjBlMjJhOGM5MWVkNTdhZjhkODJiNjZmYjBkZWFhMGQ0YjQwNmFkODhmOTQxZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhMGFiMzViNDM1ZDFhMzRiZWE0NDgzMTY3YTU4MDIzYTk1ZjQ3MmQwN2M0M2ZmMTZmMGFiOGVhY2Q5MDNjMzMifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

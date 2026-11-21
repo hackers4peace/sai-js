@@ -66,12 +66,14 @@ sources:
     resource: repo://test/setup.ts
   - id: openwiki-source-681173e11e9e253d0432fde4
     resource: repo://test/share.test.ts
+  - id: openwiki-source-8ecd23b5249188459642af00
+    resource: repo://test/specific-instance-access-request.test.ts
   - id: openwiki-source-44922de4c3997ca2d1d53cd9
     resource: repo://test/util.ts
-generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T23:03:01.178Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Integration test suite
@@ -307,6 +309,13 @@ the black-box `/test` suite may not.
 - `http-capture.test.ts` — token/body capture, redaction, and the exclusion of
   `application/x-ndjson` / `text/event-stream` bodies so a stream is never
   buffered by the capture wrapper.
+- `plain-lws-access-request.test.ts` — plain LWS request detection, the
+  Asset/AssetCollection mapping onto instance, registration, and shape-tree
+  needs, grouping by action set, and the constraint/assignee/source rejection
+  paths.
+- `need-based-access-request.test.ts` — ODRL need parsing: multi-permission
+  instance needs, registration and shape-tree needs, inherited nesting, action
+  normalization, mixed-target rejection, and constraint rejection.
 
 ## Coverage
 
@@ -330,7 +339,11 @@ file), `impersonation.test.ts` (read-only admin impersonation),
 `personal-admin.test.ts` (AddAdmin/RemoveAdmin + ACR),
 `policy-engine.test.ts` (WAC/ACP matrix), `reciprocal-webhook.test.ts`,
 `reconciliation.test.ts` (sweep arms + seed subtree reuse), `roles.test.ts`,
-`services.test.ts` (reachability smoke), and `share.test.ts`. The owner
+`services.test.ts` (reachability smoke), `share.test.ts`, and
+`specific-instance-access-request.test.ts` (an instance-scoped request → the
+approval view's requested instances → an instance-limited authorization and
+grant → the requester's granted-request detection, plus the plain LWS `Asset`
+POST returning a `Location`). The owner
 `RevokeGrants` RPC suite (`revocation-rpc.test.ts`) was removed together with
 that RPC; revocation is exercised through `authorization-revocation.test.ts` and
 the boundary cases.

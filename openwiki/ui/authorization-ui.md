@@ -4,6 +4,8 @@ title: Authorization UI
 description: The Vue 3 + Vuetify + Pinia authorization console — entrypoint, router and pages, Pinia stores, the @effect/rpc client, the NDJSON events stream, localization, and PWA push.
 tags: [ui, vue, vuetify, pinia, effect, pwa]
 sources:
+  - id: openwiki-source-791f6c3ba8bda98bd2981258
+    resource: repo://ui/authorization/src/components/AuthorizeApp.vue
   - id: openwiki-source-a3fc2fbd28c4b3f035ac208f
     resource: repo://ui/authorization/src/effect.ts
   - id: openwiki-source-59c73756667a9a84494055ec
@@ -14,6 +16,8 @@ sources:
     resource: repo://ui/authorization/src/router/index.ts
   - id: openwiki-source-1de1cb7b4e5904caddca9b5c
     resource: repo://ui/authorization/src/store/app.ts
+  - id: openwiki-source-d35913359d5c36fd4a96bea1
+    resource: repo://ui/authorization/src/tracing.ts
   - id: openwiki-source-115b92ff88e5a5db36bb3b82
     resource: repo://ui/authorization/src/views/ApplicationList.vue
   - id: openwiki-source-eb958bdbb71f90b66e02abb5
@@ -22,10 +26,10 @@ sources:
     resource: repo://ui/authorization/src/views/SocialAgentList.vue
   - id: openwiki-source-1f2b0c598f24062f7708088d
     resource: repo://ui/authorization/vite.config.ts
-generated: { by: "pi", at: "2026-10-22T04:35:20.186Z" }
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Authorization UI
@@ -58,10 +62,14 @@ resolver), and `/login`. A global guard calls `getWebId()` and redirects to
 
 ## RPC client and events stream
 
-`src/effect.ts` builds an `HttpRpcResolverNoStream<UiRpcRouter>` whose requests
-are prefixed with `${backendBaseUrl}/.sai/api` and send
-`credentials: 'include'` (cookie auth), wrapped in `UiTracingLive` so browser
-OTLP spans supply the `traceparent` the server reads. Every exported function
+`src/effect.ts` builds the client with `RpcClient.make(rpcGroup)` from
+`@janeirodigital/sai-api-messages` and serves it over
+`RpcClient.layerProtocolHttp({ url: ${backendBaseUrl}/.sai/api })` with
+`RpcSerialization.layerNdjson`; the `FetchHttpClient` layer sets
+`credentials: 'include'` for cookie auth. `UiTracingLive` (a `WebSdk` layer
+exporting browser spans to OTLP) makes the per-request HTTP client span real, so
+@effect/platform's tracer propagation emits the `traceparent` the server reads.
+Every exported function
 (`getWebId`, `authorizeApp`, `listAuthorizations`, `revokeAuthorizations`,
 `shareResource`, …) builds a typed `@effect/rpc`
 request and `Effect.runPromise`s it. Activity-first RPCs echo the triggering
@@ -124,6 +132,16 @@ The view is read-only apart from revoke: it shows the recorded authorizations
 (the source of truth) and the deletion is projected onto grants by the Temporal
 workflow — see
 [Authorization revocation and grant projections](../architecture/authorization-revocation.md).
+
+Approving a pending access request does not default to the owner's whole data
+set. `AuthorizeApp.vue`'s `applyRequestedSelections` reads the
+`dataInstances`/`dataRegistration` fields of the approval view's access-need
+group, forces the top-level scope to `agent`, and then preselects either the
+named registration as a whole (registration-scoped need) or exactly the
+requested instances inside the registration whose shape tree matches. The load
+of that registration's instances is best-effort: a registration the approver
+cannot read is left unselected rather than failing the screen. The owner can
+still widen or narrow the selection before authorizing.
 
 ## Localization and PWA
 

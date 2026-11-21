@@ -34,10 +34,10 @@ sources:
     resource: repo://turbo.json
   - id: openwiki-source-fbadcd8591b65031efaaedce
     resource: repo://vitest.config.ts
-generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T23:03:01.178Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Architecture overview
@@ -112,7 +112,8 @@ the worker/CSS entrypoints run the compiled JavaScript. `repl` also builds to
 - **TypeScript** is configured through a shared `tsconfig.base.json` with
   `strict`, `module`/`moduleResolution: nodenext`,
   `allowImportingTsExtensions`, and `erasableSyntaxOnly`; `npm run typecheck`
-  runs `tsgo --noEmit` over the no-build packages, including `lws-auth`.
+  runs `tsc --noEmit` per package over the no-build packages, including
+  `lws-auth`.
 - **Node.js 26** is the supported runtime (README, `devbox.json`, CI, and the
   Nix images all pin 26), and npm 11 is the package manager.
 
@@ -149,6 +150,8 @@ wire them.
 
 ## Related pages
 
+- [Access request wire profile and need resolution](access-request-profile.md) —
+  the ODRL request shapes the `.sai` endpoint accepts.
 - [SAI endpoint authentication](sai-endpoint-authentication.md) — the `.sai`
   first hop.
 - [Domain-logic placement](domain-logic-placement.md) — the service/workflow/AA

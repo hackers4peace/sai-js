@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:bc0d19edb3db6db83c657db207d03d2871b855420439f73e86be1543c8b1ee66",
+  "pageVersion": "sha256:43749e717453ae1e23ab013804eba912c7a9ca30494d425f02a6bd0e61d90d6f",
   "claims": [
     {
       "id": "claim_de90dafba2794452afd037605ec9fa0e",
@@ -85,10 +85,24 @@
           "version": "repo-lines-v1:sha256:a4139e209148ad134c10c226bd913e942abce9570cff5140eb90907b5cc25ce7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4YWJhM2UxMzE4MmRjNjFkNTY1YmJkYzlhYzE3OGNkMzRmMmZjMDA1ODVkMzRkNjBkYjVhNDQzMDEyYTAwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5ZDhmNDJhN2VlNDA1MzQ3Y2ZiNzFjMzZkNWY2NzhhZDlkZWI0ZGI5NzM3ODc2N2ZkMDFlZWQ4OWEzMjc0ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkNjQxNmQwMmU2ZGVhNDkxYTk5N2VhNjc2YWFiZjk3NGRkYzJlNDJlYzliOWU1ZDZmMzkwNDU2YmY0ZGIzYmUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_0cc74056dfda462eae9f5f6520e6d210",
+      "statement": "A SelectedFromRegistry grant is generated as one Asset permission per selected data instance (each with its own target and advisory partOf registration), so equivalence compares its access shape as a sorted set of per-permission tuples and two instance selections match only when they produce the same tuple multiset.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/check-equivalence.ts#L52-L75",
+          "version": "repo-lines-v1:sha256:3b1de35fb706590c47652509add787bfe1389c56462da2bacca02a02c19b222c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1NTliZjA3NzVlNGM3MDQ3MjRhZGYwZTM0NmM3NDAxNjIyZjUzNjI5NTUzNTMwMGQ0YjY0Mzk1MTU4YjcxNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExZGViNjBhZmJkNzhiMzdhYzMzYTg1NGIxYzlkZDZhMmUwMTRkMDhkM2ZhNWUwYTBhMTE0ODNkYmE5ZjI1YTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3ZWNkZGFiNGZlNjNhNTA2MmNiMDNhZjIzNWMxNjQzZmZmYzY5ZmQ3NmQyZDE1YWFiMDBjYTZjZDU3MGEyMjUifQ"
+        },
+        {
+          "resource": "repo://packages/data-model/src/grant.ts#L322-L340",
+          "version": "repo-lines-v1:sha256:5d687aec6089d26945cf606ee4e9465e489606b41b0aeeecc088197e8185face:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNGM0ZjMyZGVjYjA1Nzg4OGM0M2JiNWRhNWMwYzExMGM4MTE1NjQxY2UwY2U1MTY4NjZlMTVlNzRkM2MxM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3M2MxNmIxMjAxNjU5YjM3NjNhNzYzYmVlZDEwNzQ3ZTBjZTlkZTRkOTk4ZGU0NDFkODQxY2M0NzI1ZWViNzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliNjA5ZDM5MTRiYjFjZjdiYmEzMzgxY2QzMjY0NzNmNmJlYWU4M2M1NTJiZDFlMTc0ZDE0NjJiY2MxODk4YzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwZTM3YzQyZWY3ZDVjYjc3ODcxZWFkNzgzOGJmODNmNGM3ODYxMWE2Mzk5MWQ5ODczYTQyYTgyZmU1YThmM2YifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

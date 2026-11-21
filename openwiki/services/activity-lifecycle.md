@@ -8,6 +8,8 @@ sources:
     resource: repo://packages/authorization-agent/src/activity-registry.ts
   - id: openwiki-source-c154d0515a7154469b1f503c
     resource: repo://packages/components/config/http/notifications/ndjson.json
+  - id: openwiki-source-65744b7e3b32ec51ca76eecf
+    resource: repo://packages/components/src/AccessRequestHandler.ts
   - id: openwiki-source-a9275a0e3a23f49eea3d9b3f
     resource: repo://packages/components/src/ActivityEvents.ts
   - id: openwiki-source-c18acf0c50387f2e5ea026d1
@@ -18,12 +20,16 @@ sources:
     resource: repo://packages/components/src/EventsHandler.ts
   - id: openwiki-source-d8a4328f642d2e3760ef7fcd
     resource: repo://packages/components/src/NdjsonNotification.ts
+  - id: openwiki-source-77ba5375a0817cab464d649a
+    resource: repo://packages/components/src/need-based-access-request.ts
   - id: openwiki-source-b51f04210bf90c2ec8824400
     resource: repo://packages/components/src/ReciprocalWebhookHandler.ts
   - id: openwiki-source-9f9c5f051cdee5032dfd735b
     resource: repo://packages/components/src/services/Authorization.ts
   - id: openwiki-source-ec9b01d4f49d308517fdc575
     resource: repo://packages/components/src/services/ShareResource.ts
+  - id: openwiki-source-0851426d2ff44a476b10b81c
+    resource: repo://packages/components/src/temporal/activities/access-request.ts
   - id: openwiki-source-a3ebe61b7dbf9a95d1051312
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-bc6348a5e5c2ba0a1275d82e
@@ -38,10 +44,10 @@ sources:
     resource: repo://packages/data-model/src/activities.ts
   - id: openwiki-source-ffa35cc9379c0d10f59dfee0
     resource: repo://packages/utils/src/notifications.ts
-generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T23:03:01.178Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Activity outbox and events pipeline
@@ -119,7 +125,16 @@ derivable at any time and an archive can target a stable id. The `SocialAgent`
 projection exposes `accessRequestsSent` and `accessRequestsReceived` as
 collections (not single flags), and the detector matches open sent requests
 against the requester's received grants, writing one `AccessRequestGranted` per
-match.
+match. For an instance-scoped need the union of received grants for the shape
+tree must cover every requested instance, so a partial grant leaves the request
+open.
+
+The opening `NeedBasedAccessRequestReceived` write happens synchronously inside
+the POST: the endpoint returns `202` as soon as the activity is appended and the
+request resource is materialized later by the workflow. The native need-based
+wire returns no `Location` header; the plain LWS compatibility path returns the
+minted request IRI in `Location` (see
+[Access request wire profile and need resolution](../architecture/access-request-profile.md)).
 
 ## Domain event catalogue
 

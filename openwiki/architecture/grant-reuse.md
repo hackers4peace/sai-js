@@ -3,9 +3,6 @@ type: architecture
 title: Grant equivalence and reuse
 description: How an unchanged authorization state regenerates to the same grant resources — whole-subtree equivalence over GrantData fields, source vs delegated tree matching, local-only body loading, fail-closed missing bodies, and the value-based result the grant workflow consumes.
 tags: [architecture, grants, equivalence, delegation, temporal]
-verified:
-  - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
 sources:
   - id: openwiki-source-5685475b394b1360422a797d
     resource: repo://packages/components/src/temporal/activities/check-equivalence.ts
@@ -13,7 +10,12 @@ sources:
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+  - id: openwiki-source-6b6976370d0cdcf6bd57cad3
+    resource: repo://packages/data-model/src/grant.ts
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Grant equivalence and reuse
@@ -73,6 +75,10 @@ A grant's identity is its **subtree**, not the individual resource.
   `hasDataInstance`, and the normalized access shape (assigner, assignee,
   target owner, action set, target type set, target source set). Sets are
   order- and duplicate-insensitive; an absent optional set equals an empty one.
+  A `SelectedFromRegistry` grant is generated with one `Asset` permission per
+  selected instance, so its access shape is compared as a sorted set of
+  per-permission tuples — two instance sets are equivalent only when they
+  produce the same tuple multiset.
 - **Not compared:** `id` (minted per run), `type`, `inheritsFromGrant` (a
   derived parent IRI that changes with the parent), and `hasInheritingGrant`
   (structure, compared by the tree walk). `delegationOfGrant` no longer exists:

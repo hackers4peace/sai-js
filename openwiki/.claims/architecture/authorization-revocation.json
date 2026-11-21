@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:09d7f2d6e580b70917da99468d3ed47a4e792e6decb56164eb0c8417407734e2",
+  "pageVersion": "sha256:edecccb08cc49bdd1fcb162f2454842c5dfa75f56d94560312073a8a27715b49",
   "claims": [
     {
       "id": "claim_c55129069ec1448bae5d78111b8133f9",
@@ -17,7 +17,7 @@
       "statement": "Revocation is authored as DataAuthorization deletion: the RevokeAuthorizations producer validates the selected authorizations and writes an AuthorizationRevoked activity, and the UI claims that activity instead of ever sending grant IRIs.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L498-L575",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L508-L585",
           "version": "repo-lines-v1:sha256:6582bc5aa630544cccc3967aa700aae779a266eb8548e6d864140d188f49142f:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2YmFmYmEzOTZmZDZiNGI5NTYwYzhmNTViOWJhYzcxODQ4YzNiYzc4YjJkODU2NTUyZTQ4OWU0MDlkZTYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2ZTcxMTk0NWJmNTAwMTdhODllZWM5Nzg4OWNjODU3ZjQ4NTM5ZTgyZWU1MzQzODIzNjI3ZGQwMjNjZjU1MmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTNjMjg1NzQ3N2E1MGQ5YWE0YmYzNTFhOTExZTljYTA0YmU2NmJiYzY2ZWQ4ODRiYTFlNWJiYzJhMjg1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1M2EyYmNiNmYzMjg1NTExMDVjMmYxMTI4NGY1NmNjYWY2MjllMzZkZDBlMjc0NzgxOGZkMDIyMzFmOWY4ZWYifQ"
         },
         {
@@ -35,7 +35,7 @@
           "version": "repo-lines-v1:sha256:63b0d836b41d741d81ad95e6cc65e3c7bbd97aede54d8a5accfcbc5cef1bd7c3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MGIyZjYxODA3MzMxNWMxYWYwMmFmOGIzZDFjZmY5OGRiZTFkY2Y4MDE4M2I4NjkzN2ZiMjUxYWFkOTFmNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkOGM4ZjY4NzFjYWZlMzVmMzM1NmQ0YWNlMDgxNjA0ZTliNDkzZmEzYjI5NjFhMmViMDdmMzg4Y2VhYWY1YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4ZDc1Y2ZlZGI4OWZjYzhmYTc4MDUzMDBjNjhkYmZmZDg1MmYzYzc5Mjc4ODkyOTgyNThiZWEzYjU1MzAyNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhMDIzNGQxOGM0Y2MxM2YwOGY4ZTI4NWIzMDc3Mjk3N2IyYjI1Zjk1NzU0MWNhMTUzMmYyMzJjYmI5MTUxNDEifQ"
         },
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L377-L440",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L387-L450",
           "version": "repo-lines-v1:sha256:f79d73a720f72e6e506e9d083192a5cb554dea01075fae3b12cc95757e53d00d:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NmQzZmE1MTg3MzFhZmVkZDE3MzEyMGNkN2YwMTNiZmExNTI1YjE0YmYxY2E1ZWMzMWEwZTliM2YzMTI5ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzZWFhZWI4OTQyNDRkMjBjYzkwMmVmZGU1MzE0NTQwODQ1NTA1ODU5YmUxZmE5YTkyMTVjNjIzM2ZmOTRjMjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlZjg1ZWZkOWRlZGM1Zjk4NTEyNzdkY2ZjN2RjMGVjZWNmMTY3OTBkMTFkMmI1YTJkZGE4MTMyNDg5OTg5ZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyMTg4YzI0YzEwNWNjNjEwNzFkMDQyM2E1NzJkMWJlZGNhNGUxOTU2NGM0Yjc2YjYwZDFkY2FiNWVjNjEzOTMifQ"
         }
       ]
@@ -45,11 +45,11 @@
       "statement": "ListAuthorizations has failure S.Never and returns an AuthorizationList of RecordedDataAuthorization rows carrying the resolved shapeTreeLabel; RevokeAuthorizations declares the typed AuthorizationRevocationFailure union (unauthorized, empty-selection, not-a-data-authorization, mixed-grantee) and returns an optional activityId plus the expanded authorization IRIs.",
       "evidence": [
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L1058-L1082",
+          "resource": "repo://packages/api-messages/src/effect.ts#L1062-L1086",
           "version": "repo-lines-v1:sha256:6ffc5ccf32c8ed19605ec0864389d9687cc0b50bfdc04b80af96a7d1ae7107d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxMDFlMjQ5MjhkMDQwODg3ODcyNWJkY2I0ZTZlYTRjNjRjZTMwY2Y4YWQ3MTJiMmZiNmZjNzUyODcyZDI2MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0ODJjNWM1MmUzODEyMWE1ZTg2MWUxOTVhMGE5ODFkYTc4N2ZjODcxMDEyMGNiMzJhNzI0ZTkxYzhkYzNjOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYjMzZjBjYmRmMTI4YzBjOWIyZThmY2VhMzE0NjA5OGE5NTM2NzQ1YzkzMDFiMGI4NTA4ZDJlMWZiY2IxOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2ODQ2OWY5YzE0NGI4ZmEwZWRhZTliNmUwZTAwZmNkNGY3ZThlYTc3YmY0Yjc5N2I0ZDFjOGFmYjA2Nzc0NzYifQ"
         },
         {
-          "resource": "repo://packages/api-messages/src/effect.ts#L775-L795",
+          "resource": "repo://packages/api-messages/src/effect.ts#L779-L799",
           "version": "repo-lines-v1:sha256:14249730ac053eeb5f5bf280e8125afb285b77aca4d1a8071bd623dd865db984:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkZWEyYTQyN2IwOGI5NzJkNTBiYzAyOGRhNmE4YTZhM2MyNjU5ZThhM2QxZGIzYjcwNTcwYTE0YzRiNTRhYzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0ZmViYTg5YTEwMDRmYTAwZjQ3YzU2NTE4MDUyYTIyZGNmZjhhMjJjMWI2ZjFkYjFmNDZiNGM1NDAzNDhmODIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNjY3ZTY4MWZkMjVmODE3ODA5NDE3N2Q4YWU2MjM2N2M2NDU4MTk5ZWMxOTExYmEwNTVhODJkMjA3YzI3ZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNTI2NGYxYWI1ODc1Njc5ZWM2M2YxY2E0MTM4MDc2ZTk2Y2MyZWFjNzIwNzEwNjg2NWIyMjMyMjE0NDZlMTQifQ"
         }
       ]
@@ -59,7 +59,7 @@
       "statement": "The revocation producer rejects an empty selection, a non-DataAuthorization, and a mixed-grantee selection; treats an IRI no longer contained in the context's authorization registry as already removed; expands inheritsFromAuthorization descendants at write time; and returns a no-op success when nothing remains to revoke.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L498-L575",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L508-L585",
           "version": "repo-lines-v1:sha256:6582bc5aa630544cccc3967aa700aae779a266eb8548e6d864140d188f49142f:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2YmFmYmEzOTZmZDZiNGI5NTYwYzhmNTViOWJhYzcxODQ4YzNiYzc4YjJkODU2NTUyZTQ4OWU0MDlkZTYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2ZTcxMTk0NWJmNTAwMTdhODllZWM5Nzg4OWNjODU3ZjQ4NTM5ZTgyZWU1MzQzODIzNjI3ZGQwMjNjZjU1MmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTNjMjg1NzQ3N2E1MGQ5YWE0YmYzNTFhOTExZTljYTA0YmU2NmJiYzY2ZWQ4ODRiYTFlNWJiYzJhMjg1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1M2EyYmNiNmYzMjg1NTExMDVjMmYxMTI4NGY1NmNjYWY2MjllMzZkZDBlMjc0NzgxOGZkMDIyMzFmOWY4ZWYifQ"
         }
       ]
@@ -103,7 +103,7 @@
       "statement": "Grant validity is a monotonic fixed point over match-based upstream coverage — same dataOwner, upstream grantee equal to the downstream grantedBy, same shape tree, registration and storage, plus scope, access-mode, creator-mode and instance coverage — so chains without a source grant stay invalid and mutual delegations cannot bootstrap a cycle.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L150-L235",
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L172-L257",
           "version": "repo-lines-v1:sha256:33b9d3c74f7f157a266d384e70f89aa47819cb1c7bf3cc00077b334169383cd1:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0YTgxMDNjNTRjZDY1ZjJiNzZhYjkwMDRhN2NjZjNkY2NjZTA2N2ZhNmJkNjEyMjk1NjY5NzQyYjA2Y2NjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZThlNWRkNjgwMGYwMmJjYmI2MjczYzBiMDg5NjM3YTg3NTk1OGNkZGMzNmYxYzc5OWQ2MzBjMmE4NDYxYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxN2U3ZjJiYWYzNTk3MTk1OWE2ZGUwMTYyZDhiZjgyNzYxNGU1MDU5YmZkYjczMTFiOTYyZjYzMDI3Mjk0NjUifQ"
         }
       ]
@@ -113,7 +113,7 @@
       "statement": "invalidGrantsAfterRemoval returns the removed grants plus every grant that was valid before and invalid after the removal plus their inheritsFromGrant descendants, while leaving already-invalid grants and grants with an alternative valid upstream untouched.",
       "evidence": [
         {
-          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L245-L282",
+          "resource": "repo://packages/authorization-agent/src/grant-chain.ts#L267-L304",
           "version": "repo-lines-v1:sha256:f28c1bb92833dc0b929dd8945c42917805cf15233427e2eafe03b2536045fcdf:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjJjMDA0ZTYzNTU4NmUxZDYzMzM1ODJiM2VmM2Q2MTZmMDBkMGFmMjdlYTBlODA1MGVjMDc1OTVhYjNlMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkNWJlMTU5YWUzZDY0NDlmNGExNmQ1ZDMxMWIyOTczMGM4YTlkYzA3ZTRhOGM0MDYwNWRhYjlhZTY0YjZjZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ODEyZTJlMzIxNWNjNjY5NzVmOTkwZDA4ZGUwNjRjOGY4Y2FmMTQ4N2Q3YjZiODk1N2E5MjY1MDhkZDkzOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5NmEyNmU3NjcxNzY5YjE3ZTQ4NjliNzU2YmZlODJmZjI1MGI0OTZhYjNiOWY3ZGYwNjgwNzU4Y2ExZmM1MmEifQ"
         }
       ]
@@ -173,6 +173,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

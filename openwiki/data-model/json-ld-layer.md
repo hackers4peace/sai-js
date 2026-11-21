@@ -23,7 +23,7 @@ sources:
 generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # JSON-LD read/write layer

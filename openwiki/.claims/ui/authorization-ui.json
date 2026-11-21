@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:5aa270c9b3385b043366e04fa47ba64e3e67e38375e2367d049f234a1a82a9fb",
+  "pageVersion": "sha256:ce6426465cb819b96d739048f34501ac42df94ee0237fca564c341415162c0ea",
   "claims": [
     {
       "id": "claim_3b287ef42f2043e1a0d19ff409c2bba9",
@@ -24,11 +24,15 @@
     },
     {
       "id": "claim_356aec4f9134490dbb3d2974deedf855",
-      "statement": "The RPC client is an HttpRpcResolverNoStream whose requests are prefixed with the backendBaseUrl/.sai/api path and send credentials include, wrapped in UiTracingLive for OTLP traceparent propagation.",
+      "statement": "The RPC client is RpcClient.make(rpcGroup) served over RpcClient.layerProtocolHttp with the URL ${backendBaseUrl}/.sai/api and NDJSON serialization; the FetchHttpClient layer sends credentials: 'include', and UiTracingLive adds the browser OTLP span source that lets @effect/platform propagate traceparent.",
       "evidence": [
         {
-          "resource": "repo://ui/authorization/src/effect.ts#L47-L80",
-          "version": "repo-lines-v1:sha256:dd66dc927e1e23e2f433325ab9a528af174eef7f9823f0897c1e729f890cd071:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhNWY1ZTU5MjMxNGU2YzU0ZGYzMmU4NGY2NGM1NjMzMzk4NDczZGYwMDY0YzM2MjgyZjVmN2Q1ZDhlYWYzNDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZmJhMDUyN2MzOTUzYzRiNmUwZTViNTczOWJhODM2MTJmODA1M2JjZGM5NDY2NzMwMTkzY2QxZDU5MGI0MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1ZWVjMTI1YTkyNWVmZTlkZjk2NjU0NTc1YjAzYzljN2QzNmRiMmQwMzFmNjY1ZDQ5Nzc0YjAxOTkzZDRiNzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzNGMxY2UzM2Y4ZGU2YWZlMzgwYWRjMjA5NjJmZTQzOTgzMDhjMDkxODUwNzNkM2U3ZGIxMTFjMjY5NGZhMTUifQ"
+          "resource": "repo://ui/authorization/src/effect.ts#L16-L35",
+          "version": "repo-lines-v1:sha256:9258444789f05501a387c35689dfd86d1e286f9de7a09dd1676bb746f8825521:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhYTExNThmZjdjMWFjMTIwNmYzN2QzZGM1MWY3YTNmMWM5NjMxYWMxNGVmOWI3ODljM2FiNDFlNzEyMGVhYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZmJhMDUyN2MzOTUzYzRiNmUwZTViNTczOWJhODM2MTJmODA1M2JjZGM5NDY2NzMwMTkzY2QxZDU5MGI0MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzY2Q0MzQxYmM1YTlkYmE1NjVhOGFmYWNhOTUzYTk3ZTEzMTY2NTM2NjZjYTA1NmJkYTFkMjZmYTk5NzA0MjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzNGMxY2UzM2Y4ZGU2YWZlMzgwYWRjMjA5NjJmZTQzOTgzMDhjMDkxODUwNzNkM2U3ZGIxMTFjMjY5NGZhMTUifQ"
+        },
+        {
+          "resource": "repo://ui/authorization/src/tracing.ts#L17-L37",
+          "version": "repo-lines-v1:sha256:49f8c738aa1860592e62ef2b1989b4c71db81eb24fc66c8a5898611b9a7f8c25:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkYmQ2YThjMjhiYzFiZGVjN2JiYzU3NDk4NGUyZWNhZWYzZjY0MzczMGNkZGRjYjY5ODQ1Njk0NWE2MDFkZWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjMmQ3YjBlNmZjNGYwYzI5YjhkZjgzMmIzM2Y1NjJmZmEwMzg1MzQ4ODYzNWEzNDNhZTNhMjQ2NDcxNzRhMjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ODZlMjI4ZjM4NmVjNmEzYTAxNmE3ZDJlOWM1NDMwZDNhNjk3Y2JjNzAyYjg1YjhjNzFhYzQzNmQ1ZDExNGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -141,10 +145,20 @@
           "version": "repo-lines-v1:sha256:58bbc9a4444cd87678ad438ca2421d0b86e14ce18189a91635715e75924f6883:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlNzEyOTJjZDkxNzI5MWFiMWQyZGMwZDcyMzYxN2MwOGQzOTY4OTE0ZjQyZTY0ODI3NDFmM2M5NDY1ZTA5YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOGJiMDRlOTI3OWY1YmQ2ZDJmMTkwNTU0YzkxMmI1ZDcyZGUxNTBiNWNlZWJlZDBjZjk2MTczMjI0MWEyY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwNmU2MTNkY2FhM2FlYWQwYTM1NDQ1NDk3MGU2ODI5YTQ5YzgzYzM2ODUxZDE5MTNhMTc3OGE3NmEyM2M2ZTgifQ"
         }
       ]
+    },
+    {
+      "id": "claim_95d2a21b43f3427fb8c494114356eb20",
+      "statement": "When approving a pending request, AuthorizeApp preselects the requested scope instead of the owner's whole data set: registration-scoped needs select the whole registration, instance-scoped needs load the registration and select exactly the requested instances, and a registration whose instances cannot be loaded is left unselected rather than failing the screen.",
+      "evidence": [
+        {
+          "resource": "repo://ui/authorization/src/components/AuthorizeApp.vue#L486-L535",
+          "version": "repo-lines-v1:sha256:27a7cc70d453e0356e35a2abc456b82510d00a80f3e2f4459fe7239078815636:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmZWM4ZTEyY2U4MjkyMDY5NDA1YWYzZjU3MjU4NGM1MjZhZjMwNTYzN2Q5ZDFiZDNmOWNmMzg3ZjY3OTMyODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzM2UxNDlhM2ZjOTIxOTljNTE0Y2IyMTUwNTdkZDNlMTBiODY0OTMzZjFmMmZmODA3NjMxNTI1MjQ4ZTA3OGUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T00:32:33.147Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

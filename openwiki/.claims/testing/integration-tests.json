@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b1846cf637cc0e8dff155bcbba7600c94cc7bccbfc95834e296f8a0fb100639c",
+  "pageVersion": "sha256:4afaf8b9c28b15516858f55bf17974070bb4b7292cb9f391fbd5d6f278386605",
   "claims": [
     {
       "id": "claim_5965c5e97fbd4467b278f92b3397d866",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://.dagger/src/index.ts",
-          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
+          "version": "repo-file-v1:sha256:d66152824f6fa9422d2c5fbf88dad5d808cf47371155cefbc4a95b2c58962eb0"
         }
       ]
     },
@@ -42,11 +42,11 @@
     },
     {
       "id": "claim_9c7043fee00f4940b50db53dc432a343",
-      "statement": "waitForQuiescence waits until none of the webIds has pending activities for two consecutive polls, treating a transient registry 500 as unsettled.",
+      "statement": "waitForQuiescence waits until none of the webIds has pending activities for two consecutive polls, treating a transient registry 500 (unreadable listing) as unsettled.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L375-L417",
-          "version": "repo-lines-v1:sha256:aa9986ea32cc81773e7bac1da8b400cdfd6f7da59d81eb222810f87b3a0fa6ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDg2YzlkYzEwY2U0NjZkNDAwYzU3ZjhiNjA2YWRlZmEyZTQwOGJjNzY0NTE3NzNmZDJjNDRlMzM4MzMxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOGU2NzRmMzZhMzYwMmQ0NzY2ZGE3M2RmNjJkNzFmZjljM2JlYzAwMGJmODVkMGQ1YjAzMjlhMTdhOGJhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyMDU3ZjZmOGI1YWUzYTEwMzIxYzMwMTRhMTE0YWM0ZGUxMmE5NWY0YmRmZGRkZTA1M2VmZTVmOWM2NmY1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwMzg3YjUwYjg4ZTVhZmM3YmJkMjdhNGMxYjJiN2M1NjVkMWY2ODkzM2Q2NGY5MWQwOTk2NzE1MDgxZWFmMjMifQ"
+          "resource": "repo://test/util.ts#L431-L472",
+          "version": "repo-lines-v1:sha256:0c785e44dccb6535a5e4d25222d475dd1a6ef711da1ff30d711b376ff0723f85:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDg2YzlkYzEwY2U0NjZkNDAwYzU3ZjhiNjA2YWRlZmEyZTQwOGJjNzY0NTE3NzNmZDJjNDRlMzM4MzMxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyMDU3ZjZmOGI1YWUzYTEwMzIxYzMwMTRhMTE0YWM0ZGUxMmE5NWY0YmRmZGRkZTA1M2VmZTVmOWM2NmY1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4ZDAyNTU1Y2M1Y2IyODI0MjRhMGZlOWU0M2MzNWJmMTRhMGZmODg1Zjg2MzJkYzcxYmZlMGZiN2Q5OTg0MzkifQ"
         }
       ]
     },
@@ -55,7 +55,7 @@
       "statement": "awaitGrantCompletion is the listen-first barrier: it opens the registration notification stream, runs one RPC trigger, awaits the registration Update, then waits for quiescence because the Update fires mid-chain before the parent workflow's completion tail.",
       "evidence": [
         {
-          "resource": "repo://test/util.ts#L420-L434",
+          "resource": "repo://test/util.ts#L485-L499",
           "version": "repo-lines-v1:sha256:e1b08cd5303499cda169cda607ac490afbec9d413863eacc4510c952247dff78:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZGY5NGI2Zjk1M2M0YmViYzYzMTJjMGVkNDFiYTY3ZjkwMGRjYWU0ZDlhMmMyOTIwZTliYzc5NzUxYWU0NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2NTI2NjNhZDlkNTY0NjJmZmVjZTBhOTVhMGRjYzU2ZWZmY2JjYzY0NjJjMWQzMzI4MzJjMGIwY2IyNTc0MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1MzljZjY4NWU5OGIzZGQyZGY2YTZhZTk2NjJhNWRmNWQ0YjJjODM3ZjQ2ZWM1OGU3NmMxNDUxMzAzODBiZTUifQ"
         }
       ]
@@ -76,7 +76,7 @@
       "evidence": [
         {
           "resource": "repo://test/util.ts",
-          "version": "repo-file-v1:sha256:08f42102cb3f1df7e5e9cbc4450c4c434e64be14c8bd3ab29070f2a5ebbcdaa5"
+          "version": "repo-file-v1:sha256:0fa7d8239e753f1fd73a60419ce59e4c7b74ea3e463e852fdbb14f64e72b9244"
         }
       ]
     },
@@ -86,7 +86,7 @@
       "evidence": [
         {
           "resource": "repo://.dagger/src/index.ts",
-          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
+          "version": "repo-file-v1:sha256:d66152824f6fa9422d2c5fbf88dad5d808cf47371155cefbc4a95b2c58962eb0"
         }
       ]
     },
@@ -100,7 +100,7 @@
         },
         {
           "resource": "repo://test/share.test.ts",
-          "version": "repo-file-v1:sha256:7142782738c7f6360b4d4f6c11f108fc0647df0de0cc92ec20126b72523d3915"
+          "version": "repo-file-v1:sha256:bab917598e09316f774c37e9426789723aaa660dd742853756e63a2ab67d3613"
         }
       ]
     },
@@ -147,11 +147,11 @@
       "statement": "test/util.ts exposes localMirror(session, peerId), which resolves the peer's registration of session.webId through the reading side's own SPARQL plane; a missing replica fails with Node <iri> not found in framed output, so the helper doubles as the mirror-existence assertion.",
       "evidence": [
         {
-          "resource": "repo://test/invitation.test.ts#L26-L45",
+          "resource": "repo://test/invitation.test.ts#L27-L46",
           "version": "repo-lines-v1:sha256:e7a4e0f7ff66eb84013f61c1cccbec7a179034ee0244ac61107d86ee715c6c39:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNTVhMjY3YjVhZGNiOTNiYjRiNTc5OTFhMjg0YzdlNzg4ZWEzZjg5ZGI3MjYxYjE2ZGY1ZDlkN2EzYzhmNDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1Njc0NWQ3MTIwYWJkODM2YWIzNzc0ZGQxOTM1N2MwOTRkZjgyNWExY2VjMWYyMDI4ZmZmZmI2ODA0ZDdlNjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhZDViYTE0ODUxMjUzMDc3OTMzYTdmMDgyMDMxNjNmZDRmOWUxNTdhNjlmNmE0MDg1NWVkN2QzMjVkZTQxMDUifQ"
         },
         {
-          "resource": "repo://test/util.ts#L178-L192",
+          "resource": "repo://test/util.ts#L223-L237",
           "version": "repo-lines-v1:sha256:3e378041f78c53deece58a0fcd3cab47f90246f803c89ab39e6a13f065776667:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MDhlM2Y4NGUyODJlNTZjNmQ0MWExMTliZDQ2MzUyNzk1OWU1ODkyMGQ5YWQ5MDc4NjQyNWYyYjVhOWFlYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0ZWQ3OTY3YWY4N2NkMDczZDVjNmI1M2Q5NmYyYzI5ZTRiYzZmMDVmZmQyZWZjZjFkNzRiNGE3MWEyMTQwNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4YzYzOTg3Yjk3MTZmOGYxNzZhNmY0MTA4MzhmOTI0MTJlYzczZDJjMzU3MTI1MmRjN2FhMzlkYWZjMjIxYzUifQ"
         }
       ]
@@ -161,8 +161,8 @@
       "statement": "The invitation suite asserts the reciprocal mirror on both legs of a runtime-created pair (no seeded relationship) once each side's completion activity is done, which is the runtime counterpart to the fixture backfill.",
       "evidence": [
         {
-          "resource": "repo://test/invitation.test.ts#L100-L200",
-          "version": "repo-lines-v1:sha256:8f0eeb88e745bee65b73e4051221b169a553ce4f28acebd425ffca1e7f91e383:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1ZGY1MDQ0N2UyYTBkNGVjYzdlZGI3MzFmZDUwMzExYjc4NzFjYTIzZjhlZmYxNTY2OTRjZGJkY2UxYWJmN2MwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlNDcwOGE1NGE1NmYzOThkNGNkNGUwZjAyNzVhZWY3OWQwMGU4NmQ3ZTc4ZGFkZDhkN2Y0OWJjMzE2MmVmYmMzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiZDA5YTlhMjcxZDk3ZTg3ZjI0MzAzYjAxMzM4YzM0OTBlMGI0Yzk4NjgzYzZlMDA2YzBiZTM4M2JiNzQ5NzAxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4N2NjZTljMDc5ZTBjZDk4ZTkzZTg4M2RiNjc2Mzg5YTgwZjc4ZmRkMzkyNWFkMWFiMzdiYmU2MzhhNWRjZjBlIn0"
+          "resource": "repo://test/invitation.test.ts#L108-L130",
+          "version": "repo-lines-v1:sha256:a06986ebeec35df9db41a346c8c79a74488e2d16f0dbcb7e4284be2e79f2d7fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4NmU2YTU4YjIwYjA3ZDJjZGEyM2RkNzBkYjUxM2ZmNWIyMjJjZjVmYTkwZjZlNDQzZDZiYTg5OGUwMmU0NzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJiYmUxNjYzMDdlNTY4NjcxY2M2OGNhMjM4M2MyYzdkMzg0MTQ1ZjFkOTY5ZGIxNzYzMWE3ZTdkNjExMTc0MGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4YThmY2E2MjUwNjVkYjg3MThmMGM0NzA0ZWE4ODlkMzA5NzQ5NjlkMGYzMzc1MmI0NjQ5YzIyY2JjN2UyMGYifQ"
         }
       ]
     },
@@ -212,7 +212,7 @@
       "evidence": [
         {
           "resource": "repo://test/util.ts",
-          "version": "repo-file-v1:sha256:08f42102cb3f1df7e5e9cbc4450c4c434e64be14c8bd3ab29070f2a5ebbcdaa5"
+          "version": "repo-file-v1:sha256:0fa7d8239e753f1fd73a60419ce59e4c7b74ea3e463e852fdbb14f64e72b9244"
         }
       ]
     },
@@ -308,7 +308,7 @@
         },
         {
           "resource": "repo://.dagger/src/index.ts",
-          "version": "repo-file-v1:sha256:a8f04a1c20afa1d5664582fce71fdc512aca146c5f91bea282272de6422324ea"
+          "version": "repo-file-v1:sha256:d66152824f6fa9422d2c5fbf88dad5d808cf47371155cefbc4a95b2c58962eb0"
         }
       ]
     },
@@ -349,10 +349,24 @@
           "version": "repo-lines-v1:sha256:313f66b5bd735ed18a16fd9cbe203c108d86fbfa4afd483b4dc312a84b99df75:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1YTQxZmE5MDEyMTNmNzI1NWE3OTgzOWNjYjNkMzE1YzBkNWNkY2IxYWY1MTAwZjQyM2QzYzk2NWIxMTU3OTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmNDNhMzQyOTQxNGY1N2E0ODgyNjNlOWU5OGQyZjdjOGNiOGNjZTNmNWJhZWY5NWJhNjg1ZDQzNDAxNjI3YmUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_57c97b02542042898249e2ad096ee706",
+      "statement": "specific-instance-access-request.test.ts drives an instance-scoped request end to end: the stored need keeps hasDataInstance/hasDataRegistration, the approval view receives the requested instances, the recorded authorization and generated grant stay limited to exactly those instances, the requester detects the granted request, and the plain LWS Asset POST returns a Location header.",
+      "evidence": [
+        {
+          "resource": "repo://test/specific-instance-access-request.test.ts#L247-L294",
+          "version": "repo-lines-v1:sha256:9be54e422566c06779eb25d416b0866985c61338a1058d01a293482bec64539a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjOGIwNmEzYjkzZTA0Y2FjNzkxY2JkZWQyNWU0NTlkODVlNTcwNjA4OTMyOWM4YmM1YzMwNjViNjFiMzBjMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlZjBiOWRjMmI1ZTFiOWFiZWNiZjJmMTAxNWE0NTIzY2IyYTc1MWVlZDgyNDQyYTBhNzA4ODBmZmNhZjliZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://test/specific-instance-access-request.test.ts#L86-L200",
+          "version": "repo-lines-v1:sha256:55ef711faf0f96bef1c8381873da7dcece1ee58fd5506788a0d3527bb871fa32:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5Zjk1OTY3NjI1NDRiMTlhOTEwOGRhMzg1ZGMwNTZkZTllMjUwODk5NGEyNDQ3YzZmMzI4MzExODQ1YTUzOWU0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI1MTIyM2IwMjI0NWVjOTA2NWQ4ODYxM2RmZTA5MzA1ZTg5NWU0MzFmZGQyMDFmYzg3NzhiNTM1ZjExYzQ1MzEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZWI0YWI5NmMzMzg3YTEwYjk0M2EzZjc0NzFjODYwYzIyNWRmZjQ2Y2VhM2NkMTRiMDY3OWJiNjNkOTdjNjBmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1MjdlNTZiZGU5NTg5ODk0NTg5YzM4ODcxN2FmZGQzYzdjOGI2NzczOTdmNzhmNDU3Y2E2OTZlMmViZDY2OGYxIn0"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T23:03:01.178Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

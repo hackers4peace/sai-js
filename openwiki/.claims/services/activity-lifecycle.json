@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:510ef2be208f41885e0ec354d05839aa17ace69aa11ed7e700ae721dbd59bf16",
+  "pageVersion": "sha256:eb7eb779e7bdbb1d1caa9f9e8e3ffe4ecaae2be58bfdf37fd73b3db06c0014e1",
   "claims": [
     {
       "id": "claim_2dbdd57724204bb28552ccc4b24a6ea5",
@@ -81,7 +81,7 @@
       "statement": "recordAuthorization pre-mints the data authorizations and embeds them as AuthorizationGranted.object, and shareResource embeds the buildShareDataAuthorizations output the same way.",
       "evidence": [
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L573-L665",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L583-L675",
           "version": "repo-lines-v1:sha256:21f81fb9e143ef3136ce23d9bf907225dea2ea0559035fd1ad725ea45fb1f5bd:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhYjVlNTk2ZWM0NWY4ZTdkZjg1ZjZjYWE1NTY2YmNiZDVhNWZhODU3NDU0YjA0NGYxMjg0YmIyMzUxZjRlZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmODI3YWUwZjJkOWE4ZDA4ZDk2N2FjMGNlZjI4ZjEwNzQ5ZDYzMzVkYzQxYmZiNGI4ZGFmMjkwMzRhMDQ2ZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyMzQ5MDE2OGMxODAxOTMyY2U4OTVjY2Y2YmM0NTE3MzBkZWViYjdmN2ZlMTE0NTRiZTQ0ZGNhMTliMTc2MjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiM2JhMGUwN2M0MGY3NDE2ZWExMDRmOTFiNThkYzRlOWJmNjdjMzAzZDViNGQ2ODQ1MWVjZTRiMTI0MWVmNDUifQ"
         },
         {
@@ -255,7 +255,7 @@
           "version": "repo-lines-v1:sha256:84434643b1e1b20a6417b9c2c91d6aaa9988b902d6aa0a6aa324e3e692e1bbd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwNDE5NTQ2YzRkMTdhZGY1NGY4NDc4OTczZjEwMzg2NDVmYzBiMTk1Zjk5MzNiNjg3OWJkMjY4ZmRmODEwY2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5MDBjN2ZjNDQwMGY2MmUyOWQ3NjVkM2NiMjA4ZjUyOGJhMTJiYjdjYmZhM2Q2ZTkxY2YyNzY2ZjNjYTNiN2EifQ"
         },
         {
-          "resource": "repo://packages/components/src/services/Authorization.ts#L498-L575",
+          "resource": "repo://packages/components/src/services/Authorization.ts#L508-L585",
           "version": "repo-lines-v1:sha256:6582bc5aa630544cccc3967aa700aae779a266eb8548e6d864140d188f49142f:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2YmFmYmEzOTZmZDZiNGI5NTYwYzhmNTViOWJhYzcxODQ4YzNiYzc4YjJkODU2NTUyZTQ4OWU0MDlkZTYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2ZTcxMTk0NWJmNTAwMTdhODllZWM5Nzg4OWNjODU3ZjQ4NTM5ZTgyZWU1MzQzODIzNjI3ZGQwMjNjZjU1MmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTNjMjg1NzQ3N2E1MGQ5YWE0YmYzNTFhOTExZTljYTA0YmU2NmJiYzY2ZWQ4ODRiYTFlNWJiYzJhMjg1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1M2EyYmNiNmYzMjg1NTExMDVjMmYxMTI4NGY1NmNjYWY2MjllMzZkZDBlMjc0NzgxOGZkMDIyMzFmOWY4ZWYifQ"
         },
         {
@@ -277,10 +277,34 @@
           "version": "repo-file-v1:sha256:042dd6ad99a3c53ac5f5762d3ac7008cd4ec35b5ceb9d2845157c645b24ebe1d"
         }
       ]
+    },
+    {
+      "id": "claim_db004bce1fb44afaafccf22d6a5dbce9",
+      "statement": "The opening NeedBasedAccessRequestReceived activity is written synchronously inside the access request POST and the endpoint returns 202 as soon as it is appended; the request resource itself is materialized later by the owner-side workflow, and only the plain LWS compatibility path adds a Location header with the minted request IRI.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L120-L140",
+          "version": "repo-lines-v1:sha256:0e8828455607a4f2dcf8abec8b6d30870492c743b90877ad69d671f7c43e25f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1N2VlMjA3YjFiZTk1MmEwNjg3MDJjYTcwZDkzMzJmY2MwNTg3YjJiNTNjMTkyMTU1ZjVjYWQ5NTNlYWRjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhOWYwY2U4NzZjYzRlMTFhZDFiNmMyZDZiY2FiOTIxYjI3MGM1NDFkYmJlZWI5MGI0M2FkNzAwYzI3NmY4ZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkNmRiM2I4OTBkYzk4Y2EwYmMzNGE4MDg0MWRmMzBiMjExZjlhN2U0MDdjMjljMGIwMDYyMDYzMTA5ZDg2YTQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L399-L437",
+          "version": "repo-lines-v1:sha256:b3ebcb4c6b7b43a022b67f4d5cdd2e8db0e53d2b60aef40d80627c288dc3ce73:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4NTY5OGQxNTYyMTUzNmQyOWM3ZjhjZTQzNTYwMWFmNjE5NGU3Njg5MDg0MGRmZjkyYTlmYmM2OGZlMmMzNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxMDYwM2U3MTE0M2RiMmRlYTQzOGE0ZTNmZTEzN2RlMzFmYTIwODg5ZWZlYzA5ZDE2ODIxNWQ4NmI4OGIyNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkNzllNTMyYjVkNjE3MjJjMTJjYmFmNDE3YTFhZjhjYzFmMDk4Y2U5ZmQ3ZmM0NDc5YTc1OTM1MzNiYzYxNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce3462308aab418698c3db40cd07b6eb",
+      "statement": "Granted-request detection requires instance coverage for instance-scoped needs: the union of received grants for the request's shape tree must cover every requested instance, so a partial grant leaves the open request unresolved.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/access-request.ts#L160-L172",
+          "version": "repo-lines-v1:sha256:d526ec4171c378e365f33f4a580659c5023cfceaaaf588743e9516e5528862d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1NjdmNTcyNTdiZDRlZGI0NmUwMDY4NDU5MjgxNDg0Njg5MTY3OGRhNzU1MDg5YjljYzcxYTI0ZTU4Y2E0ZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwMTRmMjllMzFiZjgwMWJlOTJiNDJkYTYzZjNiYmYyOGVhMjVlNjI4NzI1OWU4MjJiMWM5MDI4ZTI3ZDY3Y2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxYmY5ZGQ0MjE4M2UwNzUzMDNjOWNkMDNlZDE5ZjRlMzU1ZTgzYTlkMGU4YjY1NzVlMDhkZDk0OGY0NTQzOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhN2NhNzFmZDQyYWFjZDY0NmM5YzE2OWM2ZWJjYjJkZTAzZWNmOWQ0OGNmZjUzNmM1NTZmZTdjMjVlNTAyODIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.3",
-    "at": "2026-11-19T23:03:01.178Z"
+    "at": "2026-11-21T19:19:35.660Z"
   }
 }

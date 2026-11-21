@@ -3,9 +3,6 @@ type: architecture
 title: Authorization revocation and grant projections
 description: How SAI revokes access — authorizations as the mutable source of truth, grants as derived projections, the authorization-revoked carrier and workflow, the grant-chain closure, and the reconciliation sweep that repairs missed revocations.
 tags: [revocation, authorization, grants, delegation, projections, reconciliation]
-verified:
-  - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
 sources:
   - id: openwiki-source-39263cf4b989bfbe674c72c0
     resource: repo://packages/api-messages/src/effect.ts
@@ -34,6 +31,9 @@ sources:
   - id: openwiki-source-1de1cb7b4e5904caddca9b5c
     resource: repo://ui/authorization/src/store/app.ts
 generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+verified:
+  - by: openwiki/0.7.3
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Authorization revocation and grant projections

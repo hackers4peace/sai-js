@@ -18,6 +18,8 @@ sources:
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-03c71d0f7eed5c1f113d08e3
     resource: repo://packages/components/src/temporal/workflows/grants.ts
+  - id: openwiki-source-c5fff05399966b99ee0942ee
+    resource: repo://packages/data-model/src/access-need.ts
   - id: openwiki-source-8b149b790c910713311c36a2
     resource: repo://packages/data-model/src/acr.ts
   - id: openwiki-source-40eb9f7315a1082fe32671da
@@ -42,10 +44,12 @@ sources:
     resource: repo://packages/data-model/src/registry-set.ts
   - id: openwiki-source-12dd5601be4d1b21ac977892
     resource: repo://packages/data-model/src/templates/index.ts
-generated: { by: "pi", at: "2026-11-19T00:32:33.147Z" }
+  - id: openwiki-source-f85019c83f715134175770e1
+    resource: repo://packages/data-model/test/framing/access-need.test.ts
+generated: { by: "pi", at: "2026-11-21T19:19:35.660Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T00:32:33.147Z
+    at: 2026-11-21T19:19:35.660Z
 ---
 
 # Data model entities
@@ -74,14 +78,20 @@ type and its helpers.
 - **Authorization and grants** — `DataAuthorizationData`, `AdminAuthorizationData`,
   `GrantData` (with the tree fields `inheritsFromGrant` on the child and the
   framed reverse `hasInheritingGrant`), `FinalGrantData` once an id is assigned,
-  and the authorization/grant registry shapes.
+  and the authorization/grant registry shapes. Both carry the optional
+  `hasDataInstance` (a set on grants) for `SelectedFromRegistry` scope; a grant
+  in that scope is built with one `Asset` permission per instance.
 - **Data** — `DataRegistryData`, `DataRegistrationData`, and the read-only
   `DataInstanceData` (with `isBlob` and `frameDataInstance` helpers; there is no
   write-side `DataInstance` class).
 - **Access needs** — `AccessNeedData` (recursive `children`, a `required`
   derived from `interop:accessNecessity`), `AccessNeedGroupData`, and the
   `*Description` shapes (`AccessDescriptionData`, `AccessNeedDescriptionData`,
-  `AccessNeedGroupDescriptionData`).
+  `AccessNeedGroupDescriptionData`). Request projections add the optional
+  `hasDataInstance[]` and `hasDataRegistration` fields; a normal client
+  access-need-group document carries neither, so shape-tree needs stay
+  unchanged ([`access-need.ts`](../../packages/data-model/src/access-need.ts),
+  [`access-need.test.ts`](../../packages/data-model/test/framing/access-need.test.ts)).
 - **Roles** — `RoleData` with a language-mapped `label` and `members`.
 - **Shape trees** — `ShapeTreeData` (with `references` via `viaPredicate`) and
   `ShapeTreeDescriptionData`. Shape trees are read through `frameNode` plus an

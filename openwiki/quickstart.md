@@ -1,7 +1,7 @@
 ---
 type: index
 title: Quickstart
-description: Task-routing map of the sai-js wiki — architecture, `.sai` authentication, data model, service layer, activity pipeline, Temporal workflows, revocation and grant projections, grant reuse, UI, testing, and operations pages at a glance.
+description: Task-routing map of the sai-js wiki — architecture, `.sai` authentication, data model, service layer, activity pipeline, Temporal workflows, access requests, revocation and grant projections, grant reuse, UI, testing, and operations pages at a glance.
 tags: [quickstart, index, navigation]
 sources:
   - id: openwiki-source-b8a927b0cc8a1ee64f5a4f78
@@ -26,10 +26,10 @@ sources:
     resource: repo://packages/components/src/temporal/activities/grants.ts
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
     resource: repo://README.md
-generated: { by: "pi", at: "2026-11-19T23:03:01.178Z" }
+generated: { by: "pi", at: "2026-11-21T20:00:43.833Z" }
 verified:
   - by: openwiki/0.7.3
-    at: 2026-11-19T23:03:01.178Z
+    at: 2026-11-21T20:00:43.833Z
 ---
 
 # Quickstart
@@ -55,6 +55,7 @@ Use this map to find the page for the topic you need.
 | Understand cross-server/federation assumptions | [Federation constraints](architecture/federation.md) |
 | Understand grant reuse and equivalence | [Grant equivalence and reuse](architecture/grant-reuse.md) |
 | Understand revocation and grant projections | [Authorization revocation and grant projections](architecture/authorization-revocation.md) |
+| Ask another agent for data (ODRL request profile, plain LWS, instance scope) | [Access request wire profile and need resolution](architecture/access-request-profile.md) |
 | See the inter-peer topology | [Social graph](architecture/social-graph.md) |
 | Learn the JSON-LD entities | [Data model entities](data-model/entities.md) |
 | Learn the JSON-LD read/write helpers | [JSON-LD read/write layer](data-model/json-ld-layer.md) |

@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8c7122e8f90b75f310a42d82913059495caac6ae2c6448675d5991d8d36b5ffc",
+  "claims": [
+    {
+      "id": "claim_7eb7d6262f294e81b230e5d60b2a4b25",
+      "statement": "The owner-scoped access request endpoint is `/.sai/access-requests/<base64url(owner)>`: the handler decodes the owner segment, requires it to be an http(s) WebID, and scopes every request to that owner.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L209-L241",
+          "version": "repo-lines-v1:sha256:e15cde92828df70909760ae2ffe948dfed7ffc8727ad549773d97cdf6423ab61:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0NjNmMzE2MGRhMzUzMjhiMTIwOTJkMWZhMTMxNmMwMTI2MTc3MmMyMTUzZGQ4NzM2NGRmMmVkYmRlYzg1NTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwZDhjODU1MjY0MjU1ZWEzMWNhZDcwMTk1YTU0MjFlZjE1NzFkMjA3OTFlMGY1NTRmN2MyNGE5ZWY4ZThmYTMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L32-L34",
+          "version": "repo-lines-v1:sha256:0feca6c14d247846a6cd065253da7e92bd5b98c5783587b9f962620d9b42b586:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTlhNDMwOGU0YWI0OTFiNDIxMDM3YzRmNTA0MWQzNzA4YmZjZWJhNTJlZjllZjZhMGU0ODliYmYyZGE0NWZhYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNjMWI0NDE5MGVmMWIwYzg0Y2M2YzNkMTRiMzhhMWNhYjY1YmY2MjY3MDhiMWM4NWEzNzIyMGE3YTNmODgyMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDFkNjhkYjllZmZkY2RkMmJlMzkyMzcwNDJhZjAzMmQyYzJkMWJhOGI1OTFlZDA0MjQ0YTc5NWIwMTgxNDY0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDQxNGRiMTM5NzZiYWRlY2EyODFmMmY1MmZkOWQ0OGFkNjZiY2I0OGUyYjNiNDQ1MmMzYzYwMjdiZTA1YTMyNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_82bbe8aefcc04e92af92cfbf32090cb6",
+      "statement": "The default component configuration routes only POST, GET, and HEAD to the access request handler, and the handler rejects any other method with 400.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/config/http/handler/default.json#L126-L140",
+          "version": "repo-lines-v1:sha256:b632eb8a41ad61b50e8f83d84bf8180b39e5d225e59753cedf64252bda10b83f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5NDViZWI3OTQ5YzQyZDI4MmIzZDM3OWY5NmVjNWMwMDZkNTYzNGQ0ZWJhNmE0YzM0ZGUyMDRkMmJjN2ZmNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5Y2E4OTFiZmY3YWMxZjdjZWFhZTQwZWYwNTEwNjZiZTllZmU0N2I0ZTQyODFlODZjMzE5YmUyYzU1ZWJjZTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5ZTRiZTI4NzdmMzE5MGM0MzE0YTJhNGZiMWE0OTE0ODk4MjM3M2Y2NmIxYzIzYjVmMGMyMDc0ZTMzMzRlZjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzNzRhYTRlMGJmMjMxZTU0ZGRkYTUzZjczM2EzYjc1MTA1YzZiOGJlNjMxNjdhMTYxOTU2MWQ5ZGE3Mjc4NDUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L72-L84",
+          "version": "repo-lines-v1:sha256:561958e247267cdaae181681b0f55716a6067b672e2d26ed9834cadd3061942a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMjhiY2FlZjBmOGE0YTg2OTFiM2I2ZjhkYWVlMzVmYmU4OWZlYmYzZGI3NDY1ZWE2Y2ZlNWZhZmMzODI1YTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1ZWJiYTU0NTI1MmQ5MjE1NGQ5YWNkZDQzNmQzZTVkMmE0ZjRmYTk4ZTdhNjBjOGQxZGJmZTQ3ZTczNGNhNGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjZGUyNTUxZGY1NjBmYTI2ZGNhNDI0YmJlMDBhMjYyYTllYzhkZDIwMGNhZDRkMmQ2MmYzM2VmNmZjYWU4ZjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7ebeababbf514c0da9e192d6e6992bdc",
+      "statement": "A request POST requires a client-bound credential (401 when absent), a client id equal to the requester's discovered authorization agent (403 otherwise), and an application/ld+json or application/lws+json body (415 otherwise).",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L186-L200",
+          "version": "repo-lines-v1:sha256:89daef06b29edf0d7e288e0df506d89de2497f92b2e555a7ac2eaf633acbb6b5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxNzZlOWIzYzJkOGQ3NjM0ZDFmOGIwOGZjOGVhNGI4ZDgwNTkzZDMxYjU4ZDhkYTc5ODhjM2M1ODFjMzU5ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkOGNmMWYyMGU4NTg0MjYxZWFlOTlmNWExYzM2MDFhYjgxMjkxNGEwZWExODM1OTA3YjljY2RkZGE5OGUzNTAifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L88-L104",
+          "version": "repo-lines-v1:sha256:488d387d9813c7525f91d64336750e3f1de1c4735ea97b0d8987390db20d48b1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5YjU5YzE2MzkxNGJmNWIyZTM4YzA4MjBiNDA0YzllMmJkMGVkN2RkZTE3YTRhMWRhN2Q0Y2JkYTA5OGMzYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjZGUyNTUxZGY1NjBmYTI2ZGNhNDI0YmJlMDBhMjYyYTllYzhkZDIwMGNhZDRkMmQ2MmYzM2VmNmZjYWU4ZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyOTg0YTYzZDY5OTA3ZjI2YzhlYzUyZmM0NDQwMDZiN2YzYTUxZmVjYmIzNDNjYzY0N2VjMWNiOGM2MGI2N2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4713cd356f5b4ed58123c3902496d55f",
+      "statement": "The handler dispatches a request to the need-based path when the type includes NeedBasedAccessRequest with an `access` array, to the plain LWS path when the type is AccessRequest without need-based or delegation/revocation markers, and otherwise returns 400 'expected a need-based access request'.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L105-L140",
+          "version": "repo-lines-v1:sha256:3ab92b6e85a9b460a0bc74a828f8c7fd97ad8d5dad37589839465962b9b8c42c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyZmMzOGMzODZjYjNjZDlkZWY4MTM3ZmM4N2MxNGUxZjk2M2ViZTE1YWEwNzVmYTRjYzU2MmIyODk4ZGNkZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2MzAxZTUyODQ3YWE2OTVlZjkzMWYzMDVhZGY3M2VjMWUyYWIzMDVkYzAzMzBjMmFmMWI2OGUwZmQxYmJkMjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkNmRiM2I4OTBkYzk4Y2EwYmMzNGE4MDg0MWRmMzBiMjExZjlhN2U0MDdjMjljMGIwMDYyMDYzMTA5ZDg2YTQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L295-L305",
+          "version": "repo-lines-v1:sha256:a1b3a28a37b2670d1e6a4dc0f957eda89a48232ff086e5839555f1b3f8340f20:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxMTQzMDQwNjNkMGRhN2FiMTU0ZWM3MDE1NjY5Y2UwNzdlNDBlYzE1YjY4ZDRkMTU5YjVmMGJjOWE1MmQzMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5ZjNiNjgyZjFlMTM1Y2M2MTJhZGQ4ZWYzNjdjZGM5NDk3NjZhZTRmZmUyNjgxNTNmY2RkODFlYzVhNWEwYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExMzg1NzY0NDcxYTYzNjk4NTYxMzZjZjQ4ZWQ4ZWY3ZTEzNGU4MDFkMDIzNmYyMzc4MDcxY2VmNzlkMjE3OWMifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/plain-lws-access-request.ts#L72-L84",
+          "version": "repo-lines-v1:sha256:fd8a88e73bcff852b20103eba622b556a7f3a074cf250216fcb2ce5d4de8a576:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlOTdhZTU1NDQzZDRkNzc1YWM5NGJlOTBkNzcxYmZmOTQwOWZlNjVmZmJhOTM1Yzk0ODIxOTkxOGI5M2ZmOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3ZmFiOTU2N2RhMjI1ZDZkMTBiZTQ1ZTg1NjFhN2ExMzQ2NDE0Y2FkZTY4ZjI2OTI0MzBkODhkYjU5MTg2YWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZGVlMzZhZDdlMzc1NzNmY2ExODk1ZjNjNzQ1YzJhYTczMTljY2E4OTEwMGMxMGQxMmJhZTJhYjIwMmZkMzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b1ca4d0775c84d779f87ea9e56bd4e50",
+      "statement": "Access actions are normalized from compact (read/modify/create/delete), prefixed (odrl:/lws:), and full-ODRL forms onto the SAI access-mode IRIs, deduped, and an empty or unknown action list is rejected with 400.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L35-L66",
+          "version": "repo-lines-v1:sha256:97790f9a1ff592a5e4176b12b86d8dae7b348390dc56dc83d75dd90bb3780ac4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1NjMyNGRmNWZiODMxOTYxNDRkOWQwMjA5M2ZkMjY5MWY4NGJmMTExZmYxYjY4MGJlNGViNzRkODAzOWFlY2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3YzJjYjVkOTE4YmRjZTcxM2NjMWRiYjM1OTM1NjAyNTVlMDliM2UyM2I0OTg4MTlhYjE0OWM0NTQyYTRjZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmNGZiNGZjNTMwNTNlZGFhODBmNzBjNDkxNjIwMGY1YjI2NmUzZjBkYzM5NzE2NjcxOGNiNGE2MDY2OTNkMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_863230b03ee341feb8dbe0aae5826e35",
+      "statement": "ODRL constraints on a policy or on any of its permissions are rejected with 400 in both the need-based and the plain LWS parsers, because the SAI need model has no constraint representation.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L105-L118",
+          "version": "repo-lines-v1:sha256:d398b9cd66257760aae93f8851ab41b0640d0e40ba23b28ef9b5dd1147434371:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlZTdjNzg5ZWQxZGM3MDdjYTkzMWMzNTM2ZjRhYjIwNjI3ZmI3ODZhZDQ0ZjA0ZmNlZTgwNDliMGFkMWVkOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiMDFkMWJhNDliODdhMzM0YzdhMDJhZDczNTBmMzc4OGNkMzk0Mjk5NzVkOTcyODFlM2Q4NDUxOGEwNzZkZWQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/plain-lws-access-request.ts#L54-L66",
+          "version": "repo-lines-v1:sha256:510bddacdad5b3367326da9ca5419d0921f2807b99a3dd03966097309c54fa85:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1MWMxNDEyZWYwMjI2ZjE0NTRhMDlmNTczMDI2NmZkMjEzNDhmYTlkMjBlNzQ1OTlkOGEwMjZhM2RhOGU3YTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4ZjJkOGMyZDFmYmJlMzgxMDBlODk5NDdlZmM0MGIyMDk2NjMzNmVlNWUzNGFjNTMxNmQyMWZiYzk0ZWYwMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_48f216c4cd5a4a89b7a0679e6a0ac6f6",
+      "statement": "Need-based policy parsing maps Asset targets to instance-scoped needs (requiring registeredShapeTree and at most one registration), AssetCollection+DataRegistration to registration-scoped needs, and AssetCollection+ShapeTree to shape-tree needs, rejecting mixed instance/collection targets, multiple registrations, multiple shape trees, and a declared shape tree that does not match the target.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L156-L289",
+          "version": "repo-lines-v1:sha256:5f806d7a34b0ca965c9758d7ed41b15748f1d7ab798036b43a9acfb5afd8968a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxODQ0OWFhZGI3M2I0NGQzZjgyYTY3NDg2MzNjNmQ0NmI3NmMyZGNlYTJlNzQ0YTcyNzc0ZGM3NGFiZTczNjIxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzZTBiOTlhMjMxMGVkYjA4OTM1NmJjMjkyNmM1MWM2Y2UxOWQ5N2JlZGQ1YWQyNWFkM2YxODEyMGY5YzM4N2M2IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmMmM3ZmJjOWUyODBiZjI5M2ZkMGFiMzkxMTZmOTk4MGI0ZjBjZDEyMGMzOGJmMmM3YzVlM2Y0YmZkNjExODAxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmYjU4MGU5NjRmODNhNDczZjQzZDQ0Mzg0NjI5NDlkNjhiNTYwMGZkYTc4N2YxNjM3NDVkMDBkZTg5Y2JmMzZhIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_c316c918e2cd469a99ff806961fd14a7",
+      "statement": "The plain LWS target resolver maps Asset targets to instance needs by loading each instance's data registration and shape tree (verifying the optional partOf containment), AssetCollection+DataRegistration to the registration's shape tree, and AssetCollection+ShapeTree to the named shape trees, and rejects container/storage-only targets with 400.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/plain-lws-target-resolver.ts#L109-L127",
+          "version": "repo-lines-v1:sha256:760b98e12426b6a85dec90dafcbe81b2224ab653750fcd1657e6a6bb877b2773:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwMDQyMTc0N2MzMTI3MTU3ZjhhZWUzMWI1NWI0N2Q4Y2I5Y2E5ODBlNzRlNmZjYmQyMDY0MDkxZjZjOGJlNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhMzFiMjJkMzhmNGJlMWIxZDZmN2IwMDRiNDJiYjRkZWRlOWNiNDkwNGEwMWRkNDYwYmQ2MzIyZjE2OWQ1MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/plain-lws-target-resolver.ts#L22-L69",
+          "version": "repo-lines-v1:sha256:8012ba0ac8caaa34ce3aa019dce3f35a6f0f82d3f6dd4f56fe200c8acfe1987b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1YTA5MGE3M2IxZGE2N2M0ZDY2MTY1NWYxNjE3YzE0YWQ2MTU2NWQzMGE1NGZhMTAzNzFmYjgyZDExN2I5ZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5MDgzNzgwNTQ4NmZjYmVmMDk0NGIwZmEyYjBiYWIxMmE2ZmNiOTA5N2E4YTA4OGNiYmYyMDYyZjdmMWQ4NjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5MmU0MTE0ZjgyN2IwZTAyZjBhMjQ5YjYyNDUzNTc3NTk5YjNhYTc5ZjY2ZTFkYjY0MDM0NmQ4M2Y0NTE2NWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e9e5a77d195141ff9b6bfad5de5e86e0",
+      "statement": "The plain LWS conversion groups permissions into needs keyed by shape tree, registration, and action set, unions their instances, marks every generated need AccessRequired, and generates fresh urn:uuid need and need-group ids; an unresolvable target aborts the request with 400.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/plain-lws-access-request.ts#L121-L195",
+          "version": "repo-lines-v1:sha256:5b6d5fd26804e121a1428ac7fe7722e23416bda5cf6fa31cca786d4538c9c9ca:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0ZWUxODI4OTZjYzZmZTY0MGQ0YTdiYjBlZGYxMmJkNDcyNDAyMDBkMmVhZDY5MjdlNTYzOTE2ZGM3NjJkZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwYWVlMDgzMDE5ZDA5NjI2MGQxOWMxNmNkOWViYjRhZGUyMGJiMzkxYWY0YTI4YTM5YzdhN2Y0YmZlNTJlMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY2MjRkYjBhNmExZjZlNjllYzc5ZjdhMzlhNDBiODE4Y2NlNTE2ODNlODgzYmYwZGQ5NDQxNGY1NzdhNzhhYTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3MWQ2NDc5MmI1NjlmOTc4YTViNDI1ZjQwMTNjNWQ1OWExMTdiMGZiZDRjYWVjYzFjYjcwMmQ2OTVmZGZjZDUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_081bc87aaa2b4184b4377f1cca0940a0",
+      "statement": "Acceptance mints the request id in the owner's AccessRequestRegistry and writes a NeedBasedAccessRequestReceived activity carrying the embedded request, returning 202 immediately; only the plain LWS path adds a Location header with the minted request IRI.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L120-L140",
+          "version": "repo-lines-v1:sha256:0e8828455607a4f2dcf8abec8b6d30870492c743b90877ad69d671f7c43e25f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1N2VlMjA3YjFiZTk1MmEwNjg3MDJjYTcwZDkzMzJmY2MwNTg3YjJiNTNjMTkyMTU1ZjVjYWQ5NTNlYWRjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhOWYwY2U4NzZjYzRlMTFhZDFiNmMyZDZiY2FiOTIxYjI3MGM1NDFkYmJlZWI5MGI0M2FkNzAwYzI3NmY4ZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkNmRiM2I4OTBkYzk4Y2EwYmMzNGE4MDg0MWRmMzBiMjExZjlhN2U0MDdjMjljMGIwMDYyMDYzMTA5ZDg2YTQifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L399-L437",
+          "version": "repo-lines-v1:sha256:b3ebcb4c6b7b43a022b67f4d5cdd2e8db0e53d2b60aef40d80627c288dc3ce73:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4NTY5OGQxNTYyMTUzNmQyOWM3ZjhjZTQzNTYwMWFmNjE5NGU3Njg5MDg0MGRmZjkyYTlmYmM2OGZlMmMzNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxMDYwM2U3MTE0M2RiMmRlYTQzOGE0ZTNmZTEzN2RlMzFmYTIwODg5ZWZlYzA5ZDE2ODIxNWQ4NmI4OGIyNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkNzllNTMyYjVkNjE3MjJjMTJjYmFmNDE3YTFhZjhjYzFmMDk4Y2U5ZmQ3ZmM0NDc5YTc1OTM1MzNiYzYxNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_239b36fb58464836912cd41f2ed2454c",
+      "statement": "Acceptance rejects non-self requests and a dataOwner that differs from the endpoint owner with 400, and rejects a requester that is not a registered social agent of the owner with 403.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/need-based-access-request.ts#L385-L398",
+          "version": "repo-lines-v1:sha256:d79019a9402c4e35637a7c5e6901a875a42f52c4883ce557bd223f60baa74fa5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NmM1ZDE5NzczOTA2ZjgyYThiZDVmMTU0OTBmZWMyMTZkOTNiN2VjZWVkNjMxZjc3ZDc4YjYyZjZlMTEwODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3ZGNhYTZiODU1NmUyZjdiOTY4NTljYjc5OWNiZDQ5ZDEzYmQ4ZGIyM2U2NTA0M2Y1ODY3YzBiNTU0Y2U2ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzM2E3ODc0YWE2NjU5MjU1MGI2MDA4YzZiMzYwNzY3NDhhYjcwZTExMDVlMzdjNTQ0NGVkOTRhNjU0YmRhNjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62cdcc37edbc4129bc3cd03b0f0c94de",
+      "statement": "GET/HEAD on the access request endpoint is owner-only (403 for other authenticated agents, 401 unauthenticated) and proxies the owner's AccessRequestRegistry with the forwarded accept, accept-language, prefer, if-none-match, if-modified-since, and range headers.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L142-L186",
+          "version": "repo-lines-v1:sha256:1692f884e8c8e25c329a4b9b36f388cbbdac38b5065002f786eb928ae69c5e18:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkMWE1NzU1ZjZmZDYxNzU2YzA1YTU2YjllMTJjYjYwOWFhNGU5OGVkZmZlOGZiNzMxNGFmNjY5ODA5YmEwYjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZWVhOWQyYmMxNjk1NWMyNWYzMDc4OGEzMzk4YzNhNDdmNTQ5ODRiMWY2NWJiZWFiZDIzYjc4NDg2MTEzZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlY2NiZjhjMzFhMmNhMzc1YWM5NzhkNzYyZGMwOGYxNDkxMzBlYjU5ODNkYjhmMTQ1MGIwMjZhN2YxY2ZjNGYifQ"
+        },
+        {
+          "resource": "repo://packages/components/src/AccessRequestHandler.ts#L40-L47",
+          "version": "repo-lines-v1:sha256:ee4a8e295fafe7a5614732c95d2d43196058b9761397f9e8e3d788c54ef18dfc:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2OWM4YjcxNTVkNzI5ODA2M2UzMGQyZWQ3N2NmMmU2MTM3MWUzY2I0ODdjOTg2MzEyOWQzYzI2OTljNWY0ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDUxZTkxOTUzMDIyZmIyMGU1MDRlODUyMWY5YmJmYmE1MThjZWZlM2Y1NjA4MDQ3NTllZjUyNzNhNjU1OThlZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGM1ZmU3YjFkMmFkNDhhZjgwNmQ3ODY4Y2M3NmE4MGM0NjZhZDdhMjgwNmRjYzlmODZjYjIwMGZjOTgyMTg2NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU1NGY3YzhmNWYxOGEzYWViYzYwZmY2ZjBmNjk4Zjg3ZjNiYTA1ZjhmOTJmZjFhNDQ2OTc2NjVhMDU5OTIxZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b227769658b7455195f682003e76846e",
+      "statement": "The storage description advertises the AccessRequestService as conforming to both the LWS and SAI access profiles and the AccessGrantService as conforming to the SAI profile only, on endpoints built from the owner's authorization agent origin and the base64url-encoded owner WebID.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/SaiAccessServiceDescriber.ts#L52-L70",
+          "version": "repo-lines-v1:sha256:4fd861a7596e3a6c7b64a3dfd3b44b45a4ff33049ad095b06ed6e92b0ad9ea3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYmYwYmRiNzAxY2QwYjljMTA4NGQyZjM3OWZiNTgzYzViNTE2MDcxYjQ1MTM5ZDJkNzhhNWVkZDMyMjIzMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkZDI0NDU4MmI2ZmIwM2QyM2I4NDE1YWJlY2QzNDZiMGM5ZjQ2NmI2Zjc1MmIwNjgxODljZTdlOWEyZGMzNTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRhM2MwN2QxZDhhZGEwMzA0YzhjODE4ODFlMzRhYzAxM2UxZDNhYTMwYjdmZGFkNWMzMmZkOThlMGRkMmNjNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxMmNmNDUzMGVlYTdkYzQxMzMzNmVlODk4MWQzNjc5YmU3NDI5MDc5Y2Y1Yjg1ZDhiMmYwOWM2Nzg2YmQyZjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_55d33fbfaed84dc9bf2910b9ad56b5aa",
+      "statement": "The requester-side forwarding leg renders the frozen ODRL wire from the embedded request: instance needs become one Asset permission per instance with SelectedFromRegistry and an advisory partOf registration, registration needs become AssetCollection+DataRegistration with AllFromRegistry, and shape-tree needs become AssetCollection+ShapeTree.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/access-request.ts#L64-L129",
+          "version": "repo-lines-v1:sha256:95c08bdb0999cfbc0da5936231dfd72e8c4f43baa6e11f4525255da6049dceac:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViMzAzZWM3NWU5YTZiNjFmM2U0YTk3MTYxNjAzODIzMmEyZjVjYmMzNjA1OGQ4N2ExNjI1NjI5NTE4OTZlZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwM2QxYmRiZDU1ZWMxN2Y4YWE3ZGUzMTc0ODM5ZGVjNjZhM2UzY2FmOWU1YTZmMzNjOWM0YzBlN2NjNGVlN2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5Zjg2ZDZhNmRkOWQ2YTE5MDBhODkzYjUxNmM2NWFiMTQ5MzA3NzNmYzZiNjU2ODYwNzIwMWI5YjhkN2RhNGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62dd38cb02e7434b8c42156128bc53a8",
+      "statement": "Request-granted detection closes an open request only when the union of received grants for its shape tree covers every requested instance, so a partial instance grant leaves the request open.",
+      "evidence": [
+        {
+          "resource": "repo://packages/components/src/temporal/activities/access-request.ts#L160-L172",
+          "version": "repo-lines-v1:sha256:d526ec4171c378e365f33f4a580659c5023cfceaaaf588743e9516e5528862d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1NjdmNTcyNTdiZDRlZGI0NmUwMDY4NDU5MjgxNDg0Njg5MTY3OGRhNzU1MDg5YjljYzcxYTI0ZTU4Y2E0ZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwMTRmMjllMzFiZjgwMWJlOTJiNDJkYTYzZjNiYmYyOGVhMjVlNjI4NzI1OWU4MjJiMWM5MDI4ZTI3ZDY3Y2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxYmY5ZGQ0MjE4M2UwNzUzMDNjOWNkMDNlZDE5ZjRlMzU1ZTgzYTlkMGU4YjY1NzVlMDhkZDk0OGY0NTQzOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhN2NhNzFmZDQyYWFjZDY0NmM5YzE2OWM2ZWJjYjJkZTAzZWNmOWQ0OGNmZjUzNmM1NTZmZTdjMjVlNTAyODIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.3",
+    "at": "2026-11-21T19:19:35.660Z"
+  }
+}
