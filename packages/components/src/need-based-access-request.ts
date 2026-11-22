@@ -158,6 +158,9 @@ function parsePolicy(
   requesterWebId: string,
   expectedDataOwner?: string
 ): ParsedPolicy {
+  if (policy.registeredShapeTree !== undefined) {
+    throw new BadRequestHttpError('registeredShapeTree belongs on the target, not the policy')
+  }
   const permissions = permissionsOf(policy)
   rejectConstraints(policy, permissions)
 
@@ -208,7 +211,10 @@ function parsePolicy(
     `urn:uuid:${crypto.randomUUID()}`
 
   if (instanceTargets.length > 0) {
-    const registeredShapeTree = policy.registeredShapeTree
+    if (instanceTargets.some((permission) => targetOf(permission).partOf !== undefined)) {
+      throw new BadRequestHttpError('instance access needs use hasDataRegistration, not partOf')
+    }
+    const registeredShapeTree = targetOf(instanceTargets[0]!).registeredShapeTree
     if (typeof registeredShapeTree !== 'string' || !registeredShapeTree) {
       throw new BadRequestHttpError('instance access needs require registeredShapeTree')
     }
@@ -219,7 +225,9 @@ function parsePolicy(
       throw new BadRequestHttpError('instance access need has no source instance')
     }
     const registrations = [
-      ...new Set(instanceTargets.flatMap((permission) => values(targetOf(permission).partOf))),
+      ...new Set(
+        instanceTargets.flatMap((permission) => values(targetOf(permission).hasDataRegistration))
+      ),
     ]
     if (registrations.length > 1) {
       throw new BadRequestHttpError('instance access need spans multiple registrations')
@@ -265,7 +273,9 @@ function parsePolicy(
   if (shapeTrees.length > 1) {
     throw new BadRequestHttpError('access need spans multiple shape trees')
   }
-  const declaredShapeTree = policy.registeredShapeTree as string | undefined
+  const declaredShapeTree = collectionTargets
+    .map((permission) => targetOf(permission).registeredShapeTree)
+    .find((value): value is string => typeof value === 'string' && value !== '')
   if (declaredShapeTree && shapeTrees[0] && declaredShapeTree !== shapeTrees[0]) {
     throw new BadRequestHttpError('access need shape tree does not match its target')
   }

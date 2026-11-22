@@ -1,4 +1,12 @@
-import { INTEROP, LWS, ODRL, ODRL_ID_JAG_CONTEXT, toStore } from '@janeirodigital/interop-utils'
+import {
+  INTEROP,
+  LWS,
+  ODRL,
+  ODRL_ID_JAG_CONTEXT,
+  RDF,
+  SHAPETREES,
+  toStore,
+} from '@janeirodigital/interop-utils'
 import type { Term } from '@rdfjs/types'
 import { BadRequestHttpError } from '@solid/community-server'
 import { DataFactory, type Store } from 'n3'
@@ -93,6 +101,9 @@ export async function verifyAccessClaim(
     oneIri(store, policy, ODRL.profile, 'odrl:profile')
     const scope = oneIri(store, policy, INTEROP.scopeOfGrant, 'interop:scopeOfGrant')
     if (!GRANT_SCOPES.has(scope)) badRequest(`${scope} is not a supported grant scope.`)
+    if (store.getObjects(policy, namedNode(INTEROP.registeredShapeTree), null).length > 0) {
+      badRequest('interop:registeredShapeTree belongs on the target, not the policy.')
+    }
   }
 
   const permissions = store.getObjects(null, namedNode(ODRL.permission), null)
@@ -130,6 +141,20 @@ export async function verifyAccessClaim(
     storages.add(oneIri(store, namedNode(target), LWS.storage, 'lws:storage'))
     oneIri(store, namedNode(target), INTEROP.dataOwner, 'interop:dataOwner')
     iriValues(store, namedNode(target), ODRL.source, 'odrl:source')
+
+    const types = store
+      .getObjects(namedNode(target), namedNode(RDF.type), null)
+      .map((term) => term.value)
+    // Every target is scoped to a shape tree, including the AllFromAgent
+    // party target; a shape-tree target names it as its source instead.
+    if (!types.includes(SHAPETREES.ShapeTree)) {
+      oneIri(store, namedNode(target), INTEROP.registeredShapeTree, 'interop:registeredShapeTree')
+    }
+    // A selected instance target names its registration explicitly;
+    // AssetCollection + DataRegistration targets use the source.
+    if (types.includes(ODRL.Asset)) {
+      oneIri(store, namedNode(target), INTEROP.hasDataRegistration, 'interop:hasDataRegistration')
+    }
   }
   if (storages.size !== 1) {
     badRequest('every target needs to be bound to the same lws:storage.')

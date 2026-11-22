@@ -1209,7 +1209,8 @@ describe('revokeGrants core (C1)', () => {
         source: string[]
         owner?: string
         storage?: string
-        partOf?: string[]
+        registeredShapeTree?: string
+        hasDataRegistration?: string
       }
     ) => {
       const targetNode = DataFactory.namedNode(targetId)
@@ -1249,12 +1250,21 @@ describe('revokeGrants core (C1)', () => {
           )
         )
       }
-      for (const part of targetValue.partOf ?? []) {
+      if (targetValue.registeredShapeTree) {
         quads.push(
           DataFactory.quad(
             targetNode,
-            DataFactory.namedNode(ODRL.partOf),
-            DataFactory.namedNode(part)
+            DataFactory.namedNode(INTEROP.registeredShapeTree),
+            DataFactory.namedNode(targetValue.registeredShapeTree)
+          )
+        )
+      }
+      if (targetValue.hasDataRegistration) {
+        quads.push(
+          DataFactory.quad(
+            targetNode,
+            DataFactory.namedNode(INTEROP.hasDataRegistration),
+            DataFactory.namedNode(targetValue.hasDataRegistration)
           )
         )
       }
@@ -1274,11 +1284,6 @@ describe('revokeGrants core (C1)', () => {
         policy,
         DataFactory.namedNode(ODRL.profile),
         DataFactory.namedNode(INTEROP.AccessProfile)
-      ),
-      DataFactory.quad(
-        policy,
-        DataFactory.namedNode(INTEROP.registeredShapeTree),
-        DataFactory.namedNode(grant.registeredShapeTree)
       ),
       DataFactory.quad(
         policy,

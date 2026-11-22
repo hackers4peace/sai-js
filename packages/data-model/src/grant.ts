@@ -23,7 +23,10 @@ export interface OdrlTarget {
   storage?: string
   type: string[]
   source: string[]
-  partOf?: string[]
+  /** SAI profile: the shape tree the target is scoped to. */
+  registeredShapeTree?: string
+  /** SAI profile: the registration of a selected instance. */
+  hasDataRegistration?: string
 }
 
 /** ODRL permission. */
@@ -45,7 +48,6 @@ export interface OdrlPolicy {
   permission: OdrlPermission[]
   scopeOfGrant?: string
   inheritsFromGrant?: string
-  registeredShapeTree?: string
   /** Derived from the first permission (compatibility convenience). */
   assignee?: string
   action?: string[]
@@ -140,11 +142,14 @@ function normalizeTarget(node: Record<string, unknown>): OdrlTarget {
     source: asArray(node.source as string | string[] | undefined).map((value) =>
       resolveIri(value)!
     ),
-    ...(node.partOf
+    ...(node.registeredShapeTree
       ? {
-          partOf: asArray(node.partOf as string | string[] | undefined).map((value) =>
-            resolveIri(value)!
-          ),
+          registeredShapeTree: resolveIri(node.registeredShapeTree as string),
+        }
+      : {}),
+    ...(node.hasDataRegistration
+      ? {
+          hasDataRegistration: resolveIri(node.hasDataRegistration as string),
         }
       : {}),
   }
@@ -176,17 +181,31 @@ function normalizePolicy(node: Record<string, unknown>): OdrlPolicy {
     permission,
     scopeOfGrant: resolveIri(node.scopeOfGrant as string | undefined),
     inheritsFromGrant: resolveIri(node.inheritsFromGrant as string | undefined),
-    registeredShapeTree: resolveIri(node.registeredShapeTree as string | undefined),
     ...(first?.assignee ? { assignee: first.assignee } : {}),
     ...(first?.action.length ? { action: [...first.action] } : {}),
     ...(first?.target ? { target: first.target } : {}),
   }
 }
 
-function shapeTreeFromTarget(target: OdrlTarget | undefined): string {
+/**
+ * The shape tree a target is scoped to. A shape-tree target names it as its
+ * `source`; every other data target carries it explicitly.
+ */
+export function shapeTreeOfTarget(target: OdrlTarget | undefined): string {
   if (!target) return ''
+  if (target.registeredShapeTree) return target.registeredShapeTree
   if (target.type.includes(SHAPETREES.ShapeTree)) return target.source[0] ?? ''
   return ''
+}
+
+/**
+ * The registration a target is scoped to: the `source` of a collection target,
+ * the explicit field of a selected asset target.
+ */
+export function registrationOfTarget(target: OdrlTarget | undefined): string {
+  if (!target) return ''
+  if (target.type.includes(INTEROP.DataRegistration)) return target.source[0] ?? ''
+  return target.hasDataRegistration ?? ''
 }
 
 function deriveFields(
@@ -217,11 +236,12 @@ function deriveFields(
     storage: target?.storage ?? (node.storage as string | undefined) ?? '',
     grantedBy: first?.assigner ?? (node.grantedBy as string | undefined) ?? '',
     dataOwner: first?.target.owner ?? (node.dataOwner as string | undefined) ?? '',
-    registeredShapeTree: access[0]?.registeredShapeTree || shapeTreeFromTarget(target) || '',
+    registeredShapeTree:
+      permissions.map((permission) => shapeTreeOfTarget(permission.target)).find(Boolean) ?? '',
     hasDataRegistration:
-      registrationTarget?.source[0] ??
-      permissions.map((permission) => permission.target.partOf?.[0]).find(Boolean) ??
-      '',
+      registrationOfTarget(registrationTarget) ||
+      (permissions.map((permission) => registrationOfTarget(permission.target)).find(Boolean) ??
+        ''),
     ...(assetTargets.length
       ? { hasDataInstance: assetTargets.map((candidate) => candidate.source[0]).filter(Boolean) }
       : {}),
@@ -293,7 +313,8 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
         storage: input.storage,
         type: [ODRL.Asset],
         source: instance ? [instance] : [...(input.hasDataInstance ?? [])],
-        ...(input.hasDataRegistration ? { partOf: [input.hasDataRegistration] } : {}),
+        ...(input.registeredShapeTree ? { registeredShapeTree: input.registeredShapeTree } : {}),
+        ...(input.hasDataRegistration ? { hasDataRegistration: input.hasDataRegistration } : {}),
       }
     case INTEROP.AllFromRegistry:
     case INTEROP.Inherited:
@@ -304,14 +325,17 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
         storage: input.storage,
         type: [ODRL.AssetCollection, INTEROP.DataRegistration],
         source: [input.hasDataRegistration],
+        ...(input.registeredShapeTree ? { registeredShapeTree: input.registeredShapeTree } : {}),
       }
     case INTEROP.AllFromAgent:
       return {
         id,
         uid: id,
         owner: input.owner,
+        storage: input.storage,
         type: [INTEROP.SocialAgent],
         source: [input.agent ?? ''],
+        ...(input.registeredShapeTree ? { registeredShapeTree: input.registeredShapeTree } : {}),
       }
     default:
       throw new Error(`Unknown scope: ${input.scopeOfGrant}`)
@@ -320,6 +344,12 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
 
 /** Build one ODRL `Agreement` policy (one permission per selected resource). */
 export function grantAccess(input: GrantPermissionInput): OdrlPolicy[] {
+  if (!input.registeredShapeTree) {
+    throw new Error(`scope ${input.scopeOfGrant} requires a registeredShapeTree`)
+  }
+  if (input.scopeOfGrant === INTEROP.SelectedFromRegistry && !input.hasDataRegistration) {
+    throw new Error('SelectedFromRegistry requires a hasDataRegistration')
+  }
   const policyId = urn()
   const permissions: OdrlPermission[] = []
   if (input.scopeOfGrant === INTEROP.SelectedFromRegistry) {
@@ -353,7 +383,6 @@ export function grantAccess(input: GrantPermissionInput): OdrlPolicy[] {
       profile: INTEROP.AccessProfile,
       permission: permissions,
       scopeOfGrant: input.scopeOfGrant,
-      ...(input.registeredShapeTree ? { registeredShapeTree: input.registeredShapeTree } : {}),
       ...(permissions[0]
         ? {
             assignee: permissions[0].assignee,
@@ -390,11 +419,15 @@ export function toJsonLd(grant: FinalGrantData): Record<string, unknown> {
           ...(permission.target.storage ? { storage: permission.target.storage } : {}),
           type: permission.target.type,
           source: permission.target.source,
-          ...(permission.target.partOf ? { partOf: permission.target.partOf } : {}),
+          ...(permission.target.registeredShapeTree
+            ? { registeredShapeTree: permission.target.registeredShapeTree }
+            : {}),
+          ...(permission.target.hasDataRegistration
+            ? { hasDataRegistration: permission.target.hasDataRegistration }
+            : {}),
         },
       })),
       ...(policy.inheritsFromGrant ? { inheritsFromGrant: policy.inheritsFromGrant } : {}),
-      ...(policy.registeredShapeTree ? { registeredShapeTree: policy.registeredShapeTree } : {}),
     })),
     ...(grant.inheritsFromGrant ? { inheritsFromGrant: grant.inheritsFromGrant } : {}),
     ...(grant.hasInheritingGrant ? { hasInheritingGrant: grant.hasInheritingGrant } : {}),

@@ -135,6 +135,13 @@ export function instancesCover(upstream: GrantData, downstream: GrantData): bool
  * storage and coverage). Does NOT check the upstream's own validity.
  */
 export function grantCovers(upstream: GrantData, downstream: GrantData): boolean {
+  if (!upstream.registeredShapeTree || !downstream.registeredShapeTree) return false
+  const needsRegistration =
+    upstream.scopeOfGrant !== INTEROP.AllFromAgent &&
+    downstream.scopeOfGrant !== INTEROP.AllFromAgent
+  if (needsRegistration && (!upstream.hasDataRegistration || !downstream.hasDataRegistration)) {
+    return false
+  }
   return (
     upstream.dataOwner === downstream.dataOwner &&
     grantGrantee(upstream) === downstream.grantedBy &&

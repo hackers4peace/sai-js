@@ -884,13 +884,13 @@ SELECT DISTINCT ?grant ?grantedBy ?shapeTree ?scope ?source WHERE {
   GRAPH ?g {
     ?grant a <${LWS.AccessGrant}> ;
            <${LWS.access}> ?policy .
-    ?policy <${INTEROP.registeredShapeTree}> ?shapeTree ;
-           <${ODRL.permission}> ?permission .
+    ?policy <${ODRL.permission}> ?permission .
     OPTIONAL { ?policy <${INTEROP.scopeOfGrant}> ?scope }
     ?permission
       <${ODRL.assignee}> <${webId}> ;
       <${ODRL.target}> ?target .
-    ?target <${INTEROP.dataOwner}> ?grantedBy .
+    ?target <${INTEROP.dataOwner}> ?grantedBy ;
+            <${INTEROP.registeredShapeTree}> ?shapeTree .
     OPTIONAL { ?target <${ODRL.source}> ?source }
   }
 }`

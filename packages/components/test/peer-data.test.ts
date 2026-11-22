@@ -256,7 +256,6 @@ describe('peerInstanceIris', () => {
           '@type': [ODRL.Agreement],
           [ODRL.uid]: [{ '@id': `${parentGrantIri}#policy` }],
           [ODRL.profile]: [{ '@id': INTEROP.AccessProfile }],
-          [INTEROP.registeredShapeTree]: [{ '@id': parentShapeTreeIri }],
           [ODRL.permission]: [
             {
               '@id': `${parentGrantIri}#permission`,
@@ -270,6 +269,7 @@ describe('peerInstanceIris', () => {
                   [ODRL.uid]: [{ '@id': `${parentGrantIri}#target` }],
                   '@type': [ODRL.AssetCollection, INTEROP.DataRegistration],
                   [ODRL.source]: [{ '@id': parentRegistrationIri }],
+                  [INTEROP.registeredShapeTree]: [{ '@id': parentShapeTreeIri }],
                   [INTEROP.dataOwner]: [{ '@id': 'https://peer.example/profile/card#me' }],
                   [LWS.storage]: [{ '@id': PEER_STORAGE }],
                 },

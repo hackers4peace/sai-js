@@ -78,6 +78,8 @@ export {
   grantAssigner,
   grantStorage,
   grantTargets,
+  registrationOfTarget,
+  shapeTreeOfTarget,
   toJsonLd,
 } from './grant.ts'
 export type { NeedBasedAccessRequestData, NeedBasedAccessRequestGroup } from './access-request.ts'

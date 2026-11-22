@@ -88,6 +88,7 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
     storage,
     hasDataRegistration,
     hasDataInstance: rest.hasDataInstance,
+    registeredShapeTree: rest.registeredShapeTree ?? PROJECT_TREE,
   }
   return {
     type: [LWS.AccessGrant],

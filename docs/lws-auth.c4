@@ -1049,11 +1049,11 @@ views {
               "storage": "https://data/acme-rnd/",
               "type": ["http://www.w3.org/ns/odrl/2/Asset"],
               "source": ["https://data/acme-rnd/pbh2yw"],
-              "partOf": ["https://data/acme-rnd/reb39k"]
+              "registeredShapeTree": "https://data/shapetrees/trees/Project",
+              "hasDataRegistration": "https://data/acme-rnd/reb39k"
             }
           }],
           "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
-          "registeredShapeTree": "https://data/shapetrees/trees/Project",
           "assignee": "https://id/bob"
         }],
         "iat": 1794876408,
@@ -1235,11 +1235,11 @@ views {
               "storage": "https://data/acme-rnd/",
               "type": ["http://www.w3.org/ns/odrl/2/Asset"],
               "source": ["https://data/acme-rnd/pbh2yw"],
-              "partOf": ["https://data/acme-rnd/reb39k"]
+              "registeredShapeTree": "https://data/shapetrees/trees/Project",
+              "hasDataRegistration": "https://data/acme-rnd/reb39k"
             }
           }],
-          "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
-          "registeredShapeTree": "https://data/shapetrees/trees/Project"
+          "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry"
         }],
         "iat": 1794876409,
         "exp": 1794876709,
@@ -1366,7 +1366,7 @@ views {
       Observed reads: `GET https://id/yoyo` (15 ms) then `22` SPARQL queries —
       `15` on `data-acme-rnd` (the resource + its registration) and `7` on
       `reg-acme` (the owner's registries). The token's `access` claim is evaluated
-      **first**, so the claim's narrowed `source` (`pbh2yw`) / `partOf` (`reb39k`)
+      **first**, so the claim's narrowed `source` (`pbh2yw`) / `hasDataRegistration` (`reb39k`)
       bound the decision.
       '''
     }
@@ -1393,7 +1393,7 @@ views {
       * `client_id` — `https://auth/`
       * `assigner` — omitted from the claim
       * `assignee` — `https://id/yoyo`, equal to the token `sub`
-      * `scopeOfGrant`, `registeredShapeTree`, `storage`, `source` — unchanged
+      * `scopeOfGrant`, target-level `registeredShapeTree` / `hasDataRegistration`, `storage`, `source` — unchanged
       '''
     }
   }
@@ -1675,13 +1675,12 @@ views {
           "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
           "access": [{ "type": ["odrl:Agreement"], "profile": "interop:AccessProfile",
             "scopeOfGrant": "interop:AllFromRegistry",
-            "registeredShapeTree": "https://data/shapetrees/trees/Project",
             "assignee": "https://id/yoyo", "action": ["odrl:read"],
             "permission": [{ "assignee": "https://id/yoyo", "action": ["odrl:read"],
               "target": { "owner": "https://id/bob", "storage": "https://data/bob/",
                 "type": ["interop:DataRegistration", "odrl:AssetCollection"],
                 "source": ["https://data/bob/avn9hv"],
-                "partOf": ["https://data/bob/avn9hv"] } }] }] }
+                "registeredShapeTree": "https://data/shapetrees/trees/Project" } }] }] }
         ```
 
         No `act`, no `/id/dan` anywhere — the admin is gone from the token, and

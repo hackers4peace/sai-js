@@ -1,6 +1,34 @@
+import { grantAccess } from '@janeirodigital/interop-data-model'
+import { INTEROP, ODRL, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
-import { rewriteAccessClaim, setAccessClaimAssignee } from '../src/access-claim.js'
+import {
+  rewriteAccessClaim,
+  setAccessClaimAssignee,
+  verifyAccessClaim,
+} from '../src/access-claim.js'
+
+const STORAGE = 'https://data/acme.example/'
+const SHAPE_TREE = 'https://data/shapetrees/trees/Project'
+const REGISTRATION = 'https://data/acme.example/registration/'
+const OWNER = 'https://id/alice'
+const GRANTEE = 'https://id/bob'
+
+function claim(scope: string): Record<string, any>[] {
+  return grantAccess({
+    scopeOfGrant: scope,
+    owner: OWNER,
+    storage: STORAGE,
+    hasDataRegistration: REGISTRATION,
+    hasDataInstance:
+      scope === INTEROP.SelectedFromRegistry ? ['https://data/acme.example/p'] : undefined,
+    registeredShapeTree: SHAPE_TREE,
+    agent: 'https://id/yoyo#id',
+    assigner: OWNER,
+    assignee: GRANTEE,
+    actions: [ODRL.read],
+  }) as Record<string, any>[]
+}
 
 const parent = {
   id: 'urn:uuid:parent-grant',
@@ -18,6 +46,32 @@ const child = {
   inheritsFromGrant: 'urn:uuid:parent-grant',
   permission: [{ id: 'urn:uuid:child-permission', action: ['odrl:read'] }],
 }
+
+describe('claim target profile', () => {
+  test('accepts an AllFromAgent claim with a shape tree and no registration', async () => {
+    await expect(
+      verifyAccessClaim(claim(INTEROP.AllFromAgent), ODRL_ID_JAG_CONTEXT, STORAGE)
+    ).resolves.toMatchObject({ storage: STORAGE })
+  })
+
+  test('rejects a policy-level registeredShapeTree', async () => {
+    const legacy = claim(INTEROP.AllFromRegistry)
+    const target = legacy[0].permission[0].target as Record<string, unknown>
+    legacy[0].registeredShapeTree = target.registeredShapeTree
+    delete target.registeredShapeTree
+    await expect(verifyAccessClaim(legacy, ODRL_ID_JAG_CONTEXT, STORAGE)).rejects.toThrow(
+      /belongs on the target/u
+    )
+  })
+
+  test('rejects a selected claim without hasDataRegistration', async () => {
+    const selected = claim(INTEROP.SelectedFromRegistry)
+    delete (selected[0].permission[0].target as Record<string, unknown>).hasDataRegistration
+    await expect(verifyAccessClaim(selected, ODRL_ID_JAG_CONTEXT, STORAGE)).rejects.toThrow(
+      /hasDataRegistration/u
+    )
+  })
+})
 
 describe('access claim rewriting', () => {
   test('keeps parent/child links internal to the rewritten claim', () => {

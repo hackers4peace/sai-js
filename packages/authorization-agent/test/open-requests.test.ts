@@ -195,6 +195,12 @@ describe('getAccessGrantsForGrantee', () => {
     // the requester is INJECTED as the grantee anchor (§3.2 — the match is
     // grant.grantee ↔ request.grantedBy, never grant.grantedBy)
     expect(queries[0]).toContain('<https://id/bob>')
+    // the shape tree is a target property, never a policy property
+    expect(queries[0]).not.toContain(
+      '?policy <http://www.w3.org/ns/solid/interop#registeredShapeTree>'
+    )
+    expect(queries[0]).toContain('?target')
+    expect(queries[0]).toContain('registeredShapeTree')
   })
 
   test('returns the grant scope and selected instances for SelectedFromRegistry', async () => {

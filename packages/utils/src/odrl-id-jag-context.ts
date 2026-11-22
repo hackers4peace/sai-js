@@ -38,6 +38,8 @@ export const accessClaimTerms = {
   profile: { '@id': ODRL.profile, '@type': '@id' },
   owner: { '@id': INTEROP.dataOwner, '@type': '@id' },
   storage: { '@id': LWS.storage, '@type': '@id' },
+  registeredShapeTree: { '@id': INTEROP.registeredShapeTree, '@type': '@id' },
+  hasDataRegistration: { '@id': INTEROP.hasDataRegistration, '@type': '@id' },
 } as const
 
 /** Body of the grant/request/access-claim JSON-LD context. */

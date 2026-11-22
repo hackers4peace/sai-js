@@ -6,6 +6,22 @@ import { ACP, PERMISSIONS } from '@solidlab/policy-engine'
 import { DataFactory, Store } from 'n3'
 import { describe, expect, test, vi } from 'vitest'
 
+const sparqlMock: { parent?: string } = { parent: 'https://data/acme.example/registration/' }
+
+vi.mock('fetch-sparql-endpoint', async () => {
+  const { Readable } = await import('node:stream')
+  return {
+    SparqlEndpointFetcher: class {
+      async fetchBindings(_endpoint: string, query: string) {
+        if (query.includes('lws#partOf')) {
+          return Readable.from(sparqlMock.parent ? [{ parent: { value: sparqlMock.parent } }] : [])
+        }
+        return Readable.from([])
+      }
+    },
+  }
+})
+
 import { SaiPermissionsEngine } from '../src/SaiPermissionsEngine.js'
 
 const { namedNode } = DataFactory
@@ -55,13 +71,12 @@ function createEngine() {
       throw new Error('registry read')
     }),
     getStorage: vi.fn(async () => STORAGE),
-    getParent: vi.fn(async () => REGISTRATION),
   }
   const storageStrategy = {
     getStorageIdentifier: vi.fn(async () => ({ path: STORAGE })),
   }
   const endpointStore = {
-    findSparqlByPodUrl: vi.fn(async () => undefined),
+    findSparqlByPodUrl: vi.fn(async () => ({ endpoint: 'https://data.example/sparql' })),
   }
   const engine = new SaiPermissionsEngine(
     manager as never,
@@ -253,6 +268,20 @@ describe('claim-first policy evaluation', () => {
     const permissions = await engine.getPermissions(RESOURCE, credentials(other))
     expect(permissions[PERMISSIONS.Read]).toBe(true)
   })
+
+  test('denies when the data pod has no lws:partOf metadata (no path fallback)', async () => {
+    const { engine } = createEngine()
+    sparqlMock.parent = undefined
+    try {
+      const permissions = await engine.getPermissions(
+        RESOURCE,
+        credentials(claim(INTEROP.AllFromRegistry))
+      )
+      expect(permissions[PERMISSIONS.Read]).toBeFalsy()
+    } finally {
+      sparqlMock.parent = REGISTRATION
+    }
+  })
 })
 
 describe('public grants', () => {
@@ -277,13 +306,12 @@ describe('public grants', () => {
     const manager = {
       getAuthorizationData: vi.fn(async () => quads),
       getStorage: vi.fn(async () => STORAGE),
-      getParent: vi.fn(async () => REGISTRATION),
     }
     const storageStrategy = {
       getStorageIdentifier: vi.fn(async () => ({ path: STORAGE })),
     }
     const endpointStore = {
-      findSparqlByPodUrl: vi.fn(async () => undefined),
+      findSparqlByPodUrl: vi.fn(async () => ({ endpoint: 'https://data.example/sparql' })),
     }
     const engine = new SaiPermissionsEngine(
       manager as never,

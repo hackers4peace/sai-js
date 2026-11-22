@@ -180,8 +180,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/acme/p9m2vr> <https://www.w3.org/ns/lws#access> <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c>.
 <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9>.
 <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9>;
@@ -193,7 +192,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/reb39k>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/acme/p9m2vr> {
@@ -207,8 +206,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/acme/hdaymz> <https://www.w3.org/ns/lws#access> <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd>.
 <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d>.
 <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d>;
@@ -220,7 +218,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/acme/hdaymz> {
@@ -234,8 +232,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:f4a32ed5-b585-4847-8d3a-859f12da3d16> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:f4a32ed5-b585-4847-8d3a-859f12da3d16>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/acme/x4j8lm> <https://www.w3.org/ns/lws#access> <urn:uuid:f4a32ed5-b585-4847-8d3a-859f12da3d16>.
 <urn:uuid:f4a32ed5-b585-4847-8d3a-859f12da3d16> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:44a00a19-9359-43ae-8265-7bece4107264>.
 <urn:uuid:44a00a19-9359-43ae-8265-7bece4107264> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:44a00a19-9359-43ae-8265-7bece4107264>;
@@ -247,7 +244,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-hr/p7t9km>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-hr/p7t9km>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-hr/>
 }
 <meta:https://registry/acme/x4j8lm> {
@@ -261,8 +258,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:2985ffe8-e78a-4358-8ba2-a46e427cfa1f> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:2985ffe8-e78a-4358-8ba2-a46e427cfa1f>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/acme/q2v9pt> <https://www.w3.org/ns/lws#access> <urn:uuid:2985ffe8-e78a-4358-8ba2-a46e427cfa1f>.
 <urn:uuid:2985ffe8-e78a-4358-8ba2-a46e427cfa1f> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:75a43410-3758-47bc-88ec-fb64e148a18c>.
 <urn:uuid:75a43410-3758-47bc-88ec-fb64e148a18c> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:75a43410-3758-47bc-88ec-fb64e148a18c>;
@@ -274,7 +270,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-hr/v4n2qx>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-hr/v4n2qx>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-hr/>
 }
 <meta:https://registry/acme/q2v9pt> {
@@ -288,8 +284,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
 <https://registry/acme/g4yhtm> <https://www.w3.org/ns/lws#access> <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d>.
 <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c>.
 <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c>;
@@ -301,7 +296,8 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/Asset>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/reb39k>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/acme/g4yhtm> {
@@ -314,8 +310,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:11111111-1111-4111-8111-111111111111> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:11111111-1111-4111-8111-111111111111>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
 <https://registry/acme/y2b6k> <https://www.w3.org/ns/lws#access> <urn:uuid:11111111-1111-4111-8111-111111111111>.
 <urn:uuid:11111111-1111-4111-8111-111111111111> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:22222222-2222-4222-8222-222222222222>.
 <urn:uuid:22222222-2222-4222-8222-222222222222> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:22222222-2222-4222-8222-222222222222>;
@@ -327,7 +322,8 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/Asset>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/reb39k>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/acme/y2b6k> {
@@ -341,8 +337,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/acme/wpqyds> <https://www.w3.org/ns/lws#access> <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3>.
 <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f>.
 <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f>;
@@ -354,7 +349,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/acme/wpqyds> {
@@ -368,8 +363,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
 <https://registry/alice/wwp4j6> <https://www.w3.org/ns/lws#access> <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc>.
 <urn:uuid:477831c0-1023-431c-8746-9f146575a9bc> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733>.
 <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:613abeab-1fd2-48b2-891e-5f48a27ef733>;
@@ -381,7 +375,8 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/Asset>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/reb39k>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/alice/wwp4j6> {
@@ -395,8 +390,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/alice/qwvbcu> <https://www.w3.org/ns/lws#access> <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7>.
 <urn:uuid:4abd5278-b3b9-468d-87d6-82df0f9ca2a7> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb>.
 <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:48aabdbf-28e4-4891-8aec-44d112c0b8fb>;
@@ -408,7 +402,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/x0md9s>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/alice/qwvbcu> {
@@ -421,8 +415,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:a2d68c67-e6f1-4c6a-8f3c-70d0201acc10> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:a2d68c67-e6f1-4c6a-8f3c-70d0201acc10>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Tree>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/acme/vled83> <https://www.w3.org/ns/lws#access> <urn:uuid:a2d68c67-e6f1-4c6a-8f3c-70d0201acc10>.
 <urn:uuid:a2d68c67-e6f1-4c6a-8f3c-70d0201acc10> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:04e7aa48-6c44-48f1-8996-056a7f82ddb0>.
 <urn:uuid:04e7aa48-6c44-48f1-8996-056a7f82ddb0> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:04e7aa48-6c44-48f1-8996-056a7f82ddb0>;
@@ -434,7 +427,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/shapetrees/trees/>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/shapetrees/trees/>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Tree>;
     <https://www.w3.org/ns/lws#storage> <https://data/shapetrees/>
 }
 <meta:https://registry/acme/vled83> {
@@ -450,8 +443,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
 <urn:uuid:dfdbee2a-de65-4933-8420-93119a327c4a> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:dfdbee2a-de65-4933-8420-93119a327c4a>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/TODO>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/acme/wegvwe> <https://www.w3.org/ns/lws#access> <urn:uuid:dfdbee2a-de65-4933-8420-93119a327c4a>.
 <urn:uuid:dfdbee2a-de65-4933-8420-93119a327c4a> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:00b965a2-dd07-44dd-829a-f7a9b875c74b>.
 <urn:uuid:00b965a2-dd07-44dd-829a-f7a9b875c74b> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:00b965a2-dd07-44dd-829a-f7a9b875c74b>;
@@ -463,7 +455,7 @@ _:n3-6 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-7.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/test-client/public/>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/test-client/public/>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/TODO>;
     <https://www.w3.org/ns/lws#storage> <https://data/test-client/>
 }
 <meta:https://registry/acme/wegvwe> {
@@ -730,8 +722,7 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
 <urn:uuid:ba6ea1d8-8a25-466d-861b-b4c466a18c2e> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:ba6ea1d8-8a25-466d-861b-b4c466a18c2e>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/alice/p3m8kr> <https://www.w3.org/ns/lws#access> <urn:uuid:ba6ea1d8-8a25-466d-861b-b4c466a18c2e>.
 <urn:uuid:ba6ea1d8-8a25-466d-861b-b4c466a18c2e> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:3905f30d-e61a-48bd-872e-2e5d9531ccc8>.
 <urn:uuid:3905f30d-e61a-48bd-872e-2e5d9531ccc8> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:3905f30d-e61a-48bd-872e-2e5d9531ccc8>;
@@ -743,7 +734,7 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-home/x1n3cm>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-home/x1n3cm>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/alice-home/>
 }
 <meta:https://registry/alice/p3m8kr> {
@@ -757,8 +748,7 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
 <urn:uuid:c2da024a-8071-4f0b-8805-48b41e9d7423> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:c2da024a-8071-4f0b-8805-48b41e9d7423>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/alice/t7k5nw> <https://www.w3.org/ns/lws#access> <urn:uuid:c2da024a-8071-4f0b-8805-48b41e9d7423>.
 <urn:uuid:c2da024a-8071-4f0b-8805-48b41e9d7423> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:1e75065a-b470-4dea-8a51-5d9650b08d53>.
 <urn:uuid:1e75065a-b470-4dea-8a51-5d9650b08d53> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:1e75065a-b470-4dea-8a51-5d9650b08d53>;
@@ -770,7 +760,7 @@ _:n3-40 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-41.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-home/pm1oxz>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-home/pm1oxz>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/alice-home/>
 }
 <meta:https://registry/alice/t7k5nw> {
@@ -818,8 +808,7 @@ _:n3-48 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-49.
 <urn:uuid:5eea7200-7c34-41a4-8a02-829d4d7fc08f> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:5eea7200-7c34-41a4-8a02-829d4d7fc08f>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/alice/afiooi> <https://www.w3.org/ns/lws#access> <urn:uuid:5eea7200-7c34-41a4-8a02-829d4d7fc08f>.
 <urn:uuid:5eea7200-7c34-41a4-8a02-829d4d7fc08f> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:c070c329-ced4-431d-81c4-224a1949233a>.
 <urn:uuid:c070c329-ced4-431d-81c4-224a1949233a> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:c070c329-ced4-431d-81c4-224a1949233a>;
@@ -831,7 +820,7 @@ _:n3-48 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-49.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-work/sx86hi>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-work/sx86hi>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/alice-work/>
 }
 <meta:https://registry/alice/afiooi> {
@@ -845,8 +834,7 @@ _:n3-48 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-49.
 <urn:uuid:2e473325-66f9-476c-890f-3671401c1750> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:2e473325-66f9-476c-890f-3671401c1750>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/alice/azgyc5> <https://www.w3.org/ns/lws#access> <urn:uuid:2e473325-66f9-476c-890f-3671401c1750>.
 <urn:uuid:2e473325-66f9-476c-890f-3671401c1750> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:5dda5ba1-217f-435f-8562-a2c11aeacf37>.
 <urn:uuid:5dda5ba1-217f-435f-8562-a2c11aeacf37> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:5dda5ba1-217f-435f-8562-a2c11aeacf37>;
@@ -858,7 +846,7 @@ _:n3-48 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-49.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/alice>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/alice-work/btze4a>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/alice-work/btze4a>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/alice-work/>
 }
 <meta:https://registry/alice/azgyc5> {
@@ -906,8 +894,7 @@ _:n3-54 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-55.
 <urn:uuid:29c881a7-e355-45a6-865b-ebcd0f15b6a2> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:29c881a7-e355-45a6-865b-ebcd0f15b6a2>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/bob/t2v9cd> <https://www.w3.org/ns/lws#access> <urn:uuid:29c881a7-e355-45a6-865b-ebcd0f15b6a2>.
 <urn:uuid:29c881a7-e355-45a6-865b-ebcd0f15b6a2> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:34770a9c-f220-4ea0-85b8-ee0847a72a53>.
 <urn:uuid:34770a9c-f220-4ea0-85b8-ee0847a72a53> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:34770a9c-f220-4ea0-85b8-ee0847a72a53>;
@@ -919,7 +906,7 @@ _:n3-54 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-55.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/bob>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/bob/avn9hv>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/bob/avn9hv>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/bob/>
 }
 <meta:https://registry/bob/t2v9cd> {
@@ -932,8 +919,7 @@ _:n3-54 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-55.
 <urn:uuid:a4a4c463-7394-4613-9ce1-67598604ac8a> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:a4a4c463-7394-4613-9ce1-67598604ac8a>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/bob/a7t2kq> <https://www.w3.org/ns/lws#access> <urn:uuid:a4a4c463-7394-4613-9ce1-67598604ac8a>.
 <urn:uuid:a4a4c463-7394-4613-9ce1-67598604ac8a> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:7cfde07b-b41e-4db6-b6ad-ad20cd195be8>.
 <urn:uuid:7cfde07b-b41e-4db6-b6ad-ad20cd195be8> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:7cfde07b-b41e-4db6-b6ad-ad20cd195be8>;
@@ -945,7 +931,7 @@ _:n3-54 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-55.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/bob>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/bob/avn9hv>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/bob/avn9hv>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/bob/>
 }
 <meta:https://registry/bob/a7t2kq> {
@@ -1403,8 +1389,7 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
 <urn:uuid:f99f6421-9ca5-4ffe-8e3d-1b32a08536a2> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:f99f6421-9ca5-4ffe-8e3d-1b32a08536a2>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
 <https://registry/yoyo/p7n2vx> <https://www.w3.org/ns/lws#access> <urn:uuid:f99f6421-9ca5-4ffe-8e3d-1b32a08536a2>.
 <urn:uuid:f99f6421-9ca5-4ffe-8e3d-1b32a08536a2> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:dbd7a0e7-319c-477d-8a3d-3f380883edf5>.
 <urn:uuid:dbd7a0e7-319c-477d-8a3d-3f380883edf5> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:dbd7a0e7-319c-477d-8a3d-3f380883edf5>;
@@ -1416,7 +1401,7 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/yoyo-eu/w4n9kx>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/yoyo-eu/w4n9kx>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
     <https://www.w3.org/ns/lws#storage> <https://data/yoyo-eu/>
 }
 <meta:https://registry/yoyo/p7n2vx> {
@@ -1430,8 +1415,7 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
 <urn:uuid:912a9fe4-0dd9-4823-87f1-9484b0641b9a> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:912a9fe4-0dd9-4823-87f1-9484b0641b9a>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
 <https://registry/yoyo/t5m8qr> <https://www.w3.org/ns/lws#access> <urn:uuid:912a9fe4-0dd9-4823-87f1-9484b0641b9a>.
 <urn:uuid:912a9fe4-0dd9-4823-87f1-9484b0641b9a> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:e62ca0fa-d036-4de7-8093-7745d915223e>.
 <urn:uuid:e62ca0fa-d036-4de7-8093-7745d915223e> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:e62ca0fa-d036-4de7-8093-7745d915223e>;
@@ -1443,7 +1427,7 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/yoyo>;
     a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/yoyo-eu/m7p3qt>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/yoyo-eu/m7p3qt>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
     <https://www.w3.org/ns/lws#storage> <https://data/yoyo-eu/>
 }
 <meta:https://registry/yoyo/t5m8qr> {
@@ -1456,8 +1440,7 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
 <urn:uuid:199c923b-2b67-4eac-997e-0b12f59c8de8> a <http://www.w3.org/ns/odrl/2/Agreement>;
     <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:199c923b-2b67-4eac-997e-0b12f59c8de8>;
     <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
-    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>;
-    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>.
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
 <https://registry/yoyo/q7w2nz> <https://www.w3.org/ns/lws#access> <urn:uuid:199c923b-2b67-4eac-997e-0b12f59c8de8>.
 <urn:uuid:199c923b-2b67-4eac-997e-0b12f59c8de8> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:60e67784-d389-40df-b05f-0b5dcb7a2b62>.
 <urn:uuid:60e67784-d389-40df-b05f-0b5dcb7a2b62> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:60e67784-d389-40df-b05f-0b5dcb7a2b62>;
@@ -1469,7 +1452,8 @@ _:n3-90 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-91.
     <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
     a <http://www.w3.org/ns/odrl/2/Asset>;
     <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
-    <http://www.w3.org/ns/odrl/2/partOf> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/reb39k>;
     <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
 }
 <meta:https://registry/yoyo/q7w2nz> {

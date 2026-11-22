@@ -505,9 +505,9 @@ describe('protected resources (scope inherited, parent selected from registry)',
   // (`registry/alice/wwp4j6`, data owner ACME) selects only Project X
   // (`pbh2yw`, read-only); the inherited Task grant (`qwvbcu`) hangs off it. The parent grant's target is
   // an `odrl:Asset`: `odrl:source` is the selected instance while
-  // `odrl:partOf` is the containing registration (`reb39k`). The engine must
-  // derive the registration from `partOf`, otherwise reading a Task of the
-  // selected Project trips the "something fishy" parent-registration check.
+  // `interop:hasDataRegistration` is the containing registration (`reb39k`).
+  // The engine must derive the registration from the target, otherwise reading
+  // a Task of the selected Project trips the parent-registration check.
   const selectedProject = 'https://data/acme-rnd/pbh2yw'
   const selectedTask = 'https://data/acme-rnd/n7k3zm' // Project X "Z1"
   const unselectedProject = 'https://data/acme-rnd/z8w2pl' // "Matrix"

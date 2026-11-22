@@ -10,7 +10,6 @@
       "comment": "Necessary for the policy-engine.",
       "@id": "urn:sai:policy-engine:AuthorizationManager",
       "@type": "SaiAuthorizationManager",
-      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
       "storageStrategy": { "@id": "urn:solid-server:default:StorageLocationStrategy" },
       "podStore": { "@id": "urn:solid-server:default:PodStore" },
       "endpointStore": { "@id": "urn:sai:default:PodEndpointStore" }

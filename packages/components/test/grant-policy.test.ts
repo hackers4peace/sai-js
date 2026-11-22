@@ -101,6 +101,24 @@ describe('claim coverage', () => {
     expect(grantCoversClaim(source, other[0] as never)).toBe(false)
   })
 
+  test('an AllFromAgent grant keeps a shape tree and no registration', () => {
+    const [policy] = grantAccess({
+      scopeOfGrant: INTEROP.AllFromAgent,
+      owner: OWNER,
+      storage: STORAGE,
+      hasDataRegistration: '',
+      registeredShapeTree: SHAPE_TREE,
+      agent: 'https://id/yoyo#id',
+      assigner: OWNER,
+      assignee: ALICE,
+      actions: [ODRL.read],
+    })
+    const claim = grantFromPolicy(policy, 'urn:sai:access-claim', INTEROP.AllFromAgent)
+    expect(claim.registeredShapeTree).toBe(SHAPE_TREE)
+    expect(claim.hasDataRegistration).toBe('')
+    expect(grantCoversClaim(claim, policy)).toBe(true)
+  })
+
   test('an app-specific grant to the client covers a claim bound to the subject', async () => {
     const source = grant({ assignee: 'https://data/test-client/public/id' })
     const appClaim = claim()

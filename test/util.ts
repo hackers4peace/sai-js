@@ -86,10 +86,11 @@ export function needBasedAccessRequestPayload({
     )
     const instances = (need.hasDataInstance as string[] | undefined) ?? []
     const registration = need.hasDataRegistration as string | undefined
+    const shapeTree = need.registeredShapeTree as string | undefined
     const permission = (
       type: string[],
       source: string[],
-      partOf?: string
+      metadata: { registeredShapeTree?: string; hasDataRegistration?: string } = {}
     ): Record<string, unknown> => {
       const permissionId = `urn:uuid:${crypto.randomUUID()}`
       const targetId = `urn:uuid:${crypto.randomUUID()}`
@@ -105,7 +106,12 @@ export function needBasedAccessRequestPayload({
           uid: targetId,
           owner: dataOwner,
           source,
-          ...(partOf ? { partOf: [partOf] } : {}),
+          ...(metadata.registeredShapeTree
+            ? { registeredShapeTree: metadata.registeredShapeTree }
+            : {}),
+          ...(metadata.hasDataRegistration
+            ? { hasDataRegistration: metadata.hasDataRegistration }
+            : {}),
         },
       }
     }
@@ -121,21 +127,27 @@ export function needBasedAccessRequestPayload({
       uid: needId,
       profile: 'AccessProfile',
       accessNeedGroup: group.id,
-      registeredShapeTree: need.registeredShapeTree,
       ...(parentId ? { inheritsFromNeed: parentId } : {}),
     }
     if (instances.length) {
       policy.scopeOfGrant = 'SelectedFromRegistry'
       policy.permission = instances.map((instance) =>
-        permission(['Asset'], [instance], registration)
+        permission(['Asset'], [instance], {
+          ...(shapeTree ? { registeredShapeTree: shapeTree } : {}),
+          ...(registration ? { hasDataRegistration: registration } : {}),
+        })
       )
     } else if (registration) {
       policy.scopeOfGrant = 'AllFromRegistry'
-      policy.permission = [permission(['AssetCollection', 'DataRegistration'], [registration])]
-    } else {
       policy.permission = [
-        permission(['AssetCollection', 'st:ShapeTree'], [need.registeredShapeTree]),
+        permission(
+          ['AssetCollection', 'DataRegistration'],
+          [registration],
+          shapeTree ? { registeredShapeTree: shapeTree } : {}
+        ),
       ]
+    } else {
+      policy.permission = [permission(['AssetCollection', 'st:ShapeTree'], [shapeTree as string])]
     }
     policies.push(policy)
     for (const child of (need.hasInheritingNeed as Array<Record<string, any>> | undefined) ?? []) {

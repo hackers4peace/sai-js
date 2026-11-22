@@ -1,7 +1,7 @@
 import { LWS, ODRL } from '@janeirodigital/interop-utils'
 import type { DatasetCore, Quad } from '@rdfjs/types'
 import { NotFoundHttpError, arrayifyStream } from '@solid/community-server'
-import type { IdentifierStrategy, PodStore, StorageLocationStrategy } from '@solid/community-server'
+import type { PodStore, StorageLocationStrategy } from '@solid/community-server'
 import type { AuthorizationManager } from '@solidlab/policy-engine'
 import { type IBindings, SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
 import { getLoggerFor } from 'global-logger-factory'
@@ -14,7 +14,6 @@ export class SaiAuthorizationManager implements AuthorizationManager {
   private readonly logger = getLoggerFor(this)
 
   public constructor(
-    protected readonly identifierStrategy: IdentifierStrategy,
     protected readonly storageStrategy: StorageLocationStrategy,
     private readonly podStore: PodStore,
     private readonly endpointStore: PodEndpointStore
@@ -22,21 +21,19 @@ export class SaiAuthorizationManager implements AuthorizationManager {
     this.fetcher = new SparqlEndpointFetcher()
   }
 
-  /**
-   * Path-based parent of a **data** resource — the fallback for hierarchical
-   * data pods when `lws:partOf` metadata is unavailable. Registry containment
-   * is flat and metadata-only; registry members must never rely on URI paths.
-   */
-  public getParent(id: string): string | undefined {
-    const identifier = { path: id }
-    return this.identifierStrategy.isRootContainer(identifier)
-      ? undefined
-      : this.identifierStrategy.getParentContainer(identifier).path
-  }
-
   public async getStorage(id: string): Promise<string> {
     const storage = await this.storageStrategy.getStorageIdentifier({ path: id })
     return storage.path
+  }
+
+  /**
+   * Required by the policy-engine `AuthorizationManager` interface. SAI never
+   * resolves a parent from the URI path: flat storage keeps containment in
+   * `lws:partOf` metadata, and a missing parent must deny. Kept as a stub so
+   * the interface stays satisfied without re-introducing a path fallback.
+   */
+  public getParent(_id: string): string | undefined {
+    return undefined
   }
 
   /**

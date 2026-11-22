@@ -115,6 +115,28 @@ describe('toJsonLd', () => {
     expect(sources).toEqual([...instances].toSorted())
   })
 
+  test('writes an AllFromAgent target with a shape tree and no registration', async () => {
+    const agent = 'https://id/yoyo#id'
+    const grant = grantData(INTEROP.AllFromAgent, {}, { agent })
+    const store = await toStore(Grant.toJsonLd(grant), snippetIri)
+    const policy = store.getQuads(
+      DataFactory.namedNode(snippetIri),
+      LWS.terms.access,
+      null,
+      null
+    )[0].object
+    const permission = store.getQuads(policy, ODRL.terms.permission, null, null)[0].object
+    const target = store.getQuads(permission, ODRL.terms.target, null, null)[0].object
+
+    expect(store.getQuads(target, RDF.terms.type, INTEROP.terms.SocialAgent, null)).toHaveLength(1)
+    expect(store.getQuads(target, ODRL.terms.source, null, null)[0].object.value).toBe(agent)
+    expect(
+      store.getQuads(target, INTEROP.terms.registeredShapeTree, null, null)[0].object.value
+    ).toBe(SHAPE_TREE)
+    expect(store.getQuads(target, INTEROP.terms.hasDataRegistration, null, null)).toHaveLength(0)
+    expect(store.getQuads(policy, INTEROP.terms.registeredShapeTree, null, null)).toHaveLength(0)
+  })
+
   test('keeps the inherited link', async () => {
     const parent = 'https://some.iri/gr'
     const grant = grantData(INTEROP.Inherited, { inheritsFromGrant: parent })

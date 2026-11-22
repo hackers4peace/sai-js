@@ -28,7 +28,6 @@ const grantGraph = (id: string, over: { tree?: string; owner?: string } = {}): Q
     quad(policy, namedNode(RDF.type), namedNode(ODRL.Agreement)),
     quad(policy, namedNode(ODRL.uid), policy),
     quad(policy, namedNode(ODRL.profile), namedNode(INTEROP.AccessProfile)),
-    quad(policy, namedNode(INTEROP.registeredShapeTree), namedNode(over.tree ?? TREE)),
     quad(policy, namedNode(INTEROP.scopeOfGrant), namedNode(INTEROP.AllFromRegistry)),
     quad(policy, namedNode(ODRL.permission), permission),
     quad(permission, namedNode(ODRL.uid), permission),
@@ -40,6 +39,7 @@ const grantGraph = (id: string, over: { tree?: string; owner?: string } = {}): Q
     quad(target, namedNode(RDF.type), namedNode(ODRL.AssetCollection)),
     quad(target, namedNode(RDF.type), namedNode(INTEROP.DataRegistration)),
     quad(target, namedNode(ODRL.source), namedNode('https://data/alice/registrations/p')),
+    quad(target, namedNode(INTEROP.registeredShapeTree), namedNode(over.tree ?? TREE)),
     quad(target, namedNode(INTEROP.dataOwner), namedNode(over.owner ?? 'https://id/alice')),
     quad(target, namedNode(LWS.storage), namedNode('https://data/alice/')),
   ]

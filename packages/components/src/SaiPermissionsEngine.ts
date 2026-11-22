@@ -247,11 +247,10 @@ export class SaiPermissionsEngine implements PolicyEngine {
       }
       case TargetType.Resource: {
         const resourceModes = await this.findResourceModes(data, target, identity)
-        const registryModes = await this.findRegistrationModes(
-          data,
-          (await this.getRegistrationId(target)) ?? target,
-          identity
-        )
+        const registrationId = await this.getRegistrationId(target)
+        const registryModes = registrationId
+          ? await this.findRegistrationModes(data, registrationId, identity)
+          : []
         const inheritedModes = await this.findInheritedModes(
           data,
           target,
@@ -303,7 +302,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
     let registrationId = id
     const selected = scope === INTEROP.SelectedFromRegistry
     if (selected) {
-      registrationId = (await this.getRegistrationId(id)) ?? id
+      const resolved = await this.getRegistrationId(id)
+      if (!resolved) return undefined
+      registrationId = resolved
     }
     const store = new Store([...data])
     const grantQuery = `
@@ -317,7 +318,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
         ${
           selected
             ? `?target <${ODRL.source}> <${id}> .
-               ?target <${ODRL.partOf}> <${registrationId}> .`
+               ?target <${INTEROP.hasDataRegistration}> <${registrationId}> .`
             : `?target <${ODRL.source}> <${registrationId}> .`
         }
         ${
@@ -362,7 +363,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     identity: GrantIdentity | undefined,
     parentPermissions: (id: string) => Promise<PermissionMap>
   ): Promise<string[]> {
-    const registrationId = (await this.getRegistrationId(resourceId)) ?? resourceId
+    const registrationId = await this.getRegistrationId(resourceId)
+    if (!registrationId) return []
     const grantId = await this.findGrant(data, registrationId, INTEROP.Inherited, identity)
     if (!grantId) return []
     const parentGrantId = await this.findObject(data, grantId, INTEROP.inheritsFromGrant)
@@ -392,36 +394,18 @@ export class SaiPermissionsEngine implements PolicyEngine {
     return bindings[0].get('o')?.value
   }
 
-  async findPolicyObject(
-    data: Quad[],
-    grantId: string,
-    predicate: string
-  ): Promise<string | undefined> {
-    const query = `
-      SELECT * WHERE {
-        <${grantId}> <${LWS.access}> ?policy .
-        ?policy <${predicate}> ?o .
-      }
-    `
-    const store = new Store([...data])
-    const bindingsStream = await this.queryEngine.queryBindings(query, {
-      sources: [store],
-    })
-    const bindings = await bindingsStream.toArray()
-    return bindings[0]?.get('o')?.value
-  }
-
   async findGrantTarget(
     data: Quad[],
     grantId: string
-  ): Promise<{ source?: string; partOf?: string }> {
+  ): Promise<{ source?: string; registration?: string; shapeTree?: string }> {
     const query = `
-      SELECT ?source ?partOf WHERE {
+      SELECT ?source ?registration ?shapeTree WHERE {
         <${grantId}> <${LWS.access}> ?policy .
         ?policy <${ODRL.permission}> ?permission .
         ?permission <${ODRL.target}> ?target .
         OPTIONAL { ?target <${ODRL.source}> ?source }
-        OPTIONAL { ?target <${ODRL.partOf}> ?partOf }
+        OPTIONAL { ?target <${INTEROP.hasDataRegistration}> ?registration }
+        OPTIONAL { ?target <${INTEROP.registeredShapeTree}> ?shapeTree }
       }
     `
     const store = new Store([...data])
@@ -431,7 +415,8 @@ export class SaiPermissionsEngine implements PolicyEngine {
     const bindings = await bindingsStream.toArray()
     return {
       source: bindings[0]?.get('source')?.value,
-      partOf: bindings[0]?.get('partOf')?.value,
+      registration: bindings[0]?.get('registration')?.value,
+      shapeTree: bindings[0]?.get('shapeTree')?.value,
     }
   }
 
@@ -440,27 +425,21 @@ export class SaiPermissionsEngine implements PolicyEngine {
     childGrantId: string,
     parentGrantId: string,
     resourceId: string
-  ): Promise<string> {
-    // find predicate
-    const parentShapeTreeId = await this.findPolicyObject(
-      data,
-      parentGrantId,
-      INTEROP.registeredShapeTree
-    )
-    if (!parentShapeTreeId) throw new Error(`invalid grant, missing shapeTree: ${parentGrantId}`)
-    const childShapeTreeId = await this.findPolicyObject(
-      data,
-      childGrantId,
-      INTEROP.registeredShapeTree
-    )
-    if (!childShapeTreeId) throw new Error(`invalid grant, missing shapeTree: ${childGrantId}`)
+  ): Promise<string | undefined> {
+    const parentTarget = await this.findGrantTarget(data, parentGrantId)
+    const childTarget = await this.findGrantTarget(data, childGrantId)
+    const parentShapeTreeId = parentTarget.shapeTree
+    const childShapeTreeId = childTarget.shapeTree
+    // A missing shape tree is a malformed grant, not a reason to throw a 500.
+    if (!parentShapeTreeId || !childShapeTreeId) return undefined
     const shapeTree = await loadShapeTree(parentShapeTreeId, fetch)
     const shapeTreeReference = shapeTree.references.find(
       (stRef) => stRef.shapeTree === childShapeTreeId
     )
+    if (!shapeTreeReference) return undefined
     const predicate = shapeTreeReference.viaPredicate.value
     const endpoint = await this.resolvePodEndpoint(resourceId)
-    if (!endpoint) return
+    if (!endpoint) return undefined
     const fetcher = new SparqlEndpointFetcher()
     const bindingsStream = await fetcher.fetchBindings(
       endpoint,
@@ -473,29 +452,25 @@ export class SaiPermissionsEngine implements PolicyEngine {
     const results = await arrayifyStream<IBindings>(bindingsStream)
     // TODO: ensure only in proper registration
     const parentId = results[0]?.['s'].value
-    if (!parentId) return
-    // check if in parent registration
-    const parentTarget = await this.findGrantTarget(data, parentGrantId)
-    // The target of a SelectedFromRegistry grant is an `odrl:Asset` whose
-    // `odrl:source` is the selected instance and whose `odrl:partOf` is the
-    // containing registration. Only AssetCollection targets (AllFromRegistry,
-    // Inherited) have the registration as `source` too, so prefer `partOf`.
-    const parentRegistrationId = parentTarget.partOf ?? parentTarget.source
+    if (!parentId) return undefined
+    // check if in parent registration: selected Asset targets name it
+    // explicitly, collection targets use the registration as their source
+    const parentRegistrationId = parentTarget.registration ?? parentTarget.source
+    if (!parentRegistrationId) return undefined
     // TODO: not needed if query only in proper registration
     const actualParent = await this.getRegistrationId(parentId)
-    if (actualParent !== parentRegistrationId)
-      throw new Error(`something fishy - ${parentId} not in ${parentRegistrationId}`)
+    if (!actualParent || actualParent !== parentRegistrationId) return undefined
     return parentId
   }
 
   /**
-   * The registration that contains a data instance. Flat data pods store the
-   * parent as `lws:partOf` metadata; the path-based parent remains the
-   * data-side fallback for hierarchical data pods. Registry containment is
-   * metadata-only (flat members), so this is never used for registry members.
+   * The registration that contains a data instance, from the data pod's
+   * `lws:partOf` metadata. Flat storage does not encode containment in the URI
+   * path, and hierarchical pods are out of scope: an unavailable parent means
+   * deny, never a path guess.
    */
   private async getRegistrationId(id: string): Promise<string | undefined> {
-    return (await this.getParentFromStore(id)) ?? this.manager.getParent(id)
+    return this.getParentFromStore(id)
   }
 
   /** Reads `lws:partOf` from the target's metadata graph in its data pod. */

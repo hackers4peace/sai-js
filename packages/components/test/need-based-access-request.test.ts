@@ -22,6 +22,8 @@ interface PermissionOptions {
   owner?: string
   type?: string[]
   source?: string[]
+  registeredShapeTree?: string
+  hasDataRegistration?: string
   partOf?: string[]
   constraint?: unknown[]
 }
@@ -37,6 +39,8 @@ function permission(source: string | string[], options: PermissionOptions = {}) 
       type: options.type ?? ['Asset'],
       owner: options.owner ?? OWNER,
       source: Array.isArray(source) ? source : [source],
+      ...(options.registeredShapeTree ? { registeredShapeTree: options.registeredShapeTree } : {}),
+      ...(options.hasDataRegistration ? { hasDataRegistration: options.hasDataRegistration } : {}),
       ...(options.partOf ? { partOf: options.partOf } : {}),
     },
   }
@@ -51,7 +55,6 @@ function policy(
     uid: 'urn:uuid:7b2a4d3f-5c6e-4f70-9a1b-2c3d4e5f6a7b',
     profile: 'AccessProfile',
     accessNeedGroup: GROUP,
-    registeredShapeTree: TREE,
     ...overrides,
     permission: permissions,
   }
@@ -69,8 +72,14 @@ describe('needBasedAccessRequestFromOdrl', () => {
     const message = request([
       policy(
         [
-          permission(INSTANCE_1, { partOf: [REGISTRATION] }),
-          permission(INSTANCE_2, { partOf: [REGISTRATION] }),
+          permission(INSTANCE_1, {
+            registeredShapeTree: TREE,
+            hasDataRegistration: REGISTRATION,
+          }),
+          permission(INSTANCE_2, {
+            registeredShapeTree: TREE,
+            hasDataRegistration: REGISTRATION,
+          }),
         ],
         { scopeOfGrant: 'SelectedFromRegistry' }
       ),
@@ -89,11 +98,15 @@ describe('needBasedAccessRequestFromOdrl', () => {
     ])
   })
 
-  test('leaves the registration undefined when the instances have no partOf hint', () => {
+  test('leaves the registration undefined when the instances have no registration hint', () => {
     const message = request([
-      policy([permission(INSTANCE_1), permission(INSTANCE_2)], {
-        scopeOfGrant: 'SelectedFromRegistry',
-      }),
+      policy(
+        [
+          permission(INSTANCE_1, { registeredShapeTree: TREE }),
+          permission(INSTANCE_2, { registeredShapeTree: TREE }),
+        ],
+        { scopeOfGrant: 'SelectedFromRegistry' }
+      ),
     ])
     const result = needBasedAccessRequestFromOdrl(message, REQUESTER, OWNER)
     const [need] = result.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
@@ -123,6 +136,7 @@ describe('needBasedAccessRequestFromOdrl', () => {
         [
           permission(REGISTRATION, {
             type: ['AssetCollection', 'DataRegistration'],
+            registeredShapeTree: TREE,
           }),
         ],
         { scopeOfGrant: 'AllFromRegistry' }
@@ -135,14 +149,24 @@ describe('needBasedAccessRequestFromOdrl', () => {
   })
 
   test('nests inherited needs', () => {
-    const child = policy([permission(INSTANCE_2)], {
-      uid: 'urn:uuid:8c3b5e40-6d7f-4f81-9a2b-3c4d5e6f7a8b',
-      registeredShapeTree: 'https://data/shapetrees/trees/Task',
-      inheritsFromNeed: 'urn:uuid:7b2a4d3f-5c6e-4f70-9a1b-2c3d4e5f6a7b',
-      scopeOfGrant: 'SelectedFromRegistry',
-    })
+    const child = policy(
+      [
+        permission(INSTANCE_2, {
+          registeredShapeTree: 'https://data/shapetrees/trees/Task',
+          hasDataRegistration: REGISTRATION,
+        }),
+      ],
+      {
+        uid: 'urn:uuid:8c3b5e40-6d7f-4f81-9a2b-3c4d5e6f7a8b',
+        inheritsFromNeed: 'urn:uuid:7b2a4d3f-5c6e-4f70-9a1b-2c3d4e5f6a7b',
+        scopeOfGrant: 'SelectedFromRegistry',
+      }
+    )
     const message = request([
-      policy([permission(INSTANCE_1)], { scopeOfGrant: 'SelectedFromRegistry' }),
+      policy(
+        [permission(INSTANCE_1, { registeredShapeTree: TREE, hasDataRegistration: REGISTRATION })],
+        { scopeOfGrant: 'SelectedFromRegistry' }
+      ),
       child,
     ])
     const result = needBasedAccessRequestFromOdrl(message, REQUESTER, OWNER)
@@ -154,12 +178,16 @@ describe('needBasedAccessRequestFromOdrl', () => {
   })
 
   test('normalizes compact action terms and rejects unknown actions', () => {
-    const compact = policy([permission(INSTANCE_1, { action: ['read', 'modify'] })])
+    const compact = policy([
+      permission(INSTANCE_1, { registeredShapeTree: TREE, action: ['read', 'modify'] }),
+    ])
     const result = needBasedAccessRequestFromOdrl(request([compact]), REQUESTER, OWNER)
     const [need] = result.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
     expect(need.accessMode).toEqual([ACCESS_ACTIONS.read, ACCESS_ACTIONS.modify])
 
-    const unknown = policy([permission(INSTANCE_1, { action: ['write'] })])
+    const unknown = policy([
+      permission(INSTANCE_1, { registeredShapeTree: TREE, action: ['write'] }),
+    ])
     expect(() => needBasedAccessRequestFromOdrl(request([unknown]), REQUESTER, OWNER)).toThrow(
       BadRequestHttpError
     )
@@ -167,7 +195,7 @@ describe('needBasedAccessRequestFromOdrl', () => {
 
   test('rejects mixed Asset and AssetCollection targets in one need', () => {
     const mixed = policy([
-      permission(INSTANCE_1),
+      permission(INSTANCE_1, { registeredShapeTree: TREE }),
       permission(TREE, { type: ['AssetCollection', 'st:ShapeTree'] }),
     ])
     expect(() => needBasedAccessRequestFromOdrl(request([mixed]), REQUESTER, OWNER)).toThrow(
@@ -177,27 +205,34 @@ describe('needBasedAccessRequestFromOdrl', () => {
 
   test('rejects inconsistent envelope/assignment values', () => {
     const wrongAssignee = policy([
-      permission(INSTANCE_1),
-      permission(INSTANCE_2, { assignee: 'https://id/karin' }),
+      permission(INSTANCE_1, { registeredShapeTree: TREE }),
+      permission(INSTANCE_2, {
+        registeredShapeTree: TREE,
+        assignee: 'https://id/karin',
+      }),
     ])
     expect(() =>
       needBasedAccessRequestFromOdrl(request([wrongAssignee]), REQUESTER, OWNER)
     ).toThrow(/invalid grantedBy\/grantee/u)
 
-    const wrongOwner = policy([permission(INSTANCE_1, { owner: 'https://id/karin' })])
+    const wrongOwner = policy([
+      permission(INSTANCE_1, { registeredShapeTree: TREE, owner: 'https://id/karin' }),
+    ])
     expect(() => needBasedAccessRequestFromOdrl(request([wrongOwner]), REQUESTER, OWNER)).toThrow(
       /invalid dataOwner/u
     )
 
-    const secondGroup = policy([permission(INSTANCE_1)], { accessNeedGroup: 'urn:uuid:other' })
-    const firstGroup = policy([permission(INSTANCE_2)])
+    const secondGroup = policy([permission(INSTANCE_1, { registeredShapeTree: TREE })], {
+      accessNeedGroup: 'urn:uuid:other',
+    })
+    const firstGroup = policy([permission(INSTANCE_2, { registeredShapeTree: TREE })])
     expect(() =>
       needBasedAccessRequestFromOdrl(request([firstGroup, secondGroup]), REQUESTER, OWNER)
     ).toThrow(/multiple access need groups/u)
   })
 
   test('rejects ODRL constraints', () => {
-    const withConstraint = policy([permission(INSTANCE_1)])
+    const withConstraint = policy([permission(INSTANCE_1, { registeredShapeTree: TREE })])
     withConstraint.constraint = [
       { leftOperand: 'purpose', operator: 'eq', rightOperand: 'https://purpose.example/x' },
     ]
@@ -206,10 +241,34 @@ describe('needBasedAccessRequestFromOdrl', () => {
     ).toThrow(/constraints are not supported/u)
   })
 
-  test('an instance need requires registeredShapeTree', () => {
-    const noTree = policy([permission(INSTANCE_1)], { registeredShapeTree: undefined })
+  test('an instance need requires a target-level registeredShapeTree', () => {
+    const noTree = policy([permission(INSTANCE_1)], { scopeOfGrant: 'SelectedFromRegistry' })
     expect(() => needBasedAccessRequestFromOdrl(request([noTree]), REQUESTER, OWNER)).toThrow(
       /require registeredShapeTree/u
+    )
+  })
+
+  test('rejects the legacy policy-level registeredShapeTree', () => {
+    const legacy = policy([permission(INSTANCE_1, { registeredShapeTree: TREE })], {
+      registeredShapeTree: TREE,
+    })
+    expect(() => needBasedAccessRequestFromOdrl(request([legacy]), REQUESTER, OWNER)).toThrow(
+      /belongs on the target/u
+    )
+  })
+
+  test('rejects the legacy selected-target partOf', () => {
+    const legacy = policy(
+      [
+        permission(INSTANCE_1, {
+          registeredShapeTree: TREE,
+          partOf: [REGISTRATION],
+        }),
+      ],
+      { scopeOfGrant: 'SelectedFromRegistry' }
+    )
+    expect(() => needBasedAccessRequestFromOdrl(request([legacy]), REQUESTER, OWNER)).toThrow(
+      /use hasDataRegistration, not partOf/u
     )
   })
 

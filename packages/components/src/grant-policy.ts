@@ -9,6 +9,8 @@ import {
   type OdrlPolicy,
   grantAccessModes,
   grantGrantee,
+  registrationOfTarget,
+  shapeTreeOfTarget,
 } from '@janeirodigital/interop-data-model'
 import { INTEROP, LWS } from '@janeirodigital/interop-utils'
 
@@ -33,9 +35,7 @@ export function grantFromPolicy(
     .filter((candidate) => candidate.type.includes('http://www.w3.org/ns/odrl/2/Asset'))
     .map((candidate) => candidate.source[0])
     .filter(Boolean)
-  const registration = target?.type.includes(INTEROP.DataRegistration)
-    ? target.source[0]
-    : (target?.partOf?.[0] ?? '')
+  const registration = registrationOfTarget(target)
   return {
     id,
     type: [LWS.AccessGrant],
@@ -44,7 +44,7 @@ export function grantFromPolicy(
     storage: target?.storage ?? '',
     dataOwner: target?.owner ?? '',
     grantedBy: permission?.assigner ?? '',
-    registeredShapeTree: policy.registeredShapeTree ?? '',
+    registeredShapeTree: shapeTreeOfTarget(target),
     hasDataRegistration: registration,
     ...(instances.length ? { hasDataInstance: instances } : {}),
   }
@@ -74,6 +74,14 @@ export function grantCoversClaim(
 ): boolean {
   const claim = grantFromPolicy(policy, 'urn:sai:access-claim', policy.scopeOfGrant ?? '')
   if (claim.grantedBy && claim.grantedBy !== grant.grantedBy) return false
+  // Every claim carries its shape tree; only AllFromAgent targets are not
+  // registration-scoped. A missing field is malformed, never a wildcard.
+  if (!grant.registeredShapeTree || !claim.registeredShapeTree) return false
+  const needsRegistration =
+    grant.scopeOfGrant !== INTEROP.AllFromAgent && claim.scopeOfGrant !== INTEROP.AllFromAgent
+  if (needsRegistration && (!grant.hasDataRegistration || !claim.hasDataRegistration)) {
+    return false
+  }
   const assignees = options.assignees ? new Set(options.assignees) : undefined
   const claimGrantee = grantGrantee(claim)
   const grantGranteeValue = grantGrantee(grant)

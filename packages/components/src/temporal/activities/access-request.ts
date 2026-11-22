@@ -50,7 +50,12 @@ export async function forwardNeedBasedAccessRequest(
     const action = (need.accessMode as string[]) ?? []
     const instances = (need.hasDataInstance as string[] | undefined) ?? []
     const registration = need.hasDataRegistration as string | undefined
-    const permission = (type: string[], source: string[], partOf?: string) => {
+    const shapeTree = need.registeredShapeTree as string | undefined
+    const permission = (
+      type: string[],
+      source: string[],
+      metadata: { registeredShapeTree?: string; hasDataRegistration?: string } = {}
+    ) => {
       const permissionId = `urn:uuid:${crypto.randomUUID()}`
       const targetId = `urn:uuid:${crypto.randomUUID()}`
       return {
@@ -63,7 +68,12 @@ export async function forwardNeedBasedAccessRequest(
           uid: targetId,
           owner: input.request.dataOwner,
           source,
-          ...(partOf ? { partOf: [partOf] } : {}),
+          ...(metadata.registeredShapeTree
+            ? { registeredShapeTree: metadata.registeredShapeTree }
+            : {}),
+          ...(metadata.hasDataRegistration
+            ? { hasDataRegistration: metadata.hasDataRegistration }
+            : {}),
         },
       }
     }
@@ -76,25 +86,32 @@ export async function forwardNeedBasedAccessRequest(
       uid: needId,
       profile: 'AccessProfile',
       accessNeedGroup: input.request.hasAccessNeedGroup.id,
-      registeredShapeTree: need.registeredShapeTree,
       ...(parentId ? { inheritsFromNeed: parentId } : {}),
     }
     if (instances.length) {
       // SelectedFromRegistry: one Asset permission per instance, matching the
-      // grant shape. The registration is an advisory `partOf` hint.
+      // grant shape. The registration is advisory on the request and required
+      // on the grant/claim.
       policy.scopeOfGrant = 'SelectedFromRegistry'
       policy.permission = instances.map((instance) =>
-        permission(['Asset'], [instance], registration)
+        permission(['Asset'], [instance], {
+          ...(shapeTree ? { registeredShapeTree: shapeTree } : {}),
+          ...(registration ? { hasDataRegistration: registration } : {}),
+        })
       )
     } else if (registration) {
       // registration-scoped request (plain LWS AssetCollection target): all
       // instances of that registration
       policy.scopeOfGrant = 'AllFromRegistry'
-      policy.permission = [permission(['AssetCollection', 'DataRegistration'], [registration])]
-    } else {
       policy.permission = [
-        permission(['AssetCollection', 'st:ShapeTree'], [need.registeredShapeTree as string]),
+        permission(
+          ['AssetCollection', 'DataRegistration'],
+          [registration],
+          shapeTree ? { registeredShapeTree: shapeTree } : {}
+        ),
       ]
+    } else {
+      policy.permission = [permission(['AssetCollection', 'st:ShapeTree'], [shapeTree as string])]
     }
     policies.push(policy)
     for (const child of (need.hasInheritingNeed as Record<string, unknown>[] | undefined) ?? []) {
