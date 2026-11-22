@@ -376,9 +376,9 @@ export class AuthorizationAgent {
 
   /**
    * The invitation with `capabilityUrl` in the context's agent registry, via
-   * the shared SPARQL query — the `hasSocialAgentInvitation` listing + one
-   * graph read per invitation (docs/sparql.md, invitations candidate; served
-   * by `InvitationHandler`). Same query the services run against
+   * the shared SPARQL query — the `lws:contains` listing + one graph read per
+   * invitation (docs/sparql.md, invitations candidate; served by
+   * `InvitationHandler`). Same query the services run against
    * `/sparql-admin` in org context.
    */
   public async findSocialAgentInvitation(capabilityUrl: string) {

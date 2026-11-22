@@ -1,6 +1,9 @@
 import { randomUUID } from 'node:crypto'
 
 import { AgentRegistry } from '@janeirodigital/interop-authorization-agent'
+import type { SparqlTransport } from '@janeirodigital/interop-authorization-agent'
+import { INTEROP, RDF } from '@janeirodigital/interop-utils'
+import { DataFactory } from 'n3'
 import { describe, test } from 'vitest'
 
 import { expect } from './expect'
@@ -42,19 +45,6 @@ test('should provide socialAgentRegistrations from the social-agent registry ldp
   expect(count).toBe(2)
 })
 
-// TODO: update snippets with some invitations
-test('should provide socialAgentInvitations from the invitation registry ldp:contains listing', async () => {
-  let count = 0
-  for await (const invitation of AgentRegistry.socialAgentInvitations(
-    invitationRegistry,
-    deps.fetch
-  )) {
-    count += 1
-    expect(invitation).toHaveProperty('capabilityUrl')
-  }
-  expect(count).toBe(0)
-})
-
 describe('findApplicationRegistration', () => {
   test('finds application registration', async () => {
     const applicationIri = 'https://projectron.example/#app'
@@ -81,20 +71,8 @@ describe('findSocialAgentRegistration', () => {
   })
 })
 
-// TODO: update snippets with some invitations
-describe.skip('findSocialAgentInvitation', () => {
-  test('finds social agent invitation', async () => {
-    const socialAgentInvitationIri = 'TODO'
-    expect(
-      await AgentRegistry.findSocialAgentInvitation(
-        invitationRegistry,
-        deps.fetch,
-        socialAgentInvitationIri
-      )
-    ).toHaveProperty('capabilityUrl')
-  })
-})
-
+// `findSocialAgentInvitation` is registry-plane only — covered through
+// `AuthorizationAgent.findSocialAgentInvitation` in authorization-agent.test.ts
 describe('findRegistration', () => {
   test('finds application registration', async () => {
     const applicationIri = 'https://projectron.example/#app'
@@ -151,10 +129,50 @@ describe('addSocialAgentRegistration', () => {
 
 describe('addSocialAgentInvitation', () => {
   const capabilityUrl = 'https://auth.jane.example/some-secret-url'
+  const invitationIri = 'https://auth.alice.example/invitation-1'
 
-  test.skip('throws if invitation already exists', async () => {
-    expect(
-      AgentRegistry.addSocialAgentInvitation(invitationRegistry, deps, capabilityUrl, 'Someone')
+  // the registry-plane duplicate check: `lws:contains` listing + one graph
+  // read per candidate, exactly like `AuthorizationAgent.findSocialAgentInvitation`
+  const emptyTransport: SparqlTransport = {
+    async fetchBindings() {
+      return []
+    },
+    async fetchTriples() {
+      throw new Error('no invitation graph expected')
+    },
+  }
+
+  const existingInvitationTransport: SparqlTransport = {
+    async fetchBindings(query: string) {
+      expect(query).toContain(`GRAPH <meta:${invitationRegistryIri}>`)
+      return [{ child: { termType: 'NamedNode', value: invitationIri } }]
+    },
+    async fetchTriples(query: string) {
+      expect(query).toContain(`GRAPH <${invitationIri}>`)
+      return [
+        DataFactory.quad(
+          DataFactory.namedNode(invitationIri),
+          RDF.terms.type,
+          INTEROP.terms.SocialAgentInvitation
+        ),
+        DataFactory.quad(
+          DataFactory.namedNode(invitationIri),
+          INTEROP.terms.hasCapabilityUrl,
+          DataFactory.namedNode(capabilityUrl)
+        ),
+      ]
+    },
+  }
+
+  test('throws if invitation already exists', async () => {
+    await expect(
+      AgentRegistry.addSocialAgentInvitation(
+        invitationRegistry,
+        deps,
+        existingInvitationTransport,
+        capabilityUrl,
+        'Someone'
+      )
     ).rejects.toThrow('already exists')
   })
 
@@ -162,6 +180,7 @@ describe('addSocialAgentInvitation', () => {
     const invitation = await AgentRegistry.addSocialAgentInvitation(
       invitationRegistry,
       deps,
+      emptyTransport,
       capabilityUrl,
       'Jane'
     )

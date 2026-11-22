@@ -3,7 +3,6 @@ import {
   type ApplicationRegistrationData,
   type ApplicationRegistryData,
   type InvitationRegistryData,
-  SocialAgentInvitation,
   type SocialAgentInvitationData,
   SocialAgentRegistration,
   type SocialAgentRegistrationData,
@@ -11,7 +10,6 @@ import {
   dataModelContext,
 } from '@janeirodigital/interop-data-model'
 const loadSocialAgentRegistration = loader(SocialAgentRegistration.fromJsonLd)
-const loadSocialAgentInvitation = loader(SocialAgentInvitation.fromJsonLd)
 const loadApplicationRegistration = loader(ApplicationRegistration.fromJsonLd)
 
 import type { AgentAndClient } from '@janeirodigital/interop-data-model'
@@ -30,6 +28,8 @@ import type { LanguageMap } from '@janeirodigital/interop-utils'
 import { setAcr } from './agent-registration.ts'
 import { createApplicationRegistration } from './application-registration.ts'
 import { createSocialAgentRegistration } from './social-agent-registration.ts'
+import { findSocialAgentInvitation as findInvitationFromSparql } from './sparql.ts'
+import type { SparqlTransport } from './sparql.ts'
 import type { DataModelDependencies } from './types.ts'
 
 // ──────────────────────────
@@ -68,16 +68,6 @@ export async function* socialAgentRegistrations(
   }
 }
 
-export async function* socialAgentInvitations(
-  data: InvitationRegistryData,
-  fetch: WhatwgFetch
-): AsyncIterable<SocialAgentInvitationData> {
-  const iris = await containedIris(data, fetch)
-  for (const iri of iris) {
-    yield loadSocialAgentInvitation(iri, fetch)
-  }
-}
-
 export async function findApplicationRegistration(
   data: ApplicationRegistryData,
   fetch: WhatwgFetch,
@@ -98,18 +88,6 @@ export async function findSocialAgentRegistration(
   for await (const registration of socialAgentRegistrations(data, fetch)) {
     if (registration.registeredAgent === registeredAgent) {
       return registration
-    }
-  }
-}
-
-export async function findSocialAgentInvitation(
-  data: InvitationRegistryData,
-  fetch: WhatwgFetch,
-  capabilityUrl: string
-): Promise<SocialAgentInvitationData | undefined> {
-  for await (const invitation of socialAgentInvitations(data, fetch)) {
-    if (invitation.capabilityUrl === capabilityUrl) {
-      return invitation
     }
   }
 }
@@ -189,11 +167,15 @@ export async function addSocialAgentRegistration(
 export async function addSocialAgentInvitation(
   data: InvitationRegistryData,
   deps: DataModelDependencies,
+  transport: SparqlTransport,
   capabilityUrl: string,
   label: string,
   note?: string
 ): Promise<SocialAgentInvitationData> {
-  const existing = await findSocialAgentInvitation(data, deps.fetch, capabilityUrl)
+  // the duplicate check runs on the registry plane — the same reader the
+  // accept path uses (`InvitationHandler` → `sai.findSocialAgentInvitation`),
+  // so containment semantics and flat storage cannot drift between the two
+  const existing = await findInvitationFromSparql(transport, data.id, capabilityUrl)
   if (existing) {
     throw new Error(`Social Agent Invitation with ${capabilityUrl} already exists`)
   }

@@ -321,9 +321,10 @@ export async function getSocialAgentInvitation(
 
 /**
  * Find the invitation with `capabilityUrl` in the given invitation registry
- * container — list-and-scan over the server-managed `ldp:contains`
- * listing, matching the HTTP `findSocialAgentInvitation` read
- * (docs/sparql.md, invitations candidate; served by `InvitationHandler`).
+ * container — list-and-scan over the server-managed `lws:contains` listing
+ * (docs/sparql.md, invitations candidate). The only invitation lookup on the
+ * plane: served by `InvitationHandler` and used by the write-path duplicate
+ * check (`addSocialAgentInvitation`).
  */
 export async function findSocialAgentInvitation(
   transport: SparqlTransport,
