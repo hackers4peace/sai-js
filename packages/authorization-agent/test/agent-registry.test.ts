@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto'
 
 import { AgentRegistry } from '@janeirodigital/interop-authorization-agent'
-import { fetch } from '@janeirodigital/interop-test-utils'
 import { describe, test } from 'vitest'
 
 import { expect } from './expect'
+import { fetch } from './mock-fetch.ts'
 
 const webId = 'https://alice.example/#id'
 const agentId = 'https://jarvis.alice.example/#agent'

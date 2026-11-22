@@ -8,7 +8,7 @@ import { docFromGraphs } from './helpers'
 const GROUP_IRI = 'https://data/test-client/public/access-needs#need-group-pm'
 const ACCESS_NEEDS_GRAPH = 'https://data/test-client/public/access-needs'
 
-// Graph <https://data/test-client/public/access-needs> in registry.trig:
+// Graph <https://data/test-client/public/access-needs> in the local framing fixture:
 // need-group-pm containing need-project.
 describe('AccessNeedGroup framing', () => {
   test('frames the access needs graph into AccessNeedGroupData', async () => {

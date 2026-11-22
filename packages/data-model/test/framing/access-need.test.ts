@@ -8,7 +8,7 @@ import { docFromGraphs } from './helpers'
 const NEED_IRI = 'https://data/test-client/public/access-needs#need-project'
 const ACCESS_NEEDS_GRAPH = 'https://data/test-client/public/access-needs'
 
-// Graph <https://data/test-client/public/access-needs> in registry.trig:
+// Graph <https://data/test-client/public/access-needs> in the local framing fixture:
 // need-project (AccessRequired), with need-task/image/file inheriting from it
 // (frames to hasInheritingNeed via @reverse), and the description sets
 // carrying usesLanguage (collected into descriptionLanguages).

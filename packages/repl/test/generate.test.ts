@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-
 import { splitFixtureByPod } from '@janeirodigital/interop-test-utils'
 import { describe, expect, test } from 'vitest'
 
@@ -62,25 +60,39 @@ describe('rewriteFixture', () => {
 })
 
 describe('seed fixture', () => {
-  // the real fixture + env map: every graph must resolve to a Fuseki dataset,
+  // A local mock of the dev seed: every graph must resolve to a Fuseki dataset,
   // i.e. be under a pod or at the id doc origin — this is what `seed-env` did
-  // not guarantee before the bare TriG graph blocks were recognized
-  test('splits the dev fixture by pod without an unmatched graph', async () => {
-    const fixture = readFileSync(
-      new URL('../../../environments/data/registry.trig', import.meta.url),
-      'utf-8'
-    )
-    const envMap = JSON.parse(
-      readFileSync(new URL('../../../environments/dev/map.json', import.meta.url), 'utf-8')
-    ) as EnvMap
-    const kv = rewriteFixture(
-      readFileSync(new URL('../../../environments/data/kv.json', import.meta.url), 'utf-8'),
-      envMap
-    )
+  // not guarantee before the bare TriG graph blocks were recognized.
+  test('splits a mapped fixture by pod without an unmatched graph', async () => {
+    const fixture = `
+<https://id/alice> {
+<https://id/alice> <http://www.w3.org/2004/02/skos/core#prefLabel> "Alice".
+}
+<https://registry/alice/> {
+<https://registry/alice/> a <http://www.w3.org/ns/solid/interop#RegistrySet>.
+}
+<https://data/test-client/public/other> {
+<https://data/test-client/public/other> a <http://www.w3.org/ns/solid/interop#ApplicationRegistration>.
+}
+`
+    const kvData = {
+      'accounts/data/test': {
+        '**sparqlEndpoint**': {
+          registry: {
+            podUrl: 'https://reg.docker/alice/',
+            endpoint: 'http://fuseki:3030/reg-alice/sparql',
+          },
+          data: {
+            podUrl: 'https://vuejectron.data.docker/',
+            endpoint: 'http://fuseki:3030/data-test-client/sparql',
+          },
+        },
+      },
+    }
 
-    const datasets = await splitFixtureByPod(rewriteFixture(fixture, envMap), {
-      podDatasets: podDatasetsFromKeyValue(JSON.parse(kv)),
-      idOrigin: envMap.prefixes['https://id/'],
+    const datasets = await splitFixtureByPod(rewriteFixture(fixture, map), {
+      podDatasets: podDatasetsFromKeyValue(kvData),
+      idOrigin: map.prefixes['https://id/'],
     })
 
     expect(datasets.has('id')).toBe(true)

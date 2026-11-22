@@ -10,7 +10,7 @@ import { docFromGraphs } from './helpers'
 
 const REGISTRY_SET_IRI = 'https://registry/alice/'
 
-// Graph <meta:https://registry/alice/> in registry.trig: the RegistrySet with
+// Graph <meta:https://registry/alice/> in the local framing fixture: the RegistrySet with
 // its nine registries (hasDataRegistry is multi-valued; the agent-side split
 // into social-agent, application, invitation and access-request registries).
 describe('RegistrySet framing', () => {

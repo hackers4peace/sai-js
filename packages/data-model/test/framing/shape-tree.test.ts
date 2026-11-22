@@ -3,12 +3,12 @@ import { describe, test } from 'vitest'
 
 import { ShapeTree } from '../../src'
 import { expect } from '../expect'
-import { docFromGraphs } from './helpers'
+import { docFromGraphs, fixtureFetch } from './helpers'
 
 const TREE_IRI = 'https://data/shapetrees/trees/Project'
 const TREE_GRAPH = 'https://data/shapetrees/trees/Project'
 
-// Graph <https://data/shapetrees/trees/Project> in registry.trig:
+// Graph <https://data/shapetrees/trees/Project> in the local framing fixture:
 // ShapeTree with expectsType, shape, describesInstance (skos:prefLabel), three
 // references (hasShapeTree/viaPredicate nodes) and the description sets
 // carrying usesLanguage. The read path frames the node-level properties and
@@ -66,5 +66,25 @@ describe('ShapeTree framing', () => {
     ).toEqual(
       tree.references.map((reference) => [reference.shapeTree, reference.viaPredicate.value])
     )
+  })
+})
+
+describe('ShapeTree.getDescription (local fixture)', () => {
+  test('returns the description for a language', async () => {
+    const tree = await ShapeTree.fromJsonLd(await docFromGraphs([TREE_GRAPH]), TREE_IRI)
+    expect((await ShapeTree.getDescription(tree, 'en', fixtureFetch))?.label).toEqual({
+      en: 'Projects',
+    })
+    expect((await ShapeTree.getDescription(tree, 'es', fixtureFetch))?.label).toEqual({
+      es: 'Proyectos',
+    })
+    expect((await ShapeTree.getDescription(tree, 'pl', fixtureFetch))?.label).toEqual({
+      pl: 'Projekty',
+    })
+  })
+
+  test('returns null when no description set exists for the language', async () => {
+    const tree = await ShapeTree.fromJsonLd(await docFromGraphs([TREE_GRAPH]), TREE_IRI)
+    await expect(ShapeTree.getDescription(tree, 'fr', fixtureFetch)).resolves.toBeNull()
   })
 })

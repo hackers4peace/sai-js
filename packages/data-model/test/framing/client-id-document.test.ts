@@ -7,7 +7,7 @@ import { docFromGraphs } from './helpers'
 const CLIENT_ID_IRI = 'https://data/test-client/public/id'
 
 // The client-id-document node lives inside the application registration graph
-// (meta:https://registry/alice/cvmsa4 in registry.trig) together with
+// (meta:https://registry/alice/cvmsa4 in the local framing fixture) together with
 // the registration node; framing the id node must ignore the registration.
 describe('ClientIdDocument framing', () => {
   test('frames the client id node into ClientIdDocumentData', async () => {

@@ -1,4 +1,4 @@
-import { INTEROP, LWS, ODRL } from '@janeirodigital/interop-utils'
+import { ACCESS_ACTIONS, INTEROP, LWS, ODRL } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import { Grant } from '../../src'
@@ -28,5 +28,42 @@ describe('Grant framing', () => {
     expect(permission.target.source).toEqual(['https://data/acme-rnd/reb39k'])
     expect(permission.target.owner).toBe('https://id/acme')
     expect(permission.target.storage).toBe('https://data/acme-rnd/')
+  })
+})
+
+describe('Grant scopes and access actions (local fixture)', () => {
+  const allFromRegistryIri = 'https://registry/acme/p9m2vr'
+  const selectedFromRegistryIri = 'https://registry/acme/g4yhtm'
+  const inheritedIri = 'https://registry/acme/hdaymz'
+
+  test('exposes the permission actions', async () => {
+    const grant = await Grant.fromJsonLd(
+      await docFromGraphs([allFromRegistryIri]),
+      allFromRegistryIri
+    )
+    expect(grant.access[0].permission[0].action).toEqual([
+      ACCESS_ACTIONS.read,
+      ACCESS_ACTIONS.create,
+      ACCESS_ACTIONS.modify,
+      ACCESS_ACTIONS.delete,
+    ])
+  })
+
+  test('frames a SelectedFromRegistry grant', async () => {
+    const grant = await Grant.fromJsonLd(
+      await docFromGraphs([selectedFromRegistryIri]),
+      selectedFromRegistryIri
+    )
+    expect(grant.scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
+    expect(grant.hasDataRegistration).toBe('https://data/acme-rnd/reb39k')
+    expect(Grant.dataRegistryIri(grant)).toBe('https://data/acme-rnd/')
+  })
+
+  test('frames an Inherited grant', async () => {
+    const grant = await Grant.fromJsonLd(await docFromGraphs([inheritedIri]), inheritedIri)
+    expect(grant.scopeOfGrant).toBe(INTEROP.Inherited)
+    expect(grant.inheritsFromGrant).toBe(allFromRegistryIri)
+    expect(grant.hasDataRegistration).toBe('https://data/acme-rnd/x0md9s')
+    expect(Grant.dataRegistryIri(grant)).toBe('https://data/acme-rnd/')
   })
 })

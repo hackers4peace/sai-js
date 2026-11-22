@@ -29,7 +29,7 @@ export async function seedFusekiDataset(datasetBaseUrl: string, data: string): P
  * Fuseki's GSP `DELETE /data` only clears the default graph, so the whole
  * dataset is dropped with a SPARQL `DROP ALL` update instead.
  */
-export async function dropFusekiDataset(datasetBaseUrl: string): Promise<void> {
+async function dropFusekiDataset(datasetBaseUrl: string): Promise<void> {
   const response = await fetch(`${datasetBaseUrl}/sparql`, {
     method: 'POST',
     headers: {

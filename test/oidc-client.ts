@@ -33,7 +33,7 @@ import type { BrowserCredential, BrowserSession, DecodedJwt } from '@elfpavlik/l
 
 const ISSUER = process.env.CSS_BASE_URL ?? 'https://auth/'
 /** The password the fixtures hash for every seeded account (`kv.json`). */
-export const FIXTURE_PASSWORD = 'password'
+const FIXTURE_PASSWORD = 'password'
 
 /** A cookie jar for the sign-in pages — the interaction is cookie-driven. */
 class CookieJar {

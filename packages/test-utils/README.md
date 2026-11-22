@@ -1,6 +1,16 @@
-# Data Model
+# Test utilities
 
-[![CI](https://github.com/janeirodigital/sai-js/actions/workflows/ci.yml/badge.svg)](https://github.com/janeirodigital/sai-js/actions/workflows/ci.yml)
-[![Matrix chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://app.gitter.im/#/room/#solid_specification:gitter.im)
-[![npm version](https://badge.fury.io/js/%40janeirodigital%2Finterop-test-utils.svg)](https://www.npmjs.com/package/@janeirodigital/interop-test-utils)
-[![MIT license](https://img.shields.io/github/license/janeirodigital/sai-js)](https://github.com/janeirodigital/sai-js/blob/main/LICENSE)
+Shared seeding and test helpers for `sai-js`:
+
+- `fuseki.ts` — split a TriG fixture per pod dataset and write each dataset to Fuseki.
+- `garage.ts` — provision one Garage bucket and key per data pod.
+- `postgres.ts` — seed and inspect the CommunitySolidServer key-value table.
+- `env.ts` — drop and seed a Fuseki dataset.
+
+These helpers are used by the Dagger-driven suite under `/test`, by the
+`packages/repl` seed test, and by `packages/repl`'s `seed-env` command for the
+local Docker environment.
+
+Unit tests under `packages/*/test` should use local mocks. The full
+`environments/data/registry.trig` fixture is reserved for the `/test`
+integration suite and the local dev seed command.

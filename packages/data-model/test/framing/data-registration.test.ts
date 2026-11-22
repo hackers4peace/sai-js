@@ -7,7 +7,7 @@ import { docFromGraphs } from './helpers'
 
 const REGISTRATION_IRI = 'https://data/acme-rnd/reb39k'
 
-// DataRegistration in registry.trig is split like CSS stores containers:
+// DataRegistration in the local framing fixture is split like CSS stores containers:
 // the meta graph carries type + registeredShapeTree + lws:contains. The data
 // model frames the LDP view, so the helper normalizes lws:contains to
 // ldp:contains — pbh2yw and z8w2pl are both contained.

@@ -1,10 +1,8 @@
-import { readFileSync } from 'node:fs'
-
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
+import { fixtureDocs } from './fixtures.ts'
+
 const STORAGE_DESCRIPTION_IRI = 'https://fake.example/storage-desription'
-const dataFile = new URL('data.json', import.meta.url)
-const data = JSON.parse(readFileSync(dataFile, 'utf-8'))
 
 const storageDescriptionJsonLd = JSON.stringify([
   {
@@ -27,7 +25,6 @@ async function common(
   state?: { [key: string]: string }
 ): Promise<Response> {
   const strippedUrl = url.replace(/#.*$/, '')
-  // Access Accept header via type assertion since RequestInit.headers is HeadersInit
   const accept = (options?.headers as Record<string, string> | undefined)?.Accept
 
   // LWS storage description: the requested storage root is the StorageRoot.
@@ -43,28 +40,21 @@ async function common(
     } as unknown as Response
   }
 
-  // handle storage description requests
   if (url === STORAGE_DESCRIPTION_IRI) {
     return {
       ok: true,
       clone: () => ({}) as unknown as Response,
-      headers: {
-        get: () => 'application/ld+json',
-      },
+      headers: { get: () => 'application/ld+json' },
       text: async () => storageDescriptionJsonLd,
       json: async () => JSON.parse(storageDescriptionJsonLd),
     } as unknown as Response
   }
 
-  // JSON-LD by default; serve Turtle only for an explicit text/turtle Accept
-  // (ACL resources, and any transitional callers that still ask for it).
   const acceptsTurtle = accept === 'text/turtle'
 
   async function getData(): Promise<string> {
-    const value = state?.[strippedUrl] ?? data[strippedUrl]
-    if (!value) {
-      throw new Error(`missing snippet: ${strippedUrl}`)
-    }
+    const value = state?.[strippedUrl] ?? fixtureDocs[strippedUrl]
+    if (!value) throw new Error(`missing snippet: ${strippedUrl}`)
     return value
   }
 
@@ -93,11 +83,6 @@ async function common(
   return response
 }
 
-/**
- * The identifier the flat LWS store allocates for a POST: the `slug` header
- * (a UUID, which our clients pre-mint) under the storage root — the container
- * IRI without its last path segment. Mirrors the flat identifier strategy.
- */
 function slugLocation(containerIri: string, headers?: HeadersInit): string {
   const record = (headers ?? {}) as Record<string, string>
   const slug = record.slug ?? record.Slug
@@ -143,21 +128,14 @@ function addState(state: { [key: string]: string }): WhatwgFetch {
   } as WhatwgFetch
 }
 
-export function createFetch(): WhatwgFetch {
-  const state: { [key: string]: string } = {}
-  return addState(state)
-}
-
 export function createStatefulFetch(): WhatwgFetch {
-  const state: { [key: string]: string } = {}
-  return addState(state)
+  return addState({})
 }
 
 export const statelessFetch = async function statelessFetch(
   url: string,
   options?: RequestInit
 ): Promise<Response> {
-  // just ok PUT or PATCH
   if (options?.method === 'PUT' || options?.method === 'PATCH') {
     const response = { ok: true } as Response
     response.clone = () => ({ ...response })

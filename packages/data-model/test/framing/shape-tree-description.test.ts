@@ -8,7 +8,7 @@ import { docFromGraphs } from './helpers'
 const DESCRIPTION_IRI = 'https://data/shapetrees/trees/desc-en#Project'
 const DESCRIPTIONS_GRAPH = 'https://data/shapetrees/trees/desc-en'
 
-// Graph <https://data/shapetrees/trees/desc-en> in registry.trig: the English
+// Graph <https://data/shapetrees/trees/desc-en> in the local framing fixture: the English
 // description set; #Project carries skos:prefLabel (language-tagged).
 describe('ShapeTreeDescription framing', () => {
   test('frames the shape tree description into ShapeTreeDescriptionData', async () => {

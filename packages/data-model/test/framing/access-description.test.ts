@@ -9,7 +9,7 @@ const DESCRIPTIONS_GRAPH = 'https://data/test-client/public/descriptions-en'
 const NEED_DESC_IRI = 'https://data/test-client/public/descriptions-en#en-need-project'
 const GROUP_DESC_IRI = 'https://data/test-client/public/descriptions-en#en-need-group-pm'
 
-// Graph <https://data/test-client/public/descriptions-en> in registry.trig:
+// Graph <https://data/test-client/public/descriptions-en> in the local framing fixture:
 // the English AccessDescriptionSet with need and need-group descriptions.
 describe('Access description framing', () => {
   test('frames an access need description into AccessNeedDescriptionData', async () => {

@@ -1,7 +1,6 @@
 import { createDpopProof } from '@elfpavlik/lws-auth'
 import { buildSelfIssuedCredential } from '@elfpavlik/sai-components'
 import { grantAccess } from '@janeirodigital/interop-data-model'
-import { loginAsClient } from '@janeirodigital/interop-test-utils'
 import {
   INTEROP,
   ODRL,
@@ -10,6 +9,8 @@ import {
 } from '@janeirodigital/interop-utils'
 import { decodeJwt } from 'jose'
 import { describe, expect, test } from 'vitest'
+
+import { loginAsClient } from './oidc-client.ts'
 
 /*
  * Impersonation (openwiki/architecture/id-jag-access-claims.md):

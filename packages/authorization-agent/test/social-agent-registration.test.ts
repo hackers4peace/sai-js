@@ -13,10 +13,10 @@ import {
 import { INTEROP, type WhatwgFetch, jsonld, loader } from '@janeirodigital/interop-utils'
 const loadSocialAgentRegistration = loader(SocialAgentRegistration.fromJsonLd)
 
-import { fetch, statelessFetch } from '@janeirodigital/interop-test-utils'
 import { describe, test, vi } from 'vitest'
 
 import { expect } from './expect'
+import { fetch, statelessFetch } from './mock-fetch.ts'
 
 describe('build', () => {
   const deps = { fetch, randomUUID }

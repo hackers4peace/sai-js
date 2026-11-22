@@ -23,7 +23,8 @@
     "@temporalio/client": "^1.26.0",
     "fetch-sparql-endpoint": "^7.3.0",
     "jose": "^6.2.18",
-    "vitest": "^5.1.1"
+    "vitest": "^5.1.1",
+    "n3": "^2.13.12"
   },
   "dependencies": {
     "rdf-vocabulary": "^1.0.1",

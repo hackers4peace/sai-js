@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto'
 
 import { findInLanguage, loadDescriptions } from '@janeirodigital/interop-authorization-agent'
-import { fetch } from '@janeirodigital/interop-test-utils'
 import { fetchJsonLd, toStore } from '@janeirodigital/interop-utils'
 import { describe, test } from 'vitest'
 
 import { expect } from './expect'
+import { fetch } from './mock-fetch.ts'
 
 const deps = { fetch, randomUUID }
 const snippetIri = 'https://projectron.example/descriptions-en'

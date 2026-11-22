@@ -4,11 +4,11 @@ import { addAccessGrant, replaceAccessGrants } from '@janeirodigital/interop-aut
 import { SocialAgentRegistration, getAccessGrantIris } from '@janeirodigital/interop-data-model'
 const loadSocialAgentRegistration = loader(SocialAgentRegistration.fromJsonLd)
 
-import { fetch } from '@janeirodigital/interop-test-utils'
 import { INTEROP, loader } from '@janeirodigital/interop-utils'
 import { describe, test } from 'vitest'
 
 import { expect } from './expect'
+import { fetch } from './mock-fetch.ts'
 
 const deps = { fetch, randomUUID }
 const snippetIri = 'https://auth.alice.example/bcf22534-0187-4ae4-b88f-fe0f9fa96659'

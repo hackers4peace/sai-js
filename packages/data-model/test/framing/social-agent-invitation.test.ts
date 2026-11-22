@@ -7,7 +7,7 @@ import { docFromGraphs } from './helpers'
 
 const INVITATION_IRI = 'https://registry/kim/zi1nic'
 
-// Graph <https://registry/kim/zi1nic> in registry.trig: a
+// Graph <https://registry/kim/zi1nic> in the local framing fixture: a
 // SocialAgentInvitation with capabilityUrl, skos:prefLabel and skos:note.
 describe('SocialAgentInvitation framing', () => {
   test('frames the invitation graph into SocialAgentInvitationData', async () => {

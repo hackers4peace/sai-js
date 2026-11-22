@@ -7,7 +7,7 @@ import { docFromGraphs } from './helpers'
 
 const REGISTRATION_IRI = 'https://registry/alice/cvmsa4'
 
-// Graph <meta:https://registry/alice/cvmsa4> in registry.trig:
+// Graph <meta:https://registry/alice/cvmsa4> in the local framing fixture:
 // ApplicationRegistration node (type, registeredAgent, hasDataGrant) and the
 // embedded client-id-document node — the latter must not disturb framing.
 describe('ApplicationRegistration framing', () => {

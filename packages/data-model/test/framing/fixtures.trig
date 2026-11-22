@@ -1,0 +1,335 @@
+# Local mock fixture for packages/data-model framing tests.
+# Derived from the full stack seed fixture (environments/data/registry.trig)
+# so package unit tests do not read environments/data.
+
+<https://registry/acme/k9m4vp> {
+<https://registry/acme/k9m4vp> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
+    <http://www.w3.org/ns/solid/interop#grantee> <https://id/alice>;
+    <http://www.w3.org/ns/solid/interop#grantedBy> <https://id/acme>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#scopeOfAuthorization> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#hasDataInstance> <https://data/acme-rnd/pbh2yw>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>.
+<https://registry/acme/r5j8tw> <http://www.w3.org/ns/solid/interop#inheritsFromAuthorization> <https://registry/acme/k9m4vp>
+}
+<meta:https://registry/acme/k9m4vp> {
+<https://registry/acme/k9m4vp> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/acme/authorization/>
+}
+<https://registry/acme/r5j8tw> {
+<https://registry/acme/r5j8tw> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
+    <http://www.w3.org/ns/solid/interop#grantee> <https://id/alice>;
+    <http://www.w3.org/ns/solid/interop#grantedBy> <https://id/acme>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/ns/solid/interop#scopeOfAuthorization> <http://www.w3.org/ns/solid/interop#Inherited>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/x0md9s>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromAuthorization> <https://registry/acme/k9m4vp>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>
+}
+<meta:https://registry/acme/r5j8tw> {
+<https://registry/acme/r5j8tw> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/acme/authorization/>
+}
+<meta:https://registry/acme/je0s7n> {
+<https://registry/acme/je0s7n> a <http://www.w3.org/ns/solid/interop#SocialAgentRegistration>, <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#BasicContainer>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredAgent> <https://id/alice>;
+    <http://www.w3.org/ns/solid/interop#reciprocalRegistration> <https://registry/alice/cp9g7p>;
+    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/acme/g4yhtm>, <https://registry/acme/wpqyds>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Alice";
+    <http://www.w3.org/2004/02/skos/core#note> "Chasing white rabits.";
+    <https://www.w3.org/ns/lws#partOf> <https://registry/acme/social-agent/>
+}
+<https://registry/acme/p9m2vr> {
+<https://registry/acme/hdaymz> <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/acme/p9m2vr>.
+<https://registry/acme/p9m2vr> a <https://www.w3.org/ns/lws#AccessGrant>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
+<urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c> a <http://www.w3.org/ns/odrl/2/Agreement>;
+    <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c>;
+    <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
+<https://registry/acme/p9m2vr> <https://www.w3.org/ns/lws#access> <urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c>.
+<urn:uuid:0a5cc233-9cf8-436c-8bed-e8549709988c> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9>.
+<urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:297ca98e-b09a-4c97-89e7-9a7cd300a5b9>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
+    <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
+    <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/odrl/2/target> <urn:uuid:ff4ad546-70cc-4304-8e06-2a8e39f7dba0>.
+<urn:uuid:ff4ad546-70cc-4304-8e06-2a8e39f7dba0> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:ff4ad546-70cc-4304-8e06-2a8e39f7dba0>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
+    a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
+    <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/reb39k>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
+}
+<https://registry/acme/hdaymz> {
+<https://registry/acme/hdaymz> a <https://www.w3.org/ns/lws#AccessGrant>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/acme/p9m2vr>.
+<urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd> a <http://www.w3.org/ns/odrl/2/Agreement>;
+    <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd>;
+    <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
+<https://registry/acme/hdaymz> <https://www.w3.org/ns/lws#access> <urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd>.
+<urn:uuid:24a7e017-12b0-4258-8edc-1f6080c220dd> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d>.
+<urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:cbfbc2c2-282c-436c-8ee4-fc73d410ff3d>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
+    <http://www.w3.org/ns/odrl/2/assignee> <https://id/bob>;
+    <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/odrl/2/target> <urn:uuid:d333bc2c-ca2f-4347-892c-277983b90daa>.
+<urn:uuid:d333bc2c-ca2f-4347-892c-277983b90daa> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:d333bc2c-ca2f-4347-892c-277983b90daa>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
+    a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
+    <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
+}
+<https://registry/acme/g4yhtm> {
+<https://registry/acme/wpqyds> <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/acme/g4yhtm>.
+<https://registry/acme/g4yhtm> a <https://www.w3.org/ns/lws#AccessGrant>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
+<urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d> a <http://www.w3.org/ns/odrl/2/Agreement>;
+    <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d>;
+    <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#SelectedFromRegistry>.
+<https://registry/acme/g4yhtm> <https://www.w3.org/ns/lws#access> <urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d>.
+<urn:uuid:dba272ed-4bdb-4d7a-88e4-39737ee5572d> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c>.
+<urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:34e1e1b8-741b-45ec-8e7b-e072bae2542c>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
+    <http://www.w3.org/ns/odrl/2/assignee> <https://id/alice>;
+    <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/odrl/2/target> <urn:uuid:4728e226-a323-4e4b-8715-244479f8d517>.
+<urn:uuid:4728e226-a323-4e4b-8715-244479f8d517> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:4728e226-a323-4e4b-8715-244479f8d517>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
+    a <http://www.w3.org/ns/odrl/2/Asset>;
+    <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/pbh2yw>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistration> <https://data/acme-rnd/reb39k>;
+    <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
+}
+<https://registry/acme/wpqyds> {
+<https://registry/acme/wpqyds> a <https://www.w3.org/ns/lws#AccessGrant>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromGrant> <https://registry/acme/g4yhtm>.
+<urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3> a <http://www.w3.org/ns/odrl/2/Agreement>;
+    <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3>;
+    <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#Inherited>.
+<https://registry/acme/wpqyds> <https://www.w3.org/ns/lws#access> <urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3>.
+<urn:uuid:849a84e7-6160-4eac-825e-69c4aefcdee3> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f>.
+<urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:529b244f-cdbd-49d4-8d0e-d6910e6b902f>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/acme>;
+    <http://www.w3.org/ns/odrl/2/assignee> <https://id/alice>;
+    <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/odrl/2/target> <urn:uuid:21b49ca3-d8c4-43ed-8fd2-a7c24d814d09>.
+<urn:uuid:21b49ca3-d8c4-43ed-8fd2-a7c24d814d09> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:21b49ca3-d8c4-43ed-8fd2-a7c24d814d09>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/acme>;
+    a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
+    <http://www.w3.org/ns/odrl/2/source> <https://data/acme-rnd/x0md9s>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    <https://www.w3.org/ns/lws#storage> <https://data/acme-rnd/>
+}
+<meta:https://registry/alice/> {
+<https://registry/alice/> a <http://www.w3.org/ns/solid/interop#RegistrySet>, <http://www.w3.org/ns/ldp#Resource>, <http://www.w3.org/ns/pim/space#Storage>;
+    <http://www.w3.org/ns/solid/interop#hasSocialAgentRegistry> <https://registry/alice/social-agent/>;
+    <http://www.w3.org/ns/solid/interop#hasApplicationRegistry> <https://registry/alice/application/>;
+    <http://www.w3.org/ns/solid/interop#hasInvitationRegistry> <https://registry/alice/invitation/>;
+    <http://www.w3.org/ns/solid/interop#hasAuthorizationRegistry> <https://registry/alice/authorization/>;
+    <http://www.w3.org/ns/solid/interop#hasGrantRegistry> <https://registry/alice/grant/>;
+    <http://www.w3.org/ns/solid/interop#hasRoleRegistry> <https://registry/alice/role/>;
+    <http://www.w3.org/ns/solid/interop#hasActivityRegistry> <https://registry/alice/activity/>;
+    <http://www.w3.org/ns/solid/interop#hasAccessRequestRegistry> <https://registry/alice/access-request/>;
+    <http://www.w3.org/ns/solid/interop#hasDataRegistry> <https://data/alice-home/>, <https://data/alice-work/>;
+    <https://www.w3.org/ns/lws#contains> <https://registry/alice/access-request/>, <https://registry/alice/activity/>, <https://registry/alice/application/>, <https://registry/alice/authorization/>, <https://registry/alice/grant/>, <https://registry/alice/invitation/>, <https://registry/alice/role/>, <https://registry/alice/social-agent/>
+}
+<https://registry/alice/ps8hc3> {
+<https://registry/alice/ps8hc3> a <http://www.w3.org/ns/solid/interop#Role>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Corps";
+    <http://www.w3.org/ns/solid/interop#hasMember> <https://id/acme>
+}
+<meta:https://registry/alice/cvmsa4> {
+<https://registry/alice/cvmsa4> a <http://www.w3.org/ns/solid/interop#ApplicationRegistration>, <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#BasicContainer>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredAgent> <https://data/test-client/public/id>;
+    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/alice/afiooi>, <https://registry/alice/azgyc5>, <https://registry/alice/wwp4j6>, <https://registry/alice/qwvbcu>.
+<https://data/test-client/public/id> <http://www.w3.org/ns/solid/oidc#client_name> "Test client";
+    <http://www.w3.org/ns/solid/interop#hasAccessNeedGroup> <https://data/test-client/public/access-needs#need-group-pm>;
+    <http://www.w3.org/ns/solid/interop#hasAuthorizationCallbackEndpoint> <https://test-client>.
+<https://registry/alice/cvmsa4> <https://www.w3.org/ns/lws#partOf> <https://registry/alice/application/>
+}
+<https://registry/kim/zi1nic> {
+<https://registry/kim/zi1nic> a <http://www.w3.org/ns/solid/interop#SocialAgentInvitation>;
+    <http://www.w3.org/ns/solid/interop#hasCapabilityUrl> <https://auth/.sai/invitations/aHR0cHM6Ly9pZC9raW0.8f19934d-b6a6-4a73-9d27-8cd20ed0657f>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Bob";
+    <http://www.w3.org/2004/02/skos/core#note> "What about Bob?"
+}
+<meta:https://data/alice-work/sx86hi> {
+<https://data/alice-work/sx86hi> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/alice-work/>;
+    <https://www.w3.org/ns/lws#contains> <https://data/alice-work/k3pqsb>
+}
+<meta:https://data/bob/oapdnp> {
+<https://data/bob/oapdnp> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/File>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/bob/>
+}
+<meta:https://data/acme-rnd/reb39k> {
+<https://data/acme-rnd/reb39k> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/acme-rnd/>;
+    <https://www.w3.org/ns/lws#contains> <https://data/acme-rnd/pbh2yw>, <https://data/acme-rnd/z8w2pl>
+}
+<https://data/test-client/public/access-needs> {
+<https://data/test-client/public/access-needs#need-group-pm> a <http://www.w3.org/ns/solid/interop#AccessNeedGroup>;
+    <http://www.w3.org/ns/solid/interop#accessNecessity> <http://www.w3.org/ns/solid/interop#accessRequired>;
+    <http://www.w3.org/ns/solid/interop#accessScenario> <http://www.w3.org/ns/solid/interop#PersonalAccess>;
+    <http://www.w3.org/ns/solid/interop#authenticatesAs> <http://www.w3.org/ns/solid/interop#SocialAgent>;
+    <http://www.w3.org/ns/solid/interop#hasAccessDescriptionSet> <https://data/test-client/public/descriptions-en>, <https://data/test-client/public/descriptions-es>;
+    <http://www.w3.org/ns/solid/interop#hasAccessNeed> <https://data/test-client/public/access-needs#need-project>.
+<https://data/test-client/public/access-needs#need-project> a <http://www.w3.org/ns/solid/interop#AccessNeed>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#accessNecessity> <http://www.w3.org/ns/solid/interop#AccessRequired>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>.
+<https://data/test-client/public/access-needs#need-task> a <http://www.w3.org/ns/solid/interop#AccessNeed>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/ns/solid/interop#accessNecessity> <http://www.w3.org/ns/solid/interop#AccessRequired>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromNeed> <https://data/test-client/public/access-needs#need-project>.
+<https://data/test-client/public/access-needs#need-image> a <http://www.w3.org/ns/solid/interop#AccessNeed>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Image>;
+    <http://www.w3.org/ns/solid/interop#accessNecessity> <http://www.w3.org/ns/solid/interop#AccessOptional>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromNeed> <https://data/test-client/public/access-needs#need-project>.
+<https://data/test-client/public/access-needs#need-file> a <http://www.w3.org/ns/solid/interop#AccessNeed>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/File>;
+    <http://www.w3.org/ns/solid/interop#accessNecessity> <http://www.w3.org/ns/solid/interop#AccessOptional>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromNeed> <https://data/test-client/public/access-needs#need-project>.
+<https://data/test-client/public/descriptions-en> <http://www.w3.org/ns/solid/interop#usesLanguage> "en"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/test-client/public/descriptions-es> <http://www.w3.org/ns/solid/interop#usesLanguage> "es"^^<http://www.w3.org/2001/XMLSchema#language>
+}
+<https://data/test-client/public/descriptions-en> {
+<https://data/test-client/public/descriptions-en> a <http://www.w3.org/ns/solid/interop#AccessDescriptionSet>;
+    <http://www.w3.org/ns/solid/interop#usesLanguage> "en"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/test-client/public/descriptions-en#en-need-group-pm> a <http://www.w3.org/ns/solid/interop#AccessNeedGroupDescription>;
+    <http://www.w3.org/ns/solid/interop#inAccessDescriptionSet> <https://data/test-client/public/descriptions-en>;
+    <http://www.w3.org/ns/solid/interop#hasAccessNeedGroup> <https://data/test-client/public/access-needs#need-group-pm>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Manage Projects"@en;
+    <http://www.w3.org/2004/02/skos/core#definition> "Allow Projectron to read the Projects you select, and Task in those projects."@en.
+<https://data/test-client/public/descriptions-en#en-need-project> a <http://www.w3.org/ns/solid/interop#AccessNeedDescription>;
+    <http://www.w3.org/ns/solid/interop#inAccessDescriptionSet> <https://data/test-client/public/descriptions-en>;
+    <http://www.w3.org/ns/solid/interop#hasAccessNeed> <https://data/test-client/public/access-needs#need-project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Access to Projects is essential for Projectron to perform its core function of Project Management."@en.
+<https://data/test-client/public/descriptions-en#en-need-task> a <http://www.w3.org/ns/solid/interop#AccessNeedDescription>;
+    <http://www.w3.org/ns/solid/interop#inAccessDescriptionSet> <https://data/test-client/public/descriptions-en>;
+    <http://www.w3.org/ns/solid/interop#hasAccessNeed> <https://data/test-client/public/access-needs#need-task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Access to Tasks allows Projectron to identify and manage the work to be done in a given Project."@en.
+<https://data/test-client/public/descriptions-en#en-need-image> a <http://www.w3.org/ns/solid/interop#AccessNeedDescription>;
+    <http://www.w3.org/ns/solid/interop#inAccessDescriptionSet> <https://data/test-client/public/descriptions-en>;
+    <http://www.w3.org/ns/solid/interop#hasAccessNeed> <https://data/test-client/public/access-needs#need-image>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Access to Images allows Projectron to identify and manage the work to be done in a given Project."@en.
+<https://data/test-client/public/descriptions-en#en-need-file> a <http://www.w3.org/ns/solid/interop#AccessNeedDescription>;
+    <http://www.w3.org/ns/solid/interop#inAccessDescriptionSet> <https://data/test-client/public/descriptions-en>;
+    <http://www.w3.org/ns/solid/interop#hasAccessNeed> <https://data/test-client/public/access-needs#need-file>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Access to Files allows Projectron to identify and manage the work to be done in a given Project."@en
+}
+<https://data/shapetrees/trees/Project> {
+<https://data/shapetrees/trees/Project> a <http://www.w3.org/ns/shapetrees#ShapeTree>;
+    <http://www.w3.org/ns/shapetrees#expectsType> <http://www.w3.org/ns/shapetrees#Resource>;
+    <http://www.w3.org/ns/shapetrees#shape> <https://data/shapetrees/shapes/Project>;
+    <http://www.w3.org/ns/shapetrees#describesInstance> <http://www.w3.org/2004/02/skos/core#prefLabel>;
+    <http://www.w3.org/ns/shapetrees#references> <urn:uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d>, <urn:uuid:86d54925-eeb5-4360-bca4-d53009bae8c7>, <urn:uuid:85a1d32b-5c91-4900-9bc8-f271117675ed>.
+<urn:uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d> <http://www.w3.org/ns/shapetrees#hasShapeTree> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/ns/shapetrees#viaPredicate> <https://vocab.example/project-management/hasTask>.
+<urn:uuid:86d54925-eeb5-4360-bca4-d53009bae8c7> <http://www.w3.org/ns/shapetrees#hasShapeTree> <https://data/shapetrees/trees/Image>;
+    <http://www.w3.org/ns/shapetrees#viaPredicate> <https://vocab.example/project-management/hasImage>.
+<urn:uuid:85a1d32b-5c91-4900-9bc8-f271117675ed> <http://www.w3.org/ns/shapetrees#hasShapeTree> <https://data/shapetrees/trees/File>;
+    <http://www.w3.org/ns/shapetrees#viaPredicate> <https://vocab.example/project-management/hasFile>.
+<https://data/shapetrees/trees/desc-en#Project> <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-en>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Project>.
+<https://data/shapetrees/trees/desc-en> <http://www.w3.org/ns/shapetrees#usesLanguage> "en"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/shapetrees/trees/desc-es#Project> <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-es>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Project>.
+<https://data/shapetrees/trees/desc-es> <http://www.w3.org/ns/shapetrees#usesLanguage> "es"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/shapetrees/trees/desc-pl#Project> <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-pl>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Project>.
+<https://data/shapetrees/trees/desc-pl> <http://www.w3.org/ns/shapetrees#usesLanguage> "pl"^^<http://www.w3.org/2001/XMLSchema#language>
+}
+<https://data/shapetrees/trees/desc-en> {
+<https://data/shapetrees/trees/desc-en> a <http://www.w3.org/ns/shapetrees#DescriptionSet>;
+    <http://www.w3.org/ns/shapetrees#usesLanguage> "en"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/shapetrees/trees/desc-en#Project> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-en>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Projects"@en.
+<https://data/shapetrees/trees/desc-en#Task> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-en>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Tasks"@en.
+<https://data/shapetrees/trees/desc-en#Image> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-en>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Image>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Images"@en.
+<https://data/shapetrees/trees/desc-en#File> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-en>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/File>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Files"@en
+}
+<https://data/shapetrees/trees/desc-es> {
+<https://data/shapetrees/trees/desc-es> a <http://www.w3.org/ns/shapetrees#DescriptionSet>;
+    <http://www.w3.org/ns/shapetrees#usesLanguage> "es"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/shapetrees/trees/desc-es#Project> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-es>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Proyectos"@es.
+<https://data/shapetrees/trees/desc-es#Task> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-es>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Tareas"@es.
+<https://data/shapetrees/trees/desc-es#Image> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-es>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Image>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Imágenes"@es.
+<https://data/shapetrees/trees/desc-es#File> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-es>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/File>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Archivos"@es
+}
+<https://data/shapetrees/trees/desc-pl> {
+<https://data/shapetrees/trees/desc-pl> a <http://www.w3.org/ns/shapetrees#DescriptionSet>;
+    <http://www.w3.org/ns/shapetrees#usesLanguage> "pl"^^<http://www.w3.org/2001/XMLSchema#language>.
+<https://data/shapetrees/trees/desc-pl#Project> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-pl>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Projekty"@pl.
+<https://data/shapetrees/trees/desc-pl#Task> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-pl>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Zadania"@pl.
+<https://data/shapetrees/trees/desc-pl#Image> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-pl>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/Image>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Grafiki"@pl.
+<https://data/shapetrees/trees/desc-pl#File> a <http://www.w3.org/ns/shapetrees#Description>;
+    <http://www.w3.org/ns/shapetrees#inDescriptionSet> <https://data/shapetrees/trees/desc-pl>;
+    <http://www.w3.org/ns/shapetrees#describes> <https://data/shapetrees/trees/File>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Pliki"@pl
+}
+<https://id/acme> {
+<https://id/acme> <http://www.w3.org/2004/02/skos/core#prefLabel> "ACME";
+    <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;
+    <http://www.w3.org/ns/solid/interop#hasAuthorizationAgent> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9hY21l>;
+    <https://www.w3.org/ns/did#service> _:b0_sai-access-request-acme, _:b0_sai-access-grant-acme;
+    <https://www.w3.org/ns/cid/v1#service> _:b0_sai-openid-provider-acme.
+_:b0_sai-access-request-acme a <https://www.w3.org/ns/lws#AccessRequestService>;
+    <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/access-requests/aHR0cHM6Ly9pZC9hY21l>.
+_:b0_sai-access-grant-acme a <https://www.w3.org/ns/lws#AccessGrantService>;
+    <https://www.w3.org/ns/did#serviceEndpoint> <https://auth/.sai/grants/aHR0cHM6Ly9pZC9hY21l>.
+_:b0_sai-openid-provider-acme a <https://www.w3.org/ns/lws#OpenIdProvider>;
+    <https://www.w3.org/ns/cid/v1#serviceEndpoint> <https://auth/>
+}

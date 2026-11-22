@@ -169,29 +169,3 @@ export async function splitFixtureByPod(
   }
   return result
 }
-
-/**
- * Render a Fuseki `config.ttl` with one `fuseki:Service` per dataset. Each
- * service offers `/sparql` (query + update) and `/data` (Graph Store
- * Protocol) and stores into its own TDB2 directory.
- */
-export function fusekiConfig(datasets: string[]): string {
-  const header = `@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix fuseki: <http://jena.apache.org/fuseki#> .
-@prefix tdb2:   <http://jena.apache.org/2016/tdb#> .
-`
-  return `${header}\n${datasets.map(fusekiServiceBlock).join('\n')}`
-}
-
-function fusekiServiceBlock(name: string): string {
-  return `<#${name}> rdf:type fuseki:Service ;
-    fuseki:name "${name}" ;
-    fuseki:endpoint [ fuseki:operation fuseki:query  ; fuseki:name "sparql" ] ;
-    fuseki:endpoint [ fuseki:operation fuseki:update ; fuseki:name "sparql" ] ;
-    fuseki:endpoint [ fuseki:operation fuseki:gsp_rw ; fuseki:name "data" ] ;
-    fuseki:dataset <#${name}-dataset> .
-
-<#${name}-dataset> rdf:type tdb2:DatasetTDB2 ;
-    tdb2:location "/fuseki-base/databases/${name}" .
-`
-}

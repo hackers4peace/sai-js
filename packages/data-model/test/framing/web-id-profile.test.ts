@@ -6,7 +6,7 @@ import { docFromGraphs } from './helpers'
 
 const WEBID_IRI = 'https://id/acme'
 
-// Graph <https://id/acme> in registry.trig: WebID profile with
+// Graph <https://id/acme> in the local framing fixture: WebID profile with
 // skos:prefLabel and solid:oidcIssuer (no rdf:type).
 describe('WebIdProfile framing', () => {
   test('frames the webid graph into WebIdProfileData', async () => {

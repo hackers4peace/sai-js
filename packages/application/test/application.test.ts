@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto'
 
-import { statelessFetch } from '@janeirodigital/interop-test-utils'
 import { FlatIdentifierStrategy } from '@janeirodigital/interop-utils'
 import { describe, expect, test, vi } from 'vitest'
 
 import { Application } from '../src'
+import { statelessFetch } from './mock-fetch.ts'
 
 const webId = 'https://alice.example/#id'
 const applicationId = 'https://projectron.example/'

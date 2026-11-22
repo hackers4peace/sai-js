@@ -9,7 +9,7 @@ import { describe, expect, test } from 'vitest'
 // that registry owner. This keeps source and delegated grants on the same
 // grantor/registration side.
 const registryTrig = readFileSync(
-  new URL('../../../../environments/data/registry.trig', import.meta.url),
+  new URL('../environments/data/registry.trig', import.meta.url),
   'utf-8'
 )
 

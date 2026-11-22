@@ -5,7 +5,6 @@ import {
   datasetForGraph,
   datasetForPod,
   fixturePodDatasets,
-  fusekiConfig,
   splitFixtureByPod,
 } from '../src/fuseki.js'
 
@@ -146,19 +145,5 @@ GRAPH <https://registry/alice/g1> { <https://registry/alice/g1> a lws:AccessGran
     expect(acme).toContain('https://registry/alice/reg-alice')
     expect(acme).toContain('https://registry/alice/g1')
     expect(split.get('reg-alice')!).not.toContain('reg-acme')
-  })
-})
-
-describe('fusekiConfig', () => {
-  test('renders one service + dataset per name', () => {
-    const ttl = fusekiConfig(['id', 'reg-alice', 'data-alice-home'])
-    for (const name of ['id', 'reg-alice', 'data-alice-home']) {
-      expect(ttl).toContain(`fuseki:name "${name}"`)
-      expect(ttl).toContain(`/fuseki-base/databases/${name}`)
-    }
-    expect(ttl.match(/rdf:type fuseki:Service/g)).toHaveLength(3)
-    expect(ttl).toContain('fuseki:operation fuseki:query')
-    expect(ttl).toContain('fuseki:operation fuseki:update')
-    expect(ttl).toContain('fuseki:operation fuseki:gsp_rw')
   })
 })

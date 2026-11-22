@@ -57,11 +57,6 @@ export class Postgres {
     `
   }
 
-  async dropTable(): Promise<void> {
-    this.init()
-    await this.sql`DROP TABLE IF EXISTS ${this.sql(this.tableName)}`
-  }
-
   async importFromJson(data: Record<string, string | object>): Promise<void> {
     this.init()
     // Keep the table in place: a running CSS server may read it while a test is

@@ -4,7 +4,6 @@ import {
   putSocialAgentInvitation,
 } from '@janeirodigital/interop-authorization-agent'
 import { Role, SocialAgentInvitation, dataModelContext } from '@janeirodigital/interop-data-model'
-import { createStatefulFetch } from '@janeirodigital/interop-test-utils'
 import {
   INTEROP,
   LDP,
@@ -20,6 +19,7 @@ import { DataFactory } from 'n3'
 import { describe, test } from 'vitest'
 
 import { expect } from './expect'
+import { createStatefulFetch } from './mock-fetch.ts'
 
 // ──────────────────────────
 // Write-path round-trips for the models whose serialization was previously

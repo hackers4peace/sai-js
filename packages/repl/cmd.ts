@@ -113,18 +113,6 @@ const envOption = Options.text('env').pipe(
   Options.withDefault('dev')
 )
 
-const datasetPathOption = Options.file('dataset').pipe(
-  Options.withAlias('d'),
-  Options.withDescription('Dataset output file path for the generated file'),
-  Options.optional
-)
-
-const kvPathOption = Options.file('key-value').pipe(
-  Options.withAlias('k'),
-  Options.withDescription('Key-value output file path for the generated file'),
-  Options.optional
-)
-
 const generateRegistry = (path: string, env: string): Effect.Effect<string, Error> =>
   Effect.try({
     try: () => {
@@ -138,46 +126,6 @@ const generateRegistry = (path: string, env: string): Effect.Effect<string, Erro
     },
     catch: (error) => new Error(`Failed to generate data: ${error}`),
   })
-
-const generateRegistryCommand = Command.make(
-  'generate-registry',
-  { datasetPath: datasetPathOption, kvPath: kvPathOption, env: envOption },
-  ({ datasetPath, kvPath, env }) =>
-    Effect.gen(function* () {
-      yield* Console.log(`Generating data for ${env}`)
-
-      yield* Option.match(datasetPath, {
-        onNone: () => Console.log('no dataset path'),
-        onSome: (filePath) =>
-          Effect.gen(function* () {
-            const result = yield* generateRegistry(datasetSourcePath, env)
-            writeFileSync(filePath, result, 'utf-8')
-          }).pipe(Effect.andThen(() => Console.log(`dataset saved to: ${filePath}`))),
-      })
-
-      yield* Option.match(kvPath, {
-        onNone: () => Console.log('no key-value path'),
-        onSome: (filePath) =>
-          Effect.gen(function* () {
-            const result = yield* generateRegistry(kvSourcePath, env)
-            writeFileSync(filePath, result, 'utf-8')
-          }).pipe(Effect.andThen(() => Console.log(`key-value saved to: ${filePath}`))),
-      })
-
-      yield* Console.log('Data generated successfully')
-
-      return 0
-    }).pipe(
-      Effect.catchAll((error: Error) =>
-        Effect.gen(function* () {
-          yield* Console.error(`Error generating registry: ${error.message}`)
-          return 1
-        })
-      )
-    )
-).pipe(
-  Command.withDescription('Generate test registry.trig by replacing URLs from dev registry.trig')
-)
 
 const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
   Effect.gen(function* () {
@@ -223,18 +171,16 @@ const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
   }).pipe(
     Effect.catchAll((error: Error) =>
       Effect.gen(function* () {
-        yield* Console.error(`Error generating registry: ${error.message}`)
+        yield* Console.error(`Error seeding data: ${error.message}`)
         return 1
       })
     )
   )
-).pipe(
-  Command.withDescription('Generate test registry.trig by replacing URLs from dev registry.trig')
-)
+).pipe(Command.withDescription('Seed local Postgres, Fuseki and Garage from the mapped fixture'))
 
 const cliCommand = Command.make('interop').pipe(
   Command.withDescription('SAI Interop CLI tool'),
-  Command.withSubcommands([genJwkCommand, generateRegistryCommand, seedEnvCommand, addUserCommand])
+  Command.withSubcommands([genJwkCommand, seedEnvCommand, addUserCommand])
 )
 
 const cli = Command.run(cliCommand, {

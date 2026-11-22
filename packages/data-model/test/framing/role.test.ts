@@ -7,7 +7,7 @@ import { docFromGraphs } from './helpers'
 
 const ROLE_IRI = 'https://registry/alice/ps8hc3'
 
-// Graph <https://registry/alice/ps8hc3> in registry.trig: a Role with
+// Graph <https://registry/alice/ps8hc3> in the local framing fixture: a Role with
 // an untagged skos:prefLabel ("Corps") and interop:hasMember. The label
 // frames as a language map — the untagged value under `@none`.
 describe('Role framing', () => {

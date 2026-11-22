@@ -2,7 +2,6 @@ import {
   findInheritingAuthorizations,
   storeDataAuthorizations,
 } from '@janeirodigital/interop-authorization-agent'
-import { createStatefulFetch } from '@janeirodigital/interop-test-utils'
 import {
   ACCESS_ACTIONS,
   INTEROP,
@@ -15,6 +14,7 @@ import { DataFactory } from 'n3'
 import { describe, expect, test } from 'vitest'
 
 import { expect as saiExpect } from './expect'
+import { createStatefulFetch } from './mock-fetch.ts'
 
 // ──────────────────────────
 // Parent→child inheritance across the activity-first write path

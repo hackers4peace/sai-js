@@ -7,7 +7,7 @@ import { docFromGraphs } from './helpers'
 
 const REGISTRATION_IRI = 'https://registry/acme/je0s7n'
 
-// Graph <meta:https://registry/acme/je0s7n> in registry.trig: a
+// Graph <meta:https://registry/acme/je0s7n> in the local framing fixture: a
 // SocialAgentRegistration with registeredAgent, reciprocalRegistration,
 // hasDataGrant, skos:prefLabel and skos:note.
 describe('SocialAgentRegistration framing', () => {
