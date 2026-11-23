@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "esnext",
     "skipLibCheck": true,
     "useDefineForClassFields": true,
@@ -18,7 +17,7 @@
     "lib": ["esnext", "dom"],
     "types": ["node", "vuetify"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

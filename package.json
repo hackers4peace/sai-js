@@ -2,6 +2,7 @@
   "name": "interop",
   "private": true,
   "devDependencies": {
+    "@cloudflare/oxlint-config": "^0.1.0",
     "@dagger.io/dagger": "^0.21.12",
     "@solid/community-server": "github:elf-pavlik/CommunitySolidServer#lws-sai",
     "@types/node": "^26.6.6",
@@ -13,6 +14,7 @@
     "oxlint": "^1.94.0",
     "rimraf": "^6.1.4",
     "tslib": "^2.9.1",
+    "tsrs": "^0.25.0-ts7.1.0-beta",
     "turbo": "^2.11.13",
     "typescript": "^5.9.3",
     "vitest": "^5.1.1"
