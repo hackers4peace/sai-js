@@ -31,7 +31,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-misused-spread',
     'typescript/use-unknown-in-catch-callback-variable',
     'typescript/no-misused-promises',
-    'unicorn/prefer-top-level-await',
     'typescript/only-throw-error',
   ].map((rule) => [rule, 'off' as const])
 )
@@ -60,6 +59,11 @@ export default defineConfig({
     // checks same-realm values (CryptoKey, Uint8Array, URL, URLSearchParams) where
     // duck typing would be weaker and harder to read.
     '@nkzw/no-instanceof': 'off',
+    // Kept off: the four sites are entry points whose promise chains end in
+    // `process.exit(1)` or mount the app. packages/components emits CommonJS, so a
+    // top-level await there is invalid, and the Vite apps' build target would have
+    // to move to esnext for it.
+    'unicorn/prefer-top-level-await': 'off',
     'unicorn/no-array-for-each': 'off',
     'oxc/no-accumulating-spread': 'off',
     'typescript/no-explicit-any': 'off',
