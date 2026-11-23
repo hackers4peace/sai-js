@@ -12,7 +12,7 @@ const shapeTreeMock = vi.hoisted(() => ({
 const authzReaderMock = vi.hoisted(() => vi.fn())
 
 vi.mock('@janeirodigital/interop-data-model', async (importOriginal) => {
-  const actual = await importOriginal<typeof InteropDataModel>()
+  const actual = await importOriginal<typeof import('@janeirodigital/interop-data-model')>()
   return {
     ...actual,
     ShapeTree: {
@@ -26,12 +26,10 @@ vi.mock('@janeirodigital/interop-data-model', async (importOriginal) => {
 // The service binds the CONTEXT registry set + transport (org contexts read
 // via `/sparql-admin`); mock the AA registry-plane reader, not the session.
 vi.mock('@janeirodigital/interop-authorization-agent', async (importOriginal) => {
-  const actual = await importOriginal<typeof InteropAuthorizationAgent>()
+  const actual =
+    await importOriginal<typeof import('@janeirodigital/interop-authorization-agent')>()
   return { ...actual, findAuthorizationsForGrantee: authzReaderMock }
 })
-
-import type * as InteropAuthorizationAgent from '@janeirodigital/interop-authorization-agent'
-import type * as InteropDataModel from '@janeirodigital/interop-data-model'
 
 import { listAuthorizations } from '../src/services/Authorization.js'
 import type { ResolvedContext } from '../src/services/Context.js'

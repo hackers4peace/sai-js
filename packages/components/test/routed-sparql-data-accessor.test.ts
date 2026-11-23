@@ -52,12 +52,11 @@ const cssMock = vi.hoisted(() => {
 })
 
 vi.mock('@solid/community-server', async (importOriginal) => {
-  const actual = await importOriginal<typeof CommunityServer>()
+  const actual = await importOriginal<typeof import('@solid/community-server')>()
   return { ...actual, SparqlDataAccessor: cssMock.SparqlDataAccessor }
 })
 
 import { NotFoundHttpError } from '@solid/community-server'
-import type * as CommunityServer from '@solid/community-server'
 
 import type { SparqlEndpointRecord } from '../src/PodEndpointStore.js'
 import { RoutedSparqlDataAccessor } from '../src/RoutedSparqlDataAccessor.js'

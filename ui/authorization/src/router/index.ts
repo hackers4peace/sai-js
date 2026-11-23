@@ -1,7 +1,7 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
 
-import * as effect from '@/effect'
+import { getWebId } from '@/effect'
 import { useCoreStore } from '@/store/core'
 
 const routes = [
@@ -91,7 +91,7 @@ router.beforeEach(async (to) => {
     return
   }
   try {
-    const webId = await effect.getWebId()
+    const webId = await getWebId()
     if (webId) {
       coreStore.userId = webId
     } else {

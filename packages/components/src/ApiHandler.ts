@@ -1,6 +1,6 @@
 import { Resource, Tracer } from '@effect/opentelemetry'
 import { Etag, HttpPlatform } from '@effect/platform'
-import * as NodeContext from '@effect/platform-node/NodeContext'
+import { layer } from '@effect/platform-node/NodeContext'
 import { RpcSerialization, RpcServer } from '@effect/rpc'
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { withSpan } from '@janeirodigital/interop-utils'
@@ -359,9 +359,9 @@ export class ApiHandler extends OperationHttpHandler {
       })
 
       const platformLayer = Layer.mergeAll(
-        HttpPlatform.layer.pipe(Layer.provide(NodeContext.layer)),
+        HttpPlatform.layer.pipe(Layer.provide(layer)),
         Etag.layer,
-        NodeContext.layer
+        layer
       )
       const tracingLayer = temporalPluginConfig()
         ? Layer.provide(Tracer.layerGlobal, Resource.layer({ serviceName: 'sai-uas' }))

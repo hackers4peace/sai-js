@@ -145,7 +145,7 @@
 <script lang="ts" setup>
 import { IRI } from '@janeirodigital/sai-api-messages'
 import type { Application } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -196,7 +196,7 @@ onMounted(() => {
   }
 })
 
-function grantAccess(application: S.Schema.Type<typeof Application>) {
+function grantAccess(application: Schema.Type<typeof Application>) {
   grantDialog.value = false
   router.push({
     name: 'authorization',

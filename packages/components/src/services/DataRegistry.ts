@@ -17,7 +17,7 @@ import {
   DataRegistry as DataRegistrySchema,
   IRI,
 } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import { peerInstanceIris, peerInstanceNode } from './peerData.js'
@@ -45,7 +45,7 @@ const buildDataRegistry = async (
   // context allowlist (personal: session, org: `/sparql-admin?pod=`).
   const transport = sparqlTransportForPod(ctx, registry.id)
   const iris = await listContained(transport, registry.id)
-  const registrations: Array<S.Schema.Type<typeof DataRegistration>> = []
+  const registrations: Array<Schema.Type<typeof DataRegistration>> = []
   for (const iri of iris) {
     const registration = await getDataRegistrationFromSparql(transport, iri)
     const shapeTree = await loadShapeTree(registration.registeredShapeTree, ctx.session.fetch)
@@ -79,7 +79,7 @@ const buildDataRegistryForGrant = async (
   ctx: ResolvedContext
 ) => {
   const seen = new Set<string>()
-  const registrations: Array<S.Schema.Type<typeof DataRegistration>> = []
+  const registrations: Array<Schema.Type<typeof DataRegistration>> = []
   for (const accessGrant of accessGrants) {
     if (seen.has(accessGrant.hasDataRegistration)) {
       continue

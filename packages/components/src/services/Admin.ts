@@ -9,7 +9,7 @@ import {
   AdminAuthorizationRevokedMessage,
   IRI,
 } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import {
@@ -31,8 +31,8 @@ import { findSocialAgentRegistrationInContext } from './SocialAgentRegistry.js'
  */
 export const addAdmin = async (
   ctx: ResolvedContext,
-  webId: S.Schema.Type<typeof IRI>
-): Promise<S.Schema.Type<typeof AdminAuthorizationGrantedMessage>> => {
+  webId: Schema.Type<typeof IRI>
+): Promise<Schema.Type<typeof AdminAuthorizationGrantedMessage>> => {
   const registration = await findSocialAgentRegistrationInContext(ctx, webId)
   if (!registration) {
     throw new Error(`Social Agent Registration for ${webId} not found`)
@@ -97,8 +97,8 @@ export const addAdmin = async (
  */
 export const removeAdmin = async (
   ctx: ResolvedContext,
-  webId: S.Schema.Type<typeof IRI>
-): Promise<S.Schema.Type<typeof AdminAuthorizationRevokedMessage>> => {
+  webId: Schema.Type<typeof IRI>
+): Promise<Schema.Type<typeof AdminAuthorizationRevokedMessage>> => {
   const registration = await findSocialAgentRegistrationInContext(ctx, webId)
   if (!registration) {
     throw new Error(`Social Agent Registration for ${webId} not found`)

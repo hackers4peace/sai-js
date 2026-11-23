@@ -11,7 +11,7 @@ import {
   InvitationCreatedMessage,
   SocialAgentInvitation,
 } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import {
@@ -64,7 +64,7 @@ export async function createInvitation(
   ctx: ResolvedContext,
   base: { label: string; note?: string },
   lang: string
-): Promise<S.Schema.Type<typeof InvitationCreatedMessage>> {
+): Promise<Schema.Type<typeof InvitationCreatedMessage>> {
   const invitationRegistry = ctx.registrySet.hasInvitationRegistry
   const activityRegistry = ctx.registrySet.hasActivityRegistry
   if (!activityRegistry) {

@@ -2,8 +2,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { Args, Command, Options } from '@effect/cli'
-import * as NodeContext from '@effect/platform-node/NodeContext'
-import * as Runtime from '@effect/platform-node/NodeRuntime'
+import { layer } from '@effect/platform-node/NodeContext'
+import { runMain } from '@effect/platform-node/NodeRuntime'
 import {
   Postgres,
   seedFusekiDataset,
@@ -192,4 +192,4 @@ const cli = Command.run(cliCommand, {
   version: '1.0.0-rc.26',
 })
 
-cli(process.argv).pipe(Effect.provide(NodeContext.layer), Runtime.runMain)
+cli(process.argv).pipe(Effect.provide(layer), runMain)

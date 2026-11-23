@@ -322,7 +322,7 @@ import type {
   Role,
   SocialAgent,
 } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 import locale from 'locale-codes'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -338,10 +338,10 @@ const coreStore = useCoreStore()
 const appStore = useAppStore()
 
 const props = defineProps<{
-  application?: Partial<S.Schema.Type<typeof Application>>
-  agent?: S.Schema.Type<typeof SocialAgent>
-  role?: S.Schema.Type<typeof Role>
-  authorizationData: S.Schema.Type<typeof AuthorizationData>
+  application?: Partial<Schema.Type<typeof Application>>
+  agent?: Schema.Type<typeof SocialAgent>
+  role?: Schema.Type<typeof Role>
+  authorizationData: Schema.Type<typeof AuthorizationData>
   redirect: boolean
 }>()
 
@@ -449,7 +449,7 @@ const dataInstancesIndex = reactive<Record<string, SelectableDataInstance>>({})
 function addDataInstancesToIndex(
   agentId: string,
   registrationId: string,
-  dataInstances: S.Schema.Type<typeof DataInstanceList>,
+  dataInstances: Schema.Type<typeof DataInstanceList>,
   selected: boolean
 ): void {
   for (const dataInstance of dataInstances) {
@@ -728,7 +728,7 @@ function isSelected(needId: string, childId?: string): boolean {
   return need.selected
 }
 
-function chooseIcon(access: ReadonlyArray<S.Schema.Type<typeof IRI>>): string {
+function chooseIcon(access: ReadonlyArray<Schema.Type<typeof IRI>>): string {
   if (access.includes(IRI.make(AccessModes.Modify))) {
     return 'mdi-square-edit-outline'
   }
@@ -737,29 +737,29 @@ function chooseIcon(access: ReadonlyArray<S.Schema.Type<typeof IRI>>): string {
 
 // TODO throw error if required need is not satisfied
 function createDataAuthorizations(
-  need: S.Schema.Type<typeof AccessNeed>,
-  parent?: S.Schema.Type<typeof AccessNeed>
-): Array<S.Schema.Type<typeof DataAuthorization>> {
+  need: Schema.Type<typeof AccessNeed>,
+  parent?: Schema.Type<typeof AccessNeed>
+): Array<Schema.Type<typeof DataAuthorization>> {
   if (!parent && !isSelected(need.id)) {
     return []
   }
   if (parent && !isSelected(parent.id, need.id)) {
     return []
   }
-  const dataAuthorizations: Array<S.Schema.Type<typeof DataAuthorization>> = []
+  const dataAuthorizations: Array<Schema.Type<typeof DataAuthorization>> = []
   const accessNeedAuthorization = {
     accessNeed: need.id,
-  } as Partial<S.Schema.Type<typeof DataAuthorization>>
+  } as Partial<Schema.Type<typeof DataAuthorization>>
   if (need.parent) {
     dataAuthorizations.push({
       ...accessNeedAuthorization,
       scope: Scopes.Inherited,
-    } as S.Schema.Type<typeof DataAuthorization>)
+    } as Schema.Type<typeof DataAuthorization>)
   } else if (topLevelScope.value === 'all') {
     dataAuthorizations.push({
       ...accessNeedAuthorization,
       scope: Scopes.All,
-    } as S.Schema.Type<typeof DataAuthorization>)
+    } as Schema.Type<typeof DataAuthorization>)
   } else if (activeTab.value === 'roles') {
     for (const role of Object.values(rolesIndex)) {
       if (role.selected) {
@@ -767,7 +767,7 @@ function createDataAuthorizations(
           ...accessNeedAuthorization,
           scope: Scopes.AllFromRole,
           dataOwner: role.id,
-        } as S.Schema.Type<typeof DataAuthorization>)
+        } as Schema.Type<typeof DataAuthorization>)
       }
     }
   } else if (topLevelScope.value === 'agent') {
@@ -780,18 +780,18 @@ function createDataAuthorizations(
         dataAuthorizations.push({
           ...agentAuthorization,
           scope: Scopes.AllFromAgent,
-        } as S.Schema.Type<typeof DataAuthorization>)
+        } as Schema.Type<typeof DataAuthorization>)
       } else if (agent.scope === 'some') {
         for (const registration of findAgentRegistrations(agent.id)) {
           const registrationAuthorization = {
             ...agentAuthorization,
             dataRegistration: registration.id,
-          } as Partial<S.Schema.Type<typeof DataAuthorization>>
+          } as Partial<Schema.Type<typeof DataAuthorization>>
           if (registration.scope === 'all') {
             dataAuthorizations.push({
               ...registrationAuthorization,
               scope: Scopes.AllFromRegistry,
-            } as S.Schema.Type<typeof DataAuthorization>)
+            } as Schema.Type<typeof DataAuthorization>)
           } else if (registration.scope === 'some') {
             dataAuthorizations.push({
               ...registrationAuthorization,
@@ -799,13 +799,13 @@ function createDataAuthorizations(
               dataInstances: findRegistrationDataInstances(registration.id)
                 .filter((i) => i.selected)
                 .map((i) => i.id),
-            } as unknown as S.Schema.Type<typeof DataAuthorization>)
+            } as unknown as Schema.Type<typeof DataAuthorization>)
           }
         }
       }
     }
   }
-  let children: Array<S.Schema.Type<typeof DataAuthorization>> = []
+  let children: Array<Schema.Type<typeof DataAuthorization>> = []
   if (need.children) {
     children = need.children.flatMap((childAccessNeed) =>
       createDataAuthorizations(childAccessNeed, need)
@@ -825,11 +825,11 @@ function authorize(granted = true) {
   loadingAuthorize.value = granted
   loadingDeny.value = !granted
   if (props.authorizationData) {
-    let authorization: S.Schema.Type<typeof Authorization>
+    let authorization: Schema.Type<typeof Authorization>
     const baseAuthorization = {
       grantee: props.authorizationData.id,
       accessNeedGroup: props.authorizationData.accessNeedGroup.id,
-    } as S.Schema.Type<typeof BaseAuthorization>
+    } as Schema.Type<typeof BaseAuthorization>
     if (granted) {
       authorization = {
         ...baseAuthorization,

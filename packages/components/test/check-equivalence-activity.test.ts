@@ -45,12 +45,10 @@ vi.mock('../src/builders/sessionManager.js', () => ({
 }))
 
 vi.mock('@janeirodigital/interop-authorization-agent', async (importOriginal) => ({
-  ...(await importOriginal<typeof InteropAuthorizationAgent>()),
+  ...(await importOriginal<typeof import('@janeirodigital/interop-authorization-agent')>()),
   localSparqlTransport: h.localSparqlTransport,
   getAccessGrant: h.getAccessGrant,
 }))
-
-import type * as InteropAuthorizationAgent from '@janeirodigital/interop-authorization-agent'
 
 import { checkEquivalence } from '../src/temporal/activities/grants.js'
 

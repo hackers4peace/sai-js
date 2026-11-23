@@ -107,7 +107,7 @@
 </template>
 <script lang="ts" setup>
 import type { SocialAgentInvitation } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -144,11 +144,11 @@ const inOrgContext = computed(() => !!appStore.context && appStore.context !== c
  *  context (the RPC enforces it there too) */
 const adminCount = computed(() => appStore.socialAgentList.filter((agent) => agent.admin).length)
 
-function copyCapabilityUrl(invitation: S.Schema.Type<typeof SocialAgentInvitation>) {
+function copyCapabilityUrl(invitation: Schema.Type<typeof SocialAgentInvitation>) {
   navigator.clipboard.writeText(invitation.capabilityUrl)
 }
 
-function webShareUrl(invitation: S.Schema.Type<typeof SocialAgentInvitation>) {
+function webShareUrl(invitation: Schema.Type<typeof SocialAgentInvitation>) {
   navigator.share({
     title: invitation.label,
     text: invitation.note,

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import type { PushSubscription } from 'web-push'
 
-import * as effect from '@/effect'
+import { registerPushSubscription } from '@/effect'
 import { fluent } from '@/plugins/fluent'
 import { getRuntimeConfig } from '@/runtime-config'
 
@@ -120,7 +120,7 @@ export const useCoreStore = defineStore('core', () => {
     const subscription = await registration.pushManager.getSubscription()
     if (subscription) {
       pushSubscription.value = subscription.toJSON() as PushSubscription
-      effect.registerPushSubscription(pushSubscription.value)
+      registerPushSubscription(pushSubscription.value)
     }
   }
 
@@ -150,7 +150,7 @@ export const useCoreStore = defineStore('core', () => {
         })
       }
       pushSubscription.value = subscription.toJSON() as PushSubscription
-      await effect.registerPushSubscription(pushSubscription.value)
+      await registerPushSubscription(pushSubscription.value)
     }
     return result
   }

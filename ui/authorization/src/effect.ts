@@ -3,7 +3,7 @@ import { RpcClient, RpcSerialization } from '@effect/rpc'
 import { IRI, rpcGroup } from '@janeirodigital/sai-api-messages'
 import type { Authorization, ShareAuthorization } from '@janeirodigital/sai-api-messages'
 import { Effect, Layer } from 'effect'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 import type { PushSubscription } from 'web-push'
 
 import { getRuntimeConfig } from './runtime-config'
@@ -162,8 +162,8 @@ export async function listDataRegistries(agentId: string, lang: string, context:
 }
 
 export async function listDataInstances(
-  agentId: S.Schema.Type<typeof IRI>,
-  registrationId: S.Schema.Type<typeof IRI>,
+  agentId: Schema.Type<typeof IRI>,
+  registrationId: Schema.Type<typeof IRI>,
   context: string
 ) {
   const program = Effect.gen(function* () {
@@ -238,7 +238,7 @@ export async function acceptInvitation(
 }
 
 export async function shareResource(
-  authorization: S.Schema.Type<typeof ShareAuthorization>,
+  authorization: Schema.Type<typeof ShareAuthorization>,
   context: string
 ) {
   const program = Effect.gen(function* () {
@@ -249,7 +249,7 @@ export async function shareResource(
 }
 
 export async function authorizeApp(
-  authorization: S.Schema.Type<typeof Authorization>,
+  authorization: Schema.Type<typeof Authorization>,
   context: string,
   accessRequestIri?: string
 ) {
@@ -277,7 +277,7 @@ export async function revokeAuthorizations(authorizations: ReadonlyArray<string>
 
 export async function createRole(
   label: string,
-  members: ReadonlyArray<S.Schema.Type<typeof IRI>>,
+  members: ReadonlyArray<Schema.Type<typeof IRI>>,
   context: string
 ) {
   const program = Effect.gen(function* () {
@@ -288,9 +288,9 @@ export async function createRole(
 }
 
 export async function updateRole(
-  id: S.Schema.Type<typeof IRI>,
+  id: Schema.Type<typeof IRI>,
   label: string,
-  members: ReadonlyArray<S.Schema.Type<typeof IRI>>,
+  members: ReadonlyArray<Schema.Type<typeof IRI>>,
   context: string
 ) {
   const program = Effect.gen(function* () {
@@ -300,7 +300,7 @@ export async function updateRole(
   return Effect.runPromise(program)
 }
 
-export async function deleteRole(id: S.Schema.Type<typeof IRI>, context: string) {
+export async function deleteRole(id: Schema.Type<typeof IRI>, context: string) {
   const program = Effect.gen(function* () {
     const client = yield* makeClient
     return yield* client.DeleteRole({ id, context: IRI.make(context) })

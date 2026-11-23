@@ -25,7 +25,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-unsafe-argument',
     'quality/no-known-value-widening',
     'typescript/no-unsafe-return',
-    'import/no-namespace',
     'typescript/no-floating-promises',
     'quality/no-unknown-returns',
     'typescript/no-misused-spread',
@@ -64,6 +63,9 @@ export default defineConfig({
     // top-level await there is invalid, and the Vite apps' build target would have
     // to move to esnext for it.
     'unicorn/prefer-top-level-await': 'off',
+    // `typeof import('x')` is the only spelling for a module-namespace type that
+    // vi.importOriginal and Temporal's proxyActivities accept, so it stays legal.
+    'typescript/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
     'unicorn/no-array-for-each': 'off',
     'oxc/no-accumulating-spread': 'off',
     'typescript/no-explicit-any': 'off',
@@ -87,6 +89,25 @@ export default defineConfig({
         'typescript/no-require-imports': 'off',
         // untyped monkey-patching of prototype methods (see preload.cjs)
         'typescript/unbound-method': 'off',
+      },
+    },
+    {
+      // Namespaces that library or local shape force: Temporal addresses activity
+      // modules as a whole (`proxyActivities<typeof activities>`, and the module
+      // object registered on a worker); jsonld-lib unwraps the CJS default export
+      // of `jsonld`; effect/Schema's `S.*` keeps its schema constructors from
+      // shadowing global String/Number/Array; and the UI store declares actions
+      // with the same names as the `@/effect` helpers it calls.
+      files: [
+        '**/src/temporal/**',
+        '**/src/workers/**',
+        'packages/utils/src/jsonld-lib.ts',
+        'services/id/**',
+        'packages/api-messages/src/effect.ts',
+        'ui/authorization/src/store/app.ts',
+      ],
+      rules: {
+        'import/no-namespace': 'off',
       },
     },
     {

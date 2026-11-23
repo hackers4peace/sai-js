@@ -18,15 +18,13 @@ import { createStatefulFetch, statelessFetch } from './mock-fetch.ts'
 // wrap discovery helpers so tests can control the outcome of the session's
 // reciprocal discovery without replacing the whole module
 vi.mock('@janeirodigital/interop-utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof InteropUtils>()
+  const actual = await importOriginal<typeof import('@janeirodigital/interop-utils')>()
   return {
     ...actual,
     discoverAuthorizationAgent: vi.fn(actual.discoverAuthorizationAgent),
     discoverAgentRegistration: vi.fn(actual.discoverAgentRegistration),
   }
 })
-import type * as InteropUtils from '@janeirodigital/interop-utils'
-
 import {
   AuthorizationAgent,
   RevocationError,

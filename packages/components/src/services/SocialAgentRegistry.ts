@@ -12,7 +12,7 @@ const loadWebIdProfile = loader(WebIdProfile.fromJsonLd)
 
 import { INTEROP, loader, pickLanguage } from '@janeirodigital/interop-utils'
 import { IRI, InvitationAcceptedMessage, SocialAgent } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import {
@@ -254,7 +254,7 @@ export async function acceptInvitation(
   ctx: ResolvedContext,
   invitation: { capabilityUrl: string; label: string; note?: string },
   lang: string
-): Promise<S.Schema.Type<typeof InvitationAcceptedMessage>> {
+): Promise<Schema.Type<typeof InvitationAcceptedMessage>> {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
   if (!activityRegistry) {
     throw new Error('activity registry not found in registry set')

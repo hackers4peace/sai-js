@@ -95,7 +95,7 @@
 <script lang="ts" setup>
 import { AccessModes, IRI, ShapeTree } from '@janeirodigital/sai-api-messages'
 import type { Resource, SocialAgentList } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 import { computed, reactive, ref, watch } from 'vue'
 
 import AccessModeSelector from '@/components/AccessModeSelector.vue'
@@ -105,8 +105,8 @@ const appStore = useAppStore()
 
 const props = defineProps<{
   applicationId: string
-  resource: S.Schema.Type<typeof Resource>
-  socialAgents: S.Schema.Type<typeof SocialAgentList>
+  resource: Schema.Type<typeof Resource>
+  socialAgents: Schema.Type<typeof SocialAgentList>
 }>()
 
 type ShareAuthorizationModes = {
@@ -151,7 +151,7 @@ const potentialGrantees = computed(() =>
   )
 )
 
-function rolesOf(agentId: S.Schema.Type<typeof IRI>) {
+function rolesOf(agentId: Schema.Type<typeof IRI>) {
   return rolesWithAccess.value.filter(({ members }) => members.includes(agentId))
 }
 

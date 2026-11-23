@@ -1,7 +1,19 @@
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { setBodyAttribute, setTokenAttributes, withSpan } from '@janeirodigital/interop-utils'
 import { context, trace } from '@opentelemetry/api'
-import * as oauth from 'oauth4webapi'
+import type {
+  AuthorizationServer,
+  Client,
+  RecognizedTokenTypes,
+  TokenEndpointResponse,
+} from 'oauth4webapi'
+import {
+  DPoP,
+  None,
+  customFetch,
+  genericTokenEndpointRequest,
+  processGenericTokenEndpointResponse,
+} from 'oauth4webapi'
 
 /** OAuth 2.0 Token Exchange (RFC 8693) — the only grant LWS uses. */
 export const TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange'
@@ -30,11 +42,11 @@ interface TokenRequestOptions {
   fetch?: WhatwgFetch
 }
 
-function authorizationServer(endpoint: TokenEndpoint): oauth.AuthorizationServer {
+function authorizationServer(endpoint: TokenEndpoint): AuthorizationServer {
   return {
     issuer: endpoint.issuer,
     token_endpoint: endpoint.tokenEndpoint,
-  } as oauth.AuthorizationServer
+  } as AuthorizationServer
 }
 
 /**
@@ -50,12 +62,12 @@ async function tokenExchange(
   parameters: Record<string, string>,
   options: TokenRequestOptions & {
     dpopKeyPair?: CryptoKeyPair
-    recognizedTokenTypes?: oauth.RecognizedTokenTypes
+    recognizedTokenTypes?: RecognizedTokenTypes
   } = {}
-): Promise<oauth.TokenEndpointResponse> {
+): Promise<TokenEndpointResponse> {
   const as = authorizationServer(endpoint)
-  const client: oauth.Client = { client_id: clientId }
-  const requestOptions: Parameters<typeof oauth.genericTokenEndpointRequest>[5] = {}
+  const client: Client = { client_id: clientId }
+  const requestOptions: Parameters<typeof genericTokenEndpointRequest>[5] = {}
 
   // `oauth4webapi` calls the fetch after awaits, so the StackContextManager's
   // active span is gone by then. Capture the client span (`withSpan`) here and
@@ -63,7 +75,7 @@ async function tokenExchange(
   // HTTP span (and its `traceparent` to the server) then nests under it.
   const activeSpan = trace.getSpan(context.active())
   const baseFetch = options.fetch ?? (globalThis.fetch as WhatwgFetch)
-  requestOptions[oauth.customFetch] = ((input: RequestInfo | URL, init?: RequestInit) =>
+  requestOptions[customFetch] = ((input: RequestInfo | URL, init?: RequestInit) =>
     activeSpan
       ? context.with(trace.setSpan(context.active(), activeSpan), () =>
           baseFetch(input as RequestInfo, init)
@@ -71,18 +83,18 @@ async function tokenExchange(
       : baseFetch(input as RequestInfo, init)) as typeof globalThis.fetch
 
   if (options.dpopKeyPair) {
-    requestOptions.DPoP = oauth.DPoP(client, options.dpopKeyPair)
+    requestOptions.DPoP = DPoP(client, options.dpopKeyPair)
   }
 
-  const response = await oauth.genericTokenEndpointRequest(
+  const response = await genericTokenEndpointRequest(
     as,
     client,
-    oauth.None(),
+    None(),
     TOKEN_EXCHANGE_GRANT,
     new URLSearchParams(parameters),
     requestOptions
   )
-  return oauth.processGenericTokenEndpointResponse(as, client, response, {
+  return processGenericTokenEndpointResponse(as, client, response, {
     recognizedTokenTypes: options.recognizedTokenTypes,
   })
 }

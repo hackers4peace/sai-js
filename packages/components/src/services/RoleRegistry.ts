@@ -16,7 +16,7 @@ import {
   RoleDeletedMessage,
   RoleMembershipChangedMessage,
 } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import { getRole, listContained, sparqlTransportFor } from './queries/org.js'
@@ -49,8 +49,8 @@ export const getRoles = async (ctx: ResolvedContext, lang: string) => {
 export const createRole = async (
   ctx: ResolvedContext,
   label: string,
-  members: ReadonlyArray<S.Schema.Type<typeof IRI>>
-): Promise<S.Schema.Type<typeof RoleCreatedMessage>> => {
+  members: ReadonlyArray<Schema.Type<typeof IRI>>
+): Promise<Schema.Type<typeof RoleCreatedMessage>> => {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
   if (!activityRegistry) {
     throw new Error('activity registry not found in registry set')
@@ -96,10 +96,10 @@ export const createRole = async (
 
 export const updateRole = async (
   ctx: ResolvedContext,
-  id: S.Schema.Type<typeof IRI>,
+  id: Schema.Type<typeof IRI>,
   label: string,
-  members: ReadonlyArray<S.Schema.Type<typeof IRI>>
-): Promise<S.Schema.Type<typeof RoleMembershipChangedMessage>> => {
+  members: ReadonlyArray<Schema.Type<typeof IRI>>
+): Promise<Schema.Type<typeof RoleMembershipChangedMessage>> => {
   // guard read: the role must exist — the workflow re-loads the before-image
   // and PATCHes; a missing role would else leave the activity pending forever
   await loadRole(id, ctx.session.fetch)
@@ -147,8 +147,8 @@ export const updateRole = async (
 
 export const deleteRole = async (
   ctx: ResolvedContext,
-  id: S.Schema.Type<typeof IRI>
-): Promise<S.Schema.Type<typeof RoleDeletedMessage>> => {
+  id: Schema.Type<typeof IRI>
+): Promise<Schema.Type<typeof RoleDeletedMessage>> => {
   // guard read + the write-time snapshot: the role is alive here, so the
   // full RoleData (members incl.) embeds as the activity's real-id object —
   // the retry backstop once the workflow has deleted the resource

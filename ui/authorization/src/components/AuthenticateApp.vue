@@ -13,14 +13,14 @@
 </template>
 <script lang="ts" setup>
 import type { Application } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import { useCoreStore } from '@/store/core'
 
 const coreStore = useCoreStore()
 
 const props = defineProps<{
-  application?: S.Schema.Type<typeof Application>
+  application?: Schema.Type<typeof Application>
 }>()
 
 async function cancel() {

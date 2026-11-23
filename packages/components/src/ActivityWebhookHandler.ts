@@ -28,7 +28,7 @@ import {
 } from '@solid/community-server'
 import type { OperationHttpHandlerInput } from '@solid/community-server'
 import { WorkflowExecutionAlreadyStartedError } from '@temporalio/client'
-import * as S from 'effect/Schema'
+import { decodeUnknownSync } from 'effect/Schema'
 import { getLoggerFor } from 'global-logger-factory'
 
 import type { ActivityEvents } from './ActivityEvents.js'
@@ -169,7 +169,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // The object is a urn:uuid snapshot embedded in the activity doc. The
       // decoded object passes verbatim; accountId rides for the webhook store
       // (this is a webhook/push type per the checklist).
-      const decoded = S.decodeUnknownSync(InvitationAccepted)(activity)
+      const decoded = decodeUnknownSync(InvitationAccepted)(activity)
       await client.workflow.start(acceptInvitation, {
         taskQueue: 'reciprocal-registration',
         args: [
@@ -189,7 +189,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // capabilityUrl); this workflow PUTs the invitation resource at that id
       // with the channel session, generates the capabilityUrl there and
       // completes. Not a webhook/push type — no accountId pass-through.
-      const decoded = S.decodeUnknownSync(InvitationCreated)(activity)
+      const decoded = decodeUnknownSync(InvitationCreated)(activity)
       await client.workflow.start(createInvitation, {
         taskQueue: 'create-grants',
         args: [
@@ -214,7 +214,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // embedded projection at the minted id, target = the AccessRequest
       // registry); the workflow PUTs the immutable AccessRequest resource
       // there, then completes. Not a webhook/push type.
-      const decoded = S.decodeUnknownSync(NeedBasedAccessRequestReceived)(activity)
+      const decoded = decodeUnknownSync(NeedBasedAccessRequestReceived)(activity)
       await client.workflow.start(processNeedBasedAccessRequestReceived, {
         taskQueue: 'create-grants',
         args: [
@@ -234,12 +234,12 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // workflow forwards the request to the data owner's access request
       // endpoint, expects 202, then completes. Not a webhook/push type — no
       // accountId pass-through.
-      const decoded = S.decodeUnknownSync(NeedBasedAccessRequestSent)(activity)
+      const decoded = decodeUnknownSync(NeedBasedAccessRequestSent)(activity)
       await client.workflow.start(processNeedBasedAccessRequest, {
         taskQueue: 'create-grants',
         args: [
           socialAgentRef(channel.webId),
-          // the schema decodes the group loosely (S.Unknown — the framed
+          // the schema decodes the group loosely (Unknown — the framed
           // group passes through); the single cast is sound: the target's
           // `hasAccessNeedGroup: NeedBasedAccessRequestGroup` is assignable
           // to the decoded `unknown` (target→source overlap)
@@ -252,7 +252,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     }
 
     if (isActivityClass(activity, 'AgentRegistrationAdded')) {
-      const decoded = S.decodeUnknownSync(AgentRegistrationAdded)(activity)
+      const decoded = decodeUnknownSync(AgentRegistrationAdded)(activity)
       await client.workflow.start(establishReciprocal, {
         taskQueue: 'reciprocal-registration',
         args: [
@@ -271,7 +271,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // the DataAuthorization id(s) and embedded the POJOs; the workflow
       // materializes them at those ids (find-first), then regenerates grants.
       // One run per activity — no deterministic workflowId, no consumer.
-      const decoded = S.decodeUnknownSync(AuthorizationGranted)(activity as never)
+      const decoded = decodeUnknownSync(AuthorizationGranted)(activity as never)
       await client.workflow.start(processAuthorizationGranted, {
         taskQueue: 'create-grants',
         args: [
@@ -288,7 +288,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // C2: the carrier is self-contained (refs + grantee) — the dedicated
       // workflow deletes the DAs and reconciles the grant projections. One
       // run per activity (no consumer, no deterministic workflowId).
-      const decoded = S.decodeUnknownSync(AuthorizationRevoked)(activity as never)
+      const decoded = decodeUnknownSync(AuthorizationRevoked)(activity as never)
       await client.workflow.start(processAuthorizationRevoked, {
         taskQueue: 'create-grants',
         args: [
@@ -311,7 +311,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
         // embedded projection at the PRE-MINTED id); the decoded object
         // passes verbatim into the workflow input (the schema decodes
         // arrays as readonly — spread to mutable)
-        const decoded = S.decodeUnknownSync(AdminAuthorizationGranted)(activity as never)
+        const decoded = decodeUnknownSync(AdminAuthorizationGranted)(activity as never)
         await client.workflow.start(processAdminAuthorizationGranted, {
           taskQueue: 'create-grants',
           args: [
@@ -326,7 +326,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
         // step 6 — the object IS the existing AdminAuthorization (real-id
         // embedded projection at its id); the removeAdmin workflow DELETEs
         // it, revokes grants + the ACR rewrite, then completes
-        const decoded = S.decodeUnknownSync(AdminAuthorizationRevoked)(activity as never)
+        const decoded = decodeUnknownSync(AdminAuthorizationRevoked)(activity as never)
         await client.workflow.start(processAdminAuthorizationRevoked, {
           taskQueue: 'create-grants',
           args: [
@@ -344,7 +344,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // step 9 — the object IS the role-to-be (real-id embedded projection
       // at the PRE-MINTED id); the decoded object passes verbatim into the
       // workflow input; the workflow PUTs the role there and completes
-      const decoded = S.decodeUnknownSync(RoleCreated)(activity as never)
+      const decoded = decodeUnknownSync(RoleCreated)(activity as never)
       await client.workflow.start(createRole, {
         taskQueue: 'create-grants',
         args: [
@@ -372,7 +372,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // input (the schema decodes arrays as readonly — spread to the mutable
       // RoleData); the triggering activity rides as a typed ref
       if (isActivityClass(activity, 'RoleMembershipChanged')) {
-        const decoded = S.decodeUnknownSync(RoleMembershipChanged)(activity as never)
+        const decoded = decodeUnknownSync(RoleMembershipChanged)(activity as never)
         await client.workflow.start(processRoleMembershipChange, {
           taskQueue: 'create-grants',
           args: [
@@ -389,7 +389,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
           workflowId: crypto.randomUUID(),
         })
       } else {
-        const decoded = S.decodeUnknownSync(RoleDeleted)(activity as never)
+        const decoded = decodeUnknownSync(RoleDeleted)(activity as never)
         await client.workflow.start(processRoleDeletion, {
           taskQueue: 'create-grants',
           args: [
@@ -410,7 +410,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     }
 
     if (isActivityClass(activity, 'DelegatedGrantsUpdated')) {
-      const decoded = S.decodeUnknownSync(DelegatedGrantsUpdated)(activity)
+      const decoded = decodeUnknownSync(DelegatedGrantsUpdated)(activity)
       // per-peer consumer (openwiki/architecture/federation.md): replicate the
       // peer's reciprocal registration (+ its grants) into the local mirror
       // FIRST, then regenerate the delegated grants from it, then mark the

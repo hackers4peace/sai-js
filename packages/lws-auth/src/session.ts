@@ -1,6 +1,29 @@
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { context, trace } from '@opentelemetry/api'
-import * as oauth from 'oauth4webapi'
+import type {
+  AuthorizationServer,
+  Client,
+  DPoPHandle,
+  TokenEndpointRequestOptions,
+  TokenEndpointResponse,
+} from 'oauth4webapi'
+import {
+  DPoP,
+  None,
+  authorizationCodeGrantRequest,
+  calculatePKCECodeChallenge,
+  customFetch,
+  discoveryRequest,
+  generateRandomCodeVerifier,
+  generateRandomNonce,
+  generateRandomState,
+  getValidatedIdTokenClaims,
+  processAuthorizationCodeResponse,
+  processDiscoveryResponse,
+  processRefreshTokenResponse,
+  refreshTokenGrantRequest,
+  validateAuthResponse,
+} from 'oauth4webapi'
 
 import { createDpopKeyPair, createDpopProof } from './dpop.ts'
 import { decodeJwt, jwtExpiresAt } from './jwt.ts'
@@ -125,41 +148,41 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
   const defaultIssuer = normalizeIssuer(options.issuer)
   const clientId = options.clientId
 
-  const metadata = new Map<string, oauth.AuthorizationServer>()
+  const metadata = new Map<string, AuthorizationServer>()
   let current: StoredSession | undefined
   let pending: PendingFlow | undefined
   let loading: Promise<StoredSession | undefined> | undefined
 
-  function client(): oauth.Client {
+  function client(): Client {
     return { client_id: clientId }
   }
 
-  function dpopHandle(keyPair: CryptoKeyPair): oauth.DPoPHandle {
-    const dpopClient: oauth.Client = { client_id: clientId }
-    return oauth.DPoP(dpopClient, keyPair)
+  function dpopHandle(keyPair: CryptoKeyPair): DPoPHandle {
+    const dpopClient: Client = { client_id: clientId }
+    return DPoP(dpopClient, keyPair)
   }
 
-  function dpopRequest(keyPair: CryptoKeyPair): oauth.TokenEndpointRequestOptions | undefined {
+  function dpopRequest(keyPair: CryptoKeyPair): TokenEndpointRequestOptions | undefined {
     if (!dpop) {
       return undefined
     }
     return { DPoP: dpopHandle(keyPair) }
   }
 
-  async function discover(issuer: string): Promise<oauth.AuthorizationServer> {
+  async function discover(issuer: string): Promise<AuthorizationServer> {
     const cached = metadata.get(issuer)
     if (cached) {
       return cached
     }
-    const response = await oauth.discoveryRequest(new URL(issuer), {
-      [oauth.customFetch]: baseFetch as typeof globalThis.fetch,
+    const response = await discoveryRequest(new URL(issuer), {
+      [customFetch]: baseFetch as typeof globalThis.fetch,
     })
-    const server = await oauth.processDiscoveryResponse(new URL(issuer), response)
+    const server = await processDiscoveryResponse(new URL(issuer), response)
     metadata.set(issuer, server)
     return server
   }
 
-  function scopeOf(server: oauth.AuthorizationServer): string {
+  function scopeOf(server: AuthorizationServer): string {
     if (options.scope) {
       return options.scope.join(' ')
     }
@@ -170,7 +193,7 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     return scope.join(' ')
   }
 
-  function expiresAt(tokens: oauth.TokenEndpointResponse): number {
+  function expiresAt(tokens: TokenEndpointResponse): number {
     if (typeof tokens.expires_in === 'number') {
       return now() + tokens.expires_in * 1000
     }
@@ -203,14 +226,14 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
       throw new Error('the session has no refresh token')
     }
     const server = await discover(session.issuer)
-    const response = await oauth.refreshTokenGrantRequest(
+    const response = await refreshTokenGrantRequest(
       server,
       client(),
-      oauth.None(),
+      None(),
       session.refreshToken,
       dpopRequest(session.keyPair)
     )
-    const tokens = await oauth.processRefreshTokenResponse(server, client(), response)
+    const tokens = await processRefreshTokenResponse(server, client(), response)
     const updated: StoredSession = {
       ...session,
       accessToken: tokens.access_token,
@@ -243,9 +266,9 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     // The one key pair for this session: token requests, `.sai` and the
     // ID-JAG exchange all use it (and it never leaves WebCrypto).
     const keyPair = await createDpopKeyPair(false)
-    const codeVerifier = oauth.generateRandomCodeVerifier()
-    const state = oauth.generateRandomState()
-    const nonce = oauth.generateRandomNonce()
+    const codeVerifier = generateRandomCodeVerifier()
+    const state = generateRandomState()
+    const nonce = generateRandomNonce()
 
     const url = new URL(server.authorization_endpoint)
     url.searchParams.set('client_id', clientId)
@@ -254,7 +277,7 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     url.searchParams.set('scope', scopeOf(server))
     url.searchParams.set('state', state)
     url.searchParams.set('nonce', nonce)
-    url.searchParams.set('code_challenge', await oauth.calculatePKCECodeChallenge(codeVerifier))
+    url.searchParams.set('code_challenge', await calculatePKCECodeChallenge(codeVerifier))
     url.searchParams.set('code_challenge_method', 'S256')
     if (dpop) {
       url.searchParams.set('dpop_jkt', await dpopHandle(keyPair).calculateThumbprint())
@@ -280,24 +303,24 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
       throw new Error('there is no pending authorization code flow')
     }
     const server = await discover(flow.issuer)
-    const flowClient: oauth.Client = { client_id: flow.clientId }
+    const flowClient: Client = { client_id: flow.clientId }
 
-    const parameters = oauth.validateAuthResponse(server, flowClient, new URL(url), flow.state)
-    const response = await oauth.authorizationCodeGrantRequest(
+    const parameters = validateAuthResponse(server, flowClient, new URL(url), flow.state)
+    const response = await authorizationCodeGrantRequest(
       server,
       flowClient,
-      oauth.None(),
+      None(),
       parameters,
       flow.redirectUrl,
       flow.codeVerifier,
-      dpop ? { DPoP: oauth.DPoP(flowClient, flow.keyPair) } : undefined
+      dpop ? { DPoP: DPoP(flowClient, flow.keyPair) } : undefined
     )
-    const tokens = await oauth.processAuthorizationCodeResponse(server, flowClient, response, {
+    const tokens = await processAuthorizationCodeResponse(server, flowClient, response, {
       expectedNonce: flow.nonce,
       requireIdToken: true,
     })
 
-    const claims = oauth.getValidatedIdTokenClaims(tokens)
+    const claims = getValidatedIdTokenClaims(tokens)
     const accessClaims = decodeJwt(tokens.access_token).claims
     const webId = [claims?.webid, claims?.sub, accessClaims.webid, accessClaims.sub].find(
       (candidate): candidate is string => typeof candidate === 'string'

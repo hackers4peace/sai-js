@@ -47,7 +47,7 @@ import type {
   AuthorizationRevocationFailure,
 } from '@janeirodigital/sai-api-messages'
 import type { Brand } from 'effect/Brand'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import { ContextError } from './Context.js'
@@ -94,7 +94,7 @@ const formatAccessNeed = async (
   descriptionsLang: string,
   fetch: WhatwgFetch,
   shapeTreeLabelFor: (shapeTreeIri: string) => Promise<string>
-): Promise<S.Schema.Type<typeof AccessNeed>> => {
+): Promise<Schema.Type<typeof AccessNeed>> => {
   // tolerant — an embedded request's needs carry urn:uuid ids with NO
   // description documents (descriptions are the follow-up); the shape trees
   // are real IRIs and always resolve
@@ -263,7 +263,7 @@ export const getDescriptions = async (
   preferredLang: string,
   accessNeedGroupIri?: string & Brand<'IRI'>,
   accessRequestIri?: string
-): Promise<S.Schema.Type<typeof AuthorizationData>> => {
+): Promise<Schema.Type<typeof AuthorizationData>> => {
   // the approval path (authorization-granting.md §6.8): the access need
   // group comes from the EMBEDDED copy in the request — no client-id doc,
   // no reciprocal registration, no group re-fetch
@@ -393,7 +393,7 @@ export const listAuthorizations = async (
   ctx: ResolvedContext,
   grantee: string,
   lang: string
-): Promise<S.Schema.Type<typeof AuthorizationList>> => {
+): Promise<Schema.Type<typeof AuthorizationList>> => {
   // The context's registry set + transport: personal reads the session's own
   // endpoint, org context reads the org's registry through `/sparql-admin`
   // (`sparqlTransportFor`). Do NOT use the session's own registry here — in an
@@ -601,9 +601,9 @@ export const revokeAuthorizations = async (
 
 export const recordAuthorization = async (
   ctx: ResolvedContext,
-  authorization: S.Schema.Type<typeof Authorization>,
+  authorization: Schema.Type<typeof Authorization>,
   accessRequestIri?: string
-): Promise<S.Schema.Type<typeof AuthorizationGrantedMessage>> => {
+): Promise<Schema.Type<typeof AuthorizationGrantedMessage>> => {
   // thin adapter: the RPC shape → the AA's AuthorizationStructure (field
   // copies); the SAI rules (scope mapping, dataOwner assignment, inheritance
   // wiring, ensure-Application-Registration) live in the AA — called from the
@@ -741,7 +741,7 @@ export const recordAuthorization = async (
 export async function archiveAccessRequest(
   ctx: ResolvedContext,
   request: string
-): Promise<S.Schema.Type<typeof AccessRequestArchivedMessage>> {
+): Promise<Schema.Type<typeof AccessRequestArchivedMessage>> {
   const transport = sparqlTransportFor(ctx)
   const open = await getOpenSentAccessRequests(transport)
   const target = open.find((r) => r.request === request)

@@ -115,7 +115,7 @@
 
 <script lang="ts" setup>
 import type { RecordedDataAuthorization } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 import { useFluent } from 'fluent-vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -123,7 +123,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/store/app'
 import { useCoreStore } from '@/store/core'
 
-type DataAuthorization = S.Schema.Type<typeof RecordedDataAuthorization>
+type DataAuthorization = Schema.Type<typeof RecordedDataAuthorization>
 
 interface AuthorizationNode {
   authorization: DataAuthorization

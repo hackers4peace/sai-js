@@ -39,7 +39,7 @@ import type {
   ShareAuthorization,
   ShareAuthorizationConfirmation,
 } from '@janeirodigital/sai-api-messages'
-import type * as S from 'effect/Schema'
+import type { Schema } from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
 import { ownStorageOf } from './Context.js'
@@ -285,8 +285,8 @@ export async function shareContextFacts(
 
 export const shareResource = async (
   ctx: ResolvedContext,
-  shareAuthorization: S.Schema.Type<typeof ShareAuthorization>
-): Promise<S.Schema.Type<typeof ShareAuthorizationConfirmation>> => {
+  shareAuthorization: Schema.Type<typeof ShareAuthorization>
+): Promise<Schema.Type<typeof ShareAuthorizationConfirmation>> => {
   // the RPC shape is structurally identical to the AA's domain structure —
   // explicit field copies (kills the previous `as unknown as` cast)
   const structure: ShareDataInstanceStructure = {
@@ -365,7 +365,7 @@ export const shareResource = async (
 async function recordAccessRequest(
   ctx: ResolvedContext,
   request: { dataOwner: string; hasAccessNeedGroup: NeedBasedAccessRequestGroup }
-): Promise<S.Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
+): Promise<Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
   if (!activityRegistry) {
     throw new Error('activity registry not found in registry set')
@@ -432,7 +432,7 @@ export async function requestAccessUsingApplicationNeeds(
   ctx: ResolvedContext,
   applicationIri: string,
   webId: string
-): Promise<S.Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
+): Promise<Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
   const clientIdDocument = await loadClientIdDocument(applicationIri, ctx.session.fetch)
   if (!clientIdDocument.hasAccessNeedGroup) {
     throw new Error('application client-id document has no access need group')
@@ -456,7 +456,7 @@ export async function requestAccessUsingAccessNeeds(
   ctx: ResolvedContext,
   dataOwner: string,
   hasAccessNeedGroup: unknown
-): Promise<S.Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
+): Promise<Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
   return recordAccessRequest(ctx, {
     dataOwner,
     hasAccessNeedGroup: hasAccessNeedGroup as NeedBasedAccessRequestGroup,
