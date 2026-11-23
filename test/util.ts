@@ -405,8 +405,11 @@ export async function waitFor<T>(
       setTimeout(resolve, interval)
     })
   }
-  if (lastError) {
+  if (lastError instanceof Error) {
     throw lastError
+  }
+  if (lastError !== undefined) {
+    throw new Error(`waitFor failed: ${String(lastError)}`)
   }
   throw new Error(`waitFor timed out after ${timeout}ms`)
 }

@@ -281,7 +281,7 @@ export const useAppStore = defineStore('app', () => {
   async function updateTask(task: Task) {
     await ensureSaiSession()
     if (!task['@id']) {
-      throw task
+      throw new Error('task has no @id yet')
     }
     const projectId = session.findParent(task['@id']!)
     const ldoProject = findProject(projectId)
@@ -307,7 +307,7 @@ export const useAppStore = defineStore('app', () => {
   async function deleteTask(task: Task) {
     await ensureSaiSession()
     if (!task['@id']) {
-      throw task
+      throw new Error('task has no @id yet')
     }
 
     // @ldo-solid

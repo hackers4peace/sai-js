@@ -30,7 +30,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-misused-spread',
     'typescript/use-unknown-in-catch-callback-variable',
     'typescript/no-misused-promises',
-    'typescript/only-throw-error',
   ].map((rule) => [rule, 'off' as const])
 )
 

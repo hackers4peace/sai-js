@@ -699,7 +699,7 @@ export async function createAcr(
   if (uasId) {
     // no self granting at this moment!
     if (grantee === payload.dataOwner) {
-      throw payload
+      throw new Error('no self granting: the grantee is the data owner')
     }
 
     // grantee is a social agent - only their UAS has access
