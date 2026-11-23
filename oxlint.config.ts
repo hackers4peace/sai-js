@@ -56,7 +56,6 @@ const notYetMigrated = Object.fromEntries(
     'unicorn/no-typeof-undefined',
     'quality/no-reflect-get',
     'unicorn/prefer-array-some',
-    'eqeqeq',
     'unicorn/prefer-string-raw',
     'unicorn/prefer-string-slice',
     'quality/no-unknown-type-aliases',

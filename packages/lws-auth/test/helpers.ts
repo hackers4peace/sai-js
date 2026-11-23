@@ -24,7 +24,7 @@ export function createFakeFetch(route: RouteHandler): {
     const url = new URL(href)
     const headers = new Headers(init.headers ?? requestLike.headers)
     const method = (init.method ?? requestLike.method ?? 'GET').toUpperCase()
-    const body = init.body == null ? undefined : String(init.body)
+    const body = init.body === null || init.body === undefined ? undefined : String(init.body)
     const request: RecordedRequest = { url: url.href, method, headers, body }
     requests.push(request)
     return route(url, request) ?? new Response('not found', { status: 404 })
