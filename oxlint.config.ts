@@ -61,7 +61,9 @@ export default defineConfig({
     // Carried over from .oxlintrc.json
     'no-underscore-dangle': [
       'error',
-      { allow: ['_tag', '__dirname', '_getContextManager', 'currentAth_'] },
+      {
+        allow: ['_tag', '__dirname', '_getContextManager', 'currentAth_', '_tracerProvider'],
+      },
     ],
     'unicorn/no-array-for-each': 'off',
     'oxc/no-accumulating-spread': 'off',

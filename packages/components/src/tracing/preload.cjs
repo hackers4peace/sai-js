@@ -108,7 +108,7 @@ if (!hardDisabled && (saiEndpoint || otlpEndpoint)) {
     // (it is set by `NodeSDK.start()` whenever span processors are configured,
     // which ours always are); the API lookup is only a fallback.
     globalThis[Symbol.for('sai.otel.tracerProvider')] =
-      Reflect.get(sdk, '_tracerProvider') ?? require('@opentelemetry/api').trace.getTracerProvider()
+      sdk._tracerProvider ?? require('@opentelemetry/api').trace.getTracerProvider()
 
     // Payload capture (bodies + parsed JWKS) for this CJS process; a no-op
     // unless `OTEL_CAPTURE_BODIES=true`.
