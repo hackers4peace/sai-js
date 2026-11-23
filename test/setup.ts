@@ -21,23 +21,22 @@ const withoutTracing = <T>(fn: () => Promise<T>): Promise<T> =>
 // @opentelemetry/api 1.9, but the registered context manager
 // (AsyncHooksContextManager after SDK start) implements attach/detach —
 // reached via the private _getContextManager, guarded for when no SDK runs.
-type Scope = unknown
-let rootToken: Scope | undefined
+let rootToken: unknown
 let rootSpan: Span | undefined
 
-function attachContext(ctx: Context): Scope | undefined {
+function attachContext(ctx: Context): unknown {
   const manager = (
-    context as unknown as { _getContextManager(): { attach(c: Context): Scope } | undefined }
+    context as unknown as { _getContextManager(): { attach(c: Context): unknown } | undefined }
   )._getContextManager?.()
   return manager?.attach?.(ctx)
 }
 
-function detachContext(scope: Scope | undefined): void {
+function detachContext(scope: unknown): void {
   if (scope === undefined) {
     return
   }
   const manager = (
-    context as unknown as { _getContextManager(): { detach(s: Scope): void } | undefined }
+    context as unknown as { _getContextManager(): { detach(s: unknown): void } | undefined }
   )._getContextManager?.()
   manager?.detach?.(scope)
 }
