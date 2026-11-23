@@ -15,7 +15,7 @@ const BOB_ID = process.env.BOB_ID ?? 'https://bob.id.docker'
 const NOBODY_ID = process.env.NOBODY_ID ?? 'https://nobody.id.docker'
 
 test.beforeEach(async ({ context, page }, testInfo) => {
-  attachDiagnostics(page, testInfo)
+  await attachDiagnostics(page, testInfo)
   await signIn(context, 'alice')
 })
 

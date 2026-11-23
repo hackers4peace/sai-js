@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
 
-import { UI_BASE_URL, attachDiagnostics, signIn } from './support'
+import { UI_BASE_URL, attachDiagnostics, newActor, signIn } from './support'
 
 // UI counterpart of test/invitation.test.ts "personal invitation": Dan invites
 // Kim and Kim accepts, each in their own browser with their own session.
@@ -24,8 +24,11 @@ test('dan invites kim, kim accepts — both see each other as peers', async ({
   context: danContext,
   page: dan,
 }, testInfo) => {
+  // three workflow round trips (create, accept, establish reciprocal)
+  test.setTimeout(3 * WORKFLOW_TIMEOUT)
+
   // ── Dan: default browser context of the test ──
-  attachDiagnostics(dan, testInfo, 'dan')
+  await attachDiagnostics(dan, testInfo, 'dan')
   await signIn(danContext, 'dan')
   // "Copy link" writes to the clipboard; the test reads the link back from it
   await danContext.grantPermissions(['clipboard-read', 'clipboard-write'], {
@@ -33,16 +36,8 @@ test('dan invites kim, kim accepts — both see each other as peers', async ({
   })
 
   // ── Kim: a second, isolated browser context (own cookies/storage) ──
-  // Contexts created with browser.newContext() do not get the config's `use`
-  // options, so pass what the app needs and record Kim's video explicitly.
-  const kimContext = await browser.newContext({
-    baseURL: UI_BASE_URL,
-    ignoreHTTPSErrors: true,
-    recordVideo: { dir: testInfo.outputPath('kim-video') },
-  })
-  const kim = await kimContext.newPage()
-  attachDiagnostics(kim, testInfo, 'kim')
-  await signIn(kimContext, 'kim')
+  const kimActor = await newActor(browser, testInfo, 'kim')
+  const kim = kimActor.page
 
   try {
     await test.step('dan creates an invitation for kim', async () => {
@@ -92,8 +87,6 @@ test('dan invites kim, kim accepts — both see each other as peers', async ({
       await expect(peer).toBeVisible({ timeout: WORKFLOW_TIMEOUT })
     })
   } finally {
-    await kimContext.close()
-    const video = await kim.video()?.path()
-    if (video) await testInfo.attach('kim video', { path: video, contentType: 'video/webm' })
+    await kimActor.close()
   }
 })

@@ -287,7 +287,13 @@ export class SaiJs {
     const scripts = this.source.directory('environments/temporal/scripts')
     const dynamicConfig = this.source.directory('environments/temporal/dynamicconfig')
 
-    const pg = dag
+    // Postgres and Temporal are started explicitly (Service.start) and stay up
+    // for the whole session. Bound-only services are "started just-in-time
+    // ... and stopped when no longer needed": the short setup execs below
+    // (schema, namespace) were their only clients, so they stopped after the
+    // grace period and came back as FRESH containers — an empty, schema-less
+    // database, no namespace — with the SAI worker's pollers dropped meanwhile.
+    const pg = await dag
       .container()
       .from(`postgres:${POSTGRESQL_VERSION}`)
       .withEnvVariable('POSTGRES_PASSWORD', 'temporal')
@@ -297,6 +303,7 @@ export class SaiJs {
       // named cache volume would leak schemas and data between test runs.
       .withExposedPort(5432)
       .asService({ useEntrypoint: true })
+      .start()
 
     await dag
       .container()
@@ -326,7 +333,7 @@ export class SaiJs {
       .withExec(['/bin/sh', '-c', `echo ${runId} && exec /bin/sh /scripts/setup-postgres.sh`])
       .sync()
 
-    const temporal = dag
+    const temporal = await dag
       .container()
       .from(`temporalio/server:${TEMPORAL_VERSION}`)
       .withServiceBinding('postgresql', pg)
@@ -349,6 +356,7 @@ export class SaiJs {
           'exec /etc/temporal/entrypoint.sh start',
       ])
       .asService({ useEntrypoint: true })
+      .start()
 
     await dag
       .container()
@@ -718,6 +726,7 @@ export class SaiJs {
         .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
         .withEnvVariable('UI_BASE_URL', 'https://ui.auth')
         .withEnvVariable('AUTH_ORIGIN', 'https://auth')
+        .withEnvVariable('ALICE_ID', 'https://id/alice')
         .withEnvVariable('BOB_ID', 'https://id/bob')
         .withEnvVariable('NOBODY_ID', 'https://id/nobody')
         // test/seed.ts provisions the per-pod Garage buckets/keys itself
@@ -725,16 +734,26 @@ export class SaiJs {
         .withEnvVariable('CSS_S3_REGION', CSS_S3_REGION)
         .withEnvVariable('CSS_GARAGE_ADMIN_ENDPOINT', CSS_GARAGE_ADMIN_ENDPOINT)
         .withEnvVariable('CSS_GARAGE_ADMIN_TOKEN', CSS_GARAGE_ADMIN_TOKEN)
-        .withWorkdir('/sai/test')
-        .withExec(['node', '--input-type=module', '-e', TEMPORAL_READY])
+        .withEnvVariable('SAI_TEMPORAL_READY', TEMPORAL_READY)
         .withWorkdir('/sai/ui/authorization')
-        // Seed the fixtures (environments/data) in the same exec as the browser
-        // run, like vitest's setup.ts does per test: the account cookie the specs
-        // use only resolves once kv.json is in Postgres, and a separate exec
-        // could see the ephemeral services restarted (and empty) in between.
-        .withExec(['sh', '-c', 'node /sai/test/seed.ts && exec "$@"', 'sh', ...args], {
-          expect: ReturnType.Any,
-        })
+        // ONE exec for the readiness wait, the fixture seed and the browser run:
+        // between execs Dagger stops the now client-less services and restarts
+        // them, which dropped the SAI worker's Temporal pollers (workflows then
+        // stalled for minutes, so "done" activity events never reached the UI)
+        // and could leave the ephemeral stores empty. The readiness script
+        // resolves @temporalio/client from /sai/test; the seed is
+        // environments/data (the account cookies resolve only once kv.json is
+        // in Postgres), as vitest's setup.ts does.
+        .withExec(
+          [
+            'sh',
+            '-c',
+            '(cd /sai/test && node --input-type=module -e "$SAI_TEMPORAL_READY") && node /sai/test/seed.ts && exec "$@"',
+            'sh',
+            ...args,
+          ],
+          { expect: ReturnType.Any }
+        )
     )
   }
 
