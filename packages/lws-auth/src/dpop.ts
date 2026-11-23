@@ -14,7 +14,7 @@ function base64url(bytes: ArrayBuffer | Uint8Array): string {
   for (const byte of view) {
     binary += String.fromCharCode(byte)
   }
-  return btoa(binary).replace(/\+/gu, '-').replace(/\//gu, '_').replace(/=+$/u, '')
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '')
 }
 
 function encodeJson(value: unknown): string {

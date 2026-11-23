@@ -59,7 +59,7 @@ function truncate(body) {
 }
 
 function redact(body) {
-  return body.replace(
+  return body.replaceAll(
     JWT_PATTERN,
     (token) =>
       `<jwt:${require('node:crypto').createHash('sha256').update(token).digest('base64url').slice(0, 12)}>`

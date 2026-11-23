@@ -9,7 +9,7 @@ function decodeBase64Url(part: string): string {
     return Buffer.from(part, 'base64url').toString('utf8')
   }
   // browsers
-  const padded = part.replace(/-/gu, '+').replace(/_/gu, '/')
+  const padded = part.replaceAll('-', '+').replaceAll('_', '/')
   return atob(padded + '='.repeat((4 - (padded.length % 4)) % 4))
 }
 

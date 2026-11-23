@@ -40,7 +40,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/unbound-method',
     'quality/no-array-filter-map',
     '@nkzw/no-instanceof',
-    'unicorn/prefer-string-replace-all',
     'typescript/no-misused-promises',
     'unicorn/prefer-top-level-await',
     'typescript/only-throw-error',

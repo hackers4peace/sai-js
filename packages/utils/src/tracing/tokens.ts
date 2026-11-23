@@ -212,7 +212,7 @@ export function setBodyAttribute(span: Span, key: string, body: string): void {
 
 /** Replaces every JWT in `body` with a stable digest of it. */
 function redactTokens(body: string): string {
-  return body.replace(JWT_PATTERN, (token) => {
+  return body.replaceAll(JWT_PATTERN, (token) => {
     const digest = sha256(token)
     return `<jwt:${digest ? digest.slice(0, 12) : 'redacted'}>`
   })

@@ -48,7 +48,7 @@ function addToRegistryListing(trig: string, handle: string): string {
   return trig.replace(graph, graph.slice(0, dotIndex) + entry + graph.slice(dotIndex))
 }
 
-const stripP = (s: string): string => s.replace(/^\s*PREFIX .*\n/gm, '')
+const stripP = (s: string): string => s.replaceAll(/^\s*PREFIX .*\n/gm, '')
 
 function registryContent(handle: string, data: Array<string>): string {
   const id = `https://registry/${handle}/`
