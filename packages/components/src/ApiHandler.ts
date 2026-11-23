@@ -86,9 +86,9 @@ export class ApiHandler extends OperationHttpHandler {
       if (webId) {
         try {
           session = await this.sessionManager.getSession(webId)
-        } catch (err) {
-          console.error(err)
-          throw err
+        } catch (error) {
+          console.error(error)
+          throw error
         }
       }
 

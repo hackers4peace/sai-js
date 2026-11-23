@@ -453,7 +453,7 @@ describe('delegated-grant generation — mirror only', () => {
       KIM,
       dataModelDeps,
       transport
-    ).catch((err: unknown) => err)
+    ).catch((error_: unknown) => error_)
 
     expect(error).toBeInstanceOf(MirrorIncompleteError)
     expect(error).toMatchObject({ iri: RECIPROCAL, kind: 'registration' })
@@ -471,7 +471,7 @@ describe('delegated-grant generation — mirror only', () => {
       KIM,
       dataModelDeps,
       transport
-    ).catch((err: unknown) => err)
+    ).catch((error_: unknown) => error_)
 
     expect(error).toBeInstanceOf(MirrorIncompleteError)
     expect(error).toMatchObject({ iri: PROJECT_GRANT, kind: 'grant' })

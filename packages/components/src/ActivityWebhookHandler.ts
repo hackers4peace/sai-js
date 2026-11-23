@@ -100,8 +100,8 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     let requestBody: { type: string; object?: string }
     try {
       requestBody = JSON.parse(await readableToString(operation.body.data))
-    } catch (err) {
-      throw new BadRequestHttpError(err.message)
+    } catch (error) {
+      throw new BadRequestHttpError(error.message)
     }
 
     if (requestBody.type === 'Add' && requestBody.object) {
@@ -451,9 +451,9 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     try {
       await start()
       return
-    } catch (err) {
-      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
-        throw err
+    } catch (error) {
+      if (!(error instanceof WorkflowExecutionAlreadyStartedError)) {
+        throw error
       }
     }
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -464,9 +464,9 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
         try {
           await start()
           return
-        } catch (err2) {
-          if (!(err2 instanceof WorkflowExecutionAlreadyStartedError)) {
-            throw err2
+        } catch (error) {
+          if (!(error instanceof WorkflowExecutionAlreadyStartedError)) {
+            throw error
           }
         }
       }
@@ -497,10 +497,10 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
           session.fetch
         )
         this.activityEvents.onActivityAdded(webId, { ...completed, status: 'done' })
-      } catch (err) {
+      } catch (error) {
         this.logger.error(
           `Failed to load completed activity ${(activity as ActivityCompleted).target}: ${
-            (err as Error).message
+            (error as Error).message
           }`
         )
       }

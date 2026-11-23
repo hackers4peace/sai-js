@@ -104,11 +104,11 @@ export class SaiAuthorizationManager implements AuthorizationManager {
       // policy consumes them by type/scope/policy assignee when it mints
       // `scope: admin`; the request-time engine never matches them.
       return data
-    } catch (err) {
-      if (NotFoundHttpError.isInstance(err)) {
+    } catch (error) {
+      if (NotFoundHttpError.isInstance(error)) {
         return
       }
-      throw err
+      throw error
     }
   }
 }

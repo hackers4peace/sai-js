@@ -161,7 +161,9 @@ describe('fetchPeerDocument', () => {
   test('wraps a storage fetch that cannot be created (no authority) in PeerProxyError', async () => {
     const { ctx } = fakeCtx({}, { storageFetchError: new Error('not an admin') })
 
-    const error = await fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION).catch((e) => e)
+    const error = await fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION).catch(
+      (error_) => error_
+    )
     expect(PeerProxyError.isInstance?.(error) ?? error instanceof PeerProxyError).toBe(true)
     expect((error as PeerProxyError).message).toContain('not an admin')
     expect((error as PeerProxyError).status).toBeUndefined()

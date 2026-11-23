@@ -207,9 +207,9 @@ export const useAppStore = defineStore('app', () => {
       await listApplications(true)
       await listRoles(true)
       await listSocialAgentInvitations(true)
-    } catch (err) {
+    } catch (error) {
       // the context is no longer allowed (e.g. admin revoked) — revert
-      console.error(err)
+      console.error(error)
       setContext(previous)
       await listSocialAgents(true)
     }

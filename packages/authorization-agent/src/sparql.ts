@@ -143,11 +143,11 @@ export function withSparqlTracing(transport: SparqlTransport, endpoint: string):
         }
         span.end()
         return result
-      } catch (err) {
-        span.recordException(err as Error)
+      } catch (error) {
+        span.recordException(error as Error)
         span.setStatus({ code: SpanStatusCode.ERROR })
         span.end()
-        throw err
+        throw error
       }
     })
   return {

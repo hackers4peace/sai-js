@@ -52,10 +52,10 @@ export class ReciprocalWebhookStore extends Initializer {
       await this.storage.createIndex(RECIPROCAL_WEBHOOK_STORAGE_TYPE, 'peerId')
       await this.storage.createIndex(RECIPROCAL_WEBHOOK_STORAGE_TYPE, 'sendTo')
       this.initialized = true
-    } catch (cause: unknown) {
+    } catch (error: unknown) {
       throw new InternalServerError(
-        `Error defining Reciprocal Webhook channels in storage: ${createErrorMessage(cause)}`,
-        { cause }
+        `Error defining Reciprocal Webhook channels in storage: ${createErrorMessage(error)}`,
+        { cause: error }
       )
     }
   }

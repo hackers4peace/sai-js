@@ -88,7 +88,7 @@ describe('postWebhook', () => {
   test.each([400, 410, 413, 415, 422])('marks status %i as non-retryable', async (status) => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status })))
 
-    const error = await postWebhook({ sendTo, body }).catch((err: unknown) => err)
+    const error = await postWebhook({ sendTo, body }).catch((error_: unknown) => error_)
 
     expect(error).toBeInstanceOf(ApplicationFailure)
     expect((error as ApplicationFailure).nonRetryable).toBe(true)
@@ -97,7 +97,7 @@ describe('postWebhook', () => {
   test.each([404, 408, 425, 429, 500])('retries status %i', async (status) => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status })))
 
-    const error = await postWebhook({ sendTo, body }).catch((err: unknown) => err)
+    const error = await postWebhook({ sendTo, body }).catch((error_: unknown) => error_)
 
     expect(error).toBeInstanceOf(Error)
     expect(error).not.toBeInstanceOf(ApplicationFailure)
@@ -133,7 +133,7 @@ describe('webhook handlers', () => {
   ])('%s returns 410 for an unknown sendTo', async (_name, makeHandler) => {
     const error = await makeHandler()
       .handle({ operation: { target: { path: sendTo } } } as never)
-      .catch((err: unknown) => err)
+      .catch((error_: unknown) => error_)
 
     expect(error).toBeInstanceOf(HttpError)
     expect((error as HttpError).statusCode).toBe(410)

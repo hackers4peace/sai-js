@@ -97,14 +97,14 @@ export const useAppStore = defineStore('app', () => {
     const deps = { fetch: sessionFetch(), randomUUID: crypto.randomUUID.bind(crypto) }
     try {
       session = await Application.build(coreStore.userId, getRuntimeConfig().clientId, deps)
-    } catch (err) {
-      if (err instanceof RequestError) {
-        saiError.value = err.message
-        if (err.response) {
-          console.error(err.response)
+    } catch (error) {
+      if (error instanceof RequestError) {
+        saiError.value = error.message
+        if (error.response) {
+          console.error(error.response)
         }
       }
-      throw err
+      throw error
     }
     notificationsManager = await NotificationManager.build(
       sessionFetch(),

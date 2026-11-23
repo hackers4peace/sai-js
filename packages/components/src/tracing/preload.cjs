@@ -113,11 +113,11 @@ if (!hardDisabled && (saiEndpoint || otlpEndpoint)) {
     // Payload capture (bodies + parsed JWKS) for this CJS process; a no-op
     // unless `OTEL_CAPTURE_BODIES=true`.
     require('./http-capture.cjs').installHttpCapture()
-  } catch (err) {
+  } catch (error) {
     // fail-soft: telemetry must never break the application
     console.warn(
       `[otel] failed to start OpenTelemetry for ${process.env.OTEL_SERVICE_NAME ?? 'sai-uas'}:`,
-      err
+      error
     )
   }
 }

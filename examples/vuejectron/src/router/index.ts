@@ -9,8 +9,8 @@ async function handleRedirect() {
   const coreStore = useCoreStore()
   try {
     await coreStore.handleRedirect(window.location.href)
-  } catch (err) {
-    console.error('handleRedirect', err)
+  } catch (error) {
+    console.error('handleRedirect', error)
     return { name: 'login' }
   }
 

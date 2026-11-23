@@ -47,10 +47,10 @@ export class UiPushSubscriptionStore extends Initializer {
       await this.storage.createIndex(UI_PUSH_SUBSCRIPTION_STORAGE_TYPE, 'accountId')
       await this.storage.createIndex(UI_PUSH_SUBSCRIPTION_STORAGE_TYPE, 'webId')
       this.initialized = true
-    } catch (cause: unknown) {
+    } catch (error: unknown) {
       throw new InternalServerError(
-        `Error defining UI Push Subscriptions in storage: ${createErrorMessage(cause)}`,
-        { cause }
+        `Error defining UI Push Subscriptions in storage: ${createErrorMessage(error)}`,
+        { cause: error }
       )
     }
   }

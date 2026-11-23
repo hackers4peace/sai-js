@@ -26,7 +26,6 @@ const notYetMigrated = Object.fromEntries(
     'quality/no-known-value-widening',
     'typescript/no-unsafe-return',
     'import/no-namespace',
-    'unicorn/catch-error-name',
     'typescript/no-floating-promises',
     'no-console',
     'quality/no-unknown-returns',

@@ -47,7 +47,7 @@ describe('fetchJsonLd', () => {
 
   test('carries the status so callers can classify the failure', async () => {
     const fetch = mockFetch({ ok: false, status: 410 })
-    const error = await fetchJsonLd('https://example.example/gone', fetch).catch((err) => err)
+    const error = await fetchJsonLd('https://example.example/gone', fetch).catch((error_) => error_)
     expect(error).toBeInstanceOf(HttpStatusError)
     expect(error).toMatchObject({ iri: 'https://example.example/gone', status: 410 })
   })

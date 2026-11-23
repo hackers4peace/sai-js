@@ -53,10 +53,10 @@ export class ActivityWebhookStore extends Initializer {
       await this.storage.createIndex(ACTIVITY_WEBHOOK_STORAGE_TYPE, 'topic')
       await this.storage.createIndex(ACTIVITY_WEBHOOK_STORAGE_TYPE, 'sendTo')
       this.initialized = true
-    } catch (cause: unknown) {
+    } catch (error: unknown) {
       throw new InternalServerError(
-        `Error defining Activity Webhook channels in storage: ${createErrorMessage(cause)}`,
-        { cause }
+        `Error defining Activity Webhook channels in storage: ${createErrorMessage(error)}`,
+        { cause: error }
       )
     }
   }

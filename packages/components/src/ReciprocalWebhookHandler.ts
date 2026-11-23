@@ -46,8 +46,8 @@ export class ReciprocalWebhookHandler extends OperationHttpHandler {
     let requestBody: { type: string }
     try {
       requestBody = JSON.parse(await readableToString(operation.body.data))
-    } catch (err) {
-      throw new BadRequestHttpError(err.message)
+    } catch (error) {
+      throw new BadRequestHttpError(error.message)
     }
     if (requestBody.type === 'Update') {
       // mirror maintenance is NOT done here — this handler only records the

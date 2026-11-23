@@ -57,10 +57,10 @@ async function expectRpcError(payload: string, cookie: string): Promise<void> {
     if (result._tag === 'Success') {
       throw new Error(`expected RPC error, got Success: ${JSON.stringify(result.value)}`)
     }
-  } catch (err) {
+  } catch (error) {
     // A Defect is an expected RPC error; rethrow only our own success assertion.
-    if (err instanceof Error && err.message.startsWith('expected RPC error')) {
-      throw err
+    if (error instanceof Error && error.message.startsWith('expected RPC error')) {
+      throw error
     }
   }
 }

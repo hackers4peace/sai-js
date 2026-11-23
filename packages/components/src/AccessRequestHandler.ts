@@ -244,8 +244,8 @@ export class AccessRequestHandler extends OperationHttpHandler {
   private async parseMessage(operation: HandlerOperation): Promise<unknown> {
     try {
       return JSON.parse(await readableToString(operation.body.data))
-    } catch (err) {
-      throw new BadRequestHttpError((err as Error).message)
+    } catch (error) {
+      throw new BadRequestHttpError((error as Error).message)
     }
   }
 }

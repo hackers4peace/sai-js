@@ -44,7 +44,7 @@ async function main() {
   console.log(`Done. Converted ${ttlFiles.length} file(s).`)
 }
 
-main().catch((err) => {
-  console.error(err)
+main().catch((error) => {
+  console.error(error)
   process.exit(1)
 })

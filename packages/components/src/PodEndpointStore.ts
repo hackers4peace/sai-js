@@ -109,10 +109,10 @@ export class PodEndpointStore extends Initializer {
       await this.storage.createIndex(OBJECT_ENDPOINT_STORAGE_TYPE, 'podUrl')
       await this.storage.createIndex(OBJECT_ENDPOINT_STORAGE_TYPE, 'accountId')
       this.initialized = true
-    } catch (cause: unknown) {
+    } catch (error: unknown) {
       throw new InternalServerError(
-        `Error defining pod endpoints in storage: ${createErrorMessage(cause)}`,
-        { cause }
+        `Error defining pod endpoints in storage: ${createErrorMessage(error)}`,
+        { cause: error }
       )
     }
   }

@@ -22,10 +22,10 @@ export class PostgresKeyValueStorage<T> extends Initializer implements KeyValueS
       this.sql = postgres(this.connectionString)
       await this.ensureTable()
       this.initialized = true
-    } catch (cause: unknown) {
+    } catch (error: unknown) {
       throw new InternalServerError(
-        `Error initializing PostgresKeyValueStorage: ${createErrorMessage(cause)}`,
-        { cause }
+        `Error initializing PostgresKeyValueStorage: ${createErrorMessage(error)}`,
+        { cause: error }
       )
     }
   }

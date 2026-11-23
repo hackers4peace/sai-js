@@ -22,8 +22,8 @@ async function connectWithRetry() {
       return await NativeConnection.connect({
         address: process.env.TEMPORAL_ADDRESS,
       })
-    } catch (err) {
-      console.error('Temporal not ready, retrying...', err.message)
+    } catch (error) {
+      console.error('Temporal not ready, retrying...', error.message)
       await sleep(500)
     }
   }
@@ -96,13 +96,13 @@ async function run() {
     // actual worker failure below
     try {
       await connection.close()
-    } catch (err) {
-      console.error('failed to close connection:', err)
+    } catch (error) {
+      console.error('failed to close connection:', error)
     }
   }
 }
 
-run().catch((err) => {
-  console.error(err)
+run().catch((error) => {
+  console.error(error)
   process.exit(1)
 })

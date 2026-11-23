@@ -191,14 +191,14 @@ export async function createObjectBucket(input: BootstrapAccountInput): Promise<
       accessKeyId: key.accessKeyId,
       secretAccessKey: key.secretAccessKey ?? '',
     }
-  } catch (err) {
+  } catch (error) {
     if (keyId) {
       await garage.deleteKey(keyId).catch(() => undefined)
     }
     if (createdBucket && bucket) {
       await garage.deleteBucket(bucket.id).catch(() => undefined)
     }
-    throw err
+    throw error
   }
 }
 

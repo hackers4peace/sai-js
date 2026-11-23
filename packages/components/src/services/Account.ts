@@ -69,9 +69,9 @@ export class AccountService {
         workflowId: `account-bootstrap:${accountId}`,
         args: [input],
       })
-    } catch (err) {
-      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
-        throw err
+    } catch (error) {
+      if (!(error instanceof WorkflowExecutionAlreadyStartedError)) {
+        throw error
       }
     }
     return webId

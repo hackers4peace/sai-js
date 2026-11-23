@@ -227,9 +227,9 @@ async function revoke() {
     await appStore.revokeAuthorizations([...selection])
     selection.clear()
     confirmRevoke.value = false
-  } catch (err) {
+  } catch (error) {
     // typed `AuthorizationRevocationFailure`: show the code (C4 / D11)
-    const code = (err as { code?: string } | undefined)?.code
+    const code = (error as { code?: string } | undefined)?.code
     revokeError.value = code ? $t('revocation-failed-code', { code }) : $t('revocation-failed')
   } finally {
     revoking.value = false

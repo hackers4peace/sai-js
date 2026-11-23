@@ -116,9 +116,9 @@ export async function initNodeTracing(serviceName: string): Promise<NodeSDK | un
     // both `dist/tracing/` and `src/tracing/`.
     createRequire(import.meta.url)('../../src/tracing/http-capture.cjs').installHttpCapture()
     return sdk
-  } catch (err) {
+  } catch (error) {
     // fail-soft: telemetry must never break the application
-    console.warn(`[otel] failed to start OpenTelemetry for ${serviceName}:`, err)
+    console.warn(`[otel] failed to start OpenTelemetry for ${serviceName}:`, error)
     return undefined
   }
 }

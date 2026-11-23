@@ -242,9 +242,9 @@ async function forceMirrorSync(webId: SocialAgentId, peerId: SocialAgentId): Pro
   try {
     await start()
     return
-  } catch (err) {
-    if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
-      throw err
+  } catch (error) {
+    if (!(error instanceof WorkflowExecutionAlreadyStartedError)) {
+      throw error
     }
   }
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -255,9 +255,9 @@ async function forceMirrorSync(webId: SocialAgentId, peerId: SocialAgentId): Pro
       try {
         await start()
         return
-      } catch (err) {
-        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
-          throw err
+      } catch (error) {
+        if (!(error instanceof WorkflowExecutionAlreadyStartedError)) {
+          throw error
         }
       }
     }
@@ -613,9 +613,9 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
             },
           ],
         })
-      } catch (err) {
-        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
-          throw err
+      } catch (error) {
+        if (!(error instanceof WorkflowExecutionAlreadyStartedError)) {
+          throw error
         }
         // a consumer is already draining for this peer — it holds the delivery
       }

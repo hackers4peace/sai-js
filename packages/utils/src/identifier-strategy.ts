@@ -182,9 +182,9 @@ export class CachingIdentifierStrategyResolver implements IdentifierStrategyReso
       const resolved = await pending
       this.byRoot.set(resolved.storageRoot, resolved.strategy)
       return resolved
-    } catch (err) {
+    } catch (error) {
       this.byUrl.delete(storageUrl)
-      throw err
+      throw error
     }
   }
 
