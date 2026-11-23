@@ -238,7 +238,7 @@ export async function discoverStorageDescription(
 export const LWS_STORAGE_DESCRIPTION_ACCEPT = 'application/lws+cid'
 
 /** The service type of the storage root in the LWS storage description. */
-const LWS_STORAGE_ROOT_TYPES = ['StorageRoot', 'https://www.w3.org/ns/lws#StorageRoot']
+const LWS_STORAGE_ROOT_TYPES = new Set(['StorageRoot', 'https://www.w3.org/ns/lws#StorageRoot'])
 
 /**
  * Discovers the storage a resource belongs to through the LWS `storage` link
@@ -312,7 +312,7 @@ export function storageRootFromDescription(
     }
     const record = service as Record<string, unknown>
     const types = Array.isArray(record.type) ? record.type : [record.type]
-    if (!types.some((type) => LWS_STORAGE_ROOT_TYPES.includes(type as string))) {
+    if (!types.some((type) => LWS_STORAGE_ROOT_TYPES.has(type as string))) {
       continue
     }
     if (typeof record.serviceEndpoint === 'string') {

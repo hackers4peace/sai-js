@@ -147,17 +147,17 @@ export async function verifyAccessClaim(
     oneIri(store, namedNode(target), INTEROP.dataOwner, 'interop:dataOwner')
     iriValues(store, namedNode(target), ODRL.source, 'odrl:source')
 
-    const types = store
-      .getObjects(namedNode(target), namedNode(RDF.type), null)
-      .map((term) => term.value)
+    const types = new Set(
+      store.getObjects(namedNode(target), namedNode(RDF.type), null).map((term) => term.value)
+    )
     // Every target is scoped to a shape tree, including the AllFromAgent
     // party target; a shape-tree target names it as its source instead.
-    if (!types.includes(SHAPETREES.ShapeTree)) {
+    if (!types.has(SHAPETREES.ShapeTree)) {
       oneIri(store, namedNode(target), INTEROP.registeredShapeTree, 'interop:registeredShapeTree')
     }
     // A selected instance target names its registration explicitly;
     // AssetCollection + DataRegistration targets use the source.
-    if (types.includes(ODRL.Asset)) {
+    if (types.has(ODRL.Asset)) {
       oneIri(store, namedNode(target), INTEROP.hasDataRegistration, 'interop:hasDataRegistration')
     }
   }
