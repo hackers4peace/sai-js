@@ -682,7 +682,9 @@ export async function createAcr(
   let uasId
   try {
     uasId = await discoverAuthorizationAgent(grantee, fetch)
-  } catch {}
+  } catch {
+    // TODO: surface discovery failures instead of leaving uasId undefined
+  }
   let grantor
   let peer
   let client
