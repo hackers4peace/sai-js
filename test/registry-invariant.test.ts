@@ -10,7 +10,7 @@ import { describe, expect, test } from 'vitest'
 // grantor/registration side.
 const registryTrig = readFileSync(
   new URL('../environments/data/registry.trig', import.meta.url),
-  'utf-8'
+  'utf8'
 )
 
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'

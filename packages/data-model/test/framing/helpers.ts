@@ -9,7 +9,7 @@ import type { Quad, Term } from 'n3'
 // stack seed (environments/data/registry.trig), so package tests never read the
 // integration fixture. Each graph is a resource document; `meta:*` graphs carry
 // the CSS container metadata and the plain graph the resource itself.
-const fixtureTrig = readFileSync(new URL('./fixtures.trig', import.meta.url), 'utf-8')
+const fixtureTrig = readFileSync(new URL('./fixtures.trig', import.meta.url), 'utf8')
 
 // Keep the parser's quad array (document order) — the N3 Store reorders quads
 // internally (numeric-id indexes), which would scramble multi-valued output.

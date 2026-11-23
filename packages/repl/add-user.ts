@@ -193,9 +193,9 @@ const addUserCommand = Command.make(
         return 1
       }
 
-      const trig = readFileSync(datasetSourcePath, 'utf-8')
-      const kvStr = readFileSync(kvSourcePath, 'utf-8')
-      const mapStr = readFileSync(mapPath, 'utf-8')
+      const trig = readFileSync(datasetSourcePath, 'utf8')
+      const kvStr = readFileSync(kvSourcePath, 'utf8')
+      const mapStr = readFileSync(mapPath, 'utf8')
 
       const kv: Record<string, unknown> = JSON.parse(kvStr)
       const map: { agents: Record<string, string>; prefixes: Record<string, string> } =
@@ -223,7 +223,7 @@ const addUserCommand = Command.make(
 
       // Update registry.trig
       const updatedTrig = addToRegistryListing(trig, handle) + registryContent(handle, data)
-      yield* Effect.sync(() => writeFileSync(datasetSourcePath, updatedTrig, 'utf-8'))
+      yield* Effect.sync(() => writeFileSync(datasetSourcePath, updatedTrig, 'utf8'))
 
       // Update kv.json
       const accountId = crypto.randomUUID()

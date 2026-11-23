@@ -33,7 +33,7 @@ function garageAdminToken(): string {
   if (process.env.CSS_GARAGE_ADMIN_TOKEN) {
     return process.env.CSS_GARAGE_ADMIN_TOKEN
   }
-  const match = readFileSync(garageTomlPath, 'utf-8').match(/^admin_token\s*=\s*"([^"]+)"/m)
+  const match = readFileSync(garageTomlPath, 'utf8').match(/^admin_token\s*=\s*"([^"]+)"/m)
   if (!match) {
     throw new Error('admin_token not found in environments/garage/garage.toml')
   }
@@ -120,8 +120,8 @@ const envOption = Options.text('env').pipe(
 const generateRegistry = (path: string, env: string): Effect.Effect<string, Error> =>
   Effect.try({
     try: () => {
-      const content = readFileSync(path, 'utf-8')
-      const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf-8')) as {
+      const content = readFileSync(path, 'utf8')
+      const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf8')) as {
         agents: Record<string, string>
         prefixes: Record<string, string>
       }
@@ -145,7 +145,7 @@ const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
     // stage 3: one Fuseki dataset per pod; the registry origin is the mapped
     // one for this environment (map.prefixes['https://registry/'])
     const kvData = JSON.parse(kv)
-    const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf-8')) as {
+    const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf8')) as {
       prefixes: Record<string, string>
     }
     const podDatasets = podDatasetsFromKeyValue(kvData)
