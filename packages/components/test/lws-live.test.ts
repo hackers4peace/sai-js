@@ -1,12 +1,11 @@
 import {
   AgentRegistry,
-  RoleRegistry,
   getDataRegistration,
   listContained,
   loadDataInstance,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import { fetchJsonLd, putJsonLd } from '@janeirodigital/interop-utils'
+import { containedIrisJsonLd, fetchJsonLd, putJsonLd } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import { buildSessionManager } from '../src/builders/sessionManager.js'
@@ -58,6 +57,7 @@ describe.skipIf(!process.env.LWS_LIVE)('LWS session (live)', () => {
     const registration = await AgentRegistry.addSocialAgentRegistration(
       session.registrySet.hasSocialAgentRegistry,
       { fetch: session.fetch, randomUUID: crypto.randomUUID.bind(crypto) },
+      localSparqlTransport(session.sparqlEndpoint),
       { agent: session.webId, client: session.agentId },
       'https://kim.id.docker',
       { '@none': 'Kim' }
@@ -80,12 +80,16 @@ describe.skipIf(!process.env.LWS_LIVE)('LWS session (live)', () => {
     expect(adminAuthorizations.map((entry) => entry.id)).toContain(
       'https://reg.docker/yoyo/authorization/gwxh7q'
     )
+    const listedAuthorizations = await containedIrisJsonLd(
+      yoyo.registrySet.hasAuthorizationRegistry.id,
+      yoyo.fetch
+    )
+    expect(listedAuthorizations).toContain('https://reg.docker/yoyo/authorization/gwxh7q')
 
     const alice = await manager.getSession('https://alice.id.docker')
     const role = 'https://reg.docker/alice/role/j1g128'
-    await expect(
-      RoleRegistry.containedIncludes(alice.registrySet.hasRoleRegistry, alice.fetch, role)
-    ).resolves.toBe(true)
+    const listedRoles = await containedIrisJsonLd(alice.registrySet.hasRoleRegistry.id, alice.fetch)
+    expect(listedRoles).toContain(role)
   }, 60_000)
 
   test('fetches a peer registration from another storage on the same server', async () => {

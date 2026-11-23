@@ -7,7 +7,6 @@ import {
   INTEROP,
   type LanguageMap,
   type WhatwgFetch,
-  containedIrisJsonLd,
   createResource,
   mintResource,
   putJsonLd,
@@ -45,15 +44,6 @@ export async function createRoleAt(
 // ──────────────────────────
 // Behavior functions (replacing class methods)
 // ──────────────────────────
-
-export async function containedIncludes(
-  data: RoleRegistryData,
-  fetch: WhatwgFetch,
-  id: string
-): Promise<boolean> {
-  const iris = await containedIrisJsonLd(data.id, fetch)
-  return iris.includes(id)
-}
 
 export async function createRole(
   data: RoleRegistryData,

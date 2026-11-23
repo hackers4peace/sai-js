@@ -22,7 +22,6 @@ import {
   WebIdProfile,
   type WebIdProfileData,
   dataModelContext,
-  getAccessGrantIris,
   grantGrantee,
 } from '@janeirodigital/interop-data-model'
 // re-export so package consumers (components services, tests) keep importing
@@ -30,7 +29,6 @@ import {
 export type { ShareDataInstanceStructure } from '@janeirodigital/interop-data-model'
 const loadRegistrySet = loader(RegistrySet.fromJsonLd)
 const loadWebIdProfile = loader(WebIdProfile.fromJsonLd)
-const loadAdminAuthorization = loader(AdminAuthorization.fromJsonLd)
 import {
   INTEROP,
   type WhatwgFetch,
@@ -42,14 +40,11 @@ import {
   discoverAuthorizationAgent,
   getRegistrySetIri,
   mintResource,
-  containedIrisJsonLd,
   loader,
   replaceStatement,
   withContext,
 } from '@janeirodigital/interop-utils'
 
-import { replaceAccessGrants } from './agent-registration.ts'
-import { findRegistration as findRegistrationInAgentRegistry } from './agent-registry.ts'
 import {
   type AccessAuthorizationStructure,
   type AgentWithAccess,
@@ -67,10 +62,12 @@ import { invalidGrantsAfterRemoval } from './grant-chain.ts'
 import { generateGrantsForAuthorization } from './grant-generation.ts'
 import { RevocationError } from './revocation.ts'
 import {
+  findAdminAuthorization as findAdminAuthorizationFromSparql,
   findApplicationRegistration as findApplicationRegistrationFromSparql,
   findAuthorizationsForGrantee,
   findSocialAgentInvitation as findInvitationFromSparql,
   findSocialAgentRegistration as findRegistrationFromSparql,
+  getAdminAuthorizations as getAdminAuthorizationsFromSparql,
   getApplicationRegistration,
   getDataAuthorization as getDataAuthorizationFromSparql,
   getDataRegistration as getDataRegistrationFromSparql,
@@ -661,29 +658,6 @@ export class AuthorizationAgent {
     )
   }
 
-  /**
-   * Clear the given grant IRIs from the grantee's registration `hasDataGrant`
-   * links — the requester-hop projection cleanup (formerly
-   * `util/registrations.ts removeGrantsFromRegistration`). No-op when the
-   * grantee has no registration.
-   */
-  public async removeGrantsFromRegistration(grantee: string, grants: string[]): Promise<void> {
-    const registration = await findRegistrationInAgentRegistry(
-      this.registrySet.hasSocialAgentRegistry,
-      this.registrySet.hasApplicationRegistry,
-      this.fetch,
-      grantee
-    )
-    if (!registration) return // nothing to clear — the projection is already empty
-    const revoked = new Set(grants)
-    const current = getAccessGrantIris(registration)
-    await replaceAccessGrants(
-      registration,
-      this.fetch,
-      current.filter((iri) => !revoked.has(iri))
-    )
-  }
-
   public async generateAccessGrants(
     dataAuthorizationIris: string[],
     grantee: string
@@ -750,15 +724,7 @@ export class AuthorizationAgent {
   public async adminAuthorizations(
     registry: AuthorizationRegistryData = this.registrySet.hasAuthorizationRegistry
   ): Promise<AdminAuthorizationData[]> {
-    const iris = await containedIrisJsonLd(registry.id, this.fetch)
-    const result: AdminAuthorizationData[] = []
-    for (const iri of iris) {
-      const adminAuthorization = await loadAdminAuthorization(iri, this.fetch)
-      if (adminAuthorization.type.includes(INTEROP.AdminAuthorization)) {
-        result.push(adminAuthorization)
-      }
-    }
-    return result
+    return getAdminAuthorizationsFromSparql(localSparqlTransport(this.sparqlEndpoint), registry.id)
   }
 
   /** The AdminAuthorization for a grantee in the given registry, if any. */
@@ -766,8 +732,11 @@ export class AuthorizationAgent {
     grantee: string,
     registry: AuthorizationRegistryData = this.registrySet.hasAuthorizationRegistry
   ): Promise<AdminAuthorizationData | undefined> {
-    const authorizations = await this.adminAuthorizations(registry)
-    return authorizations.find((authorization) => authorization.grantee === grantee)
+    return findAdminAuthorizationFromSparql(
+      localSparqlTransport(this.sparqlEndpoint),
+      registry.id,
+      grantee
+    )
   }
 
   /** Delete an AdminAuthorization resource from the org's AuthorizationRegistry. */

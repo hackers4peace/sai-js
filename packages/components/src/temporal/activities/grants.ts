@@ -15,7 +15,6 @@ import {
   storeDataAuthorizations,
 } from '@janeirodigital/interop-authorization-agent'
 import {
-  type ActivityCompleted,
   type ActivityData,
   type AgentId,
   type AgentOrRoleId,
@@ -854,6 +853,7 @@ export async function resolveAuthorizationGrantee(
         randomUUID: session.randomUUID,
         identifierStrategies: session.identifierStrategies,
       },
+      localSparqlTransport(session.sparqlEndpoint),
       { agent: payload.webId.id, client: session.agentId },
       granteeIri
     )
@@ -876,19 +876,24 @@ export async function getPendingActivities(
   const session = await manager.getSession(payload.webId.id)
   const registry = session.registrySet.hasActivityRegistry
   if (!registry) return []
-  const iris = await ActivityRegistry.getActivityIris(registry, session.fetch)
-  // one pass: partition completions into a completed-set, keep the rest
+  const transport = localSparqlTransport(session.sparqlEndpoint)
+  // one listing + one typed completion SELECT; only the pending bodies are read
+  const [iris, completions] = await Promise.all([
+    ActivityRegistry.getActivityIris(registry, transport),
+    ActivityRegistry.getActivityCompletions(registry, transport),
+  ])
+  const completionIris = new Set(completions.map((completion) => completion.completion))
+  const completedTargets = new Set(
+    completions
+      .map((completion) => completion.target)
+      .filter((target): target is string => target !== undefined)
+  )
   const workItems: ActivityData[] = []
-  const completed = new Set<string>()
   for (const iri of iris) {
-    const activity = await ActivityRegistry.loadActivity(iri, session.fetch)
-    if (isActivityClass(activity, 'ActivityCompleted')) {
-      completed.add((activity as ActivityCompleted).target)
-    } else {
-      workItems.push(activity)
-    }
+    if (completionIris.has(iri) || completedTargets.has(iri)) continue
+    workItems.push(await ActivityRegistry.getActivity(transport, iri))
   }
-  return workItems.filter((activity) => !completed.has(activity.id))
+  return workItems
 }
 
 export interface DelegatedGrantsConsumerInput {

@@ -478,6 +478,10 @@ describe('findSocialAgentInvitation', () => {
 
 describe('AdminAuthorization session methods', () => {
   const MIXED_REGISTRY = 'https://auth.alice.example/authorization-registry-mixed'
+  const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+  const ADMIN_AUTHZ = `${MIXED_REGISTRY}/admin-auth`
+  const DATA_AUTHZ_1 = `${MIXED_REGISTRY}/data-auth-1`
+  const DATA_AUTHZ_2 = `${MIXED_REGISTRY}/data-auth-2`
 
   const buildAgent = async (fetchMock: typeof statelessFetch = createStatefulFetch()) =>
     AuthorizationAgent.build(webId, agentId, registryId, {
@@ -485,6 +489,55 @@ describe('AdminAuthorization session methods', () => {
       randomUUID,
       sparqlEndpoint: 'http://example.test/sparql',
     })
+
+  // the registry plane listing + one graph read per contained resource;
+  // AdminAuthorizations share the container with the DataAuthorizations
+  const mockAdminRegistry = () => {
+    sparqlMock.handlers.bindings = (query) => {
+      expect(query).toContain(`GRAPH <meta:${MIXED_REGISTRY}>`)
+      return [DATA_AUTHZ_1, DATA_AUTHZ_2, ADMIN_AUTHZ].map((iri) => ({
+        child: { termType: 'NamedNode', value: iri },
+      }))
+    }
+    sparqlMock.handlers.triples = (query) => {
+      if (query.includes(`GRAPH <${ADMIN_AUTHZ}>`)) {
+        return [
+          DataFactory.quad(
+            DataFactory.namedNode(ADMIN_AUTHZ),
+            DataFactory.namedNode(RDF_TYPE),
+            DataFactory.namedNode(INTEROP.AdminAuthorization)
+          ),
+          DataFactory.quad(
+            DataFactory.namedNode(ADMIN_AUTHZ),
+            DataFactory.namedNode(INTEROP.grantee),
+            DataFactory.namedNode('https://id/dan')
+          ),
+          DataFactory.quad(
+            DataFactory.namedNode(ADMIN_AUTHZ),
+            DataFactory.namedNode(INTEROP.grantedBy),
+            DataFactory.namedNode('https://id/yoyo')
+          ),
+          DataFactory.quad(
+            DataFactory.namedNode(ADMIN_AUTHZ),
+            DataFactory.namedNode(INTEROP.scopeOfAuthorization),
+            DataFactory.namedNode(INTEROP.All)
+          ),
+        ]
+      }
+      for (const iri of [DATA_AUTHZ_1, DATA_AUTHZ_2]) {
+        if (query.includes(`GRAPH <${iri}>`)) {
+          return [
+            DataFactory.quad(
+              DataFactory.namedNode(iri),
+              DataFactory.namedNode(RDF_TYPE),
+              DataFactory.namedNode(INTEROP.DataAuthorization)
+            ),
+          ]
+        }
+      }
+      throw new Error(`unexpected CONSTRUCT: ${query}`)
+    }
+  }
 
   test('recordAdminAuthorization writes the AdminAuthorization resource', async () => {
     const statefulFetch = createStatefulFetch()
@@ -514,6 +567,7 @@ describe('AdminAuthorization session methods', () => {
   test('findAdminAuthorization returns the admin authorization for the grantee / undefined otherwise', async () => {
     const agent = await buildAgent()
     const registry = { id: MIXED_REGISTRY }
+    mockAdminRegistry()
 
     const result = await agent.findAdminAuthorization('https://id/dan', registry)
     expect(result).toBeDefined()
@@ -527,6 +581,7 @@ describe('AdminAuthorization session methods', () => {
 
   test('adminAuthorizations yields only AdminAuthorizations', async () => {
     const agent = await buildAgent()
+    mockAdminRegistry()
 
     const result = await agent.adminAuthorizations({ id: MIXED_REGISTRY })
     expect(result).toHaveLength(1)

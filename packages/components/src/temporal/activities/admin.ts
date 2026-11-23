@@ -1,4 +1,8 @@
 import { replaceAdminGrantLinks } from '@janeirodigital/interop-authorization-agent'
+import {
+  getRegistryGrants,
+  localSparqlTransport,
+} from '@janeirodigital/interop-authorization-agent'
 import type {
   AdminAuthorizationData,
   AgentId,
@@ -7,15 +11,12 @@ import type {
 } from '@janeirodigital/interop-data-model'
 import {
   AdminAuthorization,
-  Grant,
   accessGrantAcrJsonLd,
   grantContext,
   grantGrantee,
   rewriteFullAdminAccess,
   type OdrlPolicy,
 } from '@janeirodigital/interop-data-model'
-const loadGrant = loader(Grant.fromJsonLd)
-
 import {
   ACCESS_ACTIONS,
   INTEROP,
@@ -24,8 +25,6 @@ import {
   discoverAuthorizationAgent,
   fetchJsonLd,
   getAcl,
-  containedIrisJsonLd,
-  loader,
   putJsonLd,
   withContext,
 } from '@janeirodigital/interop-utils'
@@ -260,15 +259,12 @@ export async function findAdminGrants(payload: {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registry = session.registrySet.hasGrantRegistry
-  const iris = await containedIrisJsonLd(registry.id, session.fetch)
-  const adminGrants: { id: string; type: string[] }[] = []
-  for (const iri of iris) {
-    const grant = await loadGrant(iri, session.fetch)
-    if (grant.type.includes(INTEROP.AdminGrant) && grantGrantee(grant) === payload.admin.id) {
-      adminGrants.push({ id: iri, type: grant.type })
-    }
-  }
-  return adminGrants
+  // the grant registry over the plane (listing + one graph read per grant)
+  const grants = await getRegistryGrants(localSparqlTransport(session.sparqlEndpoint), registry.id)
+  return grants
+    .filter((grant) => grant.type.includes(INTEROP.AdminGrant))
+    .filter((grant) => grantGrantee(grant) === payload.admin.id)
+    .map((grant) => ({ id: grant.id, type: grant.type }))
 }
 
 /** Delete the admin's AdminGrant resources (and their ACRs); 404 is tolerated. */

@@ -1,5 +1,5 @@
 import { buildOidcSession, buildSessionManager } from '@elfpavlik/sai-components'
-import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
+import { ActivityRegistry, localSparqlTransport } from '@janeirodigital/interop-authorization-agent'
 import {
   AS,
   discoverAgentRegistration,
@@ -59,10 +59,13 @@ describe('reciprocal webhook', () => {
       async () => {
         const completed = await ActivityRegistry.getCompletedActivityIris(
           registry,
-          aliceSession.fetch
+          localSparqlTransport(aliceSession.sparqlEndpoint)
         )
         if (!completed.length) return false
-        const iris = await ActivityRegistry.getActivityIris(registry, aliceSession.fetch)
+        const iris = await ActivityRegistry.getActivityIris(
+          registry,
+          localSparqlTransport(aliceSession.sparqlEndpoint)
+        )
         for (const iri of iris) {
           const activity = await ActivityRegistry.loadActivity(iri, aliceSession.fetch)
           if (activity.type.includes('DelegatedGrantsUpdated') && completed.includes(activity.id)) {

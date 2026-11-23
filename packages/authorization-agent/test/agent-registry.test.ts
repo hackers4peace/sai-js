@@ -4,10 +4,21 @@ import { AgentRegistry } from '@janeirodigital/interop-authorization-agent'
 import type { SparqlTransport } from '@janeirodigital/interop-authorization-agent'
 import { INTEROP, RDF } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
-import { describe, test } from 'vitest'
+import { describe, test, vi } from 'vitest'
 
 import { expect } from './expect'
 import { fetch } from './mock-fetch.ts'
+
+// The write paths discover the peer's authorization agent before setting the
+// registration ACR; the fixture profiles carry no `hasAuthorizationAgent`, so
+// pin the discovery result (the lookup itself is covered by the utils tests).
+vi.mock('@janeirodigital/interop-utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@janeirodigital/interop-utils')>()
+  return {
+    ...actual,
+    discoverAuthorizationAgent: vi.fn(async () => 'https://auth.acme.example/'),
+  }
+})
 
 const webId = 'https://alice.example/#id'
 const agentId = 'https://jarvis.alice.example/#agent'
@@ -19,106 +30,109 @@ const socialAgentRegistry = { id: socialAgentRegistryIri }
 const applicationRegistry = { id: applicationRegistryIri }
 const invitationRegistry = { id: invitationRegistryIri }
 
-test('should provide applicationRegistrations from the application registry ldp:contains listing', async () => {
-  let count = 0
-  for await (const authorization of AgentRegistry.applicationRegistrations(
-    applicationRegistry,
-    deps.fetch
-  )) {
-    count += 1
-    expect(authorization).toHaveProperty('id')
-    expect(authorization).toHaveProperty('registeredAgent')
+const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+
+/** A plane stub listing one registration in `containerIri` and serving its graph. */
+function listingTransport(
+  containerIri: string,
+  registrationIri: string,
+  type: string,
+  registeredAgent: string
+): SparqlTransport {
+  return {
+    async fetchBindings(query: string) {
+      expect(query).toContain(`GRAPH <meta:${containerIri}>`)
+      return [{ child: { termType: 'NamedNode', value: registrationIri } }]
+    },
+    async fetchTriples(query: string) {
+      expect(query).toContain(`GRAPH <${registrationIri}>`)
+      return [
+        DataFactory.quad(
+          DataFactory.namedNode(registrationIri),
+          DataFactory.namedNode(RDF_TYPE),
+          DataFactory.namedNode(type)
+        ),
+        DataFactory.quad(
+          DataFactory.namedNode(registrationIri),
+          DataFactory.namedNode(INTEROP.registeredAgent),
+          DataFactory.namedNode(registeredAgent)
+        ),
+      ]
+    },
   }
-  expect(count).toBe(2)
-})
+}
 
-test('should provide socialAgentRegistrations from the social-agent registry ldp:contains listing', async () => {
-  let count = 0
-  for await (const authorization of AgentRegistry.socialAgentRegistrations(
-    socialAgentRegistry,
-    deps.fetch
-  )) {
-    count += 1
-    expect(authorization).toHaveProperty('id')
-    expect(authorization).toHaveProperty('registeredAgent')
-  }
-  expect(count).toBe(2)
-})
+/** A plane stub whose registry container lists nothing (no registration). */
+const emptyTransport: SparqlTransport = {
+  async fetchBindings(query: string) {
+    expect(query).toContain('lws#contains')
+    return []
+  },
+  async fetchTriples() {
+    throw new Error('no registration graph expected')
+  },
+}
 
-describe('findApplicationRegistration', () => {
-  test('finds application registration', async () => {
-    const applicationIri = 'https://projectron.example/#app'
-    expect(
-      await AgentRegistry.findApplicationRegistration(
+describe('addApplicationRegistration', () => {
+  const gigaApp = 'https://gigaApp.example'
+  const existingApp = 'https://projectron.example/#app'
+
+  test('throws if registration already exists (plane duplicate check)', async () => {
+    await expect(
+      AgentRegistry.addApplicationRegistration(
         applicationRegistry,
-        deps.fetch,
-        applicationIri
+        deps,
+        listingTransport(
+          applicationRegistryIri,
+          'https://auth.alice.example/app-reg',
+          INTEROP.ApplicationRegistration,
+          existingApp
+        ),
+        { agent: webId, client: agentId },
+        existingApp
       )
-    ).toHaveProperty('registeredAgent', applicationIri)
-  })
-})
-
-describe('findSocialAgentRegistration', () => {
-  test('finds social agent registration', async () => {
-    const socialAgentIri = 'https://acme.example/#corp'
-    expect(
-      await AgentRegistry.findSocialAgentRegistration(
-        socialAgentRegistry,
-        deps.fetch,
-        socialAgentIri
-      )
-    ).toHaveProperty('registeredAgent', socialAgentIri)
-  })
-})
-
-// `findSocialAgentInvitation` is registry-plane only — covered through
-// `AuthorizationAgent.findSocialAgentInvitation` in authorization-agent.test.ts
-describe('findRegistration', () => {
-  test('finds application registration', async () => {
-    const applicationIri = 'https://projectron.example/#app'
-    expect(
-      await AgentRegistry.findRegistration(
-        socialAgentRegistry,
-        applicationRegistry,
-        deps.fetch,
-        applicationIri
-      )
-    ).toHaveProperty('registeredAgent', applicationIri)
+    ).rejects.toThrow('already exists')
   })
 
-  test('finds social agent registration', async () => {
-    const socialAgentIri = 'https://acme.example/#corp'
-    expect(
-      await AgentRegistry.findRegistration(
-        socialAgentRegistry,
-        applicationRegistry,
-        deps.fetch,
-        socialAgentIri
-      )
-    ).toHaveProperty('registeredAgent', socialAgentIri)
+  test('returns added registration', async () => {
+    const registration = await AgentRegistry.addApplicationRegistration(
+      applicationRegistry,
+      deps,
+      emptyTransport,
+      { agent: webId, client: agentId },
+      gigaApp
+    )
+    expect(registration.registeredAgent).toBe(gigaApp)
   })
 })
 
 describe('addSocialAgentRegistration', () => {
+  const acme = 'https://acme.example/#corp'
   const jane = 'https://jane.example'
 
-  test('throws if registration already exists', async () => {
-    const socialAgentIri = 'https://acme.example/#corp'
+  test('throws if registration already exists (plane duplicate check)', async () => {
     await expect(
       AgentRegistry.addSocialAgentRegistration(
         socialAgentRegistry,
         deps,
+        listingTransport(
+          socialAgentRegistryIri,
+          'https://auth.alice.example/social-reg',
+          INTEROP.SocialAgentRegistration,
+          acme
+        ),
         { agent: webId, client: agentId },
-        socialAgentIri,
+        acme,
         'Someone'
       )
     ).rejects.toThrow('already exists')
   })
 
-  test.skip('returns added registration', async () => {
+  test('returns added registration', async () => {
     const registration = await AgentRegistry.addSocialAgentRegistration(
       socialAgentRegistry,
-      factory,
+      deps,
+      emptyTransport,
       { agent: webId, client: agentId },
       jane,
       'Jane'
@@ -133,15 +147,6 @@ describe('addSocialAgentInvitation', () => {
 
   // the registry-plane duplicate check: `lws:contains` listing + one graph
   // read per candidate, exactly like `AuthorizationAgent.findSocialAgentInvitation`
-  const emptyTransport: SparqlTransport = {
-    async fetchBindings() {
-      return []
-    },
-    async fetchTriples() {
-      throw new Error('no invitation graph expected')
-    },
-  }
-
   const existingInvitationTransport: SparqlTransport = {
     async fetchBindings(query: string) {
       expect(query).toContain(`GRAPH <meta:${invitationRegistryIri}>`)
@@ -186,31 +191,5 @@ describe('addSocialAgentInvitation', () => {
     )
     expect(invitation.capabilityUrl).toBe(capabilityUrl)
     expect(invitation.label).toEqual({ '@none': 'Jane' })
-  })
-})
-
-describe('addApplicationRegistration', () => {
-  const gigaApp = 'https://gigaApp.example'
-
-  test('throws if registration already exists', async () => {
-    const applicationIri = 'https://projectron.example/#app'
-    await expect(
-      AgentRegistry.addApplicationRegistration(
-        applicationRegistry,
-        deps,
-        { agent: webId, client: agentId },
-        applicationIri
-      )
-    ).rejects.toThrow('already exists')
-  })
-
-  test('returns added registration', async () => {
-    const registration = await AgentRegistry.addApplicationRegistration(
-      applicationRegistry,
-      deps,
-      { agent: webId, client: agentId },
-      gigaApp
-    )
-    expect(registration.registeredAgent).toBe(gigaApp)
   })
 })

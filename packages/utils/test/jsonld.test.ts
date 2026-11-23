@@ -7,7 +7,6 @@ import {
   documentValues,
   fetchJsonLd,
   findNodeIdByType,
-  linkedIrisJsonLd,
 } from '../src'
 
 function mockFetch(response: Partial<Response> & { ok: boolean }): WhatwgFetch {
@@ -100,35 +99,6 @@ describe('findNodeIdByType', () => {
     await expect(findNodeIdByType(doc, 'https://absent.example/type')).rejects.toThrow(
       'no node of type https://absent.example/type in document'
     )
-  })
-})
-
-describe('linkedIrisJsonLd', () => {
-  const property = 'http://www.w3.org/ns/ldp#contains'
-  const container = 'https://example.example/container/'
-  const doc = [
-    {
-      '@id': container,
-      [property]: [
-        { '@id': 'https://example.example/container/a' },
-        { '@id': 'https://example.example/container/b' },
-      ],
-    },
-  ]
-
-  test('collects the IRI values of the given property', async () => {
-    const fetch = mockFetch({ ok: true, json: async () => doc })
-    const iris = await linkedIrisJsonLd(container, fetch, property)
-    expect(iris).toEqual([
-      'https://example.example/container/a',
-      'https://example.example/container/b',
-    ])
-  })
-
-  test('yields [] when the property is absent', async () => {
-    const fetch = mockFetch({ ok: true, json: async () => doc })
-    const iris = await linkedIrisJsonLd(container, fetch, 'https://example.example/vocab#missing')
-    expect(iris).toEqual([])
   })
 })
 

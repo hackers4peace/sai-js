@@ -1,6 +1,7 @@
 import {
   AgentRegistry,
   createSocialAgentRegistration,
+  localSparqlTransport,
   setAcr,
 } from '@janeirodigital/interop-authorization-agent'
 import type {
@@ -76,6 +77,7 @@ export async function invitationAcceptance(
         randomUUID: session.randomUUID,
         identifierStrategies: session.identifierStrategies,
       },
+      localSparqlTransport(session.sparqlEndpoint),
       { agent: webId, client: session.agentId },
       inviterWebId,
       // the snapshot's label is already the language map

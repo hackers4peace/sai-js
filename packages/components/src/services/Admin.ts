@@ -12,6 +12,11 @@ import {
 import type * as S from 'effect/Schema'
 
 import type { ResolvedContext } from './Context.js'
+import {
+  findAdminAuthorization,
+  getAdminAuthorizations,
+  sparqlTransportFor,
+} from './queries/org.js'
 import { findSocialAgentRegistrationInContext } from './SocialAgentRegistry.js'
 
 /**
@@ -32,7 +37,11 @@ export const addAdmin = async (
   if (!registration) throw new Error(`Social Agent Registration for ${webId} not found`)
 
   const authorizationRegistry = ctx.registrySet.hasAuthorizationRegistry
-  const existing = await ctx.session.findAdminAuthorization(webId, authorizationRegistry)
+  const existing = await findAdminAuthorization(
+    sparqlTransportFor(ctx),
+    authorizationRegistry.id,
+    webId
+  )
   if (existing) throw new Error(`Admin Authorization for ${webId} already exists`)
 
   // pre-mint the AdminAuthorization id — the workflow PUTs the resource there
@@ -88,7 +97,11 @@ export const removeAdmin = async (
   if (!registration) throw new Error(`Social Agent Registration for ${webId} not found`)
 
   const authorizationRegistry = ctx.registrySet.hasAuthorizationRegistry
-  const existing = await ctx.session.findAdminAuthorization(webId, authorizationRegistry)
+  const existing = await findAdminAuthorization(
+    sparqlTransportFor(ctx),
+    authorizationRegistry.id,
+    webId
+  )
   if (!existing) throw new Error(`Admin Authorization for ${webId} not found`)
 
   // last-admin guard — the org must never end up adminless; sails as a
@@ -98,7 +111,8 @@ export const removeAdmin = async (
   // the operator of their own registry set, so demoting the only admin is
   // legitimate — the guard only protects org contexts from ending up
   // admin-less.
-  const count = (await ctx.session.adminAuthorizations(authorizationRegistry)).length
+  const count = (await getAdminAuthorizations(sparqlTransportFor(ctx), authorizationRegistry.id))
+    .length
   if (ctx.webId !== ctx.userWebId && count === 1) {
     throw new Error('can not remove the last admin')
   }

@@ -2,6 +2,7 @@ import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpa
 import {
   ActivityRegistry,
   type AuthorizationAgent,
+  localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import { AccessRequest, type NeedBasedAccessRequestSent } from '@janeirodigital/interop-data-model'
 const loadNeedBasedAccessRequest = loader(AccessRequest.fromJsonLd)
@@ -14,6 +15,7 @@ import {
   needBasedAccessRequestPayload,
   parseRpcResult,
   rpcPayload,
+  waitFor,
   waitForNeedBasedAccessRequestReceivedCompletion,
   waitForNeedBasedAccessRequestSentCompletion,
 } from './util'
@@ -141,7 +143,10 @@ describe('request access (sent side)', () => {
     // the Sent activity carries the request snapshot with the embedded group
     const registry = session.registrySet.hasActivityRegistry
     expect(registry).toBeDefined()
-    const iris = await ActivityRegistry.getActivityIris(registry!, session.fetch)
+    const iris = await ActivityRegistry.getActivityIris(
+      registry!,
+      localSparqlTransport(session.sparqlEndpoint)
+    )
     const sentActivities = []
     for (const iri of iris) {
       const activity = await ActivityRegistry.loadActivity(iri, session.fetch)
@@ -160,6 +165,13 @@ describe('request access (sent side)', () => {
 
 describe('request access (receive side)', () => {
   test('leg A — the data owner endpoint receives and stores the request', async () => {
+    const manager = buildSessionManager()
+    const aliceSession: AuthorizationAgent = await manager.getSession(aliceId)
+    // the earlier tests may already have delivered requests to Alice's
+    // registry (the sent-side leg forwards to the same endpoint), so anchor on
+    // the requests present before this POST instead of an absolute count
+    const before = new Set((await storedAccessRequests(aliceSession)).map((request) => request.id))
+
     // Bob's UAS POSTs DIRECTLY to Alice's owner-scoped access request
     // endpoint — no RPC, no requester activity
     const session = await buildOidcSession(bobId)
@@ -177,13 +189,16 @@ describe('request access (receive side)', () => {
     expect(response.headers.get('location')).toBeNull()
     expect(await response.text()).toBe('')
 
-    // the owner-side workflow materialized the immutable AccessRequest
-    const manager = buildSessionManager()
-    const aliceSession: AuthorizationAgent = await manager.getSession(aliceId)
-    await waitForNeedBasedAccessRequestReceivedCompletion(aliceSession)
-    const stored = await storedAccessRequests(aliceSession)
-    expect(stored.length).toBe(1)
-    expectRequestShape(stored[0], { grantee: bobId, grantedBy: bobId, dataOwner: aliceId })
+    // the owner-side workflow materialized the immutable AccessRequest —
+    // exactly one new resource (a retried/duplicated delivery would add more)
+    const added = await waitFor(async () => {
+      const fresh = (await storedAccessRequests(aliceSession)).filter(
+        (request) => !before.has(request.id)
+      )
+      return fresh.length > 0 ? fresh : undefined
+    })
+    expect(added.length).toBe(1)
+    expectRequestShape(added[0], { grantee: bobId, grantedBy: bobId, dataOwner: aliceId })
   })
 
   test('owner reads the request registry through the access request facade', async () => {

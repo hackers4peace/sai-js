@@ -1,5 +1,8 @@
 import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
+import type { SparqlTransport } from '@janeirodigital/interop-authorization-agent'
 import { dataModelContext } from '@janeirodigital/interop-data-model'
+import { AS, INTEROP, LDP, RDF } from '@janeirodigital/interop-utils'
+import { DataFactory } from 'n3'
 import { describe, test } from 'vitest'
 
 import { expect } from './expect'
@@ -440,5 +443,78 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
     expect(denied.satisfiesAccessRequest).toBe(
       'https://registry/alice/3d7a5c9e-1f2b-4c6d-8e9a-0b1c2d3e4f5a'
     )
+  })
+})
+
+// ──────────────────────────
+// Registry-plane activity reads (listContained + typed completion SELECT)
+// ──────────────────────────
+
+describe('ActivityRegistry — registry plane', () => {
+  const registry = { id: 'https://registry.example/alice/activity/' }
+  const PENDING = `${registry.id}pending`
+  const DONE = `${registry.id}done`
+  const COMPLETION = `${registry.id}completion`
+
+  const quad = (subject: string, predicate: string, object: string) =>
+    DataFactory.quad(
+      DataFactory.namedNode(subject),
+      DataFactory.namedNode(predicate),
+      DataFactory.namedNode(object)
+    )
+
+  const transport = (): SparqlTransport => ({
+    async fetchBindings(query: string) {
+      if (query.includes('lws#contains')) {
+        return [PENDING, DONE, COMPLETION].map((iri) => ({
+          child: { termType: 'NamedNode', value: iri },
+        }))
+      }
+      // the typed completion SELECT: rows carry the completion + its target
+      expect(query).toContain(INTEROP.ActivityCompleted)
+      expect(query).toContain(AS.target)
+      return [
+        {
+          activity: { termType: 'NamedNode', value: COMPLETION },
+          target: { termType: 'NamedNode', value: DONE },
+        },
+      ]
+    },
+    async fetchTriples(query: string) {
+      if (query.includes(`GRAPH <${PENDING}>`)) {
+        return [
+          // the meta-graph twin types the resource `ldp:Resource` — the plane
+          // read must not mistake it for the activity class
+          quad(PENDING, RDF.type, LDP.Resource),
+          quad(PENDING, RDF.type, INTEROP.Activity),
+          quad(PENDING, RDF.type, INTEROP.InvitationCreated),
+          quad(PENDING, RDF.type, AS.Create),
+        ]
+      }
+      throw new Error(`unexpected CONSTRUCT: ${query}`)
+    },
+  })
+
+  test('lists the registry members and the completion rows', async () => {
+    await expect(ActivityRegistry.getActivityIris(registry, transport())).resolves.toEqual([
+      PENDING,
+      DONE,
+      COMPLETION,
+    ])
+    await expect(ActivityRegistry.getActivityCompletions(registry, transport())).resolves.toEqual([
+      { completion: COMPLETION, target: DONE },
+    ])
+    await expect(ActivityRegistry.getCompletedActivityIris(registry, transport())).resolves.toEqual(
+      [DONE]
+    )
+  })
+
+  test('frames an activity body from its graph', async () => {
+    const activity = (await ActivityRegistry.getActivity(transport(), PENDING)) as unknown as {
+      id: string
+      type: string[]
+    }
+    expect(activity.id).toBe(PENDING)
+    expect(activity.type).toEqual(['Activity', 'InvitationCreated', 'as:Create'])
   })
 })

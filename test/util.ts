@@ -400,7 +400,10 @@ async function pendingActivitiesFor(
   if (!registry) return []
   let iris: string[]
   try {
-    iris = await ActivityRegistry.getActivityIris(registry, session.fetch)
+    iris = await ActivityRegistry.getActivityIris(
+      registry,
+      localSparqlTransport(session.sparqlEndpoint)
+    )
   } catch {
     // transient 500 on the container listing — the known CSS SPARQL-backend
     // concurrent-write corruption (duplicate dcterms:modified on a child;
@@ -522,9 +525,15 @@ export async function waitForActivityCompletion(
   await waitFor(
     async () => {
       try {
-        const completed = await ActivityRegistry.getCompletedActivityIris(registry, session.fetch)
+        const completed = await ActivityRegistry.getCompletedActivityIris(
+          registry,
+          localSparqlTransport(session.sparqlEndpoint)
+        )
         if (!completed.length) return false
-        const iris = await ActivityRegistry.getActivityIris(registry, session.fetch)
+        const iris = await ActivityRegistry.getActivityIris(
+          registry,
+          localSparqlTransport(session.sparqlEndpoint)
+        )
         for (const iri of iris) {
           const activity = await ActivityRegistry.loadActivity(iri, session.fetch)
           if (activity.type.includes(cls) && completed.includes(activity.id)) {

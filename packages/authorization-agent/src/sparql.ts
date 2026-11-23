@@ -1,4 +1,6 @@
 import {
+  AdminAuthorization,
+  type AdminAuthorizationData,
   ApplicationRegistration,
   type ApplicationRegistrationData,
   DataAuthorization,
@@ -303,6 +305,60 @@ export async function findApplicationRegistration(
   for (const iri of await listContained(transport, applicationRegistryContainerIri)) {
     const registration = await getApplicationRegistration(transport, iri)
     if (registration.registeredAgent === webId) return registration
+  }
+}
+
+/**
+ * AdminAuthorization body from its graph — framed via the data-model's own
+ * `AdminAuthorization.fromJsonLd`, producing the same `AdminAuthorizationData`
+ * POJO as `factory.adminAuthorization`. AdminAuthorizations share the
+ * authorization registry container with the DataAuthorizations, so every
+ * caller type-filters.
+ */
+export async function getAdminAuthorization(
+  transport: SparqlTransport,
+  iri: string
+): Promise<AdminAuthorizationData> {
+  return AdminAuthorization.fromJsonLd(await graphDoc(transport, iri), iri)
+}
+
+/**
+ * The AdminAuthorizations in an authorization registry — list-and-scan over
+ * the server-managed `lws:contains` listing (docs/sparql.md step 3), the same
+ * shape as the registration lookups. Used by the admin RPCs and the
+ * `syncAdminAcr` workflow.
+ */
+export async function getAdminAuthorizations(
+  transport: SparqlTransport,
+  authorizationRegistryContainerIri: string
+): Promise<AdminAuthorizationData[]> {
+  const adminAuthorizations: AdminAuthorizationData[] = []
+  for (const iri of await listContained(transport, authorizationRegistryContainerIri)) {
+    const adminAuthorization = await getAdminAuthorization(transport, iri)
+    if (adminAuthorization.type.includes(INTEROP.AdminAuthorization)) {
+      adminAuthorizations.push(adminAuthorization)
+    }
+  }
+  return adminAuthorizations
+}
+
+/**
+ * The AdminAuthorization for `grantee` in an authorization registry, if any —
+ * the same list-and-scan, returning early on the match.
+ */
+export async function findAdminAuthorization(
+  transport: SparqlTransport,
+  authorizationRegistryContainerIri: string,
+  grantee: string
+): Promise<AdminAuthorizationData | undefined> {
+  for (const iri of await listContained(transport, authorizationRegistryContainerIri)) {
+    const adminAuthorization = await getAdminAuthorization(transport, iri)
+    if (
+      adminAuthorization.type.includes(INTEROP.AdminAuthorization) &&
+      adminAuthorization.grantee === grantee
+    ) {
+      return adminAuthorization
+    }
   }
 }
 

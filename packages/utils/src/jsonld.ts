@@ -12,24 +12,6 @@ export { localDocumentLoader }
 export type JsonLdContext = Record<string, unknown>
 
 /**
- * Collect the IRI values of a property (`propertyIri`) on the resource at
- * `id` from a raw JSON-LD GET. Node references are coerced to IRI strings
- * (`@type: '@id'` + `@container: '@set'` on the resolved term); an absent
- * property yields `[]`.
- */
-export async function linkedIrisJsonLd(
-  id: string,
-  fetch: WhatwgFetch,
-  propertyIri: string
-): Promise<string[]> {
-  const context: JsonLdContext = {
-    [propertyIri]: { '@id': propertyIri, '@type': '@id', '@container': '@set' },
-  }
-  const node = (await frameDoc(await fetchJsonLd(id, fetch), context, id)) as any
-  return node[propertyIri] ?? []
-}
-
-/**
  * Children of a container, from its `ldp:contains` (hierarchical/Solid storage)
  * and `lws:contains` (flat LWS storage) listings — the union, so the same
  * helper works for both. The container document is fetched once. Auxiliary

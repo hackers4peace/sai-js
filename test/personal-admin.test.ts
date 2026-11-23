@@ -1,5 +1,5 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
-import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
+import { ActivityRegistry, localSparqlTransport } from '@janeirodigital/interop-authorization-agent'
 import { Grant, grantGrantee } from '@janeirodigital/interop-data-model'
 const loadGrant = loader(Grant.fromJsonLd)
 
@@ -98,7 +98,7 @@ async function completedActivityTargets(webId: string): Promise<string[]> {
   const session = await manager.getSession(webId)
   return ActivityRegistry.getCompletedActivityIris(
     session.registrySet.hasActivityRegistry,
-    session.fetch
+    localSparqlTransport(session.sparqlEndpoint)
   )
 }
 

@@ -11,9 +11,9 @@ import {
   type EmbeddedSocialAgentRegistration,
   type RoleData,
   dataModelContext,
-  isActivityClass,
 } from '@janeirodigital/interop-data-model'
 import {
+  AS,
   INTEROP,
   type LanguageMap,
   type WhatwgFetch,
@@ -21,18 +21,19 @@ import {
   frameDoc,
   createResource,
   mintResource,
-  containedIrisJsonLd,
   withContext,
 } from '@janeirodigital/interop-utils'
 
+import { graphDoc, listContained } from './sparql.ts'
+import type { SparqlTransport } from './sparql.ts'
 import type { DataModelDependencies } from './types.ts'
 
-/** The activity resources currently in the registry (ldp:contains). */
+/** The activity resources currently in the registry (`lws:contains` listing). */
 export async function getActivityIris(
   data: ActivityRegistryData,
-  fetch: WhatwgFetch
+  transport: SparqlTransport
 ): Promise<string[]> {
-  return containedIrisJsonLd(data.id, fetch)
+  return listContained(transport, data.id)
 }
 
 /**
@@ -175,13 +176,28 @@ function isLanguageMap(value: unknown): value is LanguageMap {
 const ASV_ACTIVITY_TYPES = new Set(['as:Accept', 'as:Create', 'as:Add', 'as:Update'])
 
 /**
+ * Storage vocabulary types the plane read picks up from `meta:<iri>` (the CSS
+ * LWS metadata graph types the resource `ldp:Resource`; `graphDoc` unions the
+ * resource and meta graphs, while the HTTP document carries only the
+ * resource's own types). Never an activity class.
+ */
+const STORAGE_TYPE_PREFIXES = ['http://www.w3.org/ns/ldp#', 'https://www.w3.org/ns/lws#']
+
+/**
  * The activity class — the `type` tuple element that is neither the generic
- * `Activity` nor an ASV type. JSON-LD `@type` is an UNORDERED set (the
- * SPARQL store may frame it back in any order), so the class is found by set
- * membership, never by position.
+ * `Activity`, an ASV type, nor a storage type. JSON-LD `@type` is an
+ * UNORDERED set (the SPARQL store may frame it back in any order), so the
+ * class is found by set membership, never by position.
  */
 function activityClass(type: string[]): string {
-  return type.find((t) => t !== 'Activity' && !ASV_ACTIVITY_TYPES.has(t)) ?? 'Activity'
+  return (
+    type.find(
+      (t) =>
+        t !== 'Activity' &&
+        !ASV_ACTIVITY_TYPES.has(t) &&
+        !STORAGE_TYPE_PREFIXES.some((prefix) => t.startsWith(prefix))
+    ) ?? 'Activity'
+  )
 }
 
 /** Read an activity resource from the Activity Registry into an ActivityData
@@ -190,7 +206,16 @@ function activityClass(type: string[]): string {
  * `type` tuple is canonicalized to `['Activity', '<Class>', <as:*>]` — the
  * write order — regardless of the order the store returned it in. */
 export async function loadActivity(id: string, fetch: WhatwgFetch): Promise<ActivityData> {
-  const doc = await fetchJsonLd(id, fetch)
+  return frameActivityData(await fetchJsonLd(id, fetch), id)
+}
+
+/** Activity body from its graph over the registry plane — the same framing as
+ * `loadActivity`, one graph read instead of an HTTP GET. */
+export async function getActivity(transport: SparqlTransport, id: string): Promise<ActivityData> {
+  return frameActivityData(await graphDoc(transport, id), id)
+}
+
+async function frameActivityData(doc: unknown, id: string): Promise<ActivityData> {
   const node = await frameActivity(doc, id)
   const type = (node.type as string[] | undefined) ?? []
   const cls = activityClass(type)
@@ -534,22 +559,42 @@ export async function createCompletion(
 }
 
 /**
- * IRIs of all completed activities — the `target`s of every `activityCompleted`
- * activity in the registry (the `type` discriminant). Completions are terminal
- * and never reference each other, so no transitive closure is needed. (One
- * load per activity; used by the pending filters and by tests.)
+ * Completion rows of the activity registry: the `activityCompleted` activity
+ * and the IRI it completes (`as:target`) — one listing + one typed SELECT over
+ * the plane, no per-activity body read. Completions are terminal and never
+ * reference each other, so no transitive closure is needed.
+ */
+export async function getActivityCompletions(
+  data: ActivityRegistryData,
+  transport: SparqlTransport
+): Promise<{ completion: string; target?: string }[]> {
+  const iris = await getActivityIris(data, transport)
+  if (iris.length === 0) return []
+  const values = iris.map((iri) => `<${iri}>`).join(' ')
+  const bindings = await transport.fetchBindings(
+    `SELECT ?activity ?target WHERE {
+  VALUES ?activity { ${values} }
+  GRAPH ?g { ?activity a <${INTEROP.ActivityCompleted}> }
+  OPTIONAL { GRAPH ?h { ?activity <${AS.target}> ?target } }
+}`
+  )
+  return bindings.map((binding) => ({
+    completion: binding.activity.value,
+    target: binding.target?.value,
+  }))
+}
+
+/**
+ * IRIs of all completed activities — the `target`s of every
+ * `activityCompleted` activity in the registry. Used by the pending filters
+ * and by tests.
  */
 export async function getCompletedActivityIris(
   data: ActivityRegistryData,
-  fetch: WhatwgFetch
+  transport: SparqlTransport
 ): Promise<string[]> {
-  const iris = await getActivityIris(data, fetch)
-  const completed: string[] = []
-  for (const iri of iris) {
-    const activity = await loadActivity(iri, fetch)
-    if (isActivityClass(activity, 'ActivityCompleted') && 'target' in activity) {
-      completed.push(activity.target)
-    }
-  }
-  return completed
+  const completions = await getActivityCompletions(data, transport)
+  return completions
+    .map((completion) => completion.target)
+    .filter((target): target is string => target !== undefined)
 }

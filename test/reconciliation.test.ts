@@ -85,7 +85,7 @@ describe('reconciliation sweep', () => {
       async () => {
         const completed = await ActivityRegistry.getCompletedActivityIris(
           registry,
-          acmeSession.fetch
+          localSparqlTransport(acmeSession.sparqlEndpoint)
         )
         return completed.includes(created.id)
       },

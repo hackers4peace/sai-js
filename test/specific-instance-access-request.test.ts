@@ -2,6 +2,7 @@ import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpa
 import {
   ActivityRegistry,
   type AuthorizationAgent,
+  localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import { AccessRequest, grantGrantee } from '@janeirodigital/interop-data-model'
 const loadAccessRequest = loader(AccessRequest.fromJsonLd)
@@ -208,7 +209,10 @@ describe('specific-instance access request', () => {
       async () => {
         const registry = kimSession.registrySet.hasActivityRegistry
         if (!registry) return undefined
-        const iris = await ActivityRegistry.getActivityIris(registry, kimSession.fetch)
+        const iris = await ActivityRegistry.getActivityIris(
+          registry,
+          localSparqlTransport(kimSession.sparqlEndpoint)
+        )
         for (const iri of iris) {
           const activity = await ActivityRegistry.loadActivity(iri, kimSession.fetch)
           if (activity.type.includes('AccessRequestGranted')) return activity
