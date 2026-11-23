@@ -58,7 +58,7 @@ export class CidIssuerResolver {
 
   public constructor(args: CidIssuerResolverArgs) {
     this.converter = args.converter
-    this.fetch = args.fetch ?? (globalThis.fetch as WhatwgFetch)
+    this.fetch = args.fetch ?? globalThis.fetch
   }
 
   public async verifySubjectDocument(subject: string, issuer: string): Promise<void> {

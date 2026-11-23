@@ -46,7 +46,7 @@ function authorizationServer(endpoint: TokenEndpoint): AuthorizationServer {
   return {
     issuer: endpoint.issuer,
     token_endpoint: endpoint.tokenEndpoint,
-  } as AuthorizationServer
+  }
 }
 
 /**
@@ -74,13 +74,13 @@ async function tokenExchange(
   // re-enter it synchronously around the request: the fetch instrumentation's
   // HTTP span (and its `traceparent` to the server) then nests under it.
   const activeSpan = trace.getSpan(context.active())
-  const baseFetch = options.fetch ?? (globalThis.fetch as WhatwgFetch)
-  requestOptions[customFetch] = ((input: RequestInfo | URL, init?: RequestInit) =>
+  const baseFetch = options.fetch ?? globalThis.fetch
+  requestOptions[customFetch] = (input: RequestInfo | URL, init?: RequestInit) =>
     activeSpan
       ? context.with(trace.setSpan(context.active(), activeSpan), () =>
           baseFetch(input as RequestInfo, init)
         )
-      : baseFetch(input as RequestInfo, init)) as typeof globalThis.fetch
+      : baseFetch(input, init)
 
   if (options.dpopKeyPair) {
     requestOptions.DPoP = DPoP(client, options.dpopKeyPair)

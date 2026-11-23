@@ -65,7 +65,7 @@ const base64urlOption = Options.boolean('base64url').pipe(
 
 const generateJwk = (alg: string): Effect.Effect<{ privateKey: JsonWebKey }, Error> =>
   Effect.promise(async () => {
-    const { privateKey } = await generateKeyPair(alg as any, { extractable: true })
+    const { privateKey } = await generateKeyPair(alg, { extractable: true })
     const privateJwk = { ...(await exportJWK(privateKey)), alg } as JsonWebKey
     return { privateKey: privateJwk }
   })

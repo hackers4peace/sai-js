@@ -243,7 +243,7 @@ export interface IdJagFetchOptions {
  */
 export function createIdJagFetch(options: IdJagFetchOptions): WhatwgFetch {
   const { credential } = options
-  const baseFetch = options.fetch ?? (globalThis.fetch as WhatwgFetch)
+  const baseFetch = options.fetch ?? globalThis.fetch
   const tokenFetch = options.tokenFetch ?? baseFetch
   const now = options.now ?? (() => Date.now())
   const renewalMargin = options.renewalMargin ?? 30_000

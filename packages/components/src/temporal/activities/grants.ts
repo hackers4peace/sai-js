@@ -364,7 +364,7 @@ export async function generateGrants(payload: GenerateGrantsInput): Promise<Gene
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   return session.generateAccessGrants(
-    payload.dataAuthorizations.map((dataAuthorization) => dataAuthorization.id!),
+    payload.dataAuthorizations.map((dataAuthorization) => dataAuthorization.id),
     payload.grantee.id
   )
 }
@@ -427,7 +427,7 @@ export async function getExistingGrantBodies(
     ),
   ]
   while (queue.length > 0) {
-    const iri = queue.shift()!
+    const iri = queue.shift()
     if (attempted.has(iri)) {
       continue
     }
@@ -468,7 +468,7 @@ export async function deleteAccessGrants(payload: {
   for (const grant of payload.grants) {
     // the grant's own ACR is part of its lifecycle — delete it with the
     // resource (a deleted resource leaves the ACR orphaned otherwise)
-    const head = await session.fetch(grant.id!, { method: 'HEAD' })
+    const head = await session.fetch(grant.id, { method: 'HEAD' })
     const acrId = head.ok ? getAcl(head.headers.get('link')) : undefined
     if (acrId) {
       const acrResponse = await session.fetch(acrId, { method: 'DELETE' })
@@ -476,7 +476,7 @@ export async function deleteAccessGrants(payload: {
         throw new Error(`failed to delete grant ACR: ${acrResponse.status}`)
       }
     }
-    const response = await session.fetch(grant.id!, { method: 'DELETE' })
+    const response = await session.fetch(grant.id, { method: 'DELETE' })
     if (!response.ok && response.status !== 404) {
       throw new Error(`failed to delete grant: ${response.status}`)
     }
@@ -499,13 +499,13 @@ export async function revokeGrantClosure(payload: {
   const registryGrants = await getRegistryGrants(transport, session.registrySet.hasGrantRegistry.id)
   const closure = invalidGrantsAfterRemoval(
     registryGrants,
-    payload.grants.map((grant) => grant.id!)
+    payload.grants.map((grant) => grant.id)
   )
   await deleteAccessGrants({
     webId: payload.webId,
-    grants: closure.map((grant) => ({ id: grant.id!, type: grant.type ?? [LWS.AccessGrant] })),
+    grants: closure.map((grant) => ({ id: grant.id, type: grant.type ?? [LWS.AccessGrant] })),
   })
-  return closure.map((grant) => grant.id!)
+  return closure.map((grant) => grant.id)
 }
 
 /**
@@ -525,7 +525,7 @@ export async function getRegistryGrantsForGrantee(payload: {
   const grants = await getRegistryGrants(transport, session.registrySet.hasGrantRegistry.id)
   return grants
     .filter((grant) => grantGrantee(grant) === payload.grantee.id)
-    .map((grant) => ({ id: grant.id!, type: grant.type ?? [LWS.AccessGrant] }))
+    .map((grant) => ({ id: grant.id, type: grant.type ?? [LWS.AccessGrant] }))
 }
 
 /**
@@ -638,7 +638,7 @@ export async function deleteAuthorizations(payload: {
   // causing "Multiple results for http://purl.org/dc/terms/modified".
   // Change back to Promise.all after the CSS bug is fixed.
   for (const authorization of payload.authorizations) {
-    const response = await session.fetch(authorization.id!, { method: 'DELETE' })
+    const response = await session.fetch(authorization.id, { method: 'DELETE' })
     if (!response.ok && response.status !== 404) {
       throw new Error(`failed to delete data authorization: ${response.status}`)
     }
@@ -771,7 +771,7 @@ export async function replaceAccessGrantsOnRegistration(
   await replaceAccessGrants(
     agentRegistration,
     session.fetch,
-    payload.grants.map((grant) => grant.id!)
+    payload.grants.map((grant) => grant.id)
   )
 }
 

@@ -155,7 +155,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
     session: AuthorizationAgent,
     temporal: Temporal
   ): Promise<void> {
-    const client = temporal.client!
+    const client = temporal.client
 
     if (isActivityClass(activity, 'AuthorizationDenied')) {
       // silent decline (Step 4) — forward-only: `handle()` already forwarded
@@ -271,7 +271,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // the DataAuthorization id(s) and embedded the POJOs; the workflow
       // materializes them at those ids (find-first), then regenerates grants.
       // One run per activity — no deterministic workflowId, no consumer.
-      const decoded = decodeUnknownSync(AuthorizationGranted)(activity as never)
+      const decoded = decodeUnknownSync(AuthorizationGranted)(activity)
       await client.workflow.start(processAuthorizationGranted, {
         taskQueue: 'create-grants',
         args: [
@@ -288,7 +288,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // C2: the carrier is self-contained (refs + grantee) — the dedicated
       // workflow deletes the DAs and reconciles the grant projections. One
       // run per activity (no consumer, no deterministic workflowId).
-      const decoded = decodeUnknownSync(AuthorizationRevoked)(activity as never)
+      const decoded = decodeUnknownSync(AuthorizationRevoked)(activity)
       await client.workflow.start(processAuthorizationRevoked, {
         taskQueue: 'create-grants',
         args: [
@@ -311,7 +311,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
         // embedded projection at the PRE-MINTED id); the decoded object
         // passes verbatim into the workflow input (the schema decodes
         // arrays as readonly — spread to mutable)
-        const decoded = decodeUnknownSync(AdminAuthorizationGranted)(activity as never)
+        const decoded = decodeUnknownSync(AdminAuthorizationGranted)(activity)
         await client.workflow.start(processAdminAuthorizationGranted, {
           taskQueue: 'create-grants',
           args: [
@@ -326,7 +326,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
         // step 6 — the object IS the existing AdminAuthorization (real-id
         // embedded projection at its id); the removeAdmin workflow DELETEs
         // it, revokes grants + the ACR rewrite, then completes
-        const decoded = decodeUnknownSync(AdminAuthorizationRevoked)(activity as never)
+        const decoded = decodeUnknownSync(AdminAuthorizationRevoked)(activity)
         await client.workflow.start(processAdminAuthorizationRevoked, {
           taskQueue: 'create-grants',
           args: [
@@ -344,7 +344,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // step 9 — the object IS the role-to-be (real-id embedded projection
       // at the PRE-MINTED id); the decoded object passes verbatim into the
       // workflow input; the workflow PUTs the role there and completes
-      const decoded = decodeUnknownSync(RoleCreated)(activity as never)
+      const decoded = decodeUnknownSync(RoleCreated)(activity)
       await client.workflow.start(createRole, {
         taskQueue: 'create-grants',
         args: [
@@ -372,7 +372,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // input (the schema decodes arrays as readonly — spread to the mutable
       // RoleData); the triggering activity rides as a typed ref
       if (isActivityClass(activity, 'RoleMembershipChanged')) {
-        const decoded = decodeUnknownSync(RoleMembershipChanged)(activity as never)
+        const decoded = decodeUnknownSync(RoleMembershipChanged)(activity)
         await client.workflow.start(processRoleMembershipChange, {
           taskQueue: 'create-grants',
           args: [
@@ -389,7 +389,7 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
           workflowId: crypto.randomUUID(),
         })
       } else {
-        const decoded = decodeUnknownSync(RoleDeleted)(activity as never)
+        const decoded = decodeUnknownSync(RoleDeleted)(activity)
         await client.workflow.start(processRoleDeletion, {
           taskQueue: 'create-grants',
           args: [

@@ -54,7 +54,7 @@ async function resolveInstances(
     }
     const existing = byRegistration.get(registration.id)
     if (existing) {
-      existing.hasDataInstance!.push(instance)
+      existing.hasDataInstance.push(instance)
     } else {
       byRegistration.set(registration.id, {
         registeredShapeTree: data.shapeTreeIri,

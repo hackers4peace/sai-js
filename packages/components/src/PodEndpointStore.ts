@@ -84,7 +84,7 @@ export class PodEndpointStore extends Initializer {
     webIdStore?: CustomWebIdStore
   ) {
     super()
-    this.storage = storage as unknown as typeof this.storage
+    this.storage = storage
     this.webIdStore = webIdStore
   }
 
@@ -133,7 +133,7 @@ export class PodEndpointStore extends Initializer {
 
   public async findSparqlByAccountId(accountId: string): Promise<Array<SparqlEndpointRecord>> {
     const records = await this.storage.find(SPARQL_ENDPOINT_STORAGE_TYPE, { accountId })
-    return records as unknown as Array<SparqlEndpointRecord>
+    return records
   }
 
   public async findSparqlByWebId(webId: string): Promise<Array<SparqlEndpointRecord>> {
@@ -167,7 +167,7 @@ export class PodEndpointStore extends Initializer {
 
   public async findObjectByAccountId(accountId: string): Promise<Array<ObjectEndpointRecord>> {
     const records = await this.storage.find(OBJECT_ENDPOINT_STORAGE_TYPE, { accountId })
-    return records as unknown as Array<ObjectEndpointRecord>
+    return records
   }
 
   public async findObjectByWebId(webId: string): Promise<Array<ObjectEndpointRecord>> {

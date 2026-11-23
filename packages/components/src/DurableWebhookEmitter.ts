@@ -49,7 +49,7 @@ export class DurableWebhookEmitter extends NotificationEmitter {
 
     try {
       await this.temporal.init()
-      await this.temporal.client!.workflow.start(deliverWebhook, {
+      await this.temporal.client.workflow.start(deliverWebhook, {
         taskQueue: WEBHOOK_DELIVERY_TASK_QUEUE,
         args: [payload],
         workflowId: `webhook:${randomUUID()}`,

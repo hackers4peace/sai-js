@@ -126,7 +126,7 @@ export function setTokenAttributes(
 
   let header: Record<string, unknown> | undefined
   try {
-    header = decodeProtectedHeader(token) as Record<string, unknown>
+    header = decodeProtectedHeader(token)
   } catch {
     // not a JWT — leave only the digest behind
     return
@@ -164,7 +164,7 @@ export function setTokenAttributes(
   if (typeof aud === 'string') {
     span.setAttribute(`${prefix}.aud`, aud)
   } else if (Array.isArray(aud) && aud.every((value) => typeof value === 'string')) {
-    span.setAttribute(`${prefix}.aud`, aud as Array<string>)
+    span.setAttribute(`${prefix}.aud`, aud)
   }
 
   const cnf = claims.cnf

@@ -102,7 +102,7 @@ export const useAppStore = defineStore('app', () => {
   const activitySnackbar = reactive({
     visible: false,
     /** mirrors the claim's status — pending: spinner, done: ✓ */
-    status: 'pending' as 'pending' | 'done',
+    status: 'pending',
     claim: null as ActivityClaim | null,
   })
 

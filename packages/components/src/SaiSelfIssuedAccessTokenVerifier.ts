@@ -111,8 +111,8 @@ export class SaiSelfIssuedAccessTokenVerifier extends SubjectTokenVerifier {
     })
 
     return {
-      subject: payload.sub!,
-      issuer: payload.iss!,
+      subject: payload.sub,
+      issuer: payload.iss,
       client: toClientUri(client, iss),
     }
   }

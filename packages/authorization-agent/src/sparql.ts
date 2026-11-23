@@ -262,7 +262,7 @@ export async function getSocialAgentRegistration(
   iri: string
 ): Promise<SocialAgentRegistrationData> {
   const doc = await graphDoc(transport, iri)
-  const node = (await frameDoc(doc, dataModelContext, iri)) as Record<string, unknown>
+  const node = await frameDoc(doc, dataModelContext, iri)
   return {
     id: iri,
     type: (node.type as Array<string> | undefined) ?? [],

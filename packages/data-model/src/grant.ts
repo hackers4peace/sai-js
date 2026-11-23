@@ -150,8 +150,8 @@ function normalizeTarget(node: Record<string, unknown>): OdrlTarget {
   return {
     id: node.id as string | undefined,
     uid: node.uid as string | undefined,
-    owner: resolveIri(node.owner as string | undefined),
-    storage: resolveIri(node.storage as string | undefined),
+    owner: resolveIri(node.owner),
+    storage: resolveIri(node.storage),
     type: asArray(node.type as string | Array<string> | undefined).map((value) =>
       resolveIri(value)!
     ),
@@ -160,12 +160,12 @@ function normalizeTarget(node: Record<string, unknown>): OdrlTarget {
     ),
     ...(node.registeredShapeTree
       ? {
-          registeredShapeTree: resolveIri(node.registeredShapeTree as string),
+          registeredShapeTree: resolveIri(node.registeredShapeTree),
         }
       : {}),
     ...(node.hasDataRegistration
       ? {
-          hasDataRegistration: resolveIri(node.hasDataRegistration as string),
+          hasDataRegistration: resolveIri(node.hasDataRegistration),
         }
       : {}),
   }
@@ -175,8 +175,8 @@ function normalizePermission(node: Record<string, unknown>): OdrlPermission {
   return {
     id: node.id as string | undefined,
     uid: node.uid as string | undefined,
-    assigner: resolveIri(node.assigner as string)!,
-    assignee: resolveIri(node.assignee as string)!,
+    assigner: resolveIri(node.assigner)!,
+    assignee: resolveIri(node.assignee)!,
     action: asArray(node.action as string | Array<string> | undefined).map((value) =>
       resolveIri(value)!
     ),
@@ -195,10 +195,10 @@ function normalizePolicy(node: Record<string, unknown>): OdrlPolicy {
     type: asArray(node.type as string | Array<string> | undefined).map((value) =>
       resolveIri(value)!
     ),
-    profile: resolveIri(node.profile as string)!,
+    profile: resolveIri(node.profile)!,
     permission,
-    scopeOfGrant: resolveIri(node.scopeOfGrant as string | undefined),
-    inheritsFromGrant: resolveIri(node.inheritsFromGrant as string | undefined),
+    scopeOfGrant: resolveIri(node.scopeOfGrant),
+    inheritsFromGrant: resolveIri(node.inheritsFromGrant),
     ...(first?.assignee ? { assignee: first.assignee } : {}),
     ...(first?.action.length ? { action: [...first.action] } : {}),
     ...(first?.target ? { target: first.target } : {}),
@@ -293,11 +293,8 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
       resolveIri(value)!
     ),
     access,
-    scopeOfGrant:
-      resolveIri(node.scopeOfGrant as string | undefined) ?? access[0]?.scopeOfGrant ?? '',
-    ...(node.inheritsFromGrant
-      ? { inheritsFromGrant: resolveIri(node.inheritsFromGrant as string)! }
-      : {}),
+    scopeOfGrant: resolveIri(node.scopeOfGrant) ?? access[0]?.scopeOfGrant ?? '',
+    ...(node.inheritsFromGrant ? { inheritsFromGrant: resolveIri(node.inheritsFromGrant)! } : {}),
     ...(node.hasInheritingGrant
       ? { hasInheritingGrant: asArray(node.hasInheritingGrant as string | Array<string>) }
       : {}),

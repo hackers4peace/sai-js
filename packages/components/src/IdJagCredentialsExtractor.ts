@@ -35,7 +35,7 @@ export class IdJagCredentialsExtractor extends CredentialsExtractorBase {
   }
 
   public async handle(request: HttpRequest): Promise<Credentials> {
-    const token = request.headers.authorization!.replace(/^Bearer\s+/iu, '').trim()
+    const token = request.headers.authorization.replace(/^Bearer\s+/iu, '').trim()
     const verified = await this.verifier.handleSafe({
       token,
       tokenType: ID_JAG_TOKEN_TYPE,

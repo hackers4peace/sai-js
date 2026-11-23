@@ -73,7 +73,7 @@ export async function createAdminGrants(payload: AdminWorkflowInput): Promise<vo
   await replaceAdminGrantLink({
     webId: payload.webId,
     admin: payload.admin,
-    grantIds: [registrySetGrant.id!],
+    grantIds: [registrySetGrant.id],
   })
 }
 

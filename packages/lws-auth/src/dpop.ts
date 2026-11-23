@@ -40,10 +40,10 @@ export async function dpopThumbprint(key: CryptoKey | JsonWebKey): Promise<strin
  * non-extractable pair: the public key stays exportable either way.
  */
 export async function createDpopKeyPair(extractable = false): Promise<CryptoKeyPair> {
-  return (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, extractable, [
+  return await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, extractable, [
     'sign',
     'verify',
-  ])) as CryptoKeyPair
+  ])
 }
 
 export interface DpopProofOptions {

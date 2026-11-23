@@ -34,7 +34,7 @@ export class ActivityWebhookStore extends Initializer {
   // Wrong typings to prevent Components.js typing issues
   public constructor(storage: AccountLoginStorage<Record<string, never>>) {
     super()
-    this.storage = storage as unknown as typeof this.storage
+    this.storage = storage
   }
 
   // Initialize the type definitions

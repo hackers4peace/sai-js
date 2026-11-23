@@ -64,7 +64,7 @@ export class AccountService {
     const temporal = new Temporal()
     await temporal.init()
     try {
-      await temporal.client!.workflow.start(bootstrapAccount, {
+      await temporal.client.workflow.start(bootstrapAccount, {
         taskQueue: 'create-grants',
         workflowId: `account-bootstrap:${accountId}`,
         args: [input],

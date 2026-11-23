@@ -141,7 +141,7 @@ function sessionInfo(session: StoredSession): BrowserSessionInfo {
  * requests.
  */
 export function createBrowserSession(options: BrowserSessionOptions): BrowserSession {
-  const baseFetch = options.fetch ?? (globalThis.fetch as WhatwgFetch)
+  const baseFetch = options.fetch ?? globalThis.fetch
   const now = options.now ?? (() => Date.now())
   const dpop = options.dpop ?? true
   const renewalMargin = options.renewalMargin ?? DEFAULT_RENEWAL_MARGIN
@@ -175,7 +175,7 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
       return cached
     }
     const response = await discoveryRequest(new URL(issuer), {
-      [customFetch]: baseFetch as typeof globalThis.fetch,
+      [customFetch]: baseFetch,
     })
     const server = await processDiscoveryResponse(new URL(issuer), response)
     metadata.set(issuer, server)

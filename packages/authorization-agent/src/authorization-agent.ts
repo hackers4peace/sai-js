@@ -622,7 +622,7 @@ export class AuthorizationAgent {
       }
       return (role.members ?? []).map((member) => ({ id: member, type: [INTEROP.SocialAgent] }))
     }
-    return [grantee as AgentId]
+    return [grantee]
   }
 
   /**

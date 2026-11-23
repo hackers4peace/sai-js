@@ -205,7 +205,7 @@ export async function frameNode(
   if (!id) {
     throw new Error(`framed node ${iri} has no id`)
   }
-  return { ...rest, id } as FramedNode
+  return { ...rest, id }
 }
 
 /**
@@ -370,7 +370,7 @@ export async function toStore(doc: Record<string, unknown>, base?: string): Prom
   for (const quad of dataset as unknown as Iterable<Quad>) {
     store.add(quad)
   }
-  return store as Store
+  return store
 }
 
 /**
@@ -513,7 +513,7 @@ export function loader<T>(decode: (doc: unknown, id: string) => Promise<T>) {
  * so PUT bodies carry no context (and are context-version-proof).
  */
 export async function expandedJsonLd(doc: Record<string, unknown>): Promise<Array<unknown>> {
-  return jsonld.expand(doc, { documentLoader }) as Promise<Array<unknown>>
+  return jsonld.expand(doc, { documentLoader })
 }
 
 /**

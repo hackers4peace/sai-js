@@ -283,7 +283,7 @@ export const useAppStore = defineStore('app', () => {
     if (!task['@id']) {
       throw new Error('task has no @id yet')
     }
-    const projectId = session.findParent(task['@id']!)
+    const projectId = session.findParent(task['@id'])
     const ldoProject = findProject(projectId)
     const isDraft = ![...ldoProject.hasTask!].some(
       (t: { '@id': string }) => t['@id'] === task['@id']
@@ -320,7 +320,7 @@ export const useAppStore = defineStore('app', () => {
       throw deleteResult
     }
 
-    const projectId = session.findParent(task['@id']!)
+    const projectId = session.findParent(task['@id'])
     const ldoProject = findProject(projectId)
     // remove reference from the project
     const cProject = changeData(ldoProject)

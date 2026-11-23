@@ -161,8 +161,8 @@ export async function* peerInstanceIris(
       // the parent grant lives in the peer's registry — refetched from the
       // grant's storage (SAPI supports one level of inheritance today)
       const parentGrant = await Grant.fromJsonLd(
-        await fetchPeerDocument(ctx, accessGrant.storage, accessGrant.inheritsFromGrant!),
-        accessGrant.inheritsFromGrant!
+        await fetchPeerDocument(ctx, accessGrant.storage, accessGrant.inheritsFromGrant),
+        accessGrant.inheritsFromGrant
       )
       for await (const parentIri of peerInstanceIris(ctx, parentGrant)) {
         const parentShapeTree = await loadShapeTree(

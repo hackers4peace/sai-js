@@ -101,7 +101,7 @@ export class GarageAdminClient {
     })
 
     if (response.status === 404 && options.tolerate404) {
-      return undefined as T
+      return undefined
     }
     if (!response.ok) {
       const detail = await response.text().catch(() => '')

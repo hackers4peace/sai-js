@@ -194,7 +194,7 @@ export async function storeAdminGrant(grant: AdminGrantData): Promise<void> {
   const session = await manager.getSession(grant.dataOwner)
   await session.createIdentifierResource(
     session.registrySet.hasGrantRegistry.id,
-    grant.id!,
+    grant.id,
     false,
     withContext(grantContext, {
       id: grant.id,
@@ -218,7 +218,7 @@ export async function createAdminGrantAcr(payload: { grant: AdminGrantData }): P
     throw new Error(`no authorization agent for admin: ${grantee}`)
   }
 
-  const headResponse = await session.fetch(payload.grant.id!, {
+  const headResponse = await session.fetch(payload.grant.id, {
     method: 'HEAD',
   })
   const acrId = getAcl(headResponse.headers.get('link'))
@@ -231,7 +231,7 @@ export async function createAdminGrantAcr(payload: { grant: AdminGrantData }): P
     session.fetch,
     accessGrantAcrJsonLd({
       id: acrId,
-      resource: payload.grant.id!,
+      resource: payload.grant.id,
       owner: {
         agent: session.webId,
         client: session.agentId,

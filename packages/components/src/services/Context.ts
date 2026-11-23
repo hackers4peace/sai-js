@@ -129,7 +129,7 @@ export async function resolveContext(
     userWebId: userSession.webId,
     endpoints,
     storageFetch: async (storage: string): Promise<WhatwgFetch> => {
-      const own = ownStorageOf({ endpoints } as ResolvedContext, storage)
+      const own = ownStorageOf({ endpoints }, storage)
       return own
         ? sessionManager.storageFetch(userSession.webId, own)
         : sessionManager.impersonationFetch(userSession.webId, context, storage)

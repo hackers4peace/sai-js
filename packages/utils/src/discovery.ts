@@ -369,7 +369,7 @@ export async function discoverAuthorizationRedirectEndpoint(
   const doc = await fetchJsonLd(authorizationAgentIri, fetch)
   return (
     await documentValues(doc, authorizationAgentIri, INTEROP.hasAuthorizationRedirectEndpoint)
-  )[0]!
+  )[0]
 }
 
 export async function discoverWebPushService(

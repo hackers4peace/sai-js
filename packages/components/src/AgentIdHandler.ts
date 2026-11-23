@@ -35,7 +35,7 @@ export class AgentIdHandler extends OperationHttpHandler {
     response,
   }: OperationHttpHandlerInput): Promise<ResponseDescription> {
     const agentId = operation.target.path
-    const webId = Buffer.from(agentId.match(/[^/]+$/u)![0], 'base64url').toString('utf8')
+    const webId = Buffer.from(agentId.match(/[^/]+$/u)[0], 'base64url').toString('utf8')
     const accessRequests = accessRequestsUrl(webId)
     const accessGrants = accessGrantsUrl(webId)
 

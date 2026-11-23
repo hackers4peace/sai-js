@@ -223,7 +223,7 @@ function parsePolicy(
     if (instanceTargets.some((permission) => targetOf(permission).partOf !== undefined)) {
       throw new BadRequestHttpError('instance access needs use hasDataRegistration, not partOf')
     }
-    const registeredShapeTree = targetOf(instanceTargets[0]!).registeredShapeTree
+    const registeredShapeTree = targetOf(instanceTargets[0]).registeredShapeTree
     if (typeof registeredShapeTree !== 'string' || !registeredShapeTree) {
       throw new BadRequestHttpError('instance access needs require registeredShapeTree')
     }

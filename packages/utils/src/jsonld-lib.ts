@@ -7,5 +7,4 @@ import * as jsonldNs from 'jsonld'
  * — in this package, in downstream packages, and in tests — uses the same
  * object (`fromRDF`, `toRDF`, `expand`, `frame`, … all available either way).
  */
-export const jsonld = ((jsonldNs as unknown as { default?: typeof jsonldNs }).default ??
-  jsonldNs) as typeof jsonldNs
+export const jsonld = (jsonldNs as unknown as { default?: typeof jsonldNs }).default ?? jsonldNs

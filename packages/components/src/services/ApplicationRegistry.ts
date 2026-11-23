@@ -25,11 +25,11 @@ const buildApplicationProfile = async (
   // TODO (angel) data validation and how to handle when the applications profile is missing some components?
   return Application.make({
     id: IRI.make(registration.registeredAgent),
-    name: clientIdDocument.clientName!,
+    name: clientIdDocument.clientName,
     logo: clientIdDocument.logoUri,
     //authorizationDate: registration.registeredAt!.toISOString(),
     //lastUpdateDate: registration.updatedAt?.toISOString(),
-    accessNeedGroup: clientIdDocument.hasAccessNeedGroup!,
+    accessNeedGroup: clientIdDocument.hasAccessNeedGroup,
     callbackEndpoint: clientIdDocument.callbackEndpoint,
   })
 }

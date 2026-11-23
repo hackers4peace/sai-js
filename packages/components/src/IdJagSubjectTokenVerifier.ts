@@ -194,7 +194,7 @@ export class IdJagSubjectTokenVerifier extends SubjectTokenVerifier {
           ? aud.filter((value): value is string => typeof value === 'string')
           : []
     return this.audiencePrefix
-      ? values.filter((value) => isWithinBaseUrl(value, this.audiencePrefix!))
+      ? values.filter((value) => isWithinBaseUrl(value, this.audiencePrefix))
       : values.filter((value) => value === audience)
   }
 

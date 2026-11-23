@@ -18,7 +18,6 @@ const notYetMigrated = Object.fromEntries(
     'quality/no-unsafe-dictionary-type',
     'quality/no-chained-type-assertions',
     'typescript/no-unsafe-member-access',
-    'typescript/no-unnecessary-type-assertion',
     'typescript/no-unsafe-assignment',
     'typescript/no-unsafe-call',
     'quality/no-conditional-empty-object-spread',

@@ -457,7 +457,7 @@ export async function processRoleMembershipChange(
         add(member)
       }
     } else {
-      add(grantee as AgentId)
+      add(grantee)
     }
   }
   await Promise.all(
@@ -516,7 +516,7 @@ export async function processRoleDeletion(
         add(member)
       }
     } else {
-      add(grantee as AgentId)
+      add(grantee)
     }
   }
   await Promise.all(
@@ -774,7 +774,7 @@ export async function reconcileGrantsForGrantee(
     grantee: payload.grantee,
     generated,
     existing,
-    ownGrantIds: orphans.map((grant) => grant.id!).filter(Boolean),
+    ownGrantIds: orphans.map((grant) => grant.id).filter(Boolean),
   })
   const reusedSource = new Set(reusedSourceIds)
   const reusedDelegated = new Set(reusedDelegatedIndexes)

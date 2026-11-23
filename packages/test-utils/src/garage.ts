@@ -100,7 +100,7 @@ export async function seedObjectEndpoints(
 
   const datasetByPodUrl = new Map<string, string>()
   for (const accountData of Object.values(kv)) {
-    for (const record of Object.values<any>((accountData as any)?.['**sparqlEndpoint**'] ?? {})) {
+    for (const record of Object.values<any>(accountData?.['**sparqlEndpoint**'] ?? {})) {
       const [dataset] = new URL(record.endpoint).pathname.split('/').filter(Boolean)
       datasetByPodUrl.set(record.podUrl, dataset)
     }

@@ -112,7 +112,7 @@ export async function forwardNeedBasedAccessRequest(
         ),
       ]
     } else {
-      policy.permission = [permission(['AssetCollection', 'st:ShapeTree'], [shapeTree as string])]
+      policy.permission = [permission(['AssetCollection', 'st:ShapeTree'], [shapeTree])]
     }
     policies.push(policy)
     for (const child of (need.hasInheritingNeed as Array<Record<string, unknown>> | undefined) ??

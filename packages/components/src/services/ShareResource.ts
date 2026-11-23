@@ -176,7 +176,7 @@ export const getResource = async (ctx: ResolvedContext, id: string, lang: string
   if (!resource) {
     throw new Error(`Resource not found: ${id}`)
   }
-  const shapeTree = await loadShapeTree(resource.shapeTreeIri!, ctx.session.fetch)
+  const shapeTree = await loadShapeTree(resource.shapeTreeIri, ctx.session.fetch)
   const shapeTreeDescription = await ShapeTree.getDescription(shapeTree, lang, ctx.session.fetch)
   // "who has access" is read via SPARQL in both contexts — personal via
   // the session's internal endpoint, org via `/sparql-admin`
@@ -188,7 +188,7 @@ export const getResource = async (ctx: ResolvedContext, id: string, lang: string
     id: IRI.make(resource.id),
     label: resource.label,
     shapeTree: {
-      id: IRI.make(resource.shapeTreeIri!),
+      id: IRI.make(resource.shapeTreeIri),
       label: pickLanguage(shapeTreeDescription?.label, lang),
     },
     accessGrantedTo: access.agents.map(({ agent }) => IRI.make(agent)),
@@ -349,7 +349,7 @@ export const shareResource = async (
   }
 
   return {
-    callbackEndpoint: clientIdDocument.callbackEndpoint!,
+    callbackEndpoint: clientIdDocument.callbackEndpoint,
   }
 }
 

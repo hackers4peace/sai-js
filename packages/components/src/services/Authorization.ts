@@ -418,7 +418,7 @@ export const listAuthorizations = async (
 
   return dataAuthorizations
     .map((dataAuthorization) => ({
-      id: IRI.make(dataAuthorization.id!),
+      id: IRI.make(dataAuthorization.id),
       grantee: IRI.make(dataAuthorization.grantee),
       grantedBy: IRI.make(dataAuthorization.grantedBy),
       registeredShapeTree: IRI.make(dataAuthorization.registeredShapeTree),
@@ -543,7 +543,7 @@ export const revokeAuthorizations = async (
 
   const queue = [...authorizations]
   while (queue.length > 0) {
-    const iri = queue.shift()!
+    const iri = queue.shift()
     if (refs.has(iri) || !contained.has(iri)) {
       continue
     }
@@ -584,7 +584,7 @@ export const revokeAuthorizations = async (
     type: ['Activity', 'AuthorizationRevoked'],
     actor: ctx.webId,
     object: [...refs.values()],
-    grantee: grantee!,
+    grantee,
     createdAt: new Date().toISOString(),
   }
   const created = await ActivityRegistry.createActivity(
@@ -657,7 +657,7 @@ export const recordAuthorization = async (
     // activity — no synchronous mutation.
     const group =
       accessNeedGroupData ??
-      (await resolveAccessNeedGroup(structure.hasAccessNeedGroup!, ctx.session.fetch))
+      (await resolveAccessNeedGroup(structure.hasAccessNeedGroup, ctx.session.fetch))
     const nested = buildNestedDataAuthorizations(structure, group, ctx.webId)
     const dataAuthorizations = await generateDataAuthorizations(
       nested,
