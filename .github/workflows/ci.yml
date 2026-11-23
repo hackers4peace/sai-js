@@ -33,6 +33,26 @@ jobs:
           # No --css override: use the fork installed from package-lock.json.
           args: test
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+      - name: Authorization UI e2e (Playwright)
+        id: e2e
+        uses: dagger/dagger-for-github@v8.2.0
+        with:
+          version: 0.21.12
+          args: playwright
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+      - name: Export Playwright report
+        if: failure() && steps.e2e.outcome == 'failure'
+        uses: dagger/dagger-for-github@v8.2.0
+        with:
+          version: 0.21.12
+          args: playwright-report export --path=e2e-out
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+      - name: Upload Playwright report
+        if: failure() && steps.e2e.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e-out
 
   outside-workspace:
     runs-on: ubuntu-latest

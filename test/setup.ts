@@ -1,18 +1,10 @@
-import { readFile } from 'node:fs/promises'
-
 import { initNodeTracing } from '@elfpavlik/sai-components'
-import {
-  Postgres,
-  fixturePodDatasets,
-  seedFusekiDataset,
-  seedObjectEndpoints,
-  splitFixtureByPod,
-} from '@janeirodigital/interop-test-utils'
 import { context, trace } from '@opentelemetry/api'
 import type { Context, Span } from '@opentelemetry/api'
 import { suppressTracing } from '@opentelemetry/core'
-import { S3mini } from 's3mini'
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest'
+
+import { prepareTestSeed } from './seed'
 
 // opt-in OpenTelemetry: a no-op unless an OTLP endpoint (SAI_OTLP_ENDPOINT in
 // the dagger test env) is set. The test runner plays the browser/App role —
@@ -62,64 +54,17 @@ afterEach(() => {
   rootSpan = undefined
 })
 
-const connectionString = 'postgres://temporal:temporal@postgresql:5432/auth'
 // buildSessionManager()'s lazy per-pod endpoint store reads this env var to
 // resolve the session's registry-pod endpoint
-process.env.CSS_POSTGRES_CONNECTION_STRING ??= connectionString
-const keyValuePath = '../environments/data/kv.json'
+process.env.CSS_POSTGRES_CONNECTION_STRING ??= 'postgres://temporal:temporal@postgresql:5432/auth'
 
-const fusekiBaseUrl = 'http://fuseki:3030'
-const datasetPath = '../environments/data/registry.trig'
-
-const kvData = JSON.parse(await readFile(keyValuePath, 'utf8'))
-const datasetData = await readFile(datasetPath, 'utf8')
-
-// stage 3: one Fuseki dataset per pod. The fixture's registry origin is the
-// raw `https://registry/` in the dagger environment.
-const accounts = Object.values(kvData).flatMap((value: any) => {
-  if (!value || !value['**pod**']) return []
-  return [
-    {
-      webId: (Object.values(value['**webIdLink**'])[0] as any).webId,
-      podBaseUrls: Object.values(value['**pod**']).map((pod: any) => pod.baseUrl),
-    },
-  ]
-})
-const podDatasets = fixturePodDatasets(accounts, 'https://registry/')
-const datasets = await splitFixtureByPod(datasetData, { podDatasets, idOrigin: 'https://id/' })
-
-const clientId = 'https://data/test-client/public/id'
-const clientIdPath = '../environments/data/test-client/public/id$.jsonld'
-
-// per-pod buckets/keys: provision them through the Garage admin API and merge
-// the generated objectEndpoint records into the fixture before it is seeded
-// (there is no shared bucket anymore)
-const s3Endpoint = (process.env.CSS_S3_ENDPOINT ?? 'http://garage:3900').replace(/\/$/, '')
-const objectEndpoints = await seedObjectEndpoints(kvData, {
-  adminBaseUrl: process.env.CSS_GARAGE_ADMIN_ENDPOINT ?? 'http://garage:3903',
-  adminToken: process.env.CSS_GARAGE_ADMIN_TOKEN ?? '',
-  s3Endpoint,
-})
-const testClientCredentials = objectEndpoints.get('https://data/test-client/')
-if (!testClientCredentials)
-  throw new Error('seed did not provision the test-client object endpoint')
-
-const pg = new Postgres(connectionString, 'key_value')
-
-const clientIdData = await readFile(clientIdPath)
-const garage = new S3mini({
-  // s3mini derives the bucket from the endpoint URL path
-  endpoint: `${s3Endpoint}/${testClientCredentials.bucket}`,
-  accessKeyId: testClientCredentials.accessKeyId,
-  secretAccessKey: testClientCredentials.secretAccessKey,
-  region: process.env.CSS_S3_REGION ?? 'garage',
-})
+const testSeed = await prepareTestSeed()
 
 beforeAll(async () => {
-  await withoutTracing(() => garage.putAnyObject(clientId, clientIdData, 'application/ld+json'))
+  await withoutTracing(() => testSeed.putClientId())
 })
 afterAll(async () => {
-  await withoutTracing(() => garage.deleteObject(clientId))
+  await withoutTracing(() => testSeed.deleteClientId())
   // flush the trace root before vitest exits: the root span ends in the very
   // last afterEach, and SimpleSpanProcessor's OTLP export is fire-and-forget
   // (the HTTP POST completes asynchronously). NodeSDK.shutdown() flushes the
@@ -134,10 +79,5 @@ afterAll(async () => {
   }
 })
 beforeEach(async () => {
-  await withoutTracing(async () => {
-    await pg.seedKeyValue(kvData)
-    for (const [dataset, trig] of datasets) {
-      await seedFusekiDataset(`${fusekiBaseUrl}/${dataset}`, trig)
-    }
-  })
+  await withoutTracing(() => testSeed.seed())
 })

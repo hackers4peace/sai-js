@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@effect/opentelemetry": "^0.64.2",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@babel/types": "^8.1.2",
+    "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "@types/web-push": "^3.6.4",
     "@types/webfontloader": "^1.6.38",

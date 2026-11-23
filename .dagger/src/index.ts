@@ -6,6 +6,7 @@ import {
   type File,
   type Secret,
   type Service,
+  ReturnType,
   argument,
   dag,
   func,
@@ -65,6 +66,63 @@ const NIX_IMAGE = 'nixos/nix'
 // Temporal native core addon.
 const NODE_IMAGE = 'node:26-slim'
 const SKOPEO_IMAGE = 'quay.io/skopeo/stable:latest'
+// keep in step with @playwright/test in ui/authorization/package.json
+const PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.65.1-noble'
+
+/** Waits (from a dir that resolves @temporalio/client) until Temporal accepts connections. */
+const TEMPORAL_READY = `
+  import { Connection } from '@temporalio/client'
+  for (let attempt = 0; attempt < 60; attempt++) {
+    try {
+      await Connection.connect({
+        address: process.env.TEMPORAL_ADDRESS,
+        connectTimeout: 1000,
+      })
+      process.exit(0)
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+  }
+  console.error('Temporal is not reachable')
+  process.exit(1)
+`
+
+/** Static HTTPS server for the built UI with SPA fallback to index.html. */
+const UI_STATIC_SERVER = `
+  import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs'
+  import { createServer } from 'node:https'
+  import { extname, join, normalize } from 'node:path'
+
+  const root = '/sai/ui/authorization/dist'
+  const types = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript',
+    '.mjs': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.webmanifest': 'application/manifest+json',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.ico': 'image/x-icon',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.eot': 'application/vnd.ms-fontobject',
+  }
+  const tls = {
+    key: readFileSync('${CSS_HTTPS_KEY}'),
+    cert: readFileSync('${CSS_HTTPS_CERT}'),
+  }
+  createServer(tls, (req, res) => {
+    const path = normalize(decodeURIComponent(new URL(req.url, 'https://ui.auth').pathname))
+    let file = join(root, path)
+    if (!file.startsWith(root) || !existsSync(file) || statSync(file).isDirectory()) {
+      file = join(root, 'index.html')
+    }
+    res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' })
+    createReadStream(file).pipe(res)
+  }).listen(443)
+`
 const IMAGE_SUFFIX = '-image'
 
 type Arch = 'amd64' | 'arm64'
@@ -506,12 +564,25 @@ export class SaiJs {
       .withHostname('data')
   }
 
-  async testBase(runId: string): Promise<Container> {
+  /** Bind the whole SAI stack (auth, registry, data, worker, ...) under the hostnames the seed data uses. */
+  private async withSaiServices(container: Container, runId: string): Promise<Container> {
     const temporal = await this.temporalServiceFor(runId)
     const auth = await this.authServiceFor(runId, temporal)
     const worker = await this.workerServiceFor(runId, temporal)
+    return container
+      .withServiceBinding('auth', auth)
+      .withServiceBinding('registry', await this.registryServiceFor(runId, temporal))
+      .withServiceBinding('data', await this.dataServiceFor(runId, temporal))
+      .withServiceBinding('worker', worker)
+      .withServiceBinding('temporal', temporal)
+      .withServiceBinding('fuseki', this.fusekiService())
+      .withServiceBinding('id', this.idService())
+      .withServiceBinding('garage', this.garageService())
+  }
+
+  async testBase(runId: string): Promise<Container> {
     return (
-      this.nodeContainer('sai-test', runId)
+      (await this.withSaiServices(this.nodeContainer('sai-test', runId), runId))
         .withEnvVariable('NODE_TLS_REJECT_UNAUTHORIZED', NODE_TLS_REJECT_UNAUTHORIZED)
         .withEnvVariable('CSS_BASE_URL', CSS_BASE_URL)
         .withEnvVariable('CSS_ID_ORIGIN', CSS_ID_ORIGIN)
@@ -527,14 +598,6 @@ export class SaiJs {
         .withEnvVariable('CSS_S3_REGION', CSS_S3_REGION)
         .withEnvVariable('CSS_GARAGE_ADMIN_ENDPOINT', CSS_GARAGE_ADMIN_ENDPOINT)
         .withEnvVariable('CSS_GARAGE_ADMIN_TOKEN', CSS_GARAGE_ADMIN_TOKEN)
-        .withServiceBinding('auth', auth)
-        .withServiceBinding('registry', await this.registryServiceFor(runId, temporal))
-        .withServiceBinding('data', await this.dataServiceFor(runId, temporal))
-        .withServiceBinding('worker', worker)
-        .withServiceBinding('temporal', temporal)
-        .withServiceBinding('fuseki', this.fusekiService())
-        .withServiceBinding('id', this.idService())
-        .withServiceBinding('garage', this.garageService())
         .withWorkdir('/sai/test')
     )
   }
@@ -570,26 +633,136 @@ export class SaiJs {
     // forward everything after the separator verbatim (npm passes `--`-suffixed
     // args straight through to the script)
     if (filter.length) args.push('--', ...filter)
-    const temporalReady = `
-      import { Connection } from '@temporalio/client'
-      for (let attempt = 0; attempt < 60; attempt++) {
-        try {
-          await Connection.connect({
-            address: process.env.TEMPORAL_ADDRESS,
-            connectTimeout: 1000,
-          })
-          process.exit(0)
-        } catch {
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-        }
-      }
-      console.error('Temporal is not reachable')
-      process.exit(1)
-    `
     return (await this.testBase(runId))
-      .withExec(['node', '--input-type=module', '-e', temporalReady])
+      .withExec(['node', '--input-type=module', '-e', TEMPORAL_READY])
       .withExec(args)
       .stdout()
+  }
+
+  /**
+   * The repo without the UI's host-installed artifacts: the UI dependencies are
+   * installed inside the engine (linux), so a macOS `node_modules` never leaks in.
+   */
+  private uiSource(): Directory {
+    return this.source
+      .withoutDirectory('ui/authorization/node_modules')
+      .withoutDirectory('ui/authorization/dist')
+      .withoutDirectory('ui/authorization/dev-dist')
+      .withoutDirectory('ui/authorization/playwright-report')
+      .withoutDirectory('ui/authorization/test-results')
+  }
+
+  /** `npm ci` of the authorization UI (its own lockfile), cached across runs. */
+  private uiNodeModules(): Directory {
+    return dag
+      .container()
+      .from(NODE_IMAGE)
+      .withMountedCache('/root/.npm', dag.cacheVolume('sai-ui-npm'))
+      .withDirectory('/sai', this.uiSource())
+      .withWorkdir('/sai/ui/authorization')
+      .withExec(['npm', 'ci', '--no-audit', '--no-fund'])
+      .directory('/sai/ui/authorization/node_modules')
+  }
+
+  /**
+   * The authorization UI, built with Vite and served over HTTPS at
+   * `https://ui.auth` (the `CSS_AUTHORIZATION_ENDPOINT` origin the auth service
+   * already points at), configured for the in-engine service hostnames.
+   */
+  @func({ cache: 'session' })
+  uiService(): Service {
+    return this.uiBuild()
+      .asService({ args: ['node', '/serve.mjs'] })
+      .withHostname('ui.auth')
+  }
+
+  private uiBuild(): Container {
+    const config = JSON.stringify({
+      backendBaseUrl: 'https://auth',
+      idOrigin: CSS_ID_ORIGIN,
+      dataOrigin: CSS_DATA_ORIGIN,
+      otlpBaseUrl: '/otlp',
+      vapidPublicKey: CSS_VAPID_PUBLIC_KEY,
+      languages: ['en', 'pl'],
+    })
+    return dag
+      .container()
+      .from(NODE_IMAGE)
+      .withDirectory('/sai', this.uiSource())
+      .withDirectory('/sai/ui/authorization/node_modules', this.uiNodeModules())
+      .withWorkdir('/sai/ui/authorization')
+      .withExec(['npx', 'vite', 'build'])
+      .withNewFile('/sai/ui/authorization/dist/config.json', config)
+      .withNewFile('/serve.mjs', UI_STATIC_SERVER)
+      .withExposedPort(443)
+  }
+
+  private async e2eContainer(runId: string, grep?: string): Promise<Container> {
+    const args = ['npx', 'playwright', 'test', '--reporter=list,html']
+    if (grep) args.push('--grep', grep)
+    // Build the UI and pull the Playwright image BEFORE the SAI services are
+    // created: withSaiServices sets up Temporal's schema eagerly, and a
+    // minutes-long build between that setup and Temporal's start lets the idle
+    // Postgres service stop, so Temporal would bind to a fresh, schema-less one.
+    await this.uiBuild().sync()
+    const container = await dag
+      .container()
+      .from(PLAYWRIGHT_IMAGE)
+      .withDirectory('/sai', this.uiSource())
+      .withDirectory('/sai/ui/authorization/node_modules', this.uiNodeModules())
+      .sync()
+    return (
+      (await this.withSaiServices(container, runId))
+        .withServiceBinding('ui.auth', this.uiService())
+        .withEnvVariable('CI', 'true')
+        .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
+        .withEnvVariable('UI_BASE_URL', 'https://ui.auth')
+        .withEnvVariable('AUTH_ORIGIN', 'https://auth')
+        .withEnvVariable('BOB_ID', 'https://id/bob')
+        .withEnvVariable('NOBODY_ID', 'https://id/nobody')
+        // test/seed.ts provisions the per-pod Garage buckets/keys itself
+        .withEnvVariable('CSS_S3_ENDPOINT', CSS_S3_ENDPOINT)
+        .withEnvVariable('CSS_S3_REGION', CSS_S3_REGION)
+        .withEnvVariable('CSS_GARAGE_ADMIN_ENDPOINT', CSS_GARAGE_ADMIN_ENDPOINT)
+        .withEnvVariable('CSS_GARAGE_ADMIN_TOKEN', CSS_GARAGE_ADMIN_TOKEN)
+        .withWorkdir('/sai/test')
+        .withExec(['node', '--input-type=module', '-e', TEMPORAL_READY])
+        .withWorkdir('/sai/ui/authorization')
+        // Seed the fixtures (environments/data) in the same exec as the browser
+        // run, like vitest's setup.ts does per test: the account cookie the specs
+        // use only resolves once kv.json is in Postgres, and a separate exec
+        // could see the ephemeral services restarted (and empty) in between.
+        .withExec(['sh', '-c', 'node /sai/test/seed.ts && exec "$@"', 'sh', ...args], {
+          expect: ReturnType.Any,
+        })
+    )
+  }
+
+  /**
+   * Run the authorization UI Playwright suite (`ui/authorization/e2e`) in a
+   * browser against the full stack. Fails when a test fails; the output is the
+   * list reporter. Narrow with `--grep="<title regex>"`.
+   */
+  @func({ cache: 'never' })
+  async playwright(@argument() grep?: string): Promise<string> {
+    const run = await this.e2eContainer(randomUUID(), grep)
+    const output = `${await run.stdout()}\n${await run.stderr()}`
+    if ((await run.exitCode()) !== 0) throw new Error(output)
+    return output
+  }
+
+  /**
+   * Same run as `playwright`, but never fails and returns the Playwright HTML report
+   * and traces, for CI artifacts:
+   *   dagger call playwright-report export --path=ui/authorization/e2e-out
+   */
+  @func({ cache: 'never' })
+  async playwrightReport(@argument() grep?: string): Promise<Directory> {
+    const run = await this.e2eContainer(randomUUID(), grep)
+    return dag
+      .directory()
+      .withDirectory('playwright-report', run.directory('playwright-report'))
+      .withDirectory('test-results', run.directory('test-results'))
   }
 
   async debugService(

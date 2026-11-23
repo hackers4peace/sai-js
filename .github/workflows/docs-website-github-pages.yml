@@ -23,15 +23,20 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 24.x
+      # Same toolchain and steps as ci.yml: the Dagger module mounts the repo and
+      # needs the workspace packages built on the host.
+      - name: Use Node.js 26.x
         uses: actions/setup-node@v4
         with:
-          node-version: 24.x
+          node-version: 26.x
           cache: npm
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build
 
       - name: Build Astro docs site
         working-directory: docs/website
@@ -43,6 +48,16 @@ jobs:
           ASTRO_SITE: ${{ vars.PAGES_PUBLIC_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
           ASTRO_BASE_PATH: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
         run: npm run build
+
+      # Playwright HTML report (traces, screenshots, video for every test) at
+      # <site>/journeys/. `playwright-report` never fails, so a red run is
+      # published too; ci.yml is what gates on test results.
+      - name: Authorization UI journeys (Playwright report)
+        uses: dagger/dagger-for-github@v8.2.0
+        with:
+          version: 0.21.12
+          args: playwright-report directory --path=playwright-report export --path=docs/website/dist/journeys
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

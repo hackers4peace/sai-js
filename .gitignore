@@ -41,3 +41,7 @@ tsconfig.tsbuildinfo
 
 environments/dev/traefik/certs/*
 
+
+# Playwright
+playwright-report/
+test-results/
