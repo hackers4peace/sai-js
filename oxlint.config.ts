@@ -36,7 +36,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/use-unknown-in-catch-callback-variable',
     'typescript/unbound-method',
     'quality/no-array-filter-map',
-    '@nkzw/no-instanceof',
     'typescript/no-misused-promises',
     'unicorn/prefer-top-level-await',
     'typescript/only-throw-error',
@@ -64,6 +63,10 @@ export default defineConfig({
         allow: ['_tag', '__dirname', '_getContextManager', 'currentAth_', '_tracerProvider'],
       },
     ],
+    // The preset bans `instanceof`, but this code brands its own error classes and
+    // checks same-realm values (CryptoKey, Uint8Array, URL, URLSearchParams) where
+    // duck typing would be weaker and harder to read.
+    '@nkzw/no-instanceof': 'off',
     'unicorn/no-array-for-each': 'off',
     'oxc/no-accumulating-spread': 'off',
     'typescript/no-explicit-any': 'off',
