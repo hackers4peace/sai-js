@@ -1,25 +1,30 @@
 {
-  "packages": [
-    "nodejs@26",
-    "mkcert@latest",
-    "openssl@latest",
-    "xh@latest",
-    "mitmproxy@latest",
-    "jaq@latest",
-    "ducker@latest",
-    "pgcli@latest",
-    "github:dagger/nix/f01f6dd5264e96540cf0ed21c7fcc8cd743fb97d#packages.x86_64-linux.dagger",
-    "nixos-anywhere@latest",
-    "nix-prefetch-docker@latest",
-    "skopeo@latest",
-    "prefetch-npm-deps@latest",
-    "ragenix@latest",
-    "cacert@latest",
-    "nixfmt@latest",
-    "nixd@latest",
-    "garage@latest",
-    "oxigraph@latest"
-  ],
+  "packages": {
+    "nodejs": "26",
+    "mkcert": "latest",
+    "openssl": "latest",
+    "xh": "latest",
+    "mitmproxy": "latest",
+    "jaq": "latest",
+    "ducker": "latest",
+    "pgcli": "latest",
+    "github:dagger/nix/f01f6dd5264e96540cf0ed21c7fcc8cd743fb97d#packages.aarch64-darwin.dagger": {
+      "platforms": ["aarch64-darwin"]
+    },
+    "github:dagger/nix/f01f6dd5264e96540cf0ed21c7fcc8cd743fb97d#packages.x86_64-linux.dagger": {
+      "platforms": ["x86_64-linux"]
+    },
+    "nixos-anywhere": "latest",
+    "nix-prefetch-docker": "latest",
+    "skopeo": "latest",
+    "prefetch-npm-deps": "latest",
+    "ragenix": "latest",
+    "cacert": "latest",
+    "nixfmt": "latest",
+    "nixd": "latest",
+    "garage": "latest",
+    "oxigraph": "latest"
+  },
   "env": {
     "_EXPERIMENTAL_DAGGER_RUNNER_HOST": "docker-container://dagger-engine-v0.21.12"
   },
