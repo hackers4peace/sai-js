@@ -50,7 +50,7 @@ export class NotificationManager extends EventTarget {
     if (!response.ok) {
       throw new Error('Failed to subscribe via push')
     }
-    return response.json()
+    return (await response.json()) as NotificationChannel
   }
 
   public async unsubscribeFromPush(topic: string, channelId: string): Promise<boolean> {

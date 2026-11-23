@@ -32,6 +32,11 @@ const frameJsonLd = jsonld.frame as unknown as (
   options: Record<string, unknown>
 ) => Promise<FramedDocument>
 
+/** The IRIs in a JSON-LD `@set` container: strings only, everything else dropped. */
+function irisOf(value: unknown): Array<string> {
+  return Array.isArray(value) ? value.filter((iri): iri is string => typeof iri === 'string') : []
+}
+
 /**
  * Children of a container, from its `ldp:contains` (hierarchical/Solid storage)
  * and `lws:contains` (flat LWS storage) listings — the union, so the same
@@ -43,8 +48,8 @@ export async function containedIrisJsonLd(id: string, fetch: WhatwgFetch): Promi
     contains: { '@id': LDP.contains, '@type': '@id', '@container': '@set' },
     lwsContains: { '@id': LWS.contains, '@type': '@id', '@container': '@set' },
   }
-  const node = (await frameDoc(await fetchJsonLd(id, fetch), context, id)) as any
-  return [...new Set([...(node.contains ?? []), ...(node.lwsContains ?? [])])].filter(
+  const node = await frameDoc(await fetchJsonLd(id, fetch), context, id)
+  return [...new Set([...irisOf(node.contains), ...irisOf(node.lwsContains)])].filter(
     (iri) => !isAuxiliaryResource(iri)
   )
 }

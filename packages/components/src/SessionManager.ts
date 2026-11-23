@@ -75,7 +75,11 @@ export class SessionManager {
     // Worker/test: the lazy shared store is unavailable when postgres is not
     // configured — that is the only tolerated failure. A query against an
     // available store must surface instead of silently falling back.
-    return getSharedEndpointStore().catch(() => undefined)
+    try {
+      return await getSharedEndpointStore()
+    } catch {
+      return undefined
+    }
   }
 
   private async buildCredential(

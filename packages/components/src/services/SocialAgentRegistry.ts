@@ -185,7 +185,7 @@ export const getSocialAgents = async (ctx: ResolvedContext, lang: string) => {
     sentAccessRequestsByDataOwner.set(request.dataOwner, list)
   }
 
-  const profiles = []
+  const profiles: Array<Awaited<ReturnType<typeof buildSocialAgentProfile>>> = []
   for (const registration of registrations) {
     profiles.push(
       await buildSocialAgentProfile(

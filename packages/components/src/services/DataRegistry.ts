@@ -194,7 +194,7 @@ export const listDataInstances = async (
   registrationId: string,
   descriptionsLang = 'en'
 ) => {
-  const dataInstances = []
+  const dataInstances: Array<ReturnType<typeof DataInstance.make>> = []
   if (agentId === ctx.webId) {
     if (ctx.webId === ctx.userWebId) {
       const dataRegistration = await loadDataRegistration(registrationId, ctx.session.fetch)

@@ -23,7 +23,6 @@ const notYetMigrated = Object.fromEntries(
     'quality/no-conditional-empty-object-spread',
     'typescript/no-unsafe-argument',
     'quality/no-known-value-widening',
-    'typescript/no-unsafe-return',
     'quality/no-unknown-returns',
   ].map((rule) => [rule, 'off' as const])
 )

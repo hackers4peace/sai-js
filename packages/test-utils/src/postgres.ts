@@ -78,7 +78,8 @@ export class Postgres {
 
   async exportToJson(): Promise<Record<string, string | object>> {
     this.init()
-    const rows = await this.sql`SELECT key, value FROM ${this.sql(this.tableName)}`
+    const rows: Array<{ key: string; value: string }> =
+      await this.sql`SELECT key, value FROM ${this.sql(this.tableName)}`
     return Object.fromEntries(rows.map((row) => [row.key, JSON.parse(row.value)]))
   }
 

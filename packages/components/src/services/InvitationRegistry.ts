@@ -42,7 +42,7 @@ function buildSocialAgentInvitation(
  */
 export async function getSocialAgentInvitations(ctx: ResolvedContext, lang: string) {
   const transport = sparqlTransportFor(ctx)
-  const invitations = []
+  const invitations: Array<ReturnType<typeof buildSocialAgentInvitation>> = []
   for (const iri of await listContained(transport, ctx.registrySet.hasInvitationRegistry.id)) {
     const invitation = await getInvitationFromSparql(transport, iri)
     if (!invitation.registeredAgent) {

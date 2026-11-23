@@ -47,7 +47,7 @@ export const getApplications = async (ctx: ResolvedContext) => {
   const registrations = await Promise.all(
     iris.map((iri) => getApplicationRegistrationFromSparql(transport, iri))
   )
-  const profiles = []
+  const profiles: Array<Awaited<ReturnType<typeof buildApplicationProfile>>> = []
   for (const registration of registrations) {
     profiles.push(await buildApplicationProfile(ctx, registration))
   }

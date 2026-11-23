@@ -79,9 +79,11 @@ export const useCoreStore = defineStore('core', () => {
 
   async function getClientInfo(): Promise<string> {
     const controlsResponse = await fetch(endpoint, { credentials: 'include' })
-    const { controls } = await controlsResponse.json()
+    const { controls } = (await controlsResponse.json()) as {
+      controls: { oidc: { consent: string } }
+    }
     const clientInfoResponse = await fetch(controls.oidc.consent, { credentials: 'include' })
-    const info = await clientInfoResponse.json()
+    const info = (await clientInfoResponse.json()) as { client: { client_id: string } }
     return info.client.client_id
   }
 
@@ -133,7 +135,7 @@ export const useCoreStore = defineStore('core', () => {
       credentials: 'include',
       body: JSON.stringify({ remember: true }),
     })
-    const data = await webIdResponse.json()
+    const data = (await webIdResponse.json()) as { location: string }
     console.log(data)
     return data.location
   }

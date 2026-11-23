@@ -7,7 +7,9 @@ export class CustomWebIdStore extends BaseWebIdStore {
    */
   public async findAccount(webId: string): Promise<string | undefined> {
     // @ts-expect-error the base store declares `find` with a narrower record type
-    const result = await this.storage.find(WEBID_STORAGE_TYPE, { webId })
+    const result: Array<{ accountId?: string }> = await this.storage.find(WEBID_STORAGE_TYPE, {
+      webId,
+    })
     return result[0]?.accountId
   }
 }

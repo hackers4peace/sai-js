@@ -67,14 +67,17 @@ function referencePairs(expanded: Array<any>, treeId: string): Array<ShapeTreeRe
     return []
   }
   const byId = new Map(expanded.map((node) => [node['@id'], node]))
-  return (treeNode[SHAPETREES.references] ?? []).map((reference: any) => {
+  const references: Array<unknown> = Array.isArray(treeNode[SHAPETREES.references])
+    ? treeNode[SHAPETREES.references]
+    : []
+  return references.map((reference: any) => {
     // Two shapes: server documents reference named/blank nodes by id
     // (`urn:uuid` IRIs, real docs) while expanded toJsonLd output embeds the
     // reference object inline (no @id). Resolve either.
     const referenceNode =
       reference[SHAPETREES.hasShapeTree] !== undefined ? reference : byId.get(reference['@id'])
-    const hasShapeTree = referenceNode?.[SHAPETREES.hasShapeTree]?.[0]?.['@id']
-    const viaPredicate = referenceNode?.[SHAPETREES.viaPredicate]?.[0]?.['@id']
+    const hasShapeTree: string | undefined = referenceNode?.[SHAPETREES.hasShapeTree]?.[0]?.['@id']
+    const viaPredicate: string | undefined = referenceNode?.[SHAPETREES.viaPredicate]?.[0]?.['@id']
     if (!hasShapeTree || !viaPredicate) {
       throw new Error(`shape tree ${treeId} has a reference missing hasShapeTree/viaPredicate`)
     }

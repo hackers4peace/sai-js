@@ -132,12 +132,22 @@ const formatAccessNeed = async (
   })
 }
 
+/** A data registration as the UI consumes it: `dataRegistry` is only set when
+ * the registration was reached through its pod. */
+interface DataRegistrationSummary {
+  id: IRI
+  label: string
+  shapeTree: string
+  count: number
+  dataRegistry?: IRI
+}
+
 async function findUserDataRegistrations(
   ctx: ResolvedContext,
   accessNeedGroup: AccessNeedGroupData,
   shapeTreeLabelFor: (shapeTreeIri: string) => Promise<string>
 ) {
-  const dataRegistrations = []
+  const dataRegistrations: Array<DataRegistrationSummary> = []
   // only the shape trees the access need group asks for — the SPARQL read
   // filters on the registration meta graphs (`registeredShapeTree`), so
   // non-matching registrations are never listed nor probed
@@ -180,7 +190,7 @@ async function findSocialAgentDataRegistrations(
   ctx: ResolvedContext,
   shapeTreeLabelFor: (shapeTreeIri: string) => Promise<string>
 ) {
-  const dataRegistrations = []
+  const dataRegistrations: Array<DataRegistrationSummary> = []
   for (const accessGrant of accessGrants) {
     for (const accessNeed of accessNeedGroup.accessNeeds) {
       if (
