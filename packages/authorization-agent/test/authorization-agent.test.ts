@@ -242,6 +242,99 @@ describe('findApplicationRegistration', () => {
   })
 })
 
+describe('findRegistration', () => {
+  const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+  const APP_REG = 'https://auth.alice.example/app-reg'
+  const APP_WEBID = 'https://projectron.example/#app'
+  const SOCIAL_REG = 'https://auth.alice.example/social-reg'
+  const SOCIAL_WEBID = 'https://acme.example/#corp'
+
+  const registrationGraph = (iri: string, type: string, registeredAgent: string) => [
+    DataFactory.quad(
+      DataFactory.namedNode(iri),
+      DataFactory.namedNode(RDF_TYPE),
+      DataFactory.namedNode(type)
+    ),
+    DataFactory.quad(
+      DataFactory.namedNode(iri),
+      DataFactory.namedNode(INTEROP.registeredAgent),
+      DataFactory.namedNode(registeredAgent)
+    ),
+  ]
+
+  // route the two registry listings by container IRI: application first, then
+  // social agent — the plane counterpart of the former HTTP scan order
+  const listings = (listed: { application: string[]; socialAgent: string[] }) => {
+    return (agent: AuthorizationAgent, query: string) => {
+      expect(query).toContain('lws#contains')
+      if (query.includes(`GRAPH <meta:${agent.registrySet.hasApplicationRegistry.id}>`)) {
+        return listed.application.map((iri) => ({ child: { termType: 'NamedNode', value: iri } }))
+      }
+      if (query.includes(`GRAPH <meta:${agent.registrySet.hasSocialAgentRegistry.id}>`)) {
+        return listed.socialAgent.map((iri) => ({ child: { termType: 'NamedNode', value: iri } }))
+      }
+      throw new Error(`unexpected SELECT: ${query}`)
+    }
+  }
+
+  test('returns the application registration from the application registry', async () => {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
+      fetch: createStatefulFetch(),
+      randomUUID,
+      sparqlEndpoint: 'http://example.test/sparql',
+    })
+
+    sparqlMock.handlers.bindings = (query) =>
+      listings({ application: [APP_REG], socialAgent: [] })(agent, query)
+    sparqlMock.handlers.triples = (query) => {
+      expect(query).toContain(`GRAPH <${APP_REG}>`)
+      return registrationGraph(APP_REG, INTEROP.ApplicationRegistration, APP_WEBID)
+    }
+
+    await expect(agent.findRegistration(APP_WEBID)).resolves.toMatchObject({
+      id: APP_REG,
+      type: [INTEROP.ApplicationRegistration],
+      registeredAgent: APP_WEBID,
+    })
+  })
+
+  test('falls back to the social-agent registration', async () => {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
+      fetch: createStatefulFetch(),
+      randomUUID,
+      sparqlEndpoint: 'http://example.test/sparql',
+    })
+
+    sparqlMock.handlers.bindings = (query) =>
+      listings({ application: [], socialAgent: [SOCIAL_REG] })(agent, query)
+    sparqlMock.handlers.triples = (query) => {
+      expect(query).toContain(`GRAPH <${SOCIAL_REG}>`)
+      return registrationGraph(SOCIAL_REG, INTEROP.SocialAgentRegistration, SOCIAL_WEBID)
+    }
+
+    await expect(agent.findRegistration(SOCIAL_WEBID)).resolves.toMatchObject({
+      id: SOCIAL_REG,
+      registeredAgent: SOCIAL_WEBID,
+    })
+  })
+
+  test('returns undefined when neither registry lists the agent', async () => {
+    const agent = await AuthorizationAgent.build(webId, agentId, registryId, {
+      fetch: createStatefulFetch(),
+      randomUUID,
+      sparqlEndpoint: 'http://example.test/sparql',
+    })
+
+    sparqlMock.handlers.bindings = (query) =>
+      listings({ application: [], socialAgent: [] })(agent, query)
+    sparqlMock.handlers.triples = () => {
+      throw new Error('no registration graph expected')
+    }
+
+    await expect(agent.findRegistration('https://id/nobody')).resolves.toBeUndefined()
+  })
+})
+
 describe('findDataRegistration', () => {
   const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
   const DATA_REGISTRY = 'https://auth.alice.example/data-registry/'

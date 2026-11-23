@@ -366,6 +366,23 @@ export class AuthorizationAgent {
   }
 
   /**
+   * The context registry's registration of `iri` — application first, then
+   * social agent — over the registry plane: the same `lws:contains` listing +
+   * one graph read per candidate the two typed lookups above run
+   * (docs/sparql.md step 3). The plane counterpart of the former HTTP
+   * `AgentRegistry.findRegistration` list-and-scan.
+   */
+  public async findRegistration(
+    iri: string,
+    registrySet: RegistrySetData = this.registrySet
+  ): Promise<ApplicationRegistrationData | SocialAgentRegistrationData | undefined> {
+    return (
+      (await this.findApplicationRegistration(iri, registrySet)) ??
+      (await this.findSocialAgentRegistration(iri, registrySet))
+    )
+  }
+
+  /**
    * Role by IRI — a single graph read (the role's own graph, keyed by its
    * IRI) via the shared SPARQL query, replacing the previous container
    * scan. The IRI targets the graph directly.

@@ -1,7 +1,6 @@
 import type { RoleUsage } from '@janeirodigital/interop-authorization-agent'
 import {
   ActivityRegistry,
-  AgentRegistry,
   RoleRegistry,
   ensureApplicationRegistration,
   getApplicationRegistration,
@@ -375,12 +374,7 @@ export async function getExistingGrants(payload: {
 }): Promise<GrantId[]> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
-  const agentRegistration = await AgentRegistry.findRegistration(
-    session.registrySet.hasSocialAgentRegistry,
-    session.registrySet.hasApplicationRegistry,
-    session.fetch,
-    payload.peerId.id
-  )
+  const agentRegistration = await session.findRegistration(payload.peerId.id)
   if (!agentRegistration) {
     throw new Error('agent registration for the peer does not exist')
   }
@@ -738,12 +732,7 @@ export async function replaceAccessGrantsOnRegistration(
 ): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
-  const agentRegistration = await AgentRegistry.findRegistration(
-    session.registrySet.hasSocialAgentRegistry,
-    session.registrySet.hasApplicationRegistry,
-    session.fetch,
-    payload.grantee.id
-  )
+  const agentRegistration = await session.findRegistration(payload.grantee.id)
   if (!agentRegistration) {
     throw new Error('agent registration for the grantee does not exist')
   }
