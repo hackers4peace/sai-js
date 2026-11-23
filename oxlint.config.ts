@@ -27,7 +27,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-unsafe-return',
     'import/no-namespace',
     'typescript/no-floating-promises',
-    'no-console',
     'quality/no-unknown-returns',
     'typescript/no-misused-spread',
     'typescript/use-unknown-in-catch-callback-variable',
@@ -84,6 +83,24 @@ export default defineConfig({
         'typescript/no-require-imports': 'off',
         // untyped monkey-patching of prototype methods (see preload.cjs)
         'typescript/unbound-method': 'off',
+      },
+    },
+    {
+      // Process entry points, build scripts, Temporal activities (sandboxed), and
+      // the Vue apps fall back to the console: none of them has a CSS logger.
+      files: [
+        'scripts/**',
+        'shapetrees/**',
+        'test/**',
+        'examples/**',
+        'ui/**',
+        '**/src/workers/**',
+        '**/src/temporal/**',
+        'packages/components/src/tracing/**',
+        'packages/application/src/notification-manager.ts',
+      ],
+      rules: {
+        'no-console': 'off',
       },
     },
     {

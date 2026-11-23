@@ -87,7 +87,7 @@ export class ApiHandler extends OperationHttpHandler {
         try {
           session = await this.sessionManager.getSession(webId)
         } catch (error) {
-          console.error(error)
+          this.logger.error(error)
           throw error
         }
       }
