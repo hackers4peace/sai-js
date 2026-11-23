@@ -173,7 +173,7 @@ export const useAppStore = defineStore('app', () => {
       })
       const serverProjects: Array<Project> = []
 
-      for await (const projectId of await session.resources(resourceServer, scope)) {
+      for (const projectId of await session.resources(resourceServer, scope)) {
         // @ldo-solid
         const ldoResource = solidLdoDataset.getResource(projectId)
         const readResult = await ldoResource.read()

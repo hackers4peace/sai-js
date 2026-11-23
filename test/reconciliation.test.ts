@@ -96,7 +96,7 @@ describe('reconciliation sweep', () => {
       localSparqlTransport(acmeSession.sparqlEndpoint),
       acmeRegForAlice
     )
-    const iris = await getAccessGrantIris(regForAlice)
+    const iris = getAccessGrantIris(regForAlice)
     expect(iris.length).toBeGreaterThan(0)
     // real equivalence (source trees): the unchanged seed subtree is REUSED —
     // same IRIs after the regeneration. The seed links the parent and its
@@ -140,7 +140,7 @@ describe('reconciliation sweep', () => {
     await waitFor(
       async () => {
         const current = await getSocialAgentRegistration(transport, acmeRegForAlice)
-        const iris = await getAccessGrantIris(current)
+        const iris = getAccessGrantIris(current)
         return iris.length > 0 && !iris.includes(seedGrant) && !iris.includes(seedChildGrant)
       },
       { timeout: 30_000 }

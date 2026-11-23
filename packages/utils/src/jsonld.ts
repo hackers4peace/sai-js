@@ -11,6 +11,27 @@ export { localDocumentLoader }
 
 export type JsonLdContext = Record<string, unknown>
 
+/** A framed document: the well-known keys plus any framed node graph. */
+type FramedDocument = Record<string, unknown> & {
+  '@graph'?: Array<Record<string, unknown>>
+}
+
+/**
+ * `@types/jsonld` only describes the callback API, so the promise form used by
+ * this package needs one explicit cast per entry point. Typing the wrappers also
+ * keeps the awaited values narrow instead of `any`.
+ */
+export const expandJsonLd = jsonld.expand as unknown as (
+  doc: unknown,
+  options: Record<string, unknown>
+) => Promise<Array<unknown>>
+
+const frameJsonLd = jsonld.frame as unknown as (
+  doc: unknown,
+  frame: unknown,
+  options: Record<string, unknown>
+) => Promise<FramedDocument>
+
 /**
  * Children of a container, from its `ldp:contains` (hierarchical/Solid storage)
  * and `lws:contains` (flat LWS storage) listings — the union, so the same
@@ -131,16 +152,10 @@ export async function frameDoc(
 ): Promise<Record<string, unknown>> {
   return withSpan('sai-jsonld', 'frameDoc', async (span) => {
     span.setAttribute('sai.jsonld.uri', iri)
-    // `@types/jsonld` types the third `frame` argument as `Frame` instead of
-    // `Options`, so cast the options to satisfy overload resolution.
-    const framed = (await jsonld.frame(
-      doc as any,
-      buildFrame(context, iri, overrides) as any,
-      {
-        documentLoader,
-      } as any
-    )) as unknown as Record<string, unknown>
-    if (!(framed as any).id && !(framed as any)['@id']) {
+    const framed = await frameJsonLd(doc, buildFrame(context, iri, overrides), {
+      documentLoader,
+    })
+    if (!framed.id && !framed['@id']) {
       throw new Error(`Node ${iri} not found in framed output`)
     }
     // the framed node — @context stripped for the payload (frameNode does
@@ -286,12 +301,12 @@ export async function findNodeIdByType(
   if (base) {
     options.base = base
   }
-  const framed = (await jsonld.frame(doc as any, { '@type': typeIri } as any, options)) as any
-  const node = framed?.['@id'] ? framed : framed?.['@graph']?.[0]
-  if (!node?.['@id']) {
+  const framed = await frameJsonLd(doc, { '@type': typeIri }, options)
+  const node = framed['@id'] ? framed : framed['@graph']?.[0]
+  if (typeof node?.['@id'] !== 'string') {
     throw new Error(`no node of type ${typeIri} in document`)
   }
-  return node['@id'] as string
+  return node['@id']
 }
 
 /**
@@ -307,10 +322,7 @@ export async function documentValues(
   iri: string,
   predicate: string
 ): Promise<Array<string>> {
-  const expanded = (await jsonld.expand(
-    doc as any,
-    { base: iri, documentLoader } as any
-  )) as unknown as Array<any>
+  const expanded = await expandJsonLd(doc, { base: iri, documentLoader })
   const values = new Set<string>()
   const nodes: Array<any> = []
   const collectNodes = (value: unknown): void => {

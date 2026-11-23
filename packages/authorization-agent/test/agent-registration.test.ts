@@ -34,7 +34,7 @@ describe('build', () => {
   })
 
   test('should set data if passed', async () => {
-    const agentRegistration = await { id: newSnippetIri, ...data }
+    const agentRegistration = { id: newSnippetIri, ...data }
     expect(agentRegistration).toMatchObject(data)
     expect(agentRegistration.id).toBe(newSnippetIri)
   })

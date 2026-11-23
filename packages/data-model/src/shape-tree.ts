@@ -3,9 +3,9 @@ import {
   XSD,
   documentLoader,
   documentValues,
+  expandJsonLd,
   fetchJsonLd,
   frameNode,
-  jsonld,
   withContext,
 } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
@@ -52,7 +52,7 @@ export type ShapeTreeData = ShapeTreeId & {
  * the shared local document loader (no remote fetching).
  */
 async function expandedNodes(doc: unknown, base: string): Promise<Array<any>> {
-  return (await jsonld.expand(doc as any, { base, documentLoader } as any)) as unknown as Array<any>
+  return (await expandJsonLd(doc, { base, documentLoader })) as Array<any>
 }
 
 /**
