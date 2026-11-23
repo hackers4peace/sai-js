@@ -87,6 +87,7 @@ describe('AdminImpersonationAuthority', () => {
       subject: ORG,
       client: ORG_UAS,
       storage: PEER_STORAGE,
+      forStorage: true,
     })
   })
 

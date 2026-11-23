@@ -83,6 +83,15 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
   // shows what each actor's UI received and when. Reading the response from
   // Playwright instead would wait for a stream that never ends.
   await page.addInitScript(() => {
+    // A rejected RPC awaited from a Vue watcher (Authorization.vue's `webid`
+    // watcher, for example) is an unhandled rejection, not a pageerror: without
+    // this a blank view leaves no diagnostic behind. Surface it at error level
+    // so the console handler below attaches it to the report.
+    window.addEventListener('unhandledrejection', (event) => {
+      const reason = event.reason
+      const detail = reason instanceof Error ? (reason.stack ?? reason.message) : String(reason)
+      console.error(`[sai-unhandled-rejection] ${detail}`)
+    })
     const originalFetch = window.fetch
     window.fetch = async (...args: Parameters<typeof fetch>) => {
       const response = await originalFetch(...args)
@@ -138,7 +147,7 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
   })
   page.on('pageerror', async (error) => {
     await testInfo.attach(`${prefix}page error`, {
-      body: error.stack ?? String(error),
+      body: error.stack || error.message || String(error) || '<no page error detail>',
       contentType: 'text/plain',
     })
   })
@@ -146,8 +155,8 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
     const rpc = response.url().endsWith('/.sai/api')
     if (response.status() < 400 && !rpc) return
     const body = await response.text().catch(() => '<unreadable>')
-    // an RPC failure travels as HTTP 200 with a Failure exit in the body
-    if (response.status() < 400 && !body.includes('"Failure"')) return
+    // an RPC failure travels as HTTP 200 with a Failure/Defect exit in the body
+    if (response.status() < 400 && !body.includes('"Failure"') && !body.includes('"Defect"')) return
     await testInfo.attach(
       `${prefix}HTTP ${response.status()} ${response.request().method()} ${response.url()}`,
       {

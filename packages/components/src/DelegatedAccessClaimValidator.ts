@@ -36,6 +36,17 @@ export interface AccessClaimLookupInput {
   client: string
   /** The storage the claim is for. */
   storage: string
+  /**
+   * Whether the ID-JAG is issued for the storage itself (its `audience` is a
+   * storage origin) rather than for another authorization server (a delegation
+   * hop). Defaults to `true` for direct callers.
+   *
+   * A storage ID-JAG is exchanged for a storage access token that serves every
+   * read in the storage, so its claim must not be narrowed to a single asset. A
+   * delegation-hop claim has to stay within one edge the receiving UAS can back
+   * with its own grant.
+   */
+  forStorage?: boolean
 }
 
 /** Narrower grant scopes win when the user has several grants for one storage. */
@@ -51,18 +62,41 @@ function grantEdgeRank(batch: GrantData[]): number {
 }
 
 /**
+ * Whether an edge grants access at registration level. A
+ * `SelectedFromRegistry` grant covers one asset, not the registration that
+ * holds it, so it cannot back the storage-scoped read of a registration.
+ */
+function isRegistrationLevelEdge(batch: GrantData[]): boolean {
+  return batch.some((grant) => grant.scopeOfGrant !== INTEROP.SelectedFromRegistry)
+}
+
+/**
  * One ID-JAG carries one delegation edge (one assigner), so pick the most
  * specific grant edge the user has for the storage. All grants of that edge are
  * kept, in a deterministic order, so the claim is stable.
+ *
+ * A storage-audience ID-JAG (the final hop) yields a token that serves every
+ * read in the storage, so an asset-only edge from one assigner must not shadow
+ * a registration-level edge from another: the token would cover only that
+ * asset, and a storage-scoped read outside it (a registration's `contains`, for
+ * example) would be denied. Asset-only edges therefore win only when they are
+ * all the user has. A delegation-hop ID-JAG (`forStorage === false`) keeps the
+ * narrowest edge, which the receiving UAS can back with its own grant (the
+ * Bob → YoYo → ACME chain).
  */
-function mostSpecificGrantEdge(grants: GrantData[]): GrantData[] {
+function mostSpecificGrantEdge(grants: GrantData[], forStorage: boolean): GrantData[] {
   const byAssigner = new Map<string, GrantData[]>()
   for (const grant of grants) {
     const bucket = byAssigner.get(grant.grantedBy)
     if (bucket) bucket.push(grant)
     else byAssigner.set(grant.grantedBy, [grant])
   }
-  const [best] = [...byAssigner.entries()].toSorted(([assignerA, batchA], [assignerB, batchB]) => {
+  const edges = [...byAssigner.entries()]
+  const registrationLevel = forStorage
+    ? edges.filter(([, batch]) => isRegistrationLevelEdge(batch))
+    : []
+  const candidates = registrationLevel.length > 0 ? registrationLevel : edges
+  const [best] = candidates.toSorted(([assignerA, batchA], [assignerB, batchB]) => {
     const byRank = grantEdgeRank(batchB) - grantEdgeRank(batchA)
     if (byRank !== 0) return byRank
     const bySize = batchB.length - batchA.length
@@ -148,8 +182,14 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     // A user can hold several grants for one storage from several assigners
     // (the owner's grant plus an intermediate delegation). Pick one edge: the
     // app-specific grant if there is one, otherwise the narrowest delegation.
+    // A storage-audience ID-JAG prefers registration-level edges (asset-only
+    // edges only as a fallback); a delegation hop keeps the narrowest edge the
+    // receiving UAS can back.
     const received = relevant.filter((grant) => grantGrantee(grant) === input.subject)
-    const selected = appSpecific.length > 0 ? appSpecific : mostSpecificGrantEdge(received)
+    const selected =
+      appSpecific.length > 0
+        ? appSpecific
+        : mostSpecificGrantEdge(received, input.forStorage !== false)
     if (selected.length === 0) return undefined
 
     // The claim must preserve the parent/child relation between selected

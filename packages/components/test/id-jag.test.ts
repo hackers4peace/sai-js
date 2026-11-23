@@ -397,7 +397,9 @@ describe('IdJagTokenHandler', () => {
     const captured = await call(handler, tokenRequest({ resource: CLAIM_STORAGE }))
 
     expect(captured.status).toBe(200)
-    expect(lookups).toEqual([{ subject: WEBID, client: CLIENT, storage: CLAIM_STORAGE }])
+    expect(lookups).toEqual([
+      { subject: WEBID, client: CLIENT, storage: CLAIM_STORAGE, forStorage: true },
+    ])
     const { payload } = await jwtVerify(
       JSON.parse(String(captured.body)).access_token,
       keys.publicKey

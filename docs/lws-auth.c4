@@ -981,8 +981,12 @@ views {
 
       >[!IMPORTANT]
       > one ID-JAG carries one delegation edge. An app-specific grant (user → this
-      > client) wins; otherwise the narrowest received edge is taken —
-      > `SelectedFromRegistry` > `Inherited` > `AllFromRegistry` > `AllFromAgent`
+      > client) wins; otherwise the narrowest received edge is taken. For a storage
+      > audience, registration-level edges win over an asset-only
+      > `SelectedFromRegistry` edge (`Inherited` > `AllFromRegistry` > `AllFromAgent`),
+      > because a selected edge cannot back a storage-scoped read outside that one
+      > asset. A delegation hop to another UAS keeps the narrowest edge, which that
+      > UAS can back.
 
       >[!TIP]
       > the UAS authenticates as Bob first: `GET /bob/` → `401` → discovery →

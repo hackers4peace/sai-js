@@ -277,6 +277,10 @@ export class IdJagTokenHandler extends HttpHandler {
           subject: subject.subject,
           client: subject.client,
           storage: resource,
+          // A storage audience gets a token that serves every read in it; an
+          // authorization-server audience is a delegation hop, where the claim
+          // must stay within one edge the receiving UAS can back.
+          forStorage: this.matchesOrigin(this.storageOrigins, audience),
         })
       } catch (error: unknown) {
         // A registry outage must not turn the UAS into a 500; an identity-only

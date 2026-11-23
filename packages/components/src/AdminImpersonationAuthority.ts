@@ -125,6 +125,9 @@ export class AdminImpersonationAuthority implements AdminImpersonationRequestAut
       subject: input.org,
       client: agentId(input.org),
       storage: input.storage,
+      // The org's ID-JAG is exchanged for a storage access token that serves
+      // the admin's reads in that storage.
+      forStorage: true,
     })
     if (!claim) {
       throw new AdminImpersonationDenied(`${input.org} holds no access grant for ${input.storage}.`)
