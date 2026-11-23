@@ -302,15 +302,15 @@ export function buildNestedDataAuthorizations(
   }
   return parents.map((parentDataAuthorization) => {
     // add children for each parent
-    const inheritingDataAuthorizations = children
-      .filter((childDataAuthorization) => {
-        const accessNeed = accessNeedGroup.accessNeeds
-          .flatMap((need) => [need, ...(need.children ?? [])])
-          .find((need) => need.id === childDataAuthorization.satisfiesAccessNeed)!
+    const inheritingDataAuthorizations = children.flatMap((childDataAuthorization) => {
+      const accessNeed = accessNeedGroup.accessNeeds
+        .flatMap((need) => [need, ...(need.children ?? [])])
+        .find((need) => need.id === childDataAuthorization.satisfiesAccessNeed)!
 
-        return accessNeed.inheritsFromNeed === parentDataAuthorization.satisfiesAccessNeed
-      })
-      .map((child) => ({ ...child, dataOwner: parentDataAuthorization.dataOwner }))
+      return accessNeed.inheritsFromNeed === parentDataAuthorization.satisfiesAccessNeed
+        ? [{ ...childDataAuthorization, dataOwner: parentDataAuthorization.dataOwner }]
+        : []
+    })
     if (inheritingDataAuthorizations.length) {
       return { ...parentDataAuthorization, children: inheritingDataAuthorizations }
     }

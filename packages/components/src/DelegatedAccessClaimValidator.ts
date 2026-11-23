@@ -243,11 +243,12 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     const visible = await this.visibleGrants(input.subject, input.client, input.storage)
     const assignees = [input.subject, input.client]
     const candidates = [...new Set(visible.map((grant) => grant.grantedBy))]
-      .map((assigner) => ({
-        assigner,
-        grants: visible.filter((grant) => grant.grantedBy === assigner),
-      }))
-      .filter(({ grants }) => matchingAssigners(input.access, grants, assignees).size > 0)
+      .flatMap((assigner) => {
+        const grants = visible.filter((grant) => grant.grantedBy === assigner)
+        return matchingAssigners(input.access, grants, assignees).size > 0
+          ? [{ assigner, grants }]
+          : []
+      })
       .toSorted(
         (a, b) =>
           grantEdgeRank(b.grants) - grantEdgeRank(a.grants) || a.assigner.localeCompare(b.assigner)

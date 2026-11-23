@@ -914,14 +914,18 @@ describe('revokeGrants core (C1)', () => {
       if (query.includes('?dataOwner')) {
         // the authority read filters with VALUES ?grant { … }
         const requested = new Set([...query.matchAll(/<([^>]+)>/g)].map((match) => match[1]))
-        return existing
-          .filter((grant) => requested.has(grant.id!))
-          .map((grant) => ({
-            grant: { termType: 'NamedNode', value: grant.id },
-            dataOwner: { termType: 'NamedNode', value: grant.dataOwner },
-            grantedBy: { termType: 'NamedNode', value: grant.grantedBy },
-            grantee: { termType: 'NamedNode', value: grantGrantee(grant) ?? '' },
-          }))
+        return existing.flatMap((grant) =>
+          requested.has(grant.id!)
+            ? [
+                {
+                  grant: { termType: 'NamedNode', value: grant.id },
+                  dataOwner: { termType: 'NamedNode', value: grant.dataOwner },
+                  grantedBy: { termType: 'NamedNode', value: grant.grantedBy },
+                  grantee: { termType: 'NamedNode', value: grantGrantee(grant) ?? '' },
+                },
+              ]
+            : []
+        )
       }
       throw new Error(`unexpected SELECT: ${query}`)
     }

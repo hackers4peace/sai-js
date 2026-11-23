@@ -156,8 +156,9 @@ test('parses an LWS access document through the bundled LWS context', async () =
   )
   expect(
     quads
-      .filter((q) => q.subject.equals(policy) && q.predicate.value === `${ODRL}action`)
-      .map((q) => q.object.value)
+      .flatMap((q) =>
+        q.subject.equals(policy) && q.predicate.value === `${ODRL}action` ? [q.object.value] : []
+      )
       .toSorted()
   ).toEqual([`${LWS}create`, `${ODRL}read`].toSorted())
 

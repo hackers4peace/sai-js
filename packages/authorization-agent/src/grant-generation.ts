@@ -521,7 +521,7 @@ async function generateSourceAccessGrants(
       ...(data.hasDataInstance?.length ? { hasDataInstance: data.hasDataInstance } : {}),
     }
     if (childGrantData.length) {
-      grant.hasInheritingGrant = childGrantData.map((g) => g.id).filter(Boolean)
+      grant.hasInheritingGrant = childGrantData.flatMap((g) => (g.id ? [g.id] : []))
     }
     result.push(grant, ...childGrantData)
   }

@@ -254,12 +254,11 @@ function deriveFields(
   const registrationTarget = permissions
     .map((permission) => permission.target)
     .find((candidate) => candidate.type.includes(INTEROP.DataRegistration))
-  const assetTargets = permissions
-    .map((permission) => permission.target)
-    .filter(
-      (candidate) =>
-        candidate.type.includes(ODRL.Asset) && !candidate.type.includes(INTEROP.DataRegistration)
-    )
+  const assetTargets = permissions.flatMap(({ target: candidate }) =>
+    candidate.type.includes(ODRL.Asset) && !candidate.type.includes(INTEROP.DataRegistration)
+      ? [candidate]
+      : []
+  )
   return {
     storage: target?.storage ?? (node.storage as string | undefined) ?? '',
     grantedBy: first?.assigner ?? (node.grantedBy as string | undefined) ?? '',
@@ -271,7 +270,11 @@ function deriveFields(
       (permissions.map((permission) => registrationOfTarget(permission.target)).find(Boolean) ??
         ''),
     ...(assetTargets.length
-      ? { hasDataInstance: assetTargets.map((candidate) => candidate.source[0]).filter(Boolean) }
+      ? {
+          hasDataInstance: assetTargets.flatMap((candidate) =>
+            candidate.source[0] ? [candidate.source[0]] : []
+          ),
+        }
       : {}),
   }
 }
