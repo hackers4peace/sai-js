@@ -185,17 +185,21 @@ const grantGraph = (
     ),
   ]
   for (const target of targets) {
-    quads.push(quad(permission, namedNode(ODRL.target), target.id))
-    quads.push(quad(target.id, namedNode(ODRL.uid), target.id))
+    quads.push(
+      quad(permission, namedNode(ODRL.target), target.id),
+      quad(target.id, namedNode(ODRL.uid), target.id)
+    )
     for (const type of target.types) {
       quads.push(quad(target.id, namedNode(RDF.type), namedNode(type)))
     }
     for (const source of target.sources) {
       quads.push(quad(target.id, namedNode(ODRL.source), namedNode(source)))
     }
-    quads.push(quad(target.id, namedNode(INTEROP.registeredShapeTree), namedNode(fields.shapeTree)))
-    quads.push(quad(target.id, namedNode(INTEROP.dataOwner), namedNode(ALICE)))
-    quads.push(quad(target.id, namedNode(LWS.storage), namedNode(fields.storage)))
+    quads.push(
+      quad(target.id, namedNode(INTEROP.registeredShapeTree), namedNode(fields.shapeTree)),
+      quad(target.id, namedNode(INTEROP.dataOwner), namedNode(ALICE)),
+      quad(target.id, namedNode(LWS.storage), namedNode(fields.storage))
+    )
     if (scopeOfGrant === INTEROP.SelectedFromRegistry) {
       quads.push(
         quad(target.id, namedNode(INTEROP.hasDataRegistration), namedNode(fields.dataRegistration))
