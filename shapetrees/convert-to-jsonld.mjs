@@ -1,6 +1,5 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises'
 import { basename, dirname, extname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import jsonld from 'jsonld'
 import { Parser, Writer } from 'n3'
