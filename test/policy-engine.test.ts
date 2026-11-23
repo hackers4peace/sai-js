@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, test } from 'vitest'
  */
 
 function getRegistration(id: string) {
-  return id.substring(0, id.lastIndexOf('/') + 1)
+  return id.slice(0, id.lastIndexOf('/') + 1)
 }
 
 describe('public resources', () => {
