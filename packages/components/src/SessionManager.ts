@@ -32,7 +32,7 @@ import { isSaiUrl, isWithinBaseUrl, saiAudience } from './util/url.js'
 let sharedEndpointStorePromise: Promise<PodEndpointStore> | undefined
 
 export function getSharedEndpointStore(): Promise<PodEndpointStore> {
-  if (!sharedEndpointStorePromise) {
+  if (sharedEndpointStorePromise === undefined) {
     sharedEndpointStorePromise = (async () => {
       const storage = (await buildAccountLoginStorage()) as any
       const webIdStore = new CustomWebIdStore(storage)
@@ -101,7 +101,7 @@ export class SessionManager {
   public async storageFetch(webid: string, storage: string): Promise<WhatwgFetch> {
     const key = `${webid}\n${storage}`
     const cached = this.storageFetches.get(key)
-    if (cached) {
+    if (cached !== undefined) {
       return cached
     }
     const created = (async (): Promise<WhatwgFetch> => {
@@ -136,7 +136,7 @@ export class SessionManager {
   ): Promise<WhatwgFetch> {
     const key = `${adminWebId}\n${orgWebId}\n${storage}`
     const cached = this.impersonationFetches.get(key)
-    if (cached) {
+    if (cached !== undefined) {
       return cached
     }
     const created = (async (): Promise<WhatwgFetch> => {

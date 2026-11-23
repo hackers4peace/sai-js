@@ -73,7 +73,7 @@ function shapeTreeLabel(fetch: WhatwgFetch, lang: string) {
   const labels = new Map<string, Promise<string>>()
   return (shapeTreeIri: string): Promise<string> => {
     let label = labels.get(shapeTreeIri)
-    if (!label) {
+    if (label === undefined) {
       label = (async (): Promise<string> => {
         try {
           const shapeTree = await loadShapeTree(shapeTreeIri, fetch)

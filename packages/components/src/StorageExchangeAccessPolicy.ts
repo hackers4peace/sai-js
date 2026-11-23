@@ -149,7 +149,7 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
 
   private agentOf(subject: string): Promise<string | undefined> {
     const cached = this.agents.get(subject)
-    if (cached) {
+    if (cached !== undefined) {
       return cached
     }
     const discovery = this.discoverAgent(subject).catch((error: unknown) => {
