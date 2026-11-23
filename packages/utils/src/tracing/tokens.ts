@@ -136,7 +136,7 @@ export function setTokenAttributes(
     span,
     Object.fromEntries(HEADER_FIELDS.map((field) => [`${prefix}.${field}`, header?.[field]]))
   )
-  if (typeof header !== 'undefined') {
+  if (header !== undefined) {
     span.setAttribute(`${prefix}.header`, JSON.stringify(header))
   }
 
