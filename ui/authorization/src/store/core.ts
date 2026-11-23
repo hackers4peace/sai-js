@@ -120,7 +120,7 @@ export const useCoreStore = defineStore('core', () => {
     const subscription = await registration.pushManager.getSubscription()
     if (subscription) {
       pushSubscription.value = subscription.toJSON() as PushSubscription
-      registerPushSubscription(pushSubscription.value)
+      void registerPushSubscription(pushSubscription.value)
     }
   }
 

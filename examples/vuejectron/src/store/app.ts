@@ -118,11 +118,11 @@ export const useAppStore = defineStore('app', () => {
     notificationsManager.addEventListener('notification', ((event: CustomEvent) => {
       // handle application registration
       if (event.detail.object === session.registrationIri && event.detail.type === AS.Update) {
-        handleRegistrationChange()
+        void handleRegistrationChange()
       }
       // handler regular resource updates
       if (event.detail.type === AS.Update) {
-        handleResourceChange(event.detail.object)
+        void handleResourceChange(event.detail.object)
       }
     }) as EventListener)
 
@@ -383,7 +383,7 @@ export const useAppStore = defineStore('app', () => {
     const target = e.target as HTMLInputElement
     const blob = target.files?.item(0)
     if (blob && currentProject.value) {
-      upload(currentProject.value['@id']!, blob, scopes.file)
+      void upload(currentProject.value['@id']!, blob, scopes.file)
     }
   }
 
@@ -391,7 +391,7 @@ export const useAppStore = defineStore('app', () => {
     const target = e.target as HTMLInputElement
     const blob = target.files?.item(0)
     if (blob && currentProject.value) {
-      upload(currentProject.value['@id']!, blob, scopes.image)
+      void upload(currentProject.value['@id']!, blob, scopes.image)
     }
   }
 
@@ -458,7 +458,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function shareProject(projectId: string) {
-    share(projectId)
+    void share(projectId)
   }
 
   async function dataUrl(url: string): Promise<string> {
@@ -469,15 +469,15 @@ export const useAppStore = defineStore('app', () => {
 
   async function handleRegistrationChange(): Promise<void> {
     await session.buildRegistration()
-    loadAgents(true)
+    void loadAgents(true)
   }
 
   async function handleResourceChange(resourceId: string): Promise<void> {
     const project = projects.value.find((p) => p['@id'] === resourceId)
     if (project) {
-      reloadProject(resourceId)
+      void reloadProject(resourceId)
     } else {
-      reloadTask(resourceId)
+      void reloadTask(resourceId)
     }
   }
 

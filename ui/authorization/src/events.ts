@@ -47,10 +47,10 @@ let stopped = false
 /** The full store refresh run on first connect and on every reconnect. */
 function fullRefresh() {
   const appStore = useAppStore()
-  appStore.listSocialAgents(true)
-  appStore.listApplications(true)
-  appStore.listRoles(true)
-  appStore.listSocialAgentInvitations(true)
+  void appStore.listSocialAgents(true)
+  void appStore.listApplications(true)
+  void appStore.listRoles(true)
+  void appStore.listSocialAgentInvitations(true)
   // recover a done-row missed while the stream was disconnected (the C0
   // authorization view may still show revoked rows)
   void appStore.refreshAuthorizations()
@@ -87,7 +87,7 @@ function handleActivity(activity: ActivityEvent) {
     if (owner && appStore.currentContext() !== owner) {
       return
     }
-    appStore.listSocialAgents(true)
+    void appStore.listSocialAgents(true)
     return
   }
   if (activity.status !== 'done') {
@@ -106,8 +106,8 @@ function handleActivity(activity: ActivityEvent) {
     activity.type.includes('AuthorizationGranted') ||
     activity.type.includes('AuthorizationRevoked')
   ) {
-    appStore.listApplications(true)
-    appStore.listSocialAgents(true)
+    void appStore.listApplications(true)
+    void appStore.listSocialAgents(true)
     if (activity.type.includes('AuthorizationRevoked')) {
       // the workflow deletes the selected DAs asynchronously — only now is the
       // C0 list authoritative; re-read the grantee the view last loaded
@@ -118,22 +118,22 @@ function handleActivity(activity: ActivityEvent) {
     activity.type.includes('RoleDeleted') ||
     activity.type.includes('RoleCreated')
   ) {
-    appStore.listSocialAgents(true)
-    appStore.listRoles(true)
+    void appStore.listSocialAgents(true)
+    void appStore.listRoles(true)
   } else if (activity.type.includes('AgentRegistrationAdded')) {
-    appStore.listSocialAgents(true)
-    appStore.listSocialAgentInvitations(true)
+    void appStore.listSocialAgents(true)
+    void appStore.listSocialAgentInvitations(true)
   } else if (activity.type.includes('InvitationAccepted')) {
     // the acceptor's workflow built the acceptor → inviter registration;
     // refresh the context's agent list (e.g. the org's list for a
     // peer-owned invitation accepted by an admin — admin-invitation-receive)
-    appStore.listSocialAgents(true)
-    appStore.listSocialAgentInvitations(true)
+    void appStore.listSocialAgents(true)
+    void appStore.listSocialAgentInvitations(true)
   } else if (activity.type.includes('InvitationCreated')) {
     // step 1: the capabilityUrl is learned from the invitation resource after
     // completion (never from an RPC or activity) — the done-row refresh does
     // exactly that via the invitation list
-    appStore.listSocialAgentInvitations(true)
+    void appStore.listSocialAgentInvitations(true)
   } else if (
     activity.type.includes('NeedBasedAccessRequestSent') ||
     activity.type.includes('NeedBasedAccessRequestReceived')
@@ -143,16 +143,16 @@ function handleActivity(activity: ActivityEvent) {
     // Both sides refresh the social-agents list so the UI reflects the pending
     // request state (e.g. a "pending" badge next to Kim in Alice's list, and the
     // incoming request entry in Kim's list).
-    appStore.listSocialAgents(true)
+    void appStore.listSocialAgents(true)
   } else if (activity.type.includes('DelegatedGrantsUpdated')) {
-    appStore.listSocialAgents(true)
+    void appStore.listSocialAgents(true)
   } else if (
     // org-admin (Phase 1/3): the admin marker lands via the grant workflow —
     // refresh the context's agent list so toggle-admin flags stay current
     activity.type.includes('AdminAuthorizationGranted') ||
     activity.type.includes('AdminAuthorizationRevoked')
   ) {
-    appStore.listSocialAgents(true)
+    void appStore.listSocialAgents(true)
   }
 }
 

@@ -15,6 +15,6 @@ import { loadFonts } from './webfontloader'
 // Types
 
 export function registerPlugins(app: App) {
-  loadFonts()
+  void loadFonts()
   app.use(vuetify).use(router).use(pinia)
 }

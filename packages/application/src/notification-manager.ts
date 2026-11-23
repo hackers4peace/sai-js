@@ -137,6 +137,6 @@ export class NotificationManager extends EventTarget {
       console.log('Failed to discover notification chanel for:', resourceId)
       return
     }
-    this.handleStream(resourceId, receiveFrom)
+    await this.handleStream(resourceId, receiveFrom)
   }
 }

@@ -314,7 +314,7 @@ export const useAppStore = defineStore('app', () => {
     members: ReadonlyArray<S.Schema.Type<typeof IRI>>
   ): Promise<S.Schema.Type<typeof Role>> {
     const role = await effect.updateRole(id, label, members, currentContext())
-    listRoles(true)
+    void listRoles(true)
     return role
   }
 
@@ -352,9 +352,9 @@ export const useAppStore = defineStore('app', () => {
       accessRequestIriRef.value
     )
     claimActivity({ context: currentContext(), type: 'AuthorizationGranted', activityId })
-    listApplications(true)
-    listSocialAgents(true)
-    listRoles(true)
+    void listApplications(true)
+    void listSocialAgents(true)
+    void listRoles(true)
   }
 
   async function revokeAuthorizations(authorizations: ReadonlyArray<string>) {
@@ -371,20 +371,20 @@ export const useAppStore = defineStore('app', () => {
     // would still list them — and can even race a per-DA read with the
     // deletion. The AuthorizationRevoked done-row re-reads the list through
     // refreshAuthorizations; the RPC ack alone decides the dialog outcome.
-    listSocialAgents(true)
-    listApplications(true)
+    void listSocialAgents(true)
+    void listApplications(true)
   }
 
   async function requestAccess(applicationId: string, agentId: string) {
     await effect.requestAccessUsingApplicationNeeds(applicationId, agentId, currentContext())
-    listSocialAgents(true)
+    void listSocialAgents(true)
   }
 
   async function archiveAccessRequest(request: string) {
     // terminal resolution — the RPC acks `archived` (false = already
     // resolved no-op); refresh either way so the outgoing list clears
     await effect.archiveAccessRequest(request, currentContext())
-    listSocialAgents(true)
+    void listSocialAgents(true)
   }
 
   async function getUnregisteredApplication(applicationId: string) {
@@ -435,7 +435,7 @@ export const useAppStore = defineStore('app', () => {
       type: 'InvitationAccepted',
       activityId: result.activityId,
     })
-    listSocialAgents(true)
+    void listSocialAgents(true)
     return result
   }
 

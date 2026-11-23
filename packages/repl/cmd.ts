@@ -168,7 +168,7 @@ const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
         await seedFusekiDataset(`${fusekiBaseUrl}/${ds}`, trig)
       }
     })
-    pg.sql.end()
+    yield* Effect.promise(() => pg.sql.end())
 
     yield* Console.log('Data seeded successfully')
     return 0
