@@ -401,7 +401,9 @@ export async function waitFor<T>(
     } catch (err) {
       lastError = err
     }
-    await new Promise((resolve) => setTimeout(resolve, interval))
+    await new Promise((resolve) => {
+      setTimeout(resolve, interval)
+    })
   }
   if (lastError) {
     throw lastError
@@ -508,7 +510,9 @@ export async function waitForQuiescence(
     } else {
       settled = 0
     }
-    await new Promise((resolve) => setTimeout(resolve, interval))
+    await new Promise((resolve) => {
+      setTimeout(resolve, interval)
+    })
   }
   throw new Error(
     `workflows did not settle within ${timeout}ms for: ${webIds.join(', ')}` +
