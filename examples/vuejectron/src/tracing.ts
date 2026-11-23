@@ -37,7 +37,7 @@ import type { RuntimeConfig } from './runtime-config'
 /** The key `packages/utils/src/tracing/shared.ts` publishes its provider under. */
 const TRACER_PROVIDER_KEY: symbol = Symbol.for('sai.otel.tracerProvider')
 
-const DEFAULT_PROPAGATE_TO = ['^https://[^/]*\\.docker/']
+const DEFAULT_PROPAGATE_TO = [String.raw`^https://[^/]*\.docker/`]
 
 export function initTracing(config: RuntimeConfig): void {
   const tracing = config.tracing

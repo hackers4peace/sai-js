@@ -41,8 +41,6 @@ const notYetMigrated = Object.fromEntries(
     'unicorn/prefer-top-level-await',
     'typescript/only-throw-error',
     'unicorn/prefer-single-call',
-    'quality/no-reflect-get',
-    'unicorn/prefer-string-raw',
     'quality/no-unknown-type-aliases',
   ].map((rule) => [rule, 'off' as const])
 )
