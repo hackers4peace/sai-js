@@ -27,10 +27,17 @@ const AuthFetch = FetchHttpClient.layer.pipe(
 )
 
 // RPC transport + the web OTel provider that exports the browser spans.
+// The URL is read when the layer is built (first RPC), not at import: this
+// module is imported by the router before main.ts has loaded config.json, and
+// reading it eagerly throws "Runtime config not loaded" (blank page).
 const AuthLayer = Layer.mergeAll(
-  RpcClient.layerProtocolHttp({
-    url: `${getRuntimeConfig().backendBaseUrl}/.sai/api`,
-  }).pipe(Layer.provide(AuthFetch), Layer.provide(RpcSerialization.layerNdjson)),
+  Layer.unwrapEffect(
+    Effect.sync(() =>
+      RpcClient.layerProtocolHttp({
+        url: `${getRuntimeConfig().backendBaseUrl}/.sai/api`,
+      })
+    )
+  ).pipe(Layer.provide(AuthFetch), Layer.provide(RpcSerialization.layerNdjson)),
   UiTracingLive
 )
 
