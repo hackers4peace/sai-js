@@ -285,7 +285,7 @@ export const useAppStore = defineStore('app', () => {
     }
     const projectId = session.findParent(task['@id']!)
     const ldoProject = findProject(projectId)
-    const isDraft = ![...ldoProject.hasTask!].find(
+    const isDraft = ![...ldoProject.hasTask!].some(
       (t: { '@id': string }) => t['@id'] === task['@id']
     )
     if (isDraft) {
