@@ -13,9 +13,9 @@ const assetBase = import.meta.env.BASE_URL
     <meta charset="utf-8" />
     <script is:inline>
       (function () {
-        var saved = localStorage.getItem("theme") || "auto";
-        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        var effectiveTheme = saved === "auto" ? (prefersDark ? "dark" : "light") : saved;
+        const saved = localStorage.getItem("theme") || "auto";
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const effectiveTheme = saved === "auto" ? (prefersDark ? "dark" : "light") : saved;
         document.documentElement.setAttribute("data-theme", saved);
         document.documentElement.classList.add(effectiveTheme);
       })();

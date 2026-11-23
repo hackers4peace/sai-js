@@ -49,7 +49,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/only-throw-error',
     'typescript/require-array-sort-compare',
     'unicorn/prefer-single-call',
-    'no-var',
     'no-useless-assignment',
     'unicorn/prefer-set-has',
     'no-promise-executor-return',
