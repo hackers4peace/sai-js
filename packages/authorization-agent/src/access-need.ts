@@ -45,7 +45,9 @@ export async function getDescription(
   const doc = await fetchJsonLd(need.id, fetch)
   const dataset = await parseJsonld(JSON.stringify(doc), need.id)
   const descriptionSetIri = findInLanguage(dataset, lang)
-  if (!descriptionSetIri) return undefined
+  if (!descriptionSetIri) {
+    return undefined
+  }
   const descriptionSet = { id: descriptionSetIri }
   const { accessNeedDescriptions } = await loadDescriptions(descriptionSet, fetch)
   return accessNeedDescriptions.find((description) => description.hasAccessNeed === need.id)

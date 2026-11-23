@@ -41,7 +41,9 @@ function matchPod(iri: string, podDatasets: Map<string, string>): string | undef
  */
 export function datasetForGraph(graphIri: string, opts: FusekiFixtureOptions): string {
   const iri = graphIri.startsWith('meta:') ? graphIri.slice('meta:'.length) : graphIri
-  if (iri.startsWith(opts.idOrigin ?? 'https://id/')) return ID_DATASET
+  if (iri.startsWith(opts.idOrigin ?? 'https://id/')) {
+    return ID_DATASET
+  }
   const podUrl = matchPod(iri, opts.podDatasets)
   if (!podUrl) {
     throw new Error(`no dataset for graph <${graphIri}> — not under a pod or the id origin`)
@@ -99,14 +101,18 @@ function applyReciprocalMirrors(
   const datasetOfGraph = new Map<string, string>()
   for (const [dataset, quads] of byDataset) {
     for (const quad of quads) {
-      if (quad.graph.termType !== 'DefaultGraph') datasetOfGraph.set(quad.graph.value, dataset)
+      if (quad.graph.termType !== 'DefaultGraph') {
+        datasetOfGraph.set(quad.graph.value, dataset)
+      }
     }
   }
 
   const links: { owner: string; target: string }[] = []
   for (const [graphIri, quads] of byGraph) {
     const owner = datasetOfGraph.get(graphIri)
-    if (!owner) continue
+    if (!owner) {
+      continue
+    }
     for (const quad of quads) {
       if (quad.predicate.value === RECIPROCAL_REGISTRATION) {
         links.push({ owner, target: quad.object.value })
@@ -118,7 +124,9 @@ function applyReciprocalMirrors(
     const bucket = byDataset.get(owner)!
     for (const graph of [iri, `meta:${iri}`]) {
       for (const quad of byGraph.get(graph) ?? []) {
-        if (!bucket.includes(quad)) bucket.push(quad)
+        if (!bucket.includes(quad)) {
+          bucket.push(quad)
+        }
       }
     }
   }
@@ -127,7 +135,9 @@ function applyReciprocalMirrors(
     copyGraph(owner, target)
     for (const graph of [target, `meta:${target}`]) {
       for (const quad of byGraph.get(graph) ?? []) {
-        if (quad.predicate.value === HAS_DATA_GRANT) copyGraph(owner, quad.object.value)
+        if (quad.predicate.value === HAS_DATA_GRANT) {
+          copyGraph(owner, quad.object.value)
+        }
       }
     }
   }
@@ -148,17 +158,25 @@ export async function splitFixtureByPod(
   for (const quad of quads) {
     const graph = quad.graph.termType === 'DefaultGraph' ? '' : quad.graph.value
     const bucket = byGraph.get(graph)
-    if (bucket) bucket.push(quad)
-    else byGraph.set(graph, [quad])
+    if (bucket) {
+      bucket.push(quad)
+    } else {
+      byGraph.set(graph, [quad])
+    }
   }
 
   const byDataset = new Map<string, Quad[]>()
   for (const [graph, graphQuads] of byGraph) {
-    if (!graph) throw new Error('default-graph quads are not supported')
+    if (!graph) {
+      throw new Error('default-graph quads are not supported')
+    }
     const dataset = datasetForGraph(graph, opts)
     const bucket = byDataset.get(dataset)
-    if (bucket) bucket.push(...graphQuads)
-    else byDataset.set(dataset, [...graphQuads])
+    if (bucket) {
+      bucket.push(...graphQuads)
+    } else {
+      byDataset.set(dataset, [...graphQuads])
+    }
   }
 
   applyReciprocalMirrors(byGraph, byDataset)

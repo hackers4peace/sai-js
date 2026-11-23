@@ -64,13 +64,17 @@ async function verifyAccessGrant(
   const findAccessGrant = async (): Promise<GrantData | undefined> => {
     // re-read the registration: the projection is PATCHed by the workflow
     const current = await grantedBySession.findSocialAgentRegistration(granteeId)
-    if (!current) return undefined
+    if (!current) {
+      return undefined
+    }
     const grants: GrantData[] = []
     for (const iri of getAccessGrantIris(current)) {
       const grant =
         (await loadGrant(iri, grantedBySession.fetch).catch(() => undefined)) ??
         (await loadGrant(iri, ownerSession.fetch).catch(() => undefined))
-      if (grant) grants.push(grant)
+      if (grant) {
+        grants.push(grant)
+      }
     }
     return grants.find(
       (grant) =>

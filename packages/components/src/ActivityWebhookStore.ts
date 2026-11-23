@@ -73,11 +73,12 @@ export class ActivityWebhookStore extends Initializer {
     | undefined
   > {
     const raw = (await this.storage.find(ACTIVITY_WEBHOOK_STORAGE_TYPE, { sendTo }))[0]
-    if (raw)
+    if (raw) {
       return {
         ...raw,
         channel: JSON.parse(raw.channel),
       }
+    }
   }
 
   public async create(

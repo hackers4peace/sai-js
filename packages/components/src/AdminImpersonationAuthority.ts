@@ -142,11 +142,15 @@ export class AdminImpersonationAuthority implements AdminImpersonationRequestAut
   ): Promise<boolean> {
     const key = `${org}\n${subject}`
     const cached = this.adminChecks.get(key)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const check = (async (): Promise<boolean> => {
       for (const record of records) {
         try {
-          if (await this.hasDataRegistryAdmin(record.endpoint, subject)) return true
+          if (await this.hasDataRegistryAdmin(record.endpoint, subject)) {
+            return true
+          }
         } catch {
           // a store outage on one pod is not an admin grant
         }
@@ -173,7 +177,9 @@ export class AdminImpersonationAuthority implements AdminImpersonationRequestAut
 
   private agentOf(subject: string): Promise<string | undefined> {
     const cached = this.agents.get(subject)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const discovery = this.discoverAgent(subject).catch(() => undefined)
     this.agents.set(subject, discovery)
     return discovery

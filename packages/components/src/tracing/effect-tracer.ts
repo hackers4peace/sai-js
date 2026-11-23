@@ -25,10 +25,14 @@ export function withEffectTracing<A, E>(
   serviceName: string
 ): EffectType<A, E> {
   const config = temporalPluginConfig()
-  if (!config) return program
+  if (!config) {
+    return program
+  }
   const layers = Layer.provide(Tracer.layerGlobal, Resource.layer({ serviceName }))
   const provided = Effect.provide(program, layers)
   const otelSpan = trace.getSpan(context.active())
-  if (!otelSpan) return provided
+  if (!otelSpan) {
+    return provided
+  }
   return Tracer.withSpanContext(otelSpan.spanContext())(provided)
 }

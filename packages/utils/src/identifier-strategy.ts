@@ -64,12 +64,16 @@ export class FlatIdentifierStrategy implements StorageIdentifierStrategy {
 
   create({ parent, identifier, isContainer, body }: CreateArgs): CreationPlan {
     const slug = identifier.split('/').filter(Boolean).pop()
-    if (!slug) throw new Error(`cannot derive a slug from ${identifier}`)
+    if (!slug) {
+      throw new Error(`cannot derive a slug from ${identifier}`)
+    }
     const headers: Record<string, string> = {
       slug,
       'content-type': 'application/ld+json',
     }
-    if (isContainer) headers.link = LWS_CONTAINER_LINK
+    if (isContainer) {
+      headers.link = LWS_CONTAINER_LINK
+    }
 
     return {
       identifier,
@@ -90,7 +94,9 @@ export class FlatIdentifierStrategy implements StorageIdentifierStrategy {
 }
 
 async function serializeBody(body: unknown): Promise<string> {
-  if (body === undefined) return '[]'
+  if (body === undefined) {
+    return '[]'
+  }
   return JSON.stringify(await expandedJsonLd(body as Record<string, unknown>))
 }
 
@@ -109,7 +115,9 @@ export async function executeCreationPlan(plan: CreationPlan, fetch: WhatwgFetch
         throw new Error(`failed to create ${plan.identifier}: ${response.status}`)
       }
       const location = response.headers.get('Location')
-      if (!location) throw new Error(`POST ${step.url} did not return a Location`)
+      if (!location) {
+        throw new Error(`POST ${step.url} did not return a Location`)
+      }
       const created = new URL(location, step.url).toString()
       if (created !== plan.identifier) {
         throw new Error(`POST ${step.url} allocated ${created}, expected ${plan.identifier}`)
@@ -164,7 +172,9 @@ export class CachingIdentifierStrategyResolver implements IdentifierStrategyReso
       return { storageUrl, storageRoot: storageUrl, strategy: cachedRoot }
     }
     const cached = this.byUrl.get(storageUrl)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
 
     const pending = this.discover(storageUrl)
     this.byUrl.set(storageUrl, pending)
@@ -180,7 +190,9 @@ export class CachingIdentifierStrategyResolver implements IdentifierStrategyReso
 
   forStorage(storageRoot: string): StorageIdentifierStrategy {
     const strategy = this.byRoot.get(storageRoot)
-    if (!strategy) throw new Error(`no identifier strategy for storage ${storageRoot}`)
+    if (!strategy) {
+      throw new Error(`no identifier strategy for storage ${storageRoot}`)
+    }
     return strategy
   }
 

@@ -90,7 +90,9 @@ export class GarageAdminClient {
     }
     const headers: Record<string, string> = { authorization: `Bearer ${this.adminToken}` }
     const hasBody = options.body !== undefined
-    if (hasBody) headers['content-type'] = 'application/json'
+    if (hasBody) {
+      headers['content-type'] = 'application/json'
+    }
 
     const response = await this.fetch(url, {
       method,
@@ -98,7 +100,9 @@ export class GarageAdminClient {
       body: hasBody ? JSON.stringify(options.body) : undefined,
     })
 
-    if (response.status === 404 && options.tolerate404) return undefined as T
+    if (response.status === 404 && options.tolerate404) {
+      return undefined as T
+    }
     if (!response.ok) {
       const detail = await response.text().catch(() => '')
       throw new Error(
@@ -137,7 +141,9 @@ export class GarageAdminClient {
    */
   public async ensureBucket(globalAlias: string): Promise<GarageBucketInfo> {
     const existing = await this.findBucketByAlias(globalAlias)
-    if (existing) return existing
+    if (existing) {
+      return existing
+    }
     return this.createBucket(globalAlias)
   }
 

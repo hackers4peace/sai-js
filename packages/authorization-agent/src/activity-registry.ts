@@ -119,18 +119,26 @@ async function frameActivity(doc: unknown, id: string): Promise<Record<string, u
 }
 
 function asString(value: unknown): string {
-  if (typeof value === 'string') return value
+  if (typeof value === 'string') {
+    return value
+  }
   if (value && typeof value === 'object') {
     const node = value as { id?: unknown; '@id'?: unknown }
-    if (typeof node.id === 'string') return node.id
-    if (typeof node['@id'] === 'string') return node['@id']
+    if (typeof node.id === 'string') {
+      return node.id
+    }
+    if (typeof node['@id'] === 'string') {
+      return node['@id']
+    }
   }
   return ''
 }
 
 /** Normalize a framed (possibly scalar-or-array) node value to a string. */
 function asStringArray(value: unknown): string[] {
-  if (value === undefined || value === null) return []
+  if (value === undefined || value === null) {
+    return []
+  }
   return (Array.isArray(value) ? value : [value]).map(asString)
 }
 
@@ -142,7 +150,9 @@ function asStringArray(value: unknown): string[] {
  * context.)
  */
 function embeddedLabel(value: unknown): LanguageMap {
-  if (isLanguageMap(value)) return value
+  if (isLanguageMap(value)) {
+    return value
+  }
   const entries = Array.isArray(value) ? value : [value]
   const map: LanguageMap = {}
   for (const entry of entries) {
@@ -161,7 +171,9 @@ function embeddedLabel(value: unknown): LanguageMap {
 
 /** A framed language map (`@none` and/or bare language-tag string entries). */
 function isLanguageMap(value: unknown): value is LanguageMap {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false
+  }
   const candidate = value as Record<string, unknown>
   const keys = Object.keys(candidate)
   return (
@@ -569,7 +581,9 @@ export async function getActivityCompletions(
   transport: SparqlTransport
 ): Promise<{ completion: string; target?: string }[]> {
   const iris = await getActivityIris(data, transport)
-  if (iris.length === 0) return []
+  if (iris.length === 0) {
+    return []
+  }
   const values = iris.map((iri) => `<${iri}>`).join(' ')
   const bindings = await transport.fetchBindings(
     `SELECT ?activity ?target WHERE {

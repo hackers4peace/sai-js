@@ -58,7 +58,9 @@ function makeClient(fetchImpl: typeof fetch): GarageAdminClient {
 describe('GarageAdminClient', () => {
   test('ensureBucket creates a missing bucket via the global alias', async () => {
     const { fetch, calls } = recordingFetch((call) => {
-      if (call.url.endsWith('/v2/ListBuckets')) return jsonResponse([])
+      if (call.url.endsWith('/v2/ListBuckets')) {
+        return jsonResponse([])
+      }
       return jsonResponse({ id: 'b1', globalAliases: ['data-alice'] })
     })
 

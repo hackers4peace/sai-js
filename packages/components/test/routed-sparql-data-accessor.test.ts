@@ -98,7 +98,9 @@ interface StoreOptions {
 function fakeStore(opts: StoreOptions = {}): unknown {
   return {
     findSparqlByPodUrl: async (podUrl: string) => {
-      if (opts.throwOn === podUrl) throw new Error('endpoint store unavailable')
+      if (opts.throwOn === podUrl) {
+        throw new Error('endpoint store unavailable')
+      }
       return records.find((record) => record.podUrl === podUrl)
     },
   }
@@ -108,7 +110,9 @@ function fakeStorageStrategy(): unknown {
   return {
     getStorageIdentifier: async (identifier: { path: string }) => {
       const pod = storageByPath[identifier.path]
-      if (!pod) throw new Error(`no storage for ${identifier.path}`)
+      if (!pod) {
+        throw new Error(`no storage for ${identifier.path}`)
+      }
       return { path: pod }
     },
   }
@@ -127,7 +131,9 @@ function accessorFor(endpoint: string): {
   calls: { method: string; path: string }[]
 } {
   const instance = cssMock.instances.find((candidate) => candidate.endpoint === endpoint)
-  if (!instance) throw new Error(`no delegate was constructed for ${endpoint}`)
+  if (!instance) {
+    throw new Error(`no delegate was constructed for ${endpoint}`)
+  }
   return instance
 }
 

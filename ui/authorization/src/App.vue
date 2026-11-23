@@ -21,8 +21,11 @@ const coreStore = useCoreStore()
 watch(
   () => coreStore.userId,
   (userId) => {
-    if (userId) startEvents()
-    else stopEvents()
+    if (userId) {
+      startEvents()
+    } else {
+      stopEvents()
+    }
   },
   { immediate: true }
 )
@@ -30,8 +33,11 @@ watch(
 const theme = useTheme()
 
 function toggleDark(on: boolean) {
-  if (on) theme.change('dark')
-  else theme.change('light')
+  if (on) {
+    theme.change('dark')
+  } else {
+    theme.change('light')
+  }
 }
 
 const mq = window.matchMedia('(prefers-color-scheme: dark)')

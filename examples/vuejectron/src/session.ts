@@ -13,7 +13,9 @@ let cached: BrowserSession | undefined
  * authorization code redirect and reloads.
  */
 export function browserSession(): BrowserSession {
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
   const config = getRuntimeConfig()
   cached = createBrowserSession({
     issuer: config.defaultOidcIssuer,

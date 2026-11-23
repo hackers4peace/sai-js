@@ -37,7 +37,9 @@ export async function createRoleAt(
   role: RoleData
 ): Promise<void> {
   const existing = await fetch(role.id, { method: 'HEAD' })
-  if (existing.status === 200) return
+  if (existing.status === 200) {
+    return
+  }
   await createResource(data.id, role.id, { fetch }, false, withContext(dataModelContext, role))
 }
 

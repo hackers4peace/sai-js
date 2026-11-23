@@ -138,7 +138,9 @@ export async function revokeGrantsClosure(
   // IRI with no body is already gone and stays an idempotent echo (regardless
   // of where its path would have placed it).
   const loaded = await getGrantsAuthority(transport, grants)
-  if (loaded.size === 0) return []
+  if (loaded.size === 0) {
+    return []
+  }
 
   // B2: existing grants must all agree on one data owner; a request mixing
   // owners fails as a whole before any authority check or mutation.
@@ -183,7 +185,9 @@ export async function revokeGrantsClosure(
 
   const closure = new Map<string, RevokedGrant>()
   for (const grant of invalid) {
-    if (!grant.id) continue
+    if (!grant.id) {
+      continue
+    }
     closure.set(grant.id, {
       iri: grant.id,
       dataOwner: grant.dataOwner,
@@ -204,7 +208,9 @@ async function readRoles(
   registrySet: RegistrySetData
 ): Promise<RoleData[]> {
   const roleRegistry = registrySet.hasRoleRegistry?.id
-  if (!roleRegistry) return []
+  if (!roleRegistry) {
+    return []
+  }
   const iris = await listContained(transport, roleRegistry)
   const roles = await Promise.all(iris.map((iri) => getRoleFromSparql(transport, iri)))
   return roles.filter((role): role is RoleData => Boolean(role))
@@ -328,7 +334,9 @@ export class AuthorizationAgent {
   /** A transport restricted to the session's own pods; throws when not allowed. */
   public sparqlTransportFor(iri: string): SparqlTransport {
     const endpoint = this.resolveEndpoint(iri)
-    if (!endpoint) throw new Error(`session is not allowed to read ${iri}`)
+    if (!endpoint) {
+      throw new Error(`session is not allowed to read ${iri}`)
+    }
     return localSparqlTransport(endpoint)
   }
 
@@ -462,9 +470,13 @@ export class AuthorizationAgent {
    * authoritative across servers.
    */
   public async getRegistrySet(webId: string): Promise<RegistrySetData> {
-    if (webId === this.webId) return this.registrySet
+    if (webId === this.webId) {
+      return this.registrySet
+    }
     const cached = this.registrySets.get(webId)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const authorizationAgentIri = await discoverAuthorizationAgent(webId, this.fetch)
     if (!authorizationAgentIri) {
       throw new Error(`cannot discover authorization agent for ${webId}`)
@@ -537,8 +549,12 @@ export class AuthorizationAgent {
     const dataAuthorizations = (
       await Promise.all(iris.map((iri) => getDataAuthorizationFromSparql(transport, iri)))
     ).filter((dataAuthorization) => {
-      if (!dataAuthorization.type.includes(INTEROP.DataAuthorization)) return false
-      if (dataAuthorization.grantee === peerId) return false
+      if (!dataAuthorization.type.includes(INTEROP.DataAuthorization)) {
+        return false
+      }
+      if (dataAuthorization.grantee === peerId) {
+        return false
+      }
       return (
         dataAuthorization.dataOwner === peerId ||
         (!roleId && dataAuthorization.scopeOfAuthorization === INTEROP.All)
@@ -548,7 +564,9 @@ export class AuthorizationAgent {
     const seen = new Set<string>()
     for (const dataAuthorization of dataAuthorizations) {
       const grantee = dataAuthorization.grantee
-      if (seen.has(grantee)) continue
+      if (seen.has(grantee)) {
+        continue
+      }
       seen.add(grantee)
       grantees.push(await this.typeGrantee(grantee))
     }
@@ -568,16 +586,22 @@ export class AuthorizationAgent {
       iris.map((iri) => getDataAuthorizationFromSparql(transport, iri))
     )
     for (const dataAuthorization of dataAuthorizations) {
-      if (!dataAuthorization.type.includes(INTEROP.DataAuthorization)) continue
+      if (!dataAuthorization.type.includes(INTEROP.DataAuthorization)) {
+        continue
+      }
       const grantee = dataAuthorization.grantee
       const isGranteeMatch = grantee === roleId
       const isDataOwnerMatch = dataAuthorization.dataOwner === roleId && grantee !== roleId
-      if (!isGranteeMatch && !isDataOwnerMatch) continue
+      if (!isGranteeMatch && !isDataOwnerMatch) {
+        continue
+      }
       if (!seenAuthorizations.has(dataAuthorization.id!)) {
         seenAuthorizations.add(dataAuthorization.id!)
         authorizations.push({ id: dataAuthorization.id, type: dataAuthorization.type })
       }
-      if (isGranteeMatch) usedAsGrantee = true
+      if (isGranteeMatch) {
+        usedAsGrantee = true
+      }
       if (isDataOwnerMatch && !seenGrantees.has(grantee)) {
         seenGrantees.add(grantee)
         affectedGrantees.push(await this.typeGrantee(grantee))
@@ -590,7 +614,9 @@ export class AuthorizationAgent {
   public async getGrantees(grantee: AgentOrRoleId): Promise<AgentId[]> {
     if (grantee.type.includes(INTEROP.Role)) {
       const role = await this.findRole(grantee.id)
-      if (!role) throw new Error(`role not found: ${grantee.id}`)
+      if (!role) {
+        throw new Error(`role not found: ${grantee.id}`)
+      }
       return (role.members ?? []).map((member) => ({ id: member, type: [INTEROP.SocialAgent] }))
     }
     return [grantee as AgentId]
@@ -622,7 +648,9 @@ export class AuthorizationAgent {
     const socialIris = await listContained(transport, this.registrySet.hasSocialAgentRegistry.id)
     for (const registrationIri of socialIris) {
       const registration = await getRegistrationFromSparql(transport, registrationIri)
-      if (registration.registeredAgent === iri) return this.agentIdFromRegistration(registration)
+      if (registration.registeredAgent === iri) {
+        return this.agentIdFromRegistration(registration)
+      }
     }
     const applicationIris = await listContained(
       transport,
@@ -630,10 +658,14 @@ export class AuthorizationAgent {
     )
     for (const registrationIri of applicationIris) {
       const registration = await getApplicationRegistration(transport, registrationIri)
-      if (registration.registeredAgent === iri) return this.agentIdFromRegistration(registration)
+      if (registration.registeredAgent === iri) {
+        return this.agentIdFromRegistration(registration)
+      }
     }
     const role = await this.findRole(iri)
-    if (role) return { id: iri, type: [INTEROP.Role] }
+    if (role) {
+      return { id: iri, type: [INTEROP.Role] }
+    }
     throw new Error('agent or role registration for the grantee does not exist')
   }
 
@@ -757,14 +789,18 @@ export class AuthorizationAgent {
    */
   public async discoverReciprocal(data: SocialAgentRegistrationData): Promise<string | null> {
     const authrizationAgentIri = await discoverAuthorizationAgent(data.registeredAgent, this.fetch)
-    if (!authrizationAgentIri) return null
+    if (!authrizationAgentIri) {
+      return null
+    }
     return (await discoverAgentRegistration(authrizationAgentIri, this.fetch)) ?? null
   }
 
   /** Discover the reciprocal registration and patch the link onto the registration. */
   public async discoverAndUpdateReciprocal(data: SocialAgentRegistrationData): Promise<void> {
     const reciprocalRegistrationIri = await this.discoverReciprocal(data)
-    if (!reciprocalRegistrationIri) return
+    if (!reciprocalRegistrationIri) {
+      return
+    }
     const doc = withContext(dataModelContext, {
       id: data.id,
       reciprocalRegistration: reciprocalRegistrationIri,

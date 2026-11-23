@@ -37,7 +37,9 @@ async function objectEndpoint(podUrl: string): Promise<ObjectEndpoint> {
   ] as string[]
   const account = kv[`accounts/data/${accountId}`] as any
   const record = Object.values<any>(account['**objectEndpoint**']).find((r) => r.podUrl === podUrl)
-  if (!record) throw new Error(`no objectEndpoint record for ${podUrl}`)
+  if (!record) {
+    throw new Error(`no objectEndpoint record for ${podUrl}`)
+  }
   return record
 }
 

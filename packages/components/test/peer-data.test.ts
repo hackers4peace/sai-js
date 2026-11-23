@@ -90,9 +90,13 @@ function fakeCtx(
   const requests: { storage: string; url: string }[] = []
   const answer = async (url: string): Promise<Response> => {
     const failed = options.status?.[url]
-    if (failed) return jsonResponse({ error: 'denied' }, failed, 'text/plain')
+    if (failed) {
+      return jsonResponse({ error: 'denied' }, failed, 'text/plain')
+    }
     const doc = byIri[url]
-    if (!doc) throw new Error(`unexpected fetch for ${url}`)
+    if (!doc) {
+      throw new Error(`unexpected fetch for ${url}`)
+    }
     return jsonResponse(doc)
   }
   const ctx = {
@@ -100,7 +104,9 @@ function fakeCtx(
     webId: options.ctxWebId ?? YOYO_WEBID,
     userWebId: options.userWebId ?? DAN_WEBID,
     storageFetch: async (storage: string) => {
-      if (options.storageFetchError) throw options.storageFetchError
+      if (options.storageFetchError) {
+        throw options.storageFetchError
+      }
       return (async (url: string) => {
         requests.push({ storage, url })
         return answer(url)
@@ -121,7 +127,9 @@ function fakeSessionCtx(
 
 const collect = async (iter: AsyncIterable<string>): Promise<string[]> => {
   const out: string[] = []
-  for await (const iri of iter) out.push(iri)
+  for await (const iri of iter) {
+    out.push(iri)
+  }
   return out
 }
 
@@ -545,7 +553,9 @@ function sparqlAdminSession(respond: (req: { url: string; init?: RequestInit }) 
   const requests: { url: string; init?: RequestInit }[] = []
   const session = fakeSession(async (url, init) => {
     requests.push({ url, init })
-    if (url === YOYO_WEBID) return jsonResponse(yoyoProfileDoc)
+    if (url === YOYO_WEBID) {
+      return jsonResponse(yoyoProfileDoc)
+    }
     return respond({ url, init })
   })
   return { session, requests }

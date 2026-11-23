@@ -62,7 +62,9 @@ export class InvitationHandler extends OperationHttpHandler {
         true
       )
       const activityRegistry = sai.registrySet.hasActivityRegistry
-      if (!activityRegistry) throw new Error('activity registry not found in registry set')
+      if (!activityRegistry) {
+        throw new Error('activity registry not found in registry set')
+      }
       const activity: Omit<AgentRegistrationAdded, 'id'> = {
         type: ['Activity', 'AgentRegistrationAdded', 'as:Add'],
         actor: sai.webId,

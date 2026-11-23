@@ -57,7 +57,9 @@ export function rewriteFixture(content: string, map: EnvMap): string {
     .split(/\r?\n/)
     .map((line) => {
       const match = line.match(graphRegExp)
-      if (!match) return rewriteIris(line)
+      if (!match) {
+        return rewriteIris(line)
+      }
       // the graph label (and block opener) only get the prefix mappings; a
       // same-line block body is rewritten like any other content
       const openerEnd = (match.index ?? 0) + match[0].length

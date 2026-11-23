@@ -39,7 +39,9 @@ export class OwnerAccessClaimValidator implements AccessClaimValidator {
         }
       )
     }
-    if (!data) throw new Error(`no owner grants for ${input.storage}`)
+    if (!data) {
+      throw new Error(`no owner grants for ${input.storage}`)
+    }
 
     const quads: Quad[] = Array.isArray(data) ? data : [...data]
     const store = new Store(quads)
@@ -65,7 +67,9 @@ export class OwnerAccessClaimValidator implements AccessClaimValidator {
       if (covering.length === 0) {
         throw new Error('no owner grant covers the access claim')
       }
-      for (const grant of covering) owners.add(grant.grantedBy)
+      for (const grant of covering) {
+        owners.add(grant.grantedBy)
+      }
     }
     if (owners.size !== 1) {
       throw new Error('the access claim is covered by grants from more than one assigner')

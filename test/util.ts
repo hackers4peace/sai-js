@@ -36,7 +36,9 @@ let rpcRequestId = 0
 
 export function rpcPayload(request: unknown): string {
   const tag = (request as { _tag?: string })._tag
-  if (!tag) throw new Error('RPC request must have a _tag')
+  if (!tag) {
+    throw new Error('RPC request must have a _tag')
+  }
   return `${JSON.stringify({
     _tag: 'Request',
     id: String(++rpcRequestId),
@@ -154,7 +156,9 @@ export function needBasedAccessRequestPayload({
       addNeed(child, needId)
     }
   }
-  for (const need of group.hasAccessNeed) addNeed(need)
+  for (const need of group.hasAccessNeed) {
+    addNeed(need)
+  }
   return JSON.stringify({
     '@context': WIRE_CONTEXT,
     type: ['AccessRequest', 'NeedBasedAccessRequest'],
@@ -176,10 +180,14 @@ export function parseRpcResult<T = any>(
   const exit = messages.find((message) => message._tag === 'Exit')
   if (!exit) {
     const defect = messages.find((message) => message._tag === 'Defect')
-    if (defect) throw new Error(`RPC defect: ${defect.defect?.message ?? JSON.stringify(defect)}`)
+    if (defect) {
+      throw new Error(`RPC defect: ${defect.defect?.message ?? JSON.stringify(defect)}`)
+    }
     throw new Error(`RPC response has no Exit: ${body}`)
   }
-  if (exit.exit?._tag === 'Success') return { _tag: 'Success', value: exit.exit.value }
+  if (exit.exit?._tag === 'Success') {
+    return { _tag: 'Success', value: exit.exit.value }
+  }
   return {
     _tag: 'Failure',
     message: exit.exit?.cause?.message ?? JSON.stringify(exit.exit),
@@ -202,7 +210,9 @@ export async function rpcCall<T = any>(payload: string, cookie: string): Promise
     },
     body: payload,
   })
-  if (response.status !== 200) throw new Error(`rpc failed with HTTP ${response.status}`)
+  if (response.status !== 200) {
+    throw new Error(`rpc failed with HTTP ${response.status}`)
+  }
   const result = parseRpcResult<T>(await response.text())
   if (result._tag !== 'Success') {
     throw new Error(`rpc returned Failure: ${result.message}`)
@@ -283,9 +293,13 @@ export async function openNotificationStream(
 ): Promise<NotificationStream> {
   const headResponse = await authFetch(resourceId, { method: 'HEAD' })
   const linkHeader = headResponse.headers.get('link')
-  if (!linkHeader) throw new Error('Link header is missing')
+  if (!linkHeader) {
+    throw new Error('Link header is missing')
+  }
   const receiveFrom = getNotificationChannel(linkHeader)
-  if (!receiveFrom) throw new Error(`Failed to discover notification chanel for: ${resourceId}`)
+  if (!receiveFrom) {
+    throw new Error(`Failed to discover notification chanel for: ${resourceId}`)
+  }
 
   const response = await authFetch(receiveFrom, { headers: { accept: 'application/x-ndjson' } })
   if (!response.ok) {
@@ -307,7 +321,9 @@ export async function openNotificationStream(
       if (newlineIndex >= 0) {
         const line = buffer.slice(0, newlineIndex).trim()
         buffer = buffer.slice(newlineIndex + 1)
-        if (!line) continue
+        if (!line) {
+          continue
+        }
         if (!initialDiscarded) {
           initialDiscarded = true
           continue
@@ -315,7 +331,9 @@ export async function openNotificationStream(
         return JSON.parse(line) as Record<string, unknown>
       }
       const { done, value } = await reader.read()
-      if (done) return undefined
+      if (done) {
+        return undefined
+      }
       buffer += decoder.decode(value, { stream: true })
     }
   }
@@ -340,10 +358,14 @@ export async function awaitNotification(
   try {
     while (true) {
       const doc = await stream.next()
-      if (!doc) return false
+      if (!doc) {
+        return false
+      }
       const dataset = await toStore(doc)
       const receivedType = getOneMatchingQuad(dataset, undefined, RDF.terms.type)!.object.value
-      if (!expectedType || receivedType === expectedType) return true
+      if (!expectedType || receivedType === expectedType) {
+        return true
+      }
     }
   } finally {
     await stream.close()
@@ -373,13 +395,17 @@ export async function waitFor<T>(
   while (Date.now() < deadline) {
     try {
       const result = await predicate()
-      if (result) return result
+      if (result) {
+        return result
+      }
     } catch (err) {
       lastError = err
     }
     await new Promise((resolve) => setTimeout(resolve, interval))
   }
-  if (lastError) throw lastError
+  if (lastError) {
+    throw lastError
+  }
   throw new Error(`waitFor timed out after ${timeout}ms`)
 }
 
@@ -397,7 +423,9 @@ async function pendingActivitiesFor(
   session: AuthorizationAgent
 ): Promise<ActivityData[] | undefined> {
   const registry = session.registrySet.hasActivityRegistry
-  if (!registry) return []
+  if (!registry) {
+    return []
+  }
   let iris: string[]
   try {
     iris = await ActivityRegistry.getActivityIris(
@@ -474,7 +502,9 @@ export async function waitForQuiescence(
     )
     if (total === 0) {
       settled += 1
-      if (settled >= settle) return
+      if (settled >= settle) {
+        return
+      }
     } else {
       settled = 0
     }
@@ -508,7 +538,9 @@ export async function awaitGrantCompletion(
   // CSS delivers the activity Add to the pre-seeded webhook channel (Phase 2) —
   // the workflow runs and the registration Update arrives on this stream
   const received = await awaitNotification(stream, AS.Update)
-  if (!received) throw new Error(`expected registration Update on ${registrationId}`)
+  if (!received) {
+    throw new Error(`expected registration Update on ${registrationId}`)
+  }
   await waitForQuiescence(webIds)
 }
 
@@ -529,7 +561,9 @@ export async function waitForActivityCompletion(
           registry,
           localSparqlTransport(session.sparqlEndpoint)
         )
-        if (!completed.length) return false
+        if (!completed.length) {
+          return false
+        }
         const iris = await ActivityRegistry.getActivityIris(
           registry,
           localSparqlTransport(session.sparqlEndpoint)
@@ -695,21 +729,29 @@ export async function awaitEvent(
   try {
     for (;;) {
       const { done, value } = await reader.read()
-      if (done) return undefined
+      if (done) {
+        return undefined
+      }
       buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
       buffer = lines.pop() ?? ''
       for (const line of lines) {
-        if (!line) continue
+        if (!line) {
+          continue
+        }
         const message = JSON.parse(line) as { type: string; activity?: any }
-        if (predicate(message)) return message
+        if (predicate(message)) {
+          return message
+        }
       }
     }
   } finally {
     reader.releaseLock()
     // keep the stream open between staged reads (pending → done on the same
     // connection); the caller closes it on the final read
-    if (options.close) await response.body.cancel()
+    if (options.close) {
+      await response.body.cancel()
+    }
   }
   return undefined
 }

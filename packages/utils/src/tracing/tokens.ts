@@ -84,7 +84,9 @@ export function isRawTokenCaptureEnabled(): boolean {
 
 function setStringAttributes(span: Span, values: Record<string, unknown>): void {
   for (const [key, value] of Object.entries(values)) {
-    if (typeof value === 'string') span.setAttribute(key, value)
+    if (typeof value === 'string') {
+      span.setAttribute(key, value)
+    }
   }
 }
 
@@ -106,15 +108,21 @@ export function setTokenAttributes(
   token: string,
   options: TokenCaptureOptions = {}
 ): void {
-  if (!span.isRecording() || !isTokenCaptureEnabled()) return
+  if (!span.isRecording() || !isTokenCaptureEnabled()) {
+    return
+  }
 
   const prefix = `sai.token.${role}`
   span.setAttribute(`${prefix}.bytes`, token.length)
   const digest = sha256(token)
-  if (digest) span.setAttribute(`${prefix}.sha256`, digest)
+  if (digest) {
+    span.setAttribute(`${prefix}.sha256`, digest)
+  }
 
   const raw = options.raw ?? isRawTokenCaptureEnabled()
-  if (raw) span.setAttribute(`${prefix}.jwt`, token)
+  if (raw) {
+    span.setAttribute(`${prefix}.jwt`, token)
+  }
 
   let header: Record<string, unknown> | undefined
   try {
@@ -128,7 +136,9 @@ export function setTokenAttributes(
     span,
     Object.fromEntries(HEADER_FIELDS.map((field) => [`${prefix}.${field}`, header?.[field]]))
   )
-  if (typeof header !== 'undefined') span.setAttribute(`${prefix}.header`, JSON.stringify(header))
+  if (typeof header !== 'undefined') {
+    span.setAttribute(`${prefix}.header`, JSON.stringify(header))
+  }
 
   let claims: Record<string, unknown>
   try {
@@ -145,7 +155,9 @@ export function setTokenAttributes(
   )
   for (const claim of NUMERIC_CLAIMS) {
     const value = claims[claim]
-    if (typeof value === 'number') span.setAttribute(`${prefix}.${claim}`, value)
+    if (typeof value === 'number') {
+      span.setAttribute(`${prefix}.${claim}`, value)
+    }
   }
 
   const aud = claims.aud
@@ -188,7 +200,9 @@ const JWT_PATTERN = /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,
  * credentials, so only a collector we control should receive them.
  */
 export function setBodyAttribute(span: Span, key: string, body: string): void {
-  if (!span.isRecording() || !isBodyCaptureEnabled()) return
+  if (!span.isRecording() || !isBodyCaptureEnabled()) {
+    return
+  }
   const redacted = isRawTokenCaptureEnabled() ? body : redactTokens(body)
   span.setAttribute(
     key,

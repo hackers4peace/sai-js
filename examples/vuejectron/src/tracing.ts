@@ -41,7 +41,9 @@ const DEFAULT_PROPAGATE_TO = ['^https://[^/]*\\.docker/']
 
 export function initTracing(config: RuntimeConfig): void {
   const tracing = config.tracing
-  if (!tracing?.enabled) return
+  if (!tracing?.enabled) {
+    return
+  }
 
   // The `sai.lws.*` client spans record bodies/claims only when the deployment
   // asks for them (`OTEL_CAPTURE_*` is the server-side equivalent).
@@ -97,6 +99,8 @@ export function initTracing(config: RuntimeConfig): void {
     void provider.forceFlush()
   })
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') void provider.forceFlush()
+    if (document.visibilityState === 'hidden') {
+      void provider.forceFlush()
+    }
   })
 }

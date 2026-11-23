@@ -74,7 +74,9 @@ describe('loadDataInstance — flat LWS parent resolution (`up` link)', () => {
           json: async () => ({}),
         } as unknown as Response
       }
-      if (docs[url]) return jsonResponse(docs[url])
+      if (docs[url]) {
+        return jsonResponse(docs[url])
+      }
       throw new Error(`unexpected request: ${init?.method ?? 'GET'} ${url}`)
     }) as unknown as Parameters<typeof loadDataInstance>[1]
 

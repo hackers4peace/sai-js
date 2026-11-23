@@ -92,7 +92,9 @@ export class UiPushSubscriptionStore extends Initializer {
     accountId: string,
     subscription: PushSubscription
   ): Promise<void> {
-    if (await this.checkIfExists(accountId, subscription)) return
+    if (await this.checkIfExists(accountId, subscription)) {
+      return
+    }
     await this.storage.create(UI_PUSH_SUBSCRIPTION_STORAGE_TYPE, {
       webId,
       accountId,

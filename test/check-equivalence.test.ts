@@ -67,7 +67,9 @@ async function acmeRegistrationIris(): Promise<string[]> {
 async function applicationRegistrationIris(): Promise<string[]> {
   const session = await buildSessionManager().getSession(aliceId)
   const listed = await session.findApplicationRegistration(testClientId)
-  if (!listed) throw new Error('alice has no registration of the test client')
+  if (!listed) {
+    throw new Error('alice has no registration of the test client')
+  }
   const registration = await getApplicationRegistration(
     localSparqlTransport(session.sparqlEndpoint),
     listed.id
@@ -85,11 +87,15 @@ async function stableApplicationRegistrationIris(): Promise<string[]> {
   const result = await waitFor<string[] | false>(async () => {
     const current = await applicationRegistrationIris()
     const key = current.join(',')
-    if (previous !== undefined && key === previous) return current
+    if (previous !== undefined && key === previous) {
+      return current
+    }
     previous = key
     return false
   })
-  if (result === false) throw new Error('registration projection never stabilized')
+  if (result === false) {
+    throw new Error('registration projection never stabilized')
+  }
   return result
 }
 

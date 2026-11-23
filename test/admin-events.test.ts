@@ -244,7 +244,9 @@ async function fetchRegistrySetAcr(webId: string): Promise<{ acrId: string; doc:
   const manager = buildSessionManager()
   const session = await manager.getSession(webId)
   const acrId = await discoverAccessResource(session.registrySet.id, session.fetch)
-  if (!acrId) throw new Error(`no acl link on registry set: ${session.registrySet.id}`)
+  if (!acrId) {
+    throw new Error(`no acl link on registry set: ${session.registrySet.id}`)
+  }
   return { acrId, doc: await fetchJsonLd(acrId, session.fetch) }
 }
 

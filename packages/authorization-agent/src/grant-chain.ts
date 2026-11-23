@@ -58,11 +58,17 @@ function upstreamKey(dataOwner: string, grantee: string | undefined, grant: Gran
  * (or a broader scope), but it never covers a non-inherited scope.
  */
 export function scopeCovers(upstream: string, downstream: string): boolean {
-  if (upstream === downstream) return true
-  if (upstream === INTEROP.All) return true
+  if (upstream === downstream) {
+    return true
+  }
+  if (upstream === INTEROP.All) {
+    return true
+  }
   const up = SCOPE_ORDER[upstream]
   const down = SCOPE_ORDER[downstream]
-  if (up === undefined || down === undefined) return false
+  if (up === undefined || down === undefined) {
+    return false
+  }
 
   if (downstream === INTEROP.Inherited) {
     // a child grant is a subset of its parent's registration; a same-shape
@@ -70,7 +76,9 @@ export function scopeCovers(upstream: string, downstream: string): boolean {
     // not (we cannot prove the child instances are in the selection)
     return up >= SCOPE_ORDER[INTEROP.AllFromRegistry]
   }
-  if (upstream === INTEROP.Inherited) return false
+  if (upstream === INTEROP.Inherited) {
+    return false
+  }
   // AllFromAgent / AllFromRole are broader than a single registration; the
   // caller enforces the same dataOwner, so they cover this owner's grants.
   return up > down
@@ -86,7 +94,9 @@ export function accessModesCover(
   downstream: readonly string[] | undefined
 ): boolean {
   const required = downstream ?? []
-  if (required.length === 0) return false
+  if (required.length === 0) {
+    return false
+  }
   const available = new Set(upstream ?? [])
   return required.every((mode) => available.has(mode))
 }
@@ -105,7 +115,9 @@ export function selectedInstancesCover(
   hasDataInstance: readonly string[] | undefined,
   requested: readonly string[]
 ): boolean {
-  if (requested.length === 0) return true
+  if (requested.length === 0) {
+    return true
+  }
   if (
     scopeOfGrant === INTEROP.All ||
     scopeOfGrant === INTEROP.AllFromAgent ||
@@ -114,14 +126,18 @@ export function selectedInstancesCover(
   ) {
     return true
   }
-  if (scopeOfGrant !== INTEROP.SelectedFromRegistry) return false
+  if (scopeOfGrant !== INTEROP.SelectedFromRegistry) {
+    return false
+  }
   const available = new Set(hasDataInstance ?? [])
   return requested.every((instance) => available.has(instance))
 }
 
 /** For a selected downstream scope, the upstream must include the instances. */
 export function instancesCover(upstream: GrantData, downstream: GrantData): boolean {
-  if (downstream.scopeOfGrant !== INTEROP.SelectedFromRegistry) return true
+  if (downstream.scopeOfGrant !== INTEROP.SelectedFromRegistry) {
+    return true
+  }
   return selectedInstancesCover(
     upstream.scopeOfGrant,
     upstream.hasDataInstance,
@@ -135,7 +151,9 @@ export function instancesCover(upstream: GrantData, downstream: GrantData): bool
  * storage and coverage). Does NOT check the upstream's own validity.
  */
 export function grantCovers(upstream: GrantData, downstream: GrantData): boolean {
-  if (!upstream.registeredShapeTree || !downstream.registeredShapeTree) return false
+  if (!upstream.registeredShapeTree || !downstream.registeredShapeTree) {
+    return false
+  }
   const needsRegistration =
     upstream.scopeOfGrant !== INTEROP.AllFromAgent &&
     downstream.scopeOfGrant !== INTEROP.AllFromAgent
@@ -183,7 +201,9 @@ export function grantChainValidity(
   const removedSet = new Set(removed)
   const byId = new Map<string, GrantData>()
   for (const grant of grants) {
-    if (grant.id) byId.set(grant.id, grant)
+    if (grant.id) {
+      byId.set(grant.id, grant)
+    }
   }
 
   const valid = new Map<string, boolean>()
@@ -214,7 +234,9 @@ export function grantChainValidity(
   while (changed) {
     changed = false
     for (const [id, grant] of byId) {
-      if (valid.get(id) || removedSet.has(id)) continue
+      if (valid.get(id) || removedSet.has(id)) {
+        continue
+      }
 
       let next = false
       if (grant.inheritsFromGrant) {
@@ -230,8 +252,12 @@ export function grantChainValidity(
             // a delegated child also needs its own valid upstream (the source
             // grant for its shape tree/registration)
             for (const candidate of candidatesFor(grant)) {
-              if (candidate.id === id) continue
-              if (valid.get(candidate.id!) !== true) continue
+              if (candidate.id === id) {
+                continue
+              }
+              if (valid.get(candidate.id!) !== true) {
+                continue
+              }
               if (grantCovers(candidate, grant)) {
                 next = true
                 break
@@ -241,8 +267,12 @@ export function grantChainValidity(
         }
       } else if (grant.grantedBy !== grant.dataOwner) {
         for (const candidate of candidatesFor(grant)) {
-          if (candidate.id === id) continue
-          if (valid.get(candidate.id!) !== true) continue
+          if (candidate.id === id) {
+            continue
+          }
+          if (valid.get(candidate.id!) !== true) {
+            continue
+          }
           if (grantCovers(candidate, grant)) {
             next = true
             break
@@ -281,7 +311,9 @@ export function invalidGrantsAfterRemoval(
 
   const invalid = new Set<string>()
   for (const grant of grants) {
-    if (!grant.id) continue
+    if (!grant.id) {
+      continue
+    }
     if (removedSet.has(grant.id)) {
       invalid.add(grant.id)
       continue
@@ -297,7 +329,9 @@ export function invalidGrantsAfterRemoval(
   while (changed) {
     changed = false
     for (const grant of grants) {
-      if (!grant.id || invalid.has(grant.id)) continue
+      if (!grant.id || invalid.has(grant.id)) {
+        continue
+      }
       if (grant.inheritsFromGrant && invalid.has(grant.inheritsFromGrant)) {
         invalid.add(grant.id)
         changed = true
@@ -314,6 +348,8 @@ export function isGrantValid(
   grants: readonly GrantData[],
   removed: Iterable<string> = []
 ): boolean {
-  if (!grant.id) return false
+  if (!grant.id) {
+    return false
+  }
   return grantChainValidity(grants, removed).get(grant.id) === true
 }

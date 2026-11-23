@@ -94,14 +94,20 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
 
   private async isOwner(storage: string, subject: string, client: string): Promise<boolean> {
     const pod = await this.podStore.findByBaseUrl(storage)
-    if (!pod) return false
+    if (!pod) {
+      return false
+    }
     const owners = await this.podStore.getOwners(pod.id)
-    if (!owners.some((owner) => owner.webId === subject)) return false
+    if (!owners.some((owner) => owner.webId === subject)) {
+      return false
+    }
     return (await this.agentOf(subject)) === client
   }
 
   private async isAdmin(storage: string, subject: string, client: string): Promise<boolean> {
-    if ((await this.agentOf(subject)) !== client) return false
+    if ((await this.agentOf(subject)) !== client) {
+      return false
+    }
     let data: Awaited<ReturnType<SaiAuthorizationManager['getAuthorizationData']>>
     try {
       data = await this.manager.getAuthorizationData(storage)
@@ -110,7 +116,9 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
       this.logger.warn(`could not read admin grants for ${storage}: ${(error as Error).message}`)
       return false
     }
-    if (!data) return false
+    if (!data) {
+      return false
+    }
     const store = new Store(Array.isArray(data) ? data : [...data])
     const assignee = namedNode(subject)
     for (const grant of store.getSubjects(
@@ -130,8 +138,9 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
       }
       for (const policy of store.getObjects(grant, namedNode(LWS.access), null)) {
         for (const permission of store.getObjects(policy, namedNode(ODRL.permission), null)) {
-          if (store.countQuads(permission, namedNode(ODRL.assignee), assignee, null) > 0)
+          if (store.countQuads(permission, namedNode(ODRL.assignee), assignee, null) > 0) {
             return true
+          }
         }
       }
     }
@@ -140,7 +149,9 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
 
   private agentOf(subject: string): Promise<string | undefined> {
     const cached = this.agents.get(subject)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const discovery = this.discoverAgent(subject).catch((error: unknown) => {
       this.logger.warn(`UAS discovery failed for ${subject}: ${(error as Error).message}`)
       return undefined

@@ -44,9 +44,13 @@ export class SaiAuthorizationManager implements AuthorizationManager {
    */
   private async resolveRegistryEndpoint(storageUrl: string): Promise<string | undefined> {
     const pod = await this.podStore.findByBaseUrl(storageUrl)
-    if (!pod) return undefined
+    if (!pod) {
+      return undefined
+    }
     const owner = (await this.podStore.getOwners(pod.id))?.[0]?.webId
-    if (!owner) return undefined
+    if (!owner) {
+      return undefined
+    }
     const record = await this.endpointStore.findSparqlByPodUrl(registryId(owner))
     return record?.endpoint
   }
@@ -60,7 +64,9 @@ export class SaiAuthorizationManager implements AuthorizationManager {
       return undefined
     }
     const endpoint = await this.resolveRegistryEndpoint(storage.path)
-    if (!endpoint) return undefined
+    if (!endpoint) {
+      return undefined
+    }
 
     try {
       const bindingsStream = await this.fetcher.fetchBindings(

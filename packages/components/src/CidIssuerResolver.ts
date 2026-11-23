@@ -106,7 +106,9 @@ export class CidIssuerResolver {
       return false
     }
     return toArray(document.service).some((service): boolean => {
-      if (!isJsonObject(service)) return false
+      if (!isJsonObject(service)) {
+        return false
+      }
       const types = toArray(service.type)
       const endpoints = toArray(service.serviceEndpoint)
       return (
@@ -144,7 +146,9 @@ export class CidIssuerResolver {
           quad.predicate.value === RDF_TYPE &&
           quad.object.value === LWS_OPENID_PROVIDER
       )
-      if (!hasType) return false
+      if (!hasType) {
+        return false
+      }
       return quads.some(
         (quad): boolean =>
           quad.subject.value === service &&
@@ -161,7 +165,9 @@ export class CidIssuerResolver {
    */
   public async getKeySet(issuer: string): Promise<JWTVerifyGetKey> {
     const cached = this.keySets.get(issuer)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
 
     const jwksUri = await this.discoverJwksUri(issuer)
     const keySet = createRemoteJWKSet(new URL(jwksUri))

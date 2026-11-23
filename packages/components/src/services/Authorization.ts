@@ -154,7 +154,9 @@ async function findUserDataRegistrations(
     )
     for (const accessNeed of accessNeedGroup.accessNeeds) {
       for (const dataRegistration of registrations) {
-        if (dataRegistration.registeredShapeTree !== accessNeed.registeredShapeTree) continue
+        if (dataRegistration.registeredShapeTree !== accessNeed.registeredShapeTree) {
+          continue
+        }
         dataRegistrations.push({
           id: IRI.make(dataRegistration.id),
           dataRegistry: IRI.make(podUrl),
@@ -278,7 +280,9 @@ export const getDescriptions = async (
     // `hasAccessNeedGroup` supplies the group; anything else must pass it
     // explicitly (access need groups on registrations are retired)
     const clientIdDocument = await loadClientIdDocument(agentIri, ctx.session.fetch)
-    if (!clientIdDocument.hasAccessNeedGroup) return null
+    if (!clientIdDocument.hasAccessNeedGroup) {
+      return null
+    }
     accessNeedGroupIriResolved = clientIdDocument.hasAccessNeedGroup
   }
 
@@ -491,7 +495,9 @@ export function toAuthorizationRevocationFailure(err: unknown): AuthorizationRev
         return { code: err.code, authorizations: err.authorizations as IRI[] }
     }
   }
-  if (err instanceof ContextError) return { code: 'unauthorized', authorizations: [] }
+  if (err instanceof ContextError) {
+    return { code: 'unauthorized', authorizations: [] }
+  }
   throw err
 }
 
@@ -517,9 +523,13 @@ export const revokeAuthorizations = async (
     )
   }
   const registry = ctx.registrySet.hasAuthorizationRegistry
-  if (!registry) throw new Error('authorization registry not found in registry set')
+  if (!registry) {
+    throw new Error('authorization registry not found in registry set')
+  }
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
 
   const transport = sparqlTransportFor(ctx)
   // membership is checked against the context's authorization registry; an IRI
@@ -533,7 +543,9 @@ export const revokeAuthorizations = async (
   const queue = [...authorizations]
   while (queue.length > 0) {
     const iri = queue.shift()!
-    if (refs.has(iri) || !contained.has(iri)) continue
+    if (refs.has(iri) || !contained.has(iri)) {
+      continue
+    }
     const dataAuthorization = await getDataAuthorizationFromSparql(transport, iri)
     if (!dataAuthorization.type.includes(INTEROP.DataAuthorization)) {
       throw new AuthorizationRevocationError(
@@ -542,7 +554,9 @@ export const revokeAuthorizations = async (
         `resource ${iri} is not a DataAuthorization`
       )
     }
-    if (grantee === undefined) grantee = dataAuthorization.grantee
+    if (grantee === undefined) {
+      grantee = dataAuthorization.grantee
+    }
     if (dataAuthorization.grantee !== grantee) {
       throw new AuthorizationRevocationError(
         'mixed-grantee',
@@ -554,12 +568,16 @@ export const revokeAuthorizations = async (
     // the inheritance closure is expanded at write time — after the workflow
     // deletes the DAs the tree is gone
     for (const child of await findInheritingAuthorizations(transport, iri)) {
-      if (!refs.has(child)) queue.push(child)
+      if (!refs.has(child)) {
+        queue.push(child)
+      }
     }
   }
 
   // all selected authorizations already removed → no-op success
-  if (refs.size === 0) return { authorizations: [] }
+  if (refs.size === 0) {
+    return { authorizations: [] }
+  }
 
   const activity: Omit<AuthorizationRevoked, 'id'> = {
     type: ['Activity', 'AuthorizationRevoked'],
@@ -615,7 +633,9 @@ export const recordAuthorization = async (
     : undefined
 
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
 
   // the deny snapshot carrier (no DataAuthorization is created — grantee rides
   // here; term-covered subset). Written as the `AuthorizationDenied` activity
@@ -728,7 +748,9 @@ export async function archiveAccessRequest(
     return AccessRequestArchivedMessage.make({ archived: false })
   }
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   const activity: Omit<AccessRequestArchived, 'id'> = {
     type: ['Activity', 'AccessRequestArchived'],
     actor: ctx.webId,

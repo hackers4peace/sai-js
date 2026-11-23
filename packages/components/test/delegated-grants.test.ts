@@ -84,7 +84,9 @@ vi.mock('@temporalio/workflow', () => ({
   ParentClosePolicy: { ABANDON: 'ABANDON' },
   // the idle wait: a scripted signal (a delivery landed mid-flight) or exit
   condition: async (predicate: () => boolean) => {
-    if (!h.state.fireSignalOnNextWait) return predicate()
+    if (!h.state.fireSignalOnNextWait) {
+      return predicate()
+    }
     h.state.fireSignalOnNextWait = false
     const name = h.state.fireReconcileMirrorOnNextWait
       ? 'reconcileMirrorSignal'

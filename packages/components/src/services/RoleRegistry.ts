@@ -52,7 +52,9 @@ export const createRole = async (
   members: readonly S.Schema.Type<typeof IRI>[]
 ): Promise<S.Schema.Type<typeof RoleCreatedMessage>> => {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   // activity-first (step 9 — the createInvitation pattern): the RPC mints
   // the role id and writes `roleCreated` (object = the role-to-be at the
   // minted id, real-id embedded projection) — the createRole workflow PUTs
@@ -102,7 +104,9 @@ export const updateRole = async (
   // and PATCHes; a missing role would else leave the activity pending forever
   await loadRole(id, ctx.session.fetch)
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   // activity-first (step 2): the RPC writes the intended change only — the
   // role-to-be as a real-id embedded projection (id + type + label + full
   // members; `target` dropped — the id rides object.id). The updateRole
@@ -150,7 +154,9 @@ export const deleteRole = async (
   // the retry backstop once the workflow has deleted the resource
   const roleData = await loadRole(id, ctx.session.fetch)
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   // activity-first (step 3): the RPC writes the intended deletion only —
   // `target` dropped, the role-to-be-deleted rides `object` (real-id
   // embedded projection); the deleteRole workflow loads first (find-first),

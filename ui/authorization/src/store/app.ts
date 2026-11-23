@@ -109,7 +109,9 @@ export const useAppStore = defineStore('app', () => {
   function scheduleSnackbarHide() {
     // only the done state auto-hides; pending stays until the workflow finishes
     window.setTimeout(() => {
-      if (!activitySnackbar.visible) return
+      if (!activitySnackbar.visible) {
+        return
+      }
       activitySnackbar.visible = false
       activitySnackbar.claim = null
     }, 5_000)
@@ -136,7 +138,9 @@ export const useAppStore = defineStore('app', () => {
               a.type.includes(claim.type) &&
               (claim.object === undefined || a.object === claim.object)
           )
-    if (!found) return
+    if (!found) {
+      return
+    }
     claim.boundActivityId = found.id
     const event = streamActivities[found.id]
     if (event.status === 'done') {
@@ -151,7 +155,9 @@ export const useAppStore = defineStore('app', () => {
   /** Feed a stream event into the tracker (events.ts — every pending + done). */
   function recordActivity(activity: ActivityEvent) {
     streamActivities[activity.id] = activity
-    for (const claim of claims) bindClaim(claim)
+    for (const claim of claims) {
+      bindClaim(claim)
+    }
   }
 
   /** Claim a user-triggered action's activity and surface it in the
@@ -263,7 +269,9 @@ export const useAppStore = defineStore('app', () => {
     authorizationsGrantee = grantee
     const list = await effect.listAuthorizations(grantee, coreStore.lang, currentContext())
     // a newer request (grantee/context switch, done-row refresh) wins
-    if (request !== authorizationsRequest) return
+    if (request !== authorizationsRequest) {
+      return
+    }
     authorizationList.value = list
   }
 
@@ -271,7 +279,9 @@ export const useAppStore = defineStore('app', () => {
    *  refresh runs before the asynchronous workflow deletes the DAs, so only
    *  the AuthorizationRevoked done-row sees the post-revocation state. */
   async function refreshAuthorizations() {
-    if (!authorizationsGrantee) return
+    if (!authorizationsGrantee) {
+      return
+    }
     await listAuthorizations(authorizationsGrantee)
   }
 

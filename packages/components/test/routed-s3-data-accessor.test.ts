@@ -91,7 +91,9 @@ interface StoreOptions {
 function fakeStore(opts: StoreOptions = {}): unknown {
   return {
     findObjectByPodUrl: async (podUrl: string) => {
-      if (opts.throwOn === podUrl) throw new Error('endpoint store unavailable')
+      if (opts.throwOn === podUrl) {
+        throw new Error('endpoint store unavailable')
+      }
       return records.find((record) => record.podUrl === podUrl)
     },
   }
@@ -101,7 +103,9 @@ function fakeStorageStrategy(): unknown {
   return {
     getStorageIdentifier: async (identifier: { path: string }) => {
       const pod = storageByPath[identifier.path]
-      if (!pod) throw new Error(`no storage for ${identifier.path}`)
+      if (!pod) {
+        throw new Error(`no storage for ${identifier.path}`)
+      }
       return { path: pod }
     },
   }
@@ -120,7 +124,9 @@ function accessorFor(bucket: string): {
   calls: { method: string; path: string }[]
 } {
   const instance = s3Mock.instances.find((candidate) => candidate.args.bucket === bucket)
-  if (!instance) throw new Error(`no delegate was constructed for ${bucket}`)
+  if (!instance) {
+    throw new Error(`no delegate was constructed for ${bucket}`)
+  }
   return instance
 }
 

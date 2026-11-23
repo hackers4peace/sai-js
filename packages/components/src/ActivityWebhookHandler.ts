@@ -137,7 +137,9 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       // workflows; events stay keyed by the channel's webId, so the admin
       // channel delivers them into the admin's own UI stream.
       const isRegistryOwner = session.registrySet.hasActivityRegistry?.id === channel.topic
-      if (!isRegistryOwner) return new ResponseDescription(200)
+      if (!isRegistryOwner) {
+        return new ResponseDescription(200)
+      }
 
       const temporal = new Temporal()
       await temporal.init()
@@ -450,7 +452,9 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
       await start()
       return
     } catch (err) {
-      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
+        throw err
+      }
     }
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
@@ -461,7 +465,9 @@ export class ActivityWebhookHandler extends OperationHttpHandler {
           await start()
           return
         } catch (err2) {
-          if (!(err2 instanceof WorkflowExecutionAlreadyStartedError)) throw err2
+          if (!(err2 instanceof WorkflowExecutionAlreadyStartedError)) {
+            throw err2
+          }
         }
       }
     }

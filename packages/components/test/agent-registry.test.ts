@@ -85,9 +85,15 @@ describe('getApplications — org context lists applications via /sparql-admin',
     const session = {
       fetch: async (url: string, init?: RequestInit) => {
         requests.push({ url, init })
-        if (url === ORG_WEBID) return mockResponse(orgProfileDoc)
-        if (url === APP_WEBID) return mockResponse(clientIdDocument)
-        if (url !== sparqlAdminUrl) throw new Error(`unexpected request: ${url}`)
+        if (url === ORG_WEBID) {
+          return mockResponse(orgProfileDoc)
+        }
+        if (url === APP_WEBID) {
+          return mockResponse(clientIdDocument)
+        }
+        if (url !== sparqlAdminUrl) {
+          throw new Error(`unexpected request: ${url}`)
+        }
         const query = String(init?.body ?? '')
         if (query.includes('SELECT')) {
           // the flat registry listing must read lws:contains
@@ -153,8 +159,12 @@ describe('getSocialAgentInvitations — org context lists invitations via /sparq
   test('ldp:contains listing + per-invitation body; settled invitations excluded', async () => {
     const session = {
       fetch: async (url: string, init?: RequestInit) => {
-        if (url === ORG_WEBID) return mockResponse(orgProfileDoc)
-        if (url !== sparqlAdminUrl) throw new Error(`unexpected request: ${url}`)
+        if (url === ORG_WEBID) {
+          return mockResponse(orgProfileDoc)
+        }
+        if (url !== sparqlAdminUrl) {
+          throw new Error(`unexpected request: ${url}`)
+        }
         const query = String(init?.body ?? '')
         if (query.includes('SELECT')) {
           // the flat invitation registry listing must read lws:contains

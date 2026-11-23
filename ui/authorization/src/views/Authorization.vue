@@ -48,8 +48,12 @@ const registered = computed(() => appStore.applicationList.find((app) => app.id 
 watch(
   () => [route.query.client_id, route.query.resource],
   async ([cId, resource]) => {
-    if (route.name !== 'authorization') return
-    if (route.query.webid || route.query.role) return
+    if (route.name !== 'authorization') {
+      return
+    }
+    if (route.query.webid || route.query.role) {
+      return
+    }
     if (!cId || Array.isArray(cId)) {
       clientId.value = await coreStore.getClientInfo()
       await coreStore.setWebId()
@@ -58,7 +62,9 @@ watch(
     }
     clientId.value = cId
     if (resource) {
-      if (Array.isArray(resource)) throw new Error('only one resource is allowed')
+      if (Array.isArray(resource)) {
+        throw new Error('only one resource is allowed')
+      }
       resourceId.value = resource
     }
     const needs = route.query.needs
@@ -74,7 +80,9 @@ watch(
   (webid) => {
     if (webid) {
       appStore.listSocialAgents()
-      if (Array.isArray(webid)) throw new Error('only one agent is allowed')
+      if (Array.isArray(webid)) {
+        throw new Error('only one agent is allowed')
+      }
       agentId.value = webid
       // the approval entry (authorization-granting.md §6.8): a social-agent
       // authorization ALWAYS originates from a pending need-based access
@@ -96,7 +104,9 @@ watch(
   (roleQueryParam) => {
     if (roleQueryParam) {
       appStore.listRoles()
-      if (Array.isArray(roleQueryParam)) throw new Error('only one role is allowed')
+      if (Array.isArray(roleQueryParam)) {
+        throw new Error('only one role is allowed')
+      }
       roleId.value = roleQueryParam
       const needs = route.query.needs
       if (needs && !Array.isArray(needs)) {

@@ -36,17 +36,23 @@ function record(value: unknown): Record<string, unknown> | undefined {
 
 function targetOf(permission: Record<string, unknown>): Record<string, unknown> {
   const target = record(permission.target)
-  if (!target) throw new BadRequestHttpError('plain LWS access policy has no target')
+  if (!target) {
+    throw new BadRequestHttpError('plain LWS access policy has no target')
+  }
   return target
 }
 
 function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>[] {
   const raw = policy.permission
   const list = Array.isArray(raw) ? raw : raw ? [raw] : []
-  if (list.length === 0) throw new BadRequestHttpError('plain LWS access policy has no permission')
+  if (list.length === 0) {
+    throw new BadRequestHttpError('plain LWS access policy has no permission')
+  }
   return list.map((permission) => {
     const parsed = record(permission)
-    if (!parsed) throw new BadRequestHttpError('invalid plain LWS permission')
+    if (!parsed) {
+      throw new BadRequestHttpError('invalid plain LWS permission')
+    }
     return parsed
   })
 }
@@ -70,7 +76,9 @@ function rejectConstraints(
  * `NeedBasedAccessRequest` type, not a delegation/revocation request).
  */
 export function isPlainLwsAccessRequest(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== 'object' || value === null) return false
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
   const message = value as Record<string, unknown>
   const types = values(message.type)
   const accessRequest = types.some((type) => type === 'AccessRequest' || type === LWS.AccessRequest)
@@ -132,7 +140,9 @@ export async function plainLwsAccessRequestToNeedBased(
   const candidates = new Map<string, Candidate>()
   for (const rawPolicy of rawPolicies) {
     const policy = record(rawPolicy)
-    if (!policy) throw new BadRequestHttpError('invalid access policy')
+    if (!policy) {
+      throw new BadRequestHttpError('invalid access policy')
+    }
     const permissions = permissionsOf(policy)
     rejectConstraints(policy, permissions)
     for (const permission of permissions) {

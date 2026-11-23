@@ -36,13 +36,21 @@ const JWT_PATTERN = /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,
 
 /** Content types worth recording; anything else is skipped as binary or streamed. */
 function isCapturableContentType(contentType) {
-  if (typeof contentType !== 'string' || contentType.length === 0) return false
+  if (typeof contentType !== 'string' || contentType.length === 0) {
+    return false
+  }
   const value = contentType.split(';')[0].trim().toLowerCase()
-  if (value.includes('octet-stream')) return false
+  if (value.includes('octet-stream')) {
+    return false
+  }
   // Long-lived stream formats: cloning/buffering their body stalls the client
   // fetch until the stream ends (notification streams never do).
-  if (value.includes('x-ndjson') || value.includes('event-stream')) return false
-  if (value.startsWith('application/') || value.startsWith('text/')) return true
+  if (value.includes('x-ndjson') || value.includes('event-stream')) {
+    return false
+  }
+  if (value.startsWith('application/') || value.startsWith('text/')) {
+    return true
+  }
   return value.endsWith('+json') || value.endsWith('+xml')
 }
 
@@ -59,23 +67,35 @@ function redact(body) {
 }
 
 function toText(body) {
-  if (typeof body === 'string') return body
-  if (body instanceof URLSearchParams) return body.toString()
+  if (typeof body === 'string') {
+    return body
+  }
+  if (body instanceof URLSearchParams) {
+    return body.toString()
+  }
   return undefined
 }
 
 function record(span, key, value) {
   /* istanbul ignore next -- defensive: a broken span must never break the app */
-  if (!span || typeof span.setAttribute !== 'function') return
-  if (typeof span.isRecording === 'function' && !span.isRecording()) return
+  if (!span || typeof span.setAttribute !== 'function') {
+    return
+  }
+  if (typeof span.isRecording === 'function' && !span.isRecording()) {
+    return
+  }
   span.setAttribute(key, value)
 }
 
 function parseJwks(contentType, url, body) {
-  if (!/jwk-set\+json/iu.test(String(contentType))) return undefined
+  if (!/jwk-set\+json/iu.test(String(contentType))) {
+    return undefined
+  }
   try {
     const document = JSON.parse(body)
-    if (!Array.isArray(document.keys)) return undefined
+    if (!Array.isArray(document.keys)) {
+      return undefined
+    }
     return {
       url: String(url),
       count: document.keys.length,
@@ -95,9 +115,13 @@ function parseJwks(contentType, url, body) {
 }
 
 function captureResponseChunk(response, chunk) {
-  if (chunk === undefined || chunk === null) return
+  if (chunk === undefined || chunk === null) {
+    return
+  }
   const state = response[CAPTURED] || (response[CAPTURED] = { body: '', skipped: false })
-  if (state.skipped) return
+  if (state.skipped) {
+    return
+  }
   const contentType = response.getHeader && response.getHeader('content-type')
   if (state.body.length === 0 && !isCapturableContentType(contentType)) {
     state.skipped = true
@@ -113,7 +137,9 @@ function captureResponseChunk(response, chunk) {
 
 function installFetchCapture(options) {
   const original = globalThis.fetch
-  if (typeof original !== 'function' || original[CAPTURED]) return
+  if (typeof original !== 'function' || original[CAPTURED]) {
+    return
+  }
 
   const wrapped = async function (input, init) {
     const { trace } = require('@opentelemetry/api')
@@ -195,9 +221,13 @@ function installServerResponseCapture(options) {
  * `OTEL_CAPTURE_RAW_TOKENS` (the latter disables redaction, local debugging only).
  */
 function installHttpCapture() {
-  if (globalThis[CAPTURED]) return
+  if (globalThis[CAPTURED]) {
+    return
+  }
   globalThis[CAPTURED] = true
-  if (process.env.OTEL_CAPTURE_BODIES !== 'true') return
+  if (process.env.OTEL_CAPTURE_BODIES !== 'true') {
+    return
+  }
 
   const rawTokens = process.env.OTEL_CAPTURE_RAW_TOKENS === 'true'
   const config = { redact: rawTokens ? (body) => body : redact }

@@ -57,7 +57,9 @@ export class ReciprocalWebhookHandler extends OperationHttpHandler {
       // finally completes the activity (openwiki/architecture/federation.md)
       const session = await this.sessionManager.getSession(channel.webId)
       const activityRegistry = session.registrySet.hasActivityRegistry
-      if (!activityRegistry) throw new Error('activity registry not found in registry set')
+      if (!activityRegistry) {
+        throw new Error('activity registry not found in registry set')
+      }
       // `object` is the reciprocal registration IRI — informational (no workflow
       // reads it; the consumer derives the peer from `target`). The subscription
       // channel already records it as its `topic`, so no registration read is

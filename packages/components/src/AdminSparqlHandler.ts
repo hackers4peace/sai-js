@@ -39,7 +39,9 @@ const SPARQL_QUERY_MEDIA_TYPE = 'application/sparql-query'
  * `lws:partOf` result instead of an error).
  */
 export function podFromRequestUrl(requestUrl: string | undefined): string | undefined {
-  if (!requestUrl) return undefined
+  if (!requestUrl) {
+    return undefined
+  }
   return new URL(requestUrl, 'http://dummy-base.example').searchParams.get('pod') ?? undefined
 }
 

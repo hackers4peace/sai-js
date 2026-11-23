@@ -42,7 +42,9 @@ export async function ensureApplicationRegistration(
     applicationRegistry.id,
     registeredAgent
   )
-  if (existing) return
+  if (existing) {
+    return
+  }
   await registerApplication(applicationRegistry, deps, creator, registeredAgent)
 }
 

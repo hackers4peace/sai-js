@@ -494,7 +494,9 @@ async function applyRequestedSelections(): Promise<void> {
   const requested = props.authorizationData.accessNeedGroup.needs.filter(
     (need) => need.dataInstances?.length || need.dataRegistration
   )
-  if (requested.length === 0) return
+  if (requested.length === 0) {
+    return
+  }
 
   // a specific request is not an implicit "all of my data" grant
   topLevelScope.value = 'agent'
@@ -512,7 +514,9 @@ async function applyRequestedSelections(): Promise<void> {
     for (const registration of candidates) {
       if (need.dataInstances?.length) {
         const wanted = wantedByRegistration.get(registration.id) ?? new Set<string>()
-        for (const instance of need.dataInstances) wanted.add(instance)
+        for (const instance of need.dataInstances) {
+          wanted.add(instance)
+        }
         wantedByRegistration.set(registration.id, wanted)
       } else {
         wholeRegistration.add(registration.id)
@@ -522,14 +526,18 @@ async function applyRequestedSelections(): Promise<void> {
 
   for (const registration of Object.values(registrationsIndex)) {
     const agent = agentsIndex[registration.agent]
-    if (!agent) continue
+    if (!agent) {
+      continue
+    }
     if (wholeRegistration.has(registration.id)) {
       agent.scope = 'some'
       registration.scope = 'all'
       continue
     }
     const wanted = wantedByRegistration.get(registration.id)
-    if (!wanted) continue
+    if (!wanted) {
+      continue
+    }
     agent.scope = 'some'
     registration.scope = 'some'
     try {
@@ -540,7 +548,9 @@ async function applyRequestedSelections(): Promise<void> {
       continue
     }
     for (const instance of findRegistrationDataInstances(registration.id)) {
-      if (wanted.has(instance.id)) instance.selected = true
+      if (wanted.has(instance.id)) {
+        instance.selected = true
+      }
     }
   }
 }
@@ -699,10 +709,14 @@ function toggleSelect(needId: string, childId?: string): void {
   const need = selection.needs.find((n) => n.id === needId)!
   if (childId) {
     const child = need.children!.find((n) => n.id === childId)!
-    if (child.required) return
+    if (child.required) {
+      return
+    }
     child.selected = !child.selected
   } else {
-    if (need.required) return
+    if (need.required) {
+      return
+    }
     need.selected = !need.selected
   }
 }
@@ -728,8 +742,12 @@ function createDataAuthorizations(
   need: S.Schema.Type<typeof AccessNeed>,
   parent?: S.Schema.Type<typeof AccessNeed>
 ): S.Schema.Type<typeof DataAuthorization>[] {
-  if (!parent && !isSelected(need.id)) return []
-  if (parent && !isSelected(parent.id, need.id)) return []
+  if (!parent && !isSelected(need.id)) {
+    return []
+  }
+  if (parent && !isSelected(parent.id, need.id)) {
+    return []
+  }
   const dataAuthorizations: S.Schema.Type<typeof DataAuthorization>[] = []
   const accessNeedAuthorization = {
     accessNeed: need.id,
@@ -844,7 +862,9 @@ function authorize(granted = true) {
 watch(
   () => appStore.activitySnackbar.claim,
   async (claim) => {
-    if (claim?.type !== 'AuthorizationGranted') return
+    if (claim?.type !== 'AuthorizationGranted') {
+      return
+    }
     if (props.redirect) {
       window.location.href = await coreStore.consent()
     } else if (props.agent) {

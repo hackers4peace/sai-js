@@ -55,7 +55,9 @@ export async function discoverSubscriptionService(
   fetch: WhatwgFetch
 ): Promise<SubscriptionService | undefined> {
   const storageDescriptionIri = await discoverStorageDescription(resourceIri, fetch)
-  if (!storageDescriptionIri) return undefined
+  if (!storageDescriptionIri) {
+    return undefined
+  }
   const dataset = await toStore(
     (await fetchJsonLd(storageDescriptionIri, fetch)) as Record<string, unknown>,
     storageDescriptionIri
@@ -63,7 +65,9 @@ export async function discoverSubscriptionService(
   const serviceQuad = getAllMatchingQuads(dataset, undefined, NOTIFY.terms.channelType).find(
     (quad) => quad.object.value === channelType
   )
-  if (!serviceQuad) return undefined
+  if (!serviceQuad) {
+    return undefined
+  }
   const feature = getAllMatchingQuads(dataset, serviceQuad.subject, NOTIFY.terms.feature).map(
     (quad) => quad.object.value
   )

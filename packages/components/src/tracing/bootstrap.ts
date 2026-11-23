@@ -30,7 +30,9 @@ export async function initNodeTracing(serviceName: string): Promise<NodeSDK | un
   // dedicated var and is handed to the exporter explicitly (which is also what
   // stops the exporter from reading the injected standard vars).
   const saiEndpoint = process.env.SAI_OTLP_ENDPOINT
-  if (!saiEndpoint && !otlpEndpoint) return undefined
+  if (!saiEndpoint && !otlpEndpoint) {
+    return undefined
+  }
 
   try {
     const [

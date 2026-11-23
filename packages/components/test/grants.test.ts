@@ -37,11 +37,15 @@ const sparqlMock = vi.hoisted(() => {
 vi.mock('fetch-sparql-endpoint', () => ({
   SparqlEndpointFetcher: class {
     async fetchBindings(_endpoint: string, query: string) {
-      if (!sparqlMock.handlers.bindings) throw new Error('mock: no bindings handler')
+      if (!sparqlMock.handlers.bindings) {
+        throw new Error('mock: no bindings handler')
+      }
       return sparqlMock.handlers.bindings(query)
     }
     async fetchTriples(_endpoint: string, query: string) {
-      if (!sparqlMock.handlers.triples) throw new Error('mock: no triples handler')
+      if (!sparqlMock.handlers.triples) {
+        throw new Error('mock: no triples handler')
+      }
       return sparqlMock.handlers.triples(query)
     }
   },
@@ -153,7 +157,9 @@ describe('findRoleUsage — authorizations sweep via SPARQL', () => {
 
     sparqlMock.handlers.bindings = (query) => {
       expect(query).toContain('SELECT DISTINCT ?child')
-      if (query.includes(SOCIAL_AGENT_REGISTRY)) return []
+      if (query.includes(SOCIAL_AGENT_REGISTRY)) {
+        return []
+      }
       return [AUTHZ_GRANTEE, AUTHZ_ADMIN].map((iri) => ({
         child: { termType: 'NamedNode', value: iri },
       }))
@@ -169,7 +175,9 @@ describe('findRoleUsage — authorizations sweep via SPARQL', () => {
         ),
       }
       for (const [iri, quads] of Object.entries(graphs)) {
-        if (query.includes(`GRAPH <${iri}>`)) return quads
+        if (query.includes(`GRAPH <${iri}>`)) {
+          return quads
+        }
       }
       throw new Error(`unexpected CONSTRUCT: ${query}`)
     }
@@ -187,7 +195,9 @@ describe('findRoleUsage — authorizations sweep via SPARQL', () => {
     sessionMock.setSession(fakeSession())
 
     sparqlMock.handlers.bindings = (query) => {
-      if (query.includes(SOCIAL_AGENT_REGISTRY)) return []
+      if (query.includes(SOCIAL_AGENT_REGISTRY)) {
+        return []
+      }
       return [{ child: { termType: 'NamedNode', value: AUTHZ_GRANTEE } }]
     }
     sparqlMock.handlers.triples = (query) => {
@@ -245,11 +255,15 @@ describe('findAffectedGrantees — delegation sweep via SPARQL', () => {
       [AUTHZ_ADMIN]: authzGraph(AUTHZ_ADMIN, 'https://example/AdminAuthorization', GRANTEE_A, PEER),
     }
     for (const [iri, quads] of Object.entries(graphs)) {
-      if (query.includes(`GRAPH <${iri}>`)) return quads
+      if (query.includes(`GRAPH <${iri}>`)) {
+        return quads
+      }
     }
     // the grantee registrations (session's plane-based typing)
     for (const iri of [GRANTEE_A, GRANTEE_B]) {
-      if (query.includes(`GRAPH <${iri}>`)) return registrationGraph(iri)
+      if (query.includes(`GRAPH <${iri}>`)) {
+        return registrationGraph(iri)
+      }
     }
     throw new Error(`unexpected CONSTRUCT: ${query}`)
   }

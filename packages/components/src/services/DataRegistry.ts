@@ -81,7 +81,9 @@ const buildDataRegistryForGrant = async (
   const seen = new Set<string>()
   const registrations: S.Schema.Type<typeof DataRegistration>[] = []
   for (const accessGrant of accessGrants) {
-    if (seen.has(accessGrant.hasDataRegistration)) continue
+    if (seen.has(accessGrant.hasDataRegistration)) {
+      continue
+    }
     seen.add(accessGrant.hasDataRegistration)
     const shapeTree = await loadShapeTree(accessGrant.registeredShapeTree, ctx.session.fetch)
     const shapeTreeDescription = descriptionsLang
@@ -107,7 +109,9 @@ function indexFromGrants(accessGrants: GrantData[]): Record<string, GrantData[]>
   return accessGrants.reduce(
     (acc, accessGrant) => {
       const regIri = Grant.dataRegistryIri(accessGrant)
-      if (!acc[regIri]) acc[regIri] = [] as GrantData[]
+      if (!acc[regIri]) {
+        acc[regIri] = [] as GrantData[]
+      }
       acc[regIri].push(accessGrant)
       return acc
     },
@@ -145,12 +149,16 @@ async function accessGrantIndexForAgent(
     : []
 
   const directIndex = indexFromGrants(directGrants)
-  if (Object.keys(directIndex).length > 0) return directIndex
+  if (Object.keys(directIndex).length > 0) {
+    return directIndex
+  }
 
   // fallback: scan every context registration's reciprocal grants for `dataOwner === agentId`
   const scanned: GrantData[] = []
   for (const registration of await listSocialAgentRegistrations(ctx)) {
-    if (!registration.reciprocalRegistration) continue
+    if (!registration.reciprocalRegistration) {
+      continue
+    }
     const grants = await reciprocalGrants(ctx, registration.reciprocalRegistration)
     scanned.push(...grants.filter((grant) => grant.dataOwner === agentId))
   }
@@ -243,14 +251,18 @@ export const listDataInstances = async (
     }
     const seenInstances = new Set<string>()
     for (const accessGrant of accessGrants) {
-      if (accessGrant.hasDataRegistration !== registrationId) continue
+      if (accessGrant.hasDataRegistration !== registrationId) {
+        continue
+      }
       if (ctx.webId === ctx.userWebId) {
         for await (const instanceId of dataInstanceIrisForGrant(
           accessGrant,
           transport,
           ctx.session.fetch
         )) {
-          if (seenInstances.has(instanceId)) continue
+          if (seenInstances.has(instanceId)) {
+            continue
+          }
           seenInstances.add(instanceId)
           const dataInstance = await loadDataInstance(
             instanceId,
@@ -271,7 +283,9 @@ export const listDataInstances = async (
         // for the grant's storage. Shape trees are public (admin-session fetch).
         const shapeTree = await loadShapeTree(accessGrant.registeredShapeTree, ctx.session.fetch)
         for await (const instanceId of peerInstanceIris(ctx, accessGrant)) {
-          if (seenInstances.has(instanceId)) continue
+          if (seenInstances.has(instanceId)) {
+            continue
+          }
           seenInstances.add(instanceId)
           const node = await peerInstanceNode(ctx, accessGrant.storage, instanceId, shapeTree)
           dataInstances.push(

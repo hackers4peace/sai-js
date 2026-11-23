@@ -75,7 +75,9 @@ describe('getDataRegistries — org context lists own data registries via /sparq
     const requests: { url: string; init?: RequestInit }[] = []
     const sessionFetch = async (url: string, init?: RequestInit) => {
       requests.push({ url, init })
-      if (url === ORG_WEBID) return mockResponse(orgProfileDoc)
+      if (url === ORG_WEBID) {
+        return mockResponse(orgProfileDoc)
+      }
       if (url === sparqlAdminPodUrl) {
         const query = String(init?.body ?? '')
         if (query.includes('SELECT')) {
@@ -218,14 +220,18 @@ describe('listDataInstances — org context lists the org’s own instances', ()
 
     const sessionFetch = async (url: string, init?: RequestInit) => {
       requests.push({ url, init })
-      if (url === ORG_WEBID) return mockResponse(orgProfileDoc)
+      if (url === ORG_WEBID) {
+        return mockResponse(orgProfileDoc)
+      }
       if (url === sparqlAdminPodUrl) {
         // the registration body (with its membership) comes from the org's
         // data-pod dataset — a query without `?pod=` would hit the registry
         expect(String(init?.body ?? '')).toContain('CONSTRUCT')
         return mockResponse(registrationDocWithInstance, 200, 'application/ld+json')
       }
-      if (url === SHAPE_TREE) return mockResponse(shapeTreeDoc)
+      if (url === SHAPE_TREE) {
+        return mockResponse(shapeTreeDoc)
+      }
       throw new Error(`unexpected request: ${url}`)
     }
     const session = { fetch: sessionFetch } as unknown as AuthorizationAgent
@@ -236,7 +242,9 @@ describe('listDataInstances — org context lists the org’s own instances', ()
       // read-only `scope: admin` (no org session)
       storageFetch: async (storage: string) => async (url: string) => {
         storageReads.push({ storage, url })
-        if (url === INSTANCE) return mockResponse(instanceDoc)
+        if (url === INSTANCE) {
+          return mockResponse(instanceDoc)
+        }
         throw new Error(`unexpected storage read: ${url}`)
       },
     } as unknown as ResolvedContext
@@ -259,8 +267,12 @@ describe('listDataInstances — org context lists the org’s own instances', ()
       'http://www.w3.org/ns/ldp#contains': [{ '@id': INSTANCE }],
     }
     const sessionFetch = async (url: string) => {
-      if (url === DATA_REG) return mockResponse(registrationDocWithInstance)
-      if (url === INSTANCE) return mockResponse(instanceDoc)
+      if (url === DATA_REG) {
+        return mockResponse(registrationDocWithInstance)
+      }
+      if (url === INSTANCE) {
+        return mockResponse(instanceDoc)
+      }
       if (url === SHAPE_TREE) {
         return mockResponse({
           '@id': SHAPE_TREE,

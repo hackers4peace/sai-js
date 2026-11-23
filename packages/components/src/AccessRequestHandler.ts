@@ -159,7 +159,9 @@ export class AccessRequestHandler extends OperationHttpHandler {
     const headers = new Headers()
     for (const name of FORWARDED_HEADERS) {
       const value = request.headers[name]
-      if (value) headers.set(name, Array.isArray(value) ? value.join(', ') : value)
+      if (value) {
+        headers.set(name, Array.isArray(value) ? value.join(', ') : value)
+      }
     }
     const upstream = await sai.fetch(target, { method: operation.method, headers })
     const contentType = upstream.headers.get('content-type') ?? 'application/octet-stream'

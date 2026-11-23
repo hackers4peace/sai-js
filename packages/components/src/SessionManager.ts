@@ -101,7 +101,9 @@ export class SessionManager {
   public async storageFetch(webid: string, storage: string): Promise<WhatwgFetch> {
     const key = `${webid}\n${storage}`
     const cached = this.storageFetches.get(key)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const created = (async (): Promise<WhatwgFetch> => {
       const credential = await this.buildCredential(webid)
       return createLwsAuthFetch({ credential, storages: [storage] })
@@ -134,7 +136,9 @@ export class SessionManager {
   ): Promise<WhatwgFetch> {
     const key = `${adminWebId}\n${orgWebId}\n${storage}`
     const cached = this.impersonationFetches.get(key)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const created = (async (): Promise<WhatwgFetch> => {
       const credential = await this.buildCredential(adminWebId)
       const clientId = credential.clientId

@@ -188,8 +188,9 @@ const grantGraph = (
   for (const target of targets) {
     quads.push(quad(permission, namedNode(ODRL.target), target.id))
     quads.push(quad(target.id, namedNode(ODRL.uid), target.id))
-    for (const type of target.types)
+    for (const type of target.types) {
       quads.push(quad(target.id, namedNode(RDF.type), namedNode(type)))
+    }
     for (const source of target.sources) {
       quads.push(quad(target.id, namedNode(ODRL.source), namedNode(source)))
     }

@@ -135,7 +135,9 @@ appStore.listSocialAgents()
 appStore.listApplications()
 
 function requestAccess(applicationId: string) {
-  if (!route.query.agent) return
+  if (!route.query.agent) {
+    return
+  }
   appStore.requestAccess(applicationId, route.query.agent as string)
   appListDialog.value = false
 }
@@ -168,7 +170,9 @@ watch(
 watch(
   () => agent.value,
   async (next, prev) => {
-    if (!next || !prev || next.id !== route.query.agent) return
+    if (!next || !prev || next.id !== route.query.agent) {
+      return
+    }
     await appStore.listDataRegistries(next.id, coreStore.lang)
   }
 )

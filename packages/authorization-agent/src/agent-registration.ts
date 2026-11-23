@@ -28,7 +28,9 @@ export async function setAcr(
   peer: AgentAndClient
 ): Promise<void> {
   const acrLocation = await discoverAccessResource(data.id, fetch)
-  if (!acrLocation) throw new Error(`no access resource for ${data.id}`)
+  if (!acrLocation) {
+    throw new Error(`no access resource for ${data.id}`)
+  }
   await putJsonLd(
     acrLocation,
     fetch,
@@ -86,7 +88,9 @@ export async function replaceAccessGrants(
   const targetSet = new Set(grantIris)
   const removed = currentSet.difference(targetSet)
   const added = targetSet.difference(currentSet)
-  if (removed.size === 0 && added.size === 0) return
+  if (removed.size === 0 && added.size === 0) {
+    return
+  }
 
   const sparqlUpdate = [
     ...(removed.size

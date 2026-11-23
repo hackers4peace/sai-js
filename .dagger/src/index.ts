@@ -184,7 +184,9 @@ export class SaiJs {
     const container = this.withTracing(dag.container().from(NODE_IMAGE), serviceName)
       .withEnvVariable('SAI_RUN_ID', runId)
       .withMountedDirectory('/sai', this.source)
-    if (!this.css) return container
+    if (!this.css) {
+      return container
+    }
     return container.withMountedDirectory('/sai/node_modules/@solid/community-server', this.css)
   }
 
@@ -795,7 +797,9 @@ export class SaiJs {
       // allow multiple files: --testFile="share.test.ts roles.test.ts"
       filter.push(...testFile.split(/\s+/))
     }
-    if (filter.length) args.push('--', ...filter)
+    if (filter.length) {
+      args.push('--', ...filter)
+    }
     return (await this.testBase(runId)).withExposedPort(9240).asService({ args })
   }
 

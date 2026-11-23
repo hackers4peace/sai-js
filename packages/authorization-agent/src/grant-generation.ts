@@ -145,7 +145,9 @@ async function generateChildDelegatedGrantData(
         break
       }
     }
-    if (!childSourceGrant) continue
+    if (!childSourceGrant) {
+      continue
+    }
 
     const storage = childSourceGrant.storage
     const hasDataRegistration = childSourceGrant.hasDataRegistration
@@ -248,7 +250,9 @@ class MirroredPeerIndex {
   /** The mirrored peer side for one of our registrations (cached per reciprocal IRI). */
   public async for(registration: SocialAgentRegistrationData): Promise<MirroredPeer | undefined> {
     const reciprocalIri = registration.reciprocalRegistration
-    if (!reciprocalIri) return undefined
+    if (!reciprocalIri) {
+      return undefined
+    }
     let peer = this.peers.get(reciprocalIri)
     if (!peer) {
       peer = this.load(reciprocalIri)
@@ -264,10 +268,14 @@ class MirroredPeerIndex {
     }
     const reciprocal = await getSocialAgentRegistration(this.transport, reciprocalIri)
     const grantIris = reciprocal.hasDataGrant ?? []
-    if (grantIris.length === 0) return { reciprocal, grants: [] }
+    if (grantIris.length === 0) {
+      return { reciprocal, grants: [] }
+    }
     const presentGrants = await presentGraphs(this.transport, grantIris)
     const missing = grantIris.find((iri) => !presentGrants.has(iri))
-    if (missing) throw new MirrorIncompleteError(missing, 'grant')
+    if (missing) {
+      throw new MirrorIncompleteError(missing, 'grant')
+    }
     const grants = await Promise.all(grantIris.map((iri) => getAccessGrant(this.transport, iri)))
     return { reciprocal, grants }
   }
@@ -299,7 +307,9 @@ async function generateDelegatedAccessGrants(
     // the mirrored reciprocal registration + the grants it links (the source
     // grants); throws MirrorIncompleteError when the mirror has a gap
     const peer = await peers.for(agentRegistration)
-    if (!peer || peer.grants.length === 0) continue
+    if (!peer || peer.grants.length === 0) {
+      continue
+    }
 
     let matchingGrants = peer.grants.filter(
       (grant) => grant.registeredShapeTree === data.registeredShapeTree
@@ -386,7 +396,9 @@ async function generateChildSourceGrantData(
     const dataRegistration = dataRegistrations.find(
       (registration) => registration.registeredShapeTree === childAuthorization.registeredShapeTree
     )
-    if (!dataRegistration) continue
+    if (!dataRegistration) {
+      continue
+    }
 
     const scopeOfGrant = INTEROP.Inherited
     const hasDataRegistration = dataRegistration.id
@@ -459,7 +471,9 @@ async function generateSourceAccessGrants(
       )
     }
 
-    if (!matchingRegistration) continue
+    if (!matchingRegistration) {
+      continue
+    }
 
     // create source grant
     const regularGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
@@ -477,8 +491,9 @@ async function generateSourceAccessGrants(
     )
 
     let scopeOfGrant: string = INTEROP.AllFromRegistry
-    if (data.scopeOfAuthorization === INTEROP.SelectedFromRegistry)
+    if (data.scopeOfAuthorization === INTEROP.SelectedFromRegistry) {
       scopeOfGrant = INTEROP.SelectedFromRegistry
+    }
     const storage = await requireLwsStorageRoot(podUrl, deps.fetch)
     const hasDataRegistration = matchingRegistration.id
     const grant: FinalGrantData = {
@@ -509,7 +524,9 @@ async function generateSourceAccessGrants(
     result.push(grant, ...childGrantData)
   }
 
-  if (!result.length) throw new Error('no access grants were generated!')
+  if (!result.length) {
+    throw new Error('no access grants were generated!')
+  }
   return result
 }
 
@@ -561,7 +578,9 @@ async function generateAccessGrantsWithPeers(
 
   if (data.dataOwner && data.scopeOfAuthorization === INTEROP.AllFromRole) {
     const role = await getRole(transport, data.dataOwner)
-    if (!role) throw new Error(`role not found: ${data.dataOwner}`)
+    if (!role) {
+      throw new Error(`role not found: ${data.dataOwner}`)
+    }
     for (const member of role.members) {
       if (member === data.grantedBy) {
         const sourceGrants = await generateSourceAccessGrants(

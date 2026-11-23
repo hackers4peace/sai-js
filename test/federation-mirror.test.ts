@@ -82,7 +82,9 @@ describe('reciprocal mirror replication', () => {
     await waitFor(
       async () => {
         const mirrored = await localMirror(kimSession, aliceId)
-        if (new Set(mirrored.hasDataGrant ?? []).size !== expected.length) return false
+        if (new Set(mirrored.hasDataGrant ?? []).size !== expected.length) {
+          return false
+        }
         // throws while a body is still missing — the completeness half
         await accessGrants(mirrored, kimSession)
         return true

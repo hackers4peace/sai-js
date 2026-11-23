@@ -157,7 +157,9 @@ const childrenById = computed(() => {
   const children = new Map<string, string[]>()
   for (const authorization of appStore.authorizationList) {
     const parent = authorization.inheritsFromAuthorization
-    if (!parent) continue
+    if (!parent) {
+      continue
+    }
     const list = children.get(parent) ?? []
     list.push(authorization.id)
     children.set(parent, list)
@@ -179,16 +181,22 @@ function descendantsOf(id: string): string[] {
 function toggle(id: string) {
   if (selection.has(id)) {
     selection.delete(id)
-    for (const descendant of descendantsOf(id)) selection.delete(descendant)
+    for (const descendant of descendantsOf(id)) {
+      selection.delete(descendant)
+    }
   } else {
     selection.add(id)
-    for (const descendant of descendantsOf(id)) selection.add(descendant)
+    for (const descendant of descendantsOf(id)) {
+      selection.add(descendant)
+    }
   }
 }
 
 function isIndeterminate(id: string): boolean {
   const descendants = descendantsOf(id)
-  if (descendants.length === 0) return false
+  if (descendants.length === 0) {
+    return false
+  }
   return descendants.some((descendant) => selection.has(descendant)) && !selection.has(id)
 }
 
@@ -202,13 +210,17 @@ function toggleAll() {
   if (allSelected.value) {
     selection.clear()
   } else {
-    for (const authorization of appStore.authorizationList) selection.add(authorization.id)
+    for (const authorization of appStore.authorizationList) {
+      selection.add(authorization.id)
+    }
   }
 }
 
 async function revoke() {
   const id = grantee.value
-  if (!id) return
+  if (!id) {
+    return
+  }
   revokeError.value = undefined
   revoking.value = true
   try {
@@ -229,8 +241,12 @@ const label = computed(() =>
 
 const granteeLabel = computed(() => {
   const id = grantee.value
-  if (label.value) return label.value
-  if (!id) return ''
+  if (label.value) {
+    return label.value
+  }
+  if (!id) {
+    return ''
+  }
   return (
     appStore.socialAgentList.find((agent) => agent.id === id)?.label ??
     appStore.applicationList.find((application) => application.id === id)?.name ??
@@ -262,10 +278,14 @@ const groups = computed<AuthorizationGroup[]>(() => {
   const nodesFor = (root: DataAuthorization): AuthorizationNode[] => {
     const nodes: AuthorizationNode[] = []
     const visit = (authorization: DataAuthorization, depth: number) => {
-      if (seen.has(authorization.id)) return
+      if (seen.has(authorization.id)) {
+        return
+      }
       seen.add(authorization.id)
       nodes.push({ authorization, depth })
-      for (const child of children.get(authorization.id) ?? []) visit(child, depth + 1)
+      for (const child of children.get(authorization.id) ?? []) {
+        visit(child, depth + 1)
+      }
     }
     visit(root, 0)
     return nodes
@@ -280,7 +300,9 @@ const groups = computed<AuthorizationGroup[]>(() => {
   }
   // malformed cycle: the unreachable remainder renders at the root
   for (const authorization of sorted) {
-    if (seen.has(authorization.id)) continue
+    if (seen.has(authorization.id)) {
+      continue
+    }
     const key = authorization.dataOwner ?? ''
     const nodes = byOwner.get(key) ?? []
     nodes.push(...nodesFor(authorization))
@@ -340,12 +362,18 @@ function chooseIcon(access: readonly string[]): string {
 }
 
 function dataOwnerLabel(dataOwner?: string): string {
-  if (!dataOwner) return $t('all-data')
-  if (dataOwner === coreStore.userId) return $t('me')
+  if (!dataOwner) {
+    return $t('all-data')
+  }
+  if (dataOwner === coreStore.userId) {
+    return $t('me')
+  }
   // the current context (personal or org) is a data owner but is not part of
   // the social-agent list; the context switcher already carries its label
   const contextLabel = appStore.contexts.find((entry) => entry.webId === dataOwner)?.label
-  if (contextLabel) return contextLabel
+  if (contextLabel) {
+    return contextLabel
+  }
   return (
     appStore.socialAgentList.find((agent) => agent.id === dataOwner)?.label ?? shortIri(dataOwner)
   )

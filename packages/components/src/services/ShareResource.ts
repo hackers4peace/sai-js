@@ -174,7 +174,9 @@ export const getResource = async (ctx: ResolvedContext, id: string, lang: string
   const resource = await (ctx.webId === ctx.userWebId
     ? loadDataInstance(id, ctx.session.fetch, undefined, lang)
     : orgContextDataInstance(ctx, id, lang))
-  if (!resource) throw new Error(`Resource not found: ${id}`)
+  if (!resource) {
+    throw new Error(`Resource not found: ${id}`)
+  }
   const shapeTree = await loadShapeTree(resource.shapeTreeIri!, ctx.session.fetch)
   const shapeTreeDescription = await ShapeTree.getDescription(shapeTree, lang, ctx.session.fetch)
   // "who has access" is read via SPARQL in both contexts — personal via
@@ -226,7 +228,9 @@ async function orgShareFacts(
     throw new Error(`cannot resolve the data registration of ${structure.resource}`)
   }
   const podUrl = contextPod(ctx, registrationIri)
-  if (!podUrl) throw new Error(`cannot read the data pod of ${registrationIri}`)
+  if (!podUrl) {
+    throw new Error(`cannot read the data pod of ${registrationIri}`)
+  }
   const dataRegistration = await getDataRegistration(
     sparqlTransportForPod(ctx, podUrl),
     registrationIri
@@ -324,7 +328,9 @@ export const shareResource = async (
   // matching the previous per-grantee empty-loop behavior
   if (recorded.length > 0) {
     const activityRegistry = ctx.registrySet.hasActivityRegistry
-    if (!activityRegistry) throw new Error('activity registry not found in registry set')
+    if (!activityRegistry) {
+      throw new Error('activity registry not found in registry set')
+    }
     const activity: Omit<AuthorizationGranted, 'id'> = {
       type: ['Activity', 'AuthorizationGranted'],
       actor: ctx.webId,
@@ -362,7 +368,9 @@ async function recordAccessRequest(
   request: { dataOwner: string; hasAccessNeedGroup: NeedBasedAccessRequestGroup }
 ): Promise<S.Schema.Type<typeof NeedBasedAccessRequestSentMessage>> {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   const object: EmbeddedNeedBasedAccessRequest = {
     id: `urn:uuid:${ctx.session.randomUUID()}`,
     type: [INTEROP.NeedBasedAccessRequest],

@@ -73,7 +73,9 @@ async function arrayifyStream<T>(stream: unknown): Promise<T[]> {
   // runtime they are object-mode Readables emitting bindings/quads, so
   // for-await collects the emitted values (same semantics as CSS
   // `arrayifyStream`'s `events.on(stream, 'data')`).
-  for await (const item of stream as AsyncIterable<T>) items.push(item)
+  for await (const item of stream as AsyncIterable<T>) {
+    items.push(item)
+  }
   return items
 }
 
@@ -104,7 +106,9 @@ function sparqlForm(query: string): string {
 
 /** Row/triple count for a transport result (bindings array or N3 Store / dataset). */
 function resultCount(result: unknown): number | undefined {
-  if (Array.isArray(result)) return result.length
+  if (Array.isArray(result)) {
+    return result.length
+  }
   const size = (result as { size?: unknown } | null)?.size
   return typeof size === 'number' ? size : undefined
 }
@@ -124,11 +128,15 @@ export function withSparqlTracing(transport: SparqlTransport, endpoint: string):
       try {
         span.setAttribute('sai.sparql.endpoint', endpoint)
         span.setAttribute('sai.sparql.form', sparqlForm(query))
-        if (span.isRecording()) span.setAttribute('sai.sparql.query', query)
+        if (span.isRecording()) {
+          span.setAttribute('sai.sparql.query', query)
+        }
         const result = await fn()
         if (span.isRecording()) {
           const count = resultCount(result)
-          if (count !== undefined) span.setAttribute('sai.sparql.resultCount', count)
+          if (count !== undefined) {
+            span.setAttribute('sai.sparql.resultCount', count)
+          }
         }
         span.end()
         return result
@@ -223,7 +231,9 @@ export async function listRegistrationsByShapeTrees(
   registryIri: string,
   shapeTrees: string[]
 ): Promise<string[]> {
-  if (shapeTrees.length === 0) return []
+  if (shapeTrees.length === 0) {
+    return []
+  }
   const trees = shapeTrees.map((tree) => `<${tree}>`).join(', ')
   const bindings = await transport.fetchBindings(
     `SELECT DISTINCT ?reg WHERE {
@@ -275,7 +285,9 @@ export async function findSocialAgentRegistration(
 ): Promise<SocialAgentRegistrationData | undefined> {
   for (const iri of await listContained(transport, socialAgentRegistryContainerIri)) {
     const registration = await getSocialAgentRegistration(transport, iri)
-    if (registration.registeredAgent === webId) return registration
+    if (registration.registeredAgent === webId) {
+      return registration
+    }
   }
 }
 
@@ -304,7 +316,9 @@ export async function findApplicationRegistration(
 ): Promise<ApplicationRegistrationData | undefined> {
   for (const iri of await listContained(transport, applicationRegistryContainerIri)) {
     const registration = await getApplicationRegistration(transport, iri)
-    if (registration.registeredAgent === webId) return registration
+    if (registration.registeredAgent === webId) {
+      return registration
+    }
   }
 }
 
@@ -389,7 +403,9 @@ export async function findSocialAgentInvitation(
 ): Promise<SocialAgentInvitationData | undefined> {
   for (const iri of await listContained(transport, invitationRegistryContainerIri)) {
     const invitation = await getSocialAgentInvitation(transport, iri)
-    if (invitation.capabilityUrl === capabilityUrl) return invitation
+    if (invitation.capabilityUrl === capabilityUrl) {
+      return invitation
+    }
   }
 }
 
@@ -428,7 +444,9 @@ export async function presentGraphs(
   transport: SparqlTransport,
   iris: string[]
 ): Promise<Set<string>> {
-  if (iris.length === 0) return new Set()
+  if (iris.length === 0) {
+    return new Set()
+  }
   const resourceValues = iris.map((iri) => `<${iri}>`).join(' ')
   const metaValues = iris.map((iri) => `<meta:${iri}>`).join(' ')
   const bindings = await transport.fetchBindings(
@@ -531,7 +549,9 @@ export async function getReciprocalGrants(
 }`
   )
   const grantIris = [...new Set(linkBindings.map((binding) => binding.grant.value))]
-  if (grantIris.length === 0) return []
+  if (grantIris.length === 0) {
+    return []
+  }
 
   const resourceValues = grantIris.map((iri) => `<${iri}>`).join(' ')
   const metaValues = grantIris.map((iri) => `<meta:${iri}>`).join(' ')
@@ -618,7 +638,9 @@ async function getDataAuthorizationIfPresent(
   iri: string
 ): Promise<DataAuthorizationData | undefined> {
   const doc = await graphDoc(transport, iri)
-  if (Array.isArray(doc) && doc.length === 0) return undefined
+  if (Array.isArray(doc) && doc.length === 0) {
+    return undefined
+  }
   return DataAuthorization.fromJsonLd(doc, iri)
 }
 
@@ -728,7 +750,9 @@ export async function getRole(
   iri: string
 ): Promise<RoleData | undefined> {
   const doc = await graphDoc(transport, iri)
-  if (Array.isArray(doc) && doc.length === 0) return undefined
+  if (Array.isArray(doc) && doc.length === 0) {
+    return undefined
+  }
   const node = (await frameDoc(doc, dataModelContext, iri)) as any
   const type = (node.type as string[] | undefined) ?? []
   // Type guard: ANY non-empty graph at the IRI is not a role. In dev the
@@ -736,7 +760,9 @@ export async function getRole(
   // `https://data/test-client/public/id` → `https://vuejectron.docker/id`),
   // so a tolerant frame returned a pseudo-role — `typeGrantee` then resolved
   // an APPLICATION as `Role` and skipped its auto-registration fallback.
-  if (!type.includes('Role') && !type.includes(INTEROP.Role)) return undefined
+  if (!type.includes('Role') && !type.includes(INTEROP.Role)) {
+    return undefined
+  }
   return {
     id: iri,
     type,
@@ -764,7 +790,9 @@ export async function getGrantsAuthority(
   transport: SparqlTransport,
   iris: string[]
 ): Promise<Map<string, GrantAuthority>> {
-  if (iris.length === 0) return new Map()
+  if (iris.length === 0) {
+    return new Map()
+  }
   const values = iris.map((iri) => `<${iri}>`).join(' ')
   const bindings = await transport.fetchBindings(
     `SELECT ?grant ?dataOwner ?grantedBy ?grantee WHERE {
@@ -859,11 +887,15 @@ SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree ?instan
       shapeTrees: [],
     }
     const shapeTree = b.shapeTree.value
-    if (!entry.shapeTrees.includes(shapeTree)) entry.shapeTrees.push(shapeTree)
+    if (!entry.shapeTrees.includes(shapeTree)) {
+      entry.shapeTrees.push(shapeTree)
+    }
     if (b.instance) {
       const instances = entry.instancesByShapeTree ?? {}
       const byTree = instances[shapeTree] ?? []
-      if (!byTree.includes(b.instance.value)) byTree.push(b.instance.value)
+      if (!byTree.includes(b.instance.value)) {
+        byTree.push(b.instance.value)
+      }
       instances[shapeTree] = byTree
       entry.instancesByShapeTree = instances
     }
@@ -960,10 +992,14 @@ SELECT DISTINCT ?grant ?grantedBy ?shapeTree ?scope ?source WHERE {
       grantedBy: b.grantedBy.value,
       shapeTree: b.shapeTree.value,
     }
-    if (b.scope) entry.scope = b.scope.value
+    if (b.scope) {
+      entry.scope = b.scope.value
+    }
     if (b.source && b.scope?.value === INTEROP.SelectedFromRegistry) {
       const instances = entry.instances ?? []
-      if (!instances.includes(b.source.value)) instances.push(b.source.value)
+      if (!instances.includes(b.source.value)) {
+        instances.push(b.source.value)
+      }
       entry.instances = instances
     }
     byGrant.set(key, entry)

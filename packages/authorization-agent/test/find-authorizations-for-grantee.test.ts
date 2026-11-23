@@ -65,7 +65,9 @@ function racingTransport(): SparqlTransport {
 
   return {
     async fetchBindings(query: string) {
-      if (query.includes('FILTER(?g = ?role)')) return []
+      if (query.includes('FILTER(?g = ?role)')) {
+        return []
+      }
       if (query.includes(LWS.contains)) {
         const container =
           /GRAPH <meta:([^>]+)>/.exec(query)?.[1] ?? /GRAPH <([^>]+)>/.exec(query)![1]
@@ -78,7 +80,9 @@ function racingTransport(): SparqlTransport {
     async fetchTriples(query: string) {
       const store = new Store()
       for (const match of query.matchAll(/GRAPH <([^>]+)>/g)) {
-        for (const entry of graphs.get(match[1]) ?? []) store.addQuad(entry)
+        for (const entry of graphs.get(match[1]) ?? []) {
+          store.addQuad(entry)
+        }
       }
       return store
     },

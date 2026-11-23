@@ -117,12 +117,16 @@ export function scopeFacts(
 ): ScopeFacts {
   const byRole = new Map<string, RoleFacts>()
   for (const role of roles) {
-    if (!role?.id) continue
+    if (!role?.id) {
+      continue
+    }
     byRole.set(role.id, { label: role.label, members: role.members ?? [] })
   }
   const byIri = new Map<string, DataAuthorizationData>()
   for (const authorization of authorizations) {
-    if (authorization.id) byIri.set(authorization.id, authorization)
+    if (authorization.id) {
+      byIri.set(authorization.id, authorization)
+    }
   }
   return { roles: byRole, authorizations: byIri }
 }
@@ -175,9 +179,13 @@ export function matchesScope(
     }
     case INTEROP.Inherited: {
       const parentIri = authorization.inheritsFromAuthorization
-      if (!parentIri || seen.has(parentIri)) return false
+      if (!parentIri || seen.has(parentIri)) {
+        return false
+      }
       const parent = facts.authorizations.get(parentIri)
-      if (!parent) return false
+      if (!parent) {
+        return false
+      }
       return matchesScope(parent, resource, ownerWebId, facts, new Set([...seen, parentIri]))
     }
     default:
@@ -202,8 +210,12 @@ export function accessForResource(
   const agents = new Map<string, AgentWithAccess>()
   const roles = new Map<string, RoleWithAccess>()
   for (const authorization of authorizations) {
-    if (authorization.registeredShapeTree !== resource.shapeTreeIri) continue
-    if (!matchesScope(authorization, resource, ownerWebId, facts)) continue
+    if (authorization.registeredShapeTree !== resource.shapeTreeIri) {
+      continue
+    }
+    if (!matchesScope(authorization, resource, ownerWebId, facts)) {
+      continue
+    }
     const role = facts.roles.get(authorization.grantee)
     const accessMode = authorization.accessMode ?? []
     if (role) {
@@ -370,7 +382,9 @@ export async function replaceDataAuthorizationsForGrantee(
   // children of kept parents must stay too (the kept parent still references them)
   for (const dataAuthorization of existingDataAuthorizations) {
     if (keep.has(dataAuthorization.id!)) {
-      for (const child of dataAuthorization.hasInheritingAuthorization ?? []) keep.add(child)
+      for (const child of dataAuthorization.hasInheritingAuthorization ?? []) {
+        keep.add(child)
+      }
     }
   }
   const irisToDelete = new Set(
@@ -418,7 +432,9 @@ export async function storeDataAuthorizations(
   // "re-links them in the store" the write path always intended.
   const childrenByParent = new Map<string, FinalDataAuthorizationData[]>()
   for (const dataAuthorization of dataAuthorizations) {
-    if (!dataAuthorization.inheritsFromAuthorization) continue
+    if (!dataAuthorization.inheritsFromAuthorization) {
+      continue
+    }
     const siblings = childrenByParent.get(dataAuthorization.inheritsFromAuthorization) ?? []
     siblings.push(dataAuthorization)
     childrenByParent.set(dataAuthorization.inheritsFromAuthorization, siblings)
@@ -431,7 +447,9 @@ export async function storeDataAuthorizations(
   }
   for (const dataAuthorization of dataAuthorizations) {
     const existing = await deps.fetch(dataAuthorization.id, { method: 'HEAD' })
-    if (existing.status === 200) continue
+    if (existing.status === 200) {
+      continue
+    }
     await createResource(
       authorizationRegistry.id,
       dataAuthorization.id,
@@ -483,8 +501,9 @@ export async function generateAuthorization(
       )
       if (matchingDataAuthorization) {
         // TODO: should we handle it differently
-        if (matchingDataAuthorization.scopeOfAuthorization !== INTEROP.SelectedFromRegistry)
+        if (matchingDataAuthorization.scopeOfAuthorization !== INTEROP.SelectedFromRegistry) {
           throw new Error(`unexpected scope: ${matchingDataAuthorization.scopeOfAuthorization}`)
+        }
 
         // copy over selected instances from existing data authorization
         // TODO: check for duplicates (make it a set?)
@@ -500,7 +519,9 @@ export async function generateAuthorization(
         ]
         for (const iri of irisToExclude) {
           const index = dataAuthorizationsToReuse.indexOf(iri)
-          if (index !== -1) dataAuthorizationsToReuse.splice(index, 1)
+          if (index !== -1) {
+            dataAuthorizationsToReuse.splice(index, 1)
+          }
         }
       }
     }

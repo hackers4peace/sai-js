@@ -106,7 +106,9 @@ async function storeGrantAndAcr(grant: FinalGrantData, registryOwner?: string) {
  * stored as its own grant body.
  */
 function delegatedGrantBodies(grant: GrantData): FinalGrantData[] {
-  if (!grant.id) throw new Error('generated delegated grant has no id')
+  if (!grant.id) {
+    throw new Error('generated delegated grant has no id')
+  }
   const embedded = ((grant.hasInheritingGrant ?? []) as unknown[]).filter(
     (child): child is GrantData => typeof child === 'object' && child !== null
   )
@@ -186,7 +188,9 @@ export async function processDelegatedGrantsUpdated(
         // wait for a signal (a new activity was routed to this consumer) or exit idle
         idle = true
         const signaled = await condition(() => !idle, CONSUMER_IDLE_TIMEOUT)
-        if (!signaled) break
+        if (!signaled) {
+          break
+        }
         continue
       }
       // forced run: sync + regenerate once even with nothing pending
@@ -238,7 +242,9 @@ async function forceMirrorSync(webId: SocialAgentId, peerId: SocialAgentId): Pro
     await start()
     return
   } catch (err) {
-    if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+    if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
+      throw err
+    }
   }
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
@@ -249,7 +255,9 @@ async function forceMirrorSync(webId: SocialAgentId, peerId: SocialAgentId): Pro
         await start()
         return
       } catch (err) {
-        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
+          throw err
+        }
       }
     }
   }
@@ -344,7 +352,9 @@ export async function processGranteeAuthorization(
     webId,
     object: dataAuthorizations,
   })
-  if (!authorizationGrantee) return
+  if (!authorizationGrantee) {
+    return
+  }
   await createGrantsForAuthorization({ webId, authorizationGrantee })
 }
 
@@ -426,19 +436,25 @@ export async function processRoleMembershipChange(
   const affected: AgentId[] = []
   const seen = new Set<string>()
   const add = (agent: AgentId) => {
-    if (seen.has(agent.id)) return
+    if (seen.has(agent.id)) {
+      return
+    }
     seen.add(agent.id)
     affected.push(agent)
   }
   // role used as grantee → the changed members' received grants changed
   if (usage.usedAsGrantee) {
-    for (const member of changed) add({ id: member, type: [SOCIAL_AGENT_TYPE] })
+    for (const member of changed) {
+      add({ id: member, type: [SOCIAL_AGENT_TYPE] })
+    }
   }
   // role used as dataOwner → the *grantees of those authorizations* are affected
   for (const grantee of usage.affectedGrantees) {
     if (grantee.type.includes(ROLE_TYPE)) {
       const members = await getGrantees({ webId, grantee })
-      for (const member of members) add(member)
+      for (const member of members) {
+        add(member)
+      }
     } else {
       add(grantee as AgentId)
     }
@@ -478,20 +494,26 @@ export async function processRoleDeletion(
   const affected: AgentId[] = []
   const seen = new Set<string>()
   const add = (agent: AgentId) => {
-    if (seen.has(agent.id)) return
+    if (seen.has(agent.id)) {
+      return
+    }
     seen.add(agent.id)
     affected.push(agent)
   }
   // role.members ARE the grantees of grantee-authorizations — read from the
   // embedded object, not the store (the role is gone by now)
   if (usage.usedAsGrantee) {
-    for (const member of role.members) add({ id: member, type: [SOCIAL_AGENT_TYPE] })
+    for (const member of role.members) {
+      add({ id: member, type: [SOCIAL_AGENT_TYPE] })
+    }
   }
   // grantees of dataOwner-authorizations — route by type
   for (const grantee of usage.affectedGrantees) {
     if (grantee.type.includes(ROLE_TYPE)) {
       const members = await getGrantees({ webId, grantee })
-      for (const member of members) add(member)
+      for (const member of members) {
+        add(member)
+      }
     } else {
       add(grantee as AgentId)
     }
@@ -591,7 +613,9 @@ export async function reconcileActivities(payload: { webId: SocialAgentId }): Pr
           ],
         })
       } catch (err) {
-        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+        if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
+          throw err
+        }
         // a consumer is already draining for this peer — it holds the delivery
       }
     } else if (isActivityClass(activity, 'NeedBasedAccessRequestReceived')) {
@@ -726,7 +750,9 @@ export async function reconcileGrantsForGrantee(
   })
   const existingById = new Map<string, GrantId>()
   for (const grant of [...projected, ...orphans]) {
-    if (grant.id) existingById.set(grant.id, grant)
+    if (grant.id) {
+      existingById.set(grant.id, grant)
+    }
   }
   const existing = [...existingById.values()]
 
@@ -763,7 +789,9 @@ export async function reconcileGrantsForGrantee(
   // create the unmatched desired trees (after the GC — delete-before-create)
   const newGrantIds: GrantId[] = []
   for (const grant of generated.sourceGrants) {
-    if (reusedSource.has(grant.id)) continue
+    if (reusedSource.has(grant.id)) {
+      continue
+    }
     await storeGrantAndAcr(grant)
     newGrantIds.push({ id: grant.id, type: grant.type })
   }
@@ -771,7 +799,9 @@ export async function reconcileGrantsForGrantee(
   // Delegated grants are projections of this context's DataAuthorizations and
   // are stored in the assigner's own grant registry.
   for (const [index, grant] of generated.delegatedGrants.entries()) {
-    if (reusedDelegated.has(index)) continue
+    if (reusedDelegated.has(index)) {
+      continue
+    }
     for (const body of delegatedGrantBodies(grant)) {
       // Delegated grants live in the assigner's registry, not the data owner's.
       await storeGrantAndAcr(body, payload.webId.id)

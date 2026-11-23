@@ -86,11 +86,15 @@ export async function peerRegistrationOfInstance(
   const transport = sparqlTransportFor(ctx)
   const seen = new Set<string>()
   for (const registration of await listSocialAgentRegistrations(ctx)) {
-    if (!registration.reciprocalRegistration) continue
+    if (!registration.reciprocalRegistration) {
+      continue
+    }
     const grants = await getReciprocalGrants(transport, registration.reciprocalRegistration)
     for (const grant of grants) {
       const candidate = grant.hasDataRegistration
-      if (!candidate || seen.has(candidate)) continue
+      if (!candidate || seen.has(candidate)) {
+        continue
+      }
       seen.add(candidate)
       if ((await dataRegistrationContains(ctx, grant.storage, candidate)).includes(instanceIri)) {
         return { id: candidate, storage: grant.storage }

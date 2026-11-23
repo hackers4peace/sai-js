@@ -31,7 +31,9 @@ const h = vi.hoisted(() => {
     localSparqlTransport: vi.fn(() => transport),
     getAccessGrant: vi.fn(async (_transport: unknown, iri: string) => {
       const grant = bodies.get(iri)
-      if (!grant) throw new Error(`no local graph for ${iri}`)
+      if (!grant) {
+        throw new Error(`no local graph for ${iri}`)
+      }
       return grant
     }),
     setSession: (sparqlEndpoint: string) => {

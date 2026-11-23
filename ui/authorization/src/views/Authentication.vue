@@ -123,16 +123,22 @@ watch(
     checking.value = true
     try {
       const available = await checkHandle(value)
-      if (cancelled) return
+      if (cancelled) {
+        return
+      }
       checkedHandle.value = value
       checkedAvailable.value = available
     } catch (error) {
-      if (cancelled) return
+      if (cancelled) {
+        return
+      }
       checkedHandle.value = undefined
       checkFailed.value = true
       console.error('failed to check handle availability', error)
     } finally {
-      if (!cancelled) checking.value = false
+      if (!cancelled) {
+        checking.value = false
+      }
     }
   },
   { immediate: true }
@@ -151,9 +157,15 @@ const chipColor = computed(() =>
   handleAvailable.value ? 'green' : handleTaken.value ? 'red' : undefined
 )
 const errors = computed(() => {
-  if (handle.value.length < 3) return 'must be at least 3 characters'
-  if (handleTaken.value) return 'is already taken'
-  if (checkFailed.value) return 'could not check handle availability'
+  if (handle.value.length < 3) {
+    return 'must be at least 3 characters'
+  }
+  if (handleTaken.value) {
+    return 'is already taken'
+  }
+  if (checkFailed.value) {
+    return 'could not check handle availability'
+  }
 })
 
 async function signIn() {
@@ -169,7 +181,9 @@ async function signIn() {
 }
 
 async function signUp() {
-  if (await bootstrapAccount(handle.value)) coreStore.navigateHome()
+  if (await bootstrapAccount(handle.value)) {
+    coreStore.navigateHome()
+  }
   // if (await coreStore.linkWebId(webId)) coreStore.navigateHome()
 }
 </script>

@@ -33,9 +33,13 @@ export class ActivityEvents {
     // no subscribers under this webId (common — a test/UI may never open the
     // stream): the bus is a no-op, never an error
     const streams = this.streams.get(webId)
-    if (!streams) return
+    if (!streams) {
+      return
+    }
     for (const stream of streams) {
-      if (stream.destroyed) continue
+      if (stream.destroyed) {
+        continue
+      }
       try {
         stream.write(`${line}\n`)
       } catch {

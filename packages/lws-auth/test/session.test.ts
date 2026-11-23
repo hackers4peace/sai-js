@@ -129,7 +129,9 @@ function buildSession(fake: Fake, options: { dpop?: boolean; now?: () => number 
 describe('createBrowserSession', () => {
   test('starts a PKCE + DPoP flow with one non-extractable key pair', async () => {
     const fake = fakeFetch((url) => {
-      if (url.href === DISCOVERY) return json(METADATA)
+      if (url.href === DISCOVERY) {
+        return json(METADATA)
+      }
       return new Response('not found', { status: 404 })
     })
     const session = buildSession(fake)
@@ -154,13 +156,19 @@ describe('createBrowserSession', () => {
     let nonce = ''
     let accessToken = ''
     const fake = fakeFetch(async (url) => {
-      if (url.href === DISCOVERY) return json(METADATA)
-      if (url.href === JWKS) return json({ keys: [signingJwk] })
+      if (url.href === DISCOVERY) {
+        return json(METADATA)
+      }
+      if (url.href === JWKS) {
+        return json({ keys: [signingJwk] })
+      }
       if (url.href === TOKEN) {
         accessToken = makeJwt({ webid: WEBID, aud: 'solid', iss: ISSUER })
         return tokenResponse(accessToken, await idToken(nonce))
       }
-      if (url.href === RESOURCE) return new Response('ok')
+      if (url.href === RESOURCE) {
+        return new Response('ok')
+      }
       return new Response('not found', { status: 404 })
     })
     const session = buildSession(fake)
@@ -200,8 +208,12 @@ describe('createBrowserSession', () => {
     let nonce = ''
     let refreshCalls = 0
     const fake = fakeFetch(async (url, request) => {
-      if (url.href === DISCOVERY) return json(METADATA)
-      if (url.href === JWKS) return json({ keys: [signingJwk] })
+      if (url.href === DISCOVERY) {
+        return json(METADATA)
+      }
+      if (url.href === JWKS) {
+        return json({ keys: [signingJwk] })
+      }
       if (url.href === TOKEN) {
         const body = new URLSearchParams(request.body ?? '')
         if (body.get('grant_type') === 'refresh_token') {
@@ -218,7 +230,9 @@ describe('createBrowserSession', () => {
           }
         )
       }
-      if (url.href === RESOURCE) return new Response('ok')
+      if (url.href === RESOURCE) {
+        return new Response('ok')
+      }
       return new Response('not found', { status: 404 })
     })
     const session = buildSession(fake, { now: () => clock })
@@ -242,8 +256,12 @@ describe('createBrowserSession', () => {
   test('can run the session on a bearer token while DPoP rolls out', async () => {
     let nonce = ''
     const fake = fakeFetch(async (url) => {
-      if (url.href === DISCOVERY) return json(METADATA)
-      if (url.href === JWKS) return json({ keys: [signingJwk] })
+      if (url.href === DISCOVERY) {
+        return json(METADATA)
+      }
+      if (url.href === JWKS) {
+        return json({ keys: [signingJwk] })
+      }
       if (url.href === TOKEN) {
         return tokenResponse(
           makeJwt({ webid: WEBID, aud: 'solid', iss: ISSUER }),
@@ -253,7 +271,9 @@ describe('createBrowserSession', () => {
           }
         )
       }
-      if (url.href === RESOURCE) return new Response('ok')
+      if (url.href === RESOURCE) {
+        return new Response('ok')
+      }
       return new Response('not found', { status: 404 })
     })
     const session = buildSession(fake, { dpop: false })
@@ -271,7 +291,9 @@ describe('createBrowserSession', () => {
 
   test('rejects a redirect whose state does not match the pending flow', async () => {
     const fake = fakeFetch((url) => {
-      if (url.href === DISCOVERY) return json(METADATA)
+      if (url.href === DISCOVERY) {
+        return json(METADATA)
+      }
       return new Response('not found', { status: 404 })
     })
     const session = buildSession(fake)

@@ -49,7 +49,9 @@ async function expectRpcError(payload: string, cookie: string): Promise<void> {
     },
     body: payload,
   })
-  if (!response.ok) return // server-side error (defect → HTTP error)
+  if (!response.ok) {
+    return
+  } // server-side error (defect → HTTP error)
   try {
     const result = parseRpcResult(await response.text())
     if (result._tag === 'Success') {
@@ -57,7 +59,9 @@ async function expectRpcError(payload: string, cookie: string): Promise<void> {
     }
   } catch (err) {
     // A Defect is an expected RPC error; rethrow only our own success assertion.
-    if (err instanceof Error && err.message.startsWith('expected RPC error')) throw err
+    if (err instanceof Error && err.message.startsWith('expected RPC error')) {
+      throw err
+    }
   }
 }
 
@@ -76,7 +80,9 @@ describe('org context — discovery (2.1/2.2)', () => {
     expect(yoyo!.admin).toBe(false)
     // a plain peer is not flagged either way
     const bob = agents.find((agent) => agent.id === bobId)
-    if (bob) expect(bob.adminOf).toBe(false)
+    if (bob) {
+      expect(bob.adminOf).toBe(false)
+    }
   })
 
   test('org-context ListSocialAgents reads the org registry directly (admin marker on the org registration)', async () => {

@@ -38,12 +38,16 @@ function fakeStorage() {
       ),
     // `findByIri` scans all records of a type rather than querying an index
     entries: async function* (type: string) {
-      for (const record of recordsOf(type)) yield record
+      for (const record of recordsOf(type)) {
+        yield record
+      }
     },
     delete: async (type: string, id: string) => {
       const records = recordsOf(type)
       const index = records.findIndex((record) => record.id === id)
-      if (index >= 0) records.splice(index, 1)
+      if (index >= 0) {
+        records.splice(index, 1)
+      }
     },
   }
 }

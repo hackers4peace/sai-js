@@ -15,7 +15,9 @@ const idOrigin = process.env.ID_ORIGIN
 const docOrigin = process.env.DOC_ORIGIN
 const sparqlEndpoint = process.env.CSS_ID_SPARQL_ENDPOINT
 
-if (!idOrigin || !docOrigin || !sparqlEndpoint) throw new Error('env missing!')
+if (!idOrigin || !docOrigin || !sparqlEndpoint) {
+  throw new Error('env missing!')
+}
 
 const fetcher = new SparqlEndpointFetcher()
 
@@ -34,24 +36,33 @@ app.use(
 )
 app.get('/', (c) => {
   const host = c.req.header('Host')
-  if (!host) return c.text('missing host', 400)
+  if (!host) {
+    return c.text('missing host', 400)
+  }
   const hostParts = host.split('.')
-  if (hostParts.length !== idOrigin.split('.').length + 1)
+  if (hostParts.length !== idOrigin.split('.').length + 1) {
     return c.text('invalid subdomain count', 400)
-  if (hostParts.slice(1).join('.') !== idOrigin) return c.text('invalid domain', 400)
+  }
+  if (hostParts.slice(1).join('.') !== idOrigin) {
+    return c.text('invalid domain', 400)
+  }
   const subdomain = hostParts[0]
   return c.redirect(`https://${docOrigin}/${subdomain}`, 303)
 })
 
 app.get('/:handle', async (c) => {
   const host = c.req.header('Host')
-  if (host !== docOrigin) return c.text('wrong doc origin', 400)
+  if (host !== docOrigin) {
+    return c.text('wrong doc origin', 400)
+  }
   const handle = c.req.param('handle')
   const id = `https://${docOrigin}/${handle}`
   const triplesStream = await fetcher.fetchTriples(sparqlEndpoint, construct(id))
   const triples = await triplesStream.toArray()
   // no triples in the requested graph — the webid does not exist
-  if (triples.length === 0) return c.text('not found', 404)
+  if (triples.length === 0) {
+    return c.text('not found', 404)
+  }
   const accept = c.req.header('Accept') ?? ''
   if (accept.includes('application/ld+json')) {
     const doc = await jsonld.fromRDF(new Store(triples))
@@ -65,7 +76,9 @@ app.get('/:handle', async (c) => {
   // default: application/cid — also matches an explicit application/cid request
   const doc = await toCidDocument(triples)
   // no services derived from the profile — nothing to serve as a CID document
-  if (!doc) return c.text('not found', 404)
+  if (!doc) {
+    return c.text('not found', 404)
+  }
   c.header('Content-Type', 'application/cid')
   return c.body(JSON.stringify(doc))
 })

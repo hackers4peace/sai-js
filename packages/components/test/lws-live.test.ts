@@ -53,7 +53,9 @@ describe.skipIf(!process.env.LWS_LIVE)('LWS session (live)', () => {
     const session = await manager.getSession('https://bob.id.docker')
     // idempotent: remove a registration left behind by an earlier failed run
     const existing = await session.findSocialAgentRegistration('https://kim.id.docker')
-    if (existing) await session.fetch(existing.id, { method: 'DELETE' })
+    if (existing) {
+      await session.fetch(existing.id, { method: 'DELETE' })
+    }
     const registration = await AgentRegistry.addSocialAgentRegistration(
       session.registrySet.hasSocialAgentRegistry,
       { fetch: session.fetch, randomUUID: crypto.randomUUID.bind(crypto) },

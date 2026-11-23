@@ -14,7 +14,9 @@ const storageDescriptionJsonLd = JSON.stringify([
 function storageRootFor(containerIri: string): string {
   const container = containerIri.replace(/\/$/u, '')
   const cut = container.lastIndexOf('/')
-  if (cut < 0) throw new Error(`cannot derive a storage root from ${containerIri}`)
+  if (cut < 0) {
+    throw new Error(`cannot derive a storage root from ${containerIri}`)
+  }
   return `${container.slice(0, cut + 1)}`
 }
 
@@ -31,7 +33,9 @@ function postResponse(location: string): Response {
 function slugLocation(containerIri: string, headers?: HeadersInit): string {
   const record = (headers ?? {}) as Record<string, string>
   const slug = record.slug ?? record.Slug
-  if (!slug) throw new Error('POST without a slug header')
+  if (!slug) {
+    throw new Error('POST without a slug header')
+  }
   return `${storageRootFor(containerIri)}${slug}`
 }
 
@@ -71,7 +75,9 @@ export const statelessFetch = async function statelessFetch(
   }
 
   const value = fixtureDocs[strippedUrl]
-  if (!value) throw new Error(`missing snippet: ${strippedUrl}`)
+  if (!value) {
+    throw new Error(`missing snippet: ${strippedUrl}`)
+  }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/ld+json',
@@ -81,7 +87,9 @@ export const statelessFetch = async function statelessFetch(
     ok: true,
     headers: {
       get(name: string) {
-        if (name in headers) return headers[name]
+        if (name in headers) {
+          return headers[name]
+        }
         throw Error(`${name} not supported`)
       },
     } as Headers,

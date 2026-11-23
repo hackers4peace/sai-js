@@ -60,7 +60,9 @@ export function buildFrame(
     '@id': iri,
   }
   for (const [key, val] of Object.entries(context)) {
-    if (key === 'id' || key === 'type' || key === '@version') continue
+    if (key === 'id' || key === 'type' || key === '@version') {
+      continue
+    }
     if (typeof val === 'object' && val !== null && !isLanguageMapTerm(val)) {
       frame[key] = overrides[key] ?? { '@embed': '@never', '@omitDefault': true }
     }
@@ -185,7 +187,9 @@ export async function frameNode(
   // pure POJO data (term keys, plain-IRI/literal values only)
   const { '@context': _context, ...rest } = node
   const id = (rest.id ?? rest['@id']) as string | undefined
-  if (!id) throw new Error(`framed node ${iri} has no id`)
+  if (!id) {
+    throw new Error(`framed node ${iri} has no id`)
+  }
   return { ...rest, id } as FramedNode
 }
 
@@ -226,7 +230,9 @@ export function opt(node: Record<string, unknown>, key: string): string | undefi
  */
 export function strs(node: Record<string, unknown>, key: string): string[] {
   const value = node[key]
-  if (value === undefined || value === null) return []
+  if (value === undefined || value === null) {
+    return []
+  }
   return (Array.isArray(value) ? value : [value]).map((item) => framedValue(item) ?? '')
 }
 
@@ -245,9 +251,15 @@ export type LanguageMap = Record<string, string> & { '@none'?: string }
  * `undefined` when the map is absent or empty.
  */
 export function pickLanguage(map: LanguageMap | undefined, preferred?: string): string | undefined {
-  if (!map) return undefined
-  if (preferred && typeof map[preferred] === 'string') return map[preferred]
-  if (typeof map['@none'] === 'string') return map['@none']
+  if (!map) {
+    return undefined
+  }
+  if (preferred && typeof map[preferred] === 'string') {
+    return map[preferred]
+  }
+  if (typeof map['@none'] === 'string') {
+    return map['@none']
+  }
   const first = Object.values(map)[0]
   return typeof first === 'string' ? first : undefined
 }
@@ -271,10 +283,14 @@ export async function findNodeIdByType(
   // compactToRelative: false — frame() compacts its output against base by
   // default and would return relative @ids for absolute-id documents
   const options: any = { documentLoader, compactToRelative: false }
-  if (base) options.base = base
+  if (base) {
+    options.base = base
+  }
   const framed = (await jsonld.frame(doc as any, { '@type': typeIri } as any, options)) as any
   const node = framed?.['@id'] ? framed : framed?.['@graph']?.[0]
-  if (!node?.['@id']) throw new Error(`no node of type ${typeIri} in document`)
+  if (!node?.['@id']) {
+    throw new Error(`no node of type ${typeIri} in document`)
+  }
   return node['@id'] as string
 }
 
@@ -304,7 +320,9 @@ export async function documentValues(
     }
     if (value && typeof value === 'object') {
       nodes.push(value)
-      for (const nested of Object.values(value)) collectNodes(nested)
+      for (const nested of Object.values(value)) {
+        collectNodes(nested)
+      }
     }
   }
   collectNodes(expanded)
@@ -312,9 +330,13 @@ export async function documentValues(
     const matches = node[predicate]
     if (Array.isArray(matches)) {
       for (const match of matches) {
-        if (typeof match === 'string') values.add(match)
-        else if (typeof match?.['@value'] === 'string') values.add(match['@value'])
-        else if (typeof match?.['@id'] === 'string') values.add(match['@id'])
+        if (typeof match === 'string') {
+          values.add(match)
+        } else if (typeof match?.['@value'] === 'string') {
+          values.add(match['@value'])
+        } else if (typeof match?.['@id'] === 'string') {
+          values.add(match['@id'])
+        }
       }
     }
   }
@@ -390,7 +412,9 @@ const JSON_LD_ACCEPT = 'application/ld+json'
  * container, so the data model can not frame it.
  */
 function isLwsContainerDocument(doc: unknown): boolean {
-  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return false
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) {
+    return false
+  }
   const record = doc as Record<string, unknown>
   const context = record['@context']
   const contexts = Array.isArray(context) ? context : [context]
@@ -447,7 +471,9 @@ export async function fetchJsonLd(iri: string, fetch: WhatwgFetch): Promise<unkn
     if (isLwsContainerDocument(doc)) {
       doc = await fetchContainerRdf(iri, fetch)
     }
-    if (span.isRecording()) span.setAttribute('sai.jsonld.raw', JSON.stringify(doc))
+    if (span.isRecording()) {
+      span.setAttribute('sai.jsonld.raw', JSON.stringify(doc))
+    }
     return doc
   })
 }
@@ -521,12 +547,20 @@ export async function putJsonLd(
  * (IRI values without `@type: '@id'` coercion) frame to `{ id }` objects.
  */
 export function framedValue(value: unknown): string | undefined {
-  if (typeof value === 'string') return value
+  if (typeof value === 'string') {
+    return value
+  }
   if (value && typeof value === 'object') {
     const obj = value as Record<string, unknown>
-    if (typeof obj['@value'] === 'string') return obj['@value']
-    if (typeof obj.id === 'string') return obj.id
-    if (typeof obj['@id'] === 'string') return obj['@id']
+    if (typeof obj['@value'] === 'string') {
+      return obj['@value']
+    }
+    if (typeof obj.id === 'string') {
+      return obj.id
+    }
+    if (typeof obj['@id'] === 'string') {
+      return obj['@id']
+    }
   }
   return undefined
 }

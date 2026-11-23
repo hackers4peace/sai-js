@@ -33,7 +33,9 @@ function attachContext(ctx: Context): Scope | undefined {
 }
 
 function detachContext(scope: Scope | undefined): void {
-  if (scope === undefined) return
+  if (scope === undefined) {
+    return
+  }
   const manager = (
     context as unknown as { _getContextManager(): { detach(s: Scope): void } | undefined }
   )._getContextManager?.()

@@ -27,7 +27,9 @@ export async function loadReciprocalRegistration(
   data: SocialAgentRegistrationData,
   fetch: WhatwgFetch
 ): Promise<SocialAgentRegistrationData | undefined> {
-  if (!data.reciprocalRegistration) return undefined
+  if (!data.reciprocalRegistration) {
+    return undefined
+  }
   return loadSocialAgentRegistration(data.reciprocalRegistration, fetch)
 }
 
@@ -61,7 +63,9 @@ export async function replaceAdminGrantLinks(
   const targetSet = new Set(grantIris)
   const removed = currentSet.difference(targetSet)
   const added = targetSet.difference(currentSet)
-  if (removed.size === 0 && added.size === 0) return
+  if (removed.size === 0 && added.size === 0) {
+    return
+  }
 
   const sparqlUpdate = [
     ...(removed.size

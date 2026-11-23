@@ -67,7 +67,9 @@ export async function createInvitation(
 ): Promise<S.Schema.Type<typeof InvitationCreatedMessage>> {
   const invitationRegistry = ctx.registrySet.hasInvitationRegistry
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   const invitationId = await ctx.session.mintIdentifier(invitationRegistry.id)
   // the invitation-to-be — full POJO projection minus capabilityUrl (the
   // workflow generates it) at the pre-minted id; the label is tagged with the

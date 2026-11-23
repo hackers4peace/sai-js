@@ -108,7 +108,9 @@ export async function recordAdminAuthorizationAtId(payload: {
   const existing = await fetchJsonLd(payload.authorization.id, session.fetch).catch(
     (): undefined => undefined
   )
-  if (existing) return
+  if (existing) {
+    return
+  }
   const data: AdminAuthorizationData = {
     id: payload.authorization.id,
     type: [INTEROP.AdminAuthorization],
@@ -140,7 +142,9 @@ export async function deleteAdminAuthorizationAtId(payload: {
   const existing = await fetchJsonLd(payload.authorization.id, session.fetch).catch(
     (): undefined => undefined
   )
-  if (!existing) return
+  if (!existing) {
+    return
+  }
   await session.deleteAdminAuthorization(payload.authorization.id)
 }
 
@@ -210,13 +214,17 @@ export async function createAdminGrantAcr(payload: { grant: AdminGrantData }): P
   const session = await manager.getSession(payload.grant.dataOwner)
   const grantee = grantGrantee(payload.grant) ?? ''
   const uasId = await discoverAuthorizationAgent(grantee, fetch)
-  if (!uasId) throw new Error(`no authorization agent for admin: ${grantee}`)
+  if (!uasId) {
+    throw new Error(`no authorization agent for admin: ${grantee}`)
+  }
 
   const headResponse = await session.fetch(payload.grant.id!, {
     method: 'HEAD',
   })
   const acrId = getAcl(headResponse.headers.get('link'))
-  if (!acrId) throw new Error(`no acl link on admin grant: ${payload.grant.id}`)
+  if (!acrId) {
+    throw new Error(`no acl link on admin grant: ${payload.grant.id}`)
+  }
 
   await putJsonLd(
     acrId,
@@ -314,12 +322,16 @@ export async function syncAdminAcr(payload: { webId: SocialAgentId }): Promise<v
   const matchers: { agent: string; client: string }[] = []
   for (const admin of admins) {
     const uasId = await discoverAuthorizationAgent(admin.grantee, fetch)
-    if (!uasId) throw new Error(`no authorization agent for admin: ${admin.grantee}`)
+    if (!uasId) {
+      throw new Error(`no authorization agent for admin: ${admin.grantee}`)
+    }
     matchers.push({ agent: admin.grantee, client: uasId })
   }
 
   const acrId = await discoverAccessResource(session.registrySet.id, session.fetch)
-  if (!acrId) throw new Error(`no acl link on registry set: ${session.registrySet.id}`)
+  if (!acrId) {
+    throw new Error(`no acl link on registry set: ${session.registrySet.id}`)
+  }
 
   // idempotent remove-then-add of the #fullAdminAccess control (and its #root
   // wiring) — an empty admin list removes the control entirely

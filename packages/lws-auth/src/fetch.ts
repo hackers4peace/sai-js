@@ -103,7 +103,9 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
   /** The UAS token endpoint: LWS metadata when advertised, the well-known path otherwise. */
   async function uasTokenEndpoint(uas: string): Promise<string> {
     const cached = tokenEndpoints.get(uas)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     let endpoint: string
     try {
       const metadata = await fetchLwsAuthorizationServerMetadata(uas, baseFetch)
@@ -123,10 +125,14 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
   async function idJag(audience: string, storage: string): Promise<string> {
     const key = `${audience}\n${storage}\n${options.impersonation?.uas ?? ''}`
     const cached = grants.get(key)
-    if (cached && cached.expiresAt > now() + renewalMargin) return cached.token
+    if (cached && cached.expiresAt > now() + renewalMargin) {
+      return cached.token
+    }
 
     const inFlight = pendingGrants.get(key)
-    if (inFlight) return inFlight
+    if (inFlight) {
+      return inFlight
+    }
 
     const promise = (async (): Promise<string> => {
       const firstAudience = options.impersonation?.uas ?? audience
@@ -194,7 +200,9 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
         // A storage `invalid_grant` means "no token for this storage", not a
         // crash: the request is retried without Authorization, so public data
         // still works. An expired/invalid access token is still a 401.
-        if (isInvalidGrant(error)) return undefined
+        if (isInvalidGrant(error)) {
+          return undefined
+        }
         throw error
       }
     },
@@ -247,10 +255,14 @@ export function createIdJagFetch(options: IdJagFetchOptions): WhatwgFetch {
 
   async function idJag(audience: string): Promise<string> {
     const cached = grants.get(audience)
-    if (cached && cached.expiresAt > now() + renewalMargin) return cached.token
+    if (cached && cached.expiresAt > now() + renewalMargin) {
+      return cached.token
+    }
 
     const inFlight = pending.get(audience)
-    if (inFlight) return inFlight
+    if (inFlight) {
+      return inFlight
+    }
 
     const promise = (async (): Promise<string> => {
       const token = await requestIdJag({
@@ -286,7 +298,9 @@ export function createIdJagFetch(options: IdJagFetchOptions): WhatwgFetch {
 
     const token = await idJag(audience)
     const response = await baseFetch(withBearer(request, token))
-    if (response.status !== 401) return response
+    if (response.status !== 401) {
+      return response
+    }
 
     // The grant may have been rejected because it expired or was revoked:
     // mint a fresh one instead of reusing the cached token.

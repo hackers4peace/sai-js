@@ -66,7 +66,9 @@ function datasetName(podUrl: string, kind: 'registry' | 'data'): string {
 
 function fusekiBaseUrl(): string {
   const url = process.env.CSS_FUSEKI_BASE_URL
-  if (!url) throw new Error('CSS_FUSEKI_BASE_URL is not set')
+  if (!url) {
+    throw new Error('CSS_FUSEKI_BASE_URL is not set')
+  }
   return url.replace(/\/$/, '')
 }
 
@@ -77,7 +79,9 @@ async function postTrig(endpoint: string, trig: string): Promise<void> {
     headers: { 'Content-Type': 'application/trig' },
     body: trig,
   })
-  if (!response.ok) throw new Error(`failed POSTing dataset to ${endpoint}: ${response.status}`)
+  if (!response.ok) {
+    throw new Error(`failed POSTing dataset to ${endpoint}: ${response.status}`)
+  }
 }
 
 /**
@@ -131,7 +135,9 @@ function garageAdminClient(): GarageAdminClient {
 
 function s3Endpoint(): string {
   const endpoint = process.env.CSS_S3_ENDPOINT
-  if (!endpoint) throw new Error('CSS_S3_ENDPOINT is not set')
+  if (!endpoint) {
+    throw new Error('CSS_S3_ENDPOINT is not set')
+  }
   return endpoint
 }
 
@@ -169,7 +175,9 @@ export async function createObjectBucket(input: BootstrapAccountInput): Promise<
   let keyId: string | undefined
   try {
     const existingKey = await garage.findKeyByName(bucketName)
-    if (existingKey) await garage.deleteKey(existingKey.accessKeyId)
+    if (existingKey) {
+      await garage.deleteKey(existingKey.accessKeyId)
+    }
     const key = await garage.createKey(bucketName)
     keyId = key.accessKeyId
     await garage.allowBucketKey(bucket.id, key.accessKeyId, {
@@ -184,8 +192,12 @@ export async function createObjectBucket(input: BootstrapAccountInput): Promise<
       secretAccessKey: key.secretAccessKey ?? '',
     }
   } catch (err) {
-    if (keyId) await garage.deleteKey(keyId).catch(() => undefined)
-    if (createdBucket && bucket) await garage.deleteBucket(bucket.id).catch(() => undefined)
+    if (keyId) {
+      await garage.deleteKey(keyId).catch(() => undefined)
+    }
+    if (createdBucket && bucket) {
+      await garage.deleteBucket(bucket.id).catch(() => undefined)
+    }
     throw err
   }
 }
@@ -266,7 +278,9 @@ let sqlClient: ReturnType<typeof postgres> | undefined
 function getSql(): ReturnType<typeof postgres> {
   if (!sqlClient) {
     const connectionString = process.env.CSS_POSTGRES_CONNECTION_STRING
-    if (!connectionString) throw new Error('CSS_POSTGRES_CONNECTION_STRING is not set')
+    if (!connectionString) {
+      throw new Error('CSS_POSTGRES_CONNECTION_STRING is not set')
+    }
     sqlClient = postgres(connectionString, {
       connection: { options: '-c client_min_messages=warning' },
     })
@@ -283,12 +297,16 @@ export async function writeAccountRecords(input: BootstrapAccountInput): Promise
   const sql = getSql()
   const key = cssKv.accountData(input.accountId)
   const rows = await sql`SELECT value FROM key_value WHERE key = ${key}`
-  if (rows.length === 0) throw new Error(`account ${input.accountId} does not exist`)
+  if (rows.length === 0) {
+    throw new Error(`account ${input.accountId} does not exist`)
+  }
   const accountData = JSON.parse(rows[0].value)
   // CSS's storage initializes every child container to `{}` when the account
   // is created, so `**webIdLink**` is always present — it is only *bootstrapped*
   // once it has an entry.
-  if (Object.keys(accountData['**webIdLink**'] ?? {}).length > 0) return
+  if (Object.keys(accountData['**webIdLink**'] ?? {}).length > 0) {
+    return
+  }
 
   const ids = {
     pod: crypto.randomUUID(),

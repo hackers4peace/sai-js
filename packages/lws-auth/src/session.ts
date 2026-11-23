@@ -140,13 +140,17 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
   }
 
   function dpopRequest(keyPair: CryptoKeyPair): oauth.TokenEndpointRequestOptions | undefined {
-    if (!dpop) return undefined
+    if (!dpop) {
+      return undefined
+    }
     return { DPoP: dpopHandle(keyPair) }
   }
 
   async function discover(issuer: string): Promise<oauth.AuthorizationServer> {
     const cached = metadata.get(issuer)
-    if (cached) return cached
+    if (cached) {
+      return cached
+    }
     const response = await oauth.discoveryRequest(new URL(issuer), {
       [oauth.customFetch]: baseFetch as typeof globalThis.fetch,
     })
@@ -156,25 +160,36 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
   }
 
   function scopeOf(server: oauth.AuthorizationServer): string {
-    if (options.scope) return options.scope.join(' ')
+    if (options.scope) {
+      return options.scope.join(' ')
+    }
     const scope = [...DEFAULT_SCOPE]
-    if (server.scopes_supported?.includes('offline_access')) scope.push('offline_access')
+    if (server.scopes_supported?.includes('offline_access')) {
+      scope.push('offline_access')
+    }
     return scope.join(' ')
   }
 
   function expiresAt(tokens: oauth.TokenEndpointResponse): number {
-    if (typeof tokens.expires_in === 'number') return now() + tokens.expires_in * 1000
+    if (typeof tokens.expires_in === 'number') {
+      return now() + tokens.expires_in * 1000
+    }
     return jwtExpiresAt(tokens.access_token) ?? now() + 300_000
   }
 
   async function persist(session: StoredSession | undefined): Promise<void> {
     current = session
-    if (session) await options.store.set(SESSION_KEY, session)
-    else await options.store.delete(SESSION_KEY)
+    if (session) {
+      await options.store.set(SESSION_KEY, session)
+    } else {
+      await options.store.delete(SESSION_KEY)
+    }
   }
 
   async function load(): Promise<StoredSession | undefined> {
-    if (current) return current
+    if (current) {
+      return current
+    }
     loading ??= options.store.get<StoredSession>(SESSION_KEY).then((stored) => {
       current = stored
       loading = undefined
@@ -184,7 +199,9 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
   }
 
   async function refresh(session: StoredSession): Promise<StoredSession> {
-    if (!session.refreshToken) throw new Error('the session has no refresh token')
+    if (!session.refreshToken) {
+      throw new Error('the session has no refresh token')
+    }
     const server = await discover(session.issuer)
     const response = await oauth.refreshTokenGrantRequest(
       server,
@@ -207,8 +224,12 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
   /** The session's access token, refreshed when it is about to expire. */
   async function accessToken(): Promise<string> {
     const session = await load()
-    if (!session) throw new Error('not signed in: there is no session access token')
-    if (session.expiresAt - renewalMargin > now()) return session.accessToken
+    if (!session) {
+      throw new Error('not signed in: there is no session access token')
+    }
+    if (session.expiresAt - renewalMargin > now()) {
+      return session.accessToken
+    }
     return (await refresh(session)).accessToken
   }
 
@@ -255,7 +276,9 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
 
   async function handleRedirect(url: string): Promise<BrowserSessionInfo> {
     const flow = pending ?? (await options.store.get<PendingFlow>(PENDING_KEY))
-    if (!flow) throw new Error('there is no pending authorization code flow')
+    if (!flow) {
+      throw new Error('there is no pending authorization code flow')
+    }
     const server = await discover(flow.issuer)
     const flowClient: oauth.Client = { client_id: flow.clientId }
 
@@ -305,8 +328,12 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     } catch {
       return undefined
     }
-    if (!session) return undefined
-    if (session.expiresAt - renewalMargin > now()) return sessionInfo(session)
+    if (!session) {
+      return undefined
+    }
+    if (session.expiresAt - renewalMargin > now()) {
+      return sessionInfo(session)
+    }
     try {
       return sessionInfo(await refresh(session))
     } catch {
@@ -324,7 +351,9 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     // The body (if any) has to be reusable for the refreshed retry.
     const retry = request.clone()
     const keyPair = current?.keyPair
-    if (!keyPair) throw new Error('not signed in: there is no session DPoP key pair')
+    if (!keyPair) {
+      throw new Error('not signed in: there is no session DPoP key pair')
+    }
 
     const send = async (attempt: Request, credential: string): Promise<Response> => {
       const headers = new Headers(attempt.headers)
@@ -352,7 +381,9 @@ export function createBrowserSession(options: BrowserSessionOptions): BrowserSes
     }
 
     const response = await send(request, token)
-    if (response.status !== 401 || !current?.refreshToken) return response
+    if (response.status !== 401 || !current?.refreshToken) {
+      return response
+    }
     const refreshed = await refresh(current).catch(() => undefined)
     return refreshed ? send(retry, refreshed.accessToken) : response
   }

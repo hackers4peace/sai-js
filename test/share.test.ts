@@ -65,7 +65,9 @@ describe('share resource', () => {
     const grants: GrantData[] = []
     for (const iri of getAccessGrantIris(linked)) {
       const grant = await loadGrant(iri, aliceSession.fetch).catch(() => undefined)
-      if (grant) grants.push(grant)
+      if (grant) {
+        grants.push(grant)
+      }
     }
     const sharedGrant = grants.find(
       (grant) =>

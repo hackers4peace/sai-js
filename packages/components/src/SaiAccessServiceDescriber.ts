@@ -36,9 +36,13 @@ export class SaiAccessServiceDescriber extends LwsStorageDescriber {
 
   public async handle({ storage, description }: LwsStorageDescriberInput): Promise<void> {
     const endpoint = await this.endpointStore.findSparqlByPodUrl(storage.path)
-    if (!endpoint) return
+    if (!endpoint) {
+      return
+    }
     const owner = (await this.webIdStore.findLinks(endpoint.accountId))[0]?.webId
-    if (!owner) return
+    if (!owner) {
+      return
+    }
 
     let authorizationAgent: string | undefined
     try {
@@ -49,7 +53,9 @@ export class SaiAccessServiceDescriber extends LwsStorageDescriber {
       )
       return
     }
-    if (!authorizationAgent) return
+    if (!authorizationAgent) {
+      return
+    }
 
     const origin = new URL(authorizationAgent).origin
     const segment = Buffer.from(owner).toString('base64url')

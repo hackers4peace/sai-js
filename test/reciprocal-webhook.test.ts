@@ -31,13 +31,16 @@ describe('reciprocal webhook', () => {
     expect(response.status).toBe(200)
     const session = await buildOidcSession(aliceId, clientId)
     const aliceAgentId = await discoverAuthorizationAgent(aliceId, fetch)
-    if (!aliceAgentId) throw new Error(`could not discover auth agent for ${aliceId}`)
+    if (!aliceAgentId) {
+      throw new Error(`could not discover auth agent for ${aliceId}`)
+    }
     const applicationRegistrationId = await discoverAgentRegistration(
       aliceAgentId,
       session.authFetch.bind(session)
     )
-    if (!applicationRegistrationId)
+    if (!applicationRegistrationId) {
       throw new Error(`could not discover application registration for ${clientId} - ${aliceId}`)
+    }
     // the notification stream is a registry-server service path: it takes the
     // storage's LWS token (the session fetch), not `.sai` DPoP credentials —
     // `servicePaths` in the registry config lets the extractor accept it and
@@ -61,7 +64,9 @@ describe('reciprocal webhook', () => {
           registry,
           localSparqlTransport(aliceSession.sparqlEndpoint)
         )
-        if (!completed.length) return false
+        if (!completed.length) {
+          return false
+        }
         const iris = await ActivityRegistry.getActivityIris(
           registry,
           localSparqlTransport(aliceSession.sparqlEndpoint)

@@ -38,7 +38,9 @@ const b64 = (str: string): string => Buffer.from(str).toString('base64url')
 
 function addToRegistryListing(trig: string, handle: string): string {
   const match = trig.match(/GRAPH <https:\/\/registry\/> \{[\s\S]*?\n\}/)
-  if (!match) return trig
+  if (!match) {
+    return trig
+  }
 
   const graph = match[0]
   const dotIndex = graph.lastIndexOf('.')

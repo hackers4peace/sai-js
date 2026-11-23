@@ -36,7 +36,9 @@ async function reciprocalAdminMarkers(
   ctx: ResolvedContext,
   registration: SocialAgentRegistrationData
 ): Promise<boolean> {
-  if (!registration.reciprocalRegistration) return false
+  if (!registration.reciprocalRegistration) {
+    return false
+  }
   const links = await getRegistrationLinks(
     sparqlTransportFor(ctx),
     registration.reciprocalRegistration,
@@ -197,13 +199,17 @@ export const getSocialAgents = async (ctx: ResolvedContext, lang: string) => {
 
   const seenIds = new Set(profiles.map((p) => p.id))
   for (const registration of registrations) {
-    if (!registration.reciprocalRegistration) continue
+    if (!registration.reciprocalRegistration) {
+      continue
+    }
     // only the owners matter here: one query per peer instead of framing every
     // linked grant
     const owners = await getLinkedGrantOwners(transport, registration.reciprocalRegistration)
     for (const owner of owners) {
       const ownerIri = IRI.make(owner)
-      if (seenIds.has(ownerIri)) continue
+      if (seenIds.has(ownerIri)) {
+        continue
+      }
       seenIds.add(ownerIri)
       let label = owner
       try {
@@ -248,7 +254,9 @@ export async function acceptInvitation(
   lang: string
 ): Promise<S.Schema.Type<typeof InvitationAcceptedMessage>> {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   // urn:uuid snapshot — the acceptor has no owning container to mint an
   // invitation id in; the full invitation projection embeds inline (the
   // singly-fetched activity doc already contains the node, never dereferenced)

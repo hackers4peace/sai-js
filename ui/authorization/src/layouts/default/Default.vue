@@ -78,7 +78,9 @@ const currentContext = computed({
 /** the snackbar label for the claimed activity class (map + class-name fallback) */
 const activityLabel = computed(() => {
   const claim = appStore.activitySnackbar.claim
-  if (!claim) return ''
+  if (!claim) {
+    return ''
+  }
   const key = ACTIVITY_LABELS[claim.type]
   return key ? $t(key) : claim.type
 })
@@ -87,7 +89,9 @@ const activityLabel = computed(() => {
 watch(
   () => coreStore.userId,
   (userId) => {
-    if (userId) void appStore.listSocialAgents(true)
+    if (userId) {
+      void appStore.listSocialAgents(true)
+    }
   },
   { immediate: true }
 )

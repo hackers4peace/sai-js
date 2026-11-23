@@ -79,7 +79,9 @@ export class ApiHandler extends OperationHttpHandler {
       span.setAttribute('sai.account', accountId)
       const webIdLinks = await this.webIdStore.findLinks(accountId)
       const webId = webIdLinks[0]?.webId
-      if (webId) span.setAttribute('sai.webid', webId)
+      if (webId) {
+        span.setAttribute('sai.webid', webId)
+      }
       let session: AuthorizationAgent
       if (webId) {
         try {
@@ -341,7 +343,9 @@ export class ApiHandler extends OperationHttpHandler {
       )
       const headers = new Headers()
       for (const [key, value] of Object.entries(httpRequest.headers)) {
-        if (value === undefined) continue
+        if (value === undefined) {
+          continue
+        }
         if (
           ['host', 'connection', 'content-length', 'transfer-encoding'].includes(key.toLowerCase())
         ) {

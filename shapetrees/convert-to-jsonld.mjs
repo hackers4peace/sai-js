@@ -13,10 +13,15 @@ async function turtleToNQuads(turtleText) {
   const quads = parser.parse(turtleText)
   const writer = new Writer({ format: 'N-Quads' })
   return new Promise((resolve, reject) => {
-    for (const q of quads) writer.addQuad(q)
+    for (const q of quads) {
+      writer.addQuad(q)
+    }
     writer.end((error, result) => {
-      if (error) reject(error)
-      else resolve(result)
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result)
+      }
     })
   })
 }

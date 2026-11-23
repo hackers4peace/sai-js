@@ -81,7 +81,9 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  if (to.name === 'login') return undefined
+  if (to.name === 'login') {
+    return undefined
+  }
 
   const coreStore = useCoreStore()
 

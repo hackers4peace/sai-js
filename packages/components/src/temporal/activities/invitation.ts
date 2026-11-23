@@ -27,7 +27,9 @@ export async function createSocialAgentInvitation(
   const existing = await loadSocialAgentInvitation(invitation.id, session.fetch).catch(
     (): undefined => undefined
   )
-  if (existing) return
+  if (existing) {
+    return
+  }
   const capabilityUrl = invitationUrl(webId)
   // The storage identifier strategy creates the member and records containment.
   await session.createIdentifierResource(

@@ -30,9 +30,13 @@ const garageTomlPath = fileURLToPath(
  * hard-coding it (`CSS_GARAGE_ADMIN_TOKEN` overrides).
  */
 function garageAdminToken(): string {
-  if (process.env.CSS_GARAGE_ADMIN_TOKEN) return process.env.CSS_GARAGE_ADMIN_TOKEN
+  if (process.env.CSS_GARAGE_ADMIN_TOKEN) {
+    return process.env.CSS_GARAGE_ADMIN_TOKEN
+  }
   const match = readFileSync(garageTomlPath, 'utf-8').match(/^admin_token\s*=\s*"([^"]+)"/m)
-  if (!match) throw new Error('admin_token not found in environments/garage/garage.toml')
+  if (!match) {
+    throw new Error('admin_token not found in environments/garage/garage.toml')
+  }
   return match[1]
 }
 const mapPaths = {

@@ -59,7 +59,9 @@ export function expandNotification(notification: CompactedNotification): Record<
     '@id': notification.id,
     '@type': [`${AS}${notification.type}`],
   }
-  if (notification.object) node[`${AS}object`] = [{ '@id': notification.object }]
+  if (notification.object) {
+    node[`${AS}object`] = [{ '@id': notification.object }]
+  }
   if (notification.target) {
     const targets = Array.isArray(notification.target) ? notification.target : [notification.target]
     node[`${AS}target`] = targets.map((target) => ({ '@id': target }))
@@ -67,7 +69,9 @@ export function expandNotification(notification: CompactedNotification): Record<
   if (notification.published) {
     node[`${AS}published`] = [{ '@type': XSD_DATETIME, '@value': notification.published }]
   }
-  if (notification.state) node[`${NOTIFY_NS}state`] = [{ '@value': notification.state }]
+  if (notification.state) {
+    node[`${NOTIFY_NS}state`] = [{ '@value': notification.state }]
+  }
   return [node]
 }
 

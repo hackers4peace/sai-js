@@ -142,8 +142,12 @@ describe('createSocialAgentRegistration', () => {
     let patchBody = ''
     let posted = ''
     const recordingFetch = (async (url: string, options?: RequestInit) => {
-      if (options?.method === 'POST') posted = url
-      if (options?.method === 'PATCH') patchBody = options.body as string
+      if (options?.method === 'POST') {
+        posted = url
+      }
+      if (options?.method === 'PATCH') {
+        patchBody = options.body as string
+      }
       const accept = (options?.headers as Record<string, string> | undefined)?.Accept
       if (accept === 'application/lws+cid') {
         return {
@@ -163,7 +167,9 @@ describe('createSocialAgentRegistration', () => {
             if (name === 'Link') {
               return '<https://auth.alice.example/>; rel="https://www.w3.org/ns/lws#storage", <http://just.en.example/description>; rel="describedby"'
             }
-            if (name === 'Location') return registration.id
+            if (name === 'Location') {
+              return registration.id
+            }
             return undefined
           },
         },

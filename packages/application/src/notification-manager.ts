@@ -27,7 +27,9 @@ export class NotificationManager extends EventTarget {
     subscription: PushSubscription,
     topic: string
   ): Promise<NotificationChannel> {
-    if (!this.webPushService) throw new Error('Web Push Service not found')
+    if (!this.webPushService) {
+      throw new Error('Web Push Service not found')
+    }
     const channel = {
       '@context': ['https://www.w3.org/ns/solid/notifications-context/v1'],
       type: 'notify:WebPushChannel2023',
@@ -88,14 +90,20 @@ export class NotificationManager extends EventTarget {
     try {
       while (response.body.locked) {
         const { done, value } = await reader.read()
-        if (done) break
+        if (done) {
+          break
+        }
         buffer += decoder.decode(value, { stream: true })
         while (true) {
           const newlineIndex = buffer.indexOf('\n')
-          if (newlineIndex < 0) break
+          if (newlineIndex < 0) {
+            break
+          }
           const line = buffer.slice(0, newlineIndex).trim()
           buffer = buffer.slice(newlineIndex + 1)
-          if (!line) continue
+          if (!line) {
+            continue
+          }
           // discard the initial state notification (first line)
           if (!initialDiscarded) {
             initialDiscarded = true
@@ -119,7 +127,9 @@ export class NotificationManager extends EventTarget {
   }
 
   public async subscribeToResource(resourceId: string): Promise<void> {
-    if (this.streamMap.has(resourceId)) return
+    if (this.streamMap.has(resourceId)) {
+      return
+    }
     const headResponse = await this.authnFetch(resourceId)
     const linkHeader = headResponse.headers.get('link')
     const receiveFrom = linkHeader ? getNotificationChannel(linkHeader) : undefined

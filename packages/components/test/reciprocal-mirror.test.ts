@@ -103,7 +103,9 @@ function session() {
       const iri = String(input)
       fetched.push(iri)
       const doc = iri === RECIPROCAL ? reciprocalDoc : iri === STALE ? undefined : grantDoc(iri)
-      if (!doc) return new Response('gone', { status: 404 })
+      if (!doc) {
+        return new Response('gone', { status: 404 })
+      }
       return new Response(JSON.stringify(doc), {
         headers: { 'content-type': 'application/ld+json' },
       })

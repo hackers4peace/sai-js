@@ -70,7 +70,9 @@ async function tokenExchange(
         )
       : baseFetch(input as RequestInfo, init)) as typeof globalThis.fetch
 
-  if (options.dpopKeyPair) requestOptions.DPoP = oauth.DPoP(client, options.dpopKeyPair)
+  if (options.dpopKeyPair) {
+    requestOptions.DPoP = oauth.DPoP(client, options.dpopKeyPair)
+  }
 
   const response = await oauth.genericTokenEndpointRequest(
     as,

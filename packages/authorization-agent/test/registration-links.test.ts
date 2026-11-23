@@ -32,19 +32,27 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
           for (const grantIri of grantIris) {
             const grantQuads = graphs.get(grantIri) ?? []
             const policy = grantQuads.find((q) => q.predicate.value === LWS.access)?.object.value
-            if (!policy) continue
+            if (!policy) {
+              continue
+            }
             const permission = grantQuads.find(
               (q) => q.predicate.value === ODRL.permission && q.subject.value === policy
             )?.object.value
-            if (!permission) continue
+            if (!permission) {
+              continue
+            }
             const target = grantQuads.find(
               (q) => q.predicate.value === ODRL.target && q.subject.value === permission
             )?.object.value
-            if (!target) continue
+            if (!target) {
+              continue
+            }
             const owner = grantQuads.find(
               (q) => q.predicate.value === INTEROP.dataOwner && q.subject.value === target
             )?.object.value
-            if (owner) owners.add(owner)
+            if (owner) {
+              owners.add(owner)
+            }
           }
         }
         return [...owners].map((owner) => ({ owner: { termType: 'NamedNode', value: owner } }))
@@ -53,7 +61,9 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
         const values = new Set<string>()
         for (const name of [RECIPROCAL, `meta:${RECIPROCAL}`]) {
           for (const q of graphs.get(name) ?? []) {
-            if (q.predicate.value === INTEROP.hasAdminGrant) values.add(q.object.value)
+            if (q.predicate.value === INTEROP.hasAdminGrant) {
+              values.add(q.object.value)
+            }
           }
         }
         return [...values].map((value) => ({ value: { termType: 'NamedNode', value } }))

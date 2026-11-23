@@ -63,7 +63,9 @@ async function expandedNodes(doc: unknown, base: string): Promise<any[]> {
  */
 function referencePairs(expanded: any[], treeId: string): ShapeTreeReference[] {
   const treeNode = expanded.find((node) => node['@id'] === treeId)
-  if (!treeNode) return []
+  if (!treeNode) {
+    return []
+  }
   const byId = new Map(expanded.map((node) => [node['@id'], node]))
   return (treeNode[SHAPETREES.references] ?? []).map((reference: any) => {
     // Two shapes: server documents reference named/blank nodes by id
@@ -155,7 +157,9 @@ export async function getDescription(
   const descriptionSetNode = expanded.find((node) =>
     (node[SHAPETREES.usesLanguage] ?? []).some(isLanguage)
   )
-  if (!descriptionSetNode) return null
+  if (!descriptionSetNode) {
+    return null
+  }
   const descriptionIri = expanded.find(
     (node) =>
       (node[SHAPETREES.describes] ?? []).some((value: any) => value['@id'] === tree.id) &&

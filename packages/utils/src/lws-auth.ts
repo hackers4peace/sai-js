@@ -100,9 +100,13 @@ function isServicePath(url: string): boolean {
  * no `Bearer` challenge (e.g. a Solid-OIDC `DPoP` challenge).
  */
 export function parseLwsChallenge(header: string | null | undefined): LwsChallenge | undefined {
-  if (!header) return undefined
+  if (!header) {
+    return undefined
+  }
   const bearer = /(?:^|,)\s*Bearer\s+(.*)$/is.exec(header)
-  if (!bearer) return undefined
+  if (!bearer) {
+    return undefined
+  }
   const params: Record<string, string> = {}
   AUTH_PARAM.lastIndex = 0
   let match: RegExpExecArray | null
@@ -110,10 +114,18 @@ export function parseLwsChallenge(header: string | null | undefined): LwsChallen
     params[match[1].toLowerCase()] = match[2] ?? match[3]
   }
   const challenge: LwsChallenge = {}
-  if (params.resource_metadata) challenge.resourceMetadata = params.resource_metadata
-  if (params.as_uri) challenge.asUri = params.as_uri
-  if (params.realm) challenge.realm = params.realm
-  if (params.error) challenge.error = params.error
+  if (params.resource_metadata) {
+    challenge.resourceMetadata = params.resource_metadata
+  }
+  if (params.as_uri) {
+    challenge.asUri = params.as_uri
+  }
+  if (params.realm) {
+    challenge.realm = params.realm
+  }
+  if (params.error) {
+    challenge.error = params.error
+  }
   return Object.keys(challenge).length > 0 ? challenge : undefined
 }
 
@@ -127,11 +139,15 @@ async function protectedResourceAuthorizationServer(
 ): Promise<string | undefined> {
   try {
     const response = await fetch(metadataIri, { headers: { accept: 'application/json' } })
-    if (!response.ok) return undefined
+    if (!response.ok) {
+      return undefined
+    }
     const document = (await response.json()) as Record<string, unknown>
     const servers = document.authorization_servers
     const first = Array.isArray(servers) ? servers[0] : servers
-    if (typeof first === 'string') return first
+    if (typeof first === 'string') {
+      return first
+    }
     if (first && typeof first === 'object' && typeof (first as { id?: unknown }).id === 'string') {
       return (first as { id: string }).id
     }
@@ -157,21 +173,29 @@ export async function discoverLwsAuthorizationServer(
 ): Promise<string> {
   if (challenge?.resourceMetadata) {
     const asUri = await protectedResourceAuthorizationServer(challenge.resourceMetadata, fetch)
-    if (asUri) return asUri
+    if (asUri) {
+      return asUri
+    }
   }
-  if (challenge?.asUri) return challenge.asUri
+  if (challenge?.asUri) {
+    return challenge.asUri
+  }
 
   const origin = new URL(storage).origin
   const asUri = await protectedResourceAuthorizationServer(
     `${origin}${LWS_PROTECTED_RESOURCE_METADATA_PATH}`,
     fetch
   )
-  if (asUri) return asUri
+  if (asUri) {
+    return asUri
+  }
 
   // A storage server that is its own authorization server advertises the
   // metadata on its base URL; for other storages the challenge is required.
   const configuration = await fetchLwsAuthorizationServerMetadata(origin, fetch)
-  if (configuration) return configuration.issuer
+  if (configuration) {
+    return configuration.issuer
+  }
   throw new Error(`cannot discover the LWS authorization server of ${storage}`)
 }
 
@@ -183,9 +207,13 @@ export async function fetchLwsAuthorizationServerMetadata(
   const iri = `${trimTrailingSlash(authorizationServer)}${LWS_CONFIGURATION_PATH}`
   try {
     const response = await fetch(iri, { headers: { accept: 'application/json' } })
-    if (!response.ok) return undefined
+    if (!response.ok) {
+      return undefined
+    }
     const document = (await response.json()) as Record<string, unknown>
-    if (typeof document.token_endpoint !== 'string') return undefined
+    if (typeof document.token_endpoint !== 'string') {
+      return undefined
+    }
     return {
       issuer: typeof document.issuer === 'string' ? document.issuer : authorizationServer,
       tokenEndpoint: document.token_endpoint,
@@ -431,7 +459,9 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
     }
     for (const storage of storages) {
       try {
-        if (new URL(storage).origin === origin) return storage
+        if (new URL(storage).origin === origin) {
+          return storage
+        }
       } catch {
         // not a valid storage URL
       }
@@ -443,7 +473,9 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
     const cached = servers.get(storage)
     // A challenge that only identifies the storage (realm/error) does not
     // point at a different authorization server: reuse the known one.
-    if (cached && !challenge?.resourceMetadata && !challenge?.asUri) return cached
+    if (cached && !challenge?.resourceMetadata && !challenge?.asUri) {
+      return cached
+    }
     const metadata = await discoverLwsAuthorizationServerMetadata(storage, baseFetch, challenge)
     servers.set(storage, metadata)
     return metadata
@@ -451,7 +483,9 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
 
   async function exchange(storage: string, challenge?: LwsChallenge): Promise<string | undefined> {
     const inFlight = pending.get(storage)
-    if (inFlight) return inFlight
+    if (inFlight) {
+      return inFlight
+    }
     const promise = (async (): Promise<string | undefined> => {
       const token = options.tokenSource
         ? await options.tokenSource(storage, challenge)
@@ -464,7 +498,9 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
       if (!token) {
         noToken.set(storage, Date.now() + noTokenTtl)
         tokens.delete(storage)
-        if (!storages.has(storage)) storages.add(storage)
+        if (!storages.has(storage)) {
+          storages.add(storage)
+        }
         return undefined
       }
       noToken.delete(storage)
@@ -472,7 +508,9 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
         accessToken: token.accessToken,
         expiresAt: Date.now() + Math.max(30_000, token.expiresIn * 1000 - renewalMargin),
       })
-      if (!storages.has(storage)) storages.add(storage)
+      if (!storages.has(storage)) {
+        storages.add(storage)
+      }
       return token.accessToken
     })()
     pending.set(storage, promise)
@@ -485,8 +523,12 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
 
   function denied(storage: string): boolean {
     const until = noToken.get(storage)
-    if (until === undefined) return false
-    if (until > Date.now()) return true
+    if (until === undefined) {
+      return false
+    }
+    if (until > Date.now()) {
+      return true
+    }
     noToken.delete(storage)
     return false
   }
@@ -496,12 +538,18 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
     challenge?: LwsChallenge
   ): Promise<string | undefined> {
     const cached = tokens.get(storage)
-    if (cached && cached.expiresAt > Date.now() && !challenge) return cached.accessToken
-    if (denied(storage)) return undefined
+    if (cached && cached.expiresAt > Date.now() && !challenge) {
+      return cached.accessToken
+    }
+    if (denied(storage)) {
+      return undefined
+    }
     // Without a challenge, the authorization server of a storage that is not
     // its own base URL can not be discovered yet: send the request
     // unauthenticated first and use the challenge of its `401` response.
-    if (!challenge && !servers.has(storage)) return undefined
+    if (!challenge && !servers.has(storage)) {
+      return undefined
+    }
     return exchange(storage, challenge)
   }
 
@@ -519,22 +567,34 @@ export function createLwsFetch(options: LwsFetchOptions): WhatwgFetch {
       const serviceStorage = isServicePath(url) ? findServiceStorage(url) : undefined
       const serviceToken = serviceStorage ? await accessToken(serviceStorage) : undefined
       const response = await baseFetch(serviceToken ? withBearer(request, serviceToken) : request)
-      if (response.status !== 401) return response
+      if (response.status !== 401) {
+        return response
+      }
       const challenge = parseLwsChallenge(response.headers.get('www-authenticate'))
-      if (!challenge?.realm && !challenge?.asUri && !challenge?.resourceMetadata) return response
+      if (!challenge?.realm && !challenge?.asUri && !challenge?.resourceMetadata) {
+        return response
+      }
       const storage = serviceStorage ?? normalizeStorage(challenge.realm ?? new URL(url).origin)
-      if (serviceToken === undefined && denied(storage)) return response
+      if (serviceToken === undefined && denied(storage)) {
+        return response
+      }
       const token = await accessToken(storage, challenge)
       return baseFetch(token ? withBearer(retryable, token) : retryable)
     }
 
     const token = await accessToken(known)
     const response = await baseFetch(token ? withBearer(request, token) : request)
-    if (response.status !== 401) return response
+    if (response.status !== 401) {
+      return response
+    }
     const challenge = parseLwsChallenge(response.headers.get('www-authenticate'))
-    if (!challenge?.realm && !challenge?.asUri && !challenge?.resourceMetadata) return response
+    if (!challenge?.realm && !challenge?.asUri && !challenge?.resourceMetadata) {
+      return response
+    }
     const storage = challenge.realm ? normalizeStorage(challenge.realm) : known
-    if (denied(storage)) return response
+    if (denied(storage)) {
+      return response
+    }
     const renewed = await exchange(storage, challenge)
     return baseFetch(renewed ? withBearer(retryable, renewed) : retryable)
   }

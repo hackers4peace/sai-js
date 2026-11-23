@@ -176,7 +176,9 @@ export async function listGranteeRegistrations(
   const grantees = new Map<string, AgentId>()
   const add = (registration: { registeredAgent: string; type: string[] }) => {
     const agent = registration.registeredAgent
-    if (!agent || grantees.has(agent)) return
+    if (!agent || grantees.has(agent)) {
+      return
+    }
     const type = registration.type.includes(INTEROP.ApplicationRegistration)
       ? INTEROP.Application
       : INTEROP.SocialAgent
@@ -184,11 +186,15 @@ export async function listGranteeRegistrations(
   }
   for (const iri of await listContained(transport, session.registrySet.hasSocialAgentRegistry.id)) {
     const registration = await getSocialAgentRegistration(transport, iri).catch(() => undefined)
-    if (registration) add(registration)
+    if (registration) {
+      add(registration)
+    }
   }
   for (const iri of await listContained(transport, session.registrySet.hasApplicationRegistry.id)) {
     const registration = await getApplicationRegistration(transport, iri).catch(() => undefined)
-    if (registration) add(registration)
+    if (registration) {
+      add(registration)
+    }
   }
   return [...grantees.values()]
 }
@@ -214,7 +220,9 @@ export async function listReciprocalRegistrations(payload: {
   const pairs: ReciprocalPair[] = []
   for (const iri of await listContained(transport, session.registrySet.hasSocialAgentRegistry.id)) {
     const registration = await getSocialAgentRegistration(transport, iri).catch(() => undefined)
-    if (!registration?.reciprocalRegistration) continue
+    if (!registration?.reciprocalRegistration) {
+      continue
+    }
     pairs.push({
       peerId: { id: registration.registeredAgent, type: [INTEROP.SocialAgent] },
       registrationId: registration.id,
@@ -296,7 +304,9 @@ export async function deleteRoleFromRegistry(payload: {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const existing = await loadRole(payload.role.id, session.fetch).catch((): undefined => undefined)
-  if (!existing) return
+  if (!existing) {
+    return
+  }
   await RoleRegistry.deleteRole(session.registrySet.hasRoleRegistry, session.fetch, payload.role.id)
 }
 
@@ -318,7 +328,9 @@ export async function createRoleAtId(payload: {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const existing = await loadRole(payload.role.id, session.fetch).catch((): undefined => undefined)
-  if (existing) return
+  if (existing) {
+    return
+  }
   // The storage identifier strategy creates the member and records containment.
   await session.createIdentifierResource(
     session.registrySet.hasRoleRegistry.id,
@@ -414,7 +426,9 @@ export async function getExistingGrantBodies(
   ]
   while (queue.length > 0) {
     const iri = queue.shift()!
-    if (attempted.has(iri)) continue
+    if (attempted.has(iri)) {
+      continue
+    }
     attempted.add(iri)
     let grant: GrantData
     try {
@@ -424,7 +438,9 @@ export async function getExistingGrantBodies(
     }
     bodies.set(iri, grant)
     for (const child of grant.hasInheritingGrant ?? []) {
-      if (typeof child === 'string' && !attempted.has(child)) queue.push(child)
+      if (typeof child === 'string' && !attempted.has(child)) {
+        queue.push(child)
+      }
     }
   }
   return [...bodies.values()]
@@ -572,7 +588,9 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
   const sourcePairs = pairTrees(grantTrees(payload.generated.sourceGrants), sourceExisting)
   for (const pair of sourcePairs) {
     for (const node of pair.nodes) {
-      if (node.generated.id) reusedSourceIds.push(node.generated.id)
+      if (node.generated.id) {
+        reusedSourceIds.push(node.generated.id)
+      }
     }
   }
   rememberExisting(sourcePairs)
@@ -584,7 +602,9 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
   const delegatedPairs = pairTrees(delegatedTrees, delegatedExisting)
   for (const pair of delegatedPairs) {
     const index = delegatedIndexByTree.get(pair.generated)
-    if (index !== undefined) reusedDelegatedIndexes.push(index)
+    if (index !== undefined) {
+      reusedDelegatedIndexes.push(index)
+    }
   }
   rememberExisting(delegatedPairs)
 
@@ -674,7 +694,9 @@ export async function createAcr(
   }
   if (uasId) {
     // no self granting at this moment!
-    if (grantee === payload.dataOwner) throw payload
+    if (grantee === payload.dataOwner) {
+      throw payload
+    }
 
     // grantee is a social agent - only their UAS has access
     peer = {
@@ -688,12 +710,16 @@ export async function createAcr(
       client: grantee,
     }
   }
-  if (!peer && !client) throw new Error('peer or client are required')
+  if (!peer && !client) {
+    throw new Error('peer or client are required')
+  }
   const headResponse = await session.fetch(payload.id, {
     method: 'HEAD',
   })
   const acrId = getAcl(headResponse.headers.get('link'))
-  if (!acrId) throw new Error(`no acl link on grant: ${payload.id}`)
+  if (!acrId) {
+    throw new Error(`no acl link on grant: ${payload.id}`)
+  }
   await putJsonLd(
     acrId,
     session.fetch,
@@ -823,7 +849,9 @@ export async function resolveAuthorizationGrantee(
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const granteeIri = payload.object[0]?.grantee
-  if (!granteeIri) return undefined
+  if (!granteeIri) {
+    return undefined
+  }
   try {
     return await session.typeGrantee(granteeIri)
   } catch {
@@ -875,7 +903,9 @@ export async function getPendingActivities(
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registry = session.registrySet.hasActivityRegistry
-  if (!registry) return []
+  if (!registry) {
+    return []
+  }
   const transport = localSparqlTransport(session.sparqlEndpoint)
   // one listing + one typed completion SELECT; only the pending bodies are read
   const [iris, completions] = await Promise.all([
@@ -890,7 +920,9 @@ export async function getPendingActivities(
   )
   const workItems: ActivityData[] = []
   for (const iri of iris) {
-    if (completionIris.has(iri) || completedTargets.has(iri)) continue
+    if (completionIris.has(iri) || completedTargets.has(iri)) {
+      continue
+    }
     workItems.push(await ActivityRegistry.getActivity(transport, iri))
   }
   return workItems
@@ -939,7 +971,9 @@ export async function markActivitiesDone(payload: MarkActivitiesDoneInput): Prom
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registry = session.registrySet.hasActivityRegistry
-  if (!registry) return
+  if (!registry) {
+    return
+  }
   for (const activity of payload.activities) {
     await ActivityRegistry.createCompletion(
       registry,

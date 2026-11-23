@@ -60,7 +60,9 @@ describe('LWS reads', () => {
     const accepts: string[] = []
     const recordingFetch = (async (url: Parameters<typeof fetch>[0], init?: RequestInit) => {
       const accept = (init?.headers as Record<string, string> | undefined)?.Accept
-      if (accept) accepts.push(accept)
+      if (accept) {
+        accepts.push(accept)
+      }
       return fetch(url, init)
     }) as unknown as typeof fetch
 

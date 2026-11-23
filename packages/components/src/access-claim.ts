@@ -100,7 +100,9 @@ export async function verifyAccessClaim(
   for (const policy of policyNodes) {
     oneIri(store, policy, ODRL.profile, 'odrl:profile')
     const scope = oneIri(store, policy, INTEROP.scopeOfGrant, 'interop:scopeOfGrant')
-    if (!GRANT_SCOPES.has(scope)) badRequest(`${scope} is not a supported grant scope.`)
+    if (!GRANT_SCOPES.has(scope)) {
+      badRequest(`${scope} is not a supported grant scope.`)
+    }
     if (store.getObjects(policy, namedNode(INTEROP.registeredShapeTree), null).length > 0) {
       badRequest('interop:registeredShapeTree belongs on the target, not the policy.')
     }
@@ -129,7 +131,9 @@ export async function verifyAccessClaim(
       targets.add(target)
     }
   }
-  if (targets.size === 0) badRequest('at least one odrl:target is required.')
+  if (targets.size === 0) {
+    badRequest('at least one odrl:target is required.')
+  }
   if (options.assignee !== undefined) {
     if (assignees.size !== 1 || !assignees.has(options.assignee)) {
       badRequest(`the claim needs to be assigned to ${options.assignee}.`)
@@ -191,19 +195,29 @@ const HIDDEN_CLAIM_FIELDS = new Set([
  * delegatee or resolvable grant references.
  */
 function sanitizeClaimNode(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sanitizeClaimNode)
-  if (!value || typeof value !== 'object') return value
+  if (Array.isArray(value)) {
+    return value.map(sanitizeClaimNode)
+  }
+  if (!value || typeof value !== 'object') {
+    return value
+  }
   const result: Record<string, unknown> = {}
   for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
-    if (HIDDEN_CLAIM_FIELDS.has(key)) continue
+    if (HIDDEN_CLAIM_FIELDS.has(key)) {
+      continue
+    }
     result[key] = sanitizeClaimNode(nested)
   }
   return result
 }
 
 function cloneClaimNode(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(cloneClaimNode)
-  if (!value || typeof value !== 'object') return value
+  if (Array.isArray(value)) {
+    return value.map(cloneClaimNode)
+  }
+  if (!value || typeof value !== 'object') {
+    return value
+  }
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, nested]) => [
       key,
@@ -266,7 +280,9 @@ export function rewriteAccessClaim(access: unknown[], assignee: string): unknown
   })
   const byRef = new Map<string, string>()
   for (const entry of entries) {
-    for (const ref of entry.refs) byRef.set(ref, entry.newId)
+    for (const ref of entry.refs) {
+      byRef.set(ref, entry.newId)
+    }
   }
 
   return entries.map(({ raw, newId, inherited }) => {
@@ -283,8 +299,11 @@ export function rewriteAccessClaim(access: unknown[], assignee: string): unknown
     const remapped = inherited
       .map((ref) => byRef.get(ref))
       .filter((ref): ref is string => typeof ref === 'string')
-    if (remapped.length === 1) policy.inheritsFromGrant = remapped[0]
-    else if (remapped.length > 1) policy.inheritsFromGrant = remapped
+    if (remapped.length === 1) {
+      policy.inheritsFromGrant = remapped[0]
+    } else if (remapped.length > 1) {
+      policy.inheritsFromGrant = remapped
+    }
     if (Array.isArray(policy.permission)) {
       policy.permission = policy.permission.map((rawPermission) => {
         const permission = sanitizeClaimNode(rawPermission) as Record<string, unknown>

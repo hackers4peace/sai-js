@@ -67,7 +67,9 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
       const seen = new Set<string>()
       for (const name of names) {
         for (const source of graphs.get(name) ?? []) {
-          if (source.predicate.value === INTEROP.hasDataGrant) seen.add(source.object.value)
+          if (source.predicate.value === INTEROP.hasDataGrant) {
+            seen.add(source.object.value)
+          }
         }
       }
       return [...seen].map((grant) => ({ grant: { termType: 'NamedNode', value: grant } })) as never
@@ -77,7 +79,9 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
       const store = new Store()
       for (const match of query.matchAll(/VALUES \?g \{([^}]*)\}/g)) {
         for (const iri of [...match[1].matchAll(/<([^>]+)>/g)].map((m) => m[1])) {
-          for (const source of graphs.get(iri) ?? []) store.addQuad(clone(source))
+          for (const source of graphs.get(iri) ?? []) {
+            store.addQuad(clone(source))
+          }
         }
       }
       return store

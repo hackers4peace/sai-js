@@ -89,7 +89,9 @@ async function adminSparqlQuery(
   )
   // the org's pod the query targets; the handler restricts it to the org's
   // account-storage records (defaults to the registry pod)
-  if (podUrl) url.searchParams.set('pod', podUrl)
+  if (podUrl) {
+    url.searchParams.set('pod', podUrl)
+  }
   const response = await adminSession.fetch(url.href, {
     method: 'QUERY',
     headers: {
@@ -229,6 +231,8 @@ export async function containingContainer(
   resourceIri: string
 ): Promise<string | undefined> {
   const podUrl = contextPod(ctx, resourceIri)
-  if (!podUrl) return undefined
+  if (!podUrl) {
+    return undefined
+  }
   return getContainingContainer(sparqlTransportForPod(ctx, podUrl), resourceIri)
 }

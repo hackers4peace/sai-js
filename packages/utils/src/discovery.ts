@@ -68,14 +68,18 @@ async function fetchCidServices(
   fetch: WhatwgFetch
 ): Promise<Record<string, unknown>[]> {
   const response = await fetch(resourceIri, { headers: { Accept: CID_ACCEPT } })
-  if (!response.ok) return []
+  if (!response.ok) {
+    return []
+  }
   let doc: unknown
   try {
     doc = await response.json()
   } catch {
     return []
   }
-  if (!doc || typeof doc !== 'object') return []
+  if (!doc || typeof doc !== 'object') {
+    return []
+  }
   const raw = (doc as { service?: unknown }).service
   const services = Array.isArray(raw) ? raw : raw ? [raw] : []
   return services.filter(
@@ -92,8 +96,12 @@ export async function discoverCidService(
   const services = await fetchCidServices(resourceIri, fetch)
   for (const service of services as CidService[]) {
     const types = Array.isArray(service.type) ? service.type : [service.type]
-    if (!types.some((type) => serviceTypeMatches(type, serviceType))) continue
-    if (typeof service.serviceEndpoint === 'string') return service.serviceEndpoint
+    if (!types.some((type) => serviceTypeMatches(type, serviceType))) {
+      continue
+    }
+    if (typeof service.serviceEndpoint === 'string') {
+      return service.serviceEndpoint
+    }
   }
   return undefined
 }
@@ -117,9 +125,13 @@ export async function discoverAgentRegistration(
   fetch: WhatwgFetch
 ): Promise<string | undefined> {
   const response = await fetch(authorizationAgentIri, { method: 'HEAD' })
-  if (!response.ok) throw new AgentRegistrationDiscoveryError(response)
+  if (!response.ok) {
+    throw new AgentRegistrationDiscoveryError(response)
+  }
   const linkHeader = response.headers.get('Link')
-  if (!linkHeader) return undefined
+  if (!linkHeader) {
+    return undefined
+  }
   return getAgentRegistrationIri(linkHeader)
 }
 
@@ -158,9 +170,13 @@ export async function upContainer(
     method: 'HEAD',
     headers: { Accept: AUXILIARY_DISCOVERY_ACCEPT },
   })
-  if (!response.ok) return undefined
+  if (!response.ok) {
+    return undefined
+  }
   const linkHeader = response.headers.get('Link')
-  if (!linkHeader) return undefined
+  if (!linkHeader) {
+    return undefined
+  }
   const up = getUp(linkHeader)
   // the header is absolute in practice; resolve defensively so a relative
   // reference can never leak out as a bogus identifier
@@ -175,9 +191,13 @@ export async function discoverDescriptionResource(
     method: 'HEAD',
     headers: { Accept: AUXILIARY_DISCOVERY_ACCEPT },
   })
-  if (!response.ok) throw new DescriptionResourceDiscoveryError(response)
+  if (!response.ok) {
+    throw new DescriptionResourceDiscoveryError(response)
+  }
   const linkHeader = response.headers.get('Link')
-  if (!linkHeader) return undefined
+  if (!linkHeader) {
+    return undefined
+  }
   return getDescriptionResource(linkHeader)
 }
 
@@ -189,9 +209,13 @@ export async function discoverAccessResource(
     method: 'HEAD',
     headers: { Accept: AUXILIARY_DISCOVERY_ACCEPT },
   })
-  if (!response.ok) throw new AccessResourceDiscoveryError(response)
+  if (!response.ok) {
+    throw new AccessResourceDiscoveryError(response)
+  }
   const linkHeader = response.headers.get('Link')
-  if (!linkHeader) return undefined
+  if (!linkHeader) {
+    return undefined
+  }
   return getAcl(linkHeader)
 }
 
@@ -200,9 +224,13 @@ export async function discoverStorageDescription(
   fetch: WhatwgFetch
 ): Promise<string | undefined> {
   const response = await fetch(resourceIri, { method: 'HEAD' })
-  if (!response.ok) throw new StorageDescriptionDiscoveryError(response)
+  if (!response.ok) {
+    throw new StorageDescriptionDiscoveryError(response)
+  }
   const linkHeader = response.headers.get('Link')
-  if (!linkHeader) return undefined
+  if (!linkHeader) {
+    return undefined
+  }
   return getStorageDescription(linkHeader)
 }
 
@@ -221,9 +249,13 @@ export async function discoverLwsStorage(
   fetch: WhatwgFetch
 ): Promise<string | undefined> {
   const response = await fetch(resourceIri, { method: 'HEAD' })
-  if (!response.ok) return undefined
+  if (!response.ok) {
+    return undefined
+  }
   const linkHeader = response.headers.get('Link')
-  if (!linkHeader) return undefined
+  if (!linkHeader) {
+    return undefined
+  }
   return getLwsStorage(linkHeader)
 }
 
@@ -235,9 +267,13 @@ export async function fetchLwsStorageDescription(
   const response = await fetch(storage, {
     headers: { Accept: LWS_STORAGE_DESCRIPTION_ACCEPT },
   })
-  if (!response.ok) return undefined
+  if (!response.ok) {
+    return undefined
+  }
   const contentType = response.headers.get('Content-Type') ?? ''
-  if (!contentType.includes(LWS_STORAGE_DESCRIPTION_ACCEPT)) return undefined
+  if (!contentType.includes(LWS_STORAGE_DESCRIPTION_ACCEPT)) {
+    return undefined
+  }
   return (await response.json()) as Record<string, unknown>
 }
 
@@ -271,11 +307,17 @@ export function storageRootFromDescription(
   const rawServices = description.service
   const services = Array.isArray(rawServices) ? rawServices : rawServices ? [rawServices] : []
   for (const service of services) {
-    if (!service || typeof service !== 'object') continue
+    if (!service || typeof service !== 'object') {
+      continue
+    }
     const record = service as Record<string, unknown>
     const types = Array.isArray(record.type) ? record.type : [record.type]
-    if (!types.some((type) => LWS_STORAGE_ROOT_TYPES.includes(type as string))) continue
-    if (typeof record.serviceEndpoint === 'string') return record.serviceEndpoint
+    if (!types.some((type) => LWS_STORAGE_ROOT_TYPES.includes(type as string))) {
+      continue
+    }
+    if (typeof record.serviceEndpoint === 'string') {
+      return record.serviceEndpoint
+    }
   }
   return undefined
 }
@@ -291,9 +333,13 @@ export async function lwsStorageRoot(
   fetch: WhatwgFetch
 ): Promise<string | undefined> {
   const storage = await discoverLwsStorage(resourceIri, fetch)
-  if (!storage) return undefined
+  if (!storage) {
+    return undefined
+  }
   const description = await fetchLwsStorageDescription(storage, fetch)
-  if (!description) return undefined
+  if (!description) {
+    return undefined
+  }
   return storageRootFromDescription(description)
 }
 
@@ -333,6 +379,8 @@ export async function discoverWebPushService(
   const doc = await fetchJsonLd(authorizationAgentIri, fetch)
   const [id] = await documentValues(doc, authorizationAgentIri, INTEROP.pushService)
   const [vapidPublicKey] = await documentValues(doc, authorizationAgentIri, NOTIFY.vapidPublicKey)
-  if (!id || !vapidPublicKey) return
+  if (!id || !vapidPublicKey) {
+    return
+  }
   return { id, vapidPublicKey }
 }

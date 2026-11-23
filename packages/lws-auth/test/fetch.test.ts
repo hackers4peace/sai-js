@@ -75,7 +75,9 @@ function createWorld(options: { grantLifetime?: number } = {}): World {
 
     // authorization server metadata
     if (url.pathname === '/.well-known/lws-configuration') {
-      if (server(url) === UAS) return undefined
+      if (server(url) === UAS) {
+        return undefined
+      }
       return json({
         issuer: server(url),
         token_endpoint: `${server(url)}.well-known/lws/token`,
@@ -94,7 +96,9 @@ function createWorld(options: { grantLifetime?: number } = {}): World {
       const authorization = request.headers.get('authorization') ?? ''
       if (!authorization.startsWith('Bearer access-')) {
         const storage = storageOf(href)
-        if (!storage) return undefined
+        if (!storage) {
+          return undefined
+        }
         return new Response(undefined, {
           status: 401,
           headers: {
@@ -273,7 +277,9 @@ describe('createLwsAuthFetch', () => {
         })
       }
       if (url.pathname === '/.well-known/lws-configuration') {
-        if (href === `${UAS}.well-known/lws-configuration`) return undefined
+        if (href === `${UAS}.well-known/lws-configuration`) {
+          return undefined
+        }
         return json({
           issuer: `https://${url.host}/`,
           token_endpoint: `https://${url.host}/.well-known/lws/token`,
@@ -332,7 +338,9 @@ describe('createLwsAuthFetch', () => {
       expect(request.body ?? '').not.toContain(world.grants[0])
       // the unauthenticated probe is allowed; the retry carries the access token
       const authorization = request.headers.get('authorization')
-      if (authorization) expect(authorization).toMatch(/^Bearer access-/u)
+      if (authorization) {
+        expect(authorization).toMatch(/^Bearer access-/u)
+      }
     }
   })
 })

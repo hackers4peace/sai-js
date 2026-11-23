@@ -88,7 +88,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
     // A claim always wins over a scope: an owner/admin who presents a narrower
     // claim gets exactly that claim, never the broad scope.
     const claimData = await this.findAccessClaimData(target, credentials)
-    if (claimData !== undefined) return this.getClaimPermissions(target, credentials, claimData)
+    if (claimData !== undefined) {
+      return this.getClaimPermissions(target, credentials, claimData)
+    }
 
     const { scope: rawScope } = credentials as AccessClaimCredentials
     const scope = new Set(
@@ -96,9 +98,13 @@ export class SaiPermissionsEngine implements PolicyEngine {
         ? rawScope.filter((value): value is string => typeof value === 'string')
         : []
     )
-    if (scope.has('owner')) return this.permissionMap(Object.values(ACCESS_ACTIONS))
+    if (scope.has('owner')) {
+      return this.permissionMap(Object.values(ACCESS_ACTIONS))
+    }
     // Admin access is read-only; writing needs a normal access claim.
-    if (scope.has('admin')) return this.permissionMap([ACCESS_ACTIONS.read])
+    if (scope.has('admin')) {
+      return this.permissionMap([ACCESS_ACTIONS.read])
+    }
     // Claimless, scopeless tokens are never issued for a data storage. Deny
     // rather than falling back to registry or public matching (D10/D22).
     return this.permissionMap([])
@@ -118,7 +124,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
       this.logger.warn(`could not read public grants for ${target}: ${(error as Error).message}`)
       return this.permissionMap([])
     }
-    if (!data) return this.permissionMap([])
+    if (!data) {
+      return this.permissionMap([])
+    }
     const quads: Quad[] = Array.isArray(data) ? data : [...data]
     return this.evaluateTarget(target, quads, PUBLIC_IDENTITY, (parent) =>
       this.getPublicPermissions(parent)
@@ -137,9 +145,15 @@ export class SaiPermissionsEngine implements PolicyEngine {
       // LDP POST on a container asks for Append, which is separate from Create.
       permissions[PERMISSIONS.Append] = true
     }
-    if (modes.includes(ACCESS_ACTIONS.read)) permissions[PERMISSIONS.Read] = true
-    if (modes.includes(ACCESS_ACTIONS.modify)) permissions[PERMISSIONS.Modify] = true
-    if (modes.includes(ACCESS_ACTIONS.delete)) permissions[PERMISSIONS.Delete] = true
+    if (modes.includes(ACCESS_ACTIONS.read)) {
+      permissions[PERMISSIONS.Read] = true
+    }
+    if (modes.includes(ACCESS_ACTIONS.modify)) {
+      permissions[PERMISSIONS.Modify] = true
+    }
+    if (modes.includes(ACCESS_ACTIONS.delete)) {
+      permissions[PERMISSIONS.Delete] = true
+    }
     return permissions
   }
 
@@ -155,8 +169,12 @@ export class SaiPermissionsEngine implements PolicyEngine {
     credentials: Credentials
   ): Promise<Quad[] | undefined> {
     const { access, accessContext } = credentials as AccessClaimCredentials
-    if (access === undefined) return undefined
-    if (accessContext !== ODRL_ID_JAG_CONTEXT) return []
+    if (access === undefined) {
+      return undefined
+    }
+    if (accessContext !== ODRL_ID_JAG_CONTEXT) {
+      return []
+    }
 
     try {
       const policies = Array.isArray(access) ? access : [access]
@@ -165,7 +183,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
         store.getObjects(null, namedNode(LWS.storage), null).map((term) => term.value)
       )
       const storage = await this.manager.getStorage(target)
-      if (storages.size !== 1 || !storage || [...storages][0] !== storage) return []
+      if (storages.size !== 1 || !storage || [...storages][0] !== storage) {
+        return []
+      }
 
       // The registry evaluator looks up policies through an `lws:access` edge;
       // the token claim is just the policy graph. Give every policy its own
@@ -178,7 +198,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
       claimPolicies.forEach((policy, index) => {
         const root = `urn:sai:ld:access-claim:${index}`
         for (const ref of [policy, ...store.getObjects(policy, namedNode(ODRL.uid), null)]) {
-          if (ref.termType === 'NamedNode') rootByPolicy.set(ref.value, root)
+          if (ref.termType === 'NamedNode') {
+            rootByPolicy.set(ref.value, root)
+          }
         }
       })
       claimPolicies.forEach((policy, index) => {
@@ -303,7 +325,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
     const selected = scope === INTEROP.SelectedFromRegistry
     if (selected) {
       const resolved = await this.getRegistrationId(id)
-      if (!resolved) return undefined
+      if (!resolved) {
+        return undefined
+      }
       registrationId = resolved
     }
     const store = new Store([...data])
@@ -343,7 +367,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
     identity?: GrantIdentity
   ): Promise<string[]> {
     const grantId = await this.findGrant(data, registrationId, INTEROP.AllFromRegistry, identity)
-    if (!grantId) return []
+    if (!grantId) {
+      return []
+    }
     return this.getAccessModes(data, grantId)
   }
 
@@ -353,7 +379,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
     identity?: GrantIdentity
   ): Promise<string[]> {
     const grantId = await this.findGrant(data, resourceId, INTEROP.SelectedFromRegistry, identity)
-    if (!grantId) return []
+    if (!grantId) {
+      return []
+    }
     return this.getAccessModes(data, grantId)
   }
 
@@ -364,14 +392,22 @@ export class SaiPermissionsEngine implements PolicyEngine {
     parentPermissions: (id: string) => Promise<PermissionMap>
   ): Promise<string[]> {
     const registrationId = await this.getRegistrationId(resourceId)
-    if (!registrationId) return []
+    if (!registrationId) {
+      return []
+    }
     const grantId = await this.findGrant(data, registrationId, INTEROP.Inherited, identity)
-    if (!grantId) return []
+    if (!grantId) {
+      return []
+    }
     const parentGrantId = await this.findObject(data, grantId, INTEROP.inheritsFromGrant)
-    if (!parentGrantId) throw new Error(`parent not found for Inherited grant: ${grantId}`)
+    if (!parentGrantId) {
+      throw new Error(`parent not found for Inherited grant: ${grantId}`)
+    }
     // TODO: consider multi parent, and parents of different types
     const parentResourceId = await this.findParentResource(data, grantId, parentGrantId, resourceId)
-    if (!parentResourceId) return []
+    if (!parentResourceId) {
+      return []
+    }
     const parentResourcePermissions = await parentPermissions(parentResourceId)
     if (parentResourcePermissions[PERMISSIONS.Read]) {
       return this.getAccessModes(data, grantId)
@@ -431,15 +467,21 @@ export class SaiPermissionsEngine implements PolicyEngine {
     const parentShapeTreeId = parentTarget.shapeTree
     const childShapeTreeId = childTarget.shapeTree
     // A missing shape tree is a malformed grant, not a reason to throw a 500.
-    if (!parentShapeTreeId || !childShapeTreeId) return undefined
+    if (!parentShapeTreeId || !childShapeTreeId) {
+      return undefined
+    }
     const shapeTree = await loadShapeTree(parentShapeTreeId, fetch)
     const shapeTreeReference = shapeTree.references.find(
       (stRef) => stRef.shapeTree === childShapeTreeId
     )
-    if (!shapeTreeReference) return undefined
+    if (!shapeTreeReference) {
+      return undefined
+    }
     const predicate = shapeTreeReference.viaPredicate.value
     const endpoint = await this.resolvePodEndpoint(resourceId)
-    if (!endpoint) return undefined
+    if (!endpoint) {
+      return undefined
+    }
     const fetcher = new SparqlEndpointFetcher()
     const bindingsStream = await fetcher.fetchBindings(
       endpoint,
@@ -452,14 +494,20 @@ export class SaiPermissionsEngine implements PolicyEngine {
     const results = await arrayifyStream<IBindings>(bindingsStream)
     // TODO: ensure only in proper registration
     const parentId = results[0]?.['s'].value
-    if (!parentId) return undefined
+    if (!parentId) {
+      return undefined
+    }
     // check if in parent registration: selected Asset targets name it
     // explicitly, collection targets use the registration as their source
     const parentRegistrationId = parentTarget.registration ?? parentTarget.source
-    if (!parentRegistrationId) return undefined
+    if (!parentRegistrationId) {
+      return undefined
+    }
     // TODO: not needed if query only in proper registration
     const actualParent = await this.getRegistrationId(parentId)
-    if (!actualParent || actualParent !== parentRegistrationId) return undefined
+    if (!actualParent || actualParent !== parentRegistrationId) {
+      return undefined
+    }
     return parentId
   }
 
@@ -476,7 +524,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
   /** Reads `lws:partOf` from the target's metadata graph in its data pod. */
   private async getParentFromStore(id: string): Promise<string | undefined> {
     const endpoint = await this.resolvePodEndpoint(id)
-    if (!endpoint) return undefined
+    if (!endpoint) {
+      return undefined
+    }
     const fetcher = new SparqlEndpointFetcher()
     const bindingsStream = await fetcher.fetchBindings(
       endpoint,
@@ -489,7 +539,9 @@ export class SaiPermissionsEngine implements PolicyEngine {
   /** The RDF types of a resource, read from its data pod. */
   private async getResourceTypes(id: string): Promise<string[]> {
     const endpoint = await this.resolvePodEndpoint(id)
-    if (!endpoint) return []
+    if (!endpoint) {
+      return []
+    }
     const fetcher = new SparqlEndpointFetcher()
     const bindingsStream = await fetcher.fetchBindings(
       endpoint,

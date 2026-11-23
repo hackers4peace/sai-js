@@ -29,7 +29,9 @@ const COLLECTIONS = {
 
 function reflectCors(request) {
   const origin = request.headers.get('Origin')
-  if (!origin) return {}
+  if (!origin) {
+    return {}
+  }
 
   return {
     'Access-Control-Allow-Origin': origin,
@@ -43,7 +45,9 @@ function reflectCors(request) {
 // Parse an Accept header into [{ media, q }, ...], dropping 0-quality
 // (explicitly unacceptable) entries. Missing q defaults to 1.0.
 function parseAccept(header) {
-  if (!header) return []
+  if (!header) {
+    return []
+  }
   return header
     .split(',')
     .map((part) => {
@@ -56,7 +60,9 @@ function parseAccept(header) {
       for (const p of params) {
         if (p.startsWith('q=')) {
           const v = Number.parseFloat(p.slice(2))
-          if (!Number.isNaN(v)) q = v
+          if (!Number.isNaN(v)) {
+            q = v
+          }
         }
       }
       return { media, q }
@@ -67,11 +73,17 @@ function parseAccept(header) {
 // Match a single media range ("text/*", "*/*", "text/turtle") against an
 // Accept entry. Returns true if the range matches.
 function rangeMatches(range, media) {
-  if (range === '*/*') return true
+  if (range === '*/*') {
+    return true
+  }
   const [type, subtype] = range.split('/')
   const [mType, mSubtype] = media.split('/')
-  if (type !== mType) return false
-  if (subtype === '*') return true
+  if (type !== mType) {
+    return false
+  }
+  if (subtype === '*') {
+    return true
+  }
   return subtype === mSubtype
 }
 
@@ -89,7 +101,9 @@ function bestByQ(formats, accept) {
           // A more specific match beats a wildcard match; with q tie-break.
           const specificity = media.includes('*') || ac.media.includes('*') ? 1 : 2
           const candidate = ac.q * specificity
-          if (candidate > score) score = candidate
+          if (candidate > score) {
+            score = candidate
+          }
         }
       }
     }
@@ -106,7 +120,9 @@ function bestByQ(formats, accept) {
 // then falls back to the collection default.
 export function negotiate(collection, name, request) {
   const info = COLLECTIONS[collection]
-  if (!info) return null
+  if (!info) {
+    return null
+  }
 
   // Strip an explicit file suffix from `name` if present.
   const lastDot = name.lastIndexOf('.')
@@ -122,7 +138,9 @@ export function negotiate(collection, name, request) {
   if (requestedExt) {
     if (info.formats) {
       const byExt = info.formats.find((f) => f.ext === requestedExt)
-      if (byExt) return { ext: byExt.ext, type: byExt.type, baseName }
+      if (byExt) {
+        return { ext: byExt.ext, type: byExt.type, baseName }
+      }
     }
     if (requestedExt === info.default.ext) {
       return { ext: info.default.ext, type: info.default.type, baseName }
@@ -157,13 +175,17 @@ export async function onRequest({ params, request, env }) {
 
   const { collection, name } = params
   const chosen = negotiate(collection, name, request)
-  if (!chosen) return new Response('Not found', { status: 404 })
+  if (!chosen) {
+    return new Response('Not found', { status: 404 })
+  }
 
   // Construct path relative to your deployed static assets
   const url = new URL(`/${collection}/${chosen.baseName}.${chosen.ext}`, BASE)
 
   const res = await env.ASSETS.fetch(url)
-  if (!res.ok) return new Response('Not found', { status: 404 })
+  if (!res.ok) {
+    return new Response('Not found', { status: 404 })
+  }
 
   const vary = chosen.fromAccept ? 'Origin, Accept' : 'Origin'
   return new Response(res.body, {

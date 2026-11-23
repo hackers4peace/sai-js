@@ -74,14 +74,18 @@ export const useAppStore = defineStore('app', () => {
    */
   let sessionFetchCache: WhatwgFetch | undefined
   function sessionFetch(): WhatwgFetch {
-    if (sessionFetchCache) return sessionFetchCache
+    if (sessionFetchCache) {
+      return sessionFetchCache
+    }
     const authServer = new URL(authSession.issuer).origin
     // plain fetch for the storages: the LWS access token is their credential;
     // the session's DPoP fetch is only for the UAS and `.sai`.
     const lwsFetch = createBrowserLwsFetch({ session: authSession })
     sessionFetchCache = async (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-      if (url.startsWith(`${authServer}/`)) return authSession.fetch(input, init)
+      if (url.startsWith(`${authServer}/`)) {
+        return authSession.fetch(input, init)
+      }
       return (await lwsFetch)(input, init)
     }
     return sessionFetchCache
@@ -91,14 +95,18 @@ export const useAppStore = defineStore('app', () => {
     if (!coreStore.userId) {
       throw new Error('no user id')
     }
-    if (session) return session
+    if (session) {
+      return session
+    }
     const deps = { fetch: sessionFetch(), randomUUID: crypto.randomUUID.bind(crypto) }
     try {
       session = await Application.build(coreStore.userId, getRuntimeConfig().clientId, deps)
     } catch (err) {
       if (err instanceof RequestError) {
         saiError.value = err.message
-        if (err.response) console.error(err.response)
+        if (err.response) {
+          console.error(err.response)
+        }
       }
       throw err
     }
@@ -131,7 +139,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function loadAgents(force = false): Promise<void> {
-    if (agents.value.length && !force) return
+    if (agents.value.length && !force) {
+      return
+    }
     await ensureSaiSession()
     const owners = await session.resourceOwners()
     const profiles = await Promise.all(
@@ -151,7 +161,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function loadProjects(ownerId: string): Promise<void> {
-    if (resourceServers.value[ownerId]) return
+    if (resourceServers.value[ownerId]) {
+      return
+    }
 
     await ensureSaiSession()
     const servers: ResourceServer[] = []
@@ -169,7 +181,9 @@ export const useAppStore = defineStore('app', () => {
         // @ldo-solid
         const ldoResource = solidLdoDataset.getResource(projectId)
         const readResult = await ldoResource.read()
-        if (readResult.isError) throw readResult
+        if (readResult.isError) {
+          throw readResult
+        }
 
         const ldoSolidProject = solidLdoDataset.usingType(ProjectShapeType).fromSubject(projectId)
         serverProjects.push(ldoSolidProject)
@@ -185,7 +199,9 @@ export const useAppStore = defineStore('app', () => {
     // @ldo-solid
     const ldoResource = solidLdoDataset.getResource(projectId)
     const readResult = await ldoResource.read()
-    if (readResult.isError) throw readResult
+    if (readResult.isError) {
+      throw readResult
+    }
     await loadChildren(projectId, scopes.task)
     await loadChildren(projectId, scopes.image)
     await loadChildren(projectId, scopes.file)
@@ -196,7 +212,9 @@ export const useAppStore = defineStore('app', () => {
     // @ldo-solid
     const ldoResource = solidLdoDataset.getResource(taskId)
     const readResult = await ldoResource.read()
-    if (readResult.isError) throw readResult
+    if (readResult.isError) {
+      throw readResult
+    }
     triggerRef(currentProject)
   }
 
@@ -223,13 +241,17 @@ export const useAppStore = defineStore('app', () => {
       let description: string | undefined
       if (nonRdf) {
         description = await session.discoverDescription(childId)
-        if (!description) continue
+        if (!description) {
+          continue
+        }
       }
 
       // @ldo-solid
       const ldoResource = solidLdoDataset.getResource(nonRdf ? description : childId)
       const readResult = await ldoResource.read()
-      if (readResult.isError) throw readResult
+      if (readResult.isError) {
+        throw readResult
+      }
       session.setChildInfo(childId, scope, ldoProject['@id']!)
       if (scope === scopes.task) {
         // subscribe to changes
@@ -262,7 +284,9 @@ export const useAppStore = defineStore('app', () => {
 
   async function updateTask(task: Task) {
     await ensureSaiSession()
-    if (!task['@id']) throw task
+    if (!task['@id']) {
+      throw task
+    }
     const projectId = session.findParent(task['@id']!)
     const ldoProject = findProject(projectId)
     const isDraft = ![...ldoProject.hasTask!].find(
@@ -273,21 +297,29 @@ export const useAppStore = defineStore('app', () => {
       const cProject = changeData(ldoProject)
       cProject.hasTask!.add({ '@id': task['@id'] })
       const result = await commitData(cProject)
-      if (result.isError) throw result
+      if (result.isError) {
+        throw result
+      }
     }
     const result = await commitData(task)
-    if (result.isError) throw result
+    if (result.isError) {
+      throw result
+    }
     triggerRef(currentProject)
   }
 
   async function deleteTask(task: Task) {
     await ensureSaiSession()
-    if (!task['@id']) throw task
+    if (!task['@id']) {
+      throw task
+    }
 
     // @ldo-solid
     const ldoResource = solidLdoDataset.getResource(task['@id'])
     const deleteResult = await ldoResource.delete()
-    if (deleteResult.isError) throw deleteResult
+    if (deleteResult.isError) {
+      throw deleteResult
+    }
 
     const projectId = session.findParent(task['@id']!)
     const ldoProject = findProject(projectId)
@@ -295,7 +327,9 @@ export const useAppStore = defineStore('app', () => {
     const cProject = changeData(ldoProject)
     cProject.hasTask!.delete(task as { '@id': string })
     const result = await commitData(cProject)
-    if (result.isError) throw result
+    if (result.isError) {
+      throw result
+    }
     triggerRef(currentProject)
   }
 
@@ -310,7 +344,9 @@ export const useAppStore = defineStore('app', () => {
     // @ts-expect-error
     cProject[propForScope[scope]].add({ '@id': fileId })
     const projectResult = await commitData(cProject)
-    if (projectResult.isError) throw projectResult
+    if (projectResult.isError) {
+      throw projectResult
+    }
 
     // upload file
     const { ok } = await session.fetch(fileId, {
@@ -326,7 +362,9 @@ export const useAppStore = defineStore('app', () => {
     // update description resource
     // must be done after the file was uploaded!
     const descriptionIri = await session.discoverDescription(fileId)
-    if (!descriptionIri) throw new Error(`no description resource for ${fileId}`)
+    if (!descriptionIri) {
+      throw new Error(`no description resource for ${fileId}`)
+    }
     const newFile = solidLdoDataset.usingType(FileShapeType).fromSubject(fileId)
 
     const resource = solidLdoDataset.getResource(descriptionIri)
@@ -336,7 +374,9 @@ export const useAppStore = defineStore('app', () => {
     //cFile.format = blob.type
 
     const fileResult = await commitData(cFile)
-    if (fileResult.isError) throw fileResult
+    if (fileResult.isError) {
+      throw fileResult
+    }
     triggerRef(currentProject)
   }
 
@@ -408,7 +448,9 @@ export const useAppStore = defineStore('app', () => {
   async function share(resourceId: string) {
     await ensureSaiSession()
     const shareUri = session.getShareUri(resourceId)
-    if (!shareUri) throw new Error('shareUri is undefined')
+    if (!shareUri) {
+      throw new Error('shareUri is undefined')
+    }
     window.localStorage.setItem(
       'restorePath',
       `${window.location.pathname}${window.location.search}`
@@ -441,7 +483,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function getPushSubscription() {
-    if (pushSubscription.value) return
+    if (pushSubscription.value) {
+      return
+    }
     const resourceServer = await navigator.serviceWorker.ready
     const subscription = await resourceServer.pushManager.getSubscription()
     if (subscription) {
@@ -490,19 +534,27 @@ export const useAppStore = defineStore('app', () => {
   async function unsubscribeViaPush(id: string): Promise<void> {
     await ensureSaiSession()
     const channelId = subscriptions.value.get(id)
-    if (!channelId) throw new Error('channel not found')
+    if (!channelId) {
+      throw new Error('channel not found')
+    }
     const response = await session.fetch(channelId, { method: 'DELETE' })
-    if (!response.ok) throw new Error('failed to unsubscribe')
+    if (!response.ok) {
+      throw new Error('failed to unsubscribe')
+    }
     const project = projects.value.find((p) => p['@id'] === id)
     const result = (await Promise.all(
       // @ts-expect-error
       project?.hasTask.map((task) => {
         const cId = subscriptions.value.get(task['@id'])
-        if (!cId) return false
+        if (!cId) {
+          return false
+        }
         return notificationsManager.unsubscribeFromPush(task['@id'], cId)
       })
     )) as boolean[]
-    if (result.includes(false)) throw new Error('failed to unsubscribe some of the tasks')
+    if (result.includes(false)) {
+      throw new Error('failed to unsubscribe some of the tasks')
+    }
     subscriptions.value.delete(id)
     // @ts-expect-error
     project?.hasTask.forEach((task) => subscriptions.value.delete(task['@id']))

@@ -113,21 +113,35 @@ const PREFIX_IRI: Record<string, string> = {
 }
 
 function resolveIri(value: unknown): string | undefined {
-  if (value === undefined || value === null) return undefined
-  if (Array.isArray(value)) return resolveIri(value[0])
+  if (value === undefined || value === null) {
+    return undefined
+  }
+  if (Array.isArray(value)) {
+    return resolveIri(value[0])
+  }
   if (typeof value === 'object') {
     const record = value as Record<string, unknown>
     return resolveIri(record['@id'] ?? record.id ?? record.value)
   }
-  if (typeof value !== 'string') return undefined
-  if (/^(https?:|urn:)/.test(value)) return value
+  if (typeof value !== 'string') {
+    return undefined
+  }
+  if (/^(https?:|urn:)/.test(value)) {
+    return value
+  }
   const [prefix, ...rest] = value.split(':')
-  if (rest.length && PREFIX_IRI[prefix]) return PREFIX_IRI[prefix] + rest.join(':')
+  if (rest.length && PREFIX_IRI[prefix]) {
+    return PREFIX_IRI[prefix] + rest.join(':')
+  }
   const term = (accessContext as Record<string, unknown>)[value]
-  if (typeof term === 'string') return term === value ? value : resolveIri(term)
+  if (typeof term === 'string') {
+    return term === value ? value : resolveIri(term)
+  }
   if (term && typeof term === 'object') {
     const id = (term as Record<string, unknown>)['@id']
-    if (typeof id === 'string') return id
+    if (typeof id === 'string') {
+      return id
+    }
   }
   return value
 }
@@ -192,9 +206,15 @@ function normalizePolicy(node: Record<string, unknown>): OdrlPolicy {
  * `source`; every other data target carries it explicitly.
  */
 export function shapeTreeOfTarget(target: OdrlTarget | undefined): string {
-  if (!target) return ''
-  if (target.registeredShapeTree) return target.registeredShapeTree
-  if (target.type.includes(SHAPETREES.ShapeTree)) return target.source[0] ?? ''
+  if (!target) {
+    return ''
+  }
+  if (target.registeredShapeTree) {
+    return target.registeredShapeTree
+  }
+  if (target.type.includes(SHAPETREES.ShapeTree)) {
+    return target.source[0] ?? ''
+  }
   return ''
 }
 
@@ -203,8 +223,12 @@ export function shapeTreeOfTarget(target: OdrlTarget | undefined): string {
  * the explicit field of a selected asset target.
  */
 export function registrationOfTarget(target: OdrlTarget | undefined): string {
-  if (!target) return ''
-  if (target.type.includes(INTEROP.DataRegistration)) return target.source[0] ?? ''
+  if (!target) {
+    return ''
+  }
+  if (target.type.includes(INTEROP.DataRegistration)) {
+    return target.source[0] ?? ''
+  }
   return target.hasDataRegistration ?? ''
 }
 

@@ -73,10 +73,14 @@ export function grantCoversClaim(
   options: GrantClaimCoverageOptions = {}
 ): boolean {
   const claim = grantFromPolicy(policy, 'urn:sai:access-claim', policy.scopeOfGrant ?? '')
-  if (claim.grantedBy && claim.grantedBy !== grant.grantedBy) return false
+  if (claim.grantedBy && claim.grantedBy !== grant.grantedBy) {
+    return false
+  }
   // Every claim carries its shape tree; only AllFromAgent targets are not
   // registration-scoped. A missing field is malformed, never a wildcard.
-  if (!grant.registeredShapeTree || !claim.registeredShapeTree) return false
+  if (!grant.registeredShapeTree || !claim.registeredShapeTree) {
+    return false
+  }
   const needsRegistration =
     grant.scopeOfGrant !== INTEROP.AllFromAgent && claim.scopeOfGrant !== INTEROP.AllFromAgent
   if (needsRegistration && (!grant.hasDataRegistration || !claim.hasDataRegistration)) {

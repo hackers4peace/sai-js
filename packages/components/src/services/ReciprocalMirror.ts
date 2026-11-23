@@ -66,8 +66,11 @@ export async function toGraphBlocks(nquads: string): Promise<string> {
   for (const quad of quads) {
     const graph = quad.graph.termType === 'DefaultGraph' ? '' : quad.graph.value
     const bucket = byGraph.get(graph)
-    if (bucket) bucket.push(quad)
-    else byGraph.set(graph, [quad])
+    if (bucket) {
+      bucket.push(quad)
+    } else {
+      byGraph.set(graph, [quad])
+    }
   }
   const blocks: string[] = []
   for (const [graph, graphQuads] of byGraph) {
@@ -136,7 +139,9 @@ export async function updateReciprocalMirror(
   sparqlEndpoint: string
 ): Promise<void> {
   const reciprocalIri = registration.reciprocalRegistration
-  if (!reciprocalIri) throw new Error(`registration ${registration.id} has no reciprocal`)
+  if (!reciprocalIri) {
+    throw new Error(`registration ${registration.id} has no reciprocal`)
+  }
 
   const reciprocalDoc = await fetchDoc(reciprocalIri, saiSession.fetch)
 
@@ -166,7 +171,9 @@ export async function updateReciprocalMirror(
   if (stillLinked.length > 0) {
     const present = await presentGraphs(localSparqlTransport(sparqlEndpoint), stillLinked)
     for (const iri of stillLinked) {
-      if (!present.has(iri)) mirroredGrantSet.delete(iri)
+      if (!present.has(iri)) {
+        mirroredGrantSet.delete(iri)
+      }
     }
   }
 
@@ -188,7 +195,9 @@ export async function updateReciprocalMirror(
     const registrationPresent = (
       await presentGraphs(localSparqlTransport(sparqlEndpoint), [reciprocalIri])
     ).has(reciprocalIri)
-    if (registrationPresent) return
+    if (registrationPresent) {
+      return
+    }
   }
 
   const drops = [reciprocalIri, ...staleGraphs]
@@ -245,7 +254,9 @@ export async function deleteReciprocalMirror(
   sparqlEndpoint: string
 ): Promise<void> {
   const reciprocalIri = registration.reciprocalRegistration
-  if (!reciprocalIri) return
+  if (!reciprocalIri) {
+    return
+  }
 
   const grantIris = await mirroredGrants(sparqlEndpoint, reciprocalIri)
   const drops = [reciprocalIri, ...grantIris]

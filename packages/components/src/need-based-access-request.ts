@@ -19,7 +19,9 @@ import type { SessionManager } from './SessionManager.js'
 export type NeedBasedAccessRequestInput = Omit<EmbeddedNeedBasedAccessRequest, 'id'>
 
 export function values(value: unknown): string[] {
-  if (typeof value === 'string') return [value]
+  if (typeof value === 'string') {
+    return [value]
+  }
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
     : []
@@ -80,7 +82,9 @@ export function targetHasType(types: readonly string[], term: string, iri: strin
 
 function targetOf(permission: Record<string, unknown>): Record<string, unknown> {
   const target = record(permission.target)
-  if (!target) throw new BadRequestHttpError('access need permission has no target')
+  if (!target) {
+    throw new BadRequestHttpError('access need permission has no target')
+  }
   return target
 }
 
@@ -95,10 +99,14 @@ function targetSources(target: Record<string, unknown>): string[] {
 function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>[] {
   const raw = policy.permission
   const list = Array.isArray(raw) ? raw : raw ? [raw] : []
-  if (list.length === 0) throw new BadRequestHttpError('access need has no permission')
+  if (list.length === 0) {
+    throw new BadRequestHttpError('access need has no permission')
+  }
   return list.map((permission) => {
     const parsed = record(permission)
-    if (!parsed) throw new BadRequestHttpError('invalid access need permission')
+    if (!parsed) {
+      throw new BadRequestHttpError('invalid access need permission')
+    }
     return parsed
   })
 }
@@ -179,8 +187,9 @@ function parsePolicy(
     }
     assigners.add(assigner)
     assignees.add(assignee)
-    if (typeof target.owner === 'string') owners.add(target.owner)
-    else if (expectedDataOwner) {
+    if (typeof target.owner === 'string') {
+      owners.add(target.owner)
+    } else if (expectedDataOwner) {
       throw new BadRequestHttpError('invalid dataOwner')
     }
   }
@@ -305,7 +314,9 @@ function parsePolicy(
  * `AccessRequest` + `NeedBasedAccessRequest` with ODRL `access[]` policies.
  */
 export function isOdrlNeedBasedAccessRequest(value: unknown): value is Record<string, unknown> {
-  if (typeof value !== 'object' || value === null) return false
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
   const types = values((value as Record<string, unknown>).type)
   return (
     (types.includes(INTEROP.NeedBasedAccessRequest) || types.includes('NeedBasedAccessRequest')) &&
@@ -328,7 +339,9 @@ export function needBasedAccessRequestFromOdrl(
   const rawPolicies = Array.isArray(message.access) ? message.access : []
   const policies = rawPolicies.map((policy) => {
     const parsed = record(policy)
-    if (!parsed) throw new BadRequestHttpError('invalid access policy')
+    if (!parsed) {
+      throw new BadRequestHttpError('invalid access policy')
+    }
     return parsed
   })
   if (policies.length === 0) {
@@ -344,7 +357,9 @@ export function needBasedAccessRequestFromOdrl(
     throw new BadRequestHttpError('invalid dataOwner')
   }
   const dataOwner = expectedDataOwner ?? owners[0]
-  if (!dataOwner) throw new BadRequestHttpError('invalid dataOwner')
+  if (!dataOwner) {
+    throw new BadRequestHttpError('invalid dataOwner')
+  }
 
   const groupId = groups[0] ?? `urn:uuid:${crypto.randomUUID()}`
   const childrenOf = (id: string) => nodes.filter((node) => node.inheritsFromNeed === id)
@@ -413,10 +428,14 @@ export async function acceptNeedBasedAccessRequest(
   // PUTs the AccessRequest resource there (find-first idempotent). The 202
   // is sent IMMEDIATELY — it awaits nothing beyond the activity write.
   const requestRegistry = sai.registrySet.hasAccessRequestRegistry
-  if (!requestRegistry) throw new Error('access-request registry not found in registry set')
+  if (!requestRegistry) {
+    throw new Error('access-request registry not found in registry set')
+  }
   const requestId = await sai.mintIdentifier(requestRegistry.id)
   const activityRegistry = sai.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   const object: EmbeddedNeedBasedAccessRequest = {
     id: requestId,
     type: [INTEROP.NeedBasedAccessRequest],
@@ -441,7 +460,9 @@ export async function acceptNeedBasedAccessRequest(
     },
     activity
   )
-  if (!options.location) return new ResponseDescription(202)
+  if (!options.location) {
+    return new ResponseDescription(202)
+  }
   const metadata = new RepresentationMetadata()
   metadata.set(SOLID_HTTP.terms.location, requestId)
   return new ResponseDescription(202, metadata)

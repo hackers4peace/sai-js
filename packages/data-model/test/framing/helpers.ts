@@ -32,9 +32,13 @@ export async function docFromGraphs(graphIris: string[]): Promise<unknown[]> {
   const seen = new Set<string>()
   const quads: Quad[] = []
   for (const quad of fixtureQuads) {
-    if (!graphIris.includes(quad.graph.value)) continue
+    if (!graphIris.includes(quad.graph.value)) {
+      continue
+    }
     const quadKey = [quad.subject, quad.predicate, quad.object].map(termKey).join('|')
-    if (seen.has(quadKey)) continue
+    if (seen.has(quadKey)) {
+      continue
+    }
     seen.add(quadKey)
     // strip the graph component -> default graph (flat expanded doc)
     quads.push(DataFactory.quad(quad.subject, quad.predicate, quad.object))

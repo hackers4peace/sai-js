@@ -59,11 +59,15 @@ const sparqlMock = vi.hoisted(() => {
 vi.mock('fetch-sparql-endpoint', () => ({
   SparqlEndpointFetcher: class {
     async fetchBindings(_endpoint: string, query: string) {
-      if (!sparqlMock.handlers.bindings) throw new Error('mock: no bindings handler')
+      if (!sparqlMock.handlers.bindings) {
+        throw new Error('mock: no bindings handler')
+      }
       return sparqlMock.handlers.bindings(query)
     }
     async fetchTriples(_endpoint: string, query: string) {
-      if (!sparqlMock.handlers.triples) throw new Error('mock: no triples handler')
+      if (!sparqlMock.handlers.triples) {
+        throw new Error('mock: no triples handler')
+      }
       return sparqlMock.handlers.triples(query)
     }
   },
@@ -135,7 +139,9 @@ describe('findAuthorizationsForAgent', () => {
         [AUTHZ_ADMIN]: authzGraph(AUTHZ_ADMIN, 'https://example/AdminAuthorization', BOB),
       }
       for (const [iri, quads] of Object.entries(graphs)) {
-        if (query.includes(`GRAPH <${iri}>`)) return quads
+        if (query.includes(`GRAPH <${iri}>`)) {
+          return quads
+        }
       }
       throw new Error(`unexpected CONSTRUCT: ${query}`)
     }
@@ -375,7 +381,9 @@ describe('findDataRegistration', () => {
         [DATA_REG_TASK]: registrationGraph(DATA_REG_TASK, TASK_TREE),
       }
       for (const [iri, quads] of Object.entries(graphs)) {
-        if (query.includes(`GRAPH <${iri}>`)) return quads
+        if (query.includes(`GRAPH <${iri}>`)) {
+          return quads
+        }
       }
       throw new Error(`unexpected CONSTRUCT: ${query}`)
     }
@@ -454,7 +462,9 @@ describe('findSocialAgentInvitation', () => {
         [INVITE_2]: invitationGraph(INVITE_2, CAPABILITY_2),
       }
       for (const [iri, quads] of Object.entries(graphs)) {
-        if (query.includes(`GRAPH <${iri}>`)) return quads
+        if (query.includes(`GRAPH <${iri}>`)) {
+          return quads
+        }
       }
       throw new Error(`unexpected CONSTRUCT: ${query}`)
     }
@@ -882,7 +892,9 @@ describe('revokeGrants core (C1)', () => {
       const targetId = index === 0 ? target.value : `${target.value}-${index}`
       quads.push(...targetQuads(targetId, p.target))
     }
-    if (grant.inheritsFromGrant) quads.push(q(INTEROP.inheritsFromGrant, grant.inheritsFromGrant))
+    if (grant.inheritsFromGrant) {
+      quads.push(q(INTEROP.inheritsFromGrant, grant.inheritsFromGrant))
+    }
     return quads
   }
 
@@ -917,7 +929,9 @@ describe('revokeGrants core (C1)', () => {
     }
     sparqlMock.handlers.triples = (query) => {
       for (const grant of existing) {
-        if (query.includes(`GRAPH <${grant.id}>`)) return grantQuads(grant)
+        if (query.includes(`GRAPH <${grant.id}>`)) {
+          return grantQuads(grant)
+        }
       }
       throw new Error(`unexpected CONSTRUCT: ${query}`)
     }

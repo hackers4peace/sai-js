@@ -47,7 +47,9 @@ delete manifest.devDependencies
 // directory first.
 const files = new Set(manifest.files ?? [])
 for (const name of ['README.md', 'LICENSE', 'LICENCE']) {
-  if (existsSync(join(source, name))) files.add(name)
+  if (existsSync(join(source, name))) {
+    files.add(name)
+  }
 }
 
 mkdirSync(target, { recursive: true })

@@ -78,7 +78,9 @@ export async function addSocialAgentRegistration(
   await createSocialAgentRegistration(data, registration, deps.fetch)
   // containment is server-managed — no container PATCH needed
   const peerUas = await discoverAuthorizationAgent(registeredAgent, deps.fetch)
-  if (!peerUas) throw new Error(`cannot discover authorization agent for ${registeredAgent}`)
+  if (!peerUas) {
+    throw new Error(`cannot discover authorization agent for ${registeredAgent}`)
+  }
   await setAcr(registration, deps.fetch, creator, {
     agent: registeredAgent,
     client: peerUas,

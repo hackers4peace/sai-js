@@ -65,9 +65,13 @@ async function admin<T>(
   }
   const headers: Record<string, string> = { authorization: `Bearer ${options.adminToken}` }
   const hasBody = request.body !== undefined
-  if (hasBody) headers['content-type'] = 'application/json'
+  if (hasBody) {
+    headers['content-type'] = 'application/json'
+  }
   const init: RequestInit = { method, headers }
-  if (hasBody) init.body = JSON.stringify(request.body)
+  if (hasBody) {
+    init.body = JSON.stringify(request.body)
+  }
   const response = await fetch(url, init)
   if (!response.ok) {
     const detail = await response.text().catch(() => '')
@@ -106,14 +110,18 @@ export async function seedObjectEndpoints(
   const buckets = await admin<BucketInfo[]>(options, 'GET', '/v2/ListBuckets')
   const bucketByAlias = new Map<string, BucketInfo>()
   for (const bucket of buckets) {
-    for (const alias of bucket.globalAliases ?? []) bucketByAlias.set(alias, bucket)
+    for (const alias of bucket.globalAliases ?? []) {
+      bucketByAlias.set(alias, bucket)
+    }
   }
   const keys = await admin<KeyInfo[]>(options, 'GET', '/v2/ListKeys')
   const keyByName = new Map<string, KeyInfo>(keys.map((key) => [key.name, key]))
 
   const ensureBucket = async (alias: string): Promise<BucketInfo> => {
     const existing = bucketByAlias.get(alias)
-    if (existing) return existing
+    if (existing) {
+      return existing
+    }
     const created = await admin<BucketInfo>(options, 'POST', '/v2/CreateBucket', {
       body: { globalAlias: alias },
     })
@@ -142,13 +150,18 @@ export async function seedObjectEndpoints(
   }
 
   for (const [key, accountData] of Object.entries(kv)) {
-    if (!key.startsWith('accounts/data/') || !accountData || typeof accountData !== 'object')
+    if (!key.startsWith('accounts/data/') || !accountData || typeof accountData !== 'object') {
       continue
+    }
     const pods = accountData['**pod**']
-    if (!pods) continue
+    if (!pods) {
+      continue
+    }
     const accountId: string =
       accountData.id ?? (Object.values<any>(pods)[0]?.accountId as string | undefined) ?? ''
-    if (!accountId) continue
+    if (!accountId) {
+      continue
+    }
 
     const records: Record<string, StoredObjectEndpoint> = {}
     for (const pod of Object.values<any>(pods)) {

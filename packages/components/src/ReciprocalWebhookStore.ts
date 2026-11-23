@@ -100,11 +100,12 @@ export class ReciprocalWebhookStore extends Initializer {
     | undefined
   > {
     const raw = (await this.storage.find(RECIPROCAL_WEBHOOK_STORAGE_TYPE, { sendTo }))[0]
-    if (raw)
+    if (raw) {
       return {
         ...raw,
         channel: JSON.parse(raw.channel),
       }
+    }
   }
 
   public async create(

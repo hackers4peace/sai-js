@@ -84,15 +84,21 @@ function handleActivity(activity: ActivityEvent) {
     activity.type.includes('AccessRequestGranted') ||
     activity.type.includes('AccessRequestArchived')
   ) {
-    if (owner && appStore.currentContext() !== owner) return
+    if (owner && appStore.currentContext() !== owner) {
+      return
+    }
     appStore.listSocialAgents(true)
     return
   }
-  if (activity.status !== 'done') return
+  if (activity.status !== 'done') {
+    return
+  }
   // org-context events arrive on the admin's stream for every org the user
   // administers — refresh only the context that owns the activity; switching
   // contexts already performs a full refresh (switchContext)
-  if (owner && appStore.currentContext() !== owner) return
+  if (owner && appStore.currentContext() !== owner) {
+    return
+  }
   // dispatch on the type discriminant — the grantee kind is resolved in the
   // store, so authorization done-rows refresh the agent/application lists; a
   // revocation additionally re-reads the C0 authorization list
@@ -151,17 +157,23 @@ function handleActivity(activity: ActivityEvent) {
 }
 
 function handleMessage(line: string) {
-  if (!line) return
+  if (!line) {
+    return
+  }
   try {
     const message = JSON.parse(line) as StreamMessage
-    if (message.type === 'activity') handleActivity(message.activity)
+    if (message.type === 'activity') {
+      handleActivity(message.activity)
+    }
   } catch {
     // a malformed line must not break the stream
   }
 }
 
 function scheduleReconnect() {
-  if (stopped) return
+  if (stopped) {
+    return
+  }
   clearTimers()
   reconnectTimer = setTimeout(() => {
     void open()
@@ -170,21 +182,29 @@ function scheduleReconnect() {
 }
 
 function clearTimers() {
-  if (heartbeatWatchdog) clearInterval(heartbeatWatchdog)
-  if (reconnectTimer) clearTimeout(reconnectTimer)
+  if (heartbeatWatchdog) {
+    clearInterval(heartbeatWatchdog)
+  }
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer)
+  }
   heartbeatWatchdog = null
   reconnectTimer = null
 }
 
 async function open() {
-  if (stopped) return
+  if (stopped) {
+    return
+  }
   controller = new AbortController()
   try {
     const response = await fetch(`${getRuntimeConfig().backendBaseUrl}/.sai/events`, {
       credentials: 'include',
       signal: controller.signal,
     })
-    if (!response.ok || !response.body) throw new Error(`stream returned ${response.status}`)
+    if (!response.ok || !response.body) {
+      throw new Error(`stream returned ${response.status}`)
+    }
 
     backoff = INITIAL_BACKOFF_MS
     lastDataAt = Date.now()
@@ -193,7 +213,9 @@ async function open() {
     // heartbeat-timeout detection: no data for several heartbeats → the
     // connection is dead; abort it so the close handler schedules a reconnect
     heartbeatWatchdog = setInterval(() => {
-      if (Date.now() - lastDataAt > HEARTBEAT_TIMEOUT_MS) controller?.abort()
+      if (Date.now() - lastDataAt > HEARTBEAT_TIMEOUT_MS) {
+        controller?.abort()
+      }
     }, HEARTBEAT_INTERVAL_MS)
 
     const reader = response.body.getReader()
@@ -201,17 +223,23 @@ async function open() {
     let buffer = ''
     for (;;) {
       const { done, value } = await reader.read()
-      if (done) break
+      if (done) {
+        break
+      }
       lastDataAt = Date.now()
       buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
       buffer = lines.pop() ?? ''
-      for (const line of lines) handleMessage(line)
+      for (const line of lines) {
+        handleMessage(line)
+      }
     }
   } catch {
     // aborted (timeout/stop) or network error — reconnect unless stopped
   } finally {
-    if (!stopped) scheduleReconnect()
+    if (!stopped) {
+      scheduleReconnect()
+    }
   }
 }
 

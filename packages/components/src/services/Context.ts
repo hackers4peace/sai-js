@@ -71,7 +71,9 @@ export type ResolvedContext = {
  */
 async function isAdminOf(userSession: AuthorizationAgent, orgWebId: string): Promise<boolean> {
   const registration = await userSession.findSocialAgentRegistration(orgWebId)
-  if (!registration?.reciprocalRegistration) return false
+  if (!registration?.reciprocalRegistration) {
+    return false
+  }
   // only the link presence matters — one link query over the mirrored reciprocal
   // on the session's internal endpoint, no registration framing
   // (see openwiki/architecture/federation.md)

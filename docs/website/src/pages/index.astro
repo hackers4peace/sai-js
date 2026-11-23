@@ -82,11 +82,11 @@ const assetBase = import.meta.env.BASE_URL
       // The likec4-view web component re-renders whenever view-id changes.
       (() => {
         const diagram = document.querySelector("likec4-view");
-        if (!diagram) return;
+        if (!diagram) {return;}
         const views = ["index", "authorization", "invitation", "share-resource"];
         let current = 0;
         setInterval(() => {
-          if (document.hidden) return; // don't churn renders in background tabs
+          if (document.hidden) {return;} // don't churn renders in background tabs
           current = (current + 1) % views.length;
           diagram.setAttribute("view-id", views[current]);
         }, 5000);

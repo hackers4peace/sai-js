@@ -70,7 +70,9 @@ export class AccountService {
         args: [input],
       })
     } catch (err) {
-      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) throw err
+      if (!(err instanceof WorkflowExecutionAlreadyStartedError)) {
+        throw err
+      }
     }
     return webId
   }

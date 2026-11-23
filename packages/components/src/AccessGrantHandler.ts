@@ -74,14 +74,18 @@ export class AccessGrantHandler extends OperationHttpHandler {
 
     const sai = await this.sessionManager.getSession(owner)
     const registry = sai.registrySet.hasGrantRegistry
-    if (!registry) throw new InternalServerError('grant registry not found in registry set')
+    if (!registry) {
+      throw new InternalServerError('grant registry not found in registry set')
+    }
 
     const grants = await getRegistryGrants(localSparqlTransport(sai.sparqlEndpoint), registry.id)
     const isUas = await this.isAuthorizationAgent(credentials)
     const visible = grants.filter((grant) => {
       // Only grants issued by the registry owner. Never expose a
       // peer-owned/mirrored grant through this view.
-      if (grantAssigner(grant) !== owner) return false
+      if (grantAssigner(grant) !== owner) {
+        return false
+      }
       if (isUas) {
         return (
           grantGrantee(grant) === credentials.agent.webId ||
@@ -110,7 +114,9 @@ export class AccessGrantHandler extends OperationHttpHandler {
 
   private async isAuthorizationAgent(credentials: Credentials): Promise<boolean> {
     const client = credentials.client?.clientId
-    if (!client) return false
+    if (!client) {
+      return false
+    }
     try {
       return (await discoverAuthorizationAgent(credentials.agent.webId, fetch)) === client
     } catch {

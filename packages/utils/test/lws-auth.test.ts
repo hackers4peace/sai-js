@@ -81,7 +81,9 @@ describe('discoverLwsAuthorizationServerMetadata', () => {
       if (url.endsWith('.well-known/oauth-protected-resource/bob.data.docker/')) {
         return json({ resource: STORAGE, authorization_servers: [AS] })
       }
-      if (url === `${AS}.well-known/lws-configuration`) return json(AS_METADATA)
+      if (url === `${AS}.well-known/lws-configuration`) {
+        return json(AS_METADATA)
+      }
       return new Response('', { status: 404 })
     }) as unknown as typeof globalThis.fetch
     const metadata = await discoverLwsAuthorizationServerMetadata(STORAGE, fetch, {
@@ -93,7 +95,9 @@ describe('discoverLwsAuthorizationServerMetadata', () => {
 
   test('falls back to as_uri when there is no resource metadata', async () => {
     const fetch = vi.fn(async (input: RequestInfo | URL) => {
-      if (String(input) === `${AS}.well-known/lws-configuration`) return json(AS_METADATA)
+      if (String(input) === `${AS}.well-known/lws-configuration`) {
+        return json(AS_METADATA)
+      }
       return new Response('', { status: 404 })
     }) as unknown as typeof globalThis.fetch
     const metadata = await discoverLwsAuthorizationServerMetadata(STORAGE, fetch, { asUri: AS })
@@ -180,7 +184,9 @@ function storageServer(options: { acceptToken?: string; expiresIn?: number } = {
   const fetch = vi.fn(async (input: RequestInfo | URL) => {
     const url = typeof input === 'string' ? input : input.url
     const request = input as Request
-    if (url === `${AS}.well-known/lws-configuration`) return json(AS_METADATA)
+    if (url === `${AS}.well-known/lws-configuration`) {
+      return json(AS_METADATA)
+    }
     if (url === TOKEN_ENDPOINT) {
       exchanges += 1
       return json({ access_token: `lws-${exchanges}`, expires_in: options.expiresIn ?? 300 })
@@ -206,8 +212,12 @@ describe('requestLwsAccessToken', () => {
           headers: { 'www-authenticate': `Bearer as_uri="${AS}", realm="${STORAGE}"` },
         })
       }
-      if (url === `${AS}.well-known/lws-configuration`) return json(AS_METADATA)
-      if (url === TOKEN_ENDPOINT) return json({ access_token: 'lws-token', expires_in: 300 })
+      if (url === `${AS}.well-known/lws-configuration`) {
+        return json(AS_METADATA)
+      }
+      if (url === TOKEN_ENDPOINT) {
+        return json({ access_token: 'lws-token', expires_in: 300 })
+      }
       return new Response('', { status: 404 })
     }) as unknown as typeof globalThis.fetch
     const token = await requestLwsAccessToken({
@@ -234,15 +244,21 @@ describe('createLwsFetch — service paths vs peer storages', () => {
     const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.url
       const request = input as Request
-      if (url === `${REGISTRY}.well-known/lws-configuration`) return json(REGISTRY_METADATA)
+      if (url === `${REGISTRY}.well-known/lws-configuration`) {
+        return json(REGISTRY_METADATA)
+      }
       if (url === `${REGISTRY}.well-known/lws/token`) {
         const resource = new URLSearchParams(init?.body as string).get('resource')!
         resources.push(resource)
         return json({ access_token: `lws-${resource}`, expires_in: 300 })
       }
       const authorization = request.headers.get('authorization')
-      if (authorization === `Bearer lws-${BOB_REGISTRY}`) return json({ id: url })
-      if (authorization === `Bearer lws-${ACME_REGISTRY}`) return json({ id: url })
+      if (authorization === `Bearer lws-${BOB_REGISTRY}`) {
+        return json({ id: url })
+      }
+      if (authorization === `Bearer lws-${ACME_REGISTRY}`) {
+        return json({ id: url })
+      }
       return unauthorized(`Bearer as_uri="${REGISTRY}", realm="${ACME_REGISTRY}"`)
     })
     return { fetch: fetch as unknown as typeof globalThis.fetch, resources }
@@ -326,7 +342,9 @@ describe('createLwsFetch', () => {
     const fetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = typeof input === 'string' ? input : input.url
       const request = input as Request
-      if (url === `${AS}.well-known/lws-configuration`) return json(AS_METADATA)
+      if (url === `${AS}.well-known/lws-configuration`) {
+        return json(AS_METADATA)
+      }
       if (url === TOKEN_ENDPOINT) {
         exchanges += 1
         return json({ access_token: `lws-${exchanges}`, expires_in: 300 })
@@ -336,7 +354,9 @@ describe('createLwsFetch', () => {
         firstTokenValid = false
         return json({ id: url })
       }
-      if (authorization === 'Bearer lws-2') return json({ id: url })
+      if (authorization === 'Bearer lws-2') {
+        return json({ id: url })
+      }
       return unauthorized(`Bearer as_uri="${AS}", realm="${STORAGE}", error="invalid_token"`)
     }) as unknown as typeof globalThis.fetch
     const lwsFetch = createLwsFetch({
@@ -371,7 +391,9 @@ describe('createLwsFetch', () => {
   test('returns a non-LWS 401 unchanged', async () => {
     const fetch = vi.fn(async (input: RequestInfo | URL) => {
       const request = input as Request
-      if (request.url === `${STORAGE}gl1tch`) return unauthorized('DPoP realm="x"')
+      if (request.url === `${STORAGE}gl1tch`) {
+        return unauthorized('DPoP realm="x"')
+      }
       return new Response('', { status: 404 })
     }) as unknown as typeof globalThis.fetch
     const lwsFetch = createLwsFetch({

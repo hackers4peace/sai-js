@@ -48,8 +48,14 @@ export interface GrantTreePair {
 function sameSet(a: readonly string[] | undefined, b: readonly string[] | undefined): boolean {
   const left = new Set(a ?? [])
   const right = new Set(b ?? [])
-  if (left.size !== right.size) return false
-  for (const value of left) if (!right.has(value)) return false
+  if (left.size !== right.size) {
+    return false
+  }
+  for (const value of left) {
+    if (!right.has(value)) {
+      return false
+    }
+  }
   return true
 }
 
@@ -81,10 +87,14 @@ function accessShape(grant: GrantData): string[] {
  */
 export function grantFieldsEqual(a: GrantData, b: GrantData): boolean {
   for (const field of SCALAR_FIELDS) {
-    if (a[field] !== b[field]) return false
+    if (a[field] !== b[field]) {
+      return false
+    }
   }
   for (const field of SET_FIELDS) {
-    if (!sameSet(a[field], b[field])) return false
+    if (!sameSet(a[field], b[field])) {
+      return false
+    }
   }
   return sameSet(accessShape(a), accessShape(b))
 }
@@ -103,9 +113,13 @@ function declaredChildIds(grant: GrantData): string[] {
  */
 function isComplete(tree: GrantTree): boolean {
   const declared = new Set(declaredChildIds(tree.grant))
-  if (declared.size !== tree.children.length) return false
+  if (declared.size !== tree.children.length) {
+    return false
+  }
   for (const child of tree.children) {
-    if (!child.grant.id || !declared.has(child.grant.id)) return false
+    if (!child.grant.id || !declared.has(child.grant.id)) {
+      return false
+    }
   }
   return tree.children.every(isComplete)
 }
@@ -119,7 +133,9 @@ function isComplete(tree: GrantTree): boolean {
 export function grantTrees(grants: GrantData[]): GrantTree[] {
   const byId = new Map<string, GrantTree>()
   for (const grant of grants) {
-    if (grant.id && !byId.has(grant.id)) byId.set(grant.id, { grant, children: [] })
+    if (grant.id && !byId.has(grant.id)) {
+      byId.set(grant.id, { grant, children: [] })
+    }
   }
   const roots: GrantTree[] = []
   for (const tree of byId.values()) {
@@ -160,23 +176,33 @@ export function delegatedGrantTrees(grants: GrantData[]): GrantTree[] {
  * Children are matched as a set: equivalent children are interchangeable.
  */
 function pairNodes(generated: GrantTree, existing: GrantTree): GrantNodePair[] | undefined {
-  if (!grantFieldsEqual(generated.grant, existing.grant)) return undefined
-  if (generated.children.length !== existing.children.length) return undefined
+  if (!grantFieldsEqual(generated.grant, existing.grant)) {
+    return undefined
+  }
+  if (generated.children.length !== existing.children.length) {
+    return undefined
+  }
 
   const used = new Set<number>()
   const nodes: GrantNodePair[] = [{ generated: generated.grant, existing: existing.grant }]
   for (const generatedChild of generated.children) {
     let matched = false
     for (let index = 0; index < existing.children.length; index += 1) {
-      if (used.has(index)) continue
+      if (used.has(index)) {
+        continue
+      }
       const childPairs = pairNodes(generatedChild, existing.children[index])
-      if (!childPairs) continue
+      if (!childPairs) {
+        continue
+      }
       used.add(index)
       nodes.push(...childPairs)
       matched = true
       break
     }
-    if (!matched) return undefined
+    if (!matched) {
+      return undefined
+    }
   }
   return nodes
 }
@@ -196,9 +222,13 @@ export function pairTrees(generated: GrantTree[], existing: GrantTree[]): GrantT
   const pairs: GrantTreePair[] = []
   for (const generatedTree of generated) {
     for (let index = 0; index < existing.length; index += 1) {
-      if (used.has(index)) continue
+      if (used.has(index)) {
+        continue
+      }
       const nodes = pairNodes(generatedTree, existing[index])
-      if (!nodes) continue
+      if (!nodes) {
+        continue
+      }
       used.add(index)
       pairs.push({ generated: generatedTree, existing: existing[index], nodes })
       break

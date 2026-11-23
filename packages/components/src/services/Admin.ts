@@ -34,7 +34,9 @@ export const addAdmin = async (
   webId: S.Schema.Type<typeof IRI>
 ): Promise<S.Schema.Type<typeof AdminAuthorizationGrantedMessage>> => {
   const registration = await findSocialAgentRegistrationInContext(ctx, webId)
-  if (!registration) throw new Error(`Social Agent Registration for ${webId} not found`)
+  if (!registration) {
+    throw new Error(`Social Agent Registration for ${webId} not found`)
+  }
 
   const authorizationRegistry = ctx.registrySet.hasAuthorizationRegistry
   const existing = await findAdminAuthorization(
@@ -42,14 +44,18 @@ export const addAdmin = async (
     authorizationRegistry.id,
     webId
   )
-  if (existing) throw new Error(`Admin Authorization for ${webId} already exists`)
+  if (existing) {
+    throw new Error(`Admin Authorization for ${webId} already exists`)
+  }
 
   // pre-mint the AdminAuthorization id — the workflow PUTs the resource there
   // (the same minting the AA's recordAdminAuthorization would do)
   const authorizationId = await ctx.session.mintIdentifier(authorizationRegistry.id)
 
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   const activity: Omit<AdminAuthorizationGranted, 'id'> = {
     type: ['Activity', 'AdminAuthorizationGranted'],
     actor: ctx.webId,
@@ -94,7 +100,9 @@ export const removeAdmin = async (
   webId: S.Schema.Type<typeof IRI>
 ): Promise<S.Schema.Type<typeof AdminAuthorizationRevokedMessage>> => {
   const registration = await findSocialAgentRegistrationInContext(ctx, webId)
-  if (!registration) throw new Error(`Social Agent Registration for ${webId} not found`)
+  if (!registration) {
+    throw new Error(`Social Agent Registration for ${webId} not found`)
+  }
 
   const authorizationRegistry = ctx.registrySet.hasAuthorizationRegistry
   const existing = await findAdminAuthorization(
@@ -102,7 +110,9 @@ export const removeAdmin = async (
     authorizationRegistry.id,
     webId
   )
-  if (!existing) throw new Error(`Admin Authorization for ${webId} not found`)
+  if (!existing) {
+    throw new Error(`Admin Authorization for ${webId} not found`)
+  }
 
   // last-admin guard — the org must never end up adminless; sails as a
   // RPC-time validation read (R1 re-decision) and is re-checked by the
@@ -118,7 +128,9 @@ export const removeAdmin = async (
   }
 
   const activityRegistry = ctx.registrySet.hasActivityRegistry
-  if (!activityRegistry) throw new Error('activity registry not found in registry set')
+  if (!activityRegistry) {
+    throw new Error('activity registry not found in registry set')
+  }
   // activity-first: the existing AdminAuthorization (alive at write) rides
   // as a real-id embedded projection at its real id — `target` dropped; the
   // workflow DELETEs the resource at object.id (404-tolerant, idempotent)

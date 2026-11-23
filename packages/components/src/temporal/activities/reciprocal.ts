@@ -64,9 +64,13 @@ export async function invitationAcceptance(
   const manager = buildSessionManager()
   const session = await manager.getSession(webId)
   const response = await session.fetch(object.capabilityUrl, { method: 'POST' })
-  if (!response.ok) throw new Error(`accepting capability url failed: ${response.status}`)
+  if (!response.ok) {
+    throw new Error(`accepting capability url failed: ${response.status}`)
+  }
   const inviterWebId = (await response.text()).trim()
-  if (!inviterWebId) throw new Error('can not accept invitation without webid')
+  if (!inviterWebId) {
+    throw new Error('can not accept invitation without webid')
+  }
 
   let registration = await session.findSocialAgentRegistration(inviterWebId)
   if (!registration) {
@@ -213,12 +217,16 @@ export async function syncReciprocalMirror(
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registration = await session.findSocialAgentRegistration(payload.peerId.id)
-  if (!registration?.reciprocalRegistration) return { peerGone: false }
+  if (!registration?.reciprocalRegistration) {
+    return { peerGone: false }
+  }
   try {
     await updateReciprocalMirror(session, registration, ownerEndpoint(session))
     return { peerGone: false }
   } catch (error) {
-    if (!isPeerGone(error, registration.reciprocalRegistration)) throw error
+    if (!isPeerGone(error, registration.reciprocalRegistration)) {
+      throw error
+    }
     // the peer deleted its registration of us — drop the replica so reads see
     // the absence, and let the caller complete. The now-dangling reciprocal
     // link on our own registration is the unregister flow's job
@@ -243,7 +251,9 @@ export async function deleteReciprocalMirror(payload: {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registration = await session.findSocialAgentRegistration(payload.peerId.id)
-  if (!registration?.reciprocalRegistration) return
+  if (!registration?.reciprocalRegistration) {
+    return
+  }
   await deleteMirror(registration, ownerEndpoint(session))
 }
 
@@ -251,7 +261,9 @@ export async function reciprocalWebhook(payload: ReciprocalWebhookInput): Promis
   const store = new ReciprocalWebhookStore(await buildAccountLoginStorage())
   await store.handle()
   const existing = await store.findAllBetween(payload.webId, payload.peerId)
-  if (existing.length) return
+  if (existing.length) {
+    return
+  }
 
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId)

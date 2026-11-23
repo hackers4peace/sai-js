@@ -88,7 +88,9 @@ class StubIdJagVerifier extends SubjectTokenVerifier {
   }
 
   public async canHandle({ tokenType }: SubjectTokenVerifierInput): Promise<void> {
-    if (tokenType !== ID_JAG_TOKEN_TYPE) throw new Error(`Unsupported token type ${tokenType}`)
+    if (tokenType !== ID_JAG_TOKEN_TYPE) {
+      throw new Error(`Unsupported token type ${tokenType}`)
+    }
   }
 
   public async handle(input: SubjectTokenVerifierInput): Promise<VerifiedSubject> {

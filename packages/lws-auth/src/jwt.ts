@@ -5,7 +5,9 @@
  */
 
 function decodeBase64Url(part: string): string {
-  if (typeof Buffer !== 'undefined') return Buffer.from(part, 'base64url').toString('utf8')
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(part, 'base64url').toString('utf8')
+  }
   // browsers
   const padded = part.replace(/-/gu, '+').replace(/_/gu, '/')
   return atob(padded + '='.repeat((4 - (padded.length % 4)) % 4))
@@ -23,7 +25,9 @@ export interface DecodedJwt {
 /** Decodes a JWS compact serialization without verifying it. */
 export function decodeJwt(token: string): DecodedJwt {
   const [header, payload] = token.split('.')
-  if (!header || !payload) throw new Error('not a JWS compact serialization')
+  if (!header || !payload) {
+    throw new Error('not a JWS compact serialization')
+  }
   return { header: decodePart(header), claims: decodePart(payload) }
 }
 

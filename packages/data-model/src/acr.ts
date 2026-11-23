@@ -76,8 +76,12 @@ export function accessGrantAcrJsonLd({
   client?: AgentAndClient
 }): Record<string, unknown> {
   const peerMatchers: Record<string, unknown>[] = []
-  if (peer) peerMatchers.push({ type: ['Matcher'], agent: peer.agent, client: peer.client })
-  if (client) peerMatchers.push({ type: ['Matcher'], agent: client.agent, client: client.client })
+  if (peer) {
+    peerMatchers.push({ type: ['Matcher'], agent: peer.agent, client: peer.client })
+  }
+  if (client) {
+    peerMatchers.push({ type: ['Matcher'], agent: client.agent, client: client.client })
+  }
 
   return {
     '@context': acrContext,
@@ -134,7 +138,9 @@ export function rewriteFullAdminAccess(
   while (changed) {
     changed = false
     for (const node of nodes) {
-      if (!toRemove.has(node['@id'])) continue
+      if (!toRemove.has(node['@id'])) {
+        continue
+      }
       for (const predicate of [ACP.apply, ACP.anyOf]) {
         for (const ref of node[predicate] ?? []) {
           const refId = ref?.['@id']
@@ -151,12 +157,18 @@ export function rewriteFullAdminAccess(
 
   // drop the #root wiring to #fullAdminAccess
   for (const node of kept) {
-    if (node['@id'] !== rootId) continue
+    if (node['@id'] !== rootId) {
+      continue
+    }
     for (const predicate of [ACP.accessControl, ACP.memberAccessControl]) {
       const refs = node[predicate]
-      if (!Array.isArray(refs)) continue
+      if (!Array.isArray(refs)) {
+        continue
+      }
       node[predicate] = refs.filter((ref) => ref?.['@id'] !== fullAdminAccess)
-      if (node[predicate].length === 0) delete node[predicate]
+      if (node[predicate].length === 0) {
+        delete node[predicate]
+      }
     }
   }
 

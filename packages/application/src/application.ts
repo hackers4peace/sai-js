@@ -83,7 +83,9 @@ export class Application {
       this.authorizationAgentIri,
       this.fetch
     )
-    if (!this.registrationIri) return
+    if (!this.registrationIri) {
+      return
+    }
     await this.buildRegistration()
   }
 
@@ -121,7 +123,9 @@ export class Application {
    * @public
    */
   get dataOwners(): DataOwnerData[] {
-    if (!this.applicationRegistration) return []
+    if (!this.applicationRegistration) {
+      return []
+    }
     // Note: this is now lazy — fetches access grants each time
     // The property access pattern changed from sync to async.
     // Consumers should use getDataOwnersAsync() instead.
@@ -152,7 +156,9 @@ export class Application {
   public async resourceServers(resourceOwner: string, scope: string): Promise<Set<string>> {
     const owners = await this.getDataOwnersAsync()
     const dataOwner = owners.find((owner) => owner.id === resourceOwner)
-    if (!dataOwner) return new Set()
+    if (!dataOwner) {
+      return new Set()
+    }
     const grants = dataOwner.issuedGrants.filter((grant) => grant.registeredShapeTree === scope)
     return new Set(grants.map((grant) => grant.storage))
   }
@@ -169,7 +175,9 @@ export class Application {
 
   public async resources(resourceServer: string, scope: string): Promise<Set<string>> {
     const grant = await this.findGrant(resourceServer, scope)
-    if (!grant) throw new Error('No grant found')
+    if (!grant) {
+      throw new Error('No grant found')
+    }
     if (grant.scopeOfGrant === INTEROP.Inherited) {
       throw new Error('Cannot list instances from Inherited grants')
     }
@@ -189,7 +197,9 @@ export class Application {
 
   public childInfo(childId: string, scope: string, parentId: string): ChildInfo {
     const parentInfo = this.parentMap.get(parentId)
-    if (!parentInfo) throw new Error(`no parent info for ${parentId}`)
+    if (!parentInfo) {
+      throw new Error(`no parent info for ${parentId}`)
+    }
     return {
       id: childId,
       scope,
@@ -213,7 +223,9 @@ export class Application {
 
   public async canCreateChild(parentId: string, scope: string): Promise<boolean> {
     const parentInfo = this.parentMap.get(parentId)
-    if (!parentInfo) throw new Error(`no parent info for ${parentId}`)
+    if (!parentInfo) {
+      throw new Error(`no parent info for ${parentId}`)
+    }
     const grant = await this.findGrant(parentInfo.resourceServer, scope)
     return grant ? grantAccessModes(grant).includes(ACCESS_ACTIONS.create) : false
   }
@@ -233,7 +245,9 @@ export class Application {
   // TODO: rename to idForNew
   public async iriForNew(resourceServer: string, scope: string): Promise<string> {
     const grant = await this.findGrant(resourceServer, scope)
-    if (!grant) throw new Error('No grant found')
+    if (!grant) {
+      throw new Error('No grant found')
+    }
     const registration = grant.hasDataRegistration
     const { strategy } = await this.identifierStrategies.resolve(grant.storage)
     const id = strategy.mint({ parent: registration, isContainer: false })
@@ -248,7 +262,9 @@ export class Application {
 
   public async iriForChild(parentId: string, scope: string): Promise<string> {
     const parentInfo = this.parentMap.get(parentId)
-    if (!parentInfo) throw new Error(`no parent info for ${parentId}`)
+    if (!parentInfo) {
+      throw new Error(`no parent info for ${parentId}`)
+    }
     const iri = await this.iriForNew(parentInfo.resourceServer, scope)
     this.childMap.set(iri, this.childInfo(iri, scope, parentId))
     return iri
@@ -256,7 +272,9 @@ export class Application {
 
   public findParent(childId: string): string {
     const child = this.childMap.get(childId)
-    if (!child) throw new Error(`no child info for ${childId}`)
+    if (!child) {
+      throw new Error(`no child info for ${childId}`)
+    }
     return child.parent
   }
 

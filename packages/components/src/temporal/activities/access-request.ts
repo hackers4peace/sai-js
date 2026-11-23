@@ -158,7 +158,9 @@ export async function materializeNeedBasedAccessRequest(
   const manager = buildSessionManager()
   const session = await manager.getSession(input.dataOwner.id)
   const existing = await session.fetch(input.request.id, { method: 'HEAD' })
-  if (existing.status === 200) return
+  if (existing.status === 200) {
+    return
+  }
   // The storage identifier strategy creates the member and records containment.
   await session.createIdentifierResource(
     session.registrySet.hasAccessRequestRegistry.id,
@@ -202,10 +204,14 @@ export function matchGrantedRequests(
       const matching = grants.filter(
         (g) => g.grantedBy === r.dataOwner && g.shapeTree === shapeTree
       )
-      if (matching.length === 0) return false
+      if (matching.length === 0) {
+        return false
+      }
       const requested = r.instancesByShapeTree?.[shapeTree] ?? []
       // a shape-tree-only request keeps the existing best-effort semantics
-      if (requested.length === 0) return true
+      if (requested.length === 0) {
+        return true
+      }
       // a broader grant covers the selected set; SelectedFromRegistry grants
       // are unioned because one request may be satisfied by several grants
       if (matching.some((g) => g.scope !== undefined && g.scope !== INTEROP.SelectedFromRegistry)) {
@@ -214,7 +220,9 @@ export function matchGrantedRequests(
       const available = new Set(matching.flatMap((g) => g.instances ?? []))
       return requested.every((instance) => available.has(instance))
     })
-    if (covered) granted.add(r.request)
+    if (covered) {
+      granted.add(r.request)
+    }
   }
   return granted
 }
@@ -236,14 +244,22 @@ export async function detectGrantedRequests(input: DetectGrantedRequestsInput): 
   const session = await manager.getSession(input.requester.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
   const open = await getOpenSentAccessRequests(transport)
-  if (open.length === 0) return
+  if (open.length === 0) {
+    return
+  }
   const grants = await getAccessGrantsForGrantee(transport, input.requester.id)
   const matched = matchGrantedRequests(open, grants)
-  if (matched.size === 0) return
+  if (matched.size === 0) {
+    return
+  }
   const registry = session.registrySet.hasActivityRegistry
-  if (!registry) return
+  if (!registry) {
+    return
+  }
   for (const request of open) {
-    if (!matched.has(request.request)) continue
+    if (!matched.has(request.request)) {
+      continue
+    }
     const activity: Omit<import('@janeirodigital/interop-data-model').AccessRequestGranted, 'id'> =
       {
         type: ['Activity', 'AccessRequestGranted'],

@@ -200,7 +200,9 @@ export class PodEndpointStore extends Initializer {
     type: typeof SPARQL_ENDPOINT_STORAGE_TYPE | typeof OBJECT_ENDPOINT_STORAGE_TYPE,
     iri: string
   ): Promise<T | undefined> {
-    if (!iri) return undefined
+    if (!iri) {
+      return undefined
+    }
     let best: T | undefined
     for await (const entry of this.storage.entries(type)) {
       const record = entry as unknown as T

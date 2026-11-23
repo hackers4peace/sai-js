@@ -56,8 +56,9 @@ class CookieJar {
     for (const raw of response.headers.getSetCookie()) {
       const [pair] = raw.split(';')
       const separator = pair.indexOf('=')
-      if (separator > 0)
+      if (separator > 0) {
         this.cookies.set(pair.slice(0, separator).trim(), pair.slice(separator + 1))
+      }
     }
     return response
   }
@@ -92,7 +93,9 @@ async function completeInteraction(options: InteractionOptions): Promise<string>
 
     if (response.status === 303 || response.status === 302 || response.status === 307) {
       const location = response.headers.get('location')
-      if (!location) throw new Error(`interaction redirect ${response.status} without a location`)
+      if (!location) {
+        throw new Error(`interaction redirect ${response.status} without a location`)
+      }
       const next = new URL(location, current)
       if (next.href.startsWith(options.redirectUrl)) {
         if (!next.searchParams.has('code')) {
@@ -112,7 +115,9 @@ async function completeInteraction(options: InteractionOptions): Promise<string>
 
     // An interaction page: its controls point at the next step.
     const body = await response.json()
-    if (body?.controls) controls = { ...controls, ...body.controls }
+    if (body?.controls) {
+      controls = { ...controls, ...body.controls }
+    }
 
     let step: { url: string; body?: unknown } | undefined
     if (!done.has('login') && controls.password?.login) {
@@ -128,7 +133,9 @@ async function completeInteraction(options: InteractionOptions): Promise<string>
       done.add('consent')
       step = { url: controls.oidc.consent }
     }
-    if (!step) throw new Error(`no known interaction step at ${current}\n${hops.join('\n')}`)
+    if (!step) {
+      throw new Error(`no known interaction step at ${current}\n${hops.join('\n')}`)
+    }
 
     const post = await jar.fetch(step.url, {
       method: 'POST',
@@ -140,7 +147,9 @@ async function completeInteraction(options: InteractionOptions): Promise<string>
       throw new Error(`interaction step ${step.url} failed: ${post.status}\n${hops.join('\n')}`)
     }
     const { location } = (await post.json()) as { location?: string }
-    if (!location) throw new Error(`interaction step ${step.url} returned no location`)
+    if (!location) {
+      throw new Error(`interaction step ${step.url} returned no location`)
+    }
     current = location
   }
 
@@ -208,7 +217,9 @@ export async function loginAsClient(options: OidcClientOptions): Promise<OidcCli
   }
 
   const keyPair = session.dpopKeyPair
-  if (!keyPair) throw new Error('the session has no DPoP key pair')
+  if (!keyPair) {
+    throw new Error('the session has no DPoP key pair')
+  }
 
   // No separate mint: the session's own DPoP-bound access token is the LWS
   // credential (`cnf.jkt` is this key, `aud` is the UAS that verifies it).

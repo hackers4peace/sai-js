@@ -67,8 +67,12 @@ function sparqlAdminSession(roleDoc: unknown): {
   const session = {
     fetch: async (url: string, init?: RequestInit) => {
       requests.push({ url, init })
-      if (url === ORG_WEBID) return mockResponse(orgProfileDoc)
-      if (url !== sparqlAdminUrl) throw new Error(`unexpected request: ${url}`)
+      if (url === ORG_WEBID) {
+        return mockResponse(orgProfileDoc)
+      }
+      if (url !== sparqlAdminUrl) {
+        throw new Error(`unexpected request: ${url}`)
+      }
       // the query travels as the POST body (application/sparql-query)
       const query = String(init?.body ?? '')
       if (query.includes('SELECT')) {

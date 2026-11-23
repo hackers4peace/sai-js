@@ -222,9 +222,15 @@ export class IdJagTokenHandler extends HttpHandler {
       'sai.lws.subject_token_type': subjectTokenType,
       'sai.lws.audience': audience,
     })
-    if (resource) span.setAttribute('sai.lws.resource', resource)
-    if (access) span.setAttribute('sai.lws.access.storage', access.storage)
-    if (proofKeyThumbprint) span.setAttribute('sai.lws.dpop_proof', true)
+    if (resource) {
+      span.setAttribute('sai.lws.resource', resource)
+    }
+    if (access) {
+      span.setAttribute('sai.lws.access.storage', access.storage)
+    }
+    if (proofKeyThumbprint) {
+      span.setAttribute('sai.lws.dpop_proof', true)
+    }
     setTokenAttributes(span, 'subject', subjectToken)
 
     await this.verifyAudience(audience)
@@ -578,7 +584,9 @@ export class IdJagTokenHandler extends HttpHandler {
    */
   private async accessClaim(params: URLSearchParams): Promise<VerifiedAccessClaim | undefined> {
     const values = params.getAll('access')
-    if (values.length === 0) return undefined
+    if (values.length === 0) {
+      return undefined
+    }
     if (values.length !== 1) {
       throw new OAuthError('invalid_request', 'The access parameter must have a single value.')
     }

@@ -208,14 +208,18 @@ describe('specific-instance access request', () => {
     const grantedActivity = await waitFor(
       async () => {
         const registry = kimSession.registrySet.hasActivityRegistry
-        if (!registry) return undefined
+        if (!registry) {
+          return undefined
+        }
         const iris = await ActivityRegistry.getActivityIris(
           registry,
           localSparqlTransport(kimSession.sparqlEndpoint)
         )
         for (const iri of iris) {
           const activity = await ActivityRegistry.loadActivity(iri, kimSession.fetch)
-          if (activity.type.includes('AccessRequestGranted')) return activity
+          if (activity.type.includes('AccessRequestGranted')) {
+            return activity
+          }
         }
         return undefined
       },

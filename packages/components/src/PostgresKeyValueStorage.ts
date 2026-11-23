@@ -71,7 +71,9 @@ export class PostgresKeyValueStorage<T> extends Initializer implements KeyValueS
     const rows = await this.sql`SELECT value FROM ${this.sql(this.tableName)} WHERE key = ${String(
       key
     )}`
-    if (rows.length === 0) return undefined
+    if (rows.length === 0) {
+      return undefined
+    }
     return JSON.parse(rows[0].value) as T
   }
 
@@ -116,7 +118,9 @@ export class PostgresKeyValueStorage<T> extends Initializer implements KeyValueS
     } finally {
       // postgres@3.x cursors expose no `close()` (only an async iterator whose
       // `return()` is the cancel path, invoked by `for await` on early exit)
-      if (typeof cursor.close === 'function') await cursor.close()
+      if (typeof cursor.close === 'function') {
+        await cursor.close()
+      }
     }
   }
 }

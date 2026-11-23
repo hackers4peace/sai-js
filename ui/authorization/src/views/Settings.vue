@@ -37,7 +37,9 @@ const languages = computed(() =>
 )
 
 async function signOut() {
-  if (await coreStore.signOut()) coreStore.navigateHome()
+  if (await coreStore.signOut()) {
+    coreStore.navigateHome()
+  }
 }
 </script>
 <style scoped>

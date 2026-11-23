@@ -23,7 +23,9 @@ export function isWithinBaseUrl(candidate: string, baseUrl: string): boolean {
   } catch {
     return false
   }
-  if (url.origin !== base.origin) return false
+  if (url.origin !== base.origin) {
+    return false
+  }
   const basePath = base.pathname.endsWith('/') ? base.pathname : `${base.pathname}/`
   return basePath === '/' || url.pathname === base.pathname || url.pathname.startsWith(basePath)
 }

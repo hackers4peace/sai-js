@@ -178,9 +178,15 @@ const availableAgents = computed(() =>
 )
 
 const dirty = computed(() => {
-  if (label.value !== originalLabel) return true
-  if (markedForDelete.size > 0) return true
-  if (newMembers.size > 0) return true
+  if (label.value !== originalLabel) {
+    return true
+  }
+  if (markedForDelete.size > 0) {
+    return true
+  }
+  if (newMembers.size > 0) {
+    return true
+  }
   return false
 })
 

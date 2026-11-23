@@ -16,7 +16,9 @@ const testClient = 'https://data/test-client/public/id'
 async function ownerGrants(owner: string): Promise<GrantData[]> {
   const session: AuthorizationAgent = await buildSessionManager().getSession(owner)
   const registry = session.registrySet.hasGrantRegistry
-  if (!registry) throw new Error('grant registry missing')
+  if (!registry) {
+    throw new Error('grant registry missing')
+  }
   return getRegistryGrants(localSparqlTransport(session.sparqlEndpoint), registry.id)
 }
 

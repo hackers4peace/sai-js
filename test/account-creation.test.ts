@@ -98,7 +98,9 @@ async function ask(dataset: string, query: string): Promise<boolean> {
     body: new URLSearchParams({ query }),
     signal: AbortSignal.timeout(5000),
   })
-  if (!response.ok) throw new Error(`SPARQL query on ${dataset} failed: ${response.status}`)
+  if (!response.ok) {
+    throw new Error(`SPARQL query on ${dataset} failed: ${response.status}`)
+  }
   return ((await response.json()) as { boolean: boolean }).boolean
 }
 
@@ -145,26 +147,35 @@ describe('account creation', () => {
           ['object', objectKey],
           ['webIdLink', webIdLinkKey],
         ] as const) {
-          if (!state[key]) missing.push(label)
+          if (!state[key]) {
+            missing.push(label)
+          }
         }
         const check = async (label: string, fn: () => Promise<boolean>) => {
           try {
-            if (!(await fn())) missing.push(label)
+            if (!(await fn())) {
+              missing.push(label)
+            }
           } catch (err) {
             missing.push(`${label}(${err instanceof Error ? err.message : String(err)})`)
           }
         }
-        if (!missing.length) await check('profile', profileLanded)
-        if (!missing.length)
+        if (!missing.length) {
+          await check('profile', profileLanded)
+        }
+        if (!missing.length) {
           await check('id-ask', () => ask('id', `ASK { GRAPH <${docId}> { <${webId}> ?p ?o } }`))
-        if (!missing.length)
+        }
+        if (!missing.length) {
           await check('registry-ask', () =>
             ask(registryDataset, `ASK { GRAPH <meta:${registrySet}> { <${registrySet}> ?p ?o } }`)
           )
-        if (!missing.length)
+        }
+        if (!missing.length) {
           await check('data-ask', () =>
             ask(dataDataset, `ASK { GRAPH <meta:${dataRegistry}> { <${dataRegistry}> ?p ?o } }`)
           )
+        }
         if (missing.length) {
           lastMissing = missing
           return undefined

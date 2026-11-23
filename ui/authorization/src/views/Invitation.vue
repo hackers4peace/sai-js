@@ -49,7 +49,9 @@ const valid = computed(
 watch(
   () => route.query.text,
   (text) => {
-    if (text) capabilityUrl.value = text as string
+    if (text) {
+      capabilityUrl.value = text as string
+    }
   },
   { immediate: true }
 )
@@ -64,7 +66,9 @@ async function create() {
     const invitation = await appStore.createInvitation(label.value, note.value)
     router.push({ name: 'social-agent-list', query: { invitation: invitation.id } })
   } else {
-    if (!capabilityUrl.value) return
+    if (!capabilityUrl.value) {
+      return
+    }
     await appStore.acceptInvitation(capabilityUrl.value, label.value, note.value)
     router.push({ name: 'social-agent-list' })
   }
