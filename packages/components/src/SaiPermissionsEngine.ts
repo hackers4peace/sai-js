@@ -248,7 +248,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
     parentPermissions: (id: string) => Promise<PermissionMap>
   ): Promise<PermissionMap> {
     const targetType = await this.determineTargetType(target)
-    let modes: Array<string> = []
+    let modes: Array<string>
     switch (targetType) {
       case TargetType.Registry:
         modes = await this.findRegistrationModes(data, target, identity)

@@ -194,6 +194,7 @@ export async function processDelegatedGrantsUpdated(
         continue
       }
       // forced run: sync + regenerate once even with nothing pending
+      // oxlint-disable-next-line no-useless-assignment -- loop-carried flag: the next iteration reads it to choose between idling and another forced sync
       forceSync = false
     }
     // no explicit workflowId on the child: the consumer already serializes per
