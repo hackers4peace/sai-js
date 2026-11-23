@@ -4,7 +4,8 @@ import {
   getRegistryGrants,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import { type GrantData, type OdrlPolicy, grantGrantee } from '@janeirodigital/interop-data-model'
+import { grantGrantee } from '@janeirodigital/interop-data-model'
+import type { GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
 import { INTEROP, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 
 import type { VerifiedAccessClaim } from './access-claim.js'

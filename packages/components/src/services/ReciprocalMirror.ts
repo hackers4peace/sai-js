@@ -1,15 +1,11 @@
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { localSparqlTransport, presentGraphs } from '@janeirodigital/interop-authorization-agent'
 import type { SocialAgentRegistrationData } from '@janeirodigital/interop-data-model'
-import {
-  INTEROP,
-  type WhatwgFetch,
-  documentValues,
-  fetchJsonLd,
-  toNQuads,
-} from '@janeirodigital/interop-utils'
+import { INTEROP, documentValues, fetchJsonLd, toNQuads } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { arrayifyStream } from '@solid/community-server'
-import { type IBindings, SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import type { IBindings } from 'fetch-sparql-endpoint'
 import { DataFactory, Parser, Writer } from 'n3'
 import type { Quad } from 'n3'
 

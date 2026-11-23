@@ -1,11 +1,8 @@
 import { INTEROP, LWS, ODRL, RDF, discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
 import { SpanStatusCode } from '@opentelemetry/api'
 import type { PodStore, StorageLocationStrategy } from '@solid/community-server'
-import {
-  LwsExchangeAccessDeniedError,
-  LwsTokenExchangePolicy,
-  type LwsTokenExchangePolicyInput,
-} from '@solid/community-server'
+import { LwsExchangeAccessDeniedError, LwsTokenExchangePolicy } from '@solid/community-server'
+import type { LwsTokenExchangePolicyInput } from '@solid/community-server'
 import { getLoggerFor } from 'global-logger-factory'
 import { DataFactory, Store } from 'n3'
 

@@ -9,12 +9,12 @@ import {
   LDP,
   RDF,
   SKOS,
-  type WhatwgFetch,
   fetchJsonLd,
   jsonld,
   toStore,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { describe, test } from 'vitest'
 

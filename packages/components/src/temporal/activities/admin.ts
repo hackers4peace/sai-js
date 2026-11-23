@@ -15,8 +15,8 @@ import {
   grantContext,
   grantGrantee,
   rewriteFullAdminAccess,
-  type OdrlPolicy,
 } from '@janeirodigital/interop-data-model'
+import type { OdrlPolicy } from '@janeirodigital/interop-data-model'
 import {
   ACCESS_ACTIONS,
   INTEROP,

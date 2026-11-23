@@ -15,7 +15,6 @@ const reactRules = Object.fromEntries(
 const notYetMigrated = Object.fromEntries(
   [
     'typescript/no-unsafe-type-assertion',
-    'import/consistent-type-specifier-style',
     'quality/no-unsafe-dictionary-type',
     'quality/no-chained-type-assertions',
     'typescript/no-unsafe-member-access',

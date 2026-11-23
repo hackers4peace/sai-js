@@ -1,4 +1,5 @@
-import { type LanguageMap, frameNode } from '@janeirodigital/interop-utils'
+import { frameNode } from '@janeirodigital/interop-utils'
+import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import type { AccessDescriptionData, AccessDescriptionId } from './access-description.ts'
 import { dataModelContext } from './context.ts'

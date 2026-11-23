@@ -1,9 +1,5 @@
-import {
-  type DataAuthorizationData,
-  type RegistrySetData,
-  grantAccessModes,
-  grantGrantee,
-} from '@janeirodigital/interop-data-model'
+import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
+import type { DataAuthorizationData, RegistrySetData } from '@janeirodigital/interop-data-model'
 import {
   ACCESS_ACTIONS,
   FlatIdentifierStrategy,
@@ -13,7 +9,8 @@ import {
   ODRL,
   RDF,
 } from '@janeirodigital/interop-utils'
-import { DataFactory, type Quad, Store } from 'n3'
+import { DataFactory, Store } from 'n3'
+import type { Quad } from 'n3'
 import { describe, expect, test, vi } from 'vitest'
 
 import { MirrorIncompleteError, generateGrantsForAuthorization } from '../src/grant-generation.js'

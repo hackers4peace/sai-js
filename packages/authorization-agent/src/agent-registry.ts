@@ -1,11 +1,11 @@
-import {
-  type ApplicationRegistrationData,
-  type ApplicationRegistryData,
-  type InvitationRegistryData,
-  type SocialAgentInvitationData,
-  type SocialAgentRegistrationData,
-  type SocialAgentRegistryData,
-  dataModelContext,
+import { dataModelContext } from '@janeirodigital/interop-data-model'
+import type {
+  ApplicationRegistrationData,
+  ApplicationRegistryData,
+  InvitationRegistryData,
+  SocialAgentInvitationData,
+  SocialAgentRegistrationData,
+  SocialAgentRegistryData,
 } from '@janeirodigital/interop-data-model'
 import type { AgentAndClient } from '@janeirodigital/interop-data-model'
 import {

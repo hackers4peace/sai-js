@@ -2,7 +2,8 @@ import { INTEROP } from '@janeirodigital/interop-utils'
 import { DataFactory, Store } from 'n3'
 import { describe, expect, test } from 'vitest'
 
-import { type SparqlTransport, getRole } from '../src/sparql.js'
+import { getRole } from '../src/sparql.js'
+import type { SparqlTransport } from '../src/sparql.js'
 
 const ROLE_IRI = 'https://registry/kim/r1'
 // in dev the app's client-id document lives at the application IRI — a

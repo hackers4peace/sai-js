@@ -1,4 +1,5 @@
-import { type LanguageMap, frameNode, selectNode } from '@janeirodigital/interop-utils'
+import { frameNode, selectNode } from '@janeirodigital/interop-utils'
+import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 

@@ -5,8 +5,8 @@ import { describe, expect, test } from 'vitest'
 import {
   isPlainLwsAccessRequest,
   plainLwsAccessRequestToNeedBased,
-  type PlainLwsTargetResolver,
 } from '../src/plain-lws-access-request.js'
+import type { PlainLwsTargetResolver } from '../src/plain-lws-access-request.js'
 
 const REQUESTER = 'https://id/bob'
 const OWNER = 'https://id/alice'

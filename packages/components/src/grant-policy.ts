@@ -4,14 +4,12 @@ import {
   scopeCovers,
 } from '@janeirodigital/interop-authorization-agent'
 import {
-  type FinalGrantData,
-  type GrantData,
-  type OdrlPolicy,
   grantAccessModes,
   grantGrantee,
   registrationOfTarget,
   shapeTreeOfTarget,
 } from '@janeirodigital/interop-data-model'
+import type { FinalGrantData, GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
 import { INTEROP, LWS } from '@janeirodigital/interop-utils'
 
 /** The data owner encoded in an ODRL policy target. */

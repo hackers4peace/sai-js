@@ -5,7 +5,8 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { setAccessClaimAssignee } from '../src/access-claim.js'
 import type { AccessClaimValidator } from '../src/DelegatedAccessClaimValidator.js'
-import { type FinalGrantData, grantFromPolicy } from '../src/grant-policy.js'
+import { grantFromPolicy } from '../src/grant-policy.js'
+import type { FinalGrantData } from '../src/grant-policy.js'
 import { grantCoversClaim } from '../src/grant-policy.js'
 import { OwnerAccessClaimValidator } from '../src/OwnerAccessClaimValidator.js'
 

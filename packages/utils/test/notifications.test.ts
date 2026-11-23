@@ -1,11 +1,7 @@
 import { describe, expect, test, vi } from 'vitest'
 
-import {
-  ChannelType,
-  type WhatwgFetch,
-  discoverSubscriptionService,
-  subscribeToNotificationChannel,
-} from '../src'
+import { ChannelType, discoverSubscriptionService, subscribeToNotificationChannel } from '../src'
+import type { WhatwgFetch } from '../src'
 
 const NOTIFY = 'http://www.w3.org/ns/solid/notifications#'
 const STORAGE_DESCRIPTION = 'http://www.w3.org/ns/solid/terms#storageDescription'

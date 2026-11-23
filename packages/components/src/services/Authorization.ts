@@ -15,35 +15,36 @@ import {
   listContained,
   accessNeedGroup as resolveAccessNeedGroup,
 } from '@janeirodigital/interop-authorization-agent'
-import {
-  type AccessNeedData,
-  type AccessNeedGroupData,
-  AccessRequest,
-  type AccessRequestArchived,
-  type AuthorizationDenied,
-  type AuthorizationGranted,
-  type AuthorizationRevoked,
-  ClientIdDocument,
-  type DataAuthorizationRef,
-  type EmbeddedAuthorization,
-  type GrantData,
-  type NeedBasedAccessRequestGroup,
-  ShapeTree,
+import { AccessRequest, ClientIdDocument, ShapeTree } from '@janeirodigital/interop-data-model'
+import type {
+  AccessNeedData,
+  AccessNeedGroupData,
+  AccessRequestArchived,
+  AuthorizationDenied,
+  AuthorizationGranted,
+  AuthorizationRevoked,
+  DataAuthorizationRef,
+  EmbeddedAuthorization,
+  GrantData,
+  NeedBasedAccessRequestGroup,
 } from '@janeirodigital/interop-data-model'
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 const loadClientIdDocument = loader(ClientIdDocument.fromJsonLd)
 const loadNeedBasedAccessRequest = loader(AccessRequest.fromJsonLd)
 
-import { INTEROP, type WhatwgFetch, loader, pickLanguage } from '@janeirodigital/interop-utils'
+import { INTEROP, loader, pickLanguage } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import {
   AccessNeed,
   AccessRequestArchivedMessage,
-  type Authorization,
-  type AuthorizationData,
-  type AuthorizationRevocationFailure,
   AuthorizationGrantedMessage,
   AuthorizationList,
   IRI,
+} from '@janeirodigital/sai-api-messages'
+import type {
+  Authorization,
+  AuthorizationData,
+  AuthorizationRevocationFailure,
 } from '@janeirodigital/sai-api-messages'
 import type { Brand } from 'effect/Brand'
 import type * as S from 'effect/Schema'

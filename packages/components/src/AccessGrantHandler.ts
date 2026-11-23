@@ -2,12 +2,8 @@ import {
   getRegistryGrants,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import {
-  type FinalGrantData,
-  grantGrantee,
-  grantAssigner,
-  toJsonLd,
-} from '@janeirodigital/interop-data-model'
+import { grantGrantee, grantAssigner, toJsonLd } from '@janeirodigital/interop-data-model'
+import type { FinalGrantData } from '@janeirodigital/interop-data-model'
 import { discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
 import {
   APPLICATION_LWS_JSON,

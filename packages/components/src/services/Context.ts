@@ -1,8 +1,8 @@
 import {
-  type AuthorizationAgent,
   getRegistrationLinks,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
+import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import type { RegistrySetData } from '@janeirodigital/interop-data-model'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { INTEROP } from '@janeirodigital/interop-utils'

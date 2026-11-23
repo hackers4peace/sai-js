@@ -1,17 +1,17 @@
 import {
-  type ApplicationRegistrationData,
   DataRegistration,
   Grant,
-  type GrantData,
   ShapeTree,
   childIris,
   frameDataInstance,
 } from '@janeirodigital/interop-data-model'
+import type { ApplicationRegistrationData, GrantData } from '@janeirodigital/interop-data-model'
 const loadGrant = loader(Grant.fromJsonLd)
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 const loadDataRegistration = loader(DataRegistration.fromJsonLd)
 
-import { INTEROP, type WhatwgFetch, loader } from '@janeirodigital/interop-utils'
+import { INTEROP, loader } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 /**
  * Whether the application registration has any access grants.

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { listContained, type SparqlTransport } from '../src/sparql'
+import { listContained } from '../src/sparql'
+import type { SparqlTransport } from '../src/sparql'
 
 const container = 'https://registry.example/alice/grant/'
 

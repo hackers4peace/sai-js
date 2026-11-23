@@ -1,17 +1,11 @@
-import {
-  ApplicationRegistration,
-  type ApplicationRegistrationData,
-  type DataOwnerData,
-  grantAccessModes,
-} from '@janeirodigital/interop-data-model'
+import { ApplicationRegistration, grantAccessModes } from '@janeirodigital/interop-data-model'
+import type { ApplicationRegistrationData, DataOwnerData } from '@janeirodigital/interop-data-model'
 const loadApplicationRegistration = loader(ApplicationRegistration.fromJsonLd)
 
 import { INTEROP } from '@janeirodigital/interop-utils'
 import {
   ACCESS_ACTIONS,
   CachingIdentifierStrategyResolver,
-  type IdentifierStrategyResolver,
-  type WhatwgFetch,
   discoverAgentRegistration,
   discoverAuthorizationAgent,
   discoverAuthorizationRedirectEndpoint,
@@ -19,6 +13,7 @@ import {
   executeCreationPlan,
   loader,
 } from '@janeirodigital/interop-utils'
+import type { IdentifierStrategyResolver, WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import { getAccessGrants, getDataInstanceIterator, getGranted } from './grant.ts'
 

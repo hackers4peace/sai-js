@@ -21,7 +21,8 @@ import type {
   PolicyEngine,
 } from '@solidlab/policy-engine'
 import { ACP, PERMISSIONS } from '@solidlab/policy-engine'
-import { type IBindings, SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import type { IBindings } from 'fetch-sparql-endpoint'
 import { getLoggerFor } from 'global-logger-factory'
 import { DataFactory, Store } from 'n3'
 

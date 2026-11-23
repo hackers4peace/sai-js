@@ -1,11 +1,7 @@
-import {
-  ACCESS_ACTIONS,
-  INTEROP,
-  LDP,
-  LWS,
-  type SparqlTransport,
-} from '@janeirodigital/interop-utils'
-import { DataFactory, Store, type Quad } from 'n3'
+import { ACCESS_ACTIONS, INTEROP, LDP, LWS } from '@janeirodigital/interop-utils'
+import type { SparqlTransport } from '@janeirodigital/interop-utils'
+import { DataFactory, Store } from 'n3'
+import type { Quad } from 'n3'
 import { describe, expect, test } from 'vitest'
 
 import { findAuthorizationsForGrantee } from '../src/sparql.js'

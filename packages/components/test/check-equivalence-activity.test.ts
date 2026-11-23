@@ -1,8 +1,5 @@
-import {
-  type GrantData,
-  type GrantTargetInput,
-  grantAccess,
-} from '@janeirodigital/interop-data-model'
+import { grantAccess } from '@janeirodigital/interop-data-model'
+import type { GrantData, GrantTargetInput } from '@janeirodigital/interop-data-model'
 import { ACCESS_ACTIONS, INTEROP, LWS } from '@janeirodigital/interop-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 

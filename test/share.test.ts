@@ -1,10 +1,6 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
-import {
-  type GrantData,
-  Grant,
-  getAccessGrantIris,
-  grantAccessModes,
-} from '@janeirodigital/interop-data-model'
+import { Grant, getAccessGrantIris, grantAccessModes } from '@janeirodigital/interop-data-model'
+import type { GrantData } from '@janeirodigital/interop-data-model'
 import { INTEROP, loader } from '@janeirodigital/interop-utils'
 const loadGrant = loader(Grant.fromJsonLd)
 

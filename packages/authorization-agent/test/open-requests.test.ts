@@ -1,12 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  type SparqlBindingTerm,
-  type SparqlTransport,
   getAccessGrantsForGrantee,
   getOpenAccessRequestsOnRegistry,
   getOpenSentAccessRequests,
 } from '../src/sparql.js'
+import type { SparqlBindingTerm, SparqlTransport } from '../src/sparql.js'
 
 const term = (value: string): SparqlBindingTerm => ({ termType: 'NamedNode', value })
 

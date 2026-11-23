@@ -2,11 +2,11 @@ import { buildSessionManager } from '@elfpavlik/sai-components'
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import {
   DataAuthorization,
-  type GrantData,
   Grant,
   getAccessGrantIris,
   grantGrantee,
 } from '@janeirodigital/interop-data-model'
+import type { GrantData } from '@janeirodigital/interop-data-model'
 import { INTEROP, loader } from '@janeirodigital/interop-utils'
 const loadDataAuthorization = loader(DataAuthorization.fromJsonLd)
 const loadGrant = loader(Grant.fromJsonLd)

@@ -1,11 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
-import {
-  type GrantData,
-  grantAccess,
-  grantAccessModes,
-  grantGrantee,
-} from '@janeirodigital/interop-data-model'
+import { grantAccess, grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
+import type { GrantData } from '@janeirodigital/interop-data-model'
 import {
   ACCESS_ACTIONS,
   INTEROP,

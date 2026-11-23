@@ -1,30 +1,31 @@
 import {
-  type DataAuthorizationData,
-  type DataRegistrationData,
-  type FinalGrantData,
-  type GeneratedGrants,
-  type GrantData,
-  type RegistrySetData,
-  type SocialAgentRegistrationData,
   ShapeTree,
   childIris,
   frameDataInstance,
   grantAccess,
   grantAccessModes,
 } from '@janeirodigital/interop-data-model'
+import type {
+  DataAuthorizationData,
+  DataRegistrationData,
+  FinalGrantData,
+  GeneratedGrants,
+  GrantData,
+  RegistrySetData,
+  SocialAgentRegistrationData,
+} from '@janeirodigital/interop-data-model'
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 
 import {
   INTEROP,
   LWS,
-  type WhatwgFetch,
   mintResource,
   loader,
   requireLwsStorageRoot,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import {
-  type SparqlTransport,
   findInheritingAuthorizations,
   getDataAuthorization,
   getAccessGrant,
@@ -35,6 +36,7 @@ import {
   localSparqlTransport,
   presentGraphs,
 } from './sparql.ts'
+import type { SparqlTransport } from './sparql.ts'
 import type { DataModelDependencies } from './types.ts'
 
 // ──────────────────────────

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { type SparqlTransport, findRolesWithMember } from '../src/sparql.js'
+import { findRolesWithMember } from '../src/sparql.js'
+import type { SparqlTransport } from '../src/sparql.js'
 
 const ROLE_REGISTRY = 'https://registry/alice/role/'
 const ROLE = 'https://registry/alice/r1'

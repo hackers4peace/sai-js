@@ -1,15 +1,16 @@
 import {
   AccessNeedDescription,
-  type AccessNeedDescriptionData,
   AccessNeedGroupDescription,
-  type AccessNeedGroupDescriptionData,
+} from '@janeirodigital/interop-data-model'
+import type {
+  AccessNeedDescriptionData,
+  AccessNeedGroupDescriptionData,
 } from '@janeirodigital/interop-data-model'
 const loadAccessNeedDescription = loader(AccessNeedDescription.fromJsonLd)
 const loadAccessNeedGroupDescription = loader(AccessNeedGroupDescription.fromJsonLd)
 
 import {
   INTEROP,
-  type WhatwgFetch,
   XSD,
   fetchJsonLd,
   getAllMatchingQuads,
@@ -17,6 +18,7 @@ import {
   loader,
   parseJsonld,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { DatasetCore } from '@rdfjs/types'
 import { DataFactory } from 'n3'
 

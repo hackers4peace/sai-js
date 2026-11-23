@@ -1,13 +1,13 @@
 import { describe, expect, test, vi } from 'vitest'
 
 import {
-  type WhatwgFetch,
   HttpStatusError,
   containedIrisJsonLd,
   documentValues,
   fetchJsonLd,
   findNodeIdByType,
 } from '../src'
+import type { WhatwgFetch } from '../src'
 
 function mockFetch(response: Partial<Response> & { ok: boolean }): WhatwgFetch {
   return vi.fn(async () => response) as unknown as WhatwgFetch

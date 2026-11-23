@@ -1,11 +1,13 @@
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
-import { type GenerateKeyPairResult, SignJWT, exportJWK, generateKeyPair } from 'jose'
+import { SignJWT, exportJWK, generateKeyPair } from 'jose'
+import type { GenerateKeyPairResult } from 'jose'
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import { dpopThumbprint } from '../src/dpop.ts'
 import { createBrowserSession } from '../src/session.ts'
 import { memoryStore } from '../src/store.ts'
-import { json, makeJwt, type RecordedRequest } from './helpers.ts'
+import { json, makeJwt } from './helpers.ts'
+import type { RecordedRequest } from './helpers.ts'
 
 const ISSUER = 'https://auth/'
 const CLIENT = 'https://app/id'

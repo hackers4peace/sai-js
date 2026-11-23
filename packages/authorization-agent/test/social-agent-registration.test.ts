@@ -6,11 +6,12 @@ import {
 } from '@janeirodigital/interop-authorization-agent'
 import {
   SocialAgentRegistration,
-  type SocialAgentRegistrationData,
   getAdminGrantIris,
   getAccessGrantIris,
 } from '@janeirodigital/interop-data-model'
-import { INTEROP, type WhatwgFetch, jsonld, loader } from '@janeirodigital/interop-utils'
+import type { SocialAgentRegistrationData } from '@janeirodigital/interop-data-model'
+import { INTEROP, jsonld, loader } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 const loadSocialAgentRegistration = loader(SocialAgentRegistration.fromJsonLd)
 
 import { describe, test, vi } from 'vitest'

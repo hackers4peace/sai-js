@@ -1,15 +1,16 @@
 import {
   SocialAgentRegistration,
-  type SocialAgentRegistrationData,
-  type SocialAgentRegistryData,
   dataModelContext,
   getAdminGrantIris,
+} from '@janeirodigital/interop-data-model'
+import type {
+  SocialAgentRegistrationData,
+  SocialAgentRegistryData,
 } from '@janeirodigital/interop-data-model'
 const loadSocialAgentRegistration = loader(SocialAgentRegistration.fromJsonLd)
 
 import {
   INTEROP,
-  type WhatwgFetch,
   applyPatch,
   deletePatch,
   insertPatch,
@@ -17,6 +18,7 @@ import {
   createResource,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 /**
  * Lazily load the peer's reciprocal registration — only consumers that need its

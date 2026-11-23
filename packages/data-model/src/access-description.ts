@@ -1,4 +1,4 @@
-import { type LanguageMap } from '@janeirodigital/interop-utils'
+import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 export type AccessDescriptionId = {
   id: string

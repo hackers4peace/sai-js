@@ -1,11 +1,7 @@
 import { FetchHttpClient } from '@effect/platform'
 import { RpcClient, RpcSerialization } from '@effect/rpc'
-import {
-  IRI,
-  type Authorization,
-  type ShareAuthorization,
-  rpcGroup,
-} from '@janeirodigital/sai-api-messages'
+import { IRI, rpcGroup } from '@janeirodigital/sai-api-messages'
+import type { Authorization, ShareAuthorization } from '@janeirodigital/sai-api-messages'
 import { Effect, Layer } from 'effect'
 import type * as S from 'effect/Schema'
 import type { PushSubscription } from 'web-push'

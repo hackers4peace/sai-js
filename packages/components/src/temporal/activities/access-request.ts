@@ -1,16 +1,16 @@
 import {
   ActivityRegistry,
-  type OpenSentAccessRequest,
   getAccessGrantsForGrantee,
   getOpenSentAccessRequests,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import {
-  type EmbeddedNeedBasedAccessRequest,
-  type NeedBasedAccessRequestReceivedId,
-  type NeedBasedAccessRequestSentId,
-  type SocialAgentId,
-  dataModelContext,
+import type { OpenSentAccessRequest } from '@janeirodigital/interop-authorization-agent'
+import { dataModelContext } from '@janeirodigital/interop-data-model'
+import type {
+  EmbeddedNeedBasedAccessRequest,
+  NeedBasedAccessRequestReceivedId,
+  NeedBasedAccessRequestSentId,
+  SocialAgentId,
 } from '@janeirodigital/interop-data-model'
 import { INTEROP, withContext } from '@janeirodigital/interop-utils'
 

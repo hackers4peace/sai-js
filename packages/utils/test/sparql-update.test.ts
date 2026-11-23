@@ -1,14 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import {
-  type WhatwgFetch,
-  applyPatch,
-  deletePatch,
-  insertPatch,
-  jsonld,
-  replaceStatement,
-  withContext,
-} from '../src'
+import { applyPatch, deletePatch, insertPatch, jsonld, replaceStatement, withContext } from '../src'
+import type { WhatwgFetch } from '../src'
 
 const context = {
   id: '@id',

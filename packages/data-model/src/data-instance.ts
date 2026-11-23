@@ -1,13 +1,5 @@
-import {
-  type FramedNode,
-  type JsonLdContext,
-  SHAPETREES,
-  type WhatwgFetch,
-  fetchJsonLd,
-  frameNode,
-  opt,
-  strs,
-} from '@janeirodigital/interop-utils'
+import { SHAPETREES, fetchJsonLd, frameNode, opt, strs } from '@janeirodigital/interop-utils'
+import type { FramedNode, JsonLdContext, WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 import type { DataRegistrationData } from './data-registration.ts'

@@ -9,7 +9,8 @@ import {
 } from '@janeirodigital/interop-utils'
 import type { Term } from '@rdfjs/types'
 import { BadRequestHttpError } from '@solid/community-server'
-import { DataFactory, type Store } from 'n3'
+import { DataFactory } from 'n3'
+import type { Store } from 'n3'
 
 const { namedNode } = DataFactory
 

@@ -1,4 +1,5 @@
-import { type BrowserSession, createBrowserSession, indexedDbStore } from '@elfpavlik/lws-auth'
+import { createBrowserSession, indexedDbStore } from '@elfpavlik/lws-auth'
+import type { BrowserSession } from '@elfpavlik/lws-auth'
 
 import { getRuntimeConfig } from '@/runtime-config'
 

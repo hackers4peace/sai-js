@@ -1,10 +1,8 @@
 import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpavlik/sai-components'
-import {
-  ActivityRegistry,
-  type AuthorizationAgent,
-  localSparqlTransport,
-} from '@janeirodigital/interop-authorization-agent'
-import { AccessRequest, type NeedBasedAccessRequestSent } from '@janeirodigital/interop-data-model'
+import { ActivityRegistry, localSparqlTransport } from '@janeirodigital/interop-authorization-agent'
+import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
+import { AccessRequest } from '@janeirodigital/interop-data-model'
+import type { NeedBasedAccessRequestSent } from '@janeirodigital/interop-data-model'
 const loadNeedBasedAccessRequest = loader(AccessRequest.fromJsonLd)
 
 import { ACCESS_ACTIONS, loader } from '@janeirodigital/interop-utils'

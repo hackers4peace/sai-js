@@ -15,13 +15,8 @@ export type {
   DataAuthorizationStructure,
 } from '@janeirodigital/interop-data-model'
 import { DataAuthorization } from '@janeirodigital/interop-data-model'
-import {
-  INTEROP,
-  type LanguageMap,
-  type WhatwgFetch,
-  createResource,
-  mintResource,
-} from '@janeirodigital/interop-utils'
+import { INTEROP, createResource, mintResource } from '@janeirodigital/interop-utils'
+import type { LanguageMap, WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import {
   getDataAuthorization as getDataAuthorizationFromSparql,

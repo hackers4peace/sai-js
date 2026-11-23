@@ -1,8 +1,10 @@
 import { INTEROP, LWS, ODRL } from '@janeirodigital/interop-utils'
-import { DataFactory, type Quad } from 'n3'
+import { DataFactory } from 'n3'
+import type { Quad } from 'n3'
 import { describe, expect, test } from 'vitest'
 
-import { type SparqlTransport, getLinkedGrantOwners, getRegistrationLinks } from '../src/sparql.js'
+import { getLinkedGrantOwners, getRegistrationLinks } from '../src/sparql.js'
+import type { SparqlTransport } from '../src/sparql.js'
 
 const { namedNode, quad } = DataFactory
 

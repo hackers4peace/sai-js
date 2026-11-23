@@ -1,6 +1,4 @@
 import {
-  type SparqlBindingTerm,
-  type SparqlTransport,
   findAdminAuthorization,
   findApplicationRegistration,
   findSocialAgentInvitation,
@@ -24,6 +22,10 @@ import {
   listRegistrationsByShapeTrees,
   localSparqlTransport,
   withSparqlTracing,
+} from '@janeirodigital/interop-authorization-agent'
+import type {
+  SparqlBindingTerm,
+  SparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { discoverAuthorizationAgent, toStore } from '@janeirodigital/interop-utils'

@@ -1,17 +1,13 @@
-import {
-  type RoleData,
-  type RoleRegistryData,
-  dataModelContext,
-} from '@janeirodigital/interop-data-model'
+import { dataModelContext } from '@janeirodigital/interop-data-model'
+import type { RoleData, RoleRegistryData } from '@janeirodigital/interop-data-model'
 import {
   INTEROP,
-  type LanguageMap,
-  type WhatwgFetch,
   createResource,
   mintResource,
   putJsonLd,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { LanguageMap, WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import type { DataModelDependencies } from './types.ts'
 

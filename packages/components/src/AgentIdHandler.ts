@@ -1,7 +1,5 @@
-import {
-  type SocialAgentRegistrationData,
-  getAdminGrantIris,
-} from '@janeirodigital/interop-data-model'
+import { getAdminGrantIris } from '@janeirodigital/interop-data-model'
+import type { SocialAgentRegistrationData } from '@janeirodigital/interop-data-model'
 import { INTEROP, LWS } from '@janeirodigital/interop-utils'
 import {
   BasicRepresentation,

@@ -2,7 +2,8 @@ import { ACCESS_ACTIONS, INTEROP, RDF, toStore } from '@janeirodigital/interop-u
 import { DataFactory } from 'n3'
 import { describe, test } from 'vitest'
 
-import { DataAuthorization, type FinalDataAuthorizationData } from '../../src'
+import { DataAuthorization } from '../../src'
+import type { FinalDataAuthorizationData } from '../../src'
 import { expect } from '../expect'
 
 const webId = 'https://alice.example/#id'

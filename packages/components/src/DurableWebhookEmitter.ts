@@ -10,7 +10,8 @@ import {
 import type { NotificationEmitterInput } from '@solid/community-server'
 import { getLoggerFor } from 'global-logger-factory'
 
-import { type PostWebhookInput, postWebhook } from './temporal/activities/webhook-delivery.js'
+import { postWebhook } from './temporal/activities/webhook-delivery.js'
+import type { PostWebhookInput } from './temporal/activities/webhook-delivery.js'
 import { Temporal } from './temporal/client.js'
 import { WEBHOOK_DELIVERY_TASK_QUEUE } from './temporal/queues.js'
 import { deliverWebhook } from './temporal/workflows/webhook-delivery.js'

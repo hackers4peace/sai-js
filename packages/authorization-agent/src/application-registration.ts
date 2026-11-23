@@ -1,16 +1,11 @@
-import {
-  type AgentAndClient,
-  type ApplicationRegistrationData,
-  type ApplicationRegistryData,
-  dataModelContext,
+import { dataModelContext } from '@janeirodigital/interop-data-model'
+import type {
+  AgentAndClient,
+  ApplicationRegistrationData,
+  ApplicationRegistryData,
 } from '@janeirodigital/interop-data-model'
-import {
-  INTEROP,
-  type WhatwgFetch,
-  createResource,
-  mintResource,
-  withContext,
-} from '@janeirodigital/interop-utils'
+import { INTEROP, createResource, mintResource, withContext } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import { setAcr } from './agent-registration.ts'
 import { findApplicationRegistration as findApplicationRegistrationFromSparql } from './sparql.ts'

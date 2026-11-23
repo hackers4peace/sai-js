@@ -2,16 +2,16 @@ import { AS, INTEROP } from '@janeirodigital/interop-utils'
 import { frameDoc } from '@janeirodigital/interop-utils'
 import { describe, expect, expectTypeOf, test } from 'vitest'
 
-import {
-  type ActivityCompleted,
-  type ActivityData,
-  type AdminAuthorizationGranted,
-  type AgentRegistrationAdded,
-  type AuthorizationRecorded,
-  type InvitationAccepted,
-  type InvitationCreated,
-  type RoleMembershipChanged,
-  dataModelContext,
+import { dataModelContext } from '../src'
+import type {
+  ActivityCompleted,
+  ActivityData,
+  AdminAuthorizationGranted,
+  AgentRegistrationAdded,
+  AuthorizationRecorded,
+  InvitationAccepted,
+  InvitationCreated,
+  RoleMembershipChanged,
 } from '../src'
 
 // The wire contract (see the OpenWiki `services/activity-lifecycle.md`): the typed activity union

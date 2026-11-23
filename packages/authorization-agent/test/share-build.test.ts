@@ -1,12 +1,13 @@
 import type { DataRegistrationData, RegistrySetData } from '@janeirodigital/interop-data-model'
-import { ACCESS_ACTIONS, INTEROP, type WhatwgFetch } from '@janeirodigital/interop-utils'
+import { ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { describe, expect, test, vi } from 'vitest'
 
-import {
-  AuthorizationAgent,
-  type DataInstanceFacts,
-  type ShareContextFacts,
-  type ShareDataInstanceStructure,
+import { AuthorizationAgent } from '../src/index.ts'
+import type {
+  DataInstanceFacts,
+  ShareContextFacts,
+  ShareDataInstanceStructure,
 } from '../src/index.ts'
 
 // ──────────────────────────

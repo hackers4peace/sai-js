@@ -3,7 +3,6 @@ import {
   ACP,
   AS,
   INTEROP,
-  type JsonLdContext,
   LDP,
   LWS,
   OIDC,
@@ -16,6 +15,7 @@ import {
   odrlContext,
   saiContext,
 } from '@janeirodigital/interop-utils'
+import type { JsonLdContext } from '@janeirodigital/interop-utils'
 
 const NFO = createVocabulary(
   'http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#',

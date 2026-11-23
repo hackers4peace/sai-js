@@ -1,28 +1,27 @@
 import {
   AdminAuthorization,
-  type AdminAuthorizationData,
-  type AgentId,
-  type AgentOrRoleId,
-  type ApplicationRegistrationData,
-  type AuthorizationRegistryData,
-  type DataAuthorizationData,
-  type DataAuthorizationId,
-  type DataInstanceData,
-  type DataRegistrationData,
-  type FinalDataAuthorizationData,
-  type GeneratedGrants,
   RegistrySet,
-  type RegistrySetData,
-  type RoleData,
-  // (a2) ShareDataInstanceStructure canonical shape moved verbatim into
-  // data-model — re-exported here for source compatibility
-  // (see the OpenWiki `data-model/entities.md`)
-  type ShareDataInstanceStructure,
-  type SocialAgentRegistrationData,
   WebIdProfile,
-  type WebIdProfileData,
   dataModelContext,
   grantGrantee,
+} from '@janeirodigital/interop-data-model'
+import type {
+  AdminAuthorizationData,
+  AgentId,
+  AgentOrRoleId,
+  ApplicationRegistrationData,
+  AuthorizationRegistryData,
+  DataAuthorizationData,
+  DataAuthorizationId,
+  DataInstanceData,
+  DataRegistrationData,
+  FinalDataAuthorizationData,
+  GeneratedGrants,
+  RegistrySetData,
+  RoleData,
+  ShareDataInstanceStructure,
+  SocialAgentRegistrationData,
+  WebIdProfileData,
 } from '@janeirodigital/interop-data-model'
 // re-export so package consumers (components services, tests) keep importing
 // it from '@janeirodigital/interop-authorization-agent'
@@ -31,9 +30,7 @@ const loadRegistrySet = loader(RegistrySet.fromJsonLd)
 const loadWebIdProfile = loader(WebIdProfile.fromJsonLd)
 import {
   INTEROP,
-  type WhatwgFetch,
   CachingIdentifierStrategyResolver,
-  type IdentifierStrategyResolver,
   addStatement,
   createResource,
   discoverAgentRegistration,
@@ -44,18 +41,21 @@ import {
   replaceStatement,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch, IdentifierStrategyResolver } from '@janeirodigital/interop-utils'
 
 import {
-  type AccessAuthorizationStructure,
-  type AgentWithAccess,
-  type DataInstanceFacts,
-  type GrantedAuthorization,
-  type NestedDataAuthorizationData,
-  type WhoHasAccess,
   accessForResource,
   generateAuthorization,
   generateDataAuthorizations,
   scopeFacts,
+} from './authorization.ts'
+import type {
+  AccessAuthorizationStructure,
+  AgentWithAccess,
+  DataInstanceFacts,
+  GrantedAuthorization,
+  NestedDataAuthorizationData,
+  WhoHasAccess,
 } from './authorization.ts'
 import { loadDataInstance } from './data-instance.ts'
 import { invalidGrantsAfterRemoval } from './grant-chain.ts'

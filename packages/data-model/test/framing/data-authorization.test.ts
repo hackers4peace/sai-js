@@ -1,7 +1,8 @@
 import { ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
 import { describe, test } from 'vitest'
 
-import { DataAuthorization, type FinalDataAuthorizationData } from '../../src'
+import { DataAuthorization } from '../../src'
+import type { FinalDataAuthorizationData } from '../../src'
 import { expect } from '../expect'
 import { docFromGraphs } from './helpers'
 

@@ -5,7 +5,8 @@ import {
   presentGraphs,
 } from '@janeirodigital/interop-authorization-agent'
 import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
-import { type AuthorizationGranted, getAccessGrantIris } from '@janeirodigital/interop-data-model'
+import { getAccessGrantIris } from '@janeirodigital/interop-data-model'
+import type { AuthorizationGranted } from '@janeirodigital/interop-data-model'
 import { INTEROP } from '@janeirodigital/interop-utils'
 import { Client, Connection } from '@temporalio/client'
 import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint'

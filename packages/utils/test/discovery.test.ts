@@ -2,7 +2,6 @@ import { describe, expect, test, vi } from 'vitest'
 
 import {
   AUXILIARY_DISCOVERY_ACCEPT,
-  type WhatwgFetch,
   discoverAccessGrantService,
   discoverAccessRequestService,
   discoverAccessResource,
@@ -16,6 +15,7 @@ import {
   requireLwsStorageRoot,
   upContainer,
 } from '../src'
+import type { WhatwgFetch } from '../src'
 
 const aliceId = 'https://id/alice'
 const aliceAgentId = 'https://auth/.sai/agents/aHR0cHM6Ly9pZC9hbGljZQ'

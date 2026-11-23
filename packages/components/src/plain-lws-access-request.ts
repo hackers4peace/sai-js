@@ -1,11 +1,8 @@
 import { INTEROP, LWS } from '@janeirodigital/interop-utils'
 import { BadRequestHttpError } from '@solid/community-server'
 
-import {
-  accessModes,
-  type NeedBasedAccessRequestInput,
-  values,
-} from './need-based-access-request.js'
+import { accessModes, values } from './need-based-access-request.js'
+import type { NeedBasedAccessRequestInput } from './need-based-access-request.js'
 
 /**
  * Plain LWS ODRL access request (issue w3c/lws-protocol#303 shape):

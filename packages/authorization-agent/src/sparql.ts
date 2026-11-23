@@ -1,20 +1,22 @@
 import {
   AdminAuthorization,
-  type AdminAuthorizationData,
   ApplicationRegistration,
-  type ApplicationRegistrationData,
   DataAuthorization,
-  type DataAuthorizationData,
   DataRegistration,
-  type DataRegistrationData,
   Grant,
-  type GrantData,
-  type RegistrySetData,
-  type RoleData,
   SocialAgentInvitation,
-  type SocialAgentInvitationData,
-  type SocialAgentRegistrationData,
   dataModelContext,
+} from '@janeirodigital/interop-data-model'
+import type {
+  AdminAuthorizationData,
+  ApplicationRegistrationData,
+  DataAuthorizationData,
+  DataRegistrationData,
+  GrantData,
+  RegistrySetData,
+  RoleData,
+  SocialAgentInvitationData,
+  SocialAgentRegistrationData,
 } from '@janeirodigital/interop-data-model'
 import {
   AS,
@@ -22,11 +24,11 @@ import {
   LDP,
   LWS,
   ODRL,
-  type LanguageMap,
   frameDoc,
   isAuxiliaryResource,
   jsonld,
 } from '@janeirodigital/interop-utils'
+import type { LanguageMap } from '@janeirodigital/interop-utils'
 import { SpanStatusCode, trace } from '@opentelemetry/api'
 /**
  * Registry-plane SPARQL transport + queries, shared by the AuthorizationAgent
@@ -36,7 +38,8 @@ import { SpanStatusCode, trace } from '@opentelemetry/api'
  * requires (docs/sparql.md).
  */
 import type { DatasetCore } from '@rdfjs/types'
-import { type IBindings, SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import type { IBindings } from 'fetch-sparql-endpoint'
 import { Store } from 'n3'
 
 const fetcher = new SparqlEndpointFetcher()

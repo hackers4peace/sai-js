@@ -2,14 +2,8 @@ import {
   findInheritingAuthorizations,
   storeDataAuthorizations,
 } from '@janeirodigital/interop-authorization-agent'
-import {
-  ACCESS_ACTIONS,
-  INTEROP,
-  type SparqlBindingTerm,
-  type SparqlTransport,
-  fetchJsonLd,
-  toStore,
-} from '@janeirodigital/interop-utils'
+import { ACCESS_ACTIONS, INTEROP, fetchJsonLd, toStore } from '@janeirodigital/interop-utils'
+import type { SparqlBindingTerm, SparqlTransport } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { describe, expect, test } from 'vitest'
 

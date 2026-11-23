@@ -2,9 +2,10 @@ import { accessGrantsUrl, buildOidcSession, buildSessionManager } from '@elfpavl
 import {
   getRegistryGrants,
   localSparqlTransport,
-  type AuthorizationAgent,
 } from '@janeirodigital/interop-authorization-agent'
-import { type GrantData, grantGrantee, grantAssigner } from '@janeirodigital/interop-data-model'
+import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
+import { grantGrantee, grantAssigner } from '@janeirodigital/interop-data-model'
+import type { GrantData } from '@janeirodigital/interop-data-model'
 import { LWS } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 

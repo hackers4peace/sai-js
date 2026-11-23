@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs'
 
-import { jsonld, type WhatwgFetch } from '@janeirodigital/interop-utils'
-import { DataFactory, Parser, type Quad, type Term } from 'n3'
+import { jsonld } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
+import { DataFactory, Parser } from 'n3'
+import type { Quad, Term } from 'n3'
 
 // A local mock TriG fixture for unit tests. It is a trimmed copy of the full
 // stack seed (environments/data/registry.trig), so package tests never read the

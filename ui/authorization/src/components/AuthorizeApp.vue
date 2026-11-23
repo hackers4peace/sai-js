@@ -310,19 +310,17 @@
   </v-card>
 </template>
 <script lang="ts" setup>
-import {
-  AccessModes,
-  type AccessNeed,
-  type Application,
-  type Authorization,
-  type AuthorizationData,
-  type BaseAuthorization,
-  type DataAuthorization,
-  type DataInstanceList,
-  IRI,
-  type Role,
-  Scopes,
-  type SocialAgent,
+import { AccessModes, IRI, Scopes } from '@janeirodigital/sai-api-messages'
+import type {
+  AccessNeed,
+  Application,
+  Authorization,
+  AuthorizationData,
+  BaseAuthorization,
+  DataAuthorization,
+  DataInstanceList,
+  Role,
+  SocialAgent,
 } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
 import locale from 'locale-codes'

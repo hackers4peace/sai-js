@@ -1,6 +1,5 @@
 import {
   SHAPETREES,
-  type WhatwgFetch,
   XSD,
   documentLoader,
   documentValues,
@@ -9,6 +8,7 @@ import {
   jsonld,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { NamedNode } from '@rdfjs/types'
 import { DataFactory } from 'n3'
 

@@ -1,10 +1,12 @@
 import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
 import {
-  type InvitationAccepted,
-  type SocialAgentRegistrationData,
   WebIdProfile,
   getAdminGrantIris,
   getAccessGrantIris,
+} from '@janeirodigital/interop-data-model'
+import type {
+  InvitationAccepted,
+  SocialAgentRegistrationData,
 } from '@janeirodigital/interop-data-model'
 const loadWebIdProfile = loader(WebIdProfile.fromJsonLd)
 

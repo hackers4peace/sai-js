@@ -1,12 +1,11 @@
 import {
-  type AgentRegistrationData,
   agentRegistrationAcrJsonLd,
   dataModelContext,
   getAccessGrantIris,
 } from '@janeirodigital/interop-data-model'
+import type { AgentRegistrationData } from '@janeirodigital/interop-data-model'
 import type { AgentAndClient } from '@janeirodigital/interop-data-model'
 import {
-  type WhatwgFetch,
   addStatement,
   applyPatch,
   deletePatch,
@@ -16,6 +15,7 @@ import {
   removeStatement,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 // ──────────────────────────
 // Behavior functions (replacing class methods)

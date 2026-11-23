@@ -6,7 +6,8 @@ import {
   getSocialAgentRegistration,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import { type AgentId, getAccessGrantIris } from '@janeirodigital/interop-data-model'
+import { getAccessGrantIris } from '@janeirodigital/interop-data-model'
+import type { AgentId } from '@janeirodigital/interop-data-model'
 import { INTEROP } from '@janeirodigital/interop-utils'
 import { Client, Connection } from '@temporalio/client'
 import { describe, expect, test } from 'vitest'

@@ -1,24 +1,26 @@
 import {
-  type ChildInfo,
-  type DataInstanceData,
   DataRegistration,
-  type DataRegistrationData,
   ShapeTree,
   frameDataInstance,
   isBlob,
   labelFromNode,
+} from '@janeirodigital/interop-data-model'
+import type {
+  ChildInfo,
+  DataInstanceData,
+  DataRegistrationData,
 } from '@janeirodigital/interop-data-model'
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 const loadDataRegistration = loader(DataRegistration.fromJsonLd)
 
 import type { ShapeTreeData } from '@janeirodigital/interop-data-model'
 import {
-  type WhatwgFetch,
   discoverDescriptionResource,
   loader,
   pickLanguage,
   upContainer,
 } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 /** Count the children of the data instance for each referenced shape tree. */
 export async function computeChildren(

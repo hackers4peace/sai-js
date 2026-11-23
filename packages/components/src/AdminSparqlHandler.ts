@@ -16,7 +16,8 @@ import type {
   OperationHttpHandlerInput,
   ResponseDescription,
 } from '@solid/community-server'
-import { type IBindings, type IUpdateTypes, SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
+import type { IBindings, IUpdateTypes } from 'fetch-sparql-endpoint'
 import { getLoggerFor } from 'global-logger-factory'
 
 import type { CustomWebIdStore } from './CustomWebIdStore.js'

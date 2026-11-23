@@ -2,7 +2,8 @@ import { ACCESS_ACTIONS, INTEROP, LWS, ODRL, RDF, toStore } from '@janeirodigita
 import { DataFactory } from 'n3'
 import { describe, expect, test } from 'vitest'
 
-import { type FinalGrantData, Grant, type GrantTargetInput, grantAccess } from '../../src'
+import { Grant, grantAccess } from '../../src'
+import type { FinalGrantData, GrantTargetInput } from '../../src'
 
 const snippetIri = 'https://some.iri/'
 const GRANTEE = 'https://id/bob'

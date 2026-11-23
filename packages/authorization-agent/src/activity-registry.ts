@@ -1,28 +1,26 @@
-import {
-  type ActivityData,
-  type ActivityRegistryData,
-  type CreateInvitationPojo,
-  DataAuthorizationFromJsonLd,
-  type EmbeddedAccessRequestRef,
-  type EmbeddedAdminAuthorization,
-  type EmbeddedAuthorization,
-  type EmbeddedNeedBasedAccessRequest,
-  type EmbeddedSocialAgentInvitation,
-  type EmbeddedSocialAgentRegistration,
-  type RoleData,
-  dataModelContext,
+import { DataAuthorizationFromJsonLd, dataModelContext } from '@janeirodigital/interop-data-model'
+import type {
+  ActivityData,
+  ActivityRegistryData,
+  CreateInvitationPojo,
+  EmbeddedAccessRequestRef,
+  EmbeddedAdminAuthorization,
+  EmbeddedAuthorization,
+  EmbeddedNeedBasedAccessRequest,
+  EmbeddedSocialAgentInvitation,
+  EmbeddedSocialAgentRegistration,
+  RoleData,
 } from '@janeirodigital/interop-data-model'
 import {
   AS,
   INTEROP,
-  type LanguageMap,
-  type WhatwgFetch,
   fetchJsonLd,
   frameDoc,
   createResource,
   mintResource,
   withContext,
 } from '@janeirodigital/interop-utils'
+import type { LanguageMap, WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import { graphDoc, listContained } from './sparql.ts'
 import type { SparqlTransport } from './sparql.ts'

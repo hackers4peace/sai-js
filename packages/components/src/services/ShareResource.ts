@@ -1,10 +1,9 @@
-import {
-  type DataInstanceFacts,
-  type ShareContextFacts,
-  type ShareDataInstanceStructure,
-  type WhoHasAccess,
-  accessForResource,
-  scopeFacts,
+import { accessForResource, scopeFacts } from '@janeirodigital/interop-authorization-agent'
+import type {
+  DataInstanceFacts,
+  ShareContextFacts,
+  ShareDataInstanceStructure,
+  WhoHasAccess,
 } from '@janeirodigital/interop-authorization-agent'
 import {
   ActivityRegistry,
@@ -13,32 +12,32 @@ import {
   accessNeedGroup as resolveAccessNeedGroup,
 } from '@janeirodigital/interop-authorization-agent'
 import {
-  type AccessNeedData,
-  type AccessNeedGroupData,
-  type AuthorizationGranted,
   ClientIdDocument,
-  type DataAuthorizationData,
-  type DataInstanceData,
-  type DataRegistrationData,
   DataRegistration,
-  type EmbeddedNeedBasedAccessRequest,
-  type NeedBasedAccessRequestGroup,
-  type NeedBasedAccessRequestSent,
-  type RoleData,
   ShapeTree,
   isBlob,
   labelFromNode,
+} from '@janeirodigital/interop-data-model'
+import type {
+  AccessNeedData,
+  AccessNeedGroupData,
+  AuthorizationGranted,
+  DataAuthorizationData,
+  DataInstanceData,
+  DataRegistrationData,
+  EmbeddedNeedBasedAccessRequest,
+  NeedBasedAccessRequestGroup,
+  NeedBasedAccessRequestSent,
+  RoleData,
 } from '@janeirodigital/interop-data-model'
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 const loadClientIdDocument = loader(ClientIdDocument.fromJsonLd)
 
 import { INTEROP, loader, pickLanguage } from '@janeirodigital/interop-utils'
-import {
-  IRI,
-  NeedBasedAccessRequestSentMessage,
-  Resource,
-  type ShareAuthorization,
-  type ShareAuthorizationConfirmation,
+import { IRI, NeedBasedAccessRequestSentMessage, Resource } from '@janeirodigital/sai-api-messages'
+import type {
+  ShareAuthorization,
+  ShareAuthorizationConfirmation,
 } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
 

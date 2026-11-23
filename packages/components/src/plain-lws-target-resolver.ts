@@ -1,7 +1,5 @@
-import {
-  type AuthorizationAgent,
-  loadDataInstance,
-} from '@janeirodigital/interop-authorization-agent'
+import { loadDataInstance } from '@janeirodigital/interop-authorization-agent'
+import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { DataRegistration } from '@janeirodigital/interop-data-model'
 import { INTEROP, loader } from '@janeirodigital/interop-utils'
 import { BadRequestHttpError } from '@solid/community-server'

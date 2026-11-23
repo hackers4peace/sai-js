@@ -93,13 +93,8 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  AccessModes,
-  IRI,
-  type Resource,
-  ShapeTree,
-  type SocialAgentList,
-} from '@janeirodigital/sai-api-messages'
+import { AccessModes, IRI, ShapeTree } from '@janeirodigital/sai-api-messages'
+import type { Resource, SocialAgentList } from '@janeirodigital/sai-api-messages'
 import type * as S from 'effect/Schema'
 import { computed, reactive, ref, watch } from 'vue'
 

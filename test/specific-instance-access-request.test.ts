@@ -1,9 +1,6 @@
 import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpavlik/sai-components'
-import {
-  ActivityRegistry,
-  type AuthorizationAgent,
-  localSparqlTransport,
-} from '@janeirodigital/interop-authorization-agent'
+import { ActivityRegistry, localSparqlTransport } from '@janeirodigital/interop-authorization-agent'
+import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { AccessRequest, grantGrantee } from '@janeirodigital/interop-data-model'
 const loadAccessRequest = loader(AccessRequest.fromJsonLd)
 

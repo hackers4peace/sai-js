@@ -1,16 +1,12 @@
 import { createBrowserLwsFetch } from '@elfpavlik/lws-auth'
 import { Application, NotificationManager } from '@janeirodigital/interop-application'
 import { WebIdProfile } from '@janeirodigital/interop-data-model'
-import {
-  AS,
-  RequestError,
-  type WhatwgFetch,
-  loader,
-  pickLanguage,
-} from '@janeirodigital/interop-utils'
+import { AS, RequestError, loader, pickLanguage } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { commitData, changeData as ldoChangeData } from '@ldo/connected'
 //@ts-ignore
-import { type SolidLdoDataset, createSolidLdoDataset } from '@ldo/connected-solid'
+import { createSolidLdoDataset } from '@ldo/connected-solid'
+import type { SolidLdoDataset } from '@ldo/connected-solid'
 import type { LdoBase } from '@ldo/ldo'
 import { useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'

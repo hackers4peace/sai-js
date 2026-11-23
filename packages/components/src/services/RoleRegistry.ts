@@ -1,10 +1,10 @@
 import { ActivityRegistry } from '@janeirodigital/interop-authorization-agent'
-import {
-  type RoleCreated,
-  type RoleData,
-  type RoleDeleted,
-  type RoleMembershipChanged,
-  Role as RoleModel,
+import { Role as RoleModel } from '@janeirodigital/interop-data-model'
+import type {
+  RoleCreated,
+  RoleData,
+  RoleDeleted,
+  RoleMembershipChanged,
 } from '@janeirodigital/interop-data-model'
 const loadRole = loader(RoleModel.fromJsonLd)
 

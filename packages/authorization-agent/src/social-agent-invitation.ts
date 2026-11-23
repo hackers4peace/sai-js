@@ -1,8 +1,7 @@
-import {
-  type SocialAgentInvitationData,
-  dataModelContext,
-} from '@janeirodigital/interop-data-model'
-import { type WhatwgFetch, putJsonLd, withContext } from '@janeirodigital/interop-utils'
+import { dataModelContext } from '@janeirodigital/interop-data-model'
+import type { SocialAgentInvitationData } from '@janeirodigital/interop-data-model'
+import { putJsonLd, withContext } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 // ──────────────────────────
 // Write path: SocialAgentInvitationData → JSON-LD (PUT)

@@ -1,9 +1,9 @@
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
-import {
-  type DataAuthorizationData,
-  type DataInstanceData,
-  type GrantData,
-  grantAccess,
+import { grantAccess } from '@janeirodigital/interop-data-model'
+import type {
+  DataAuthorizationData,
+  DataInstanceData,
+  GrantData,
 } from '@janeirodigital/interop-data-model'
 import { ACCESS_ACTIONS, INTEROP, LWS, ODRL } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'

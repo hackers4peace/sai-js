@@ -1,5 +1,7 @@
-import { type DataRegistrationData, dataModelContext } from '@janeirodigital/interop-data-model'
-import { type WhatwgFetch, createResource, withContext } from '@janeirodigital/interop-utils'
+import { dataModelContext } from '@janeirodigital/interop-data-model'
+import type { DataRegistrationData } from '@janeirodigital/interop-data-model'
+import { createResource, withContext } from '@janeirodigital/interop-utils'
+import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 // ──────────────────────────
 // Write path: DataRegistrationData → container (container.create)

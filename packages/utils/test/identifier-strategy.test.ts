@@ -4,8 +4,8 @@ import {
   CachingIdentifierStrategyResolver,
   FlatIdentifierStrategy,
   executeCreationPlan,
-  type WhatwgFetch,
 } from '../src'
+import type { WhatwgFetch } from '../src'
 
 const root = 'https://data.example/alice/'
 const uuid = '6f1e6c1e-0000-4000-8000-000000000000'
