@@ -20,7 +20,7 @@ export async function buildAccountLoginStorage<T extends IndexTypeCollection<T>>
   const indexStorage = new ContainerPathStorage<Array<string>>(keyValueStorage, '/accounts/index/')
   const storage = new WrappedIndexedStorage<T>(valueStorage, indexStorage)
   const accountStorage = new BaseLoginAccountStorage(storage)
-  //@ts-expect-error
+  // @ts-expect-error the index storage is typed for strings, not account records
   const accountStore = new BaseAccountStore(accountStorage)
   await accountStore.handle()
   return accountStorage

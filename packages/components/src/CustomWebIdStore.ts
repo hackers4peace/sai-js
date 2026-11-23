@@ -6,7 +6,7 @@ export class CustomWebIdStore extends BaseWebIdStore {
    * resolve a session owner to the endpoints stored under its account.
    */
   public async findAccount(webId: string): Promise<string | undefined> {
-    //@ts-ignore
+    // @ts-expect-error the base store declares `find` with a narrower record type
     const result = await this.storage.find(WEBID_STORAGE_TYPE, { webId })
     return result[0]?.accountId
   }

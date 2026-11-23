@@ -1,7 +1,7 @@
 import { FluentBundle } from '@fluent/bundle'
 import { createFluentVue } from 'fluent-vue'
 
-// @ts-ignore
+// @ts-expect-error Vite loads .ftl locale files as strings
 import enMessages from '../locales/en.ftl'
 
 // Create bundles for locales that will be used

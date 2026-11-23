@@ -99,7 +99,6 @@ export class ApiHandler extends OperationHttpHandler {
 
       const SaiServiceLive = Layer.succeed(
         SaiService,
-        // @ts-ignore
         SaiService.of({
           getWebId: () => Effect.succeed(session.webId),
           checkHandle: (handle: string) =>

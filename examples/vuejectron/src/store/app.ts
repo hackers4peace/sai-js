@@ -4,9 +4,9 @@ import { WebIdProfile } from '@janeirodigital/interop-data-model'
 import { AS, RequestError, loader, pickLanguage } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import { commitData, changeData as ldoChangeData } from '@ldo/connected'
-//@ts-ignore
+import type { ConnectedLdoDataset } from '@ldo/connected'
 import { createSolidLdoDataset } from '@ldo/connected-solid'
-import type { SolidLdoDataset } from '@ldo/connected-solid'
+import type { SolidConnectedPlugin } from '@ldo/connected-solid'
 import type { LdoBase } from '@ldo/ldo'
 import { useStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
@@ -48,7 +48,7 @@ export const useAppStore = defineStore('app', () => {
   // TODO: find a better way to ensure it was created
   let session: Application
   let notificationsManager: NotificationManager
-  let solidLdoDataset: SolidLdoDataset
+  let solidLdoDataset: ConnectedLdoDataset<Array<SolidConnectedPlugin>>
   const projects = ref<Array<Project>>([])
 
   const authSession = browserSession()
@@ -232,7 +232,7 @@ export const useAppStore = defineStore('app', () => {
     await ensureSaiSession()
     const ldoProject = findProject(projectId)
 
-    // @ts-expect-error
+    // @ts-expect-error LDO subjects are indexed by scope-specific property names
     for (const { '@id': childId } of ldoProject[propForScope[scope]]) {
       let description: string | undefined
       if (nonRdf) {
@@ -312,6 +312,9 @@ export const useAppStore = defineStore('app', () => {
 
     // @ldo-solid
     const ldoResource = solidLdoDataset.getResource(task['@id'])
+    if (!('delete' in ldoResource)) {
+      throw new Error(`cannot delete ${task['@id']}`)
+    }
     const deleteResult = await ldoResource.delete()
     if (deleteResult.isError) {
       throw deleteResult
@@ -337,7 +340,7 @@ export const useAppStore = defineStore('app', () => {
 
     // add reference from project to new file
     const cProject = changeData(ldoProject)
-    // @ts-expect-error
+    // @ts-expect-error LDO subjects are indexed by scope-specific property names
     cProject[propForScope[scope]].add({ '@id': fileId })
     const projectResult = await commitData(cProject)
     if (projectResult.isError) {
@@ -516,7 +519,7 @@ export const useAppStore = defineStore('app', () => {
     const project = projects.value.find((p) => p['@id'] === id)
     // also all the tasks
     const taskChannels = await Promise.all(
-      // @ts-expect-error
+      // @ts-expect-error `hasTask` is optional in the shape-tree types
       project.hasTask.map((task) =>
         notificationsManager.subscribeViaPush(pushSubscription.value!, task['@id'])
       )
@@ -539,7 +542,7 @@ export const useAppStore = defineStore('app', () => {
     }
     const project = projects.value.find((p) => p['@id'] === id)
     const result = (await Promise.all(
-      // @ts-expect-error
+      // @ts-expect-error `hasTask` is optional in the shape-tree types
       project?.hasTask.map((task) => {
         const cId = subscriptions.value.get(task['@id'])
         if (!cId) {
@@ -552,7 +555,7 @@ export const useAppStore = defineStore('app', () => {
       throw new Error('failed to unsubscribe some of the tasks')
     }
     subscriptions.value.delete(id)
-    // @ts-expect-error
+    // @ts-expect-error `hasTask` is optional in the shape-tree types
     project?.hasTask.forEach((task) => subscriptions.value.delete(task['@id']))
   }
 

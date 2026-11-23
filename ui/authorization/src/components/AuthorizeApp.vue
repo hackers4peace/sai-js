@@ -844,7 +844,7 @@ function authorize(granted = true) {
         granted: false,
       }
     }
-    //@ts-ignore
+    // @ts-expect-error `dataAuthorizations` is absent from the generated type
     if (granted && !authorization.dataAuthorizations?.length) {
       throw new Error('Use granted = false if no data is being shared')
     }
