@@ -34,14 +34,14 @@ const CREATE = 'https://www.w3.org/ns/lws#create'
 
 interface GrantOverrides {
   grantee?: string
-  accessMode?: string[]
+  accessMode?: Array<string>
   hasStorage?: string
   grantedBy?: string
   dataOwner?: string
   registeredShapeTree?: string
   hasDataRegistration?: string
   scopeOfGrant?: string
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
   inheritsFromGrant?: string
 }
 

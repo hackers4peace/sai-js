@@ -26,13 +26,13 @@ export async function computeChildren(
   shapeTree: ShapeTreeData,
   fetch: WhatwgFetch,
   lang: string
-): Promise<ChildInfo[]> {
+): Promise<Array<ChildInfo>> {
   return Promise.all(
     shapeTree.references.map(async (reference) => {
       const childTree = await loadShapeTree(reference.shapeTree, fetch)
       const description = await ShapeTree.getDescription(childTree, lang, fetch)
       return {
-        count: ((node[reference.viaPredicate.value] as string[] | undefined) ?? []).length,
+        count: ((node[reference.viaPredicate.value] as Array<string> | undefined) ?? []).length,
         // the shape tree's label is a language map — picked for the
         // requested language
         shapeTree: { id: reference.shapeTree, label: pickLanguage(description?.label, lang) ?? '' },

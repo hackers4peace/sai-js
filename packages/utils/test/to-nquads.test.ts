@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { jsonld, toNQuads } from '../src'
 
 /** Parse N-Quads text the way the codebase reads RDF: jsonld.fromRDF → expanded JSON-LD. */
-const fromNQuads = (text: string): Promise<any[]> =>
+const fromNQuads = (text: string): Promise<Array<any>> =>
   jsonld.fromRDF(text, { format: 'application/n-quads' })
 
 const context = {

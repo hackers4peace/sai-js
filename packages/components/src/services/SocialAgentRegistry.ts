@@ -58,7 +58,7 @@ async function reciprocalAdminMarkers(
  */
 async function listSocialAgentRegistrations(
   ctx: ResolvedContext
-): Promise<SocialAgentRegistrationData[]> {
+): Promise<Array<SocialAgentRegistrationData>> {
   const transport = sparqlTransportFor(ctx)
   const iris = await listContained(transport, ctx.registrySet.hasSocialAgentRegistry.id)
   return Promise.all(iris.map((iri) => getRegistrationFromSparql(transport, iri)))
@@ -86,11 +86,11 @@ export const findSocialAgentRegistrationInContext = async (
 /** The owner's OPEN access requests keyed by grantee — the approval entries
  *  (see the OpenWiki `services/activity-lifecycle.md` — the request IRIs open the
  *  authorization screen). */
-export type AccessRequestsByGrantee = Map<string, string[]>
+export type AccessRequestsByGrantee = Map<string, Array<string>>
 
 /** The requester's OPEN sent requests keyed by dataOwner — the archive
  *  targets (see the OpenWiki `services/activity-lifecycle.md` — the snapshot ids). */
-export type SentAccessRequestsByDataOwner = Map<string, string[]>
+export type SentAccessRequestsByDataOwner = Map<string, Array<string>>
 
 /**
  * Build the UI profile of a social agent from its registration.

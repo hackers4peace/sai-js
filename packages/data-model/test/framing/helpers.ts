@@ -28,9 +28,9 @@ function termKey(term: Term): string {
  * containment in the meta and resource graphs of a container) and flattened to
  * the default graph so `fromRDF` yields a flat node array.
  */
-export async function docFromGraphs(graphIris: string[]): Promise<unknown[]> {
+export async function docFromGraphs(graphIris: Array<string>): Promise<Array<unknown>> {
   const seen = new Set<string>()
-  const quads: Quad[] = []
+  const quads: Array<Quad> = []
   for (const quad of fixtureQuads) {
     if (!graphIris.includes(quad.graph.value)) {
       continue

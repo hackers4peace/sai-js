@@ -464,10 +464,10 @@ function addDataInstancesToIndex(
   }
 }
 
-function findAgentRegistrations(agentId: string): Registration[] {
+function findAgentRegistrations(agentId: string): Array<Registration> {
   return Object.values(registrationsIndex).filter((registration) => registration.agent === agentId)
 }
-function findRegistrationDataInstances(registrationId: string): SelectableDataInstance[] {
+function findRegistrationDataInstances(registrationId: string): Array<SelectableDataInstance> {
   return Object.values(dataInstancesIndex).filter(
     (dataInstance) => dataInstance.registration === registrationId
   )
@@ -475,7 +475,7 @@ function findRegistrationDataInstances(registrationId: string): SelectableDataIn
 
 const activeTab = ref<'peers' | 'roles'>('peers')
 
-const panelsOpened = ref<string[]>([])
+const panelsOpened = ref<Array<string>>([])
 const topLevelScope = ref<TopLevelScope>('all')
 
 function setScopeForAgents(scope: PropagatingScope): void {
@@ -730,7 +730,7 @@ function isSelected(needId: string, childId?: string): boolean {
   return need.selected
 }
 
-function chooseIcon(access: readonly S.Schema.Type<typeof IRI>[]): string {
+function chooseIcon(access: ReadonlyArray<S.Schema.Type<typeof IRI>>): string {
   if (access.includes(IRI.make(AccessModes.Modify))) {
     return 'mdi-square-edit-outline'
   }
@@ -741,14 +741,14 @@ function chooseIcon(access: readonly S.Schema.Type<typeof IRI>[]): string {
 function createDataAuthorizations(
   need: S.Schema.Type<typeof AccessNeed>,
   parent?: S.Schema.Type<typeof AccessNeed>
-): S.Schema.Type<typeof DataAuthorization>[] {
+): Array<S.Schema.Type<typeof DataAuthorization>> {
   if (!parent && !isSelected(need.id)) {
     return []
   }
   if (parent && !isSelected(parent.id, need.id)) {
     return []
   }
-  const dataAuthorizations: S.Schema.Type<typeof DataAuthorization>[] = []
+  const dataAuthorizations: Array<S.Schema.Type<typeof DataAuthorization>> = []
   const accessNeedAuthorization = {
     accessNeed: need.id,
   } as Partial<S.Schema.Type<typeof DataAuthorization>>
@@ -807,7 +807,7 @@ function createDataAuthorizations(
       }
     }
   }
-  let children: S.Schema.Type<typeof DataAuthorization>[] = []
+  let children: Array<S.Schema.Type<typeof DataAuthorization>> = []
   if (need.children) {
     children = need.children.flatMap((childAccessNeed) =>
       createDataAuthorizations(childAccessNeed, need)

@@ -32,7 +32,7 @@ const OWNER = 'https://alice.example/#id'
 
 interface PutRecord {
   url: string
-  body: Record<string, unknown>[]
+  body: Array<Record<string, unknown>>
 }
 
 /**
@@ -44,8 +44,8 @@ interface PutRecord {
  * listed id, so the fake returns the doc directly when the URL matches a
  * registered invitation.
  */
-function makeSession(registeredInvitations: string[] = []) {
-  const puts: PutRecord[] = []
+function makeSession(registeredInvitations: Array<string> = []) {
+  const puts: Array<PutRecord> = []
   const fetch = vi.fn(async (url: string, init?: RequestInit) => {
     if (init?.method === 'POST') {
       // the mock store honors the Slug under the registry pod root and
@@ -102,16 +102,19 @@ function makeSession(registeredInvitations: string[] = []) {
 
 function capabilityUrlOf(put: PutRecord): string {
   const node = put.body
-  const capabilityUrl = node[0][INTEROP.hasCapabilityUrl] as { '@id'?: string; '@value'?: string }[]
+  const capabilityUrl = node[0][INTEROP.hasCapabilityUrl] as Array<{
+    '@id'?: string
+    '@value'?: string
+  }>
   // the context types capabilityUrl as an IRI term — expanded to `@id`
   return (capabilityUrl[0]['@id'] ?? capabilityUrl[0]['@value']) as string
 }
 
 function labelOf(put: PutRecord): string {
   const node = put.body
-  const label = node[0]['http://www.w3.org/2004/02/skos/core#prefLabel'] as {
+  const label = node[0]['http://www.w3.org/2004/02/skos/core#prefLabel'] as Array<{
     '@value': string
-  }[]
+  }>
   return label[0]['@value'] as string
 }
 

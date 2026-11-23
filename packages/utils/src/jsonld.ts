@@ -17,7 +17,7 @@ export type JsonLdContext = Record<string, unknown>
  * helper works for both. The container document is fetched once. Auxiliary
  * resources (`.acr`/`.acl`/`.meta`) are not members and are filtered out.
  */
-export async function containedIrisJsonLd(id: string, fetch: WhatwgFetch): Promise<string[]> {
+export async function containedIrisJsonLd(id: string, fetch: WhatwgFetch): Promise<Array<string>> {
   const context: JsonLdContext = {
     contains: { '@id': LDP.contains, '@type': '@id', '@container': '@set' },
     lwsContains: { '@id': LWS.contains, '@type': '@id', '@container': '@set' },
@@ -80,7 +80,7 @@ export function buildFrame(
  * compact correctly.
  */
 function isLanguageMapTerm(definition: unknown): boolean {
-  const container = (definition as { '@container'?: string | string[] } | null)?.['@container']
+  const container = (definition as { '@container'?: string | Array<string> } | null)?.['@container']
   return Array.isArray(container) ? container.includes('@language') : container === '@language'
 }
 
@@ -164,7 +164,7 @@ export async function frameDoc(
 export type FramedNode = {
   id: string
   '@id'?: string
-  type?: string[]
+  type?: Array<string>
 } & Record<string, unknown>
 
 /**
@@ -203,16 +203,16 @@ export async function frameNode(
  */
 export function selectNode(
   node: FramedNode,
-  terms: readonly string[]
-): Record<string, string | string[] | undefined> {
-  const out: Record<string, string | string[] | undefined> = {
+  terms: ReadonlyArray<string>
+): Record<string, string | Array<string> | undefined> {
+  const out: Record<string, string | Array<string> | undefined> = {
     id: node.id ?? node['@id'],
     type: node.type ?? [],
   }
   for (const term of terms) {
     const value = node[term]
     if (value !== undefined && value !== null) {
-      out[term] = value as string | string[]
+      out[term] = value as string | Array<string>
     }
   }
   return out
@@ -228,7 +228,7 @@ export function opt(node: Record<string, unknown>, key: string): string | undefi
  * accessor also absorbs scalar-or-array and literal-object members;
  * `[]` when absent.
  */
-export function strs(node: Record<string, unknown>, key: string): string[] {
+export function strs(node: Record<string, unknown>, key: string): Array<string> {
   const value = node[key]
   if (value === undefined || value === null) {
     return []
@@ -306,13 +306,13 @@ export async function documentValues(
   doc: unknown,
   iri: string,
   predicate: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const expanded = (await jsonld.expand(
     doc as any,
     { base: iri, documentLoader } as any
-  )) as unknown as any[]
+  )) as unknown as Array<any>
   const values = new Set<string>()
-  const nodes: any[] = []
+  const nodes: Array<any> = []
   const collectNodes = (value: unknown): void => {
     if (Array.isArray(value)) {
       value.forEach(collectNodes)
@@ -500,8 +500,8 @@ export function loader<T>(decode: (doc: unknown, id: string) => Promise<T>) {
  * `{ '@value' }` — with no `@context` on the result. The write path uses this
  * so PUT bodies carry no context (and are context-version-proof).
  */
-export async function expandedJsonLd(doc: Record<string, unknown>): Promise<unknown[]> {
-  return jsonld.expand(doc, { documentLoader }) as Promise<unknown[]>
+export async function expandedJsonLd(doc: Record<string, unknown>): Promise<Array<unknown>> {
+  return jsonld.expand(doc, { documentLoader }) as Promise<Array<unknown>>
 }
 
 /**

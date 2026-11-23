@@ -13,7 +13,7 @@ const term = (value: string): SparqlBindingTerm => ({ termType: 'NamedNode', val
 /** A fake transport capturing the emitted query while returning fixture bindings. */
 function capturingTransport(
   bindings: Array<Record<string, SparqlBindingTerm>>,
-  queries: string[]
+  queries: Array<string>
 ): SparqlTransport {
   return {
     fetchBindings: async (query: string) => {
@@ -26,7 +26,7 @@ function capturingTransport(
 
 describe('getOpenSentAccessRequests', () => {
   test('groups the per-need shape trees under each open request', async () => {
-    const queries: string[] = []
+    const queries: Array<string> = []
     const transport = capturingTransport(
       [
         // request r1 — Project + inherited Task (two rows, one request)
@@ -76,7 +76,7 @@ describe('getOpenSentAccessRequests', () => {
   })
 
   test('groups requested instances under their shape tree', async () => {
-    const queries: string[] = []
+    const queries: Array<string> = []
     const transport = capturingTransport(
       [
         {
@@ -120,7 +120,7 @@ describe('getOpenSentAccessRequests', () => {
     // contract test: a regression dropping the guard would list resolved
     // requests forever (the "never clears" cause); the SPARQL engine does the
     // actual exclusion (covered end-to-end in steps 7/9)
-    const queries: string[] = []
+    const queries: Array<string> = []
     await getOpenSentAccessRequests(capturingTransport([], queries))
     const query = queries[0]
     expect(query).toContain('interop#AccessRequestGranted')
@@ -134,7 +134,7 @@ describe('getOpenSentAccessRequests', () => {
 
 describe('getOpenAccessRequestsOnRegistry', () => {
   test('scopes to the container membership and excludes resolved requests via satisfiesAccessRequest', async () => {
-    const queries: string[] = []
+    const queries: Array<string> = []
     const transport = capturingTransport(
       [
         {
@@ -163,7 +163,7 @@ describe('getOpenAccessRequestsOnRegistry', () => {
 
 describe('getAccessGrantsForGrantee', () => {
   test('binds the requester as grantee and returns grantedBy + shapeTree per grant', async () => {
-    const queries: string[] = []
+    const queries: Array<string> = []
     const transport = capturingTransport(
       [
         {
@@ -204,7 +204,7 @@ describe('getAccessGrantsForGrantee', () => {
   })
 
   test('returns the grant scope and selected instances for SelectedFromRegistry', async () => {
-    const queries: string[] = []
+    const queries: Array<string> = []
     const transport = capturingTransport(
       [
         {

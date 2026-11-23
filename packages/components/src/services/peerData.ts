@@ -113,7 +113,7 @@ export async function dataRegistrationContains(
   ctx: ResolvedContext,
   storage: string,
   registrationIri: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const doc = await fetchPeerDocument(ctx, storage, registrationIri)
   return (await DataRegistration.fromJsonLd(doc, registrationIri)).contains
 }

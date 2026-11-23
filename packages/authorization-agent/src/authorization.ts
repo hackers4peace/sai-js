@@ -32,7 +32,7 @@ import type { DataModelDependencies } from './types.ts'
 
 // Nesting is being used to capture inheritance before IRIs are available
 export type NestedDataAuthorizationData = DataAuthorizationData & {
-  children?: DataAuthorizationData[]
+  children?: Array<DataAuthorizationData>
 }
 
 interface BaseAuthorization {
@@ -41,7 +41,7 @@ interface BaseAuthorization {
 }
 
 export interface GrantedAuthorization extends BaseAuthorization {
-  dataAuthorizations: DataAuthorizationData[]
+  dataAuthorizations: Array<DataAuthorizationData>
   granted: true
 }
 
@@ -60,7 +60,7 @@ export type AccessAuthorizationStructure = GrantedAuthorization | DeniedAuthoriz
 export interface AgentWithAccess {
   agent: string
   dataAuthorization: string
-  accessMode: string[]
+  accessMode: Array<string>
 }
 
 /**
@@ -72,9 +72,9 @@ export interface AgentWithAccess {
 export interface RoleWithAccess {
   role: string
   label?: LanguageMap
-  members: string[]
+  members: Array<string>
   dataAuthorization: string
-  accessMode: string[]
+  accessMode: Array<string>
 }
 
 /**
@@ -84,14 +84,14 @@ export interface RoleWithAccess {
  * granted), and both facts are visible to the caller.
  */
 export interface WhoHasAccess {
-  agents: AgentWithAccess[]
-  roles: RoleWithAccess[]
+  agents: Array<AgentWithAccess>
+  roles: Array<RoleWithAccess>
 }
 
 /** The role facts the scope rule needs (role IRI → label + members). */
 export interface RoleFacts {
   label?: LanguageMap
-  members: readonly string[]
+  members: ReadonlyArray<string>
 }
 
 /**
@@ -112,8 +112,8 @@ export const EMPTY_SCOPE_FACTS: ScopeFacts = {
 
 /** Build the `ScopeFacts` for a whole registry read (one pass, no extra queries). */
 export function scopeFacts(
-  roles: readonly (RoleData | undefined)[],
-  authorizations: readonly DataAuthorizationData[]
+  roles: ReadonlyArray<RoleData | undefined>,
+  authorizations: ReadonlyArray<DataAuthorizationData>
 ): ScopeFacts {
   const byRole = new Map<string, RoleFacts>()
   for (const role of roles) {
@@ -202,7 +202,7 @@ export function matchesScope(
  * Entries are deduped per agent/role with the access modes unioned.
  */
 export function accessForResource(
-  authorizations: readonly DataAuthorizationData[],
+  authorizations: ReadonlyArray<DataAuthorizationData>,
   resource: DataInstanceFacts,
   ownerWebId: string,
   facts: ScopeFacts = EMPTY_SCOPE_FACTS
@@ -263,7 +263,7 @@ export function buildNestedDataAuthorizations(
   structure: AuthorizationStructure,
   accessNeedGroup: AccessNeedGroupData,
   grantedBy: string
-): NestedDataAuthorizationData[] {
+): Array<NestedDataAuthorizationData> {
   const structuredDataAuthorizations = (structure.dataAuthorizations ?? []).map(
     (dataAuthorization) => {
       const accessNeed = accessNeedGroup.accessNeeds
@@ -296,8 +296,8 @@ export function buildNestedDataAuthorizations(
       return saiReady
     }
   )
-  const parents: NestedDataAuthorizationData[] = []
-  const children: DataAuthorizationData[] = []
+  const parents: Array<NestedDataAuthorizationData> = []
+  const children: Array<DataAuthorizationData> = []
   for (const structuredDataAuthorization of structuredDataAuthorizations) {
     if (structuredDataAuthorization.scopeOfAuthorization === INTEROP.Inherited) {
       children.push(structuredDataAuthorization)
@@ -328,20 +328,20 @@ export function buildNestedDataAuthorizations(
  * registry and wiring children via hasInheritingAuthorization.
  */
 export async function generateDataAuthorizations(
-  dataAuthorizations: NestedDataAuthorizationData[],
+  dataAuthorizations: Array<NestedDataAuthorizationData>,
   grantedBy: string,
   authorizationRegistry: AuthorizationRegistryData,
   deps: DataModelDependencies
-): Promise<FinalDataAuthorizationData[]> {
+): Promise<Array<FinalDataAuthorizationData>> {
   // don't create data authorization where grantee == dataowner
   const validDataAuthorizations = dataAuthorizations.filter(
     (dataAuthorization) => dataAuthorization.dataOwner !== dataAuthorization.grantee
   )
 
-  const result: FinalDataAuthorizationData[] = []
+  const result: Array<FinalDataAuthorizationData> = []
   for (const dataAuthorization of validDataAuthorizations) {
     const dataAuthorizationIri = await mintResource(authorizationRegistry.id, deps)
-    const children: FinalDataAuthorizationData[] = []
+    const children: Array<FinalDataAuthorizationData> = []
     if (dataAuthorization.children) {
       for (const childDataAuthorization of dataAuthorization.children) {
         const childDataAuthorizationIri = await mintResource(authorizationRegistry.id, deps)
@@ -374,8 +374,8 @@ export async function generateDataAuthorizations(
  */
 export async function replaceDataAuthorizationsForGrantee(
   registry: AuthorizationRegistryData,
-  existingDataAuthorizations: DataAuthorizationData[],
-  irisToKeep: string[],
+  existingDataAuthorizations: Array<DataAuthorizationData>,
+  irisToKeep: Array<string>,
   fetch: WhatwgFetch
 ): Promise<void> {
   const keep = new Set(irisToKeep)
@@ -419,7 +419,7 @@ export async function replaceDataAuthorizationsForGrantee(
  * and `lws:partOf` are recorded.
  */
 export async function storeDataAuthorizations(
-  dataAuthorizations: FinalDataAuthorizationData[],
+  dataAuthorizations: Array<FinalDataAuthorizationData>,
   authorizationRegistry: AuthorizationRegistryData,
   deps: DataModelDependencies
 ): Promise<void> {
@@ -430,7 +430,7 @@ export async function storeDataAuthorizations(
   // so the parents arrive without their child list. The CHILD's forward
   // `inheritsFromAuthorization` survives and is the re-link source — the
   // "re-links them in the store" the write path always intended.
-  const childrenByParent = new Map<string, FinalDataAuthorizationData[]>()
+  const childrenByParent = new Map<string, Array<FinalDataAuthorizationData>>()
   for (const dataAuthorization of dataAuthorizations) {
     if (!dataAuthorization.inheritsFromAuthorization) {
       continue
@@ -468,7 +468,7 @@ export async function generateAuthorization(
   extendIfExists: boolean,
   /** Internal SPARQL endpoint of the session recording the authorization. */
   sparqlEndpoint: string
-): Promise<FinalDataAuthorizationData[]> {
+): Promise<Array<FinalDataAuthorizationData>> {
   if (extendIfExists && !authorization.granted) {
     throw new Error('Previous denied authorizations can not be extended')
   }
@@ -488,7 +488,7 @@ export async function generateAuthorization(
 
   // TODO: agent has and access authorization, with data authorization (SelectedFromRegistry) which does not include this data instance
   // do we need to check access modes? (if same extend data authorization, if different create a new one)
-  const dataAuthorizationsToReuse: string[] = []
+  const dataAuthorizationsToReuse: Array<string> = []
   if (extendIfExists && authorization.granted) {
     // start with reusing all existing data authorizations
     dataAuthorizationsToReuse.push(...existingDataAuthorizations.map((da) => da.id!))
@@ -527,7 +527,7 @@ export async function generateAuthorization(
     }
   }
 
-  let dataAuthorizations: FinalDataAuthorizationData[] = []
+  let dataAuthorizations: Array<FinalDataAuthorizationData> = []
   if (authorization.granted) {
     dataAuthorizations = await generateDataAuthorizations(
       authorization.dataAuthorizations,

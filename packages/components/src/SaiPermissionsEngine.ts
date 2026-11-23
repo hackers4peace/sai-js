@@ -40,7 +40,7 @@ type AccessClaimCredentials = Credentials & {
   accessContext?: string
   storage?: string
   /** Storage authority minted by this server's exchange (`owner`/`admin`). */
-  scope?: string[]
+  scope?: Array<string>
 }
 
 /** The grant identity a registry lookup matches; public grants use ACP's public actors. */
@@ -127,7 +127,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
     if (!data) {
       return this.permissionMap([])
     }
-    const quads: Quad[] = Array.isArray(data) ? data : [...data]
+    const quads: Array<Quad> = Array.isArray(data) ? data : [...data]
     return this.evaluateTarget(target, quads, PUBLIC_IDENTITY, (parent) =>
       this.getPublicPermissions(parent)
     )
@@ -138,7 +138,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
    * `UnionPermissionReader` and would veto the credential-independent public
    * reader; an absent mode is denied by the LDP authorization by default.
    */
-  private permissionMap(modes: string[]): PermissionMap {
+  private permissionMap(modes: Array<string>): PermissionMap {
     const permissions: PermissionMap = {}
     if (modes.includes(ACCESS_ACTIONS.create)) {
       permissions[PERMISSIONS.Create] = true
@@ -167,7 +167,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
   private async findAccessClaimData(
     target: string,
     credentials: Credentials
-  ): Promise<Quad[] | undefined> {
+  ): Promise<Array<Quad> | undefined> {
     const { access, accessContext } = credentials as AccessClaimCredentials
     if (access === undefined) {
       return undefined
@@ -232,7 +232,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
   private async getClaimPermissions(
     target: string,
     credentials: Credentials,
-    data: Quad[]
+    data: Array<Quad>
   ): Promise<PermissionMap> {
     return this.evaluateTarget(target, data, undefined, (parent) =>
       this.getPermissions(parent, credentials)
@@ -242,12 +242,12 @@ export class SaiPermissionsEngine implements PolicyEngine {
   /** Evaluate one grant graph (a token claim or a public registry grant). */
   private async evaluateTarget(
     target: string,
-    data: Quad[],
+    data: Array<Quad>,
     identity: GrantIdentity | undefined,
     parentPermissions: (id: string) => Promise<PermissionMap>
   ): Promise<PermissionMap> {
     const targetType = await this.determineTargetType(target)
-    let modes: string[] = []
+    let modes: Array<string> = []
     switch (targetType) {
       case TargetType.Registry:
         modes = await this.findRegistrationModes(data, target, identity)
@@ -296,7 +296,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
     throw new Error('do not use')
   }
 
-  async getAccessModes(data: Quad[], grantId: string): Promise<string[]> {
+  async getAccessModes(data: Array<Quad>, grantId: string): Promise<Array<string>> {
     const store = new Store([...data])
     const modesQuery = `
     SELECT ?action WHERE {
@@ -316,7 +316,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
 
   // Inherited is the same as AllFromRegistry here
   async findGrant(
-    data: Quad[],
+    data: Array<Quad>,
     id: string,
     scope: string,
     identity?: GrantIdentity
@@ -362,10 +362,10 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   async findRegistrationModes(
-    data: Quad[],
+    data: Array<Quad>,
     registrationId: string,
     identity?: GrantIdentity
-  ): Promise<string[]> {
+  ): Promise<Array<string>> {
     const grantId = await this.findGrant(data, registrationId, INTEROP.AllFromRegistry, identity)
     if (!grantId) {
       return []
@@ -374,10 +374,10 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   async findResourceModes(
-    data: Quad[],
+    data: Array<Quad>,
     resourceId: string,
     identity?: GrantIdentity
-  ): Promise<string[]> {
+  ): Promise<Array<string>> {
     const grantId = await this.findGrant(data, resourceId, INTEROP.SelectedFromRegistry, identity)
     if (!grantId) {
       return []
@@ -386,11 +386,11 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   async findInheritedModes(
-    data: Quad[],
+    data: Array<Quad>,
     resourceId: string,
     identity: GrantIdentity | undefined,
     parentPermissions: (id: string) => Promise<PermissionMap>
-  ): Promise<string[]> {
+  ): Promise<Array<string>> {
     const registrationId = await this.getRegistrationId(resourceId)
     if (!registrationId) {
       return []
@@ -415,7 +415,11 @@ export class SaiPermissionsEngine implements PolicyEngine {
     return []
   }
 
-  async findObject(data: Quad[], subject: string, predicate: string): Promise<string | undefined> {
+  async findObject(
+    data: Array<Quad>,
+    subject: string,
+    predicate: string
+  ): Promise<string | undefined> {
     const query = `
       SELECT * WHERE {
         <${subject}>
@@ -431,7 +435,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   async findGrantTarget(
-    data: Quad[],
+    data: Array<Quad>,
     grantId: string
   ): Promise<{ source?: string; registration?: string; shapeTree?: string }> {
     const query = `
@@ -457,7 +461,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   async findParentResource(
-    data: Quad[],
+    data: Array<Quad>,
     childGrantId: string,
     parentGrantId: string,
     resourceId: string
@@ -537,7 +541,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
   }
 
   /** The RDF types of a resource, read from its data pod. */
-  private async getResourceTypes(id: string): Promise<string[]> {
+  private async getResourceTypes(id: string): Promise<Array<string>> {
     const endpoint = await this.resolvePodEndpoint(id)
     if (!endpoint) {
       return []

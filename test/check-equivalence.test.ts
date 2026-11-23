@@ -54,7 +54,7 @@ async function regenerate(webId: string, grantee: AgentId): Promise<void> {
 }
 
 /** Fresh read of acme's registration of alice (the reused source tree). */
-async function acmeRegistrationIris(): Promise<string[]> {
+async function acmeRegistrationIris(): Promise<Array<string>> {
   const session = await buildSessionManager().getSession(acmeId)
   const registration = await getSocialAgentRegistration(
     localSparqlTransport(session.sparqlEndpoint),
@@ -64,7 +64,7 @@ async function acmeRegistrationIris(): Promise<string[]> {
 }
 
 /** Fresh read of alice's registration of the test client (source + delegated). */
-async function applicationRegistrationIris(): Promise<string[]> {
+async function applicationRegistrationIris(): Promise<Array<string>> {
   const session = await buildSessionManager().getSession(aliceId)
   const listed = await session.findApplicationRegistration(testClientId)
   if (!listed) {
@@ -82,9 +82,9 @@ async function applicationRegistrationIris(): Promise<string[]> {
  * fires a reciprocal webhook that starts a second (consumer) regeneration.
  * Wait until two consecutive reads agree before asserting on it.
  */
-async function stableApplicationRegistrationIris(): Promise<string[]> {
+async function stableApplicationRegistrationIris(): Promise<Array<string>> {
   let previous: string | undefined
-  const result = await waitFor<string[] | false>(async () => {
+  const result = await waitFor<Array<string> | false>(async () => {
     const current = await applicationRegistrationIris()
     const key = current.join(',')
     if (previous !== undefined && key === previous) {

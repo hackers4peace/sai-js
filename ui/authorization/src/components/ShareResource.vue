@@ -115,8 +115,8 @@ const props = defineProps<{
 }>()
 
 type ShareAuthorizationModes = {
-  accessMode: string[]
-  children: { shapeTree: string; accessMode: string[] }[]
+  accessMode: Array<string>
+  children: Array<{ shapeTree: string; accessMode: Array<string> }>
 }
 const shareData: ShareAuthorizationModes = reactive({
   accessMode: [],
@@ -164,7 +164,7 @@ function agentLabel(agentId: string): string {
   return props.socialAgents.find(({ id }) => id === agentId)?.label ?? agentId
 }
 
-function chooseAccessMode(value: string): string[] {
+function chooseAccessMode(value: string): Array<string> {
   switch (value) {
     case 'view':
       return [AccessModes.Read]

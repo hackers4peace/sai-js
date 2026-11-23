@@ -121,7 +121,7 @@ describe('rewriteFullAdminAccess', () => {
           ],
         },
       ],
-    })) as unknown[]
+    })) as Array<unknown>
 
   test('replaces the fullAdminAccess matchers and preserves other controls', async () => {
     const rewritten = rewriteFullAdminAccess(await expandedAcr(), acrId, [

@@ -20,15 +20,15 @@ interface RecordedAuthorization {
   registeredShapeTree: string
   scopeOfAuthorization: string
   shapeTreeLabel: string
-  accessMode: string[]
+  accessMode: Array<string>
   dataOwner?: string
   hasDataRegistration?: string
   inheritsFromAuthorization?: string
-  hasInheritingAuthorization?: string[]
+  hasInheritingAuthorization?: Array<string>
 }
 
 function listAuthorizations(grantee: string) {
-  return rpcCall<RecordedAuthorization[]>(
+  return rpcCall<Array<RecordedAuthorization>>(
     rpcPayload({
       _tag: 'ListAuthorizations',
       grantee,

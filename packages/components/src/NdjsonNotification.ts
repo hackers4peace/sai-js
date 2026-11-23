@@ -42,7 +42,7 @@ export interface CompactedNotification {
   type: string
   object: string
   state?: string
-  target?: string | string[]
+  target?: string | Array<string>
   published: string
 }
 
@@ -54,7 +54,9 @@ export interface CompactedNotification {
  * `type` → `as:<Type>`, `object`/`target` → `as:{object,target}` node refs,
  * `published` → `as:published` `xsd:dateTime`, `state` → `notify:state`.
  */
-export function expandNotification(notification: CompactedNotification): Record<string, unknown>[] {
+export function expandNotification(
+  notification: CompactedNotification
+): Array<Record<string, unknown>> {
   const node: Record<string, unknown> = {
     '@id': notification.id,
     '@type': [`${AS}${notification.type}`],

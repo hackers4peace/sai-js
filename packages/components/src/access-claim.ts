@@ -22,15 +22,15 @@ const GRANT_SCOPES = new Set<string>([
 
 export interface VerifiedAccessClaim {
   /** The compact JSON-LD policies exactly as they go into the token. */
-  access: unknown[]
+  access: Array<unknown>
   /** The JSON-LD context of {@link access}. */
   context: string
   /** The single storage every target of the claim is bound to. */
   storage: string
   /** Legacy `odrl:assigner` values; ID-JAG claims no longer carry one. */
-  assigners: string[]
+  assigners: Array<string>
   /** Every `odrl:assignee` of the claim (the token subject for an ID-JAG). */
-  assignees: string[]
+  assignees: Array<string>
 }
 
 /** Options for {@link verifyAccessClaim}. */
@@ -51,7 +51,7 @@ function oneIri(store: Store, subject: Term, predicate: string, what: string): s
   return values[0].value
 }
 
-function iriValues(store: Store, subject: Term, predicate: string, what: string): string[] {
+function iriValues(store: Store, subject: Term, predicate: string, what: string): Array<string> {
   const values = store.getObjects(subject, namedNode(predicate), null)
   if (values.length === 0 || values.some((term) => term.termType !== 'NamedNode')) {
     badRequest(`${what} needs at least one IRI value.`)
@@ -232,7 +232,7 @@ function cloneClaimNode(value: unknown): unknown {
  * still the grant-derived policy but the wire shape must not expose an
  * assigner.
  */
-export function setAccessClaimAssignee(access: unknown[], assignee: string): unknown[] {
+export function setAccessClaimAssignee(access: Array<unknown>, assignee: string): Array<unknown> {
   return access.map((raw) => {
     const policy = cloneClaimNode(raw) as Record<string, unknown>
     delete policy.assigner
@@ -256,7 +256,7 @@ export function setAccessClaimAssignee(access: unknown[], assignee: string): unk
  * chain are dropped; internal parent/child links between claim policies are
  * remapped to the fresh policy ids (C2 strict hiding).
  */
-export function rewriteAccessClaim(access: unknown[], assignee: string): unknown[] {
+export function rewriteAccessClaim(access: Array<unknown>, assignee: string): Array<unknown> {
   // Parent/child links inside the claim reference the parent policy's local
   // id/uid. Allocate the fresh ids first so a child can be remapped to its
   // parent without exposing the hidden grant IRIs.

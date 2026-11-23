@@ -52,7 +52,7 @@ export async function discoverAuthorizationAgent(
 }
 
 type CidService = {
-  type?: string | string[]
+  type?: string | Array<string>
   serviceEndpoint?: string
 }
 
@@ -66,7 +66,7 @@ function serviceTypeMatches(type: unknown, expected: string): boolean {
 async function fetchCidServices(
   resourceIri: string,
   fetch: WhatwgFetch
-): Promise<Record<string, unknown>[]> {
+): Promise<Array<Record<string, unknown>>> {
   const response = await fetch(resourceIri, { headers: { Accept: CID_ACCEPT } })
   if (!response.ok) {
     return []
@@ -94,7 +94,7 @@ export async function discoverCidService(
   serviceType: string
 ): Promise<string | undefined> {
   const services = await fetchCidServices(resourceIri, fetch)
-  for (const service of services as CidService[]) {
+  for (const service of services as Array<CidService>) {
     const types = Array.isArray(service.type) ? service.type : [service.type]
     if (!types.some((type) => serviceTypeMatches(type, serviceType))) {
       continue
@@ -283,7 +283,7 @@ export async function fetchLwsStorageDescription(
  * `DataStorage` and `RegistryStorage`, so accept both the compact and the
  * expanded IRI.
  */
-export function descriptionStorageTypes(description: Record<string, unknown>): string[] {
+export function descriptionStorageTypes(description: Record<string, unknown>): Array<string> {
   const raw = description.type
   const types = Array.isArray(raw) ? raw : raw ? [raw] : []
   return types.filter((type): type is string => typeof type === 'string')

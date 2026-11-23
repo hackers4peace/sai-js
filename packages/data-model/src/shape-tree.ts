@@ -29,7 +29,7 @@ export interface ShapeTreeReference {
 export type ShapeTreeId = {
   id: string
   /** rdf:type IRIs — captured from the document on read (e.g. `[SHAPETREES.ShapeTree]`) */
-  type: string[]
+  type: Array<string>
 }
 
 /** Plain JSON representation of a shape tree. */
@@ -38,8 +38,8 @@ export type ShapeTreeData = ShapeTreeId & {
   describesInstance?: string
   expectsType?: string
   /** Languages used by description sets in the shape tree document. */
-  descriptionLanguages: string[]
-  references: ShapeTreeReference[]
+  descriptionLanguages: Array<string>
+  references: Array<ShapeTreeReference>
 }
 
 // ──────────────────────────
@@ -51,8 +51,8 @@ export type ShapeTreeData = ShapeTreeId & {
  * compacted, or flattened form) to the expanded node array. Loads contexts via
  * the shared local document loader (no remote fetching).
  */
-async function expandedNodes(doc: unknown, base: string): Promise<any[]> {
-  return (await jsonld.expand(doc as any, { base, documentLoader } as any)) as unknown as any[]
+async function expandedNodes(doc: unknown, base: string): Promise<Array<any>> {
+  return (await jsonld.expand(doc as any, { base, documentLoader } as any)) as unknown as Array<any>
 }
 
 /**
@@ -61,7 +61,7 @@ async function expandedNodes(doc: unknown, base: string): Promise<any[]> {
  * (`buildFrame` forces `@embed: '@never'`, yielding id-only references), so
  * they are paired from the expanded document by node id.
  */
-function referencePairs(expanded: any[], treeId: string): ShapeTreeReference[] {
+function referencePairs(expanded: Array<any>, treeId: string): Array<ShapeTreeReference> {
   const treeNode = expanded.find((node) => node['@id'] === treeId)
   if (!treeNode) {
     return []

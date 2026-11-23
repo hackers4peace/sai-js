@@ -16,19 +16,19 @@ const REGISTRATION = 'https://data/alice-home/x1n3cm'
 const GROUP = 'urn:uuid:6a1f3c2e-4b5d-4e6f-9a0b-1c2d3e4f5a6b'
 
 interface PermissionOptions {
-  action?: string[]
+  action?: Array<string>
   assignee?: string
   assigner?: string
   owner?: string
-  type?: string[]
-  source?: string[]
+  type?: Array<string>
+  source?: Array<string>
   registeredShapeTree?: string
   hasDataRegistration?: string
-  partOf?: string[]
-  constraint?: unknown[]
+  partOf?: Array<string>
+  constraint?: Array<unknown>
 }
 
-function permission(source: string | string[], options: PermissionOptions = {}) {
+function permission(source: string | Array<string>, options: PermissionOptions = {}) {
   return {
     uid: `urn:uuid:${crypto.randomUUID()}`,
     assigner: options.assigner ?? REQUESTER,
@@ -47,7 +47,7 @@ function permission(source: string | string[], options: PermissionOptions = {}) 
 }
 
 function policy(
-  permissions: ReturnType<typeof permission>[],
+  permissions: Array<ReturnType<typeof permission>>,
   overrides: Record<string, unknown> = {}
 ) {
   return {
@@ -109,7 +109,7 @@ describe('needBasedAccessRequestFromOdrl', () => {
       ),
     ])
     const result = needBasedAccessRequestFromOdrl(message, REQUESTER, OWNER)
-    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
+    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, unknown>>
     expect(need.hasDataInstance).toEqual([INSTANCE_1, INSTANCE_2])
     expect(need.hasDataRegistration).toBeUndefined()
   })
@@ -143,7 +143,7 @@ describe('needBasedAccessRequestFromOdrl', () => {
       ),
     ])
     const result = needBasedAccessRequestFromOdrl(message, REQUESTER, OWNER)
-    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
+    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, unknown>>
     expect(need.hasDataRegistration).toBe(REGISTRATION)
     expect(need.hasDataInstance).toBeUndefined()
   })
@@ -170,7 +170,7 @@ describe('needBasedAccessRequestFromOdrl', () => {
       child,
     ])
     const result = needBasedAccessRequestFromOdrl(message, REQUESTER, OWNER)
-    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Record<string, any>[]
+    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, any>>
     expect(need.hasDataInstance).toEqual([INSTANCE_1])
     expect(need.hasInheritingNeed).toHaveLength(1)
     expect(need.hasInheritingNeed[0].id).toBe('urn:uuid:8c3b5e40-6d7f-4f81-9a2b-3c4d5e6f7a8b')
@@ -182,7 +182,7 @@ describe('needBasedAccessRequestFromOdrl', () => {
       permission(INSTANCE_1, { registeredShapeTree: TREE, action: ['read', 'modify'] }),
     ])
     const result = needBasedAccessRequestFromOdrl(request([compact]), REQUESTER, OWNER)
-    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
+    const [need] = result.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, unknown>>
     expect(need.accessMode).toEqual([ACCESS_ACTIONS.read, ACCESS_ACTIONS.modify])
 
     const unknown = policy([

@@ -86,8 +86,8 @@ function fakeCtx(
     status?: Record<string, number>
     storageFetchError?: Error
   } = {}
-): { ctx: ResolvedContext; requests: { storage: string; url: string }[] } {
-  const requests: { storage: string; url: string }[] = []
+): { ctx: ResolvedContext; requests: Array<{ storage: string; url: string }> } {
+  const requests: Array<{ storage: string; url: string }> = []
   const answer = async (url: string): Promise<Response> => {
     const failed = options.status?.[url]
     if (failed) {
@@ -125,8 +125,8 @@ function fakeSessionCtx(
   return { session, webId, userWebId } as unknown as ResolvedContext
 }
 
-const collect = async (iter: AsyncIterable<string>): Promise<string[]> => {
-  const out: string[] = []
+const collect = async (iter: AsyncIterable<string>): Promise<Array<string>> => {
+  const out: Array<string> = []
   for await (const iri of iter) {
     out.push(iri)
   }
@@ -548,9 +548,9 @@ const SPARQL_ADMIN_URL = `${new URL(YOYO_AA).origin}/.sai/sparql-admin/${Buffer.
 /** Mock org server answering the admin-session fetch: profile + sparql-admin QUERY. */
 function sparqlAdminSession(respond: (req: { url: string; init?: RequestInit }) => Response): {
   session: AuthorizationAgent
-  requests: { url: string; init?: RequestInit }[]
+  requests: Array<{ url: string; init?: RequestInit }>
 } {
-  const requests: { url: string; init?: RequestInit }[] = []
+  const requests: Array<{ url: string; init?: RequestInit }> = []
   const session = fakeSession(async (url, init) => {
     requests.push({ url, init })
     if (url === YOYO_WEBID) {

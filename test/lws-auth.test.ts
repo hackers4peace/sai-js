@@ -244,7 +244,7 @@ describe('ID-JAG exchange at a storage authorization server', () => {
 
     expect(response.status).toBe(200)
     const metadata = (await response.json()) as Record<string, unknown>
-    const types = metadata.subject_token_types_supported as string[]
+    const types = metadata.subject_token_types_supported as Array<string>
     expect(types).toEqual([ID_JAG_TYPE])
   })
 })

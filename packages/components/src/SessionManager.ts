@@ -196,7 +196,7 @@ export class SessionManager {
     // is no shared/default endpoint — a missing registry record fails closed.
     const registryPodUrl = registrySetId ?? registryId(webid)
     const store = await this.resolveEndpointStore()
-    const records: SparqlEndpointRecord[] = store ? await store.findSparqlByWebId(webid) : []
+    const records: Array<SparqlEndpointRecord> = store ? await store.findSparqlByWebId(webid) : []
     const sparqlEndpoints = new Map<string, string>(
       records.map((record) => [record.podUrl, record.endpoint])
     )

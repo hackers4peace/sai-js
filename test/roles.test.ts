@@ -67,7 +67,7 @@ async function verifyAccessGrant(
     if (!current) {
       return undefined
     }
-    const grants: GrantData[] = []
+    const grants: Array<GrantData> = []
     for (const iri of getAccessGrantIris(current)) {
       const grant =
         (await loadGrant(iri, grantedBySession.fetch).catch(() => undefined)) ??
@@ -87,7 +87,7 @@ async function verifyAccessGrant(
   const cookie = GRANTEE_COOKIES[granteeId]
   expect(cookie, `no seeded cookie for ${granteeId}`).toBeDefined()
   const seesGrant = async (): Promise<boolean> => {
-    const registries = await rpcCall<{ registrations: { shapeTree: string }[] }[]>(
+    const registries = await rpcCall<Array<{ registrations: Array<{ shapeTree: string }> }>>(
       rpcPayload({
         _tag: 'ListDataRegistries',
         agentId: grantedById,
@@ -345,8 +345,8 @@ describe('role-based access', () => {
     test('who has access reports direct peers and granted roles separately', async () => {
       const projectInstance = 'https://data/bob/n3onkx'
       type Access = {
-        accessGrantedTo: string[]
-        accessGrantedViaRoles: { role: string; label: string; members: string[] }[]
+        accessGrantedTo: Array<string>
+        accessGrantedViaRoles: Array<{ role: string; label: string; members: Array<string> }>
       }
       const readAccess = () =>
         rpcCall<Access>(
@@ -359,7 +359,7 @@ describe('role-based access', () => {
         bobSession.findRole(bizRoleId),
         bobSession.findRole(whizRoleId),
       ])
-      const updateRole = async (id: string, label: string, members: string[]) => {
+      const updateRole = async (id: string, label: string, members: Array<string>) => {
         await rpcCall(
           rpcPayload({ _tag: 'UpdateRole', context: bobId, id, label, members }),
           bobCookie
@@ -419,7 +419,7 @@ describe('role-based access', () => {
         )
       })
 
-      let grantedIds: string[] = []
+      let grantedIds: Array<string> = []
       await awaitGrantCompletion(bobSession.fetch, regForDan.id, [bobId, danId], async () => {
         const body = await rpcCall(payload, bobCookie)
         // activity-first (step 2): pending ack — pre-minted ids + activityId

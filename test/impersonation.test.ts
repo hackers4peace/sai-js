@@ -125,7 +125,7 @@ describe('C2 impersonation chain', () => {
       client_id: TEST_CLIENT,
       '@context': ODRL_ID_JAG_CONTEXT,
     })
-    const derived = (firstPayload.access as any[])[0]
+    const derived = (firstPayload.access as Array<any>)[0]
     expect(derived).toMatchObject({
       assignee: BOB,
       profile: claim[0].profile,
@@ -165,7 +165,7 @@ describe('C2 impersonation chain', () => {
       client_id: AUTH,
       '@context': ODRL_ID_JAG_CONTEXT,
     })
-    const rewritten = (secondPayload.access as any[])[0]
+    const rewritten = (secondPayload.access as Array<any>)[0]
     const original = claim[0]
     expect(rewritten).toMatchObject({
       assignee: YOYO,

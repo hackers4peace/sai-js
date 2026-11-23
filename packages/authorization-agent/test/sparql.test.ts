@@ -4,7 +4,7 @@ import { listContained, type SparqlTransport } from '../src/sparql'
 
 const container = 'https://registry.example/alice/grant/'
 
-function transportReturning(children: string[]): SparqlTransport {
+function transportReturning(children: Array<string>): SparqlTransport {
   return {
     async fetchBindings(query: string) {
       expect(query).toContain(`GRAPH <meta:${container}>`)

@@ -22,7 +22,7 @@ const LWS_OPENID_PROVIDER = 'https://www.w3.org/ns/lws#OpenIdProvider'
 
 const CID_ACCEPT = 'application/ld+json, application/json;q=0.9, text/turtle;q=0.8, application/cid'
 
-function toArray(value: unknown): unknown[] {
+function toArray(value: unknown): Array<unknown> {
   return Array.isArray(value) ? value : [value]
 }
 
@@ -126,7 +126,7 @@ export class CidIssuerResolver {
     subject: string,
     issuer: string
   ): Promise<boolean> {
-    let quads: Quad[]
+    let quads: Array<Quad>
     try {
       const representation = await responseToDataset(response, this.converter, body)
       quads = await arrayifyStream<Quad>(representation.data)

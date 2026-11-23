@@ -18,7 +18,7 @@ import type { SessionManager } from './SessionManager.js'
 /** The request-to-be, before the owner mints its real id. */
 export type NeedBasedAccessRequestInput = Omit<EmbeddedNeedBasedAccessRequest, 'id'>
 
-export function values(value: unknown): string[] {
+export function values(value: unknown): Array<string> {
   if (typeof value === 'string') {
     return [value]
   }
@@ -50,7 +50,7 @@ const ACTION_ALIASES: Record<string, string> = {
 const KNOWN_ACTIONS = new Set<string>(Object.values(ACCESS_ACTIONS))
 
 /** Normalize and validate the access actions of one or more permissions. */
-export function accessModes(value: unknown): string[] {
+export function accessModes(value: unknown): Array<string> {
   const actions = values(value)
   if (actions.length === 0) {
     throw new BadRequestHttpError('access need permission has no action')
@@ -69,7 +69,7 @@ export function accessModes(value: unknown): string[] {
  * Match a target type by its compact term, prefixed term, or full IRI. The
  * LWS/source payloads mix `Asset`, `odrl:Asset`, and the ODRL IRI.
  */
-export function targetHasType(types: readonly string[], term: string, iri: string): boolean {
+export function targetHasType(types: ReadonlyArray<string>, term: string, iri: string): boolean {
   return types.some(
     (value) =>
       value === term ||
@@ -88,15 +88,15 @@ function targetOf(permission: Record<string, unknown>): Record<string, unknown> 
   return target
 }
 
-function targetTypes(target: Record<string, unknown>): string[] {
+function targetTypes(target: Record<string, unknown>): Array<string> {
   return values(target.type)
 }
 
-function targetSources(target: Record<string, unknown>): string[] {
+function targetSources(target: Record<string, unknown>): Array<string> {
   return values(target.source)
 }
 
-function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>[] {
+function permissionsOf(policy: Record<string, unknown>): Array<Record<string, unknown>> {
   const raw = policy.permission
   const list = Array.isArray(raw) ? raw : raw ? [raw] : []
   if (list.length === 0) {
@@ -114,7 +114,7 @@ function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>
 /** ODRL constraints have no SAI needs representation yet. */
 function rejectConstraints(
   policy: Record<string, unknown>,
-  permissions: readonly Record<string, unknown>[]
+  permissions: ReadonlyArray<Record<string, unknown>>
 ): void {
   if (
     policy.constraint !== undefined ||
@@ -148,16 +148,16 @@ function isRegistrationTarget(target: Record<string, unknown>): boolean {
 
 interface ParsedPolicy {
   id: string
-  types: string[]
+  types: Array<string>
   registeredShapeTree: string
   required: boolean
-  accessMode: string[]
+  accessMode: Array<string>
   inheritsFromNeed?: string
   group?: string
   assignee: string
   assigner: string
   owner?: string
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
   hasDataRegistration?: string
 }
 

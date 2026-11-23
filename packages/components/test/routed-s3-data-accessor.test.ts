@@ -14,10 +14,10 @@ const s3Mock = vi.hoisted(() => {
     method: string
     path: string
   }
-  const instances: { args: Record<string, string>; calls: Call[] }[] = []
+  const instances: Array<{ args: Record<string, string>; calls: Array<Call> }> = []
   class S3DataAccessor {
     args: Record<string, string>
-    calls: Call[] = []
+    calls: Array<Call> = []
     public constructor(args: Record<string, string>) {
       this.args = args
       instances.push(this)
@@ -54,7 +54,7 @@ import { RoutedS3DataAccessor } from '../src/RoutedS3DataAccessor.js'
 
 const S3_ENDPOINT = 'http://garage:3900'
 
-const records: ObjectEndpointRecord[] = [
+const records: Array<ObjectEndpointRecord> = [
   {
     id: 'o-alice',
     accountId: 'acc',
@@ -121,7 +121,7 @@ function makeAccessor(opts: StoreOptions = {}): RoutedS3DataAccessor {
 
 function accessorFor(bucket: string): {
   args: Record<string, string>
-  calls: { method: string; path: string }[]
+  calls: Array<{ method: string; path: string }>
 } {
   const instance = s3Mock.instances.find((candidate) => candidate.args.bucket === bucket)
   if (!instance) {

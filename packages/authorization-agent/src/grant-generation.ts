@@ -89,7 +89,7 @@ async function getChildInstanceIris(
   parentId: string,
   childShapeTree: string,
   fetch: WhatwgFetch
-): Promise<string[]> {
+): Promise<Array<string>> {
   const parentShapeTree = await loadShapeTree(parentGrant.registeredShapeTree, fetch)
   const node = await frameDataInstance(parentId, fetch, parentShapeTree)
   return childIris(node, parentShapeTree, childShapeTree)
@@ -101,8 +101,8 @@ async function getChildInstanceIris(
 // ──────────────────────────
 
 export interface SourceAndDelegatedGrants {
-  source: FinalGrantData[]
-  delegated: GrantData[]
+  source: Array<FinalGrantData>
+  delegated: Array<GrantData>
 }
 
 /**
@@ -112,7 +112,7 @@ export interface SourceAndDelegatedGrants {
 async function inheritingAuthorizations(
   data: DataAuthorizationData,
   transport: SparqlTransport
-): Promise<DataAuthorizationData[]> {
+): Promise<Array<DataAuthorizationData>> {
   // the parent's `hasInheritingAuthorization` reverse list is UNRELIABLE
   // (the activity framing drops @reverse on embedded nodes — stored parents
   // can lack it); the child's forward `inheritsFromAuthorization` always
@@ -132,8 +132,8 @@ async function generateChildDelegatedGrantData(
   grantee: string,
   deps: DataModelDependencies,
   transport: SparqlTransport
-): Promise<GrantData[]> {
-  const result: GrantData[] = []
+): Promise<Array<GrantData>> {
+  const result: Array<GrantData> = []
   const childAuthorizations = await inheritingAuthorizations(data, transport)
   for (const childAuthorization of childAuthorizations) {
     // Find matching child grant by reading each child IRI (registry plane)
@@ -206,7 +206,7 @@ interface MirroredPeer {
   /** the peer's registration of us (the mirrored reciprocal) */
   reciprocal: SocialAgentRegistrationData
   /** the grants the peer issued to us — the delegation sources */
-  grants: GrantData[]
+  grants: Array<GrantData>
 }
 
 /**
@@ -228,7 +228,7 @@ interface MirroredPeer {
 class MirroredPeerIndex {
   private readonly transport: SparqlTransport
   private readonly registrySet: RegistrySetData
-  private registrations?: Promise<SocialAgentRegistrationData[]>
+  private registrations?: Promise<Array<SocialAgentRegistrationData>>
   private readonly peers = new Map<string, Promise<MirroredPeer>>()
 
   public constructor(transport: SparqlTransport, registrySet: RegistrySetData) {
@@ -237,7 +237,7 @@ class MirroredPeerIndex {
   }
 
   /** Our registrations that carry a reciprocal link — the delegation candidates. */
-  public async socialAgents(): Promise<SocialAgentRegistrationData[]> {
+  public async socialAgents(): Promise<Array<SocialAgentRegistrationData>> {
     this.registrations ??= listContained(
       this.transport,
       this.registrySet.hasSocialAgentRegistry.id
@@ -289,11 +289,11 @@ async function generateDelegatedAccessGrants(
   deps: DataModelDependencies,
   transport: SparqlTransport,
   dataOwner?: string
-): Promise<GrantData[]> {
+): Promise<Array<GrantData>> {
   if (data.scopeOfAuthorization === INTEROP.Inherited) {
     throw new Error('this method should not be callend on data authorizations with Inherited scope')
   }
-  const result: GrantData[] = []
+  const result: Array<GrantData> = []
 
   for (const agentRegistration of await peers.socialAgents()) {
     // data onwer is specified but it is not their registration
@@ -323,7 +323,7 @@ async function generateDelegatedAccessGrants(
     for (const sourceGrant of matchingGrants) {
       const regularGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
 
-      const childGrantData: GrantData[] = await generateChildDelegatedGrantData(
+      const childGrantData: Array<GrantData> = await generateChildDelegatedGrantData(
         data,
         regularGrantIri,
         sourceGrant,
@@ -370,7 +370,7 @@ async function generateDelegatedAccessGrants(
       }
       if (childGrantData.length) {
         // embed full child grant data so reconciliation can flatten the tree
-        grant.hasInheritingGrant = childGrantData as unknown as string[]
+        grant.hasInheritingGrant = childGrantData as unknown as Array<string>
       }
       // only push parent — children are embedded in hasInheritingGrant and stored by reconciliation
       result.push(grant)
@@ -382,14 +382,14 @@ async function generateDelegatedAccessGrants(
 async function generateChildSourceGrantData(
   data: DataAuthorizationData,
   parentGrantIri: string,
-  dataRegistrations: DataRegistrationData[],
+  dataRegistrations: Array<DataRegistrationData>,
   registrySet: RegistrySetData,
   grantee: string,
   dataStorageIri: string,
   deps: DataModelDependencies,
   transport: SparqlTransport
-): Promise<FinalGrantData[]> {
-  const result: FinalGrantData[] = []
+): Promise<Array<FinalGrantData>> {
+  const result: Array<FinalGrantData> = []
   const childAuthorizations = await inheritingAuthorizations(data, transport)
   for (const childAuthorization of childAuthorizations) {
     const childGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
@@ -435,16 +435,16 @@ async function generateSourceAccessGrants(
   deps: DataModelDependencies,
   transport: SparqlTransport,
   endpoints?: Map<string, string>
-): Promise<FinalGrantData[]> {
+): Promise<Array<FinalGrantData>> {
   if (data.scopeOfAuthorization === INTEROP.Inherited) {
     throw new Error('this method should not be callend on data authorizations with Inherited scope')
   }
 
-  const result: FinalGrantData[] = []
+  const result: Array<FinalGrantData> = []
 
   // data pods from the account-storage allowlist when available (the caller
   // excludes the registry pod); the registry set is only the fallback
-  const pods: [string, string | undefined][] = endpoints
+  const pods: Array<[string, string | undefined]> = endpoints
     ? [...endpoints.entries()]
     : registrySet.hasDataRegistry.map((registry) => [registry.id, undefined])
   for (const [podUrl, endpoint] of pods) {
@@ -479,7 +479,7 @@ async function generateSourceAccessGrants(
     const regularGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
 
     // create children if needed
-    const childGrantData: FinalGrantData[] = await generateChildSourceGrantData(
+    const childGrantData: Array<FinalGrantData> = await generateChildSourceGrantData(
       data,
       regularGrantIri,
       dataRegistrations,
@@ -657,15 +657,15 @@ async function generateAccessGrantsWithPeers(
  * not granted and results in empty grants.
  */
 export async function generateGrantsForAuthorization(
-  dataAuthorizations: DataAuthorizationData[],
+  dataAuthorizations: Array<DataAuthorizationData>,
   registrySet: RegistrySetData,
   grantee: string,
   deps: DataModelDependencies,
   transport: SparqlTransport,
   endpoints?: Map<string, string>
 ): Promise<GeneratedGrants> {
-  const sourceGrants: FinalGrantData[] = []
-  const delegatedGrants: GrantData[] = []
+  const sourceGrants: Array<FinalGrantData> = []
+  const delegatedGrants: Array<GrantData> = []
   // one peer index for the whole regeneration: the mirrored peer side is read
   // once, no matter how many authorizations (or role members) delegate from it
   const peers = new MirroredPeerIndex(transport, registrySet)

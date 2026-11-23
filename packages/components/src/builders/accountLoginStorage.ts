@@ -17,7 +17,7 @@ export async function buildAccountLoginStorage<T extends IndexTypeCollection<T>>
   )
   await keyValueStorage.handle()
   const valueStorage = new ContainerPathStorage<VirtualObject>(keyValueStorage, '/accounts/data/')
-  const indexStorage = new ContainerPathStorage<string[]>(keyValueStorage, '/accounts/index/')
+  const indexStorage = new ContainerPathStorage<Array<string>>(keyValueStorage, '/accounts/index/')
   const storage = new WrappedIndexedStorage<T>(valueStorage, indexStorage)
   const accountStorage = new BaseLoginAccountStorage(storage)
   //@ts-expect-error

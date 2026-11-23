@@ -4,7 +4,7 @@ import { dataModelContext } from './context.ts'
 
 export type DataAuthorizationId = {
   id?: string
-  type: string[]
+  type: Array<string>
 }
 
 export type DataAuthorizationData = DataAuthorizationId & {
@@ -16,10 +16,10 @@ export type DataAuthorizationData = DataAuthorizationId & {
   hasDataRegistration?: string
   satisfiesAccessNeed?: string
   inheritsFromAuthorization?: string // parent data authorization IRI (Inherited scope)
-  accessMode: string[]
-  hasDataInstance?: string[]
+  accessMode: Array<string>
+  hasDataInstance?: Array<string>
   // Children discovered via inverse quads in the dataset (lazily resolved)
-  hasInheritingAuthorization?: string[] // child data authorization IRIs
+  hasInheritingAuthorization?: Array<string> // child data authorization IRIs
 }
 
 /** A data authorization that has been assigned its IRI. */

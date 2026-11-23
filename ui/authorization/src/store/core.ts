@@ -9,7 +9,7 @@ import { getRuntimeConfig } from '@/runtime-config'
 
 let endpoint: string
 
-function defaultLang(availableLanguages: string[]): string {
+function defaultLang(availableLanguages: Array<string>): string {
   const lang = navigator.language.split('-')[0]
   return availableLanguages.includes(lang) ? lang : 'en'
 }
@@ -21,7 +21,7 @@ function navigateHome() {
 export const useCoreStore = defineStore('core', () => {
   endpoint = `${getRuntimeConfig().backendBaseUrl}/.account/`
   const userId = ref<string | null>(null)
-  const availableLanguages = ref<string[]>(getRuntimeConfig().languages)
+  const availableLanguages = ref<Array<string>>(getRuntimeConfig().languages)
   const lang = ref(localStorage.getItem('lang') ?? defaultLang(availableLanguages.value))
   const pushSubscription = ref<PushSubscription | null>(null)
 

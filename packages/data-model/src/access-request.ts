@@ -8,8 +8,8 @@ import { dataModelContext } from './context.ts'
  *  `registeredShapeTree`, `required` and `accessMode`. */
 export type NeedBasedAccessRequestGroup = {
   id: string
-  type: string[]
-  hasAccessNeed: unknown[]
+  type: Array<string>
+  hasAccessNeed: Array<unknown>
 }
 
 /**
@@ -21,7 +21,7 @@ export type NeedBasedAccessRequestGroup = {
  */
 export interface NeedBasedAccessRequestData {
   id: string
-  type: string[]
+  type: Array<string>
   grantee: string
   grantedBy: string
   dataOwner: string
@@ -64,10 +64,10 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<NeedBasedAcc
     hasAccessNeedGroup: group
       ? {
           id: group.id as string,
-          type: (group.type as string[] | undefined) ?? [],
+          type: (group.type as Array<string> | undefined) ?? [],
           // the deep frame EMBEDS the need nodes (children incl. inherited
           // children ride the graph) — pass them through, not as IRI strings
-          hasAccessNeed: (group.hasAccessNeed as unknown[] | undefined) ?? [],
+          hasAccessNeed: (group.hasAccessNeed as Array<unknown> | undefined) ?? [],
         }
       : { id: '', type: [], hasAccessNeed: [] },
   }

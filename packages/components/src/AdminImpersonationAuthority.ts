@@ -40,7 +40,7 @@ export interface AdminImpersonationRequestAuthority {
 }
 
 /** The `odrl:action` values of one compact ODRL policy. */
-function claimActions(policy: unknown): string[] {
+function claimActions(policy: unknown): Array<string> {
   const action = (policy as { action?: unknown }).action
   return (Array.isArray(action) ? action : [action]).filter(
     (value): value is string => typeof value === 'string'
@@ -137,7 +137,7 @@ export class AdminImpersonationAuthority implements AdminImpersonationRequestAut
 
   private isDataRegistryAdmin(
     org: string,
-    records: { podUrl: string; endpoint: string }[],
+    records: Array<{ podUrl: string; endpoint: string }>,
     subject: string
   ): Promise<boolean> {
     const key = `${org}\n${subject}`

@@ -85,7 +85,7 @@ async function completeInteraction(options: InteractionOptions): Promise<string>
   const done = new Set<string>()
   let controls: any = {}
   let current = options.authorizeUrl
-  const hops: string[] = []
+  const hops: Array<string> = []
 
   for (let hop = 0; hop < 16; hop++) {
     const response = await jar.fetch(current)

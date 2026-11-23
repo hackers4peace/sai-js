@@ -32,7 +32,7 @@ import type { DataModelDependencies } from './types.ts'
 export async function getActivityIris(
   data: ActivityRegistryData,
   transport: SparqlTransport
-): Promise<string[]> {
+): Promise<Array<string>> {
   return listContained(transport, data.id)
 }
 
@@ -69,7 +69,7 @@ function docHasClass(doc: unknown, classIri: string): boolean {
   const nodes = Array.isArray(doc) ? doc : [doc]
   return nodes.some((node) => {
     const raw = (node as Record<string, unknown>)?.['@type']
-    const types = typeof raw === 'string' ? [raw] : ((raw as string[] | undefined) ?? [])
+    const types = typeof raw === 'string' ? [raw] : ((raw as Array<string> | undefined) ?? [])
     return types.some((type) => type === classIri || type === term)
   })
 }
@@ -135,7 +135,7 @@ function asString(value: unknown): string {
 }
 
 /** Normalize a framed (possibly scalar-or-array) node value to a string. */
-function asStringArray(value: unknown): string[] {
+function asStringArray(value: unknown): Array<string> {
   if (value === undefined || value === null) {
     return []
   }
@@ -201,7 +201,7 @@ const STORAGE_TYPE_PREFIXES = ['http://www.w3.org/ns/ldp#', 'https://www.w3.org/
  * UNORDERED set (the SPARQL store may frame it back in any order), so the
  * class is found by set membership, never by position.
  */
-function activityClass(type: string[]): string {
+function activityClass(type: Array<string>): string {
   return (
     type.find(
       (t) =>
@@ -229,7 +229,7 @@ export async function getActivity(transport: SparqlTransport, id: string): Promi
 
 async function frameActivityData(doc: unknown, id: string): Promise<ActivityData> {
   const node = await frameActivity(doc, id)
-  const type = (node.type as string[] | undefined) ?? []
+  const type = (node.type as Array<string> | undefined) ?? []
   const cls = activityClass(type)
   const canonicalType = ['Activity', cls, ...type.filter((t) => ASV_ACTIVITY_TYPES.has(t))]
   const base = {
@@ -579,7 +579,7 @@ export async function createCompletion(
 export async function getActivityCompletions(
   data: ActivityRegistryData,
   transport: SparqlTransport
-): Promise<{ completion: string; target?: string }[]> {
+): Promise<Array<{ completion: string; target?: string }>> {
   const iris = await getActivityIris(data, transport)
   if (iris.length === 0) {
     return []
@@ -606,7 +606,7 @@ export async function getActivityCompletions(
 export async function getCompletedActivityIris(
   data: ActivityRegistryData,
   transport: SparqlTransport
-): Promise<string[]> {
+): Promise<Array<string>> {
   const completions = await getActivityCompletions(data, transport)
   return completions
     .map((completion) => completion.target)

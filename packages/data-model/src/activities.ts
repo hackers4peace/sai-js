@@ -49,7 +49,7 @@ type ActivityBase = {
  */
 export type EmbeddedSocialAgentInvitation = {
   id: string
-  type: string[]
+  type: Array<string>
   capabilityUrl: string
   /** language map — the accepted snapshot carries the invitation's `label` per `SocialAgentInvitationData` */
   label: LanguageMap
@@ -64,7 +64,7 @@ export type EmbeddedSocialAgentInvitation = {
  */
 export type EmbeddedSocialAgentRegistration = {
   id: string
-  type: string[]
+  type: Array<string>
   registeredAgent: string
   /** language map — the snapshot carries `label` per `SocialAgentRegistrationData` */
   label: LanguageMap
@@ -80,7 +80,7 @@ export type EmbeddedSocialAgentRegistration = {
  */
 export type EmbeddedNeedBasedAccessRequest = {
   id: string
-  type: string[]
+  type: Array<string>
   grantee: string
   grantedBy: string
   dataOwner: string
@@ -172,7 +172,7 @@ export type NeedBasedAccessRequestReceivedId = {
  */
 export type EmbeddedAccessRequestRef = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 /**
@@ -311,7 +311,7 @@ export type AdminAuthorizationGrantedId = {
  */
 export type EmbeddedAdminAuthorization = {
   id: string
-  type: string[]
+  type: Array<string>
   grantee: string
   grantedBy: string
   scopeOfAuthorization: string
@@ -353,7 +353,7 @@ export type AdminAuthorizationRevokedId = {
  */
 export type EmbeddedAuthorization = {
   id: string
-  type: string[]
+  type: Array<string>
   grantee: string
   hasAccessNeedGroup?: string
 }
@@ -379,7 +379,7 @@ export type AuthorizationGranted = ActivityBase & {
   /** the AuthorizationRegistry */
   target: string
   /** the DataAuthorizations-to-be (embedded POJOs, all grantees) */
-  object: DataAuthorizationData[]
+  object: Array<DataAuthorizationData>
 }
 
 /** Typed activity ref for the `processAuthorizationGranted` workflow's
@@ -407,7 +407,7 @@ export type AuthorizationDenied = Omit<ActivityBase, 'target'> & {
 /** A DataAuthorization reference (id + type) carried by `AuthorizationRevoked`. */
 export type DataAuthorizationRef = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 /**
@@ -422,7 +422,7 @@ export type AuthorizationRevoked = Omit<ActivityBase, 'target'> & {
   /** as:actor — plain IRI (the registry owner) */
   actor: string
   /** the DataAuthorizations — refs (selected + expanded descendants) */
-  object: DataAuthorizationRef[]
+  object: Array<DataAuthorizationRef>
   /** the revoked authorization's grantee (agent, application, or role) */
   grantee: string
 }
@@ -544,5 +544,5 @@ export type ActivityData =
  * awkward to type, so the discriminant check lives here.
  */
 export function isActivityClass(activity: ActivityData, cls: string): boolean {
-  return (activity.type as readonly string[]).includes(cls)
+  return (activity.type as ReadonlyArray<string>).includes(cls)
 }

@@ -51,7 +51,7 @@ const registryId = 'https://auth.alice.example/13e60d32-77a6-4239-864d-cfe2c9080
 const sparqlMock = vi.hoisted(() => {
   const handlers: {
     bindings?: (query: string) => Array<Record<string, { termType: string; value: string }>>
-    triples?: (query: string) => unknown[]
+    triples?: (query: string) => Array<unknown>
   } = {}
   return { handlers }
 })
@@ -133,7 +133,7 @@ describe('findAuthorizationsForAgent', () => {
       return [{ role: { termType: 'NamedNode', value: ROLE_ADMIN } }]
     }
     sparqlMock.handlers.triples = (query) => {
-      const graphs: Record<string, unknown[]> = {
+      const graphs: Record<string, Array<unknown>> = {
         [AUTHZ_DIRECT]: authzGraph(AUTHZ_DIRECT, INTEROP.DataAuthorization, BOB),
         [AUTHZ_VIA_ROLE]: authzGraph(AUTHZ_VIA_ROLE, INTEROP.DataAuthorization, ROLE_ADMIN),
         [AUTHZ_ADMIN]: authzGraph(AUTHZ_ADMIN, 'https://example/AdminAuthorization', BOB),
@@ -270,7 +270,7 @@ describe('findRegistration', () => {
 
   // route the two registry listings by container IRI: application first, then
   // social agent — the plane counterpart of the former HTTP scan order
-  const listings = (listed: { application: string[]; socialAgent: string[] }) => {
+  const listings = (listed: { application: Array<string>; socialAgent: Array<string> }) => {
     return (agent: AuthorizationAgent, query: string) => {
       expect(query).toContain('lws#contains')
       if (query.includes(`GRAPH <meta:${agent.registrySet.hasApplicationRegistry.id}>`)) {
@@ -376,7 +376,7 @@ describe('findDataRegistration', () => {
       }))
     }
     sparqlMock.handlers.triples = (query) => {
-      const graphs: Record<string, unknown[]> = {
+      const graphs: Record<string, Array<unknown>> = {
         [DATA_REG_PROJECT]: registrationGraph(DATA_REG_PROJECT, PROJECT_TREE),
         [DATA_REG_TASK]: registrationGraph(DATA_REG_TASK, TASK_TREE),
       }
@@ -457,7 +457,7 @@ describe('findSocialAgentInvitation', () => {
       }))
     }
     sparqlMock.handlers.triples = (query) => {
-      const graphs: Record<string, unknown[]> = {
+      const graphs: Record<string, Array<unknown>> = {
         [INVITE_1]: invitationGraph(INVITE_1, 'https://auth.alice.example/capability/invite-1'),
         [INVITE_2]: invitationGraph(INVITE_2, CAPABILITY_2),
       }
@@ -700,14 +700,14 @@ describe('revokeGrants core (C1)', () => {
 
   interface GrantOverrides {
     grantee?: string
-    accessMode?: string[]
+    accessMode?: Array<string>
     hasStorage?: string
     dataOwner?: string
     grantedBy?: string
     registeredShapeTree?: string
     hasDataRegistration?: string
     scopeOfGrant?: string
-    hasDataInstance?: string[]
+    hasDataInstance?: Array<string>
     inheritsFromGrant?: string
   }
 
@@ -783,8 +783,8 @@ describe('revokeGrants core (C1)', () => {
     const targetQuads = (
       targetId: string,
       targetValue: {
-        type: string[]
-        source: string[]
+        type: Array<string>
+        source: Array<string>
         owner?: string
         storage?: string
         registeredShapeTree?: string
@@ -904,8 +904,8 @@ describe('revokeGrants core (C1)', () => {
    * being a member of this registry.
    */
   const installRegistry = (
-    existing: GrantData[] = baseGrants,
-    contained: GrantData[] = existing
+    existing: Array<GrantData> = baseGrants,
+    contained: Array<GrantData> = existing
   ) => {
     sparqlMock.handlers.bindings = (query) => {
       if (query.includes('lws#contains')) {
@@ -1081,7 +1081,7 @@ describe('dataInstanceIrisForGrant (Phase 4)', () => {
       throw new Error(`unexpected CONSTRUCT: ${query}`)
     }
 
-    const collected: string[] = []
+    const collected: Array<string> = []
     for await (const id of dataInstanceIrisForGrant(
       {
         id: 'https://auth.alice.example/grant/1',

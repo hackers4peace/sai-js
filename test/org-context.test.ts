@@ -67,7 +67,7 @@ async function expectRpcError(payload: string, cookie: string): Promise<void> {
 
 describe('org context — discovery (2.1/2.2)', () => {
   test('personal ListSocialAgents flags the orgs the user administers (reciprocal `adminOf`)', async () => {
-    const agents = await rpcCall<{ id: string; admin: boolean; adminOf: boolean }[]>(
+    const agents = await rpcCall<Array<{ id: string; admin: boolean; adminOf: boolean }>>(
       rpcPayload({ _tag: 'ListSocialAgents', lang: 'en', context: danId }),
       danCookie
     )
@@ -86,7 +86,7 @@ describe('org context — discovery (2.1/2.2)', () => {
   })
 
   test('org-context ListSocialAgents reads the org registry directly (admin marker on the org registration)', async () => {
-    const agents = await rpcCall<{ id: string; admin: boolean }[]>(
+    const agents = await rpcCall<Array<{ id: string; admin: boolean }>>(
       rpcPayload({ _tag: 'ListSocialAgents', lang: 'en', context: yoyoId }),
       danCookie
     )
@@ -130,7 +130,7 @@ describe('org context — registry-set resolution (2.3)', () => {
 
 describe('org context — context authorization (2.2)', () => {
   test('an admin can target the org context; a non-admin is rejected', async () => {
-    const roles = await rpcCall<unknown[]>(
+    const roles = await rpcCall<Array<unknown>>(
       rpcPayload({ _tag: 'ListRoles', lang: 'en', context: yoyoId }),
       danCookie
     )
@@ -144,7 +144,7 @@ describe('org context — context authorization (2.2)', () => {
   })
 
   test('the personal context is always allowed', async () => {
-    const agents = await rpcCall<unknown[]>(
+    const agents = await rpcCall<Array<unknown>>(
       rpcPayload({ _tag: 'ListSocialAgents', lang: 'en', context: bobId }),
       bobCookie
     )
@@ -154,7 +154,7 @@ describe('org context — context authorization (2.2)', () => {
 
 describe('org context — owner identity (2.4)', () => {
   test('a role created in the org context lands in the org registry with the org as owner', async () => {
-    const role = await rpcCall<{ id: string; label: string; members: string[] }>(
+    const role = await rpcCall<{ id: string; label: string; members: Array<string> }>(
       rpcPayload({
         _tag: 'CreateRole',
         label: 'YoYo Ops',
@@ -178,7 +178,7 @@ describe('org context — owner identity (2.4)', () => {
 
 /** YoYo's profile of an agent in the org context — the marker is linked by the workflow, so poll. */
 async function orgContextAdminFlag(webId: string, cookie: string): Promise<boolean | undefined> {
-  const agents = await rpcCall<{ id: string; admin: boolean }[]>(
+  const agents = await rpcCall<Array<{ id: string; admin: boolean }>>(
     rpcPayload({ _tag: 'ListSocialAgents', lang: 'en', context: yoyoId }),
     cookie
   )
@@ -244,7 +244,7 @@ describe('org context — peers’ granted data (read-only org impersonation)', 
   const taskShapeTree = 'https://data/shapetrees/trees/Task'
 
   test('ListDataRegistries (peer branch) lists the peer registration the org is granted', async () => {
-    const registries = await rpcCall<{ id: string; registrations: { id: string }[] }[]>(
+    const registries = await rpcCall<Array<{ id: string; registrations: Array<{ id: string }> }>>(
       rpcPayload({ _tag: 'ListDataRegistries', agentId: bobId, lang: 'en', context: yoyoId }),
       danCookie
     )
@@ -256,7 +256,7 @@ describe('org context — peers’ granted data (read-only org impersonation)', 
   })
 
   test('ListDataInstances on the peer’s granted registration lists the instances (labels)', async () => {
-    const instances = await rpcCall<{ id: string; label?: string }[]>(
+    const instances = await rpcCall<Array<{ id: string; label?: string }>>(
       rpcPayload({
         _tag: 'ListDataInstances',
         agentId: bobId,
@@ -278,9 +278,9 @@ describe('org context — peers’ granted data (read-only org impersonation)', 
       id: string
       label?: string
       shapeTree: { id: string }
-      accessGrantedTo: string[]
-      accessGrantedViaRoles: { role: string; label: string; members: string[] }[]
-      children: { shapeTree: { id: string }; count: number }[]
+      accessGrantedTo: Array<string>
+      accessGrantedViaRoles: Array<{ role: string; label: string; members: Array<string> }>
+      children: Array<{ shapeTree: { id: string }; count: number }>
     }>(rpcPayload({ _tag: 'GetResource', id: bobNeon, lang: 'en', context: yoyoId }), danCookie)
     expect(resource.id).toBe(bobNeon)
     expect(resource.label).toBe('Neon')
@@ -407,7 +407,7 @@ describe('org context — sharing the org’s own data (2.4 write path)', () => 
     // the read side agrees: the org context reports the peer as a DIRECT
     // grantee (the grantee-facing replication of these grants is covered by
     // federation-mirror)
-    const access = await rpcCall<{ accessGrantedTo: string[] }>(
+    const access = await rpcCall<{ accessGrantedTo: Array<string> }>(
       rpcPayload({ _tag: 'GetResource', id: ghost, lang: 'en', context: yoyoId }),
       danCookie
     )
@@ -437,11 +437,11 @@ describe('org context — listing the org’s own data (2.4 data plane)', () => 
 
   test('ListDataRegistries resolves the org’s own pods and their registrations', async () => {
     const registries = await rpcCall<
-      {
+      Array<{
         id: string
         label: string
-        registrations: { id: string; shapeTree: string; count: number }[]
-      }[]
+        registrations: Array<{ id: string; shapeTree: string; count: number }>
+      }>
     >(
       rpcPayload({ _tag: 'ListDataRegistries', agentId: yoyoId, lang: 'en', context: yoyoId }),
       danCookie
@@ -467,7 +467,7 @@ describe('org context — listing the org’s own data (2.4 data plane)', () => 
   })
 
   test('ListDataInstances reads the org registration’s membership and labels', async () => {
-    const instances = await rpcCall<{ id: string; label?: string }[]>(
+    const instances = await rpcCall<Array<{ id: string; label?: string }>>(
       rpcPayload({
         _tag: 'ListDataInstances',
         agentId: yoyoId,
@@ -509,9 +509,9 @@ describe('org context — authorizing an agent over the org’s data (2.4 write 
     const regForBob = (await yoyoSession.findSocialAgentRegistration(bobId))!
     expect(regForBob).toBeDefined()
 
-    let ids: string[] = []
+    let ids: Array<string> = []
     await awaitGrantCompletion(yoyoSession.fetch, regForBob.id, [yoyoId, bobId], async () => {
-      const body = await rpcCall<{ activityId: string; ids: string[] }>(
+      const body = await rpcCall<{ activityId: string; ids: Array<string> }>(
         rpcPayload({
           _tag: 'AuthorizeApp',
           authorization: {

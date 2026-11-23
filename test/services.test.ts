@@ -23,7 +23,7 @@ describe('main', () => {
     expect(response.ok).toBeTruthy()
     expect(response.headers.get('content-type')).toContain('application/lws+cid')
     const body = (await response.json()) as {
-      service: { type: string; serviceEndpoint: string; conformsTo?: string[] }[]
+      service: Array<{ type: string; serviceEndpoint: string; conformsTo?: Array<string> }>
     }
     expect(body.service).toEqual(
       expect.arrayContaining([
@@ -49,7 +49,10 @@ describe('main', () => {
       headers: { accept: 'application/lws+cid' },
     })
     expect(response.status).toBe(200)
-    const body = (await response.json()) as { '@context': string[]; type: string | string[] }
+    const body = (await response.json()) as {
+      '@context': Array<string>
+      type: string | Array<string>
+    }
     expect(body.type).toEqual(expect.arrayContaining(['Storage', 'DataStorage']))
     expect(body['@context']).toContain('https://www.w3.org/ns/solid/interop-context/v1')
   })
@@ -58,7 +61,10 @@ describe('main', () => {
       headers: { accept: 'application/lws+cid' },
     })
     expect(response.status).toBe(200)
-    const body = (await response.json()) as { '@context': string[]; type: string | string[] }
+    const body = (await response.json()) as {
+      '@context': Array<string>
+      type: string | Array<string>
+    }
     expect(body.type).toEqual(expect.arrayContaining(['Storage', 'RegistryStorage']))
     expect(body['@context']).toContain('https://www.w3.org/ns/solid/interop-context/v1')
   })

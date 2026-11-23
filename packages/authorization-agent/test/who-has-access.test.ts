@@ -29,7 +29,7 @@ const BIZ = 'https://registry/bob/biz'
 const REGISTRATION = 'https://data/bob/avn9hv'
 const RESOURCE = 'https://data/bob/n3onkx'
 
-const ROLE_DATA: RoleData[] = [
+const ROLE_DATA: Array<RoleData> = [
   { id: WHIZ, type: [INTEROP.Role], label: { '@none': 'Whiz' }, members: [DAN] },
   { id: BIZ, type: [INTEROP.Role], label: { '@none': 'Biz' }, members: [YOYO] },
 ]
@@ -56,7 +56,7 @@ function authorization(
   } as DataAuthorizationData
 }
 
-function factsFor(authorizations: DataAuthorizationData[]) {
+function factsFor(authorizations: Array<DataAuthorizationData>) {
   return scopeFacts(ROLE_DATA, authorizations)
 }
 

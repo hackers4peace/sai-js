@@ -14,7 +14,7 @@ const REGISTRATION = 'https://data/acme.example/registration/'
 const OWNER = 'https://id/alice'
 const GRANTEE = 'https://id/bob'
 
-function claim(scope: string): Record<string, any>[] {
+function claim(scope: string): Array<Record<string, any>> {
   return grantAccess({
     scopeOfGrant: scope,
     owner: OWNER,
@@ -27,7 +27,7 @@ function claim(scope: string): Record<string, any>[] {
     assigner: OWNER,
     assignee: GRANTEE,
     actions: [ODRL.read],
-  }) as Record<string, any>[]
+  }) as Array<Record<string, any>>
 }
 
 const parent = {
@@ -78,7 +78,7 @@ describe('access claim rewriting', () => {
     const [rewrittenParent, rewrittenChild] = rewriteAccessClaim(
       [parent, child],
       'https://id/yoyo'
-    ) as Record<string, any>[]
+    ) as Array<Record<string, any>>
 
     expect(rewrittenParent.id).toMatch(/^urn:uuid:/u)
     expect(rewrittenParent.id).not.toBe(parent.id)
@@ -93,7 +93,7 @@ describe('access claim rewriting', () => {
     const [rewrittenParent, rewrittenChild] = setAccessClaimAssignee(
       [parent, child],
       'https://id/alice'
-    ) as Record<string, any>[]
+    ) as Array<Record<string, any>>
 
     expect(rewrittenChild.inheritsFromGrant).toBe(parent.uid)
     expect(rewrittenParent.assignee).toBe('https://id/alice')

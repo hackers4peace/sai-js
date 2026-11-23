@@ -122,7 +122,7 @@ export class Application {
    * Array of DataOwner instances out of all the data application can access.
    * @public
    */
-  get dataOwners(): DataOwnerData[] {
+  get dataOwners(): Array<DataOwnerData> {
     if (!this.applicationRegistration) {
       return []
     }
@@ -132,7 +132,7 @@ export class Application {
     return []
   }
 
-  public async getDataOwnersAsync(): Promise<DataOwnerData[]> {
+  public async getDataOwnersAsync(): Promise<Array<DataOwnerData>> {
     if (!this.applicationRegistration || !getGranted(this.applicationRegistration)) {
       return []
     }
@@ -145,7 +145,7 @@ export class Application {
       }
       owner.issuedGrants.push(grant)
       return acc
-    }, [] as DataOwnerData[])
+    }, [] as Array<DataOwnerData>)
   }
 
   public async resourceOwners(): Promise<Set<string>> {
@@ -181,7 +181,7 @@ export class Application {
     if (grant.scopeOfGrant === INTEROP.Inherited) {
       throw new Error('Cannot list instances from Inherited grants')
     }
-    const list: string[] = []
+    const list: Array<string> = []
     for await (const resource of getDataInstanceIterator(grant, this.fetch)) {
       list.push(resource)
     }

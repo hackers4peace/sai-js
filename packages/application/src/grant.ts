@@ -26,7 +26,7 @@ export function getGranted(data: ApplicationRegistrationData): boolean {
 export async function getAccessGrants(
   data: ApplicationRegistrationData,
   fetch: WhatwgFetch
-): Promise<GrantData[]> {
+): Promise<Array<GrantData>> {
   return Promise.all((data.hasDataGrant ?? []).map((id) => loadGrant(id, fetch)))
 }
 
@@ -77,7 +77,7 @@ async function getChildInstanceIris(
   parentId: string,
   childShapeTree: string,
   fetch: WhatwgFetch
-): Promise<string[]> {
+): Promise<Array<string>> {
   const parentShapeTree = await loadShapeTree(parentGrant.registeredShapeTree, fetch)
   const node = await frameDataInstance(parentId, fetch, parentShapeTree)
   return childIris(node, parentShapeTree, childShapeTree)

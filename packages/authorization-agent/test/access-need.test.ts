@@ -83,7 +83,7 @@ describe('descriptions', () => {
 
 describe('LWS reads', () => {
   test('every data-pod document read asks for the LWS JSON-LD profile', async () => {
-    const accepts: string[] = []
+    const accepts: Array<string> = []
     const recordingFetch = (async (url: Parameters<typeof fetch>[0], init?: RequestInit) => {
       const accept = (init?.headers as Record<string, string> | undefined)?.Accept
       if (accept) {

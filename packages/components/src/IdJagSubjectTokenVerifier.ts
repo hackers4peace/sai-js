@@ -32,7 +32,7 @@ export interface IdJagSubjectTokenVerifierArgs {
    * Issuers trusted without verifying the controlled identifier document of the
    * subject — typically the storages/UASs of this deployment.
    */
-  trustedIssuers?: string[]
+  trustedIssuers?: Array<string>
   /**
    * Accept any audience URL within this base URL (the auth `.sai` verifier).
    * When unset, the `aud` claim has to match the verifier's audience exactly
@@ -186,7 +186,7 @@ export class IdJagSubjectTokenVerifier extends SubjectTokenVerifier {
    * target UAS base URLs); otherwise the storage AS audience has to match
    * exactly.
    */
-  private acceptedAudiences(aud: unknown, audience: string): string[] {
+  private acceptedAudiences(aud: unknown, audience: string): Array<string> {
     const values =
       typeof aud === 'string'
         ? [aud]

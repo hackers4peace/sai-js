@@ -24,7 +24,7 @@ const registrySet = {
   hasRoleRegistry: { id: ROLE_REGISTRY },
 } as never
 
-function dataAuthorizationGraph(id: string): Quad[] {
+function dataAuthorizationGraph(id: string): Array<Quad> {
   return [
     quad(
       namedNode(id),
@@ -51,7 +51,7 @@ function dataAuthorizationGraph(id: string): Quad[] {
  * (a UI ListAuthorizations right after a revoke raced exactly this).
  */
 function racingTransport(): SparqlTransport {
-  const graphs = new Map<string, Quad[]>([
+  const graphs = new Map<string, Array<Quad>>([
     [
       AUTHORIZATION_REGISTRY,
       [

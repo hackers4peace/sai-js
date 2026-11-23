@@ -68,7 +68,7 @@ export class UiPushSubscriptionStore extends Initializer {
 
   public async findSubscriptions(
     accountId: string
-  ): Promise<{ id: string; webId: string; subscription: PushSubscription }[]> {
+  ): Promise<Array<{ id: string; webId: string; subscription: PushSubscription }>> {
     return (await this.storage.find(UI_PUSH_SUBSCRIPTION_STORAGE_TYPE, { accountId })).map(
       ({
         id,

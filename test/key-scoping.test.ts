@@ -34,7 +34,7 @@ async function objectEndpoint(podUrl: string): Promise<ObjectEndpoint> {
   const kv = await pg.exportToJson()
   const [accountId] = kv[
     `accounts/index/objectEndpoint/podUrl/${encodeURIComponent(podUrl)}`
-  ] as string[]
+  ] as Array<string>
   const account = kv[`accounts/data/${accountId}`] as any
   const record = Object.values<any>(account['**objectEndpoint**']).find((r) => r.podUrl === podUrl)
   if (!record) {

@@ -56,7 +56,7 @@ export async function createSocialAgentRegistration(
 export async function replaceAdminGrantLinks(
   data: SocialAgentRegistrationData,
   fetch: WhatwgFetch,
-  grantIris: string[]
+  grantIris: Array<string>
 ): Promise<void> {
   const current = getAdminGrantIris(data)
   const currentSet = new Set(current)

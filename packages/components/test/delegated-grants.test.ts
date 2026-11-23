@@ -13,13 +13,13 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 interface ChildOptions {
   taskQueue?: string
-  args?: unknown[]
+  args?: Array<unknown>
   workflowId?: string
 }
 
 interface PendingActivity {
   id: string
-  type: string[]
+  type: Array<string>
   actor: string
   target: string
   object: string
@@ -27,10 +27,10 @@ interface PendingActivity {
 }
 
 const h = vi.hoisted(() => {
-  const calls: string[] = []
+  const calls: Array<string> = []
   const state: {
-    batches: PendingActivity[][]
-    pending: PendingActivity[]
+    batches: Array<Array<PendingActivity>>
+    pending: Array<PendingActivity>
     signals: Record<string, () => void>
     fireSignalOnNextWait: boolean
     fireReconcileMirrorOnNextWait: boolean
@@ -39,9 +39,9 @@ const h = vi.hoisted(() => {
     signaledWorkflowId?: string
     mirrorOptions?: ChildOptions
     consumerOptions?: ChildOptions
-    consumerCalls: ChildOptions[]
+    consumerCalls: Array<ChildOptions>
     /** drift-arm child starts (the per-grantee reconciliation) */
-    driftOptions: ChildOptions[]
+    driftOptions: Array<ChildOptions>
     /** what the mirror child reports back (terminal peer-gone case) */
     mirrorResult: { peerGone: boolean }
   } = {
@@ -62,10 +62,10 @@ const h = vi.hoisted(() => {
     // the sweep's registry scan
     getPendingActivities: vi.fn(async () => state.pending),
     // C5 drift arm — the registered grantees the sweep re-derives
-    listGranteeRegistrations: vi.fn(async () => [] as { id: string; type: string[] }[]),
+    listGranteeRegistrations: vi.fn(async () => [] as Array<{ id: string; type: Array<string> }>),
     // C5 mirror arm — reciprocal pairs and local completeness
-    listReciprocalRegistrations: vi.fn(async () => [] as unknown[]),
-    findIncompleteReciprocalMirrors: vi.fn(async () => [] as unknown[]),
+    listReciprocalRegistrations: vi.fn(async () => [] as Array<unknown>),
+    findIncompleteReciprocalMirrors: vi.fn(async () => [] as Array<unknown>),
     // `updateDelegatedGrants` runs for real (same module) — its first activity
     // marks the regenerate step in the recorded order
     findAffectedGrantees: vi.fn(async () => {

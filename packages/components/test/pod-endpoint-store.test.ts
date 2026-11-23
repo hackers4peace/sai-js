@@ -8,9 +8,9 @@ import {
 
 /** Minimal in-memory stand-in for the CSS AccountLoginStorage (per type). */
 function fakeStorage() {
-  const byType = new Map<string, any[]>()
-  const calls: any[] = []
-  const recordsOf = (type: string): any[] => {
+  const byType = new Map<string, Array<any>>()
+  const calls: Array<any> = []
+  const recordsOf = (type: string): Array<any> => {
     let records = byType.get(type)
     if (!records) {
       records = []
@@ -21,10 +21,10 @@ function fakeStorage() {
   return {
     recordsOf,
     calls,
-    defineType: async (...args: any[]) => {
+    defineType: async (...args: Array<any>) => {
       calls.push(['defineType', ...args])
     },
-    createIndex: async (...args: any[]) => {
+    createIndex: async (...args: Array<any>) => {
       calls.push(['createIndex', ...args])
     },
     create: async (type: string, value: any) => {

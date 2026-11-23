@@ -83,15 +83,15 @@ export function needBasedAccessRequestPayload({
   const policies: Array<Record<string, unknown>> = []
   const addNeed = (need: Record<string, any>, parentId?: string): void => {
     const needId = need.id as string
-    const action = ((need.accessMode as string[] | undefined) ?? []).map(
+    const action = ((need.accessMode as Array<string> | undefined) ?? []).map(
       (mode) => COMPACT_ACTIONS[mode] ?? mode
     )
-    const instances = (need.hasDataInstance as string[] | undefined) ?? []
+    const instances = (need.hasDataInstance as Array<string> | undefined) ?? []
     const registration = need.hasDataRegistration as string | undefined
     const shapeTree = need.registeredShapeTree as string | undefined
     const permission = (
-      type: string[],
-      source: string[],
+      type: Array<string>,
+      source: Array<string>,
       metadata: { registeredShapeTree?: string; hasDataRegistration?: string } = {}
     ): Record<string, unknown> => {
       const permissionId = `urn:uuid:${crypto.randomUUID()}`
@@ -227,7 +227,7 @@ export async function rpcCall<T = any>(payload: string, cookie: string): Promise
 export async function accessGrants(
   registration: SocialAgentRegistrationData,
   session: AuthorizationAgent
-): Promise<GrantData[]> {
+): Promise<Array<GrantData>> {
   const transport = localSparqlTransport(session.sparqlEndpoint)
   return Promise.all((registration.hasDataGrant ?? []).map((iri) => getAccessGrant(transport, iri)))
 }
@@ -269,7 +269,7 @@ export async function localMirror(
 export async function containedIris(
   session: AuthorizationAgent,
   container: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   return containedIrisJsonLd(container, session.fetch)
 }
 
@@ -421,12 +421,12 @@ export async function waitFor<T>(
  */
 async function pendingActivitiesFor(
   session: AuthorizationAgent
-): Promise<ActivityData[] | undefined> {
+): Promise<Array<ActivityData> | undefined> {
   const registry = session.registrySet.hasActivityRegistry
   if (!registry) {
     return []
   }
-  let iris: string[]
+  let iris: Array<string>
   try {
     iris = await ActivityRegistry.getActivityIris(
       registry,
@@ -441,7 +441,7 @@ async function pendingActivitiesFor(
     return undefined
   }
   const completed = new Set<string>()
-  const workItems: ActivityData[] = []
+  const workItems: Array<ActivityData> = []
   for (const iri of iris) {
     const activity = await ActivityRegistry.loadActivity(iri, session.fetch)
     if (activity.type.includes('ActivityCompleted')) {
@@ -472,7 +472,7 @@ async function pendingActivitiesFor(
  * activities, so they don't block settlement.
  */
 export async function waitForQuiescence(
-  webIds: string[],
+  webIds: Array<string>,
   {
     timeout = 30_000,
     interval = 250,
@@ -486,7 +486,7 @@ export async function waitForQuiescence(
   )
   const deadline = Date.now() + timeout
   let settled = 0
-  let pendingDetail: string[] = []
+  let pendingDetail: Array<string> = []
   while (Date.now() < deadline) {
     const pending = await Promise.all(
       sessions.map(async ([, session]) => pendingActivitiesFor(session))
@@ -530,7 +530,7 @@ export async function waitForQuiescence(
 export async function awaitGrantCompletion(
   authFetch: typeof fetch,
   registrationId: string,
-  webIds: string[],
+  webIds: Array<string>,
   trigger: () => Promise<unknown>
 ): Promise<void> {
   const stream = await openNotificationStream(authFetch, registrationId)

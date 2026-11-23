@@ -60,7 +60,7 @@ const SOCIAL_AGENT_TYPE = 'http://www.w3.org/ns/solid/interop#SocialAgent'
 /** Sandbox-safe discriminant check (the data-model `isActivityClass` helper
  * is a runtime import — not allowed here; the tuples are read as string[]). */
 function isActivityClass(activity: ActivityData, cls: string): boolean {
-  return (activity.type as readonly string[]).includes(cls)
+  return (activity.type as ReadonlyArray<string>).includes(cls)
 }
 
 const {
@@ -105,11 +105,11 @@ async function storeGrantAndAcr(grant: FinalGrantData, registryOwner?: string) {
  * parent links them by the ids minted during generation, and every child is
  * stored as its own grant body.
  */
-function delegatedGrantBodies(grant: GrantData): FinalGrantData[] {
+function delegatedGrantBodies(grant: GrantData): Array<FinalGrantData> {
   if (!grant.id) {
     throw new Error('generated delegated grant has no id')
   }
-  const embedded = ((grant.hasInheritingGrant ?? []) as unknown[]).filter(
+  const embedded = ((grant.hasInheritingGrant ?? []) as Array<unknown>).filter(
     (child): child is GrantData => typeof child === 'object' && child !== null
   )
   const children = embedded.flatMap((child) => delegatedGrantBodies(child))
@@ -314,7 +314,7 @@ export async function processAuthorizationGranted(
   activity: AuthorizationGrantedId
 ): Promise<void> {
   // sandbox-safe grouping (mirror of activities.groupAuthorizationDataAuthorizations)
-  const byGrantee = new Map<string, DataAuthorizationData[]>()
+  const byGrantee = new Map<string, Array<DataAuthorizationData>>()
   for (const dataAuthorization of dataAuthorizations) {
     const group = byGrantee.get(dataAuthorization.grantee) ?? []
     group.push(dataAuthorization)
@@ -345,7 +345,7 @@ export async function processGranteeAuthorization(
   if (dataAuthorizations.length > 0) {
     await storeAuthorizationGranted({
       webId,
-      dataAuthorizations: dataAuthorizations as FinalDataAuthorizationData[],
+      dataAuthorizations: dataAuthorizations as Array<FinalDataAuthorizationData>,
     })
   }
   const authorizationGrantee = await resolveAuthorizationGrantee({
@@ -433,7 +433,7 @@ export async function processRoleMembershipChange(
     ...[...afterMembers].filter((member) => !beforeMembers.has(member)),
   ]
   const usage = await findRoleUsage({ webId, roleId: { id: role.id, type: role.type } })
-  const affected: AgentId[] = []
+  const affected: Array<AgentId> = []
   const seen = new Set<string>()
   const add = (agent: AgentId) => {
     if (seen.has(agent.id)) {
@@ -491,7 +491,7 @@ export async function processRoleDeletion(
   // createGrantsForAgent re-derives memberships from the store (find-first,
   // 404-tolerant — a retry sees the role already deleted and skips)
   await deleteRoleFromRegistry({ webId, role })
-  const affected: AgentId[] = []
+  const affected: Array<AgentId> = []
   const seen = new Set<string>()
   const add = (agent: AgentId) => {
     if (seen.has(agent.id)) {
@@ -557,7 +557,7 @@ export async function processRoleDeletion(
  */
 export async function reconcileActivities(payload: { webId: SocialAgentId }): Promise<void> {
   const pending = await getPendingActivities({ webId: payload.webId })
-  const roleActivities: ActivityData[] = []
+  const roleActivities: Array<ActivityData> = []
   for (const activity of pending) {
     if (isActivityClass(activity, 'AuthorizationGranted')) {
       // dedicated workflow (step 2 — architecture.md §4): materialize the
@@ -787,7 +787,7 @@ export async function reconcileGrantsForGrantee(
   }
 
   // create the unmatched desired trees (after the GC — delete-before-create)
-  const newGrantIds: GrantId[] = []
+  const newGrantIds: Array<GrantId> = []
   for (const grant of generated.sourceGrants) {
     if (reusedSource.has(grant.id)) {
       continue
@@ -832,9 +832,9 @@ export async function createGrantsForAgent(
  */
 export async function processAuthorizationRevoked(
   webId: SocialAgentId,
-  authorizations: DataAuthorizationRef[],
+  authorizations: Array<DataAuthorizationRef>,
   grantee: string,
-  activity: { id: string; type: string[] }
+  activity: { id: string; type: Array<string> }
 ): Promise<void> {
   await deleteAuthorizations({ webId, authorizations })
   const granteeKind = await resolveGranteeKind({ webId, grantee })

@@ -9,7 +9,7 @@ import type { PodEndpointStore } from './PodEndpointStore.js'
 type LwsService = {
   type: string
   serviceEndpoint: string
-  conformsTo: string[]
+  conformsTo: Array<string>
 }
 
 /**
@@ -59,7 +59,7 @@ export class SaiAccessServiceDescriber extends LwsStorageDescriber {
 
     const origin = new URL(authorizationAgent).origin
     const segment = Buffer.from(owner).toString('base64url')
-    const services: LwsService[] = [
+    const services: Array<LwsService> = [
       {
         type: 'AccessRequestService',
         serviceEndpoint: `${origin}/.sai/access-requests/${segment}`,

@@ -23,9 +23,9 @@ interface Call {
 /** A scripted `fetch` that records every request. */
 function recordingFetch(handler: (call: Call, index: number) => Response | Promise<Response>): {
   fetch: typeof fetch
-  calls: Call[]
+  calls: Array<Call>
 } {
-  const calls: Call[] = []
+  const calls: Array<Call> = []
   const impl = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const headers: Record<string, string> = {}
     for (const [key, value] of Object.entries((init?.headers as Record<string, string>) ?? {})) {

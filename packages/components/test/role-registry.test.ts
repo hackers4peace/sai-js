@@ -61,9 +61,9 @@ const sparqlAdminUrl = `${new URL(ORG_AA).origin}/.sai/sparql-admin/${Buffer.fro
  */
 function sparqlAdminSession(roleDoc: unknown): {
   session: AuthorizationAgent
-  requests: { url: string; init?: RequestInit }[]
+  requests: Array<{ url: string; init?: RequestInit }>
 } {
-  const requests: { url: string; init?: RequestInit }[] = []
+  const requests: Array<{ url: string; init?: RequestInit }> = []
   const session = {
     fetch: async (url: string, init?: RequestInit) => {
       requests.push({ url, init })

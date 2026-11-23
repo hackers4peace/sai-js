@@ -110,7 +110,7 @@ export class PostgresKeyValueStorage<T> extends Initializer implements KeyValueS
 
     try {
       // the cursor yields batches of row objects (`{ key, value }`)
-      for await (const rows of cursor as AsyncIterableIterator<any[]>) {
+      for await (const rows of cursor as AsyncIterableIterator<Array<any>>) {
         for (const row of rows) {
           yield [row.key as string, JSON.parse(row.value) as T]
         }

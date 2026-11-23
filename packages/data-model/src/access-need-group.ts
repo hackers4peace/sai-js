@@ -5,13 +5,13 @@ import { dataModelContext } from './context.ts'
 
 export type AccessNeedGroupId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type AccessNeedGroupData = AccessNeedGroupId & {
-  hasAccessNeed: string[]
+  hasAccessNeed: Array<string>
   /** The group's access needs, loaded recursively (see the AA `accessNeedGroup` composed read). */
-  accessNeeds: AccessNeedData[]
+  accessNeeds: Array<AccessNeedData>
 }
 
 // ──────────────────────────
@@ -28,7 +28,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedGr
   return {
     id: node.id ?? node['@id'],
     type: node.type ?? [],
-    hasAccessNeed: (node.hasAccessNeed as string[] | undefined) ?? [],
+    hasAccessNeed: (node.hasAccessNeed as Array<string> | undefined) ?? [],
     accessNeeds: [],
   }
 }

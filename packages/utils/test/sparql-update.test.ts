@@ -19,7 +19,7 @@ const iri = 'https://work.alice.example/something/'
 const doc = withContext(context, { id: iri, thinks: `${iri}boop` })
 
 /** The triples inside an `INSERT DATA { … }` / `DELETE DATA { … }` block, as expanded JSON-LD. */
-const blockExpanded = (patch: string): Promise<any[]> =>
+const blockExpanded = (patch: string): Promise<Array<any>> =>
   jsonld.fromRDF(patch.replace(/^\w+ DATA \{ /, '').replace(/ \}$/, ''), {
     format: 'application/n-quads',
   })

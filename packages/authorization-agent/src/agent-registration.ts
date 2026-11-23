@@ -81,7 +81,7 @@ export async function removeAllAccessGrants(
 export async function replaceAccessGrants(
   data: AgentRegistrationData,
   fetch: WhatwgFetch,
-  grantIris: string[]
+  grantIris: Array<string>
 ): Promise<void> {
   const current = getAccessGrantIris(data)
   const currentSet = new Set(current)

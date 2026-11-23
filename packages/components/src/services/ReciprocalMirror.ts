@@ -62,7 +62,7 @@ const fetcher = new SparqlEndpointFetcher()
  */
 export async function toGraphBlocks(nquads: string): Promise<string> {
   const quads = new Parser({ format: 'N-Quads' }).parse(nquads)
-  const byGraph = new Map<string, Quad[]>()
+  const byGraph = new Map<string, Array<Quad>>()
   for (const quad of quads) {
     const graph = quad.graph.termType === 'DefaultGraph' ? '' : quad.graph.value
     const bucket = byGraph.get(graph)
@@ -72,7 +72,7 @@ export async function toGraphBlocks(nquads: string): Promise<string> {
       byGraph.set(graph, [quad])
     }
   }
-  const blocks: string[] = []
+  const blocks: Array<string> = []
   for (const [graph, graphQuads] of byGraph) {
     const triples = await new Promise<string>((resolve, reject) => {
       const writer = new Writer({ format: 'N-Triples' })
@@ -207,11 +207,10 @@ export async function updateReciprocalMirror(
 
   // each document becomes a named graph — as a `GRAPH <…> { … }` block, which
   // is what SPARQL `INSERT DATA` accepts (N-Quads lines are invalid there)
-  const inserts: string[] = []
-  for (const [graphIri, doc] of [[reciprocalIri, reciprocalDoc], ...grantDocs.entries()] as [
-    string,
-    unknown,
-  ][]) {
+  const inserts: Array<string> = []
+  for (const [graphIri, doc] of [[reciprocalIri, reciprocalDoc], ...grantDocs.entries()] as Array<
+    [string, unknown]
+  >) {
     inserts.push(await toGraphBlocks(await toNQuads({ '@id': graphIri, '@graph': doc })))
   }
 
@@ -230,7 +229,7 @@ export async function updateReciprocalMirror(
 export async function mirroredGrants(
   sparqlEndpoint: string,
   reciprocalIri: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const bindingsStream = await fetcher.fetchBindings(
     sparqlEndpoint,
     `SELECT DISTINCT ?grant WHERE {

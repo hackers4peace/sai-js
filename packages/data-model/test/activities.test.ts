@@ -36,7 +36,13 @@ describe('ActivityData typed union', () => {
       createdAt: string
       type: ['Activity', 'InvitationAccepted', 'as:Accept']
       actor: string
-      object: { id: string; type: string[]; capabilityUrl: string; label: string; note?: string }
+      object: {
+        id: string
+        type: Array<string>
+        capabilityUrl: string
+        label: string
+        note?: string
+      }
     }>()
     // live link (InvitationCreated) — the object is the pre-minted invitation IRI
     expectTypeOf<InvitationCreated>().toMatchTypeOf<{
@@ -51,13 +57,13 @@ describe('ActivityData typed union', () => {
       type: ['Activity', 'AuthorizationGranted']
       actor: string
       target: string
-      object: string[]
+      object: Array<string>
     }>()
     expectTypeOf<RoleMembershipChanged>().toMatchTypeOf<{
       type: ['Activity', 'RoleMembershipChanged']
       actor: string
       target: string
-      object: string[]
+      object: Array<string>
     }>()
   })
 

@@ -36,7 +36,7 @@ function verifier(): SaiSelfIssuedAccessTokenVerifier {
 interface TokenOverrides {
   typ?: string
   iss?: string
-  aud?: string | string[]
+  aud?: string | Array<string>
   sub?: string
   client?: string
   cnf?: unknown

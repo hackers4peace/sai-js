@@ -50,7 +50,7 @@ const commonQuads = [
 
 async function toJsonLdAndCheck(
   data: Omit<FinalDataAuthorizationData, 'id'>,
-  expectedQuads: any[]
+  expectedQuads: Array<any>
 ) {
   const finalData: FinalDataAuthorizationData = { id: snippetIri, ...data }
   const dataset = await toStore(DataAuthorization.toJsonLd(finalData), snippetIri)

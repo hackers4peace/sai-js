@@ -44,16 +44,16 @@ export async function forwardNeedBasedAccessRequest(
     'http://www.w3.org/ns/odrl.jsonld',
     'https://www.w3.org/ns/solid/interop-context/v1',
   ]
-  const policies: Record<string, unknown>[] = []
+  const policies: Array<Record<string, unknown>> = []
   const addNeed = (need: Record<string, unknown>, parentId?: string) => {
     const needId = need.id as string
-    const action = (need.accessMode as string[]) ?? []
-    const instances = (need.hasDataInstance as string[] | undefined) ?? []
+    const action = (need.accessMode as Array<string>) ?? []
+    const instances = (need.hasDataInstance as Array<string> | undefined) ?? []
     const registration = need.hasDataRegistration as string | undefined
     const shapeTree = need.registeredShapeTree as string | undefined
     const permission = (
-      type: string[],
-      source: string[],
+      type: Array<string>,
+      source: Array<string>,
       metadata: { registeredShapeTree?: string; hasDataRegistration?: string } = {}
     ) => {
       const permissionId = `urn:uuid:${crypto.randomUUID()}`
@@ -114,11 +114,14 @@ export async function forwardNeedBasedAccessRequest(
       policy.permission = [permission(['AssetCollection', 'st:ShapeTree'], [shapeTree as string])]
     }
     policies.push(policy)
-    for (const child of (need.hasInheritingNeed as Record<string, unknown>[] | undefined) ?? []) {
+    for (const child of (need.hasInheritingNeed as Array<Record<string, unknown>> | undefined) ??
+      []) {
       addNeed(child, needId)
     }
   }
-  for (const need of input.request.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]) {
+  for (const need of input.request.hasAccessNeedGroup.hasAccessNeed as Array<
+    Record<string, unknown>
+  >) {
     addNeed(need)
   }
   const response = await session.fetch(endpoint, {
@@ -189,13 +192,13 @@ export async function materializeNeedBasedAccessRequest(
  * Returns the snapshot ids of the requests to close.
  */
 export function matchGrantedRequests(
-  requests: OpenSentAccessRequest[],
+  requests: Array<OpenSentAccessRequest>,
   grants: Array<{
     grant: string
     grantedBy: string
     shapeTree: string
     scope?: string
-    instances?: string[]
+    instances?: Array<string>
   }>
 ): Set<string> {
   const granted = new Set<string>()

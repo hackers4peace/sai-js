@@ -20,7 +20,7 @@ const seededGrantCount = 9
 const parent = 'https://registry/acme/p3j7mq' // Project, AllFromAgent
 const child = 'https://registry/acme/m9k4wr' // Task, Inherited
 
-function revokePayload(authorizations: string[]) {
+function revokePayload(authorizations: Array<string>) {
   return rpcPayload({
     _tag: 'RevokeAuthorizations',
     authorizations,

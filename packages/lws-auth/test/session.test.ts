@@ -47,12 +47,12 @@ afterEach(() => {
 
 interface Fake {
   fetch: WhatwgFetch
-  requests: RecordedRequest[]
+  requests: Array<RecordedRequest>
 }
 
 /** A recording fetch; oauth4webapi fetches the JWKS with the global fetch, which is stubbed too. */
 function fakeFetch(handler: (url: URL, request: RecordedRequest) => Response | Promise<Response>) {
-  const requests: RecordedRequest[] = []
+  const requests: Array<RecordedRequest> = []
   const fetchImpl = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const request = new Request(input, init)
     const url = new URL(request.url)

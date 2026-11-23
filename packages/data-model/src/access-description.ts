@@ -2,7 +2,7 @@ import { type LanguageMap } from '@janeirodigital/interop-utils'
 
 export type AccessDescriptionId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type AccessDescriptionData = AccessDescriptionId & {

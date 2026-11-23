@@ -179,7 +179,7 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
     )
     expect(activity.type).toEqual(['Activity', 'AuthorizationDenied'])
     // a single rdf:type frames as a scalar — normalized back to string[]
-    expect((activity as { object: { type: string[] } }).object.type).toEqual([
+    expect((activity as { object: { type: Array<string> } }).object.type).toEqual([
       'http://www.w3.org/ns/solid/interop#AuthorizationStructure',
     ])
     expect((activity as { object: { grantee: string } }).object.grantee).toBe(
@@ -230,15 +230,15 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
       'https://registry/alice/grant',
       mockFetch(doc)
     )) as unknown as {
-      type: string[]
-      object: {
+      type: Array<string>
+      object: Array<{
         id: string
         grantee: string
         scopeOfAuthorization: string
         satisfiesAccessNeed?: string
-        hasInheritingAuthorization?: string[]
+        hasInheritingAuthorization?: Array<string>
         inheritsFromAuthorization?: string
-      }[]
+      }>
     }
     expect(activity.type).toEqual(['Activity', 'AuthorizationGranted'])
     expect(activity.object).toHaveLength(2)
@@ -289,8 +289,12 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
       'https://registry/alice/share-single',
       mockFetch(doc)
     )) as unknown as {
-      type: string[]
-      object: { grantee: string; scopeOfAuthorization: string; hasDataInstance?: string[] }[]
+      type: Array<string>
+      object: Array<{
+        grantee: string
+        scopeOfAuthorization: string
+        hasDataInstance?: Array<string>
+      }>
     }
     expect(activity.type).toEqual(['Activity', 'AuthorizationGranted'])
     expect(activity.object).toHaveLength(1)
@@ -359,7 +363,7 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
     expect(activity.actor).toBe('https://id/bob')
     // no target — dropped with the light ref form
     expect((activity as Record<string, unknown>).target).toBeUndefined()
-    expect((activity as { object: { id: string; type: string[] } }).object).toEqual({
+    expect((activity as { object: { id: string; type: Array<string> } }).object).toEqual({
       id: 'urn:uuid:5c9e3a72-4d1f-4a8b-9c2e-0f1a2b3c4d5e',
       // the class term has a context def — frames to the BARE term (same
       // normalization the Sent snapshot's type goes through)
@@ -385,7 +389,7 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
       mockFetch(doc)
     )
     expect(activity.type).toEqual(['Activity', 'AccessRequestArchived'])
-    expect((activity as { object: { type: string[] } }).object.type).toEqual([
+    expect((activity as { object: { type: Array<string> } }).object.type).toEqual([
       'NeedBasedAccessRequest',
     ])
   })
@@ -512,7 +516,7 @@ describe('ActivityRegistry — registry plane', () => {
   test('frames an activity body from its graph', async () => {
     const activity = (await ActivityRegistry.getActivity(transport(), PENDING)) as unknown as {
       id: string
-      type: string[]
+      type: Array<string>
     }
     expect(activity.id).toBe(PENDING)
     expect(activity.type).toEqual(['Activity', 'InvitationCreated', 'as:Create'])

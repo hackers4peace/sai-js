@@ -60,7 +60,7 @@ describe('loadDataInstance — flat LWS parent resolution (`up` link)', () => {
   }
 
   test('the instance response `Link: rel="up"` supplies partOf + the registration', async () => {
-    const calls: string[] = []
+    const calls: Array<string> = []
     const fakeFetch = (async (url: string, init?: RequestInit) => {
       calls.push(`${init?.method ?? 'GET'} ${url}`)
       if (url === instance && init?.method === 'HEAD') {

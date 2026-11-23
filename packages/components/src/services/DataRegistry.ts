@@ -45,7 +45,7 @@ const buildDataRegistry = async (
   // context allowlist (personal: session, org: `/sparql-admin?pod=`).
   const transport = sparqlTransportForPod(ctx, registry.id)
   const iris = await listContained(transport, registry.id)
-  const registrations: S.Schema.Type<typeof DataRegistration>[] = []
+  const registrations: Array<S.Schema.Type<typeof DataRegistration>> = []
   for (const iri of iris) {
     const registration = await getDataRegistrationFromSparql(transport, iri)
     const shapeTree = await loadShapeTree(registration.registeredShapeTree, ctx.session.fetch)
@@ -74,12 +74,12 @@ const buildDataRegistry = async (
 
 const buildDataRegistryForGrant = async (
   registryIri: string,
-  accessGrants: GrantData[],
+  accessGrants: Array<GrantData>,
   descriptionsLang: string,
   ctx: ResolvedContext
 ) => {
   const seen = new Set<string>()
-  const registrations: S.Schema.Type<typeof DataRegistration>[] = []
+  const registrations: Array<S.Schema.Type<typeof DataRegistration>> = []
   for (const accessGrant of accessGrants) {
     if (seen.has(accessGrant.hasDataRegistration)) {
       continue
@@ -105,17 +105,17 @@ const buildDataRegistryForGrant = async (
   })
 }
 
-function indexFromGrants(accessGrants: GrantData[]): Record<string, GrantData[]> {
+function indexFromGrants(accessGrants: Array<GrantData>): Record<string, Array<GrantData>> {
   return accessGrants.reduce(
     (acc, accessGrant) => {
       const regIri = Grant.dataRegistryIri(accessGrant)
       if (!acc[regIri]) {
-        acc[regIri] = [] as GrantData[]
+        acc[regIri] = [] as Array<GrantData>
       }
       acc[regIri].push(accessGrant)
       return acc
     },
-    {} as Record<string, GrantData[]>
+    {} as Record<string, Array<GrantData>>
   )
 }
 
@@ -126,7 +126,10 @@ function indexFromGrants(accessGrants: GrantData[]): Record<string, GrantData[]>
  * `sparqlTransportFor`: personal → internal endpoint, org → `/sparql-admin`;
  * peer `.acr`s never grant the admin.
  */
-async function reciprocalGrants(ctx: ResolvedContext, reciprocalIri: string): Promise<GrantData[]> {
+async function reciprocalGrants(
+  ctx: ResolvedContext,
+  reciprocalIri: string
+): Promise<Array<GrantData>> {
   return getReciprocalGrants(sparqlTransportFor(ctx), reciprocalIri)
 }
 
@@ -142,7 +145,7 @@ async function reciprocalGrants(ctx: ResolvedContext, reciprocalIri: string): Pr
 async function accessGrantIndexForAgent(
   ctx: ResolvedContext,
   agentId: string
-): Promise<Record<string, GrantData[]>> {
+): Promise<Record<string, Array<GrantData>>> {
   const socialAgentRegistration = await findSocialAgentRegistrationInContext(ctx, agentId)
   const directGrants = socialAgentRegistration?.reciprocalRegistration
     ? await reciprocalGrants(ctx, socialAgentRegistration.reciprocalRegistration)
@@ -154,7 +157,7 @@ async function accessGrantIndexForAgent(
   }
 
   // fallback: scan every context registration's reciprocal grants for `dataOwner === agentId`
-  const scanned: GrantData[] = []
+  const scanned: Array<GrantData> = []
   for (const registration of await listSocialAgentRegistrations(ctx)) {
     if (!registration.reciprocalRegistration) {
       continue
@@ -243,7 +246,7 @@ export const listDataInstances = async (
     const direct = socialAgentRegistration?.reciprocalRegistration
       ? await reciprocalGrants(ctx, socialAgentRegistration.reciprocalRegistration)
       : []
-    const accessGrants: GrantData[] = direct.length
+    const accessGrants: Array<GrantData> = direct.length
       ? direct
       : Object.values(await accessGrantIndexForAgent(ctx, agentId)).flat()
     if (!accessGrants.length) {

@@ -10,7 +10,7 @@ import { dataModelContext } from './context.ts'
 export type WebIdProfileId = {
   id: string
   /** rdf:type IRIs — captured from framing on read */
-  type: string[]
+  type: Array<string>
 }
 
 /** Plain JSON representation of a WebID profile document. */

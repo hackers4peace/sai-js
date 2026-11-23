@@ -22,7 +22,7 @@ afterAll(() => {
   process.env.CSS_REG_ORIGIN = originalOrigins.reg
 })
 
-const records: SparqlEndpointRecord[] = [
+const records: Array<SparqlEndpointRecord> = [
   {
     id: 'acme-reg',
     accountId: 'acme',

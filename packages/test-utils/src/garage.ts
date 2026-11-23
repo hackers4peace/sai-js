@@ -38,7 +38,7 @@ interface StoredObjectEndpoint extends ObjectEndpointSeed {
 
 interface BucketInfo {
   id: string
-  globalAliases: string[]
+  globalAliases: Array<string>
 }
 
 interface KeyInfo {
@@ -107,14 +107,14 @@ export async function seedObjectEndpoints(
   }
 
   // list once; created resources are added to these maps
-  const buckets = await admin<BucketInfo[]>(options, 'GET', '/v2/ListBuckets')
+  const buckets = await admin<Array<BucketInfo>>(options, 'GET', '/v2/ListBuckets')
   const bucketByAlias = new Map<string, BucketInfo>()
   for (const bucket of buckets) {
     for (const alias of bucket.globalAliases ?? []) {
       bucketByAlias.set(alias, bucket)
     }
   }
-  const keys = await admin<KeyInfo[]>(options, 'GET', '/v2/ListKeys')
+  const keys = await admin<Array<KeyInfo>>(options, 'GET', '/v2/ListKeys')
   const keyByName = new Map<string, KeyInfo>(keys.map((key) => [key.name, key]))
 
   const ensureBucket = async (alias: string): Promise<BucketInfo> => {

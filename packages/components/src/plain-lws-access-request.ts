@@ -14,19 +14,21 @@ import {
  * extensions (`accessNeedGroup`, `inheritsFromNeed`, `registeredShapeTree`).
  */
 export interface PlainLwsTarget {
-  type: string[]
-  source: string[]
-  partOf?: string[]
+  type: Array<string>
+  source: Array<string>
+  partOf?: Array<string>
 }
 
 export interface PlainLwsResolvedTarget {
   registeredShapeTree: string
   hasDataRegistration?: string
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
 }
 
 /** Resolves one LWS target to SAI need scope using the owner's registry view. */
-export type PlainLwsTargetResolver = (target: PlainLwsTarget) => Promise<PlainLwsResolvedTarget[]>
+export type PlainLwsTargetResolver = (
+  target: PlainLwsTarget
+) => Promise<Array<PlainLwsResolvedTarget>>
 
 function record(value: unknown): Record<string, unknown> | undefined {
   return typeof value === 'object' && value !== null
@@ -42,7 +44,7 @@ function targetOf(permission: Record<string, unknown>): Record<string, unknown> 
   return target
 }
 
-function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>[] {
+function permissionsOf(policy: Record<string, unknown>): Array<Record<string, unknown>> {
   const raw = policy.permission
   const list = Array.isArray(raw) ? raw : raw ? [raw] : []
   if (list.length === 0) {
@@ -59,7 +61,7 @@ function permissionsOf(policy: Record<string, unknown>): Record<string, unknown>
 
 function rejectConstraints(
   policy: Record<string, unknown>,
-  permissions: readonly Record<string, unknown>[]
+  permissions: ReadonlyArray<Record<string, unknown>>
 ): void {
   if (
     policy.constraint !== undefined ||
@@ -109,7 +111,7 @@ interface Candidate {
   registeredShapeTree: string
   hasDataRegistration?: string
   hasDataInstance: Set<string>
-  accessMode: string[]
+  accessMode: Array<string>
 }
 
 function candidateKey(candidate: Candidate): string {

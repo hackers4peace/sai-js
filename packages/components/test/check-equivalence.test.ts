@@ -40,14 +40,14 @@ const KIM = 'https://id/kim'
 interface GrantOverrides extends Partial<GrantData> {
   /** legacy-named fixture fields — derived into the canonical access policy */
   grantee?: string
-  accessMode?: string[]
+  accessMode?: Array<string>
   hasStorage?: string
 }
 
 function target(
   scopeOfGrant: string,
   hasDataRegistration: string,
-  hasDataInstance: string[] | undefined,
+  hasDataInstance: Array<string> | undefined,
   storage: string
 ): GrantTargetInput {
   return { scopeOfGrant, owner: ALICE, hasDataRegistration, hasDataInstance, storage }
@@ -81,7 +81,7 @@ function grant(overrides: GrantOverrides = {}): GrantData {
         assigner: ACME,
         assignee: grantee,
         actions: accessMode,
-      }) as OdrlPolicy[]),
+      }) as Array<OdrlPolicy>),
     grantedBy: ACME,
     dataOwner: ALICE,
     registeredShapeTree: PROJECT_TREE,
@@ -105,7 +105,7 @@ function child(overrides: GrantOverrides = {}): GrantData {
 }
 
 /** A parent with the flat-shape child links (`hasInheritingGrant` = ids). */
-function parentWith(...children: GrantData[]): GrantData {
+function parentWith(...children: Array<GrantData>): GrantData {
   return grant({ hasInheritingGrant: children.map((node) => node.id!) })
 }
 
@@ -141,7 +141,7 @@ describe('grantFieldsEqual', () => {
     expect(grantFieldsEqual(a, b)).toBe(true)
   })
 
-  const scalarChanges: [keyof GrantData, string][] = [
+  const scalarChanges: Array<[keyof GrantData, string]> = [
     ['grantedBy', 'https://id/bob'],
     ['dataOwner', 'https://id/bob'],
     ['registeredShapeTree', 'https://data/shapetrees/trees/Other'],
@@ -217,7 +217,7 @@ describe('grantTrees', () => {
 describe('delegatedGrantTrees', () => {
   test('builds a tree from embedded child objects', () => {
     const embeddedParent = grant({
-      hasInheritingGrant: [child({ id: undefined })] as unknown as string[],
+      hasInheritingGrant: [child({ id: undefined })] as unknown as Array<string>,
     })
     const [root] = delegatedGrantTrees([embeddedParent])
     expect(root.children).toHaveLength(1)
@@ -234,10 +234,10 @@ describe('delegatedGrantTrees', () => {
     const middle = child({
       id: undefined,
       inheritsFromGrant: undefined,
-      hasInheritingGrant: [grandchild] as unknown as string[],
+      hasInheritingGrant: [grandchild] as unknown as Array<string>,
     })
     const [root] = delegatedGrantTrees([
-      grant({ hasInheritingGrant: [middle] as unknown as string[] }),
+      grant({ hasInheritingGrant: [middle] as unknown as Array<string> }),
     ])
     expect(root.children[0].children[0].grant.registeredShapeTree).toBe(PROJECT_TREE)
   })
@@ -399,7 +399,7 @@ describe('pairTrees', () => {
   test('pairs an embedded delegated tree against a flat existing tree', () => {
     const embedded = grant({
       id: undefined,
-      hasInheritingGrant: [child({ id: undefined })] as unknown as string[],
+      hasInheritingGrant: [child({ id: undefined })] as unknown as Array<string>,
     })
     const existing = grantTrees([parentWith(child()), child()])
     const pairs = pairTrees(delegatedGrantTrees([embedded]), existing)

@@ -39,7 +39,7 @@ let keys: GenerateKeyPairResult
 let publicJwk: JWK
 
 /** The wire shape expected from the handler: no assigner, assignee = subject. */
-function idJagShape(access: any[], assignee: string): unknown[] {
+function idJagShape(access: Array<any>, assignee: string): Array<unknown> {
   return access.map((policy) => {
     const { assigner: _policyAssigner, ...rest } = policy
     return {
@@ -379,7 +379,7 @@ describe('IdJagTokenHandler', () => {
 
   test('derives the access claim from the grants for the requested storage', async () => {
     const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
-    const lookups: unknown[] = []
+    const lookups: Array<unknown> = []
     const { handler } = buildHandler({
       claimValidator: {
         validate: async () => undefined,
@@ -412,7 +412,7 @@ describe('IdJagTokenHandler', () => {
 
   test('validates a client-supplied delegated claim like an incoming ID-JAG', async () => {
     const claim = accessClaim({ assigner: YOYO, assignee: CLAIM_SUBJECT })
-    const validated: unknown[] = []
+    const validated: Array<unknown> = []
     const { handler } = buildHandler({
       claimValidator: {
         validate: async (input) => {
@@ -520,7 +520,7 @@ describe('IdJagTokenHandler', () => {
       getPrivateKey: async () => (await exportJWK(keys.privateKey)) as JWK & { alg: 'ES256' },
     }
     const verifier = new StubIdJagVerifier(claim)
-    const validated: unknown[] = []
+    const validated: Array<unknown> = []
     const handler = new TestIdJagTokenHandler({
       issuer: new IdJagIssuer(BASE_URL, generator, 300),
       verifier,
@@ -564,7 +564,7 @@ describe('IdJagTokenHandler', () => {
       sub: YOYO,
       client_id: BASE_URL,
     })
-    const rewritten = (payload.access as any[])[0]
+    const rewritten = (payload.access as Array<any>)[0]
     const original = claim[0]
     expect(rewritten).toMatchObject({
       assignee: YOYO,

@@ -50,7 +50,7 @@ function addToRegistryListing(trig: string, handle: string): string {
 
 const stripP = (s: string): string => s.replace(/^\s*PREFIX .*\n/gm, '')
 
-function registryContent(handle: string, data: string[]): string {
+function registryContent(handle: string, data: Array<string>): string {
   const id = `https://registry/${handle}/`
   const webId = `https://id/${handle}`
   const uas = `https://auth/.sai/agents/${b64(webId)}`
@@ -105,10 +105,10 @@ GRAPH <https://registry/${handle}/role/> {
 
 function kvEntries(
   handle: string,
-  data: string[],
+  data: Array<string>,
   accountId: string,
-  podIds: string[],
-  ownerIds: string[],
+  podIds: Array<string>,
+  ownerIds: Array<string>,
   webIdLinkId: string,
   cookieId: string,
   email: Option.Option<string>

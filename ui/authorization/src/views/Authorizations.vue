@@ -133,7 +133,7 @@ interface AuthorizationNode {
 interface AuthorizationGroup {
   key: string
   dataOwner?: string
-  nodes: AuthorizationNode[]
+  nodes: Array<AuthorizationNode>
 }
 
 const router = useRouter()
@@ -154,7 +154,7 @@ const revoking = ref(false)
 const revokeError = ref<string>()
 
 const childrenById = computed(() => {
-  const children = new Map<string, string[]>()
+  const children = new Map<string, Array<string>>()
   for (const authorization of appStore.authorizationList) {
     const parent = authorization.inheritsFromAuthorization
     if (!parent) {
@@ -167,8 +167,8 @@ const childrenById = computed(() => {
   return children
 })
 
-function descendantsOf(id: string): string[] {
-  const result: string[] = []
+function descendantsOf(id: string): Array<string> {
+  const result: Array<string> = []
   const stack = [...(childrenById.value.get(id) ?? [])]
   while (stack.length > 0) {
     const child = stack.pop()!
@@ -254,13 +254,13 @@ const granteeLabel = computed(() => {
   )
 })
 
-const groups = computed<AuthorizationGroup[]>(() => {
+const groups = computed<Array<AuthorizationGroup>>(() => {
   const sorted = appStore.authorizationList.toSorted(
     (a, b) => a.shapeTreeLabel.localeCompare(b.shapeTreeLabel) || a.id.localeCompare(b.id)
   )
   const byId = new Map(sorted.map((authorization) => [authorization.id, authorization]))
-  const children = new Map<string, DataAuthorization[]>()
-  const roots: DataAuthorization[] = []
+  const children = new Map<string, Array<DataAuthorization>>()
+  const roots: Array<DataAuthorization> = []
   for (const authorization of sorted) {
     const parent = authorization.inheritsFromAuthorization
     if (parent && byId.has(parent)) {
@@ -275,8 +275,8 @@ const groups = computed<AuthorizationGroup[]>(() => {
   // Build the tree once across the whole list: a child whose own `dataOwner`
   // is missing still nests under its parent and joins the parent's group.
   const seen = new Set<string>()
-  const nodesFor = (root: DataAuthorization): AuthorizationNode[] => {
-    const nodes: AuthorizationNode[] = []
+  const nodesFor = (root: DataAuthorization): Array<AuthorizationNode> => {
+    const nodes: Array<AuthorizationNode> = []
     const visit = (authorization: DataAuthorization, depth: number) => {
       if (seen.has(authorization.id)) {
         return
@@ -291,7 +291,7 @@ const groups = computed<AuthorizationGroup[]>(() => {
     return nodes
   }
 
-  const byOwner = new Map<string, AuthorizationNode[]>()
+  const byOwner = new Map<string, Array<AuthorizationNode>>()
   for (const root of roots) {
     const key = root.dataOwner ?? ''
     const nodes = byOwner.get(key) ?? []
@@ -355,7 +355,7 @@ function modeLabel(mode: string): string {
   return key ? $t(key) : name
 }
 
-function chooseIcon(access: readonly string[]): string {
+function chooseIcon(access: ReadonlyArray<string>): string {
   return access.some((mode) => tail(mode) === 'modify' || tail(mode) === 'create')
     ? 'mdi-square-edit-outline'
     : 'mdi-eye-outline'

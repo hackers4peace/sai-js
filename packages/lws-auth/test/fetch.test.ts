@@ -30,7 +30,7 @@ interface World {
   fetch: WhatwgFetch
   requests: ReturnType<typeof createFakeFetch>['requests']
   /** The ID-JAGs the UAS minted, in order. */
-  grants: string[]
+  grants: Array<string>
   clock(): number
 }
 
@@ -41,7 +41,7 @@ interface World {
 function createWorld(options: { grantLifetime?: number } = {}): World {
   const grantLifetime = options.grantLifetime ?? 300
   let clock = Date.UTC(2026, 10, 14, 12, 0, 0)
-  const grants: string[] = []
+  const grants: Array<string> = []
 
   const server = (url: URL): string => `https://${url.host}/`
   const storageOf = (href: string): string | undefined =>
@@ -165,7 +165,7 @@ describe('createLwsAuthFetch', () => {
 
   test('keys access-claim grants by authorization server and storage', async () => {
     const world = createWorld()
-    const claims: unknown[] = []
+    const claims: Array<unknown> = []
     const fetch = createLwsAuthFetch({
       credential: createCredential(),
       fetch: world.fetch,
@@ -351,7 +351,7 @@ describe('createIdJagFetch', () => {
 
   function createSaiWorld(options: { staleFirst?: string } = {}) {
     let counter = 0
-    const grants: string[] = []
+    const grants: Array<string> = []
     const world = createFakeFetch((url, request): Response | undefined => {
       if (url.href === UAS_TOKEN && request.method === 'POST') {
         const audience = formBody(request).get('audience') ?? ''

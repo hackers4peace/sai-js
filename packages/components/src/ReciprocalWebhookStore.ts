@@ -80,7 +80,7 @@ export class ReciprocalWebhookStore extends Initializer {
   public async findAllBetween(
     webId: string,
     peerId: string
-  ): Promise<{ id: string; webId: string; peerId: string; channel: NotificationChannel }[]> {
+  ): Promise<Array<{ id: string; webId: string; peerId: string; channel: NotificationChannel }>> {
     return (await this.storage.find(RECIPROCAL_WEBHOOK_STORAGE_TYPE, { webId, peerId })).map(
       (rec) => ({
         ...rec,

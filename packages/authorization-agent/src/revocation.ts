@@ -27,9 +27,9 @@ export type RevocationErrorCode =
  */
 export class RevocationError extends Error {
   readonly code: RevocationErrorCode
-  readonly grants: string[]
+  readonly grants: Array<string>
 
-  constructor(code: RevocationErrorCode, grants: readonly string[], message: string) {
+  constructor(code: RevocationErrorCode, grants: ReadonlyArray<string>, message: string) {
     super(message)
     this.name = 'RevocationError'
     this.code = code

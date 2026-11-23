@@ -12,12 +12,12 @@ const G2 = 'https://registry/alice/g2'
 const CHILD = 'https://registry/alice/g-child'
 const TREE = 'https://data/shapetrees/trees/Project'
 
-const registrationGraph = (links: string[]): Quad[] =>
+const registrationGraph = (links: Array<string>): Array<Quad> =>
   links.map((grant) =>
     quad(namedNode(RECIPROCAL), namedNode(INTEROP.hasDataGrant), namedNode(grant))
   )
 
-const grantGraph = (id: string, over: { tree?: string; owner?: string } = {}): Quad[] => {
+const grantGraph = (id: string, over: { tree?: string; owner?: string } = {}): Array<Quad> => {
   const policy = namedNode(`urn:uuid:${id}-policy`)
   const permission = namedNode(`urn:uuid:${id}-permission`)
   const target = namedNode(`urn:uuid:${id}-target`)
@@ -50,8 +50,10 @@ const grantGraph = (id: string, over: { tree?: string; owner?: string } = {}): Q
  * the batching contract (two queries per registration, regardless of the link
  * count) is observable.
  */
-function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { queries: string[] } {
-  const queries: string[] = []
+function graphTransport(
+  graphs: Map<string, Array<Quad>>
+): SparqlTransport & { queries: Array<string> } {
+  const queries: Array<string> = []
   const clone = (source: Quad): Quad =>
     quad(
       namedNode(source.subject.value),
@@ -86,12 +88,12 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
       }
       return store
     },
-  } as unknown as SparqlTransport & { queries: string[] }
+  } as unknown as SparqlTransport & { queries: Array<string> }
 }
 
 describe('getReciprocalGrants — batched grantee-side read', () => {
   test('reads the link set and every linked body in two queries', async () => {
-    const graphs = new Map<string, Quad[]>([
+    const graphs = new Map<string, Array<Quad>>([
       // registration body only in the meta twin (the CSS convention)
       [`meta:${RECIPROCAL}`, registrationGraph([G1, G2])],
       [G1, grantGraph(G1)],
@@ -110,7 +112,7 @@ describe('getReciprocalGrants — batched grantee-side read', () => {
   })
 
   test('a linked grant without a mirrored body is skipped, not thrown', async () => {
-    const graphs = new Map<string, Quad[]>([
+    const graphs = new Map<string, Array<Quad>>([
       [RECIPROCAL, registrationGraph([G1, G2])],
       [G1, grantGraph(G1)],
     ])
@@ -122,7 +124,7 @@ describe('getReciprocalGrants — batched grantee-side read', () => {
   })
 
   test('framing sees the reverse inheriting edge the grantor wrote on the parent', async () => {
-    const graphs = new Map<string, Quad[]>([
+    const graphs = new Map<string, Array<Quad>>([
       [RECIPROCAL, registrationGraph([G1, CHILD])],
       [
         G1,
@@ -149,7 +151,7 @@ describe('getReciprocalGrants — batched grantee-side read', () => {
   })
 
   test('is unaffected by unrelated graphs (LDP containers)', async () => {
-    const graphs = new Map<string, Quad[]>([
+    const graphs = new Map<string, Array<Quad>>([
       [RECIPROCAL, registrationGraph([G1])],
       [G1, grantGraph(G1)],
       [

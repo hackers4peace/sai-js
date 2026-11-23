@@ -210,7 +210,7 @@ function agentLabel(webId: string): string {
 }
 
 async function save() {
-  const finalMembers: IRI[] = [
+  const finalMembers: Array<IRI> = [
     ...members.value.filter((m) => !markedForDelete.has(m)),
     ...newMembers,
   ]

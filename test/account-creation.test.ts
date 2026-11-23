@@ -133,10 +133,10 @@ describe('account creation', () => {
 
     // poll each artifact independently so a failure reports exactly what the
     // workflow did not produce (rather than a bare timeout)
-    let lastMissing: string[] = []
+    let lastMissing: Array<string> = []
     const kv = await waitFor(
       async () => {
-        const missing: string[] = []
+        const missing: Array<string> = []
         const state = (await pg.exportToJson().catch((err) => {
           missing.push(`kv(${err instanceof Error ? err.message : String(err)})`)
           return {} as Record<string, unknown>
@@ -197,7 +197,7 @@ describe('account creation', () => {
 
     // the internal endpoint registry carries an object endpoint for the data
     // pod (the S3 plan gives every data pod its own record/bucket)
-    const accountId = (kv[objectKey] as string[])[0]
+    const accountId = (kv[objectKey] as Array<string>)[0]
     const account = kv[`accounts/data/${accountId}`] as any
     const objectEndpoint = Object.values(account['**objectEndpoint**'])[0] as any
     expect(objectEndpoint).toMatchObject({

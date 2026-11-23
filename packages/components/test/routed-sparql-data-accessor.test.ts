@@ -14,10 +14,10 @@ const cssMock = vi.hoisted(() => {
     method: string
     path: string
   }
-  const instances: { endpoint: string; calls: Call[] }[] = []
+  const instances: Array<{ endpoint: string; calls: Array<Call> }> = []
   class SparqlDataAccessor {
     endpoint: string
-    calls: Call[] = []
+    calls: Array<Call> = []
     public constructor(endpoint: string) {
       this.endpoint = endpoint
       instances.push(this)
@@ -68,7 +68,7 @@ import { RoutedSparqlDataAccessor } from '../src/RoutedSparqlDataAccessor.js'
 const DATA_ENDPOINT = 'http://fuseki:3030/data-alice-home/sparql'
 const REGISTRY_ENDPOINT = 'http://fuseki:3030/reg-alice/sparql'
 
-const records: SparqlEndpointRecord[] = [
+const records: Array<SparqlEndpointRecord> = [
   {
     id: 'reg',
     accountId: 'acc',
@@ -128,7 +128,7 @@ function makeAccessor(opts: StoreOptions = {}): RoutedSparqlDataAccessor {
 
 function accessorFor(endpoint: string): {
   endpoint: string
-  calls: { method: string; path: string }[]
+  calls: Array<{ method: string; path: string }>
 } {
   const instance = cssMock.instances.find((candidate) => candidate.endpoint === endpoint)
   if (!instance) {

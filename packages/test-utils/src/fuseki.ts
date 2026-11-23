@@ -57,7 +57,7 @@ export function datasetForGraph(graphIri: string, opts: FusekiFixtureOptions): s
  * account's WebID handle and the registry origin of the environment.
  */
 export function fixturePodDatasets(
-  accounts: { webId: string; podBaseUrls: string[] }[],
+  accounts: Array<{ webId: string; podBaseUrls: Array<string> }>,
   registryOrigin: string
 ): Map<string, string> {
   const map = new Map<string, string>()
@@ -75,7 +75,7 @@ export function fixturePodDatasets(
   return map
 }
 
-function quadsToTrig(quads: Quad[]): Promise<string> {
+function quadsToTrig(quads: Array<Quad>): Promise<string> {
   return new Promise((resolve, reject) => {
     const writer = new Writer({ format: 'TriG' })
     writer.addQuads(quads)
@@ -95,8 +95,8 @@ const HAS_DATA_GRANT = 'http://www.w3.org/ns/solid/interop#hasDataGrant'
  * peer graphs are no longer visible from the owner's dataset).
  */
 function applyReciprocalMirrors(
-  byGraph: Map<string, Quad[]>,
-  byDataset: Map<string, Quad[]>
+  byGraph: Map<string, Array<Quad>>,
+  byDataset: Map<string, Array<Quad>>
 ): void {
   const datasetOfGraph = new Map<string, string>()
   for (const [dataset, quads] of byDataset) {
@@ -107,7 +107,7 @@ function applyReciprocalMirrors(
     }
   }
 
-  const links: { owner: string; target: string }[] = []
+  const links: Array<{ owner: string; target: string }> = []
   for (const [graphIri, quads] of byGraph) {
     const owner = datasetOfGraph.get(graphIri)
     if (!owner) {
@@ -154,7 +154,7 @@ export async function splitFixtureByPod(
   opts: FusekiFixtureOptions
 ): Promise<Map<string, string>> {
   const quads = new Parser({ format: 'TriG' }).parse(trig)
-  const byGraph = new Map<string, Quad[]>()
+  const byGraph = new Map<string, Array<Quad>>()
   for (const quad of quads) {
     const graph = quad.graph.termType === 'DefaultGraph' ? '' : quad.graph.value
     const bucket = byGraph.get(graph)
@@ -165,7 +165,7 @@ export async function splitFixtureByPod(
     }
   }
 
-  const byDataset = new Map<string, Quad[]>()
+  const byDataset = new Map<string, Array<Quad>>()
   for (const [graph, graphQuads] of byGraph) {
     if (!graph) {
       throw new Error('default-graph quads are not supported')

@@ -4,13 +4,13 @@ import { dataModelContext } from './context.ts'
 
 export type DataRegistrationId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type DataRegistrationData = DataRegistrationId & {
   registeredShapeTree: string
   /** Resources contained in the registration (LDP containment, server-managed). */
-  contains: string[]
+  contains: Array<string>
   /**
    * The container the registration belongs to (flat LWS storage keeps this in
    * metadata, so it does not follow from the registration's URI path).
@@ -33,7 +33,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<DataRegistra
       lwsContains: { '@embed': '@never', '@default': [] },
     }),
     DATA_REGISTRATION_TERMS
-  )) as DataRegistrationData & { lwsContains?: string[]; lwsPartOf?: string }
+  )) as DataRegistrationData & { lwsContains?: Array<string>; lwsPartOf?: string }
   // Flat LWS storage keeps membership as `lws:contains` and the parent as
   // `lws:partOf`; path-based storage uses `ldp:contains` and the URI path.
   // Both are exposed as `contains` / `partOf`.

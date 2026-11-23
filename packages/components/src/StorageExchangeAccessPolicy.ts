@@ -50,7 +50,9 @@ export class StorageExchangeAccessPolicy extends LwsTokenExchangePolicy {
     return discoverAuthorizationAgent(webId, fetch)
   }
 
-  public async determineScope(input: LwsTokenExchangePolicyInput): Promise<string[] | undefined> {
+  public async determineScope(
+    input: LwsTokenExchangePolicyInput
+  ): Promise<Array<string> | undefined> {
     // The decision is the storage AS's authorization event: record the input,
     // the minted scope and a denial so the token chain is observable end to end.
     const span = sharedTracer('sai-lws').startSpan('sai.lws.exchange-scope')

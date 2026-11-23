@@ -21,7 +21,7 @@ export interface AccessClaimValidationInput {
   /** Client of the incoming ID-JAG (Bob's UAS/client). */
   client: string
   /** Compact ODRL policies from the incoming ID-JAG. */
-  access: unknown[]
+  access: Array<unknown>
   /** JSON-LD context of `access`. */
   context: string
   /** Storage bound by the claim. */
@@ -57,7 +57,7 @@ const SCOPE_RANK: Record<string, number> = {
   [INTEROP.AllFromAgent]: 0,
 }
 
-function grantEdgeRank(batch: GrantData[]): number {
+function grantEdgeRank(batch: Array<GrantData>): number {
   return Math.max(...batch.map((grant) => SCOPE_RANK[grant.scopeOfGrant] ?? -1))
 }
 
@@ -84,8 +84,8 @@ function isRegistrationLevelEdge(batch: GrantData[]): boolean {
  * narrowest edge, which the receiving UAS can back with its own grant (the
  * Bob → YoYo → ACME chain).
  */
-function mostSpecificGrantEdge(grants: GrantData[], forStorage: boolean): GrantData[] {
-  const byAssigner = new Map<string, GrantData[]>()
+function mostSpecificGrantEdge(grants: Array<GrantData>, forStorage: boolean): Array<GrantData> {
+  const byAssigner = new Map<string, Array<GrantData>>()
   for (const grant of grants) {
     const bucket = byAssigner.get(grant.grantedBy)
     if (bucket) {
@@ -129,7 +129,7 @@ export interface AccessClaimValidator {
   find?(input: AccessClaimLookupInput): Promise<VerifiedAccessClaim | undefined>
 }
 
-function usableGrants(grants: GrantData[]): GrantData[] {
+function usableGrants(grants: Array<GrantData>): Array<GrantData> {
   const ids = new Set(grants.map((grant) => grant.id))
   return grants.filter((grant) => !grant.inheritsFromGrant || ids.has(grant.inheritsFromGrant))
 }
@@ -139,8 +139,8 @@ function usableGrants(grants: GrantData[]): GrantData[] {
  * The claim may omit the assigner; the candidate grant supplies it.
  */
 function matchingAssigners(
-  access: unknown[],
-  grants: GrantData[],
+  access: Array<unknown>,
+  grants: Array<GrantData>,
   assignees: Iterable<string>
 ): Set<string> {
   const usable = usableGrants(grants)
@@ -269,7 +269,7 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     subject: string,
     client: string,
     storage: string
-  ): Promise<GrantData[]> {
+  ): Promise<Array<GrantData>> {
     let session: Awaited<ReturnType<ReturnType<typeof buildSessionManager>['getSession']>>
     try {
       session = await buildSessionManager().getSession(subject)
@@ -305,7 +305,7 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
   }
 
   /** Load all grants in one assigner's own grant registry. */
-  private async assignerGrants(assigner: string): Promise<GrantData[]> {
+  private async assignerGrants(assigner: string): Promise<Array<GrantData>> {
     let session: Awaited<ReturnType<ReturnType<typeof buildSessionManager>['getSession']>>
     try {
       session = await buildSessionManager().getSession(assigner)

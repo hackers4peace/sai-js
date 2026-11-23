@@ -81,7 +81,7 @@ const sparqlAdminUrl = `${new URL(ORG_AA).origin}/.sai/sparql-admin/${Buffer.fro
 
 describe('getApplications — org context lists applications via /sparql-admin', () => {
   test('ldp:contains listing + per-registration body; profile from the client-id document', async () => {
-    const requests: { url: string; init?: RequestInit }[] = []
+    const requests: Array<{ url: string; init?: RequestInit }> = []
     const session = {
       fetch: async (url: string, init?: RequestInit) => {
         requests.push({ url, init })

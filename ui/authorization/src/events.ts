@@ -17,7 +17,7 @@ import { getRuntimeConfig } from './runtime-config'
 export interface ActivityEvent {
   id: string
   /** the typed activity tuple — `['Activity', '<Class>', <as:*>]` */
-  type: string[]
+  type: Array<string>
   /** as:target — absent on classes whose changed-record id rides the embedded
    *  object (`InvitationCreated` + re-pins); present elsewhere */
   target?: string

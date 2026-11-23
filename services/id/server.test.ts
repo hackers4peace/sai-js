@@ -184,7 +184,7 @@ describe('doc', () => {
     })
     expect(res.status).toBe(200)
     expect(res.headers.get('Content-Type')).toBe('application/cid')
-    const body = (await res.json()) as { service: unknown[] }
+    const body = (await res.json()) as { service: Array<unknown> }
     expect(body).toEqual({
       '@context': 'https://www.w3.org/ns/cid/v1',
       id: `https://${docOrigin}/somehandle`,

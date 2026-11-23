@@ -4,7 +4,7 @@ import { dataModelContext } from './context.ts'
 
 export type ClientIdDocumentId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type ClientIdDocumentData = ClientIdDocumentId & {

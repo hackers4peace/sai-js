@@ -13,7 +13,7 @@ const bobId = 'https://id/bob'
 const acmeId = 'https://id/acme'
 const testClient = 'https://data/test-client/public/id'
 
-async function ownerGrants(owner: string): Promise<GrantData[]> {
+async function ownerGrants(owner: string): Promise<Array<GrantData>> {
   const session: AuthorizationAgent = await buildSessionManager().getSession(owner)
   const registry = session.registrySet.hasGrantRegistry
   if (!registry) {
@@ -41,7 +41,7 @@ describe('access grant view', () => {
     })
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toContain('application/lws+json')
-    const body = (await response.json()) as Record<string, any>[]
+    const body = (await response.json()) as Array<Record<string, any>>
     expect(body.map((grant) => grant.id as string).toSorted()).toEqual(expected)
 
     // wire documents stay in the canonical LWS shape; derived POJO fields are
@@ -69,7 +69,7 @@ describe('access grant view', () => {
     const session = await buildOidcSession(bobId)
     const response = await session.authFetch(accessGrantsUrl(acmeId))
     expect(response.status).toBe(200)
-    const body = (await response.json()) as { id: string }[]
+    const body = (await response.json()) as Array<{ id: string }>
     expect(body.map((grant) => grant.id).toSorted()).toEqual(expected)
   })
 
@@ -88,7 +88,7 @@ describe('access grant view', () => {
     const session = await buildOidcSession(aliceId, testClient)
     const response = await session.authFetch(accessGrantsUrl(aliceId))
     expect(response.status).toBe(200)
-    const body = (await response.json()) as { id: string }[]
+    const body = (await response.json()) as Array<{ id: string }>
     expect(body.map((grant) => grant.id).toSorted()).toEqual(expected)
   })
 
@@ -96,9 +96,9 @@ describe('access grant view', () => {
     const session = await buildOidcSession(aliceId, testClient)
     const response = await session.authFetch(accessGrantsUrl(aliceId))
     expect(response.status).toBe(200)
-    const body = (await response.json()) as {
-      access: { permission: { assignee: string }[] }[]
-    }[]
+    const body = (await response.json()) as Array<{
+      access: Array<{ permission: Array<{ assignee: string }> }>
+    }>
     expect(body.length).toBeGreaterThan(0)
     for (const grant of body) {
       expect(grant.access[0].permission[0].assignee).toBe(testClient)
@@ -109,9 +109,9 @@ describe('access grant view', () => {
     const aliceSession = await buildOidcSession(aliceId, testClient)
     const response = await aliceSession.authFetch(accessGrantsUrl(aliceId))
     expect(response.status).toBe(200)
-    const body = (await response.json()) as {
-      access: { permission: { assigner: string; assignee: string }[] }[]
-    }[]
+    const body = (await response.json()) as Array<{
+      access: Array<{ permission: Array<{ assigner: string; assignee: string }> }>
+    }>
     // The non-UAS branch sees grants the authenticated user (Alice) assigned to
     // the client (testClient) in Alice's registry; source and delegated grants
     // share the registry now.

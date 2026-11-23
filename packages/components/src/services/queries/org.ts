@@ -156,8 +156,8 @@ function adminSparqlTransport(
       async fetchBindings(query) {
         const response = await adminSparqlQuery(adminSession, orgWebId, query, podUrl)
         const json = (await response.json()) as {
-          head: { vars: string[] }
-          results?: { bindings: Record<string, Record<string, string>>[] }
+          head: { vars: Array<string> }
+          results?: { bindings: Array<Record<string, Record<string, string>>> }
           boolean?: boolean
         }
         if (json.boolean !== undefined) {

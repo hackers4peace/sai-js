@@ -174,7 +174,7 @@ async function findUserDataRegistrations(
 }
 
 async function findSocialAgentDataRegistrations(
-  accessGrants: GrantData[],
+  accessGrants: Array<GrantData>,
   accessNeedGroup: AccessNeedGroupData,
   ctx: ResolvedContext,
   shapeTreeLabelFor: (shapeTreeIri: string) => Promise<string>
@@ -222,20 +222,20 @@ async function findSocialAgentDataRegistrations(
 
 /** Embedded need node → the composed-read `AccessNeedData` (recursive). */
 function accessNeedFromEmbedded(node: Record<string, unknown>, parentId?: string): AccessNeedData {
-  const children = ((node.hasInheritingNeed as Record<string, unknown>[] | undefined) ?? []).map(
-    (child) => accessNeedFromEmbedded(child, node.id as string)
-  )
+  const children = (
+    (node.hasInheritingNeed as Array<Record<string, unknown>> | undefined) ?? []
+  ).map((child) => accessNeedFromEmbedded(child, node.id as string))
   return {
     id: node.id as string,
-    type: (node.type as string[] | undefined) ?? [],
+    type: (node.type as Array<string> | undefined) ?? [],
     registeredShapeTree: node.registeredShapeTree as string,
     inheritsFromNeed: parentId,
     hasInheritingNeed: children.map((child) => child.id),
-    accessMode: (node.accessMode as string[]) ?? [],
+    accessMode: (node.accessMode as Array<string>) ?? [],
     required: node.required === INTEROP.AccessRequired,
     children,
     descriptionLanguages: [],
-    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as string[] } : {}),
+    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as Array<string> } : {}),
     ...(node.hasDataRegistration
       ? { hasDataRegistration: node.hasDataRegistration as string }
       : {}),
@@ -245,9 +245,9 @@ function accessNeedFromEmbedded(node: Record<string, unknown>, parentId?: string
 /** The embedded group of the request → `AccessNeedGroupData` — NO re-fetch
  *  (the group's urn:uuid ids resolve nowhere; descriptions follow-up). */
 function accessNeedGroupFromEmbedded(group: NeedBasedAccessRequestGroup): AccessNeedGroupData {
-  const accessNeeds = ((group.hasAccessNeed as unknown as Record<string, unknown>[]) ?? []).map(
-    (need) => accessNeedFromEmbedded(need)
-  )
+  const accessNeeds = (
+    (group.hasAccessNeed as unknown as Array<Record<string, unknown>>) ?? []
+  ).map((need) => accessNeedFromEmbedded(need))
   return {
     id: group.id,
     type: group.type,
@@ -310,17 +310,17 @@ export const getDescriptions = async (
       : descriptionLanguages[0]
   const shapeTreeLabelFor = shapeTreeLabel(ctx.session.fetch, descriptionsLang)
 
-  const dataOwners: {
+  const dataOwners: Array<{
     id: string & Brand<'IRI'>
     label: string
-    dataRegistrations: {
+    dataRegistrations: Array<{
       id: string & Brand<'IRI'>
       dataRegistry?: string & Brand<'IRI'>
       label: string
       shapeTree: string
       count: number
-    }[]
-  }[] = [
+    }>
+  }> = [
     {
       id: IRI.make(ctx.webId),
       label: ctx.webId, // TODO get from user's webid document
@@ -465,11 +465,11 @@ export const listAuthorizations = async (
  */
 export class AuthorizationRevocationError extends Error {
   readonly code: 'unauthorized' | 'empty-selection' | 'not-a-data-authorization' | 'mixed-grantee'
-  readonly authorizations: string[]
+  readonly authorizations: Array<string>
 
   constructor(
     code: AuthorizationRevocationError['code'],
-    authorizations: readonly string[],
+    authorizations: ReadonlyArray<string>,
     message: string
   ) {
     super(message)
@@ -492,7 +492,7 @@ export function toAuthorizationRevocationFailure(err: unknown): AuthorizationRev
         }
       case 'mixed-grantee':
       case 'unauthorized':
-        return { code: err.code, authorizations: err.authorizations as IRI[] }
+        return { code: err.code, authorizations: err.authorizations as Array<IRI> }
     }
   }
   if (err instanceof ContextError) {
@@ -513,8 +513,8 @@ export function toAuthorizationRevocationFailure(err: unknown): AuthorizationRev
  */
 export const revokeAuthorizations = async (
   ctx: ResolvedContext,
-  authorizations: readonly string[]
-): Promise<{ activityId?: string; authorizations: string[] }> => {
+  authorizations: ReadonlyArray<string>
+): Promise<{ activityId?: string; authorizations: Array<string> }> => {
   if (authorizations.length === 0) {
     throw new AuthorizationRevocationError(
       'empty-selection',
@@ -621,7 +621,7 @@ export const recordAuthorization = async (
           hasDataInstance: dataAuthorization.dataInstances
             ? [...dataAuthorization.dataInstances]
             : undefined,
-        })) satisfies DataAuthorizationStructure[])
+        })) satisfies Array<DataAuthorizationStructure>)
       : undefined,
   }
   // the approval path (§6.8): the group comes from the EMBEDDED copy in the

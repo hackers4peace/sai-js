@@ -57,7 +57,7 @@ function validatorFor(source: FinalGrantData): AccessClaimValidator {
   return new OwnerAccessClaimValidator(manager as never)
 }
 
-const input = (access: unknown[]) => ({
+const input = (access: Array<unknown>) => ({
   subject: ALICE,
   client: 'https://data/test-client/public/id',
   access,

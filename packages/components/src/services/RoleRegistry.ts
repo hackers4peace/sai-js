@@ -49,7 +49,7 @@ export const getRoles = async (ctx: ResolvedContext, lang: string) => {
 export const createRole = async (
   ctx: ResolvedContext,
   label: string,
-  members: readonly S.Schema.Type<typeof IRI>[]
+  members: ReadonlyArray<S.Schema.Type<typeof IRI>>
 ): Promise<S.Schema.Type<typeof RoleCreatedMessage>> => {
   const activityRegistry = ctx.registrySet.hasActivityRegistry
   if (!activityRegistry) {
@@ -98,7 +98,7 @@ export const updateRole = async (
   ctx: ResolvedContext,
   id: S.Schema.Type<typeof IRI>,
   label: string,
-  members: readonly S.Schema.Type<typeof IRI>[]
+  members: ReadonlyArray<S.Schema.Type<typeof IRI>>
 ): Promise<S.Schema.Type<typeof RoleMembershipChangedMessage>> => {
   // guard read: the role must exist — the workflow re-loads the before-image
   // and PATCHes; a missing role would else leave the activity pending forever

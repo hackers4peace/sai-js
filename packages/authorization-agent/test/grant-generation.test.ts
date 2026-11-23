@@ -66,9 +66,11 @@ const cloneQuad = (source: Quad): Quad =>
   )
 
 /** A fake registry plane serving only named graphs (the mirror). */
-function mirrorTransport(graphs: Map<string, Quad[]>): SparqlTransport & { queries: string[] } {
-  const queries: string[] = []
-  const allQuads = (): Quad[] => [...graphs.values()].flat()
+function mirrorTransport(
+  graphs: Map<string, Array<Quad>>
+): SparqlTransport & { queries: Array<string> } {
+  const queries: Array<string> = []
+  const allQuads = (): Array<Quad> => [...graphs.values()].flat()
   return {
     queries,
     async fetchBindings(query: string) {
@@ -122,15 +124,15 @@ function mirrorTransport(graphs: Map<string, Quad[]>): SparqlTransport & { queri
       }
       return store
     },
-  } as unknown as SparqlTransport & { queries: string[] }
+  } as unknown as SparqlTransport & { queries: Array<string> }
 }
 
 const registrationGraph = (
   id: string,
   registeredAgent: string,
   reciprocal: string,
-  grants: string[]
-): Quad[] => [
+  grants: Array<string>
+): Array<Quad> => [
   quad(namedNode(id), namedNode(RDF.type), namedNode(INTEROP.SocialAgentRegistration)),
   quad(namedNode(id), namedNode(INTEROP.registeredAgent), namedNode(registeredAgent)),
   quad(namedNode(id), namedNode(INTEROP.reciprocalRegistration), namedNode(reciprocal)),
@@ -143,11 +145,11 @@ const grantGraph = (
     shapeTree: string
     dataRegistration: string
     storage: string
-    accessMode?: string[]
+    accessMode?: Array<string>
     scopeOfGrant?: string
-    hasDataInstance?: string[]
+    hasDataInstance?: Array<string>
   }
-): Quad[] => {
+): Array<Quad> => {
   const scopeOfGrant = fields.scopeOfGrant ?? INTEROP.AllFromRegistry
   const policy = namedNode(`urn:uuid:${id}-policy`)
   const permission = namedNode(`urn:uuid:${id}-permission`)
@@ -169,7 +171,7 @@ const grantGraph = (
               scopeOfGrant === INTEROP.AllFromAgent ? [fields.storage] : [fields.dataRegistration],
           },
         ]
-  const quads: Quad[] = [
+  const quads: Array<Quad> = [
     quad(namedNode(id), namedNode(RDF.type), namedNode(LWS.AccessGrant)),
     quad(namedNode(id), namedNode(INTEROP.scopeOfGrant), namedNode(scopeOfGrant)),
     quad(namedNode(id), namedNode(LWS.access), policy),
@@ -223,7 +225,7 @@ const grantGraph = (
  * `generateChildDelegatedGrantData` walks. (There is no
  * `interop:hasInheritingGrant` term.)
  */
-function mirroredPeerGraphs(options: { withInheriting?: boolean } = {}): Map<string, Quad[]> {
+function mirroredPeerGraphs(options: { withInheriting?: boolean } = {}): Map<string, Array<Quad>> {
   const linked = [PROJECT_GRANT, TASK_GRANT, ...(options.withInheriting ? [CHILD_GRANT] : [])]
   const projectGrant = grantGraph(PROJECT_GRANT, {
     shapeTree: PROJECT_TREE,
@@ -242,7 +244,7 @@ function mirroredPeerGraphs(options: { withInheriting?: boolean } = {}): Map<str
       quad(namedNode(CHILD_GRANT), namedNode(INTEROP.inheritsFromGrant), namedNode(PROJECT_GRANT))
     )
   }
-  return new Map<string, Quad[]>([
+  return new Map<string, Array<Quad>>([
     [
       SOCIAL_AGENT_REGISTRY,
       [
@@ -277,15 +279,15 @@ function mirroredPeerGraphs(options: { withInheriting?: boolean } = {}): Map<str
               storage: TASK_STORAGE,
               scopeOfGrant: INTEROP.Inherited,
             }),
-          ] as [string, Quad[]],
-          [CHILD_AUTHORIZATION, childAuthorizationGraph()] as [string, Quad[]],
+          ] as [string, Array<Quad>],
+          [CHILD_AUTHORIZATION, childAuthorizationGraph()] as [string, Array<Quad>],
         ]
       : []),
   ])
 }
 
 /** Our child authorization (Inherited scope) — read via the registry plane. */
-const childAuthorizationGraph = (): Quad[] => [
+const childAuthorizationGraph = (): Array<Quad> => [
   quad(namedNode(CHILD_AUTHORIZATION), namedNode(RDF.type), namedNode(INTEROP.DataAuthorization)),
   quad(namedNode(CHILD_AUTHORIZATION), namedNode(INTEROP.grantee), namedNode(KIM)),
   quad(namedNode(CHILD_AUTHORIZATION), namedNode(INTEROP.grantedBy), namedNode(ACME)),
@@ -498,12 +500,12 @@ describe('delegated-grant generation — mirror only', () => {
     expect(parent.id).toBeDefined()
     // the child rides the parent as embedded data; both ids are minted in the
     // assigner's registry and the child stores `inheritsFromGrant` on write
-    const [child] = parent.hasInheritingGrant as unknown as {
+    const [child] = parent.hasInheritingGrant as unknown as Array<{
       registeredShapeTree: string
       scopeOfGrant: string
       hasDataRegistration: string
       dataOwner: string
-    }[]
+    }>
     expect(child).toMatchObject({
       registeredShapeTree: TASK_TREE,
       scopeOfGrant: INTEROP.Inherited,

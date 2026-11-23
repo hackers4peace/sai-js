@@ -29,7 +29,7 @@ vi.mock('../src/builders/sessionManager.js', () => ({
 const sparqlMock = vi.hoisted(() => {
   const handlers: {
     bindings?: (query: string) => Array<Record<string, { termType: string; value: string }>>
-    triples?: (query: string) => unknown[]
+    triples?: (query: string) => Array<unknown>
   } = {}
   return { handlers }
 })
@@ -165,7 +165,7 @@ describe('findRoleUsage — authorizations sweep via SPARQL', () => {
       }))
     }
     sparqlMock.handlers.triples = (query) => {
-      const graphs: Record<string, unknown[]> = {
+      const graphs: Record<string, Array<unknown>> = {
         [AUTHZ_GRANTEE]: authzGraph(AUTHZ_GRANTEE, INTEROP.DataAuthorization, ROLE_ID, ALICE),
         [AUTHZ_ADMIN]: authzGraph(
           AUTHZ_ADMIN,
@@ -242,8 +242,8 @@ describe('findAffectedGrantees — delegation sweep via SPARQL', () => {
     roleId: roleId ? ({ id: roleId, type: [INTEROP.Role] } as never) : undefined,
   })
 
-  const routeTriples = (query: string): unknown[] => {
-    const graphs: Record<string, unknown[]> = {
+  const routeTriples = (query: string): Array<unknown> => {
+    const graphs: Record<string, Array<unknown>> = {
       [AUTHZ_DELEG]: authzGraph(AUTHZ_DELEG, INTEROP.DataAuthorization, GRANTEE_A, PEER),
       [AUTHZ_ALL]: authzGraph(
         AUTHZ_ALL,

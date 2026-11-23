@@ -251,7 +251,7 @@ async function fetchRegistrySetAcr(webId: string): Promise<{ acrId: string; doc:
 }
 
 /** `acp:agent` values of every matcher under the registry set's `#fullAdminAccess`. */
-async function fullAdminAccessAgents(webId: string): Promise<string[]> {
+async function fullAdminAccessAgents(webId: string): Promise<Array<string>> {
   const { acrId, doc } = await fetchRegistrySetAcr(webId)
   const store = await toStore(doc as Record<string, unknown>, acrId)
   const policies = new Set<string>()
@@ -266,7 +266,7 @@ async function fullAdminAccessAgents(webId: string): Promise<string[]> {
       matchers.add(quad.object.value)
     }
   }
-  const agents: string[] = []
+  const agents: Array<string> = []
   for (const quad of store) {
     if (matchers.has(quad.subject.value) && quad.predicate.value === acp.agent) {
       agents.push(quad.object.value)
@@ -276,7 +276,7 @@ async function fullAdminAccessAgents(webId: string): Promise<string[]> {
 }
 
 /** `target`s of every completion in the webId's Activity Registry. */
-async function completedActivityTargets(webId: string): Promise<string[]> {
+async function completedActivityTargets(webId: string): Promise<Array<string>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(webId)
   return ActivityRegistry.getCompletedActivityIris(
@@ -286,12 +286,12 @@ async function completedActivityTargets(webId: string): Promise<string[]> {
 }
 
 /** AdminGrant IRIs in the webId's GrantRegistry for the given grantee. */
-async function adminGrantIris(webId: string, grantee: string): Promise<string[]> {
+async function adminGrantIris(webId: string, grantee: string): Promise<Array<string>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(webId)
   const registry = session.registrySet.hasGrantRegistry
   const iris = await containedIris(session, registry.id)
-  const adminGrants: string[] = []
+  const adminGrants: Array<string> = []
   for (const iri of iris) {
     const grant = await loadGrant(iri, session.fetch)
     if (grant.type.includes(INTEROP.AdminGrant) && grantGrantee(grant) === grantee) {

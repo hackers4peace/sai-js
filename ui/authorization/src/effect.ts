@@ -268,7 +268,7 @@ export async function authorizeApp(
   return Effect.runPromise(program)
 }
 
-export async function revokeAuthorizations(authorizations: readonly string[], context: string) {
+export async function revokeAuthorizations(authorizations: ReadonlyArray<string>, context: string) {
   const program = Effect.gen(function* () {
     const client = yield* makeClient
     return yield* client.RevokeAuthorizations({
@@ -281,7 +281,7 @@ export async function revokeAuthorizations(authorizations: readonly string[], co
 
 export async function createRole(
   label: string,
-  members: readonly S.Schema.Type<typeof IRI>[],
+  members: ReadonlyArray<S.Schema.Type<typeof IRI>>,
   context: string
 ) {
   const program = Effect.gen(function* () {
@@ -294,7 +294,7 @@ export async function createRole(
 export async function updateRole(
   id: S.Schema.Type<typeof IRI>,
   label: string,
-  members: readonly S.Schema.Type<typeof IRI>[],
+  members: ReadonlyArray<S.Schema.Type<typeof IRI>>,
   context: string
 ) {
   const program = Effect.gen(function* () {

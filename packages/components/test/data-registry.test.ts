@@ -72,7 +72,7 @@ function orgCtx(session: AuthorizationAgent): ResolvedContext {
 
 describe('getDataRegistries — org context lists own data registries via /sparql-admin', () => {
   test('ldp:contains listing + per-registration body; storage description stays HTTP', async () => {
-    const requests: { url: string; init?: RequestInit }[] = []
+    const requests: Array<{ url: string; init?: RequestInit }> = []
     const sessionFetch = async (url: string, init?: RequestInit) => {
       requests.push({ url, init })
       if (url === ORG_WEBID) {
@@ -199,7 +199,7 @@ describe('listDataInstances — org context lists the org’s own instances', ()
   const ENTITY = 'http://www.w3.org/2004/02/skos/core#prefLabel'
 
   test('membership via /sparql-admin?pod=, instance content via the storage fetch', async () => {
-    const requests: { url: string; init?: RequestInit }[] = []
+    const requests: Array<{ url: string; init?: RequestInit }> = []
     const registrationDocWithInstance = {
       '@id': DATA_REG,
       '@type': ['http://www.w3.org/ns/solid/interop#DataRegistration'],
@@ -216,7 +216,7 @@ describe('listDataInstances — org context lists the org’s own instances', ()
       'http://www.w3.org/ns/shapetrees#references': [],
     }
     const instanceDoc = { '@id': INSTANCE, [ENTITY]: [{ '@value': 'Ghost' }] }
-    const storageReads: { storage: string; url: string }[] = []
+    const storageReads: Array<{ storage: string; url: string }> = []
 
     const sessionFetch = async (url: string, init?: RequestInit) => {
       requests.push({ url, init })

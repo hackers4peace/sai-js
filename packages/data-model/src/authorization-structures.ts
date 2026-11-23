@@ -20,7 +20,7 @@ export type DataAuthorizationStructure = {
   scopeOfAuthorization: string
   dataOwner?: string
   hasDataRegistration?: string
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
 }
 
 /** RPC-shaped authorization consumed by `recordAuthorization` (components —
@@ -32,17 +32,17 @@ export type AuthorizationStructure = {
   grantee: string
   hasAccessNeedGroup?: string
   granted: boolean
-  dataAuthorizations?: DataAuthorizationStructure[]
+  dataAuthorizations?: Array<DataAuthorizationStructure>
 }
 
 // TODO: duplicates ShareAuthorization from api-messages (sai-impl-service)
 export type ShareDataInstanceStructure = {
   applicationId: string
   resource: string
-  accessMode: string[]
-  children: {
+  accessMode: Array<string>
+  children: Array<{
     shapeTree: string
-    accessMode: string[]
-  }[]
-  agents: string[]
+    accessMode: Array<string>
+  }>
+  agents: Array<string>
 }

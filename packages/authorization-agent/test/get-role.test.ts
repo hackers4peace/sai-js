@@ -10,7 +10,7 @@ const ROLE_IRI = 'https://registry/kim/r1'
 const CLIENT_ID_IRI = 'https://vuejectron.docker/id'
 
 /** A fake transport serving the given triples for ANY graphDoc CONSTRUCT. */
-function storeTransport(...quads: ReturnType<typeof DataFactory.quad>[]): SparqlTransport {
+function storeTransport(...quads: Array<ReturnType<typeof DataFactory.quad>>): SparqlTransport {
   const store = new Store()
   store.addQuads(quads)
   return {

@@ -12,9 +12,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const h = vi.hoisted(() => {
   const activities = {
-    getAuthorizations: vi.fn(async () => [] as { id: string; type: string[] }[]),
-    getExistingGrants: vi.fn(async () => [] as { id: string; type: string[] }[]),
-    getRegistryGrantsForGrantee: vi.fn(async () => [] as { id: string; type: string[] }[]),
+    getAuthorizations: vi.fn(async () => [] as Array<{ id: string; type: Array<string> }>),
+    getExistingGrants: vi.fn(async () => [] as Array<{ id: string; type: Array<string> }>),
+    getRegistryGrantsForGrantee: vi.fn(
+      async () => [] as Array<{ id: string; type: Array<string> }>
+    ),
     generateGrants: vi.fn(async () => ({ sourceGrants: [], delegatedGrants: [] })),
     checkEquivalence: vi.fn(async () => ({
       reusedSourceIds: [],
@@ -23,7 +25,7 @@ const h = vi.hoisted(() => {
     })),
     storeAccessGrant: vi.fn(async () => {}),
     createAcr: vi.fn(async () => {}),
-    revokeGrantClosure: vi.fn(async () => [] as string[]),
+    revokeGrantClosure: vi.fn(async () => [] as Array<string>),
     replaceAccessGrantsOnRegistration: vi.fn(async () => {}),
   }
   return { activities }

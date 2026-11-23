@@ -67,8 +67,8 @@ export interface SparqlTransport {
   fetchTriples(query: string): Promise<DatasetCore>
 }
 
-async function arrayifyStream<T>(stream: unknown): Promise<T[]> {
-  const items: T[] = []
+async function arrayifyStream<T>(stream: unknown): Promise<Array<T>> {
+  const items: Array<T> = []
   // fetch-sparql-endpoint declares its streams as raw node streams; at
   // runtime they are object-mode Readables emitting bindings/quads, so
   // for-await collects the emitted values (same semantics as CSS
@@ -190,7 +190,7 @@ export async function graphDoc(transport: SparqlTransport, iri: string): Promise
 export async function listContained(
   transport: SparqlTransport,
   containerIri: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const bindings = await transport.fetchBindings(
     `SELECT DISTINCT ?child WHERE {
   GRAPH <meta:${containerIri}> { <${containerIri}> <${LWS.contains}> ?child }
@@ -229,8 +229,8 @@ export async function getContainingContainer(
 export async function listRegistrationsByShapeTrees(
   transport: SparqlTransport,
   registryIri: string,
-  shapeTrees: string[]
-): Promise<string[]> {
+  shapeTrees: Array<string>
+): Promise<Array<string>> {
   if (shapeTrees.length === 0) {
     return []
   }
@@ -262,10 +262,10 @@ export async function getSocialAgentRegistration(
   const node = (await frameDoc(doc, dataModelContext, iri)) as Record<string, unknown>
   return {
     id: iri,
-    type: (node.type as string[] | undefined) ?? [],
+    type: (node.type as Array<string> | undefined) ?? [],
     registeredAgent: node.registeredAgent as string,
-    hasDataGrant: (node.hasDataGrant as string[]) ?? [],
-    hasAdminGrant: (node.hasAdminGrant as string[]) ?? [],
+    hasDataGrant: (node.hasDataGrant as Array<string>) ?? [],
+    hasAdminGrant: (node.hasAdminGrant as Array<string>) ?? [],
     label: (node.label as LanguageMap | undefined) ?? {},
     note: (node.note as string | undefined) ?? undefined,
     reciprocalRegistration: (node.reciprocalRegistration as string | undefined) ?? undefined,
@@ -345,8 +345,8 @@ export async function getAdminAuthorization(
 export async function getAdminAuthorizations(
   transport: SparqlTransport,
   authorizationRegistryContainerIri: string
-): Promise<AdminAuthorizationData[]> {
-  const adminAuthorizations: AdminAuthorizationData[] = []
+): Promise<Array<AdminAuthorizationData>> {
+  const adminAuthorizations: Array<AdminAuthorizationData> = []
   for (const iri of await listContained(transport, authorizationRegistryContainerIri)) {
     const adminAuthorization = await getAdminAuthorization(transport, iri)
     if (adminAuthorization.type.includes(INTEROP.AdminAuthorization)) {
@@ -442,7 +442,7 @@ export async function getDataRegistration(
  */
 export async function presentGraphs(
   transport: SparqlTransport,
-  iris: string[]
+  iris: Array<string>
 ): Promise<Set<string>> {
   if (iris.length === 0) {
     return new Set()
@@ -477,7 +477,7 @@ export async function getRegistrationLinks(
   transport: SparqlTransport,
   registrationIri: string,
   predicate: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const bindings = await transport.fetchBindings(
     `SELECT DISTINCT ?value WHERE {
   { GRAPH <${registrationIri}> { <${registrationIri}> <${predicate}> ?value } }
@@ -500,7 +500,7 @@ export async function getRegistrationLinks(
 export async function getLinkedGrantOwners(
   transport: SparqlTransport,
   registrationIri: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const bindings = await transport.fetchBindings(
     `SELECT DISTINCT ?owner WHERE {
   { GRAPH <${registrationIri}> { <${registrationIri}> <${INTEROP.hasDataGrant}> ?grant } }
@@ -540,7 +540,7 @@ export async function getLinkedGrantOwners(
 export async function getReciprocalGrants(
   transport: SparqlTransport,
   registrationIri: string
-): Promise<GrantData[]> {
+): Promise<Array<GrantData>> {
   const linkBindings = await transport.fetchBindings(
     `SELECT DISTINCT ?grant WHERE {
   { GRAPH <${registrationIri}> { <${registrationIri}> <${INTEROP.hasDataGrant}> ?grant } }
@@ -564,7 +564,7 @@ export async function getReciprocalGrants(
   )
   const doc = await jsonld.fromRDF(store)
 
-  const grants: GrantData[] = []
+  const grants: Array<GrantData> = []
   for (const iri of grantIris) {
     try {
       grants.push(await Grant.fromJsonLd(doc, iri))
@@ -594,7 +594,7 @@ export async function getAccessGrant(transport: SparqlTransport, iri: string): P
 export async function getRegistryGrants(
   transport: SparqlTransport,
   grantRegistryIri: string
-): Promise<GrantData[]> {
+): Promise<Array<GrantData>> {
   const iris = await listContained(transport, grantRegistryIri)
   const grants = await Promise.all(
     iris.map(async (iri) => {
@@ -664,7 +664,7 @@ export async function findRolesWithMember(
   transport: SparqlTransport,
   roleRegistryContainerIri: string,
   member: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const bindings = await transport.fetchBindings(
     `SELECT DISTINCT ?role WHERE {
   { GRAPH <${roleRegistryContainerIri}> { <${roleRegistryContainerIri}> <${LDP.contains}> ?role } }
@@ -695,7 +695,7 @@ export async function findAuthorizationsForGrantee(
   transport: SparqlTransport,
   registrySet: RegistrySetData,
   grantee: string
-): Promise<DataAuthorizationData[]> {
+): Promise<Array<DataAuthorizationData>> {
   const [iris, roleIris] = await Promise.all([
     listContained(transport, registrySet.hasAuthorizationRegistry.id),
     findRolesWithMember(transport, registrySet.hasRoleRegistry.id, grantee),
@@ -726,7 +726,7 @@ export async function findAuthorizationsForGrantee(
 export async function findInheritingAuthorizations(
   transport: SparqlTransport,
   parentIri: string
-): Promise<string[]> {
+): Promise<Array<string>> {
   const bindings = await transport.fetchBindings(
     `SELECT ?child WHERE {
   GRAPH ?g {
@@ -754,7 +754,7 @@ export async function getRole(
     return undefined
   }
   const node = (await frameDoc(doc, dataModelContext, iri)) as any
-  const type = (node.type as string[] | undefined) ?? []
+  const type = (node.type as Array<string> | undefined) ?? []
   // Type guard: ANY non-empty graph at the IRI is not a role. In dev the
   // app's client-id document lives at the application IRI (map.json maps
   // `https://data/test-client/public/id` → `https://vuejectron.docker/id`),
@@ -788,7 +788,7 @@ export type GrantAuthority = {
  */
 export async function getGrantsAuthority(
   transport: SparqlTransport,
-  iris: string[]
+  iris: Array<string>
 ): Promise<Map<string, GrantAuthority>> {
   if (iris.length === 0) {
     return new Map()
@@ -841,17 +841,17 @@ export type OpenSentAccessRequest = {
   grantedBy: string
   dataOwner: string
   /** the request's registered shape trees (need-group intersection) */
-  shapeTrees: string[]
+  shapeTrees: Array<string>
   /**
    * Requested data instances per shape tree (`interop:hasDataInstance` on the
    * need). Absent for shape-tree-only requests.
    */
-  instancesByShapeTree?: Record<string, string[]>
+  instancesByShapeTree?: Record<string, Array<string>>
 }
 
 export async function getOpenSentAccessRequests(
   transport: SparqlTransport
-): Promise<OpenSentAccessRequest[]> {
+): Promise<Array<OpenSentAccessRequest>> {
   const query = `
 SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree ?instance WHERE {
   GRAPH ?g {
@@ -917,7 +917,7 @@ SELECT DISTINCT ?sent ?request ?grantee ?grantedBy ?dataOwner ?shapeTree ?instan
 export async function getOpenAccessRequestsOnRegistry(
   transport: SparqlTransport,
   accessRequestRegistryContainerIri: string
-): Promise<{ id: string; grantee: string }[]> {
+): Promise<Array<{ id: string; grantee: string }>> {
   const query = `
 SELECT DISTINCT ?request ?grantee WHERE {
   { GRAPH <${accessRequestRegistryContainerIri}> {
@@ -961,13 +961,13 @@ export interface GranteeGrant {
   /** the grant policy's `interop:scopeOfGrant` */
   scope?: string
   /** selected instances (`SelectedFromRegistry` only) */
-  instances?: string[]
+  instances?: Array<string>
 }
 
 export async function getAccessGrantsForGrantee(
   transport: SparqlTransport,
   webId: string
-): Promise<GranteeGrant[]> {
+): Promise<Array<GranteeGrant>> {
   const query = `
 SELECT DISTINCT ?grant ?grantedBy ?shapeTree ?scope ?source WHERE {
   GRAPH ?g {

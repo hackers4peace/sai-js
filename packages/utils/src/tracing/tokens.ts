@@ -164,7 +164,7 @@ export function setTokenAttributes(
   if (typeof aud === 'string') {
     span.setAttribute(`${prefix}.aud`, aud)
   } else if (Array.isArray(aud) && aud.every((value) => typeof value === 'string')) {
-    span.setAttribute(`${prefix}.aud`, aud as string[])
+    span.setAttribute(`${prefix}.aud`, aud as Array<string>)
   }
 
   const cnf = claims.cnf

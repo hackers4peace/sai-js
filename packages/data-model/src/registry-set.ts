@@ -14,14 +14,14 @@ import type { RoleRegistryData } from './role-registry.ts'
 
 export type RegistrySetData = {
   id: string
-  type: string[]
+  type: Array<string>
   hasAuthorizationRegistry: AuthorizationRegistryData
   hasGrantRegistry: GrantRegistryData
   hasSocialAgentRegistry: SocialAgentRegistryData
   hasApplicationRegistry: ApplicationRegistryData
   hasInvitationRegistry: InvitationRegistryData
   hasRoleRegistry: RoleRegistryData
-  hasDataRegistry: DataRegistryData[]
+  hasDataRegistry: Array<DataRegistryData>
   /** present once the Activity Registry is seeded; producers throw without it */
   hasActivityRegistry?: ActivityRegistryData
   /** present once the AccessRequestRegistry is seeded (authorization-granting.md §6.3) */
@@ -48,7 +48,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<RegistrySetD
     hasApplicationRegistry: { id: node.hasApplicationRegistry as string },
     hasInvitationRegistry: { id: node.hasInvitationRegistry as string },
     hasRoleRegistry: { id: node.hasRoleRegistry as string },
-    hasDataRegistry: ((node.hasDataRegistry as string[] | undefined) ?? []).map(
+    hasDataRegistry: ((node.hasDataRegistry as Array<string> | undefined) ?? []).map(
       (dataRegistryId) => ({ id: dataRegistryId })
     ),
     hasActivityRegistry: node.hasActivityRegistry

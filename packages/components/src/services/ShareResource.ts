@@ -66,21 +66,21 @@ import { listSocialAgentRegistrations } from './SocialAgentRegistry.js'
  * `accessForResource` (the rule lives in the AA, not here).
  */
 export function whoHasAccessMatching(
-  authorizations: DataAuthorizationData[],
+  authorizations: Array<DataAuthorizationData>,
   resource: DataInstanceFacts,
   ownerWebId: string,
-  roles: RoleData[] = []
+  roles: Array<RoleData> = []
 ): WhoHasAccess {
   return accessForResource(authorizations, resource, ownerWebId, scopeFacts(roles, authorizations))
 }
 
 /** `whoHasAccessMatching` projected to its direct agent grantees. */
 export function agentsWithAccessMatching(
-  authorizations: DataAuthorizationData[],
+  authorizations: Array<DataAuthorizationData>,
   resource: DataInstanceFacts,
   ownerWebId: string,
-  roles: RoleData[] = []
-): string[] {
+  roles: Array<RoleData> = []
+): Array<string> {
   return whoHasAccessMatching(authorizations, resource, ownerWebId, roles).agents.map(
     ({ agent }) => agent
   )

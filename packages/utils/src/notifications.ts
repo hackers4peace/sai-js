@@ -19,7 +19,7 @@ const NOTIFICATION_CONTEXT = 'https://www.w3.org/ns/solid/notification/v1'
 export interface NotificationChannel {
   id: string
   type: string
-  topic: string | string[]
+  topic: string | Array<string>
   receiveFrom?: string
   sendTo?: string
   sender?: string
@@ -29,7 +29,7 @@ export interface NotificationChannel {
 export interface SubscriptionService {
   id: string
   channelType: string
-  feature: string[]
+  feature: Array<string>
 }
 
 /** Notification channel types (the `notify:` channel type IRIs). */

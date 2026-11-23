@@ -97,8 +97,8 @@ export type { AgentWithAccess, RoleWithAccess, WhoHasAccess } from './authorizat
 /** How a role is used across authorizations (findRoleUsage). */
 export interface RoleUsage {
   usedAsGrantee: boolean
-  affectedGrantees: AgentOrRoleId[]
-  authorizations: DataAuthorizationId[]
+  affectedGrantees: Array<AgentOrRoleId>
+  authorizations: Array<DataAuthorizationId>
 }
 
 /** Authority-relevant fields of a grant removed by a revocation. */
@@ -131,9 +131,9 @@ export interface RevokedGrant {
 export async function revokeGrantsClosure(
   transport: SparqlTransport,
   grantRegistryIri: string,
-  grants: string[],
+  grants: Array<string>,
   requesterWebId?: string
-): Promise<RevokedGrant[]> {
+): Promise<Array<RevokedGrant>> {
   // Ownership comes from the grant bodies, not from the IRI shape. A requested
   // IRI with no body is already gone and stays an idempotent echo (regardless
   // of where its path would have placed it).
@@ -206,7 +206,7 @@ export async function revokeGrantsClosure(
 async function readRoles(
   transport: SparqlTransport,
   registrySet: RegistrySetData
-): Promise<RoleData[]> {
+): Promise<Array<RoleData>> {
   const roleRegistry = registrySet.hasRoleRegistry?.id
   if (!roleRegistry) {
     return []
@@ -518,7 +518,7 @@ export class AuthorizationAgent {
   public async recordAccessAuthorization(
     authorization: AccessAuthorizationStructure,
     extendIfExists = false
-  ): Promise<FinalDataAuthorizationData[]> {
+  ): Promise<Array<FinalDataAuthorizationData>> {
     return generateAuthorization(
       authorization,
       this.webId,
@@ -543,7 +543,10 @@ export class AuthorizationAgent {
    * authorizations; grantees equal to the peer are excluded. Deduped and typed
    * (may include roles).
    */
-  public async findAffectedGrantees(peerId: string, roleId?: string): Promise<AgentOrRoleId[]> {
+  public async findAffectedGrantees(
+    peerId: string,
+    roleId?: string
+  ): Promise<Array<AgentOrRoleId>> {
     const transport = localSparqlTransport(this.sparqlEndpoint)
     const iris = await listContained(transport, this.registrySet.hasAuthorizationRegistry.id)
     const dataAuthorizations = (
@@ -560,7 +563,7 @@ export class AuthorizationAgent {
         (!roleId && dataAuthorization.scopeOfAuthorization === INTEROP.All)
       )
     })
-    const grantees: AgentOrRoleId[] = []
+    const grantees: Array<AgentOrRoleId> = []
     const seen = new Set<string>()
     for (const dataAuthorization of dataAuthorizations) {
       const grantee = dataAuthorization.grantee
@@ -577,8 +580,8 @@ export class AuthorizationAgent {
   public async findRoleUsage(roleId: string): Promise<RoleUsage> {
     const transport = localSparqlTransport(this.sparqlEndpoint)
     let usedAsGrantee = false
-    const affectedGrantees: AgentOrRoleId[] = []
-    const authorizations: DataAuthorizationId[] = []
+    const affectedGrantees: Array<AgentOrRoleId> = []
+    const authorizations: Array<DataAuthorizationId> = []
     const seenAuthorizations = new Set<string>()
     const seenGrantees = new Set<string>()
     const iris = await listContained(transport, this.registrySet.hasAuthorizationRegistry.id)
@@ -611,7 +614,7 @@ export class AuthorizationAgent {
   }
 
   /** Route a grantee by type: Role → its members, agent types → as-is. */
-  public async getGrantees(grantee: AgentOrRoleId): Promise<AgentId[]> {
+  public async getGrantees(grantee: AgentOrRoleId): Promise<Array<AgentId>> {
     if (grantee.type.includes(INTEROP.Role)) {
       const role = await this.findRole(grantee.id)
       if (!role) {
@@ -681,7 +684,10 @@ export class AuthorizationAgent {
    * Already-removed grants are absent (idempotent tolerance). Refusals are
    * typed `RevocationError`s. Grantee self-revocation is not offered (D17).
    */
-  public async revokeGrants(grants: string[], requesterWebId?: string): Promise<RevokedGrant[]> {
+  public async revokeGrants(
+    grants: Array<string>,
+    requesterWebId?: string
+  ): Promise<Array<RevokedGrant>> {
     return revokeGrantsClosure(
       localSparqlTransport(this.sparqlEndpoint),
       this.registrySet.hasGrantRegistry.id,
@@ -691,7 +697,7 @@ export class AuthorizationAgent {
   }
 
   public async generateAccessGrants(
-    dataAuthorizationIris: string[],
+    dataAuthorizationIris: Array<string>,
     grantee: string
   ): Promise<GeneratedGrants> {
     const transport = localSparqlTransport(this.sparqlEndpoint)
@@ -755,7 +761,7 @@ export class AuthorizationAgent {
    */
   public async adminAuthorizations(
     registry: AuthorizationRegistryData = this.registrySet.hasAuthorizationRegistry
-  ): Promise<AdminAuthorizationData[]> {
+  ): Promise<Array<AdminAuthorizationData>> {
     return getAdminAuthorizationsFromSparql(localSparqlTransport(this.sparqlEndpoint), registry.id)
   }
 
@@ -817,7 +823,7 @@ export class AuthorizationAgent {
     data.reciprocalRegistration = reciprocalRegistrationIri
   }
 
-  public async findAuthorizationsForAgent(peerId: string): Promise<DataAuthorizationData[]> {
+  public async findAuthorizationsForAgent(peerId: string): Promise<Array<DataAuthorizationData>> {
     // The session's own registry (personal context). The exported
     // `findAuthorizationsForGrantee` is the same read with an explicit
     // registry set + transport — the components service uses the context's
@@ -833,7 +839,7 @@ export class AuthorizationAgent {
     dataInstanceIri: string,
     ownerWebId = this.webId,
     registrySet = this.registrySet
-  ): Promise<AgentWithAccess[]> {
+  ): Promise<Array<AgentWithAccess>> {
     // direct agent grantees only: role-granted access is reported by
     // `findWhoHasAccess` and expanded to its members there (a role is not a
     // social agent registration)
@@ -878,7 +884,7 @@ export class AuthorizationAgent {
     dataInstanceIri: string,
     ownerWebId = this.webId,
     registrySet = this.registrySet
-  ): Promise<AgentWithAccess[]> {
+  ): Promise<Array<AgentWithAccess>> {
     return (await this.findWhoHasAccess(dataInstanceIri, ownerWebId, registrySet)).agents
   }
 
@@ -979,7 +985,7 @@ export class AuthorizationAgent {
   public async shareDataInstance(
     details: ShareDataInstanceStructure,
     ownerWebId?: string
-  ): Promise<FinalDataAuthorizationData[]> {
+  ): Promise<Array<FinalDataAuthorizationData>> {
     // ensure owner doesn't grant acces for oneself (class-C fix: filter the
     // *context owner*, not the session's webId)
     // TODO: reconsider for TrustedGrants grantees, compare with data instance owner instead
@@ -1028,7 +1034,7 @@ export class AuthorizationAgent {
     ownerWebId: string,
     registrySet: RegistrySetData = this.registrySet,
     facts?: ShareContextFacts
-  ): Promise<FinalDataAuthorizationData[]> {
+  ): Promise<Array<FinalDataAuthorizationData>> {
     // ensure owner doesn't grant access for oneself (the context owner, not
     // the session's webId)
     const requestedAgents = details.agents.filter((agent) => agent !== ownerWebId)

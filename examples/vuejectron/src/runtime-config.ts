@@ -6,7 +6,7 @@ export interface TracingConfig {
   /** `service.name` resource attribute. */
   serviceName?: string
   /** Origin regexes that get the `traceparent` header (cross-origin CORS). */
-  propagateTo?: string[]
+  propagateTo?: Array<string>
   /** Record request/response payloads on `sai.lws.*` spans (JWTs are redacted). */
   captureBodies?: boolean
   /** Record decoded credential claims/headers on `sai.lws.*` spans. */

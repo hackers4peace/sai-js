@@ -14,7 +14,6 @@ const reactRules = Object.fromEntries(
 // to stay off. Delete each entry as its rule is migrated.
 const notYetMigrated = Object.fromEntries(
   [
-    'typescript/array-type',
     'typescript/no-unsafe-type-assertion',
     'import/consistent-type-specifier-style',
     'quality/no-unsafe-dictionary-type',

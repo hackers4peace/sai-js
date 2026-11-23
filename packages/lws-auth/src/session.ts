@@ -29,7 +29,7 @@ export interface BrowserSessionOptions {
   /** Underlying fetch (discovery, token and resource requests). */
   fetch?: WhatwgFetch
   /** Scopes to request. Defaults to `openid webid` (+ `offline_access` when supported). */
-  scope?: string[]
+  scope?: Array<string>
   /** Clock, injectable for tests. */
   now?: () => number
   /** Renew the access token this many milliseconds before it expires. Defaults to 30s. */

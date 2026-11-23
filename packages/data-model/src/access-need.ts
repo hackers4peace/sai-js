@@ -4,20 +4,20 @@ import { dataModelContext } from './context.ts'
 
 export type AccessNeedId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type AccessNeedData = AccessNeedId & {
   registeredShapeTree: string
   inheritsFromNeed?: string
-  hasInheritingNeed: string[]
-  accessMode: string[]
+  hasInheritingNeed: Array<string>
+  accessMode: Array<string>
   /** Whether the need is required (interop:accessNecessity = interop:AccessRequired). */
   required: boolean
   /** Inheriting needs, loaded recursively (see the AA `accessNeed` composed read). */
-  children: AccessNeedData[]
+  children: Array<AccessNeedData>
   /** Languages used by description sets in the access needs document. */
-  descriptionLanguages: string[]
+  descriptionLanguages: Array<string>
   /**
    * Requested data instances (`interop:hasDataInstance`).
    *
@@ -25,7 +25,7 @@ export type AccessNeedData = AccessNeedId & {
    * normally carries none. It is optional so a plain access need (shape-tree
    * scope) remains unchanged.
    */
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
   /**
    * The requested data registration, when the request is registration-scoped
    * rather than shape-tree or instance scoped. Request projections only.
@@ -55,12 +55,12 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedDa
     type: node.type ?? [],
     registeredShapeTree: node.registeredShapeTree as string,
     inheritsFromNeed: node.inheritsFromNeed as string | undefined,
-    hasInheritingNeed: (node.hasInheritingNeed as string[] | undefined) ?? [],
-    accessMode: (node.accessMode as string[] | undefined) ?? [],
+    hasInheritingNeed: (node.hasInheritingNeed as Array<string> | undefined) ?? [],
+    accessMode: (node.accessMode as Array<string> | undefined) ?? [],
     required: node.required === INTEROP.AccessRequired,
     children: [],
     descriptionLanguages: await documentValues(doc, id, INTEROP.usesLanguage),
-    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as string[] } : {}),
+    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as Array<string> } : {}),
     ...(node.hasDataRegistration
       ? { hasDataRegistration: node.hasDataRegistration as string }
       : {}),

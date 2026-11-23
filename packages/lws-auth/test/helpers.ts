@@ -15,9 +15,9 @@ export type RouteHandler = (url: URL, request: RecordedRequest) => Response | un
  */
 export function createFakeFetch(route: RouteHandler): {
   fetch: WhatwgFetch
-  requests: RecordedRequest[]
+  requests: Array<RecordedRequest>
 } {
-  const requests: RecordedRequest[] = []
+  const requests: Array<RecordedRequest> = []
   const fetchImpl = async (input: unknown, init: RequestInit = {}): Promise<Response> => {
     const requestLike = input as { url?: string; headers?: HeadersInit; method?: string }
     const href = typeof input === 'string' ? input : (requestLike.url ?? String(input))

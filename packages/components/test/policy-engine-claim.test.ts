@@ -35,7 +35,7 @@ const ALICE = 'https://id/alice'
 const CLIENT = 'https://data/test-client/public/id'
 const READ = ODRL.read
 
-function withoutAssigner(policies: any[]): any[] {
+function withoutAssigner(policies: Array<any>): Array<any> {
   return policies.map((policy) => {
     const { assigner: _policyAssigner, ...rest } = policy
     return {
@@ -133,7 +133,10 @@ describe('claim-first policy evaluation', () => {
 
     const data = await (
       engine as unknown as {
-        findAccessClaimData(target: string, credentials: Credentials): Promise<Quad[] | undefined>
+        findAccessClaimData(
+          target: string,
+          credentials: Credentials
+        ): Promise<Array<Quad> | undefined>
       }
     ).findAccessClaimData(RESOURCE, credentials([...parent, ...child]))
     const store = new Store(data ?? [])

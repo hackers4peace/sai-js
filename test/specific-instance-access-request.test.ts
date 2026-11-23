@@ -75,7 +75,7 @@ async function storedRequestForKim(
       needs.some(
         (need) =>
           need.registeredShapeTree === projectShapeTree &&
-          (need.hasDataInstance as string[] | undefined)?.includes(instance)
+          (need.hasDataInstance as Array<string> | undefined)?.includes(instance)
       )
     ) {
       return { id: iri, request }
@@ -175,7 +175,7 @@ describe('specific-instance access request', () => {
     expect(recorded).toBeDefined()
     expect(recorded!.scopeOfAuthorization).toBe(INTEROP.SelectedFromRegistry)
     expect(recorded!.hasDataRegistration).toBe(projectRegistration)
-    expect([...(recorded!.hasDataInstance as string[])].toSorted()).toEqual(
+    expect([...(recorded!.hasDataInstance as Array<string>)].toSorted()).toEqual(
       [instance1, instance2].toSorted()
     )
 

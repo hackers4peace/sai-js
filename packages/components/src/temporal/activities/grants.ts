@@ -77,7 +77,7 @@ export interface CreateGrantsForAgentInput {
 export interface GenerateGrantsInput {
   webId: SocialAgentId
   grantee: AgentId
-  dataAuthorizations: DataAuthorizationId[]
+  dataAuthorizations: Array<DataAuthorizationId>
 }
 
 export interface GetAuthorizationsInput {
@@ -90,21 +90,21 @@ export interface CheckEquivalenceInput {
   grantee: AgentId
   generated: GeneratedGrants
   /** the grantee's current grant IRIs (from `getExistingGrants`) */
-  existing: GrantId[]
+  existing: Array<GrantId>
   /**
    * IRIs present in the actor's own grant registry (the orphan scan). C2
    * delegated grants are stored locally in the same registry.
    */
-  ownGrantIds?: string[]
+  ownGrantIds?: Array<string>
 }
 
 export interface EquivalenceResult {
   /** `generated.sourceGrants` ids to keep (parents AND children of matched trees) */
-  reusedSourceIds: string[]
+  reusedSourceIds: Array<string>
   /** indexes into `generated.delegatedGrants` (top-level only) to keep */
-  reusedDelegatedIndexes: number[]
+  reusedDelegatedIndexes: Array<number>
   /** every existing grant IRI in matched trees — parents AND children */
-  reusedExisting: GrantId[]
+  reusedExisting: Array<GrantId>
 }
 
 // ---------------------------------------------------------------------------
@@ -120,7 +120,7 @@ export interface EquivalenceResult {
  */
 export async function findAffectedGrantees(
   payload: FindAffectedAuthorizationsInput
-): Promise<AgentOrRoleId[]> {
+): Promise<Array<AgentOrRoleId>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   // the match semantics live in the AA session method (relocated Phase 4)
@@ -145,7 +145,7 @@ export async function findRoleUsage(payload: {
 export async function getGrantees(payload: {
   webId: SocialAgentId
   grantee: AgentOrRoleId
-}): Promise<AgentId[]> {
+}): Promise<Array<AgentId>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   // role → members routing lives in the AA session method (relocated Phase 4)
@@ -169,12 +169,12 @@ export interface ListGranteeRegistrationsInput {
  */
 export async function listGranteeRegistrations(
   payload: ListGranteeRegistrationsInput
-): Promise<AgentId[]> {
+): Promise<Array<AgentId>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
   const grantees = new Map<string, AgentId>()
-  const add = (registration: { registeredAgent: string; type: string[] }) => {
+  const add = (registration: { registeredAgent: string; type: Array<string> }) => {
     const agent = registration.registeredAgent
     if (!agent || grantees.has(agent)) {
       return
@@ -213,11 +213,11 @@ export interface ReciprocalPair {
  */
 export async function listReciprocalRegistrations(payload: {
   webId: SocialAgentId
-}): Promise<ReciprocalPair[]> {
+}): Promise<Array<ReciprocalPair>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
-  const pairs: ReciprocalPair[] = []
+  const pairs: Array<ReciprocalPair> = []
   for (const iri of await listContained(transport, session.registrySet.hasSocialAgentRegistry.id)) {
     const registration = await getSocialAgentRegistration(transport, iri).catch(() => undefined)
     if (!registration?.reciprocalRegistration) {
@@ -241,11 +241,11 @@ export async function listReciprocalRegistrations(payload: {
  */
 export async function findIncompleteReciprocalMirrors(payload: {
   webId: SocialAgentId
-}): Promise<ReciprocalPair[]> {
+}): Promise<Array<ReciprocalPair>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
-  const incomplete: ReciprocalPair[] = []
+  const incomplete: Array<ReciprocalPair> = []
   for (const pair of await listReciprocalRegistrations(payload)) {
     const linked = await mirroredGrants(session.sparqlEndpoint, pair.reciprocalIri)
     const present = await presentGraphs(transport, [pair.reciprocalIri, ...linked])
@@ -271,7 +271,7 @@ export async function findIncompleteReciprocalMirrors(payload: {
 export async function updateRoleInRegistry(payload: {
   webId: SocialAgentId
   role: RoleData
-}): Promise<string[]> {
+}): Promise<Array<string>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const before = await loadRole(payload.role.id, session.fetch)
@@ -347,7 +347,7 @@ export async function createRoleAtId(payload: {
 /** All authorizations for the grantee (incl. via roles), typed. */
 export async function getAuthorizations(
   payload: GetAuthorizationsInput
-): Promise<DataAuthorizationId[]> {
+): Promise<Array<DataAuthorizationId>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const authorizations = await session.findAuthorizationsForAgent(payload.peerId.id)
@@ -382,7 +382,7 @@ export async function generateGrants(payload: GenerateGrantsInput): Promise<Gene
 export async function getExistingGrants(payload: {
   webId: SocialAgentId
   peerId: AgentId
-}): Promise<GrantId[]> {
+}): Promise<Array<GrantId>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const agentRegistration = await session.findRegistration(payload.peerId.id)
@@ -395,7 +395,7 @@ export async function getExistingGrants(payload: {
 export interface GetExistingGrantBodiesInput {
   webId: SocialAgentId
   /** grant IRIs from `getExistingGrants` (the registration projection) */
-  grants: GrantId[]
+  grants: Array<GrantId>
 }
 
 /**
@@ -411,7 +411,7 @@ export interface GetExistingGrantBodiesInput {
  */
 export async function getExistingGrantBodies(
   payload: GetExistingGrantBodiesInput
-): Promise<GrantData[]> {
+): Promise<Array<GrantData>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
@@ -455,7 +455,7 @@ export async function getExistingGrantBodies(
  */
 export async function deleteAccessGrants(payload: {
   webId: SocialAgentId
-  grants: GrantId[]
+  grants: Array<GrantId>
 }): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
@@ -489,8 +489,8 @@ export async function deleteAccessGrants(payload: {
  */
 export async function revokeGrantClosure(payload: {
   webId: SocialAgentId
-  grants: GrantId[]
-}): Promise<string[]> {
+  grants: Array<GrantId>
+}): Promise<Array<string>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
@@ -516,7 +516,7 @@ export async function revokeGrantClosure(payload: {
 export async function getRegistryGrantsForGrantee(payload: {
   webId: SocialAgentId
   grantee: AgentId
-}): Promise<GrantId[]> {
+}): Promise<Array<GrantId>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const transport = localSparqlTransport(session.sparqlEndpoint)
@@ -569,8 +569,8 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
       (!ownGrantIds || (tree.grant.id !== undefined && ownGrantIds.has(tree.grant.id)))
   )
 
-  const reusedSourceIds: string[] = []
-  const reusedDelegatedIndexes: number[] = []
+  const reusedSourceIds: Array<string> = []
+  const reusedDelegatedIndexes: Array<number> = []
   const reusedExisting = new Map<string, GrantId>()
   const rememberExisting = (pairs: ReturnType<typeof pairTrees>) => {
     for (const pair of pairs) {
@@ -627,7 +627,7 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
  */
 export async function deleteAuthorizations(payload: {
   webId: SocialAgentId
-  authorizations: DataAuthorizationId[]
+  authorizations: Array<DataAuthorizationId>
 }): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
@@ -744,7 +744,7 @@ export async function createAcr(
 export interface ReplaceAccessGrantsOnRegistrationInput {
   webId: SocialAgentId
   grantee: AgentId
-  grants: GrantId[]
+  grants: Array<GrantId>
 }
 
 /**
@@ -778,7 +778,7 @@ export async function replaceAccessGrantsOnRegistration(
 
 export interface StoreAuthorizationGrantedInput {
   webId: SocialAgentId
-  dataAuthorizations: FinalDataAuthorizationData[]
+  dataAuthorizations: Array<FinalDataAuthorizationData>
 }
 
 /**
@@ -824,8 +824,8 @@ export interface ProcessGranteeAuthorizationInput {
  */
 export function groupAuthorizationDataAuthorizations(
   object: AuthorizationGranted['object']
-): AuthorizationGranted['object'][] {
-  const byGrantee = new Map<string, DataAuthorizationData[]>()
+): Array<AuthorizationGranted['object']> {
+  const byGrantee = new Map<string, Array<DataAuthorizationData>>()
   for (const dataAuthorization of object) {
     const group = byGrantee.get(dataAuthorization.grantee) ?? []
     group.push(dataAuthorization)
@@ -899,7 +899,7 @@ export interface GetPendingActivitiesInput {
  */
 export async function getPendingActivities(
   payload: GetPendingActivitiesInput
-): Promise<ActivityData[]> {
+): Promise<Array<ActivityData>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registry = session.registrySet.hasActivityRegistry
@@ -918,7 +918,7 @@ export async function getPendingActivities(
       .map((completion) => completion.target)
       .filter((target): target is string => target !== undefined)
   )
-  const workItems: ActivityData[] = []
+  const workItems: Array<ActivityData> = []
   for (const iri of iris) {
     if (completionIris.has(iri) || completedTargets.has(iri)) {
       continue
@@ -951,7 +951,7 @@ export interface DelegatedGrantsConsumerInput {
  */
 export async function getPendingDelegatedGrantsUpdates(
   payload: DelegatedGrantsConsumerInput
-): Promise<ActivityData[]> {
+): Promise<Array<ActivityData>> {
   const pending = await getPendingActivities({ webId: payload.webId })
   return pending.filter(
     (activity) =>
@@ -963,7 +963,7 @@ export async function getPendingDelegatedGrantsUpdates(
 export interface MarkActivitiesDoneInput {
   webId: SocialAgentId
   /** the activities to complete — only their ids are read */
-  activities: { id: string }[]
+  activities: Array<{ id: string }>
 }
 
 /** Mark the given activities done (one minimal completion activity each). */

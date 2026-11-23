@@ -70,7 +70,7 @@ export const useAppStore = defineStore('app', () => {
    * administers, derived from the personal-context `ListSocialAgents` list
    * (admin flag + label, §2.2/§2.6 of org-admin-feature.md).
    */
-  const contexts = ref<{ webId: string; label: string }[]>([])
+  const contexts = ref<Array<{ webId: string; label: string }>>([])
 
   // ──────────────────────────
   // Activity tracker + snackbar (see the OpenWiki `ui/authorization-ui.md`) — record
@@ -98,7 +98,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const streamActivities = reactive<Record<string, ActivityEvent>>({})
-  const claims: ActivityClaim[] = []
+  const claims: Array<ActivityClaim> = []
   const activitySnackbar = reactive({
     visible: false,
     /** mirrors the claim's status — pending: spinner, done: ✓ */
@@ -293,7 +293,7 @@ export const useAppStore = defineStore('app', () => {
 
   async function createRole(
     label: string,
-    members: readonly S.Schema.Type<typeof IRI>[]
+    members: ReadonlyArray<S.Schema.Type<typeof IRI>>
   ): Promise<S.Schema.Type<typeof RoleCreatedMessage>> {
     // activity-first (step 9): the role is PUT by the createRole workflow
     // later (the ack echoes the role-to-be + activityId) — the RoleCreated
@@ -311,7 +311,7 @@ export const useAppStore = defineStore('app', () => {
   async function updateRole(
     id: S.Schema.Type<typeof IRI>,
     label: string,
-    members: readonly S.Schema.Type<typeof IRI>[]
+    members: ReadonlyArray<S.Schema.Type<typeof IRI>>
   ): Promise<S.Schema.Type<typeof Role>> {
     const role = await effect.updateRole(id, label, members, currentContext())
     listRoles(true)
@@ -357,7 +357,7 @@ export const useAppStore = defineStore('app', () => {
     listRoles(true)
   }
 
-  async function revokeAuthorizations(authorizations: readonly string[]) {
+  async function revokeAuthorizations(authorizations: ReadonlyArray<string>) {
     const { activityId } = await effect.revokeAuthorizations(authorizations, currentContext())
     if (activityId) {
       claimActivity({ context: currentContext(), type: 'AuthorizationRevoked', activityId })

@@ -1,7 +1,7 @@
 export interface RuntimeConfig {
   backendBaseUrl: string
   vapidPublicKey: string
-  languages: string[]
+  languages: Array<string>
   idOrigin: string
   dataOrigin: string
   // Browser OTLP endpoint for the UI spans (docs/opentelemetry.md). A path is

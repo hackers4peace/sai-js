@@ -38,16 +38,16 @@ import { buildSessionManager } from '../../builders/sessionManager.js'
  */
 export type AdminGrantData = {
   id?: string
-  type: string[]
+  type: Array<string>
   storage: string
-  access: OdrlPolicy[]
+  access: Array<OdrlPolicy>
   grantedBy: string
   dataOwner: string
   scopeOfAdminGrant: string
 }
 
 /** Admin grants are read-only Storage-scoped ODRL agreements. */
-function adminAccess(assignee: string, storage: string, owner: string): OdrlPolicy[] {
+function adminAccess(assignee: string, storage: string, owner: string): Array<OdrlPolicy> {
   const policyId = `urn:uuid:${crypto.randomUUID()}`
   const permissionId = `urn:uuid:${crypto.randomUUID()}`
   const targetId = `urn:uuid:${crypto.randomUUID()}`
@@ -88,7 +88,7 @@ export interface AdminActivityInput {
 
 export interface AdminGrantsData {
   registrySetGrant: AdminGrantData
-  dataRegistryGrants: AdminGrantData[]
+  dataRegistryGrants: Array<AdminGrantData>
 }
 
 /**
@@ -173,7 +173,7 @@ export async function buildAdminGrants(payload: {
     scopeOfAdminGrant: INTEROP.RegistrySet,
   }
 
-  const dataRegistryGrants: AdminGrantData[] = []
+  const dataRegistryGrants: Array<AdminGrantData> = []
   for (const dataRegistry of session.registrySet.hasDataRegistry) {
     dataRegistryGrants.push({
       id: await session.mintIdentifier(registry.id),
@@ -248,7 +248,7 @@ export async function createAdminGrantAcr(payload: { grant: AdminGrantData }): P
 export async function replaceAdminGrantLink(payload: {
   webId: SocialAgentId
   admin: AgentId
-  grantIds: string[]
+  grantIds: Array<string>
 }): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
@@ -263,7 +263,7 @@ export async function replaceAdminGrantLink(payload: {
 export async function findAdminGrants(payload: {
   webId: SocialAgentId
   admin: AgentId
-}): Promise<{ id: string; type: string[] }[]> {
+}): Promise<Array<{ id: string; type: Array<string> }>> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
   const registry = session.registrySet.hasGrantRegistry
@@ -278,7 +278,7 @@ export async function findAdminGrants(payload: {
 /** Delete the admin's AdminGrant resources (and their ACRs); 404 is tolerated. */
 export async function deleteAdminGrants(payload: {
   webId: SocialAgentId
-  grants: { id: string; type: string[] }[]
+  grants: Array<{ id: string; type: Array<string> }>
 }): Promise<void> {
   const manager = buildSessionManager()
   const session = await manager.getSession(payload.webId.id)
@@ -319,7 +319,7 @@ export async function syncAdminAcr(payload: { webId: SocialAgentId }): Promise<v
 
   const admins = await session.adminAuthorizations(session.registrySet.hasAuthorizationRegistry)
 
-  const matchers: { agent: string; client: string }[] = []
+  const matchers: Array<{ agent: string; client: string }> = []
   for (const admin of admins) {
     const uasId = await discoverAuthorizationAgent(admin.grantee, fetch)
     if (!uasId) {

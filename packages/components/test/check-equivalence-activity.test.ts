@@ -68,7 +68,7 @@ const STORAGE = 'https://data/acme/'
 interface GrantOverrides extends Partial<GrantData> {
   /** legacy-named fixture fields — derived into the canonical access policy */
   grantee?: string
-  accessMode?: string[]
+  accessMode?: Array<string>
   hasStorage?: string
 }
 
@@ -112,7 +112,11 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
   } as GrantData
 }
 
-const parent = (id: string, children: string[] = [], overrides: GrantOverrides = {}): GrantData =>
+const parent = (
+  id: string,
+  children: Array<string> = [],
+  overrides: GrantOverrides = {}
+): GrantData =>
   makeGrant({
     ...overrides,
     id,
@@ -133,7 +137,7 @@ const child = (id: string, parentId: string, overrides: GrantOverrides = {}): Gr
 /** An existing delegated grant body (the peer is the dataOwner). */
 const delegatedParent = (
   id: string,
-  children: string[] = [],
+  children: Array<string> = [],
   overrides: GrantOverrides = {}
 ): GrantData =>
   makeGrant({
@@ -171,7 +175,7 @@ const generatedDelegated = (overrides: GrantOverrides = {}, withChild = true): G
               scopeOfGrant: INTEROP.Inherited,
               accessMode: [ACCESS_ACTIONS.read, ACCESS_ACTIONS.create],
             }),
-          ] as unknown as string[],
+          ] as unknown as Array<string>,
         }
       : {}),
   })

@@ -3,10 +3,10 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import { seedObjectEndpoints } from '../src/garage.js'
 
 interface State {
-  buckets: { id: string; globalAliases: string[]; localAliases: unknown[] }[]
-  keys: { accessKeyId: string; name: string; expired: boolean }[]
+  buckets: Array<{ id: string; globalAliases: Array<string>; localAliases: Array<unknown> }>
+  keys: Array<{ accessKeyId: string; name: string; expired: boolean }>
   secrets: Record<string, string>
-  calls: string[]
+  calls: Array<string>
 }
 
 function json(body: unknown): Response {
@@ -116,7 +116,7 @@ describe('seedObjectEndpoints', () => {
     })
 
     // records land on the account, keyed by podUrl
-    const records = Object.values(kv['accounts/data/acc-1']['**objectEndpoint**']) as any[]
+    const records = Object.values(kv['accounts/data/acc-1']['**objectEndpoint**']) as Array<any>
     expect(records).toHaveLength(2)
     expect(records.find((r) => r.podUrl === 'https://data/test-client/')).toMatchObject({
       accountId: 'acc-1',

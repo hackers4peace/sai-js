@@ -14,11 +14,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 const sparql = vi.hoisted(() => {
   const state: {
     /** grant IRIs linked in the mirror's reciprocal graph (the oracle's input) */
-    mirroredLinks: string[]
+    mirroredLinks: Array<string>
     /** graph names that actually have a body (resource and/or `meta:` twin) */
     present: Set<string>
-    updates: string[]
-    bindingQueries: string[]
+    updates: Array<string>
+    bindingQueries: Array<string>
   } = {
     mirroredLinks: [],
     present: new Set(),
@@ -95,7 +95,7 @@ const grantDoc = (id: string) => ({
   [INTEROP.dataOwner]: [{ '@id': 'https://id/alice' }],
 })
 
-let fetched: string[]
+let fetched: Array<string>
 
 function session() {
   return {

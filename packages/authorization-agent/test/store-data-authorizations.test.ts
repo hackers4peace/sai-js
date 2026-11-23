@@ -88,7 +88,7 @@ describe('findInheritingAuthorizations — forward-direction child lookup', () =
   const term = (value: string): SparqlBindingTerm => ({ termType: 'NamedNode', value })
   function capturingTransport(
     bindings: Array<Record<string, SparqlBindingTerm>>,
-    queries: string[]
+    queries: Array<string>
   ): SparqlTransport {
     return {
       fetchBindings: async (query: string) => {
@@ -100,7 +100,7 @@ describe('findInheritingAuthorizations — forward-direction child lookup', () =
   }
 
   test('returns children via `inheritsFromAuthorization`', async () => {
-    const queries: string[] = []
+    const queries: Array<string> = []
     const transport = capturingTransport([{ child: term(CHILD) }], queries)
     const result = await findInheritingAuthorizations(transport, PARENT)
     expect(result).toEqual([CHILD])

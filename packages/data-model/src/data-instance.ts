@@ -38,7 +38,7 @@ export type DataInstanceData = {
   shapeTreeIri?: string
   label?: string
   isBlob: boolean
-  children: ChildInfo[]
+  children: Array<ChildInfo>
   dataRegistration?: DataRegistrationData
 }
 
@@ -127,7 +127,7 @@ export function childIris(
   node: Record<string, unknown>,
   shapeTree: ShapeTreeData,
   childShapeTree: string
-): string[] {
+): Array<string> {
   const reference = shapeTree.references.find((ref) => ref.shapeTree === childShapeTree)
   if (!reference) {
     throw new Error(`shape tree ${shapeTree.id} does not reference ${childShapeTree}`)

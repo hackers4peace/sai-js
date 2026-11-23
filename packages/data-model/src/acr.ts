@@ -8,7 +8,10 @@ import type { AgentAndClient } from './templates/types.ts'
 // ──────────────────────────
 
 /** An `acp:Policy` with `acp:allow` modes and a single `acp:Matcher` (agent + client). */
-function acrPolicy(allow: string[], { agent, client }: AgentAndClient): Record<string, unknown> {
+function acrPolicy(
+  allow: Array<string>,
+  { agent, client }: AgentAndClient
+): Record<string, unknown> {
   return {
     type: ['Policy'],
     allow,
@@ -75,7 +78,7 @@ export function accessGrantAcrJsonLd({
   peer?: AgentAndClient
   client?: AgentAndClient
 }): Record<string, unknown> {
-  const peerMatchers: Record<string, unknown>[] = []
+  const peerMatchers: Array<Record<string, unknown>> = []
   if (peer) {
     peerMatchers.push({ type: ['Matcher'], agent: peer.agent, client: peer.client })
   }
@@ -124,10 +127,10 @@ type ExpandedNode = Record<string, any>
 export function rewriteFullAdminAccess(
   doc: unknown,
   acrId: string,
-  matchers: AgentAndClient[]
+  matchers: Array<AgentAndClient>
 ): Record<string, unknown> {
   const source = Array.isArray(doc) ? doc : ((doc as any)?.['@graph'] ?? [doc])
-  const nodes: ExpandedNode[] = source.map((node: ExpandedNode) => structuredClone(node))
+  const nodes: Array<ExpandedNode> = source.map((node: ExpandedNode) => structuredClone(node))
 
   const fullAdminAccess = `${acrId}#fullAdminAccess`
   const rootId = `${acrId}#root`

@@ -4,7 +4,7 @@ import { dataModelContext } from './context.ts'
 
 export type SocialAgentInvitationId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type SocialAgentInvitationData = SocialAgentInvitationId & {

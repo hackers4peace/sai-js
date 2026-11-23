@@ -11,8 +11,8 @@ import { matchGrantedRequests } from '../src/temporal/activities/access-request.
 const sentRequest = (
   id: string,
   dataOwner: string,
-  shapeTrees: string[],
-  instancesByShapeTree?: Record<string, string[]>
+  shapeTrees: Array<string>,
+  instancesByShapeTree?: Record<string, Array<string>>
 ): OpenSentAccessRequest => ({
   sent: `https://registry/bob/sent-${id}`,
   request: `urn:uuid:${id}`,
@@ -23,7 +23,12 @@ const sentRequest = (
   ...(instancesByShapeTree ? { instancesByShapeTree } : {}),
 })
 
-const grant = (grantedBy: string, shapeTree: string, scope?: string, instances?: string[]) => ({
+const grant = (
+  grantedBy: string,
+  shapeTree: string,
+  scope?: string,
+  instances?: Array<string>
+) => ({
   grant: `https://registry/${grantedBy === 'https://id/alice' ? 'alice' : 'x'}/g`,
   grantedBy,
   shapeTree,

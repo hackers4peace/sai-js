@@ -60,7 +60,7 @@ import { acceptInvitation, establishReciprocal } from './temporal/workflows/reci
 type ActivityChannel = NonNullable<Awaited<ReturnType<ActivityWebhookStore['findBySendTo']>>>
 
 /** Brand a plain webId as a SocialAgent ref (refs exist only in temporal inputs). */
-const socialAgentRef = (id: string): { id: string; type: string[] } => ({
+const socialAgentRef = (id: string): { id: string; type: Array<string> } => ({
   id,
   type: [INTEROP.SocialAgent],
 })

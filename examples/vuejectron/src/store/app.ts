@@ -42,8 +42,8 @@ type AgentId = string
 export const useAppStore = defineStore('app', () => {
   const subscriptions = useStorage<Map<string, string>>('subscriptions', new Map())
   const coreStore = useCoreStore()
-  const agents = ref<Agent[]>([])
-  const resourceServers = ref<Record<AgentId, ResourceServer[]>>({})
+  const agents = ref<Array<Agent>>([])
+  const resourceServers = ref<Record<AgentId, Array<ResourceServer>>>({})
   const currentAgent = ref<Agent>()
   const currentProject = shallowRef<Project>()
   const saiError = ref<string | undefined>()
@@ -53,7 +53,7 @@ export const useAppStore = defineStore('app', () => {
   let session: Application
   let notificationsManager: NotificationManager
   let solidLdoDataset: SolidLdoDataset
-  const projects = ref<Project[]>([])
+  const projects = ref<Array<Project>>([])
 
   const authSession = browserSession()
 
@@ -154,7 +154,7 @@ export const useAppStore = defineStore('app', () => {
     }))
   }
 
-  function projectsFor(resourceServer: string): Project[] {
+  function projectsFor(resourceServer: string): Array<Project> {
     return projects.value.filter(
       (project) => session.parentMap.get(project['@id']!)?.resourceServer === resourceServer
     )
@@ -166,7 +166,7 @@ export const useAppStore = defineStore('app', () => {
     }
 
     await ensureSaiSession()
-    const servers: ResourceServer[] = []
+    const servers: Array<ResourceServer> = []
     const scope = scopes.project
     for (const resourceServer of await session.resourceServers(ownerId, scope)) {
       servers.push({
@@ -175,7 +175,7 @@ export const useAppStore = defineStore('app', () => {
         owner: ownerId,
         canCreate: await session.canCreate(resourceServer, scope),
       })
-      const serverProjects: Project[] = []
+      const serverProjects: Array<Project> = []
 
       for await (const projectId of await session.resources(resourceServer, scope)) {
         // @ldo-solid
@@ -551,7 +551,7 @@ export const useAppStore = defineStore('app', () => {
         }
         return notificationsManager.unsubscribeFromPush(task['@id'], cId)
       })
-    )) as boolean[]
+    )) as Array<boolean>
     if (result.includes(false)) {
       throw new Error('failed to unsubscribe some of the tasks')
     }

@@ -10,8 +10,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 // ──────────────────────────
 
 const h = vi.hoisted(() => {
-  const calls: string[] = []
-  const children: { workflow: unknown; options?: { args?: unknown[] } }[] = []
+  const calls: Array<string> = []
+  const children: Array<{ workflow: unknown; options?: { args?: Array<unknown> } }> = []
   const activities = {
     deleteAuthorizations: vi.fn(async () => {
       calls.push('delete-authorizations')
@@ -34,7 +34,7 @@ vi.mock('@temporalio/workflow', () => ({
   ParentClosePolicy: { ABANDON: 'ABANDON' },
   condition: async () => true,
   defineSignal: (name: string) => name,
-  executeChild: vi.fn(async (workflow: unknown, options?: { args?: unknown[] }) => {
+  executeChild: vi.fn(async (workflow: unknown, options?: { args?: Array<unknown> }) => {
     h.children.push({ workflow, options })
     h.calls.push('reconcile')
     return undefined

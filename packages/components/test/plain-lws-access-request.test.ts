@@ -34,7 +34,7 @@ const resolver: PlainLwsTargetResolver = async (target) => {
   return []
 }
 
-function permission(action: string[], type: string[], source: string[], extra = {}) {
+function permission(action: Array<string>, type: Array<string>, source: Array<string>, extra = {}) {
   return {
     action,
     assignee: REQUESTER,
@@ -108,7 +108,7 @@ describe('plainLwsAccessRequestToNeedBased', () => {
       OWNER,
       resolver
     )
-    const [need] = input.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
+    const [need] = input.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, unknown>>
     expect(need.hasDataRegistration).toBe(REGISTRATION)
     expect(need.hasDataInstance).toBeUndefined()
   })
@@ -120,7 +120,7 @@ describe('plainLwsAccessRequestToNeedBased', () => {
       OWNER,
       resolver
     )
-    const [need] = input.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
+    const [need] = input.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, unknown>>
     expect(need.registeredShapeTree).toBe(TREE)
     expect(need.hasDataRegistration).toBeUndefined()
     expect(need.hasDataInstance).toBeUndefined()
@@ -139,7 +139,7 @@ describe('plainLwsAccessRequestToNeedBased', () => {
       OWNER,
       resolver
     )
-    const [need] = input.hasAccessNeedGroup.hasAccessNeed as Record<string, unknown>[]
+    const [need] = input.hasAccessNeedGroup.hasAccessNeed as Array<Record<string, unknown>>
     expect(need.accessMode).toEqual([ACCESS_ACTIONS.read])
   })
 

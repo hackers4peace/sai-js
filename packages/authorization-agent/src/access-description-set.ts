@@ -25,7 +25,7 @@ import { DataFactory } from 'n3'
 // ──────────────────────────
 
 /** All subjects in the dataset that point interop:inAccessDescriptionSet at the set. */
-function descriptionIrisInSet(dataset: DatasetCore, setIri: string): string[] {
+function descriptionIrisInSet(dataset: DatasetCore, setIri: string): Array<string> {
   return getAllMatchingQuads(
     dataset,
     undefined,
@@ -39,7 +39,7 @@ function descriptionIrisInSet(dataset: DatasetCore, setIri: string): string[] {
  * A description belongs to the set when it points interop:inAccessDescriptionSet
  * at the set and carries interop:hasAccessNeed.
  */
-export function forAccessNeed(dataset: DatasetCore, setIri: string): string[] {
+export function forAccessNeed(dataset: DatasetCore, setIri: string): Array<string> {
   return descriptionIrisInSet(dataset, setIri).filter(
     (iri) => dataset.match(DataFactory.namedNode(iri), INTEROP.terms.hasAccessNeed).size > 0
   )
@@ -50,7 +50,7 @@ export function forAccessNeed(dataset: DatasetCore, setIri: string): string[] {
  * A description belongs to the set when it points interop:inAccessDescriptionSet
  * at the set and carries interop:hasAccessNeedGroup.
  */
-export function forAccessNeedGroup(dataset: DatasetCore, setIri: string): string[] {
+export function forAccessNeedGroup(dataset: DatasetCore, setIri: string): Array<string> {
   return descriptionIrisInSet(dataset, setIri).filter(
     (iri) => dataset.match(DataFactory.namedNode(iri), INTEROP.terms.hasAccessNeedGroup).size > 0
   )
@@ -81,8 +81,8 @@ export async function loadDescriptions(
   set: { id: string },
   fetch: WhatwgFetch
 ): Promise<{
-  accessNeedDescriptions: AccessNeedDescriptionData[]
-  accessNeedGroupDescriptions: AccessNeedGroupDescriptionData[]
+  accessNeedDescriptions: Array<AccessNeedDescriptionData>
+  accessNeedGroupDescriptions: Array<AccessNeedGroupDescriptionData>
 }> {
   // the description set's dataset lives on a data pod — read it through
   // `fetchJsonLd` (LWS JSON-LD profile, plain-`ld+json` fallback); a bare

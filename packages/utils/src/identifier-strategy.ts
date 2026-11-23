@@ -35,7 +35,7 @@ export type CreationStep =
 
 export interface CreationPlan {
   identifier: string
-  steps: CreationStep[]
+  steps: Array<CreationStep>
 }
 
 export interface StorageIdentifierStrategy {

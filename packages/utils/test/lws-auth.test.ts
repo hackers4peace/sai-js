@@ -240,7 +240,7 @@ describe('createLwsFetch — service paths vs peer storages', () => {
   }
 
   function registryServer() {
-    const resources: string[] = []
+    const resources: Array<string> = []
     const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.url
       const request = input as Request

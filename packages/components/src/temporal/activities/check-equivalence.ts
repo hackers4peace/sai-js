@@ -30,7 +30,7 @@ const SET_FIELDS = ['hasDataInstance'] as const
 /** A grant plus its descendants (one level in generation today, recursive for future n-depth). */
 export interface GrantTree {
   grant: GrantData
-  children: GrantTree[]
+  children: Array<GrantTree>
 }
 
 export interface GrantNodePair {
@@ -42,10 +42,13 @@ export interface GrantTreePair {
   generated: GrantTree
   existing: GrantTree
   /** flattened correspondence, parent first, then every descendant */
-  nodes: GrantNodePair[]
+  nodes: Array<GrantNodePair>
 }
 
-function sameSet(a: readonly string[] | undefined, b: readonly string[] | undefined): boolean {
+function sameSet(
+  a: ReadonlyArray<string> | undefined,
+  b: ReadonlyArray<string> | undefined
+): boolean {
   const left = new Set(a ?? [])
   const right = new Set(b ?? [])
   if (left.size !== right.size) {
@@ -64,7 +67,7 @@ function sameSet(a: readonly string[] | undefined, b: readonly string[] | undefi
  * assignee, target owner, the action set, the target type and the target value
  * set. The policy order and the action/value order do not matter.
  */
-function accessShape(grant: GrantData): string[] {
+function accessShape(grant: GrantData): Array<string> {
   return grant.access
     .flatMap((policy) => policy.permission)
     .map((permission) =>
@@ -99,7 +102,7 @@ export function grantFieldsEqual(a: GrantData, b: GrantData): boolean {
   return sameSet(accessShape(a), accessShape(b))
 }
 
-function declaredChildIds(grant: GrantData): string[] {
+function declaredChildIds(grant: GrantData): Array<string> {
   return (grant.hasInheritingGrant ?? []).filter(
     (child): child is string => typeof child === 'string'
   )
@@ -130,14 +133,14 @@ function isComplete(tree: GrantTree): boolean {
  * children whose bodies are missing) and orphaned children (parent body
  * missing) are omitted — they can never be reused.
  */
-export function grantTrees(grants: GrantData[]): GrantTree[] {
+export function grantTrees(grants: Array<GrantData>): Array<GrantTree> {
   const byId = new Map<string, GrantTree>()
   for (const grant of grants) {
     if (grant.id && !byId.has(grant.id)) {
       byId.set(grant.id, { grant, children: [] })
     }
   }
-  const roots: GrantTree[] = []
+  const roots: Array<GrantTree> = []
   for (const tree of byId.values()) {
     const parentId = tree.grant.inheritsFromGrant
     if (!parentId) {
@@ -153,7 +156,7 @@ export function grantTrees(grants: GrantData[]): GrantTree[] {
 function embeddedGrantTree(grant: GrantData): GrantTree {
   // delegated generation embeds child grant objects (no ids yet); the
   // `string[]` type is a wire convenience, so only object children build the tree
-  const embedded = (grant.hasInheritingGrant ?? []) as unknown[]
+  const embedded = (grant.hasInheritingGrant ?? []) as Array<unknown>
   return {
     grant,
     children: embedded
@@ -166,7 +169,7 @@ function embeddedGrantTree(grant: GrantData): GrantTree {
  * Build trees from generated delegated grants, whose children ride the parent
  * as embedded objects (recursive, so n-depth nests work unchanged).
  */
-export function delegatedGrantTrees(grants: GrantData[]): GrantTree[] {
+export function delegatedGrantTrees(grants: Array<GrantData>): Array<GrantTree> {
   return grants.map((grant) => embeddedGrantTree(grant))
 }
 
@@ -175,7 +178,7 @@ export function delegatedGrantTrees(grants: GrantData[]): GrantTree[] {
  * node correspondence (parent first) or `undefined` when the trees differ.
  * Children are matched as a set: equivalent children are interchangeable.
  */
-function pairNodes(generated: GrantTree, existing: GrantTree): GrantNodePair[] | undefined {
+function pairNodes(generated: GrantTree, existing: GrantTree): Array<GrantNodePair> | undefined {
   if (!grantFieldsEqual(generated.grant, existing.grant)) {
     return undefined
   }
@@ -184,7 +187,7 @@ function pairNodes(generated: GrantTree, existing: GrantTree): GrantNodePair[] |
   }
 
   const used = new Set<number>()
-  const nodes: GrantNodePair[] = [{ generated: generated.grant, existing: existing.grant }]
+  const nodes: Array<GrantNodePair> = [{ generated: generated.grant, existing: existing.grant }]
   for (const generatedChild of generated.children) {
     let matched = false
     for (let index = 0; index < existing.children.length; index += 1) {
@@ -217,9 +220,12 @@ export function treesEqual(generated: GrantTree, existing: GrantTree): boolean {
  * generated trees are simply absent from the result (they will be regenerated);
  * each existing tree is claimed at most once.
  */
-export function pairTrees(generated: GrantTree[], existing: GrantTree[]): GrantTreePair[] {
+export function pairTrees(
+  generated: Array<GrantTree>,
+  existing: Array<GrantTree>
+): Array<GrantTreePair> {
   const used = new Set<number>()
-  const pairs: GrantTreePair[] = []
+  const pairs: Array<GrantTreePair> = []
   for (const generatedTree of generated) {
     for (let index = 0; index < existing.length; index += 1) {
       if (used.has(index)) {

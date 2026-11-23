@@ -12,7 +12,7 @@ const CLIENT = 'https://data/test-client/public/id'
 describe('createSelfIssuedCredential', () => {
   test('mints a DPoP-bound access token for the issuer by default', async () => {
     const dpopKeyPair = await createDpopKeyPair()
-    const seen: SelfIssuedCredentialClaims[] = []
+    const seen: Array<SelfIssuedCredentialClaims> = []
     const credential = createSelfIssuedCredential({
       issuer: ISSUER,
       subject: SUBJECT,
@@ -48,7 +48,7 @@ describe('createSelfIssuedCredential', () => {
 
   test('uses an explicit audience and reuses the cached key thumbprint', async () => {
     const dpopKeyPair = await createDpopKeyPair()
-    const seen: SelfIssuedCredentialClaims[] = []
+    const seen: Array<SelfIssuedCredentialClaims> = []
     const credential = createSelfIssuedCredential({
       issuer: ISSUER,
       subject: SUBJECT,

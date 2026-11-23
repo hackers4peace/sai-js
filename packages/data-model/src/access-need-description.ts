@@ -25,6 +25,6 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedDe
     type: node.type ?? [],
     label: node.label as LanguageMap,
     definition: node.definition as LanguageMap | undefined,
-    hasAccessNeed: (node.hasAccessNeed as string[] | undefined)?.[0],
+    hasAccessNeed: (node.hasAccessNeed as Array<string> | undefined)?.[0],
   }
 }

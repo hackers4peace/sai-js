@@ -62,13 +62,13 @@ export interface IdJagTokenHandlerArgs {
    * (`https://data.docker`). The `audience` parameter must name one of them,
    * otherwise a client could ask for a grant "for" any URL.
    */
-  storageOrigins: string[]
+  storageOrigins: Array<string>
   /**
    * Authorization servers/UASs that may be the `audience` of an ID-JAG. C2 uses
    * this for the first hop (Bob's UAS -> YoYo's UAS) before the final storage
    * exchange.
    */
-  authorizationServerOrigins?: string[]
+  authorizationServerOrigins?: Array<string>
   /**
    * Optional independent UAS check of an incoming delegated claim. The auth
    * server wires the grant-registry-backed validator; package tests can inject
@@ -122,8 +122,8 @@ export class IdJagTokenHandler extends HttpHandler {
 
   private readonly issuer: IdJagIssuer
   private readonly verifier: SubjectTokenVerifier
-  private readonly storageOrigins: string[]
-  private readonly authorizationServerOrigins: string[]
+  private readonly storageOrigins: Array<string>
+  private readonly authorizationServerOrigins: Array<string>
   private readonly tokenEndpoint: string
   private readonly claimValidator?: AccessClaimValidator
   private readonly adminImpersonationScope?: string
@@ -737,7 +737,7 @@ export class IdJagTokenHandler extends HttpHandler {
   }
 
   /** Whether the IRI belongs to one of the configured origins (URLs or bare hosts). */
-  private matchesOrigin(origins: string[], iri: string): boolean {
+  private matchesOrigin(origins: Array<string>, iri: string): boolean {
     let url: URL
     try {
       url = new URL(iri)

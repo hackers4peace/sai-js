@@ -45,7 +45,7 @@ describe('CidIssuerResolver', () => {
     const { fetch, resolver: service } = resolver(
       cid({
         service: [
-          ...(cid().service as unknown[]),
+          ...(cid().service as Array<unknown>),
           {
             type: 'https://www.w3.org/ns/lws#OpenIdProvider',
             serviceEndpoint: ISSUER,

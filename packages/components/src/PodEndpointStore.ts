@@ -128,15 +128,15 @@ export class PodEndpointStore extends Initializer {
 
   public async findSparqlByPodUrl(podUrl: string): Promise<SparqlEndpointRecord | undefined> {
     const records = await this.storage.find(SPARQL_ENDPOINT_STORAGE_TYPE, { podUrl })
-    return (records as unknown as SparqlEndpointRecord[])[0]
+    return (records as unknown as Array<SparqlEndpointRecord>)[0]
   }
 
-  public async findSparqlByAccountId(accountId: string): Promise<SparqlEndpointRecord[]> {
+  public async findSparqlByAccountId(accountId: string): Promise<Array<SparqlEndpointRecord>> {
     const records = await this.storage.find(SPARQL_ENDPOINT_STORAGE_TYPE, { accountId })
-    return records as unknown as SparqlEndpointRecord[]
+    return records as unknown as Array<SparqlEndpointRecord>
   }
 
-  public async findSparqlByWebId(webId: string): Promise<SparqlEndpointRecord[]> {
+  public async findSparqlByWebId(webId: string): Promise<Array<SparqlEndpointRecord>> {
     const accountId = await this.resolveAccount(webId)
     return accountId ? this.findSparqlByAccountId(accountId) : []
   }
@@ -162,15 +162,15 @@ export class PodEndpointStore extends Initializer {
 
   public async findObjectByPodUrl(podUrl: string): Promise<ObjectEndpointRecord | undefined> {
     const records = await this.storage.find(OBJECT_ENDPOINT_STORAGE_TYPE, { podUrl })
-    return (records as unknown as ObjectEndpointRecord[])[0]
+    return (records as unknown as Array<ObjectEndpointRecord>)[0]
   }
 
-  public async findObjectByAccountId(accountId: string): Promise<ObjectEndpointRecord[]> {
+  public async findObjectByAccountId(accountId: string): Promise<Array<ObjectEndpointRecord>> {
     const records = await this.storage.find(OBJECT_ENDPOINT_STORAGE_TYPE, { accountId })
-    return records as unknown as ObjectEndpointRecord[]
+    return records as unknown as Array<ObjectEndpointRecord>
   }
 
-  public async findObjectByWebId(webId: string): Promise<ObjectEndpointRecord[]> {
+  public async findObjectByWebId(webId: string): Promise<Array<ObjectEndpointRecord>> {
     const accountId = await this.resolveAccount(webId)
     return accountId ? this.findObjectByAccountId(accountId) : []
   }

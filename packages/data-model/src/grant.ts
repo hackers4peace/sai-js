@@ -12,7 +12,7 @@ import { accessContext } from './context.ts'
 
 export type GrantId = {
   id?: string
-  type: string[]
+  type: Array<string>
 }
 
 /** ODRL target object. */
@@ -21,8 +21,8 @@ export interface OdrlTarget {
   uid?: string
   owner?: string
   storage?: string
-  type: string[]
-  source: string[]
+  type: Array<string>
+  source: Array<string>
   /** SAI profile: the shape tree the target is scoped to. */
   registeredShapeTree?: string
   /** SAI profile: the registration of a selected instance. */
@@ -35,7 +35,7 @@ export interface OdrlPermission {
   uid?: string
   assigner: string
   assignee: string
-  action: string[]
+  action: Array<string>
   target: OdrlTarget
 }
 
@@ -43,14 +43,14 @@ export interface OdrlPermission {
 export interface OdrlPolicy {
   id?: string
   uid?: string
-  type: string[]
+  type: Array<string>
   profile: string
-  permission: OdrlPermission[]
+  permission: Array<OdrlPermission>
   scopeOfGrant?: string
   inheritsFromGrant?: string
   /** Derived from the first permission (compatibility convenience). */
   assignee?: string
-  action?: string[]
+  action?: Array<string>
   target?: OdrlTarget
 }
 
@@ -60,10 +60,10 @@ export interface OdrlPolicy {
  * convenience values for existing consumers and are never serialized.
  */
 export type GrantData = GrantId & {
-  access: OdrlPolicy[]
+  access: Array<OdrlPolicy>
   scopeOfGrant: string
   inheritsFromGrant?: string
-  hasInheritingGrant?: string[]
+  hasInheritingGrant?: Array<string>
 
   // Derived convenience fields (not serialized).
   storage: string
@@ -71,14 +71,14 @@ export type GrantData = GrantId & {
   dataOwner: string
   registeredShapeTree: string
   hasDataRegistration: string
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
 }
 
 export type FinalGrantData = GrantData & Required<Pick<GrantData, 'id'>>
 
 export interface GeneratedGrants {
-  sourceGrants: FinalGrantData[]
-  delegatedGrants: GrantData[]
+  sourceGrants: Array<FinalGrantData>
+  delegatedGrants: Array<GrantData>
 }
 
 export interface GrantTargetInput {
@@ -87,7 +87,7 @@ export interface GrantTargetInput {
   owner: string
   storage: string
   hasDataRegistration: string
-  hasDataInstance?: string[]
+  hasDataInstance?: Array<string>
   registeredShapeTree?: string
   /** `AllFromAgent` target party. */
   agent?: string
@@ -97,12 +97,12 @@ export interface GrantPermissionInput extends GrantTargetInput {
   /** the delegator */
   assigner: string
   assignee: string
-  actions: readonly string[]
+  actions: ReadonlyArray<string>
 }
 
 const urn = (): string => `urn:uuid:${crypto.randomUUID()}`
 
-const asArray = <T>(value: T | T[] | undefined): T[] =>
+const asArray = <T>(value: T | Array<T> | undefined): Array<T> =>
   value === undefined ? [] : Array.isArray(value) ? value : [value]
 
 const PREFIX_IRI: Record<string, string> = {
@@ -152,8 +152,10 @@ function normalizeTarget(node: Record<string, unknown>): OdrlTarget {
     uid: node.uid as string | undefined,
     owner: resolveIri(node.owner as string | undefined),
     storage: resolveIri(node.storage as string | undefined),
-    type: asArray(node.type as string | string[] | undefined).map((value) => resolveIri(value)!),
-    source: asArray(node.source as string | string[] | undefined).map((value) =>
+    type: asArray(node.type as string | Array<string> | undefined).map((value) =>
+      resolveIri(value)!
+    ),
+    source: asArray(node.source as string | Array<string> | undefined).map((value) =>
       resolveIri(value)!
     ),
     ...(node.registeredShapeTree
@@ -175,7 +177,7 @@ function normalizePermission(node: Record<string, unknown>): OdrlPermission {
     uid: node.uid as string | undefined,
     assigner: resolveIri(node.assigner as string)!,
     assignee: resolveIri(node.assignee as string)!,
-    action: asArray(node.action as string | string[] | undefined).map((value) =>
+    action: asArray(node.action as string | Array<string> | undefined).map((value) =>
       resolveIri(value)!
     ),
     target: normalizeTarget((node.target as Record<string, unknown>) ?? {}),
@@ -183,14 +185,16 @@ function normalizePermission(node: Record<string, unknown>): OdrlPermission {
 }
 
 function normalizePolicy(node: Record<string, unknown>): OdrlPolicy {
-  const permission = asArray(node.permission as Record<string, unknown>[] | undefined).map(
+  const permission = asArray(node.permission as Array<Record<string, unknown>> | undefined).map(
     normalizePermission
   )
   const first = permission[0]
   return {
     id: node.id as string | undefined,
     uid: node.uid as string | undefined,
-    type: asArray(node.type as string | string[] | undefined).map((value) => resolveIri(value)!),
+    type: asArray(node.type as string | Array<string> | undefined).map((value) =>
+      resolveIri(value)!
+    ),
     profile: resolveIri(node.profile as string)!,
     permission,
     scopeOfGrant: resolveIri(node.scopeOfGrant as string | undefined),
@@ -234,7 +238,7 @@ export function registrationOfTarget(target: OdrlTarget | undefined): string {
 
 function deriveFields(
   node: Record<string, unknown>,
-  access: OdrlPolicy[]
+  access: Array<OdrlPolicy>
 ): Pick<
   GrantData,
   | 'storage'
@@ -277,12 +281,14 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
   const node = (await frameNode(expanded, accessContext, id, {
     access: { '@embed': '@always' },
   })) as Record<string, unknown>
-  const access = asArray(node.access as Record<string, unknown>[] | undefined)
+  const access = asArray(node.access as Array<Record<string, unknown>> | undefined)
     .filter(Boolean)
     .map(normalizePolicy)
   return {
     id,
-    type: asArray(node.type as string | string[] | undefined).map((value) => resolveIri(value)!),
+    type: asArray(node.type as string | Array<string> | undefined).map((value) =>
+      resolveIri(value)!
+    ),
     access,
     scopeOfGrant:
       resolveIri(node.scopeOfGrant as string | undefined) ?? access[0]?.scopeOfGrant ?? '',
@@ -290,7 +296,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
       ? { inheritsFromGrant: resolveIri(node.inheritsFromGrant as string)! }
       : {}),
     ...(node.hasInheritingGrant
-      ? { hasInheritingGrant: asArray(node.hasInheritingGrant as string | string[]) }
+      ? { hasInheritingGrant: asArray(node.hasInheritingGrant as string | Array<string>) }
       : {}),
     ...deriveFields(node, access),
   }
@@ -302,12 +308,12 @@ export function grantGrantee(grant: Pick<GrantData, 'access'>): string | undefin
 }
 
 /** Every action across the grant's permissions (deduped). */
-export function grantAccessModes(grant: Pick<GrantData, 'access'>): string[] {
+export function grantAccessModes(grant: Pick<GrantData, 'access'>): Array<string> {
   return [...new Set(grant.access.flatMap((policy) => policy.permission.flatMap((p) => p.action)))]
 }
 
 /** Every target across the grant's permissions. */
-export function grantTargets(grant: Pick<GrantData, 'access'>): OdrlTarget[] {
+export function grantTargets(grant: Pick<GrantData, 'access'>): Array<OdrlTarget> {
   return grant.access.flatMap((policy) => policy.permission.map((permission) => permission.target))
 }
 
@@ -367,7 +373,7 @@ function targetFor(input: GrantTargetInput, instance?: string): OdrlTarget {
 }
 
 /** Build one ODRL `Agreement` policy (one permission per selected resource). */
-export function grantAccess(input: GrantPermissionInput): OdrlPolicy[] {
+export function grantAccess(input: GrantPermissionInput): Array<OdrlPolicy> {
   if (!input.registeredShapeTree) {
     throw new Error(`scope ${input.scopeOfGrant} requires a registeredShapeTree`)
   }
@@ -375,7 +381,7 @@ export function grantAccess(input: GrantPermissionInput): OdrlPolicy[] {
     throw new Error('SelectedFromRegistry requires a hasDataRegistration')
   }
   const policyId = urn()
-  const permissions: OdrlPermission[] = []
+  const permissions: Array<OdrlPermission> = []
   if (input.scopeOfGrant === INTEROP.SelectedFromRegistry) {
     for (const instance of input.hasDataInstance ?? []) {
       const permissionId = urn()

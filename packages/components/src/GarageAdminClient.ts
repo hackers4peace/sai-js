@@ -33,13 +33,13 @@ export interface GarageBucketKeyPermissions {
 /** Subset of `GetBucketInfoResponse` this client relies on. */
 export interface GarageBucketInfo {
   id: string
-  globalAliases: string[]
+  globalAliases: Array<string>
   /** keys already granted on the bucket (used for reconciliation) */
-  keys?: {
+  keys?: Array<{
     accessKeyId: string
     name: string
     permissions: GarageBucketKeyPermissions
-  }[]
+  }>
   [key: string]: unknown
 }
 
@@ -118,8 +118,8 @@ export class GarageAdminClient {
   // Buckets
   // ──────────────────────────
 
-  public async listBuckets(): Promise<GarageBucketInfo[]> {
-    return this.request<GarageBucketInfo[]>('GET', '/v2/ListBuckets')
+  public async listBuckets(): Promise<Array<GarageBucketInfo>> {
+    return this.request<Array<GarageBucketInfo>>('GET', '/v2/ListBuckets')
   }
 
   public async findBucketByAlias(globalAlias: string): Promise<GarageBucketInfo | undefined> {
@@ -159,8 +159,8 @@ export class GarageAdminClient {
   // Keys
   // ──────────────────────────
 
-  public async listKeys(): Promise<GarageKeyInfo[]> {
-    const items = await this.request<(GarageKeyInfo & { id?: string })[]>('GET', '/v2/ListKeys')
+  public async listKeys(): Promise<Array<GarageKeyInfo>> {
+    const items = await this.request<Array<GarageKeyInfo & { id?: string }>>('GET', '/v2/ListKeys')
     // `ListKeys` names the access key id `id`; normalise to the `GetKeyInfo`
     // shape so callers see one field name.
     return items.map((item) => ({ ...item, accessKeyId: item.accessKeyId ?? item.id ?? '' }))

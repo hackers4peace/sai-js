@@ -14,7 +14,7 @@ export function accessClaim(
     storage?: string
     assigner?: string
     assignee?: string
-    actions?: string[]
+    actions?: Array<string>
   } = {}
 ) {
   return grantAccess({
@@ -34,7 +34,7 @@ export function idJagClaim(
   options: {
     storage?: string
     assignee?: string
-    actions?: string[]
+    actions?: Array<string>
   } = {}
 ) {
   const assignee = options.assignee ?? CLAIM_SUBJECT

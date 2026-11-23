@@ -43,13 +43,13 @@ export class OwnerAccessClaimValidator implements AccessClaimValidator {
       throw new Error(`no owner grants for ${input.storage}`)
     }
 
-    const quads: Quad[] = Array.isArray(data) ? data : [...data]
+    const quads: Array<Quad> = Array.isArray(data) ? data : [...data]
     const store = new Store(quads)
     const grantIris = [
       ...new Set(store.getSubjects(namedNode(LWS.access), null, null).map((term) => term.value)),
     ]
     const doc = await jsonld.fromRDF(quads)
-    const grants: GrantData[] = []
+    const grants: Array<GrantData> = []
     for (const iri of grantIris) {
       try {
         grants.push(await Grant.fromJsonLd(doc, iri))

@@ -90,8 +90,8 @@ export function scopeCovers(upstream: string, downstream: string): boolean {
  * check also rejected it).
  */
 export function accessModesCover(
-  upstream: readonly string[] | undefined,
-  downstream: readonly string[] | undefined
+  upstream: ReadonlyArray<string> | undefined,
+  downstream: ReadonlyArray<string> | undefined
 ): boolean {
   const required = downstream ?? []
   if (required.length === 0) {
@@ -112,8 +112,8 @@ export function accessModesCover(
  */
 export function selectedInstancesCover(
   scopeOfGrant: string,
-  hasDataInstance: readonly string[] | undefined,
-  requested: readonly string[]
+  hasDataInstance: ReadonlyArray<string> | undefined,
+  requested: ReadonlyArray<string>
 ): boolean {
   if (requested.length === 0) {
     return true
@@ -195,7 +195,7 @@ export function parentCoversChild(parent: GrantData, child: GrantData): boolean 
  * every grant id to `true`/`false`; a grant not in the map (no id) is invalid.
  */
 export function grantChainValidity(
-  grants: readonly GrantData[],
+  grants: ReadonlyArray<GrantData>,
   removed: Iterable<string> = []
 ): Map<string, boolean> {
   const removedSet = new Set(removed)
@@ -220,14 +220,14 @@ export function grantChainValidity(
   // shape tree + registration + storage; the remaining checks are scope/mode/
   // instance coverage. Without the index every grant would scan the whole
   // registry on every fixed-point iteration.
-  const upstreamIndex = new Map<string, GrantData[]>()
+  const upstreamIndex = new Map<string, Array<GrantData>>()
   for (const grant of byId.values()) {
     const key = upstreamKey(grant.dataOwner, grantGrantee(grant), grant)
     const list = upstreamIndex.get(key) ?? []
     list.push(grant)
     upstreamIndex.set(key, list)
   }
-  const candidatesFor = (grant: GrantData): GrantData[] =>
+  const candidatesFor = (grant: GrantData): Array<GrantData> =>
     upstreamIndex.get(upstreamKey(grant.dataOwner, grant.grantedBy, grant)) ?? []
 
   let changed = true
@@ -302,9 +302,9 @@ export function grantChainValidity(
  * not removed (replacement re-anchoring).
  */
 export function invalidGrantsAfterRemoval(
-  grants: readonly GrantData[],
+  grants: ReadonlyArray<GrantData>,
   removed: Iterable<string> = []
-): GrantData[] {
+): Array<GrantData> {
   const removedSet = new Set(removed)
   const validBefore = grantChainValidity(grants)
   const validAfter = grantChainValidity(grants, removedSet)
@@ -345,7 +345,7 @@ export function invalidGrantsAfterRemoval(
 /** Single-grant convenience for callers that already have the chain. */
 export function isGrantValid(
   grant: GrantData,
-  grants: readonly GrantData[],
+  grants: ReadonlyArray<GrantData>,
   removed: Iterable<string> = []
 ): boolean {
   if (!grant.id) {

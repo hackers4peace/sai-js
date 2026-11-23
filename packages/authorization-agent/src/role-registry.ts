@@ -51,7 +51,7 @@ export async function createRole(
   data: RoleRegistryData,
   deps: DataModelDependencies,
   label: LanguageMap,
-  members: string[]
+  members: Array<string>
 ): Promise<RoleData> {
   const iri = await mintResource(data.id, deps)
   const role: RoleData = { id: iri, label, members, type: [INTEROP.Role] }
@@ -64,7 +64,7 @@ export async function updateRole(
   fetch: WhatwgFetch,
   roleId: string,
   label: LanguageMap,
-  members: string[]
+  members: Array<string>
 ): Promise<RoleData> {
   const role: RoleData = { id: roleId, label, members, type: [INTEROP.Role] }
   await putRole(role, fetch)

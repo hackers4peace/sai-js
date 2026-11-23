@@ -73,7 +73,7 @@ const childAuthorization = {
   accessMode: [READ],
 }
 
-function buildContext(authorizations: unknown[]): {
+function buildContext(authorizations: Array<unknown>): {
   ctx: ResolvedContext
   reader: typeof authzReaderMock
 } {

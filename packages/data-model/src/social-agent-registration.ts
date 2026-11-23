@@ -8,8 +8,8 @@ export type SocialAgentRegistrationId = AgentRegistrationId
 export type SocialAgentRegistrationData = SocialAgentRegistrationId & {
   registeredAgent: string
   /** `interop:hasDataGrant` — the registration's link predicate to `lws:AccessGrant` resources (the wire term is kept for Interop compatibility). */
-  hasDataGrant?: string[]
-  hasAdminGrant?: string[]
+  hasDataGrant?: Array<string>
+  hasAdminGrant?: Array<string>
   /** language map — the untagged label under `@none`, translations under their tags */
   label: LanguageMap
   note?: string
@@ -18,7 +18,7 @@ export type SocialAgentRegistrationData = SocialAgentRegistrationId & {
 
 export type SocialAgentId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 // ──────────────────────────
@@ -42,14 +42,14 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<SocialAgentR
     id,
     type: node.type ?? [],
     registeredAgent: node.registeredAgent as string,
-    hasDataGrant: node.hasDataGrant as string[],
-    hasAdminGrant: node.hasAdminGrant as string[],
+    hasDataGrant: node.hasDataGrant as Array<string>,
+    hasAdminGrant: node.hasAdminGrant as Array<string>,
     label: (node.label as LanguageMap | undefined) ?? {},
     note: opt(node, 'note'),
     reciprocalRegistration: opt(node, 'reciprocalRegistration'),
   }
 }
 
-export function getAdminGrantIris(data: SocialAgentRegistrationData): string[] {
+export function getAdminGrantIris(data: SocialAgentRegistrationData): Array<string> {
   return data.hasAdminGrant ?? []
 }

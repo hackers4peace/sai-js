@@ -30,7 +30,7 @@ let keys: GenerateKeyPairResult
 
 interface Claims {
   iss?: string
-  aud?: string | string[]
+  aud?: string | Array<string>
   sub?: string
   client_id?: string
   typ?: string
@@ -57,7 +57,7 @@ async function makeGrant(overrides: Claims = {}): Promise<string> {
 
 /** The verifier with the network-facing parts swapped for local stand-ins. */
 class TestVerifier extends IdJagSubjectTokenVerifier {
-  public documents: string[] = []
+  public documents: Array<string> = []
 
   public constructor(args: Partial<IdJagSubjectTokenVerifierArgs> = {}) {
     super({

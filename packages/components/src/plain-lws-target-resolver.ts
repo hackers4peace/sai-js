@@ -22,7 +22,7 @@ const SHAPE_TREE = 'https://www.w3.org/ns/shapetrees#ShapeTree'
 async function resolveInstances(
   sai: AuthorizationAgent,
   target: PlainLwsTarget
-): Promise<PlainLwsResolvedTarget[]> {
+): Promise<Array<PlainLwsResolvedTarget>> {
   if (target.partOf && target.partOf.length > 1) {
     throw new BadRequestHttpError('an Asset target must name at most one data registration')
   }
@@ -71,8 +71,8 @@ async function resolveInstances(
 async function resolveRegistrations(
   sai: AuthorizationAgent,
   target: PlainLwsTarget
-): Promise<PlainLwsResolvedTarget[]> {
-  const resolved: PlainLwsResolvedTarget[] = []
+): Promise<Array<PlainLwsResolvedTarget>> {
+  const resolved: Array<PlainLwsResolvedTarget> = []
   for (const registrationIri of target.source) {
     let registration: Awaited<ReturnType<typeof loadDataRegistration>>
     try {

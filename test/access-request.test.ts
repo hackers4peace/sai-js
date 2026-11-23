@@ -66,7 +66,7 @@ const accessNeedGroup = {
 /** The stored AccessRequests of the session's (owner's) AccessRequestRegistry
  *  — container containment (`ldp:contains` ∪ `lws:contains`) + the data-model
  *  loader (embeds the group). */
-async function storedAccessRequests(session: AuthorizationAgent): Promise<any[]> {
+async function storedAccessRequests(session: AuthorizationAgent): Promise<Array<any>> {
   const registry = session.registrySet.hasAccessRequestRegistry
   expect(registry).toBeDefined()
   const iris = await containedIris(session, registry!.id)

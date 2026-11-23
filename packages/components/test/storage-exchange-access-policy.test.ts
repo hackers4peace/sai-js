@@ -36,7 +36,7 @@ class TestPolicy extends StorageExchangeAccessPolicy {
 
 function createPolicy(
   options: {
-    owners?: string[]
+    owners?: Array<string>
     subject?: string
     data?: Store
     agent?: string

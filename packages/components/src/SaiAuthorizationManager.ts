@@ -55,7 +55,7 @@ export class SaiAuthorizationManager implements AuthorizationManager {
     return record?.endpoint
   }
 
-  public async getAuthorizationData(id: string): Promise<DatasetCore | Quad[] | undefined> {
+  public async getAuthorizationData(id: string): Promise<DatasetCore | Array<Quad> | undefined> {
     let storage: { path: string }
     try {
       storage = await this.storageStrategy.getStorageIdentifier({ path: id })
@@ -85,7 +85,7 @@ export class SaiAuthorizationManager implements AuthorizationManager {
       const results = await arrayifyStream<IBindings>(bindingsStream)
       const grants = results.map((b) => b.g.value)
 
-      let data: Quad[] = []
+      let data: Array<Quad> = []
       for (const grant of grants) {
         const grantsStream = await this.fetcher.fetchTriples(
           endpoint,

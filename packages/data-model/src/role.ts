@@ -4,13 +4,13 @@ import { dataModelContext } from './context.ts'
 
 export type RoleId = {
   id: string
-  type: string[]
+  type: Array<string>
 }
 
 export type RoleData = RoleId & {
   /** language map — the untagged label under `@none`, translations under their tags */
   label: LanguageMap
-  members: string[]
+  members: Array<string>
 }
 
 const ROLE_TERMS = ['label', 'members'] as const

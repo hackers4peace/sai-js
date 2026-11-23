@@ -1134,13 +1134,13 @@ export class SaiService extends Context.Tag('SaiService')<
     readonly getRoles: (lang: string, context: IRI) => Effect.Effect<S.Schema.Type<typeof RoleList>>
     readonly createRole: (
       label: string,
-      members: readonly S.Schema.Type<typeof IRI>[],
+      members: ReadonlyArray<S.Schema.Type<typeof IRI>>,
       context: IRI
     ) => Effect.Effect<S.Schema.Type<typeof RoleCreatedMessage>>
     readonly updateRole: (
       id: IRI,
       label: string,
-      members: readonly S.Schema.Type<typeof IRI>[],
+      members: ReadonlyArray<S.Schema.Type<typeof IRI>>,
       context: IRI
     ) => Effect.Effect<S.Schema.Type<typeof RoleMembershipChangedMessage>>
     readonly deleteRole: (
@@ -1198,7 +1198,7 @@ export class SaiService extends Context.Tag('SaiService')<
       context: IRI
     ) => Effect.Effect<S.Schema.Type<typeof AuthorizationGrantedMessage>>
     readonly revokeAuthorizations: (
-      authorizations: readonly S.Schema.Type<typeof IRI>[],
+      authorizations: ReadonlyArray<S.Schema.Type<typeof IRI>>,
       context: IRI
     ) => Effect.Effect<
       S.Schema.Type<typeof AuthorizationRevokedMessage>,

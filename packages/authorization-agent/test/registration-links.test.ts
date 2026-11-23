@@ -17,8 +17,10 @@ const CAROL = 'https://id/carol'
  * A transport that serves named graphs and answers the two target queries, so
  * the "one query, no framing" contract is observable.
  */
-function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { queries: string[] } {
-  const queries: string[] = []
+function graphTransport(
+  graphs: Map<string, Array<Quad>>
+): SparqlTransport & { queries: Array<string> } {
+  const queries: Array<string> = []
   return {
     queries,
     async fetchBindings(query: string) {
@@ -74,13 +76,13 @@ function graphTransport(graphs: Map<string, Quad[]>): SparqlTransport & { querie
       queries.push('CONSTRUCT')
       throw new Error('fetchTriples must not be used by the link queries')
     },
-  } as unknown as SparqlTransport & { queries: string[] }
+  } as unknown as SparqlTransport & { queries: Array<string> }
 }
 
 const link = (predicate: string, target: string): Quad =>
   quad(namedNode(RECIPROCAL), namedNode(predicate), namedNode(target))
 
-const grant = (id: string, owner: string): Quad[] => {
+const grant = (id: string, owner: string): Array<Quad> => {
   const policy = `${id}#policy`
   const permission = `${id}#permission`
   const target = `${id}#target`
@@ -117,7 +119,7 @@ describe('getRegistrationLinks — link presence without framing', () => {
 describe('getLinkedGrantOwners — whose data is reachable (T4)', () => {
   test('returns the distinct data owners behind the linked grants', async () => {
     const transport = graphTransport(
-      new Map<string, Quad[]>([
+      new Map<string, Array<Quad>>([
         // link set only in the meta twin (the CSS convention)
         [
           `meta:${RECIPROCAL}`,
@@ -134,7 +136,7 @@ describe('getLinkedGrantOwners — whose data is reachable (T4)', () => {
 
   test('linked grants without a mirrored body contribute nothing', async () => {
     const transport = graphTransport(
-      new Map<string, Quad[]>([
+      new Map<string, Array<Quad>>([
         [
           RECIPROCAL,
           [link(INTEROP.hasDataGrant, PROJECT_GRANT), link(INTEROP.hasDataGrant, TASK_GRANT)],

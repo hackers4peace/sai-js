@@ -51,7 +51,7 @@ export type CidService = {
 export type CidDocument = {
   '@context': string
   id: string
-  service: CidService[]
+  service: Array<CidService>
 }
 
 /**
@@ -87,7 +87,7 @@ export async function toCidDocument(triples: Iterable<Quad>): Promise<CidDocumen
   }
   const framed = (await jsonld.frame(await jsonld.fromRDF([...dataset]), frame, {
     documentLoader,
-  })) as { service?: CidService | CidService[] }
+  })) as { service?: CidService | Array<CidService> }
   // the cid context declares no `@container: '@set'` on `service`, so a single
   // service compacts to a scalar — normalize to the array shape
   if (framed.service && !Array.isArray(framed.service)) {

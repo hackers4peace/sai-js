@@ -62,7 +62,7 @@ describe('share resource', () => {
     // registration of kim links it and the body sits in alice's own grant
     // registry (she is the data owner) — re-read after the barrier
     const linked = (await aliceSession.findSocialAgentRegistration(kimId))!
-    const grants: GrantData[] = []
+    const grants: Array<GrantData> = []
     for (const iri of getAccessGrantIris(linked)) {
       const grant = await loadGrant(iri, aliceSession.fetch).catch(() => undefined)
       if (grant) {
@@ -84,8 +84,8 @@ describe('share resource', () => {
     // the seeded ROLE-granted authorization (the `Test` role, no members)
     // separate — a role is never folded into accessGrantedTo
     const access = await rpcCall<{
-      accessGrantedTo: string[]
-      accessGrantedViaRoles: { role: string; label: string; members: string[] }[]
+      accessGrantedTo: Array<string>
+      accessGrantedViaRoles: Array<{ role: string; label: string; members: Array<string> }>
     }>(rpcPayload({ _tag: 'GetResource', id: resource, lang: 'en', context: aliceId }), aliceCookie)
     expect(access.accessGrantedTo).toContain(kimId)
     expect(access.accessGrantedViaRoles).toEqual([
@@ -99,7 +99,7 @@ describe('share resource', () => {
     // contract lives in federation-mirror.test.ts).
     await waitFor(
       async () => {
-        const registries = await rpcCall<{ registrations: { shapeTree: string }[] }[]>(
+        const registries = await rpcCall<Array<{ registrations: Array<{ shapeTree: string }> }>>(
           rpcPayload({
             _tag: 'ListDataRegistries',
             agentId: aliceId,

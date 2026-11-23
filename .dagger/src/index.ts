@@ -631,7 +631,7 @@ export class SaiJs {
   ): Promise<string> {
     const runId = randomUUID()
     const args = ['npm', 'run', 'dagger:test']
-    const filter: string[] = []
+    const filter: Array<string> = []
     if (testFile) {
       // allow multiple files: --testFile="share.test.ts roles.test.ts"
       filter.push(...testFile.split(/\s+/))
@@ -792,7 +792,7 @@ export class SaiJs {
     runId = randomUUID()
   ): Promise<Service> {
     const args = ['npm', 'run', 'dagger:debug']
-    const filter: string[] = []
+    const filter: Array<string> = []
     if (testFile) {
       // allow multiple files: --testFile="share.test.ts roles.test.ts"
       filter.push(...testFile.split(/\s+/))
@@ -922,17 +922,17 @@ export class SaiJs {
   @func()
   async publishImages(
     system: string,
-    images: string[],
+    images: Array<string>,
     registry: string,
     namespace: string,
     tag: string,
     username: Secret,
     password: Secret
-  ): Promise<string[]> {
+  ): Promise<Array<string>> {
     const arch = systemToArch(system)
     const archTag = `${tag}-${arch}`
 
-    const refs: string[] = []
+    const refs: Array<string> = []
 
     for (const image of images) {
       const baseName = imageBaseName(image)

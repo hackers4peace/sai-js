@@ -4,7 +4,7 @@ import { dataModelContext } from './context.ts'
 
 export type AdminAuthorizationData = {
   id: string
-  type: string[]
+  type: Array<string>
   grantee: string
   grantedBy: string
   scopeOfAuthorization: string
