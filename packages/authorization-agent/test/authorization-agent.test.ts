@@ -192,9 +192,9 @@ describe('findAuthorizationsForAgent', () => {
 
     const authorizations = await agent.findAuthorizationsForAgent(BOB)
 
-    expect(authorizations.map((authorization) => authorization.id).toSorted()).toEqual(
-      [PARENT, CHILD].toSorted()
-    )
+    expect(
+      authorizations.map((authorization) => authorization.id).toSorted((a, b) => a.localeCompare(b))
+    ).toEqual([PARENT, CHILD].toSorted())
     expect(authorizations.find((authorization) => authorization.id === CHILD)).toMatchObject({
       inheritsFromAuthorization: PARENT,
       grantee: BOB,

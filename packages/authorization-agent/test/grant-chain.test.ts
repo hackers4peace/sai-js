@@ -380,7 +380,7 @@ describe('invalidGrantsAfterRemoval — dependent closure', () => {
 
     const invalid = invalidGrantsAfterRemoval(grants, ['ab'])
 
-    expect(invalid.map((g) => g.id).toSorted()).toEqual(['ab', 'bc'])
+    expect(invalid.map((g) => g.id).toSorted((a, b) => a.localeCompare(b))).toEqual(['ab', 'bc'])
     expect(invalid.some((g) => g.id === 'cd')).toBe(false)
   })
 
@@ -390,7 +390,7 @@ describe('invalidGrantsAfterRemoval — dependent closure', () => {
     expect(
       invalidGrantsAfterRemoval(grants, ['root'])
         .map((g) => g.id)
-        .toSorted()
+        .toSorted((a, b) => a.localeCompare(b))
     ).toEqual(['ab', 'bc', 'root'])
   })
 
