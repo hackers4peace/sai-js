@@ -24,11 +24,9 @@ const AS_SERVER = {
 }
 
 function json(body: unknown, init: ResponseInit = {}): Response {
-  return new Response(JSON.stringify(body), {
-    status: 200,
-    ...init,
-    headers: { 'content-type': 'application/json', ...init.headers },
-  })
+  const headers = new Headers({ 'content-type': 'application/json' })
+  new Headers(init.headers).forEach((value, key) => headers.set(key, value))
+  return new Response(JSON.stringify(body), { status: 200, ...init, headers })
 }
 
 function unauthorized(challenge: string): Response {

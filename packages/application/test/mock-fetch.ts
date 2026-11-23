@@ -26,7 +26,7 @@ function postResponse(location: string): Response {
     status: 201,
     headers: { get: (name: string) => (name.toLowerCase() === 'location' ? location : undefined) },
   } as unknown as Response
-  response.clone = () => ({ ...response })
+  response.clone = () => Object.assign({}, response)
   return response
 }
 
@@ -45,7 +45,7 @@ export const statelessFetch = async function statelessFetch(
 ): Promise<Response> {
   if (options?.method === 'PUT' || options?.method === 'PATCH') {
     const response = { ok: true } as Response
-    response.clone = () => ({ ...response })
+    response.clone = () => Object.assign({}, response)
     return response
   }
   if (options?.method === 'POST') {
@@ -96,6 +96,6 @@ export const statelessFetch = async function statelessFetch(
     text: async () => value,
     json: async () => JSON.parse(value),
   } as unknown as Response
-  response.clone = () => ({ ...response })
+  response.clone = () => Object.assign({}, response)
   return response
 } as WhatwgFetch

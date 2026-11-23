@@ -21,7 +21,7 @@ describe('applicatrion registration exists', () => {
     ok: true,
     headers: { get: (name: string): string | null => (name === 'Link' ? linkString : null) },
   } as unknown as Response
-  responseMock.clone = () => ({ ...responseMock })
+  responseMock.clone = () => Object.assign({}, responseMock)
 
   test('should build application registration if discovered', async () => {
     mocked.mockResolvedValueOnce(await statelessFetch(webId)).mockResolvedValueOnce(responseMock)
@@ -50,7 +50,7 @@ describe('discovery helpers', () => {
   const expectedRedirectUriBase = 'https://auth.example/authorize'
   const mocked = vi.fn(statelessFetch)
   const responseMock = { ok: true, headers: { get: (): null => null } } as unknown as Response
-  responseMock.clone = () => ({ ...responseMock })
+  responseMock.clone = () => Object.assign({}, responseMock)
 
   test('should not build appliction registration if not discovered', async () => {
     mocked.mockResolvedValueOnce(await statelessFetch(webId)).mockResolvedValueOnce(responseMock)

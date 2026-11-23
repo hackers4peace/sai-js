@@ -85,7 +85,7 @@ async function common(
           return JSON.parse(raw)
         },
   } as unknown as Response
-  response.clone = () => ({ ...response })
+  response.clone = () => Object.assign({}, response)
   return response
 }
 
@@ -104,7 +104,7 @@ function postResponse(location: string): Response {
     status: 201,
     headers: { get: (name: string) => (name.toLowerCase() === 'location' ? location : undefined) },
   } as unknown as Response
-  response.clone = () => ({ ...response })
+  response.clone = () => Object.assign({}, response)
   return response
 }
 
@@ -113,7 +113,7 @@ function addState(state: { [key: string]: string }): WhatwgFetch {
     if (options?.method === 'PUT') {
       state[url] = options.body as string
       const response = { ok: true } as Response
-      response.clone = () => ({ ...response })
+      response.clone = () => Object.assign({}, response)
       return response
     }
 
@@ -128,7 +128,7 @@ function addState(state: { [key: string]: string }): WhatwgFetch {
     if (options?.method === 'DELETE') {
       delete state[url]
       const response = { ok: true } as Response
-      response.clone = () => ({ ...response })
+      response.clone = () => Object.assign({}, response)
       return response
     }
 
@@ -146,7 +146,7 @@ export const statelessFetch = async function statelessFetch(
 ): Promise<Response> {
   if (options?.method === 'PUT' || options?.method === 'PATCH') {
     const response = { ok: true } as Response
-    response.clone = () => ({ ...response })
+    response.clone = () => Object.assign({}, response)
     return response
   }
   if (options?.method === 'POST') {
