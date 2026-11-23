@@ -40,7 +40,7 @@ interface World {
  */
 function createWorld(options: { grantLifetime?: number } = {}): World {
   const grantLifetime = options.grantLifetime ?? 300
-  let clock = Date.UTC(2026, 10, 14, 12, 0, 0)
+  const clock = Date.UTC(2026, 10, 14, 12, 0, 0)
   const grants: Array<string> = []
 
   const server = (url: URL): string => `https://${url.host}/`
