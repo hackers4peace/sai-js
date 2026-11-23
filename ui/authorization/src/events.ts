@@ -34,7 +34,7 @@ type StreamMessage = { type: 'activity'; activity: ActivityEvent } | { type: 'he
 
 const HEARTBEAT_INTERVAL_MS = 30_000
 const HEARTBEAT_TIMEOUT_MS = HEARTBEAT_INTERVAL_MS * 3
-const INITIAL_BACKOFF_MS = 1_000
+const INITIAL_BACKOFF_MS = 1000
 const MAX_BACKOFF_MS = 30_000
 
 let controller: AbortController | null = null

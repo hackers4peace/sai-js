@@ -114,7 +114,7 @@ export const useAppStore = defineStore('app', () => {
       }
       activitySnackbar.visible = false
       activitySnackbar.claim = null
-    }, 5_000)
+    }, 5000)
   }
 
   /** Bind (or refresh) a claim against the recorded events — the done event

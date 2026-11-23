@@ -65,7 +65,7 @@ export function initTracing(config: RuntimeConfig): void {
     }),
     spanProcessors: [
       new BatchSpanProcessor(new OTLPTraceExporter({ url: tracesUrl }), {
-        scheduledDelayMillis: 1_000,
+        scheduledDelayMillis: 1000,
       }),
     ],
   })
