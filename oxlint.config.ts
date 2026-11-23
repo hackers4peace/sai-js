@@ -30,7 +30,6 @@ const notYetMigrated = Object.fromEntries(
     'no-console',
     'quality/no-unknown-returns',
     'typescript/no-misused-spread',
-    'no-undef',
     'typescript/use-unknown-in-catch-callback-variable',
     'typescript/no-misused-promises',
     'unicorn/prefer-top-level-await',
@@ -85,6 +84,26 @@ export default defineConfig({
         'typescript/no-require-imports': 'off',
         // untyped monkey-patching of prototype methods (see preload.cjs)
         'typescript/unbound-method': 'off',
+      },
+    },
+    {
+      // Vue <script setup> macros and Astro's component global are compiler
+      // provided: oxlint parses .vue/.astro but does not inject their globals.
+      files: ['**/*.vue'],
+      globals: {
+        defineEmits: 'readonly',
+        defineExpose: 'readonly',
+        defineModel: 'readonly',
+        defineOptions: 'readonly',
+        defineProps: 'readonly',
+        defineSlots: 'readonly',
+        withDefaults: 'readonly',
+      },
+    },
+    {
+      files: ['**/*.astro'],
+      globals: {
+        Astro: 'readonly',
       },
     },
     {
