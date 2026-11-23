@@ -6,6 +6,10 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
+  // one shared, stateful stack (seeded once per run) — run files serially,
+  // like the vitest integration suite (`--no-file-parallelism`). Two files
+  // starting at once made the registry answer 500 for both users' pods.
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: 0,
   reporter: [['list'], ['html', { open: 'never' }]],

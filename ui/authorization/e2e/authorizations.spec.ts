@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { attachDiagnostics, signIn } from './support'
+
 // UI counterpart of test/authorizations.test.ts (ListAuthorizations, C0): the
 // read-only authorization listing for a peer, rendered by the Authorizations
 // view, signed in as alice. Seeded in environments/data/registry.trig: alice's
@@ -9,44 +11,12 @@ import { expect, test } from '@playwright/test'
 // https://id/bob -> https://bob.id.docker); `dagger call playwright` sets the env to
 // the in-engine hostnames (https://auth, https://id/bob).
 
-const AUTH_ORIGIN = process.env.AUTH_ORIGIN ?? 'https://auth.docker'
 const BOB_ID = process.env.BOB_ID ?? 'https://bob.id.docker'
 const NOBODY_ID = process.env.NOBODY_ID ?? 'https://nobody.id.docker'
-// alice's seeded session cookie (environments/data/kv.json)
-const ALICE_ACCOUNT_COOKIE = '8187358a-2072-4dce-9c76-24caffcc84a4'
 
-// Surface backend failures and browser errors in the report: the trace keeps
-// requests, but not the body of a failed RPC response.
-test.beforeEach(async ({ page }, testInfo) => {
-  page.on('response', async (response) => {
-    if (response.status() < 400) return
-    const body = await response.text().catch(() => '<unreadable>')
-    await testInfo.attach(
-      `HTTP ${response.status()} ${response.request().method()} ${response.url()}`,
-      {
-        body: `request:\n${response.request().postData() ?? ''}\n\nresponse:\n${body}`,
-        contentType: 'text/plain',
-      }
-    )
-  })
-  page.on('console', async (message) => {
-    if (message.type() !== 'error') return
-    await testInfo.attach('console error', { body: message.text(), contentType: 'text/plain' })
-  })
-})
-
-test.beforeEach(async ({ context }) => {
-  await context.addCookies([
-    {
-      name: 'css-account',
-      value: ALICE_ACCOUNT_COOKIE,
-      url: AUTH_ORIGIN,
-      secure: true,
-      // under Dagger the UI (ui.auth) and the backend (auth) are different
-      // sites, so the credentialed RPC fetch needs a cross-site cookie
-      sameSite: 'None',
-    },
-  ])
+test.beforeEach(async ({ context, page }, testInfo) => {
+  attachDiagnostics(page, testInfo)
+  await signIn(context, 'alice')
 })
 
 test('lists the recorded authorizations for a grantee, including inherited children', async ({
