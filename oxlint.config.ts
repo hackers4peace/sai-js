@@ -30,7 +30,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-floating-promises',
     'no-console',
     'quality/no-unknown-returns',
-    'typescript/no-require-imports',
     'typescript/no-misused-spread',
     'typescript/await-thenable',
     'no-undef',
@@ -82,6 +81,15 @@ export default defineConfig({
       rules: {
         'unicorn/consistent-function-scoping': 'off',
         'no-shadow': 'off',
+      },
+    },
+    {
+      // CommonJS is mandatory: these files are loaded through `node --require`
+      // before the app's main module, so http instrumentation can patch the
+      // server first. `typescript/no-require-imports` would force ESM here.
+      files: ['**/*.cjs'],
+      rules: {
+        'typescript/no-require-imports': 'off',
       },
     },
     {
