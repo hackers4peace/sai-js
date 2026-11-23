@@ -10,6 +10,9 @@ export default defineConfig({
   // like the vitest integration suite (`--no-file-parallelism`). Two files
   // starting at once made the registry answer 500 for both users' pods.
   workers: 1,
+  // the first screens of a run hit a cold stack (registry/data pods, Fuseki):
+  // the authorization list took > 5s (the default) on GitHub runners
+  expect: { timeout: 20_000 },
   forbidOnly: !!process.env.CI,
   retries: 0,
   reporter: [['list'], ['html', { open: 'never' }]],
