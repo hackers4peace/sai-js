@@ -38,6 +38,12 @@ jobs:
       - name: Build packages
         run: npm run build
 
+      # services/id is outside the workspace (own lockfile); the Dagger id
+      # service runs it from the mounted repo (ci.yml installs it the same way)
+      - name: Install id service dependencies
+        run: npm ci
+        working-directory: services/id
+
       - name: Build Astro docs site
         working-directory: docs/website
         env:
