@@ -37,7 +37,7 @@ function fakeStorage() {
         Object.entries(query).every(([key, value]) => record[key] === value)
       ),
     // `findByIri` scans all records of a type rather than querying an index
-    entries: async function* (type: string) {
+    async *entries(type: string) {
       for (const record of recordsOf(type)) {
         yield record
       }

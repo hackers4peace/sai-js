@@ -78,7 +78,7 @@ export async function loadDataInstance(
   const shapeTree = await loadShapeTree(resolvedShapeTreeIri, fetch)
   const blob = isBlob(shapeTree)
   const data: DataInstanceData = {
-    id: id,
+    id,
     ...(partOf ? { partOf } : {}),
     shapeTreeIri: resolvedShapeTreeIri,
     isBlob: blob,

@@ -11,7 +11,7 @@ if (!process.env.CSS_HTTPS_KEY || !process.env.CSS_HTTPS_CERT) {
 serve({
   port: 443,
   fetch: app.fetch,
-  createServer: createServer,
+  createServer,
   serverOptions: {
     key: readFileSync(process.env.CSS_HTTPS_KEY),
     cert: readFileSync(process.env.CSS_HTTPS_CERT),

@@ -169,8 +169,8 @@ export async function listDataInstances(
   const program = Effect.gen(function* () {
     const client = yield* makeClient
     return yield* client.ListDataInstances({
-      agentId: agentId,
-      registrationId: registrationId,
+      agentId,
+      registrationId,
       context: IRI.make(context),
     })
   }).pipe(Effect.scoped, Effect.provide(AuthLayer))
