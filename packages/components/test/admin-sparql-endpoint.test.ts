@@ -4,12 +4,13 @@ import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 // The admin gate needs real sessions; this test only pins WHICH query source
 // the handler targets, so the gate is stubbed out.
 vi.mock('../src/services/adminGate.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../src/services/adminGate.js')>()
+  const actual = await importOriginal<typeof AdminGate>()
   return { ...actual, requireOrgAdmin: vi.fn(async () => ({})) }
 })
 
 import { AdminSparqlHandler, podFromRequestUrl } from '../src/AdminSparqlHandler.js'
 import type { SparqlEndpointRecord } from '../src/PodEndpointStore.js'
+import type * as AdminGate from '../src/services/adminGate.js'
 
 // registryId() derives the registry pod URL from the environment origins
 const originalOrigins = { id: process.env.CSS_ID_ORIGIN, reg: process.env.CSS_REG_ORIGIN }

@@ -1,3 +1,5 @@
+import type * as NodeCrypto from 'node:crypto'
+
 import type { Span } from '@opentelemetry/api'
 import { decodeJwt, decodeProtectedHeader } from 'jose'
 
@@ -33,9 +35,7 @@ function sha256(value: string): string | undefined {
   try {
     const proc = (globalThis as { process?: { getBuiltinModule?: (id: string) => unknown } })
       .process
-    const crypto = proc?.getBuiltinModule?.('node:crypto') as
-      | typeof import('node:crypto')
-      | undefined
+    const crypto = proc?.getBuiltinModule?.('node:crypto') as typeof NodeCrypto | undefined
     return crypto?.createHash('sha256').update(value).digest('base64url')
   } catch {
     return undefined

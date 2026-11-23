@@ -12,6 +12,7 @@ import type {
   NeedBasedAccessRequestSentId,
   SocialAgentId,
 } from '@janeirodigital/interop-data-model'
+import type { AccessRequestGranted } from '@janeirodigital/interop-data-model'
 import { INTEROP, withContext } from '@janeirodigital/interop-utils'
 
 import { buildSessionManager } from '../../builders/sessionManager.js'
@@ -263,15 +264,14 @@ export async function detectGrantedRequests(input: DetectGrantedRequestsInput): 
     if (!matched.has(request.request)) {
       continue
     }
-    const activity: Omit<import('@janeirodigital/interop-data-model').AccessRequestGranted, 'id'> =
-      {
-        type: ['Activity', 'AccessRequestGranted'],
-        actor: input.requester.id,
-        // the light ref — the Sent activity's SNAPSHOT id (the open-set query
-        // joins `outcome.object.id → sent.object.id`)
-        object: { id: request.request, type: [INTEROP.NeedBasedAccessRequest] },
-        createdAt: new Date().toISOString(),
-      }
+    const activity: Omit<AccessRequestGranted, 'id'> = {
+      type: ['Activity', 'AccessRequestGranted'],
+      actor: input.requester.id,
+      // the light ref — the Sent activity's SNAPSHOT id (the open-set query
+      // joins `outcome.object.id → sent.object.id`)
+      object: { id: request.request, type: [INTEROP.NeedBasedAccessRequest] },
+      createdAt: new Date().toISOString(),
+    }
     await ActivityRegistry.createActivity(
       registry,
       {

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { AgentRegistry } from '@janeirodigital/interop-authorization-agent'
 import type { SparqlTransport } from '@janeirodigital/interop-authorization-agent'
 import { INTEROP, RDF } from '@janeirodigital/interop-utils'
+import type * as InteropUtils from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { describe, test, vi } from 'vitest'
 
@@ -13,7 +14,7 @@ import { fetch } from './mock-fetch.ts'
 // registration ACR; the fixture profiles carry no `hasAuthorizationAgent`, so
 // pin the discovery result (the lookup itself is covered by the utils tests).
 vi.mock('@janeirodigital/interop-utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@janeirodigital/interop-utils')>()
+  const actual = await importOriginal<typeof InteropUtils>()
   return {
     ...actual,
     discoverAuthorizationAgent: vi.fn(async () => 'https://auth.acme.example/'),

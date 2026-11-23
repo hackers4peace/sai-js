@@ -31,7 +31,6 @@ const notYetMigrated = Object.fromEntries(
     'no-console',
     'quality/no-unknown-returns',
     'typescript/no-require-imports',
-    'typescript/consistent-type-imports',
     'typescript/ban-ts-comment',
     'typescript/no-misused-spread',
     'typescript/await-thenable',

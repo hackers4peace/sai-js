@@ -8,6 +8,7 @@ import {
   setTokenAttributes,
 } from '@janeirodigital/interop-utils'
 import { SpanStatusCode } from '@opentelemetry/api'
+import type { Span } from '@opentelemetry/api'
 import {
   APPLICATION_X_WWW_FORM_URLENCODED,
   HttpHandler,
@@ -169,10 +170,7 @@ export class IdJagTokenHandler extends HttpHandler {
   /**
    * Validates the token request and issues the ID-JAG.
    */
-  protected async exchange(
-    request: HttpRequest,
-    span: import('@opentelemetry/api').Span
-  ): Promise<Record<string, unknown>> {
+  protected async exchange(request: HttpRequest, span: Span): Promise<Record<string, unknown>> {
     const contentType = request.headers['content-type']
     if (!contentType || parseContentType(contentType).value !== APPLICATION_X_WWW_FORM_URLENCODED) {
       throw new OAuthError(
@@ -444,7 +442,7 @@ export class IdJagTokenHandler extends HttpHandler {
     subjectTokenType: string
     access: VerifiedAccessClaim | undefined
     subject: { access?: unknown }
-    span: import('@opentelemetry/api').Span
+    span: Span
   }): void {
     if (!this.adminImpersonationAuthority) {
       throw new OAuthError('invalid_request', 'Admin impersonation is not enabled on this server.')

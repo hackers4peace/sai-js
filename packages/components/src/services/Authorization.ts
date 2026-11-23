@@ -34,11 +34,11 @@ const loadNeedBasedAccessRequest = loader(AccessRequest.fromJsonLd)
 
 import { INTEROP, loader, pickLanguage } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
+import type { AuthorizationList } from '@janeirodigital/sai-api-messages'
 import {
   AccessNeed,
   AccessRequestArchivedMessage,
   AuthorizationGrantedMessage,
-  AuthorizationList,
   IRI,
 } from '@janeirodigital/sai-api-messages'
 import type {
