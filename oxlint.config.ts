@@ -47,7 +47,6 @@ const notYetMigrated = Object.fromEntries(
     'unicorn/prefer-single-call',
     'no-useless-assignment',
     'no-promise-executor-return',
-    'unicorn/prefer-import-meta-properties',
     'typescript/no-import-type-side-effects',
     'no-empty',
     'quality/no-reflect-get',

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import jsonld from 'jsonld'
 import { Parser, Writer } from 'n3'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 const PUBLIC_DIR = join(__dirname, 'public')
 
 async function turtleToNQuads(turtleText) {

@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'astro/config'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 /** Monorepo root (so `README.md` and Vite can watch it for HMR + builds). */
 const monorepoRoot = path.resolve(__dirname, '../..')
 
