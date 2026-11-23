@@ -12,6 +12,7 @@ import { BadRequestHttpError } from '@solid/community-server'
 import { DataFactory } from 'n3'
 import type { Store } from 'n3'
 
+// oxlint-disable-next-line typescript/unbound-method -- n3's DataFactory methods never read `this`
 const { namedNode } = DataFactory
 
 const GRANT_SCOPES = new Set<string>([

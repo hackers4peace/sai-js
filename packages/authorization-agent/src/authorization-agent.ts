@@ -81,7 +81,7 @@ import {
 import type { SparqlTransport } from './sparql.ts'
 interface AuthorizationAgentDependencies {
   fetch: WhatwgFetch
-  randomUUID(): string
+  randomUUID: () => string
   /** Internal SPARQL endpoint the session reads registry data from (org-context-sparql.md §2.3). */
   sparqlEndpoint: string
   /**

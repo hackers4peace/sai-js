@@ -33,7 +33,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-misused-spread',
     'no-undef',
     'typescript/use-unknown-in-catch-callback-variable',
-    'typescript/unbound-method',
     'typescript/no-misused-promises',
     'unicorn/prefer-top-level-await',
     'typescript/only-throw-error',
@@ -86,6 +85,8 @@ export default defineConfig({
       files: ['**/*.cjs'],
       rules: {
         'typescript/no-require-imports': 'off',
+        // untyped monkey-patching of prototype methods (see preload.cjs)
+        'typescript/unbound-method': 'off',
       },
     },
     {

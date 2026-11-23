@@ -11,6 +11,7 @@ import type {
 import { grantCoversClaim } from './grant-policy.js'
 import type { SaiAuthorizationManager } from './SaiAuthorizationManager.js'
 
+// oxlint-disable-next-line typescript/unbound-method -- n3's DataFactory methods never read `this`
 const { namedNode } = DataFactory
 
 /**

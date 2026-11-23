@@ -8,6 +8,6 @@ import type { IdentifierStrategyResolver, WhatwgFetch } from '@janeirodigital/in
  */
 export interface DataModelDependencies {
   fetch: WhatwgFetch
-  randomUUID(): string
+  randomUUID: () => string
   identifierStrategies?: IdentifierStrategyResolver
 }

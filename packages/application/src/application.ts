@@ -19,7 +19,7 @@ import { getAccessGrants, getDataInstanceIterator, getGranted } from './grant.ts
 
 interface ApplicationDependencies {
   fetch: WhatwgFetch
-  randomUUID(): string
+  randomUUID: () => string
 }
 
 type ParentInfo = {

@@ -9,6 +9,7 @@ import { DataFactory, Store } from 'n3'
 import type { SaiAuthorizationManager } from './SaiAuthorizationManager.js'
 import { sharedTracer } from './tracing/otel-state.js'
 
+// oxlint-disable-next-line typescript/unbound-method -- n3's DataFactory methods never read `this`
 const { namedNode } = DataFactory
 
 /** Discovers the subject's authorization agent (its UAS). */

@@ -55,6 +55,7 @@ const PUBLIC_IDENTITY: GrantIdentity = {
   client: ACP.PublicClient,
 }
 
+// oxlint-disable-next-line typescript/unbound-method -- n3's DataFactory methods never read `this`
 const { namedNode } = DataFactory
 
 export class SaiPermissionsEngine implements PolicyEngine {
