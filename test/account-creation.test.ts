@@ -137,7 +137,7 @@ describe('account creation', () => {
     const kv = await waitFor(
       async () => {
         const missing: Array<string> = []
-        const state = (await pg.exportToJson().catch((error) => {
+        const state = (await pg.exportToJson().catch((error: unknown) => {
           missing.push(`kv(${error instanceof Error ? error.message : String(error)})`)
           return {} as Record<string, unknown>
         })) as Record<string, unknown>
@@ -183,8 +183,9 @@ describe('account creation', () => {
         return state
       },
       { timeout: 25_000, interval: 500 }
-    ).catch((error) => {
-      throw new Error(`${error.message} — never present: ${lastMissing.join(', ')}`)
+    ).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error)
+      throw new Error(`${message} — never present: ${lastMissing.join(', ')}`)
     })
 
     // the handle is now taken: the account has the reverse WebID link that

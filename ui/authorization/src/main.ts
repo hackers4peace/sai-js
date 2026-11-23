@@ -22,7 +22,7 @@ loadRuntimeConfig()
     // All components can now use getRuntimeConfig() in their setup/created hooks
     app.mount('#app')
   })
-  .catch((error) => {
+  .catch((error: unknown) => {
     // Handle config loading failure gracefully
     // Log the error for debugging purposes
     console.error('Failed to initialize app:', error)

@@ -102,7 +102,7 @@ async function run() {
   }
 }
 
-run().catch((error) => {
+run().catch((error: unknown) => {
   console.error(error)
   process.exit(1)
 })

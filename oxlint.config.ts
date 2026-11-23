@@ -27,7 +27,6 @@ const notYetMigrated = Object.fromEntries(
     'typescript/no-unsafe-return',
     'typescript/no-floating-promises',
     'quality/no-unknown-returns',
-    'typescript/use-unknown-in-catch-callback-variable',
     'typescript/no-misused-promises',
   ].map((rule) => [rule, 'off' as const])
 )
@@ -76,6 +75,14 @@ export default defineConfig({
       rules: {
         'unicorn/consistent-function-scoping': 'off',
         'no-shadow': 'off',
+      },
+    },
+    {
+      // Plain JavaScript has no annotations to widen, so the typed catch-callback
+      // rule cannot be satisfied in .js/.mjs/.cjs files.
+      files: ['**/*.{js,jsx,mjs,cjs}'],
+      rules: {
+        'typescript/use-unknown-in-catch-callback-variable': 'off',
       },
     },
     {
