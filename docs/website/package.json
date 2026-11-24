@@ -5,10 +5,12 @@
   "version": "0.0.1",
   "scripts": {
     "codegen:likec4": "likec4 codegen webcomponent .. -o public/likec4-webcomponent.js",
+    "codegen:openwiki": "npx --yes openwiki@0.7.3 visualize ../../openwiki --export dist/openwiki",
     "predev": "npm run codegen:likec4",
     "dev": "astro dev",
     "prebuild": "npm run codegen:likec4",
     "build": "astro build",
+    "postbuild": "npm run codegen:openwiki",
     "preview": "astro preview",
     "clean": "rm -rf .astro dist node_modules/.vite"
   },

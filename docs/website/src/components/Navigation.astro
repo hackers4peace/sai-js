@@ -1,13 +1,22 @@
 ---
 const REPO_URL = 'https://github.com/hackers4peace/sai-js'
 
+const base = import.meta.env.BASE_URL
+
 const navLinks = [
-  { title: 'Intro', href: '#intro' },
-  { title: 'Architecture', href: '#architecture' },
-  { title: 'Videos', href: '#videos' },
-  { title: 'Localization', href: '#localization' },
-  { title: 'Funding', href: '#funding' },
+  { title: 'Intro', href: '#intro', newTab: false },
+  { title: 'Architecture', href: '#architecture', newTab: false },
+  { title: 'Videos', href: '#videos', newTab: false },
+  { title: 'Localization', href: '#localization', newTab: false },
+  { title: 'Funding', href: '#funding', newTab: false },
+  // Built by `codegen:openwiki`; the visualizer has its own chrome and navigation.
+  { title: 'OpenWiki', href: `${base}openwiki/`, newTab: true },
+  // Populated by the Playwright report export in the Pages workflow.
+  { title: 'Journeys', href: `${base}journeys/`, newTab: true },
 ]
+
+// The two generated extras are set apart from the in-page sections.
+const firstNewTabIndex = navLinks.findIndex((link) => link.newTab)
 ---
 
 <nav class="capsule-nav">
@@ -27,8 +36,39 @@ const navLinks = [
       </a>
 
       <div class="nav-links">
-        {navLinks.map((link) => (
-          <a href={link.href} class="nav-link">{link.title}</a>
+        {navLinks.map((link, index) => (
+          <Fragment>
+            {index === firstNewTabIndex && <span class="nav-separator" aria-hidden="true" />}
+            <a
+              href={link.href}
+              class="nav-link"
+              target={link.newTab ? '_blank' : undefined}
+              rel={link.newTab ? 'noopener noreferrer' : undefined}
+              title={link.newTab ? 'Opens in a new tab' : undefined}
+            >
+              {link.title}
+              {link.newTab && (
+                <>
+                  <svg
+                    class="external-icon"
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17 17 7" />
+                    <path d="M9 7h8v8" />
+                  </svg>
+                  <span class="visually-hidden">(opens in a new tab)</span>
+                </>
+              )}
+            </a>
+          </Fragment>
         ))}
       </div>
     </div>
@@ -85,7 +125,35 @@ const navLinks = [
 
   <div class="mobile-menu" id="mobile-menu">
     {navLinks.map((link) => (
-      <a href={link.href} class="mobile-link">{link.title}</a>
+      <a
+        href={link.href}
+        class="mobile-link"
+        target={link.newTab ? '_blank' : undefined}
+        rel={link.newTab ? 'noopener noreferrer' : undefined}
+        title={link.newTab ? 'Opens in a new tab' : undefined}
+      >
+        {link.title}
+        {link.newTab && (
+          <>
+            <svg
+              class="external-icon"
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M7 17 17 7" />
+              <path d="M9 7h8v8" />
+            </svg>
+            <span class="visually-hidden">(opens in a new tab)</span>
+          </>
+        )}
+      </a>
     ))}
     <a href={REPO_URL} class="mobile-link" target="_blank" rel="noopener noreferrer">GitHub</a>
   </div>
@@ -161,6 +229,25 @@ const navLinks = [
 
   .nav-link:hover {
     color: var(--color-primary);
+  }
+
+  .nav-separator {
+    width: 1px;
+    height: 1rem;
+    margin: 0 -0.5rem;
+    align-self: center;
+    background: var(--border-color);
+  }
+
+  .external-icon {
+    flex: none;
+    opacity: 0.55;
+    transition: opacity var(--transition-fast);
+  }
+
+  .nav-link:hover .external-icon,
+  .mobile-link:hover .external-icon {
+    opacity: 1;
   }
 
   /* GitHub icon button (replaces search) */

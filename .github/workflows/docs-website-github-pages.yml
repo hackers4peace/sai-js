@@ -44,6 +44,10 @@ jobs:
         run: npm ci
         working-directory: services/id
 
+      # The site's postbuild step exports OpenWiki's own static visualizer
+      # (npx openwiki@0.7.3 visualize ../../openwiki) to
+      # docs/website/dist/openwiki, so the original wiki UI ships in this
+      # same artifact. The Playwright report is exported to dist/journeys below.
       - name: Build Astro docs site
         working-directory: docs/website
         env:
