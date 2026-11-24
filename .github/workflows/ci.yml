@@ -13,6 +13,16 @@ jobs:
         uses: actions/checkout@v4
       - name: Install dependencies (including the pinned CSS fork)
         run: npm ci
+      # services/id, ui/authorization, and examples/vuejectron are not npm
+      # workspaces: they carry their own lockfiles. Oxlint's type-aware rules
+      # read their types, so without these trees every cross-module import
+      # resolves to `any` and the lint step reports false positives (or an
+      # invalid-tsconfig error for examples/vuejectron's `types` entries).
+      - name: Install project dependencies for type-aware lint
+        run: |
+          npm ci --prefix services/id
+          npm ci --prefix ui/authorization
+          npm ci --prefix examples/vuejectron
       - name: Lint and format check
         run: npm run check
       - name: Typecheck
@@ -24,7 +34,7 @@ jobs:
       - name: Build docs site
         run: npm run build -w @janeirodigital/sai-js-docs-website
       - name: Verify id service
-        run: npm ci && npm run typecheck && npm test
+        run: npm run typecheck && npm test
         working-directory: services/id
       - name: Integration tests
         uses: dagger/dagger-for-github@v8.2.0
