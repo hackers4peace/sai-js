@@ -24,7 +24,9 @@ vi.mock('@janeirodigital/interop-authorization-agent', () => ({
   getAccessGrantsForGrantee: async () => [...registry.grants.keys()].map((grant) => ({ grant })),
   getAccessGrant: async (_transport: unknown, id: string) => {
     const grant = registry.grants.get(id)
-    if (!grant) throw new Error(`unknown grant ${id}`)
+    if (!grant) {
+      throw new Error(`unknown grant ${id}`)
+    }
     return grant
   },
 }))
@@ -63,11 +65,11 @@ function addGrant(id: string, options: GrantOptions) {
 
 type ClaimPolicy = {
   scopeOfGrant: string
-  permission: Array<{ target: { source: string[] } }>
+  permission: Array<{ target: { source: Array<string> } }>
 }
 
-function policiesOf(claim: { access: unknown[] } | undefined): ClaimPolicy[] {
-  return (claim?.access ?? []) as ClaimPolicy[]
+function policiesOf(claim: { access: Array<unknown> } | undefined): Array<ClaimPolicy> {
+  return (claim?.access ?? []) as Array<ClaimPolicy>
 }
 
 function find(validator: DelegatedAccessClaimValidator, forStorage = true) {

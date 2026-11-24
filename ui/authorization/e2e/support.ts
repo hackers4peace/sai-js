@@ -97,7 +97,9 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
       const response = await originalFetch(...args)
       const input = args[0]
       const url = input instanceof Request ? input.url : String(input)
-      if (!url.endsWith('/.sai/events') || !response.body) return response
+      if (!url.endsWith('/.sai/events') || !response.body) {
+        return response
+      }
       const [forApp, forLog] = response.body.tee()
       void (async () => {
         const reader = forLog.getReader()
@@ -107,13 +109,17 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
           const { value, done } = await reader
             .read()
             .catch(() => ({ value: undefined, done: true }))
-          if (done) break
+          if (done) {
+            break
+          }
           buffer += decoder.decode(value, { stream: true })
           let newline = buffer.indexOf('\n')
           while (newline >= 0) {
             const line = buffer.slice(0, newline)
             buffer = buffer.slice(newline + 1)
-            if (line.includes('"activity"')) console.debug(`[sai-event] ${line}`)
+            if (line.includes('"activity"')) {
+              console.debug(`[sai-event] ${line}`)
+            }
             newline = buffer.indexOf('\n')
           }
         }
@@ -127,7 +133,9 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
   })
   page.on('console', async (message) => {
     const text = message.text()
-    if (!text.startsWith('[sai-event] ')) return
+    if (!text.startsWith('[sai-event] ')) {
+      return
+    }
     const line = text.slice('[sai-event] '.length)
     let name = 'event'
     try {
@@ -153,10 +161,14 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
   })
   page.on('response', async (response) => {
     const rpc = response.url().endsWith('/.sai/api')
-    if (response.status() < 400 && !rpc) return
+    if (response.status() < 400 && !rpc) {
+      return
+    }
     const body = await response.text().catch(() => '<unreadable>')
     // an RPC failure travels as HTTP 200 with a Failure/Defect exit in the body
-    if (response.status() < 400 && !body.includes('"Failure"') && !body.includes('"Defect"')) return
+    if (response.status() < 400 && !body.includes('"Failure"') && !body.includes('"Defect"')) {
+      return
+    }
     await testInfo.attach(
       `${prefix}HTTP ${response.status()} ${response.request().method()} ${response.url()}`,
       {
@@ -166,7 +178,9 @@ export async function attachDiagnostics(page: Page, testInfo: TestInfo, who = ''
     )
   })
   page.on('console', async (message) => {
-    if (message.type() !== 'error') return
+    if (message.type() !== 'error') {
+      return
+    }
     await testInfo.attach(`${prefix}console error`, {
       body: message.text(),
       contentType: 'text/plain',

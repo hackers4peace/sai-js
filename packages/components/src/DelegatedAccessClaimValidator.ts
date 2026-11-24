@@ -67,7 +67,7 @@ function grantEdgeRank(batch: Array<GrantData>): number {
  * `SelectedFromRegistry` grant covers one asset, not the registration that
  * holds it, so it cannot back the storage-scoped read of a registration.
  */
-function isRegistrationLevelEdge(batch: GrantData[]): boolean {
+function isRegistrationLevelEdge(batch: Array<GrantData>): boolean {
   return batch.some((grant) => grant.scopeOfGrant !== INTEROP.SelectedFromRegistry)
 }
 
@@ -202,7 +202,9 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
       appSpecific.length > 0
         ? appSpecific
         : mostSpecificGrantEdge(received, input.forStorage !== false)
-    if (selected.length === 0) return undefined
+    if (selected.length === 0) {
+      return undefined
+    }
 
     // The claim must preserve the parent/child relation between selected
     // grants: the policy engine evaluates inheritance from the claim alone.

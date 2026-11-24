@@ -632,7 +632,9 @@ export class SaiJs {
     }
     // forward everything after the separator verbatim (npm passes `--`-suffixed
     // args straight through to the script)
-    if (filter.length) args.push('--', ...filter)
+    if (filter.length) {
+      args.push('--', ...filter)
+    }
     return (await this.testBase(runId))
       .withExec(['node', '--input-type=module', '-e', TEMPORAL_READY])
       .withExec(args)
@@ -699,7 +701,9 @@ export class SaiJs {
 
   private async e2eContainer(runId: string, grep?: string): Promise<Container> {
     const args = ['npx', 'playwright', 'test', '--reporter=list,html']
-    if (grep) args.push('--grep', grep)
+    if (grep) {
+      args.push('--grep', grep)
+    }
     // Build the UI and pull the Playwright image BEFORE the SAI services are
     // created: withSaiServices sets up Temporal's schema eagerly, and a
     // minutes-long build between that setup and Temporal's start lets the idle
@@ -758,7 +762,9 @@ export class SaiJs {
   async playwright(@argument() grep?: string): Promise<string> {
     const run = await this.e2eContainer(randomUUID(), grep)
     const output = `${await run.stdout()}\n${await run.stderr()}`
-    if ((await run.exitCode()) !== 0) throw new Error(output)
+    if ((await run.exitCode()) !== 0) {
+      throw new Error(output)
+    }
     return output
   }
 

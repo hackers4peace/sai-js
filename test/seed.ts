@@ -1,5 +1,4 @@
 import { readFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
 
 import {
   Postgres,
@@ -34,7 +33,9 @@ export async function prepareTestSeed(): Promise<TestSeed> {
   // stage 3: one Fuseki dataset per pod. The fixture's registry origin is the
   // raw `https://registry/` in the dagger environment.
   const accounts = Object.values(kvData).flatMap((value: any) => {
-    if (!value || !value['**pod**']) return []
+    if (!value || !value['**pod**']) {
+      return []
+    }
     return [
       {
         webId: (Object.values(value['**webIdLink**'])[0] as any).webId,
@@ -55,8 +56,9 @@ export async function prepareTestSeed(): Promise<TestSeed> {
     s3Endpoint,
   })
   const testClientCredentials = objectEndpoints.get('https://data/test-client/')
-  if (!testClientCredentials)
+  if (!testClientCredentials) {
     throw new Error('seed did not provision the test-client object endpoint')
+  }
 
   const pg = new Postgres(connectionString, 'key_value')
 
@@ -85,7 +87,7 @@ export async function prepareTestSeed(): Promise<TestSeed> {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (process.argv[1] === import.meta.filename) {
   const testSeed = await prepareTestSeed()
   await testSeed.putClientId()
   await testSeed.seed()
