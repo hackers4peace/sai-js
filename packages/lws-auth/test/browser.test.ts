@@ -99,11 +99,13 @@ describe('createBrowserLwsFetch', () => {
       if (url.pathname.includes('/.well-known/oauth-protected-resource/')) {
         return json({ resource: url.href, authorization_servers: [DATA_AS] })
       }
+      // every LWS authorization server advertises its own token endpoint
       if (url.pathname === '/.well-known/lws-configuration') {
+        const issuer = url.host === new URL(AUTH).host ? AUTH : DATA_AS
         return json({
-          issuer: DATA_AS,
-          token_endpoint: `${DATA_AS}.well-known/lws/token`,
-          jwks_uri: `${DATA_AS}.well-known/lws/jwks`,
+          issuer,
+          token_endpoint: `${issuer}.well-known/lws/token`,
+          jwks_uri: `${issuer}.well-known/lws/jwks`,
         })
       }
       if (!url.pathname.includes('/.well-known/')) {

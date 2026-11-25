@@ -247,6 +247,18 @@ describe('ID-JAG exchange at a storage authorization server', () => {
     const types = metadata.subject_token_types_supported as Array<string>
     expect(types).toEqual([ID_JAG_TYPE])
   })
+
+  test('advertises the ID-JAG token endpoint at the UAS', async () => {
+    const response = await fetch(new URL('.well-known/lws-configuration', AUTH).href, {
+      headers: { accept: 'application/json' },
+    })
+
+    expect(response.status).toBe(200)
+    const metadata = (await response.json()) as Record<string, unknown>
+    expect(metadata.issuer).toBe(AUTH)
+    expect(metadata.token_endpoint).toBe(TOKEN_ENDPOINT)
+    expect(metadata.subject_token_types_supported).toEqual([ACCESS_TOKEN_TYPE, ID_JAG_TYPE])
+  })
 })
 
 describe('ODRL access claim in the ID-JAG (C1)', () => {

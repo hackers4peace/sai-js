@@ -82,6 +82,32 @@
       "@type": "DelegatedAccessClaimValidator"
     },
     {
+      "comment": "LWS authorization server metadata of the UAS (LWS §Authorization Server Metadata): clients discover where the ID-JAG token endpoint lives instead of assuming its path. `jwks_uri` is the OpenID provider's JWKS — the key that already signs the ID-JAGs. The UAS accepts the user's DPoP-bound access token and an incoming ID-JAG (impersonation hop) as subject tokens.",
+      "@id": "urn:sai:default:IdJagMetadataRouter",
+      "@type": "RouterHandler",
+      "baseUrl": {
+        "@id": "urn:solid-server:default:variable:baseUrl"
+      },
+      "targetExtractor": {
+        "@id": "urn:solid-server:default:TargetExtractor"
+      },
+      "allowedPathNames": ["^/\\.well-known/lws-configuration$"],
+      "allowedMethods": ["GET", "HEAD"],
+      "handler": {
+        "@type": "LwsAuthorizationServerMetadataHttpHandler",
+        "issuer": {
+          "@id": "urn:sai:default:IdJagIssuer"
+        },
+        "tokenPath": ".well-known/lws/token",
+        "jwksPath": ".oidc/jwks",
+        "subjectTokenTypes": [
+          "urn:ietf:params:oauth:token-type:access_token",
+          "urn:ietf:params:oauth:token-type:id-jag"
+        ],
+        "subjectIdentifierTypes": ["https"]
+      }
+    },
+    {
       "comment": "LWS token endpoint of the UAS: exchanges the user's DPoP-bound access token (or an incoming ID-JAG at an impersonation hop) for an ID-JAG restricted to one storage's authorization server. A regular ID token is rejected.",
       "@id": "urn:sai:default:IdJagRouter",
       "@type": "RouterHandler",

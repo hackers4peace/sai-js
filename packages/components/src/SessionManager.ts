@@ -12,6 +12,7 @@ import {
   createLwsFetch,
   discoverAuthorizationAgent,
   discoverLwsAuthorizationServerMetadata,
+  fetchLwsAuthorizationServerMetadata,
 } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { JwkGenerator } from '@solid/community-server'
@@ -148,12 +149,15 @@ export class SessionManager {
       const clientId = credential.clientId
       const organizationUas = await this.organizationUas(orgWebId)
       const ras = await discoverLwsAuthorizationServerMetadata(storage, fetch)
+      const adminTokenEndpoint = await this.uasTokenEndpoint(this.baseUrl)
+      const organizationTokenEndpoint = await this.uasTokenEndpoint(organizationUas)
 
       // Hop 1: the admin's own UAS mints an identity-only ID-JAG for the
       // organization's UAS. No scope here — the request scope is only
       // meaningful at the organization's UAS (hop 2).
       const idJag = await requestIdJag({
         uas: this.baseUrl,
+        tokenEndpoint: adminTokenEndpoint,
         audience: organizationUas,
         resource: storage,
         subjectToken: await credential.getSubjectToken(),
@@ -165,6 +169,7 @@ export class SessionManager {
       // organization's claim for this storage and narrows it to `read`.
       const impersonated = await requestIdJag({
         uas: organizationUas,
+        tokenEndpoint: organizationTokenEndpoint,
         audience: ras.issuer,
         resource: storage,
         scope: SAI_ADMIN_IMPERSONATION_SCOPE,
@@ -183,6 +188,15 @@ export class SessionManager {
     this.impersonationFetches.set(key, created)
     created.catch(() => this.impersonationFetches.delete(key))
     return created
+  }
+
+  /** The token endpoint an LWS authorization server advertises in its metadata. */
+  private async uasTokenEndpoint(uas: string): Promise<string> {
+    const metadata = await fetchLwsAuthorizationServerMetadata(uas, fetch)
+    if (!metadata) {
+      throw new Error(`cannot discover the token endpoint of ${uas}`)
+    }
+    return metadata.tokenEndpoint
   }
 
   /** The organization's own UAS origin (its authorization agent's origin). */

@@ -24,9 +24,6 @@ export const ID_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:id_token'
 /** OAuth 2.0 access token. */
 export const ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 
-/** Default token endpoint path of the LWS authorization server (LWS §Authorization Server Metadata). */
-export const LWS_TOKEN_PATH = '.well-known/lws/token'
-
 /** The `token_type` of an ID-JAG response (`N_A` — it is not an OAuth access token). */
 const ID_JAG_RESPONSE_TOKEN_TYPE = 'n_a'
 
@@ -102,8 +99,13 @@ async function tokenExchange(
 export interface IdJagRequest extends TokenRequestOptions {
   /** The user's authorization server (the subject token's `iss`). */
   uas: string
-  /** Its token endpoint; defaults to `<uas>/.well-known/lws/token`. */
-  tokenEndpoint?: string
+  /**
+   * Its token endpoint, from the server's `/.well-known/lws-configuration`
+   * metadata (`token_endpoint`). It is never assumed: an LWS authorization
+   * server advertises where its token endpoint lives (LWS §Authorization Server
+   * Metadata).
+   */
+  tokenEndpoint: string
   /** Issuer identifier of the resource authorization server the grant is for. */
   audience: string
   /**
@@ -185,7 +187,7 @@ export async function requestIdJag(request: IdJagRequest): Promise<string> {
     const body = await tokenExchange(
       {
         issuer: request.uas,
-        tokenEndpoint: request.tokenEndpoint ?? new URL(LWS_TOKEN_PATH, request.uas).href,
+        tokenEndpoint: request.tokenEndpoint,
       },
       request.clientId,
       parameters,

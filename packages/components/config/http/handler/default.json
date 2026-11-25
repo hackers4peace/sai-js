@@ -18,6 +18,10 @@
           "handlers": [
             { "@id": "urn:sai:default:AuthorizationAgentHandler" },
             {
+              "comment": "The LWS authorization server metadata (`.well-known/lws-configuration`): advertises the ID-JAG token endpoint. Imported from `sai:config/identity/id-jag.json`.",
+              "@id": "urn:sai:default:IdJagMetadataRouter"
+            },
+            {
               "comment": "The UAS token endpoint (`.well-known/lws/token`): ID token → ID-JAG, one per storage's authorization server. Imported from `sai:config/identity/id-jag.json`.",
               "@id": "urn:sai:default:IdJagRouter"
             },

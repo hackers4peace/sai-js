@@ -38,6 +38,7 @@ describe('requestIdJag', () => {
     await expect(
       requestIdJag({
         uas: UAS,
+        tokenEndpoint: UAS_TOKEN_ENDPOINT,
         audience: RAS,
         resource: STORAGE,
         subjectToken: SUBJECT_TOKEN,
@@ -68,6 +69,7 @@ describe('requestIdJag', () => {
 
     await requestIdJag({
       uas: UAS,
+      tokenEndpoint: UAS_TOKEN_ENDPOINT,
       audience: RAS,
       subjectToken: SUBJECT_TOKEN,
       clientId: CLIENT,
@@ -87,6 +89,7 @@ describe('requestIdJag', () => {
     await expect(
       requestIdJag({
         uas: UAS,
+        tokenEndpoint: UAS_TOKEN_ENDPOINT,
         audience: 'https://elsewhere.example/',
         subjectToken: SUBJECT_TOKEN,
         clientId: CLIENT,

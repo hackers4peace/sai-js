@@ -50,7 +50,7 @@ function createWorld(options: { grantLifetime?: number } = {}): World {
   const { fetch, requests } = createFakeFetch((url, request): Response | undefined => {
     const href = url.href
 
-    // UAS token endpoint (the UAS deliberately advertises no LWS metadata)
+    // UAS token endpoint
     if (href === UAS_TOKEN && request.method === 'POST') {
       const grant = makeJwt({
         iss: UAS,
@@ -73,11 +73,8 @@ function createWorld(options: { grantLifetime?: number } = {}): World {
       return json({ resource: href, authorization_servers: [server(url)] })
     }
 
-    // authorization server metadata
+    // authorization server metadata (the UAS and every storage advertise theirs)
     if (url.pathname === '/.well-known/lws-configuration') {
-      if (server(url) === UAS) {
-        return undefined
-      }
       return json({
         issuer: server(url),
         token_endpoint: `${server(url)}.well-known/lws/token`,
@@ -264,6 +261,38 @@ describe('createLwsAuthFetch', () => {
     expect(world.requests.filter(isGrantRequest)).toHaveLength(2)
   })
 
+  test('does not assume the UAS token endpoint: without its metadata it fails', async () => {
+    const { fetch } = createFakeFetch((url, request): Response | undefined => {
+      if (url.pathname.includes('/.well-known/oauth-protected-resource/')) {
+        return json({ resource: url.href, authorization_servers: [DATA] })
+      }
+      // the storage authorization server advertises its endpoint, the UAS does not
+      if (url.pathname === '/.well-known/lws-configuration') {
+        if (url.host === new URL(UAS).host) {
+          return undefined
+        }
+        return json({
+          issuer: DATA,
+          token_endpoint: `${DATA}.well-known/lws/token`,
+          jwks_uri: `${DATA}.well-known/lws/jwks`,
+        })
+      }
+      if (url.href.startsWith(DATA_STORAGE)) {
+        return new Response(undefined, {
+          status: 401,
+          headers: {
+            'www-authenticate': `Bearer resource_metadata="${DATA_STORAGE}.well-known/oauth-protected-resource/x", as_uri="${DATA}", realm="${DATA_STORAGE}"`,
+          },
+        })
+      }
+    })
+    const lwsFetch = createLwsAuthFetch({ credential: createCredential(), fetch })
+
+    await expect(lwsFetch(`${DATA_STORAGE}k3pqsb`)).rejects.toThrow(
+      `cannot discover the token endpoint of ${UAS}`
+    )
+  })
+
   test('treats a storage invalid_grant as no token and retries without Authorization', async () => {
     let resourceRequests = 0
     const { fetch, requests } = createFakeFetch((url, request): Response | undefined => {
@@ -277,9 +306,6 @@ describe('createLwsAuthFetch', () => {
         })
       }
       if (url.pathname === '/.well-known/lws-configuration') {
-        if (href === `${UAS}.well-known/lws-configuration`) {
-          return undefined
-        }
         return json({
           issuer: `https://${url.host}/`,
           token_endpoint: `https://${url.host}/.well-known/lws/token`,
@@ -353,6 +379,13 @@ describe('createIdJagFetch', () => {
     let counter = 0
     const grants: Array<string> = []
     const world = createFakeFetch((url, request): Response | undefined => {
+      if (url.pathname === '/.well-known/lws-configuration') {
+        return json({
+          issuer: UAS,
+          token_endpoint: UAS_TOKEN,
+          jwks_uri: `${UAS}.well-known/lws/jwks`,
+        })
+      }
       if (url.href === UAS_TOKEN && request.method === 'POST') {
         const audience = formBody(request).get('audience') ?? ''
         counter += 1

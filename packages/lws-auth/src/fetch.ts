@@ -8,12 +8,15 @@ import {
 import type { LwsCredential } from './credential.ts'
 import { jwtExpiresAt } from './jwt.ts'
 import type { TokenEndpoint } from './tokens.ts'
-import { ID_JAG_TOKEN_TYPE, LWS_TOKEN_PATH, requestAccessToken, requestIdJag } from './tokens.ts'
+import { ID_JAG_TOKEN_TYPE, requestAccessToken, requestIdJag } from './tokens.ts'
 
 export interface LwsImpersonationOptions {
   /** The UAS that re-issues the ID-JAG at the next hop. */
   uas: string
-  /** Its token endpoint; defaults to `<uas>/.well-known/lws/token`. */
+  /**
+   * Its token endpoint. When omitted it is discovered from `<uas>`'s
+   * `/.well-known/lws-configuration` metadata.
+   */
   tokenEndpoint?: string
 }
 
@@ -71,14 +74,37 @@ function isInvalidGrant(error: unknown): boolean {
 }
 
 /**
+ * Resolves the token endpoint of an LWS authorization server from its metadata
+ * (`/.well-known/lws-configuration`). The endpoint is never assumed: the LWS
+ * profile requires the server to advertise it (LWS §Authorization Server
+ * Metadata), so a missing document is an error rather than a guessed URL.
+ */
+function createTokenEndpointResolver(baseFetch: WhatwgFetch): (uas: string) => Promise<string> {
+  const endpoints = new Map<string, string>()
+  return async (uas: string): Promise<string> => {
+    const cached = endpoints.get(uas)
+    if (cached) {
+      return cached
+    }
+    const metadata = await fetchLwsAuthorizationServerMetadata(uas, baseFetch)
+    if (!metadata) {
+      throw new Error(`cannot discover the token endpoint of ${uas}`)
+    }
+    endpoints.set(uas, metadata.tokenEndpoint)
+    return metadata.tokenEndpoint
+  }
+}
+
+/**
  * `fetch` for LWS storages that goes through the **two-step** authorization
  * chain instead of exchanging the authentication credential directly:
  *
- * 1. `POST <uas>/.well-known/lws/token` — the user's DPoP-bound access token
- *    (or an incoming ID-JAG at an impersonation hop) + DPoP proof → one ID-JAG
- *    per resource authorization server (`aud` = that server's issuer),
- * 2. `POST <storage>/.well-known/lws/token` — ID-JAG → bearer access token for
- *    the storage (a bearer grant exchange, no DPoP proof),
+ * 1. `POST <uas token_endpoint>` (discovered from its LWS metadata) — the
+ *    user's DPoP-bound access token (or an incoming ID-JAG at an impersonation
+ *    hop) + DPoP proof → one ID-JAG per resource authorization server (`aud` =
+ *    that server's issuer),
+ * 2. `POST <storage token_endpoint>` — ID-JAG → bearer access token for the
+ *    storage (a bearer grant exchange, no DPoP proof),
  * 3. the storage request, retried once on `401`.
  *
  * The UAS derives the claim from the user's grants for the requested storage,
@@ -95,27 +121,10 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
   const tokenFetch = options.tokenFetch ?? baseFetch
   const now = options.now ?? (() => Date.now())
   const renewalMargin = options.renewalMargin ?? 30_000
+  const uasTokenEndpoint = createTokenEndpointResolver(baseFetch)
 
   const grants = new Map<string, CachedGrant>()
   const pendingGrants = new Map<string, Promise<string>>()
-  const tokenEndpoints = new Map<string, string>()
-
-  /** The UAS token endpoint: LWS metadata when advertised, the well-known path otherwise. */
-  async function uasTokenEndpoint(uas: string): Promise<string> {
-    const cached = tokenEndpoints.get(uas)
-    if (cached) {
-      return cached
-    }
-    let endpoint: string
-    try {
-      const metadata = await fetchLwsAuthorizationServerMetadata(uas, baseFetch)
-      endpoint = metadata?.tokenEndpoint ?? new URL(LWS_TOKEN_PATH, uas).href
-    } catch {
-      endpoint = new URL(LWS_TOKEN_PATH, uas).href
-    }
-    tokenEndpoints.set(uas, endpoint)
-    return endpoint
-  }
 
   /**
    * The ID-JAG for one resource authorization server (and, for an access-claim
@@ -154,7 +163,9 @@ export function createLwsAuthFetch(options: LwsAuthFetchOptions): WhatwgFetch {
         // claim to the visible actor, and issues the ID-JAG for the storage AS.
         token = await requestIdJag({
           uas: options.impersonation.uas,
-          tokenEndpoint: options.impersonation.tokenEndpoint,
+          tokenEndpoint:
+            options.impersonation.tokenEndpoint ??
+            (await uasTokenEndpoint(options.impersonation.uas)),
           audience,
           resource: storage,
           subjectToken: token,
@@ -247,6 +258,7 @@ export function createIdJagFetch(options: IdJagFetchOptions): WhatwgFetch {
   const tokenFetch = options.tokenFetch ?? baseFetch
   const now = options.now ?? (() => Date.now())
   const renewalMargin = options.renewalMargin ?? 30_000
+  const uasTokenEndpoint = createTokenEndpointResolver(baseFetch)
   const resolveAudience: (requestUrl: string) => string =
     typeof options.audience === 'string' ? () => String(options.audience) : options.audience
 
@@ -267,6 +279,7 @@ export function createIdJagFetch(options: IdJagFetchOptions): WhatwgFetch {
     const promise = (async (): Promise<string> => {
       const token = await requestIdJag({
         uas: credential.issuer,
+        tokenEndpoint: await uasTokenEndpoint(credential.issuer),
         audience,
         // The `.sai` grant is identity-only: no resource and no access claim.
         subjectToken: await credential.getSubjectToken(),

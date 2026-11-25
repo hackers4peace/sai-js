@@ -12,7 +12,9 @@
  *     config/ldp/metadata-writer/writers/lws-link.json      (Link: rel=lws#storage)
  * - SAI
  *     packages/components/config/{data,registry}.json import css:config/identity/lws/default.json
- *     packages/components/config/auth.json does NOT (auth is only the OIDC provider)
+ *     packages/components/config/auth.json does NOT import it: auth is the OIDC
+ *       provider and the UAS. `sai:config/identity/id-jag.json` adds its LWS
+ *       metadata (`IdJagMetadataRouter`) and the ID-JAG token endpoint.
  *     packages/utils/src/lws-auth.ts        (client-side discovery + exchange)
  *     packages/components/src/SaiSession.ts, builders/sessionManager.ts;
  *     packages/lws-auth/src/credential.ts, src/fetch.ts
@@ -138,9 +140,9 @@ model {
         The `.sai` ID-JAG is identity-only: no `resource`, no ODRL access claim.
         `.sai` requests carry it as a plain Bearer token; DPoP stops here.
 
-        The UAS advertises no `/.well-known/lws-configuration` (`auth.json`
-        imports no `css:config/identity/lws/default.json`), so clients use this
-        well-known path directly.
+        The UAS advertises this endpoint at `/.well-known/lws-configuration`
+        (`IdJagMetadataRouter`, `sai:config/identity/id-jag.json`); clients
+        discover `token_endpoint` there and never assume the path.
       '''
     }
   }
