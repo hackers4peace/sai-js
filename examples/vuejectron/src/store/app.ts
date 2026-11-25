@@ -1,4 +1,8 @@
-import { createBrowserLwsFetch } from '@elfpavlik/lws-auth'
+import {
+  createBrowserCredential,
+  createBrowserLwsFetch,
+  createIdJagFetch,
+} from '@elfpavlik/lws-auth'
 import { Application, NotificationManager } from '@janeirodigital/interop-application'
 import { WebIdProfile } from '@janeirodigital/interop-data-model'
 import { AS, RequestError, loader, pickLanguage } from '@janeirodigital/interop-utils'
@@ -26,16 +30,19 @@ import { useCoreStore } from './core'
 
 const loadWebIdProfile = loader(WebIdProfile.fromJsonLd)
 
-const scopes = {
-  project: 'https://shapetrees.hackers4peace.net/trees/Project',
-  task: 'https://shapetrees.hackers4peace.net/trees/Task',
-  image: 'https://shapetrees.hackers4peace.net/trees/Image',
-  file: 'https://shapetrees.hackers4peace.net/trees/File',
-}
-
 type AgentId = string
 
 export const useAppStore = defineStore('app', () => {
+  // runtime-configurable: the Dagger stack seeds its own copy of the shape trees
+  const shapeTreesOrigin = (
+    getRuntimeConfig().shapeTreesOrigin ?? 'https://shapetrees.hackers4peace.net'
+  ).replace(/\/$/, '')
+  const scopes = {
+    project: `${shapeTreesOrigin}/trees/Project`,
+    task: `${shapeTreesOrigin}/trees/Task`,
+    image: `${shapeTreesOrigin}/trees/Image`,
+    file: `${shapeTreesOrigin}/trees/File`,
+  }
   const subscriptions = useStorage<Map<string, string>>('subscriptions', new Map())
   const coreStore = useCoreStore()
   const agents = ref<Array<Agent>>([])
@@ -54,35 +61,49 @@ export const useAppStore = defineStore('app', () => {
   const authSession = browserSession()
 
   /**
-   * The data and registry storages accept only LWS access tokens, while the
-   * `.sai` API keeps the Solid-OIDC DPoP session.
+   * The data and registry storages accept only LWS access tokens and the `.sai`
+   * API accepts only an identity-only ID-JAG. The app's Solid-OIDC session is
+   * the first-hop credential for both; it is presented only to the UAS that
+   * issued it, never to a storage or `.sai` route.
    *
    * The browser runs the LWS chain itself (`@elfpavlik/lws-auth`): its session
    * **access token** (`aud` = `auth`, `cnf.jkt` = the session key) is exchanged
    * for one ID-JAG per storage authorization server, and each grant is traded
-   * for a storage access token. The token never leaves the browser and the
-   * grants are `aud`-restricted, so nothing here can mint a token for another
-   * storage.
+   * for a storage access token. A separate identity-only ID-JAG (audience = the
+   * `.sai` UAS, no `resource` claim) authenticates the `.sai` requests. The
+   * token never leaves the browser and the grants are `aud`-restricted, so
+   * nothing here can mint a token for another storage.
    *
-   * Both legs use the session's **single** non-extractable DPoP key pair: the
-   * session fetch signs the `.sai`/token requests with it, and the LWS client
-   * proves the `cnf.jkt` of the access token at the ID-JAG exchange with it.
+   * Both legs use the session's **single** non-extractable DPoP key pair, which
+   * also signs the token requests that mint the grants.
    */
   let sessionFetchCache: WhatwgFetch | undefined
+  let fetchesCache: Promise<{ storage: WhatwgFetch; sai: WhatwgFetch }> | undefined
+  /** `/.sai` requests never carry the DPoP session token — see `saiAudience`. */
+  function isSaiUrl(url: string): boolean {
+    return new URL(url, window.location.origin).pathname.startsWith('/.sai/')
+  }
+  /** The audience of a `.sai` ID-JAG: its own URL, or the UAS base for agent discovery. */
+  function saiAudience(requestUrl: string): string {
+    const parsed = new URL(requestUrl)
+    return parsed.pathname.startsWith('/.sai/agents/') ? `${parsed.origin}/` : parsed.href
+  }
   function sessionFetch(): WhatwgFetch {
     if (sessionFetchCache) {
       return sessionFetchCache
     }
-    const authServer = new URL(authSession.issuer).origin
-    // plain fetch for the storages: the LWS access token is their credential;
-    // the session's DPoP fetch is only for the UAS and `.sai`.
-    const lwsFetch = createBrowserLwsFetch({ session: authSession })
+    fetchesCache ??= (async () => {
+      const credential = await createBrowserCredential(authSession)
+      return {
+        storage: await createBrowserLwsFetch({ session: authSession }),
+        sai: createIdJagFetch({ credential, audience: saiAudience }),
+      }
+    })()
+    const fetches = fetchesCache
     sessionFetchCache = async (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-      if (url.startsWith(`${authServer}/`)) {
-        return authSession.fetch(input, init)
-      }
-      return (await lwsFetch)(input, init)
+      const { storage, sai } = await fetches
+      return isSaiUrl(url) ? sai(input, init) : storage(input, init)
     }
     return sessionFetchCache
   }

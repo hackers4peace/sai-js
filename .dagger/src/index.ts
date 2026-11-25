@@ -77,13 +77,14 @@ const TEMPORAL_READY = `
   process.exit(1)
 `
 
-/** Static HTTPS server for the built UI with SPA fallback to index.html. */
-const UI_STATIC_SERVER = `
+/** Static HTTPS server for a built SPA with fallback to index.html. */
+function staticServer(root: string): string {
+  return `
   import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs'
   import { createServer } from 'node:https'
   import { extname, join, normalize } from 'node:path'
 
-  const root = '/sai/ui/authorization/dist'
+  const root = '${root}'
   const types = {
     '.html': 'text/html; charset=utf-8',
     '.js': 'text/javascript',
@@ -104,7 +105,7 @@ const UI_STATIC_SERVER = `
     cert: readFileSync('${CSS_HTTPS_CERT}'),
   }
   createServer(tls, (req, res) => {
-    const path = normalize(decodeURIComponent(new URL(req.url, 'https://ui.auth').pathname))
+    const path = normalize(decodeURIComponent(new URL(req.url, 'https://spa').pathname))
     let file = join(root, path)
     if (!file.startsWith(root) || !existsSync(file) || statSync(file).isDirectory()) {
       file = join(root, 'index.html')
@@ -113,6 +114,10 @@ const UI_STATIC_SERVER = `
     createReadStream(file).pipe(res)
   }).listen(443)
 `
+}
+
+const UI_STATIC_SERVER = staticServer('/sai/ui/authorization/dist')
+const VUEJECTRON_STATIC_SERVER = staticServer('/sai/examples/vuejectron/dist')
 const IMAGE_SUFFIX = '-image'
 
 type Arch = 'amd64' | 'arm64'
@@ -699,16 +704,72 @@ export class SaiJs {
       .withExposedPort(443)
   }
 
+  /** The example app without its host-installed artifacts (installed in-engine). */
+  private vuejectronSource(): Directory {
+    return this.source
+      .withoutDirectory('examples/vuejectron/node_modules')
+      .withoutDirectory('examples/vuejectron/dist')
+      .withoutDirectory('examples/vuejectron/dev-dist')
+  }
+
+  /** `npm ci` of the example app (its own lockfile), cached across runs. */
+  private vuejectronNodeModules(): Directory {
+    return dag
+      .container()
+      .from(NODE_IMAGE)
+      .withMountedCache('/root/.npm', dag.cacheVolume('sai-vuejectron-npm'))
+      .withDirectory('/sai', this.vuejectronSource())
+      .withWorkdir('/sai/examples/vuejectron')
+      .withExec(['npm', 'ci', '--no-audit', '--no-fund'])
+      .directory('/sai/examples/vuejectron/node_modules')
+  }
+
+  /**
+   * The vuejectron demo app, the stack's `test-client` application. It is served
+   * at `https://test-client` — the `hasAuthorizationCallbackEndpoint` of the
+   * seeded client-id document — and identifies as the canonical
+   * `https://data/test-client/public/id` client. The shape-tree scopes point at
+   * the in-engine copies (`https://data/shapetrees`) instead of the public
+   * workers the dev/prod deployments use.
+   */
+  @func({ cache: 'session' })
+  vuejectronService(): Service {
+    return this.vuejectronBuild()
+      .asService({ args: ['node', '/serve.mjs'] })
+      .withHostname('test-client')
+  }
+
+  private vuejectronBuild(): Container {
+    const config = JSON.stringify({
+      defaultOidcIssuer: CSS_BASE_URL,
+      clientId: 'https://data/test-client/public/id',
+      baseUrl: 'https://test-client',
+      shapeTreesOrigin: 'https://data/shapetrees',
+    })
+    return dag
+      .container()
+      .from(NODE_IMAGE)
+      .withDirectory('/sai', this.vuejectronSource())
+      .withDirectory('/sai/examples/vuejectron/node_modules', this.vuejectronNodeModules())
+      .withWorkdir('/sai/examples/vuejectron')
+      .withExec(['npx', 'vite', 'build'])
+      .withNewFile('/sai/examples/vuejectron/dist/config.json', config)
+      .withNewFile('/serve.mjs', VUEJECTRON_STATIC_SERVER)
+      .withExposedPort(443)
+  }
+
   private async e2eContainer(runId: string, grep?: string): Promise<Container> {
     const args = ['npx', 'playwright', 'test', '--reporter=list,html']
     if (grep) {
       args.push('--grep', grep)
     }
-    // Build the UI and pull the Playwright image BEFORE the SAI services are
-    // created: withSaiServices sets up Temporal's schema eagerly, and a
-    // minutes-long build between that setup and Temporal's start lets the idle
-    // Postgres service stop, so Temporal would bind to a fresh, schema-less one.
+    // Build the UI and the demo app, and pull the Playwright image BEFORE the
+    // SAI services are created: withSaiServices sets up Temporal's schema
+    // eagerly, and a minutes-long build between that setup and Temporal's start
+    // lets the idle Postgres service stop, so Temporal would bind to a fresh,
+    // schema-less one.
     await this.uiBuild().sync()
+    await this.vuejectronBuild().sync()
     const container = await dag
       .container()
       .from(PLAYWRIGHT_IMAGE)
@@ -718,12 +779,15 @@ export class SaiJs {
     return (
       (await this.withSaiServices(container, runId))
         .withServiceBinding('ui.auth', this.uiService())
+        .withServiceBinding('test-client', this.vuejectronService())
         .withEnvVariable('CI', 'true')
         .withEnvVariable('TEMPORAL_ADDRESS', 'temporal:7233')
         .withEnvVariable('UI_BASE_URL', 'https://ui.auth')
+        .withEnvVariable('VUEJECTRON_URL', 'https://test-client')
         .withEnvVariable('AUTH_ORIGIN', 'https://auth')
         .withEnvVariable('ALICE_ID', 'https://id/alice')
         .withEnvVariable('BOB_ID', 'https://id/bob')
+        .withEnvVariable('KIM_ID', 'https://id/kim')
         .withEnvVariable('NOBODY_ID', 'https://id/nobody')
         // test/seed.ts provisions the per-pod Garage buckets/keys itself
         .withEnvVariable('CSS_S3_ENDPOINT', CSS_S3_ENDPOINT)

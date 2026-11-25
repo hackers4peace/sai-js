@@ -497,7 +497,7 @@ _:n3-28 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-29.
 <meta:https://registry/alice/authorization/> {
 <https://registry/alice/authorization/> a <http://www.w3.org/ns/solid/interop#AuthorizationRegistry>, <http://www.w3.org/ns/ldp#Resource>;
     <https://www.w3.org/ns/lws#partOf> <https://registry/alice/>;
-    <https://www.w3.org/ns/lws#contains> <https://registry/alice/g08qqa>, <https://registry/alice/p7n4qw>, <https://registry/alice/t5m8kr>, <https://registry/alice/w329t6>
+    <https://www.w3.org/ns/lws#contains> <https://registry/alice/g08qqa>, <https://registry/alice/p7n4qw>, <https://registry/alice/t5k9wz>, <https://registry/alice/t5m8kr>, <https://registry/alice/w329t6>
 }
 <https://registry/alice/w329t6> {
 <https://registry/alice/w329t6> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
@@ -510,6 +510,19 @@ _:n3-28 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-29.
 <meta:https://registry/alice/w329t6> {
 <https://registry/alice/w329t6> a <http://www.w3.org/ns/ldp#Resource>;
     <https://www.w3.org/ns/lws#partOf> <https://registry/alice/authorization/>
+}
+<meta:https://registry/alice/t5k9wz> {
+<https://registry/alice/t5k9wz> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/alice/authorization/>
+}
+<https://registry/alice/t5k9wz> {
+<https://registry/alice/t5k9wz> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
+    <http://www.w3.org/ns/solid/interop#grantee> <https://data/test-client/public/id>;
+    <http://www.w3.org/ns/solid/interop#grantedBy> <https://id/alice>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/ns/solid/interop#scopeOfAuthorization> <http://www.w3.org/ns/solid/interop#Inherited>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromAuthorization> <https://registry/alice/w329t6>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>
 }
 <https://registry/alice/p7n4qw> {
 <https://registry/alice/p7n4qw> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
@@ -1199,7 +1212,8 @@ _:n3-78 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-79.
 }
 <meta:https://registry/kim/grant/> {
 <https://registry/kim/grant/> a <http://www.w3.org/ns/solid/interop#GrantRegistry>, <http://www.w3.org/ns/ldp#Resource>;
-    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/>
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/>;
+    <https://www.w3.org/ns/lws#contains> <https://registry/kim/grt7pq>
 }
 <meta:https://registry/yoyo/> {
 <https://registry/yoyo/> a <http://www.w3.org/ns/solid/interop#RegistrySet>, <http://www.w3.org/ns/ldp#Resource>, <http://www.w3.org/ns/pim/space#Storage>;
@@ -1603,7 +1617,8 @@ _:n3-112 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-113.
 }
 <meta:https://registry/kim/authorization/> {
 <https://registry/kim/authorization/> a <http://www.w3.org/ns/solid/interop#AuthorizationRegistry>, <http://www.w3.org/ns/ldp#Resource>;
-    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/>
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/>;
+    <https://www.w3.org/ns/lws#contains> <https://registry/kim/aut5zm>, <https://registry/kim/aut5zt>
 }
 <meta:https://registry/kim/role/> {
 <https://registry/kim/role/> a <http://www.w3.org/ns/solid/interop#RoleRegistry>, <http://www.w3.org/ns/ldp#Resource>;
@@ -1624,7 +1639,113 @@ _:n3-112 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-113.
 }
 <meta:https://registry/kim/application/> {
 <https://registry/kim/application/> a <http://www.w3.org/ns/solid/interop#ApplicationRegistry>, <http://www.w3.org/ns/ldp#Resource>;
-    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/>
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/>;
+    <https://www.w3.org/ns/lws#contains> <https://registry/kim/app8kt>
+}
+<meta:https://registry/kim/app8kt> {
+<https://registry/kim/app8kt> a <http://www.w3.org/ns/solid/interop#ApplicationRegistration>, <http://www.w3.org/ns/ldp#Container>, <http://www.w3.org/ns/ldp#BasicContainer>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredAgent> <https://data/test-client/public/id>;
+    <http://www.w3.org/ns/solid/interop#hasDataGrant> <https://registry/kim/grt7pq>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/application/>
+}
+<meta:https://registry/kim/app8kt.acr> {
+<https://registry/kim/app8kt.acr> a <http://www.w3.org/ns/ldp#Resource>
+}
+<https://registry/kim/app8kt.acr> {
+<https://registry/kim/app8kt.acr#root> a <http://www.w3.org/ns/solid/acp#AccessControlResource>;
+    <http://www.w3.org/ns/solid/acp#resource> <https://registry/kim/app8kt>;
+    <http://www.w3.org/ns/solid/acp#accessControl> <https://registry/kim/app8kt.acr#fullOwnerAccess>, <https://registry/kim/app8kt.acr#peerReadAccess>;
+    <http://www.w3.org/ns/solid/acp#memberAccessControl> <https://registry/kim/app8kt.acr#fullOwnerAccess>, <https://registry/kim/app8kt.acr#peerReadAccess>.
+<https://registry/kim/app8kt.acr#fullOwnerAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+_:n3-kim-app-owner a <http://www.w3.org/ns/solid/acp#Policy>;
+    <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>, <http://www.w3.org/ns/auth/acl#Write>, <http://www.w3.org/ns/auth/acl#Control>.
+_:n3-kim-app-owner-matcher a <http://www.w3.org/ns/solid/acp#Matcher>;
+    <http://www.w3.org/ns/solid/acp#agent> <https://id/kim>;
+    <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0>.
+_:n3-kim-app-owner <http://www.w3.org/ns/solid/acp#anyOf> _:n3-kim-app-owner-matcher.
+<https://registry/kim/app8kt.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-kim-app-owner.
+<https://registry/kim/app8kt.acr#peerReadAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+_:n3-kim-app-peer a <http://www.w3.org/ns/solid/acp#Policy>;
+    <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>.
+_:n3-kim-app-peer-matcher a <http://www.w3.org/ns/solid/acp#Matcher>;
+    <http://www.w3.org/ns/solid/acp#agent> <https://id/kim>;
+    <http://www.w3.org/ns/solid/acp#client> <https://data/test-client/public/id>.
+_:n3-kim-app-peer <http://www.w3.org/ns/solid/acp#anyOf> _:n3-kim-app-peer-matcher.
+<https://registry/kim/app8kt.acr#peerReadAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-kim-app-peer
+}
+<meta:https://registry/kim/aut5zm> {
+<https://registry/kim/aut5zm> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/authorization/>
+}
+<https://registry/kim/aut5zm> {
+<https://registry/kim/aut5zm> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
+    <http://www.w3.org/ns/solid/interop#grantee> <https://data/test-client/public/id>;
+    <http://www.w3.org/ns/solid/interop#grantedBy> <https://id/kim>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <http://www.w3.org/ns/solid/interop#scopeOfAuthorization> <http://www.w3.org/ns/solid/interop#All>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>
+}
+<meta:https://registry/kim/aut5zt> {
+<https://registry/kim/aut5zt> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/authorization/>
+}
+<https://registry/kim/aut5zt> {
+<https://registry/kim/aut5zt> a <http://www.w3.org/ns/solid/interop#DataAuthorization>;
+    <http://www.w3.org/ns/solid/interop#grantee> <https://data/test-client/public/id>;
+    <http://www.w3.org/ns/solid/interop#grantedBy> <https://id/kim>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    <http://www.w3.org/ns/solid/interop#scopeOfAuthorization> <http://www.w3.org/ns/solid/interop#Inherited>;
+    <http://www.w3.org/ns/solid/interop#inheritsFromAuthorization> <https://registry/kim/aut5zm>;
+    <http://www.w3.org/ns/solid/interop#accessMode> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>
+}
+<https://registry/kim/grt7pq> {
+<https://registry/kim/grt7pq> a <https://www.w3.org/ns/lws#AccessGrant>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
+<urn:uuid:6b1f2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d> a <http://www.w3.org/ns/odrl/2/Agreement>;
+    <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:6b1f2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d>;
+    <http://www.w3.org/ns/odrl/2/profile> <http://www.w3.org/ns/solid/interop#AccessProfile>;
+    <http://www.w3.org/ns/solid/interop#scopeOfGrant> <http://www.w3.org/ns/solid/interop#AllFromRegistry>.
+<https://registry/kim/grt7pq> <https://www.w3.org/ns/lws#access> <urn:uuid:6b1f2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d>.
+<urn:uuid:6b1f2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d> <http://www.w3.org/ns/odrl/2/permission> <urn:uuid:7c2e3f4a-5b6c-4d7e-9f80-a1b2c3d4e5f6>.
+<urn:uuid:7c2e3f4a-5b6c-4d7e-9f80-a1b2c3d4e5f6> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:7c2e3f4a-5b6c-4d7e-9f80-a1b2c3d4e5f6>;
+    <http://www.w3.org/ns/odrl/2/assigner> <https://id/kim>;
+    <http://www.w3.org/ns/odrl/2/assignee> <https://data/test-client/public/id>;
+    <http://www.w3.org/ns/odrl/2/action> <http://www.w3.org/ns/odrl/2/read>, <https://www.w3.org/ns/lws#create>, <http://www.w3.org/ns/odrl/2/modify>, <http://www.w3.org/ns/odrl/2/delete>;
+    <http://www.w3.org/ns/odrl/2/target> <urn:uuid:8d3f4a5b-6c7d-4e8f-a091-b2c3d4e5f6a7>.
+<urn:uuid:8d3f4a5b-6c7d-4e8f-a091-b2c3d4e5f6a7> <http://www.w3.org/ns/odrl/2/uid> <urn:uuid:8d3f4a5b-6c7d-4e8f-a091-b2c3d4e5f6a7>;
+    <http://www.w3.org/ns/solid/interop#dataOwner> <https://id/kim>;
+    a <http://www.w3.org/ns/odrl/2/AssetCollection>, <http://www.w3.org/ns/solid/interop#DataRegistration>;
+    <http://www.w3.org/ns/odrl/2/source> <https://data/kim-red/n8w3qp>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    <https://www.w3.org/ns/lws#storage> <https://data/kim-red/>
+}
+<meta:https://registry/kim/grt7pq> {
+<https://registry/kim/grt7pq> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://registry/kim/grant/>
+}
+<meta:https://registry/kim/grt7pq.acr> {
+<https://registry/kim/grt7pq.acr> a <http://www.w3.org/ns/ldp#Resource>
+}
+<https://registry/kim/grt7pq.acr> {
+<https://registry/kim/grt7pq.acr#root> a <http://www.w3.org/ns/solid/acp#AccessControlResource>;
+    <http://www.w3.org/ns/solid/acp#resource> <https://registry/kim/grt7pq>;
+    <http://www.w3.org/ns/solid/acp#accessControl> <https://registry/kim/grt7pq.acr#fullOwnerAccess>, <https://registry/kim/grt7pq.acr#peerReadAccess>.
+<https://registry/kim/grt7pq.acr#fullOwnerAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+_:n3-kim-grant-owner a <http://www.w3.org/ns/solid/acp#Policy>;
+    <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>, <http://www.w3.org/ns/auth/acl#Write>, <http://www.w3.org/ns/auth/acl#Control>.
+_:n3-kim-grant-owner-matcher a <http://www.w3.org/ns/solid/acp#Matcher>;
+    <http://www.w3.org/ns/solid/acp#agent> <https://id/kim>;
+    <http://www.w3.org/ns/solid/acp#client> <https://auth/.sai/agents/aHR0cHM6Ly9pZC9raW0>.
+_:n3-kim-grant-owner <http://www.w3.org/ns/solid/acp#anyOf> _:n3-kim-grant-owner-matcher.
+<https://registry/kim/grt7pq.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-kim-grant-owner.
+<https://registry/kim/grt7pq.acr#peerReadAccess> a <http://www.w3.org/ns/solid/acp#AccessControl>.
+_:n3-kim-grant-peer a <http://www.w3.org/ns/solid/acp#Policy>;
+    <http://www.w3.org/ns/solid/acp#allow> <http://www.w3.org/ns/auth/acl#Read>.
+_:n3-kim-grant-peer-matcher a <http://www.w3.org/ns/solid/acp#Matcher>;
+    <http://www.w3.org/ns/solid/acp#agent> <https://id/kim>;
+    <http://www.w3.org/ns/solid/acp#client> <https://data/test-client/public/id>.
+_:n3-kim-grant-peer <http://www.w3.org/ns/solid/acp#anyOf> _:n3-kim-grant-peer-matcher.
+<https://registry/kim/grt7pq.acr#peerReadAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-kim-grant-peer
 }
 <meta:https://registry/kim/invitation/> {
 <https://registry/kim/invitation/> a <http://www.w3.org/ns/solid/interop#InvitationRegistry>, <http://www.w3.org/ns/ldp#Resource>;

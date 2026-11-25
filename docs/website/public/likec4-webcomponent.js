@@ -440,7 +440,7 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange
 &subject_token_type=urn:ietf:params:oauth:token-type:access_token
 \`\`\`
 No \`access\` field and no JSON here — the UAS adds the claim (next steps).`},points:[[360,934],[519,899],[741,848],[754,833],[791,790],[747,631],[774,582],[784,565],[797,549],[812,534]],labelBBox:{x:478,y:774,width:223,height:52}},{id:`step-07`,parent:`Bob`,source:`Bob.UAS`,target:`Bob.Registry`,label:`find the grants for the client + storage 
-(registry-pod dataset)`,relations:[],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@6`,notes:{md:"#### find the grants for the client + storage (registry-pod dataset)\n>[!NOTE]\n>impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references\n\n>[!IMPORTANT]\n> one ID-JAG carries one delegation edge. An app-specific grant (user → this\n> client) wins; otherwise the narrowest received edge is taken —\n> `SelectedFromRegistry` > `Inherited` > `AllFromRegistry` > `AllFromAgent`\n\n>[!TIP]\n> the UAS authenticates as Bob first: `GET /bob/` → `401` → discovery →\n> `POST /.well-known/lws/token` (100 ms) → `200` (109 ms), then `GET /bob/`\n> again for the registry set — `~470 ms` before the first grant read\n\n```http\nPOST http://fuseki:3030/reg-bob/sparql    // 12 grant queries (+ registry reads)\n```\nMatches the seeded `https://registry/yoyo/q7w2nz` (YoYo → Bob,\n`SelectedFromRegistry`, `https://data/acme-rnd/`). That graph reaches\n`reg-bob` through the reciprocal mirror the test fixture seeds\n(`applyReciprocalMirrors`, copying the linked registration's graphs and its\ngrants into the grantee's dataset). The claim is that grant's own ODRL, ids\nincluded; nothing is invented.\n\nWith no matching grant the UAS issues an **identity-only** ID-JAG (no\n`access`), which the next UAS refuses."},points:[[1134,437],[1250,437],[1407,437],[1525,437]],labelBBox:{x:1209,y:396,width:258,height:35}},{id:`step-08`,parent:null,source:`Bob.UAS`,target:`App.UI`,label:`ID-JAG #1 — derived claim, aud=YoYo.UAS, 
+(registry-pod dataset)`,relations:[],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@6`,notes:{md:"#### find the grants for the client + storage (registry-pod dataset)\n>[!NOTE]\n>impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references\n\n>[!IMPORTANT]\n> one ID-JAG carries one delegation edge. An app-specific grant (user → this\n> client) wins; otherwise the narrowest received edge is taken. For a storage\n> audience, registration-level edges win over an asset-only\n> `SelectedFromRegistry` edge (`Inherited` > `AllFromRegistry` > `AllFromAgent`),\n> because a selected edge cannot back a storage-scoped read outside that one\n> asset. A delegation hop to another UAS keeps the narrowest edge, which that\n> UAS can back.\n\n>[!TIP]\n> the UAS authenticates as Bob first: `GET /bob/` → `401` → discovery →\n> `POST /.well-known/lws/token` (100 ms) → `200` (109 ms), then `GET /bob/`\n> again for the registry set — `~470 ms` before the first grant read\n\n```http\nPOST http://fuseki:3030/reg-bob/sparql    // 12 grant queries (+ registry reads)\n```\nMatches the seeded `https://registry/yoyo/q7w2nz` (YoYo → Bob,\n`SelectedFromRegistry`, `https://data/acme-rnd/`). That graph reaches\n`reg-bob` through the reciprocal mirror the test fixture seeds\n(`applyReciprocalMirrors`, copying the linked registration's graphs and its\ngrants into the grantee's dataset). The claim is that grant's own ODRL, ids\nincluded; nothing is invented.\n\nWith no matching grant the UAS issues an **identity-only** ID-JAG (no\n`access`), which the next UAS refuses."},points:[[1134,437],[1250,437],[1407,437],[1525,437]],labelBBox:{x:1209,y:396,width:258,height:35}},{id:`step-08`,parent:null,source:`Bob.UAS`,target:`App.UI`,label:`ID-JAG #1 — derived claim, aud=YoYo.UAS, 
 sub=bob, client_id=test-client`,relations:[],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@7`,notes:{md:`#### ID-JAG #1 — derived claim, aud=YoYo.UAS, sub=bob, client_id=test-client
 >[!NOTE]
 >impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references
@@ -484,11 +484,11 @@ decoded (header \`typ=oauth-id-jag+jwt\`, \`kid=5Q5ZOPHv…\`):
         "storage": "https://data/acme-rnd/",
         "type": ["http://www.w3.org/ns/odrl/2/Asset"],
         "source": ["https://data/acme-rnd/pbh2yw"],
-        "partOf": ["https://data/acme-rnd/reb39k"]
+        "registeredShapeTree": "https://data/shapetrees/trees/Project",
+        "hasDataRegistration": "https://data/acme-rnd/reb39k"
       }
     }],
     "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
-    "registeredShapeTree": "https://data/shapetrees/trees/Project",
     "assignee": "https://id/bob"
   }],
   "iat": 1794876408,
@@ -582,11 +582,11 @@ decoded (\`sai.lws.impersonation=true\`):
         "storage": "https://data/acme-rnd/",
         "type": ["http://www.w3.org/ns/odrl/2/Asset"],
         "source": ["https://data/acme-rnd/pbh2yw"],
-        "partOf": ["https://data/acme-rnd/reb39k"]
+        "registeredShapeTree": "https://data/shapetrees/trees/Project",
+        "hasDataRegistration": "https://data/acme-rnd/reb39k"
       }
     }],
-    "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry",
-    "registeredShapeTree": "https://data/shapetrees/trees/Project"
+    "scopeOfGrant": "http://www.w3.org/ns/solid/interop#SelectedFromRegistry"
   }],
   "iat": 1794876409,
   "exp": 1794876709,
@@ -645,7 +645,7 @@ GET https://acme-rnd.data.docker/pbh2yw
 Accept: text/turtle
 Authorization: Bearer <access token>
 \`\`\``},points:[[208,1057],[222,1191],[270,1443],[420,1585],[933,2071],[1870,2006],[2252,1956]],labelBBox:{x:1218,y:1913,width:239,height:20}},{id:`step-19`,parent:`h4p.Data`,source:`h4p.Data.LwsAccessTokenValidation`,target:`h4p.Data.SaiPolicyEngine`,label:`claim-first decision (claim + 
-registries)`,relations:[`pom0x0`],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@18`,notes:{md:"#### claim-first decision (claim + registries)\n>[!NOTE]\n>impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references\n\n>[!TIP]\n> `h4p.Data` serves both the AS and the storage endpoint, so the decision runs\n> in the process that answered the token exchange — 185 ms inside\n> `data.docker` (`sai-data`), no second server hop\n\nObserved reads: `GET https://id/yoyo` (15 ms) then `22` SPARQL queries —\n`15` on `data-acme-rnd` (the resource + its registration) and `7` on\n`reg-acme` (the owner's registries). The token's `access` claim is evaluated\n**first**, so the claim's narrowed `source` (`pbh2yw`) / `partOf` (`reb39k`)\nbound the decision."},points:[[2582,1926],[2680,1924],[2806,1923],[2907,1921]],labelBBox:{x:2651,y:1880,width:201,height:35}},{id:`step-20`,parent:null,source:`h4p.Data.SaiPolicyEngine`,target:`App.UI`,label:`200 text/turtle — the narrowed project`,relations:[],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@19`,notes:{md:'#### 200 text/turtle — the narrowed project\n>[!NOTE]\n>impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references\n\n```http\nHTTP/1.1 200 OK\nContent-Type: text/turtle\n```\n### Checks\n\n#### String matching — on ID-JAG #2 and on the access token\n* no `https://id/bob` anywhere\n* no the app\'s `client_id` (`https://data/test-client/public/id`)\n* no `"act"` claim (impersonation drops the hidden actor chain)\n\n#### Compare with request\n* `sub` — `https://id/yoyo`\n* `client_id` — `https://auth/`\n* `assigner` — omitted from the claim\n* `assignee` — `https://id/yoyo`, equal to the token `sub`\n* `scopeOfGrant`, `registeredShapeTree`, `storage`, `source` — unchanged'},dir:`back`,points:[[205,1068],[215,1239],[257,1591],[420,1830],[591,2081],[670,2228],[973,2228],[973,2228],[973,2228],[2423,2228],[2630,2228],[2841,2100],[2965,2008]],labelBBox:{x:1565,y:2196,width:266,height:21}}]},"lws-id-jag":{_type:`dynamic`,tags:null,links:null,_stage:`layouted`,sourcePath:`lws-auth.c4`,description:{md:`\`lws-auth/oidc.c4\` builds on LWS core §Authorization but keeps the
+registries)`,relations:[`pom0x0`],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@18`,notes:{md:"#### claim-first decision (claim + registries)\n>[!NOTE]\n>impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references\n\n>[!TIP]\n> `h4p.Data` serves both the AS and the storage endpoint, so the decision runs\n> in the process that answered the token exchange — 185 ms inside\n> `data.docker` (`sai-data`), no second server hop\n\nObserved reads: `GET https://id/yoyo` (15 ms) then `22` SPARQL queries —\n`15` on `data-acme-rnd` (the resource + its registration) and `7` on\n`reg-acme` (the owner's registries). The token's `access` claim is evaluated\n**first**, so the claim's narrowed `source` (`pbh2yw`) / `hasDataRegistration` (`reb39k`)\nbound the decision."},points:[[2582,1926],[2680,1924],[2806,1923],[2907,1921]],labelBBox:{x:2651,y:1880,width:201,height:35}},{id:`step-20`,parent:null,source:`h4p.Data.SaiPolicyEngine`,target:`App.UI`,label:`200 text/turtle — the narrowed project`,relations:[],color:`gray`,line:`dashed`,head:`normal`,tags:[],astPath:`/steps@19`,notes:{md:'#### 200 text/turtle — the narrowed project\n>[!NOTE]\n>impersonation.test.ts > Bob -> YoYo -> ACME hides Bob and the delegated grant references\n\n```http\nHTTP/1.1 200 OK\nContent-Type: text/turtle\n```\n### Checks\n\n#### String matching — on ID-JAG #2 and on the access token\n* no `https://id/bob` anywhere\n* no the app\'s `client_id` (`https://data/test-client/public/id`)\n* no `"act"` claim (impersonation drops the hidden actor chain)\n\n#### Compare with request\n* `sub` — `https://id/yoyo`\n* `client_id` — `https://auth/`\n* `assigner` — omitted from the claim\n* `assignee` — `https://id/yoyo`, equal to the token `sub`\n* `scopeOfGrant`, target-level `registeredShapeTree` / `hasDataRegistration`, `storage`, `source` — unchanged'},dir:`back`,points:[[205,1068],[215,1239],[257,1591],[420,1830],[591,2081],[670,2228],[973,2228],[973,2228],[973,2228],[2423,2228],[2630,2228],[2841,2100],[2965,2008]],labelBBox:{x:1565,y:2196,width:266,height:21}}]},"lws-id-jag":{_type:`dynamic`,tags:null,links:null,_stage:`layouted`,sourcePath:`lws-auth.c4`,description:{md:`\`lws-auth/oidc.c4\` builds on LWS core §Authorization but keeps the
 authorization server **separate** from the resource server and adds an
 Identity Assertion JWT Authorization Grant
 ([draft-ietf-oauth-identity-assertion-authz-grant](https://www.ietf.org/archive/id/draft-ietf-oauth-identity-assertion-authz-grant-01.html)):
@@ -709,13 +709,12 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange
   "@context": "https://www.w3.org/ns/solid/interop-context/v1/odrl-id-jag-context",
   "access": [{ "type": ["odrl:Agreement"], "profile": "interop:AccessProfile",
     "scopeOfGrant": "interop:AllFromRegistry",
-    "registeredShapeTree": "https://data/shapetrees/trees/Project",
     "assignee": "https://id/yoyo", "action": ["odrl:read"],
     "permission": [{ "assignee": "https://id/yoyo", "action": ["odrl:read"],
       "target": { "owner": "https://id/bob", "storage": "https://data/bob/",
         "type": ["interop:DataRegistration", "odrl:AssetCollection"],
         "source": ["https://data/bob/avn9hv"],
-        "partOf": ["https://data/bob/avn9hv"] } }] }] }
+        "registeredShapeTree": "https://data/shapetrees/trees/Project" } }] }] }
 \`\`\`
 
 No \`act\`, no \`/id/dan\` anywhere — the admin is gone from the token, and

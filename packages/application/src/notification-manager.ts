@@ -82,13 +82,21 @@ export class NotificationManager extends EventTarget {
       return
     }
     this.streamMap.set(resourceId, response)
+    // The stream stays open until the network drops or the page closes, so
+    // subscribing must not wait for it — the caller only waits for the setup.
+    void this.consumeStream(response.body).catch((error: unknown) => {
+      console.error('notification stream failed:', receiveFrom, error)
+    })
+  }
+
+  private async consumeStream(body: ReadableStream<Uint8Array>): Promise<void> {
     // TODO remove from map on error or close, and reconnect
-    const reader = response.body.getReader()
+    const reader = body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
     let initialDiscarded = false
     try {
-      while (response.body.locked) {
+      while (body.locked) {
         const { done, value } = await reader.read()
         if (done) {
           break
@@ -122,7 +130,7 @@ export class NotificationManager extends EventTarget {
       }
     } finally {
       reader.releaseLock()
-      await response.body.cancel()
+      await body.cancel()
     }
   }
 

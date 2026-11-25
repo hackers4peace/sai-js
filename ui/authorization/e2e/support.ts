@@ -2,6 +2,8 @@ import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test'
 
 export const AUTH_ORIGIN = process.env.AUTH_ORIGIN ?? 'https://auth.docker'
 export const UI_BASE_URL = process.env.UI_BASE_URL ?? 'https://ui.auth.docker'
+/** The demo app (`examples/vuejectron`), the stack's `test-client` application. */
+export const VUEJECTRON_URL = process.env.VUEJECTRON_URL ?? 'https://vuejectron.docker'
 
 /**
  * Agent WebIDs: the compose dev stack maps them (environments/dev/map.json,
@@ -11,6 +13,7 @@ export const UI_BASE_URL = process.env.UI_BASE_URL ?? 'https://ui.auth.docker'
 export const AGENT_IDS = {
   alice: process.env.ALICE_ID ?? 'https://alice.id.docker',
   bob: process.env.BOB_ID ?? 'https://bob.id.docker',
+  kim: process.env.KIM_ID ?? 'https://kim.id.docker',
   nobody: process.env.NOBODY_ID ?? 'https://nobody.id.docker',
 } as const
 

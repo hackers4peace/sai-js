@@ -9,7 +9,7 @@
   "client_id": "https://data/test-client/public/id",
   "client_name": "Test client",
   "logo_uri": "https://robohash.org/aHR0cHM6Ly92dWVqZWN0cm9uLmRvY2tlcg?set=set3",
-  "redirect_uris": ["https://data/test-client/public/id"],
+  "redirect_uris": ["https://data/test-client/public/id", "https://test-client/redirect"],
   "grant_types": ["refresh_token", "authorization_code"],
   "interop:hasAccessNeedGroup": {
     "@id": "https://data/test-client/public/access-needs#need-group-pm"

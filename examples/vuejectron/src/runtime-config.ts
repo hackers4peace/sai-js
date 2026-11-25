@@ -17,6 +17,13 @@ export interface RuntimeConfig {
   defaultOidcIssuer: string
   clientId: string
   baseUrl: string
+  /**
+   * Base URL of the shape tree collection the app works with. Defaults to the
+   * public workers; set it to the deployment's own copy (for example
+   * `https://data/shapetrees` in the Dagger integration stack) so the scopes
+   * match the deployed data fixtures.
+   */
+  shapeTreesOrigin?: string
   /** Optional browser tracing; absent/disabled leaves the app untouched. */
   tracing?: TracingConfig
 }

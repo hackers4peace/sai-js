@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <AuthenticateApp v-if="registered" :application="registered" />
+    <AuthenticateApp v-if="registered && !route.query.resource" :application="registered" />
     <AuthorizeApp
       v-if="
         !registered &&
