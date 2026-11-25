@@ -133,9 +133,9 @@ export const useAppStore = defineStore('app', () => {
     )
     solidLdoDataset = createSolidLdoDataset()
     solidLdoDataset.setContext('solid', { fetch: sessionFetch() })
-    if (session.registrationIri) {
-      await notificationsManager.subscribeToResource(session.registrationIri)
-    }
+    // a freshly authorized app only gets the registration link once the
+    // registration resource exists — see `pullAuthorization`
+    await subscribeToRegistration()
     notificationsManager.addEventListener('notification', ((event: CustomEvent) => {
       // handle application registration
       if (event.detail.object === session.registrationIri && event.detail.type === AS.Update) {
@@ -148,6 +148,16 @@ export const useAppStore = defineStore('app', () => {
     }) as EventListener)
 
     return session
+  }
+
+  /** Subscribe to the application registration once (it appears after the authorization). */
+  let registrationSubscribed = false
+  async function subscribeToRegistration(): Promise<void> {
+    if (registrationSubscribed || !session?.registrationIri) {
+      return
+    }
+    registrationSubscribed = true
+    await notificationsManager.subscribeToResource(session.registrationIri)
   }
 
   function changeData<Type extends LdoBase>(input: Type): Type {
@@ -450,7 +460,133 @@ export const useAppStore = defineStore('app', () => {
 
   async function checkAuthoriztion(): Promise<boolean> {
     await ensureSaiSession()
-    return !!session.applicationRegistration?.granted
+    const granted = !!session.applicationRegistration?.granted
+    if (granted) {
+      clearAwaitingAuthorization()
+    }
+    return granted
+  }
+
+  /**
+   * The authorization flow ends on the app's own callback endpoint — BEFORE the
+   * grant generation and the application-registration projection (Temporal
+   * workflows) have created and linked them. This marker (and the pull below)
+   * bridges that window, so a just-authorized agent is not asked to request the
+   * authorization again.
+   *
+   * `request` — the agent went through the app's own authorization request: the
+   * registration and its grants are guaranteed to arrive, so its return waits
+   * for them.
+   * `login` — the browser came back from the OIDC redirect. A login does NOT
+   * have to carry a grant (a first-time user has not authorized the app yet),
+   * so this one is only followed in the background: the request screen stays
+   * usable and the app jumps in if the grant does show up (unified authN/authZ
+   * deployments record it during the login interaction).
+   */
+  interface PendingAuthorization {
+    kind: 'request' | 'login'
+    since: number
+  }
+  const AWAITING_AUTHORIZATION_KEY = 'awaitingAuthorization'
+  /** How long the app keeps pulling for the grants after the redirect. */
+  const AUTHORIZATION_PULL_TIMEOUT = 45_000
+  /** How long a `login` return watches for a registration link to appear. */
+  const REGISTRATION_GRACE = 12_000
+  const AUTHORIZATION_PULL_INTERVAL = 1000
+
+  function pendingAuthorization(): PendingAuthorization | undefined {
+    const raw = window.localStorage.getItem(AWAITING_AUTHORIZATION_KEY)
+    if (!raw) {
+      return undefined
+    }
+    try {
+      const pending = JSON.parse(raw) as Partial<PendingAuthorization>
+      if ((pending.kind === 'request' || pending.kind === 'login') && pending.since) {
+        return { kind: pending.kind, since: pending.since }
+      }
+    } catch {
+      // a marker from an older version of the app — ignore it
+    }
+    return undefined
+  }
+
+  const awaitingAuthorization = ref(pendingAuthorization() !== undefined)
+
+  /** The kind of the recorded return, if any — `undefined` when nothing is pending. */
+  function pendingAuthorizationKind(): PendingAuthorization['kind'] | undefined {
+    return pendingAuthorization()?.kind
+  }
+
+  function clearAwaitingAuthorization(): void {
+    window.localStorage.removeItem(AWAITING_AUTHORIZATION_KEY)
+    awaitingAuthorization.value = false
+  }
+
+  /**
+   * Remember that the browser is about to leave for — or has just returned
+   * from — the authorization flow, so the login screen pulls for the
+   * registration instead of offering to request the authorization again.
+   * Called before leaving (`authorize`) and after the OIDC redirect (the
+   * unified authN/authZ interaction may record the authorization on the way in).
+   */
+  function awaitAuthorization(kind: PendingAuthorization['kind']): void {
+    const pending: PendingAuthorization = { kind, since: Date.now() }
+    window.localStorage.setItem(AWAITING_AUTHORIZATION_KEY, JSON.stringify(pending))
+    awaitingAuthorization.value = true
+  }
+
+  /**
+   * Pull for updates: re-discover the application registration and reload it
+   * until the grants are projected, so the app can start reading the data the
+   * agent just authorized. Returns whether the registration is granted; a
+   * timeout falls back to the un-authorized screen (and drops the marker).
+   *
+   * A `login` return gets the registration grace only, a `request` return waits
+   * the whole window; and any pull stops once a NEWER flow records its own
+   * marker (the caller navigated on, e.g. to request the authorization).
+   */
+  async function pullAuthorization(): Promise<boolean> {
+    await ensureSaiSession()
+    const started = pendingAuthorization()
+    const requested = started?.kind === 'request'
+    const registrationDeadline = requested ? undefined : Date.now() + REGISTRATION_GRACE
+    const grantedDeadline = Date.now() + AUTHORIZATION_PULL_TIMEOUT
+    for (;;) {
+      if (pendingAuthorization()?.since !== started?.since) {
+        // superseded (or cleared) — stop without touching the newer marker
+        return false
+      }
+      try {
+        await session.refreshRegistration()
+      } catch (error) {
+        // the registration can be minted BEFORE its grants (and so before the
+        // app may read it) — a failed read is transient here, keep polling
+        console.debug('refreshRegistration', error)
+      }
+      if (session.applicationRegistration?.granted) {
+        clearAwaitingAuthorization()
+        // the registration link only appeared now: start following it, so the
+        // app keeps receiving the same live updates as a seeded session
+        try {
+          await subscribeToRegistration()
+        } catch (error) {
+          console.debug('subscribeToRegistration', error)
+        }
+        return true
+      }
+      const now = Date.now()
+      const registrationLapsed =
+        !session.registrationIri &&
+        registrationDeadline !== undefined &&
+        now >= registrationDeadline
+      if (now >= grantedDeadline || registrationLapsed) {
+        clearAwaitingAuthorization()
+        return false
+      }
+      await new Promise((resolve) => {
+        setTimeout(resolve, AUTHORIZATION_PULL_INTERVAL)
+      })
+    }
   }
 
   async function getAuthorizationRedirectUri(): Promise<string> {
@@ -462,7 +598,9 @@ export const useAppStore = defineStore('app', () => {
     if (!coreStore.userId) {
       throw new Error('no user id')
     }
-    window.location.href = await getAuthorizationRedirectUri()
+    const redirectUri = await getAuthorizationRedirectUri()
+    awaitAuthorization('request')
+    window.location.href = redirectUri
   }
 
   async function share(resourceId: string) {
@@ -606,6 +744,10 @@ export const useAppStore = defineStore('app', () => {
     loadImages,
     changeData,
     authorize,
+    awaitingAuthorization,
+    awaitAuthorization,
+    pendingAuthorizationKind,
+    pullAuthorization,
     saiError,
     getAuthorizationRedirectUri,
     checkAuthoriztion,

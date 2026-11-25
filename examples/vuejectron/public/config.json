@@ -2,6 +2,7 @@
   "defaultOidcIssuer": "https://auth.docker",
   "clientId": "https://vuejectron.docker/id",
   "baseUrl": "https://vuejectron.docker",
+  "authorizationOnLogin": true,
   "tracing": {
     "enabled": true,
     "otlpBaseUrl": "/otlp",

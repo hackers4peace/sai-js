@@ -864,7 +864,21 @@ watch(
       return
     }
     if (props.redirect) {
-      window.location.href = await coreStore.consent()
+      // two ways in: the app sent the browser to its authorization redirect
+      // endpoint (`?client_id=` — there is no OIDC interaction to finish), or
+      // this screen IS the OIDC interaction (unified authN/authZ, no
+      // `client_id` in the query), which has to be completed with the consent.
+      // The first returns to the app's own callback endpoint; the grant
+      // generation and the registration projection still have to land, so the
+      // app pulls for them once it is back.
+      const callbackEndpoint = route.query.client_id
+        ? props.application?.callbackEndpoint
+        : undefined
+      if (callbackEndpoint) {
+        window.location.href = callbackEndpoint
+      } else {
+        window.location.href = await coreStore.consent()
+      }
     } else if (props.agent) {
       router.push({ name: 'social-agent-list' })
     } else if (props.role) {

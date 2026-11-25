@@ -93,6 +93,26 @@ export class Application {
     }
   }
 
+  /**
+   * Pull for updates after the authorization flow. The authorization callback
+   * returns the app to its own origin BEFORE the grant generation and the
+   * application-registration projection (Temporal workflows) land, so both the
+   * registration link (the authorization agent's `Link` header, present only
+   * once the registration resource exists) and its `hasDataGrant` links have to
+   * be re-read. `cache: 'no-store'` keeps an intermediary or the browser cache
+   * from answering with the pre-grant representation. Callers poll until
+   * `applicationRegistration` is [granted](./grant.ts).
+   */
+  public async refreshRegistration(): Promise<void> {
+    const fetch: WhatwgFetch = (input, init) => this.fetch(input, { ...init, cache: 'no-store' })
+    this.registrationIri = await discoverAgentRegistration(this.authorizationAgentIri, fetch)
+    if (!this.registrationIri) {
+      this.applicationRegistration = undefined
+      return
+    }
+    this.applicationRegistration = await loadApplicationRegistration(this.registrationIri, fetch)
+  }
+
   get authorizationRedirectUri(): string {
     return `${this.authorizationRedirectEndpoint}?client_id=${encodeURIComponent(this.applicationId)}`
   }

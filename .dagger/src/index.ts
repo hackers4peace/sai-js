@@ -740,6 +740,9 @@ export class SaiJs {
   }
 
   private vuejectronBuild(): Container {
+    // No `authorizationOnLogin`: this stack's OIDC interaction stays on the
+    // auth service's `/.account/`, so a login never carries a grant — the app
+    // shows the request screen right away and only watches in the background.
     const config = JSON.stringify({
       defaultOidcIssuer: CSS_BASE_URL,
       clientId: 'https://data/test-client/public/id',
@@ -787,6 +790,7 @@ export class SaiJs {
         .withEnvVariable('AUTH_ORIGIN', 'https://auth')
         .withEnvVariable('ALICE_ID', 'https://id/alice')
         .withEnvVariable('BOB_ID', 'https://id/bob')
+        .withEnvVariable('DAN_ID', 'https://id/dan')
         .withEnvVariable('KIM_ID', 'https://id/kim')
         .withEnvVariable('NOBODY_ID', 'https://id/nobody')
         // test/seed.ts provisions the per-pod Garage buckets/keys itself

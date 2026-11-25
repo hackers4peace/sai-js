@@ -113,7 +113,7 @@ async function signInVuejectron(page: Page, webId: string): Promise<void> {
 async function newVuejectronActor(
   browser: Browser,
   testInfo: TestInfo,
-  account: Extract<Account, 'alice' | 'kim'>
+  account: Extract<Account, 'alice' | 'dan' | 'kim'>
 ): Promise<Actor> {
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
@@ -214,5 +214,101 @@ test('alice shares a project from vuejectron, kim sees it in her session', async
   } finally {
     await aliceActor.close()
     await kimActor.close()
+  }
+})
+
+// A NEW agent: Dan has Projects and Tasks in his pods but no application
+// registration for the test client, so vuejectron has to walk the whole
+// authorization flow — request, review the needs, authorize — and then wait for
+// the grant generation and the registration projection to reach it.
+//
+// Seed (environments/data/registry.trig): Dan owns two data pods — `dan-east`
+// ("Hydra", "Nimbus") and `dan-west` ("Vega") with two Tasks each — and holds
+// NO `test-client` application registration, exactly like a first-time user.
+// Both of his peers (Bob, YoYo) registered Dan without granting him any of
+// their data, so he is the only data owner on the screen. His account is seeded
+// with a login cookie (`ACCOUNT_COOKIES.dan`), so the OIDC and authorization UI
+// flows run as Dan.
+//
+// The authorization is `AllFromAgent` (the per-agent scope inside the UI's
+// "Selected data" toggle): one data authorization for Project, inherited by
+// Task, so every project in BOTH pods and their tasks become readable — the
+// grants are generated per data registration after the redirect back.
+test('dan authorizes vuejectron for all his projects and tasks', async ({ browser }, testInfo) => {
+  // sign-in round trips, the authorization workflow and the app's pull for
+  // the registration + grants
+  test.setTimeout(4 * WORKFLOW_TIMEOUT)
+
+  const danActor = await newVuejectronActor(browser, testInfo, 'dan')
+  const app = danActor.page
+  const appOrigin = new URL(VUEJECTRON_URL).origin
+
+  try {
+    // ── the app: no registration for the test client yet ──
+    // The request screen is shown right away: this stack's OIDC interaction is
+    // CSS's `/.account/` (not the authorization UI), so a login carries no grant
+    // and the app only watches for one in the background. A unified deployment
+    // sets `authorizationOnLogin` and waits on the login return instead (the
+    // dev stack — see examples/vuejectron/public/config.json).
+    const request = app.getByRole('button', { name: 'Request Authorization' })
+    await expect(request).toBeVisible({ timeout: FIRST_LOAD_TIMEOUT })
+    await request.click()
+
+    // ── the authorization UI: the app's needs from its client-id document ──
+    await expect(app).toHaveURL(/\/authorize\?/, { timeout: FIRST_LOAD_TIMEOUT })
+    await expect(app.getByText('Project').first()).toBeVisible({ timeout: WORKFLOW_TIMEOUT })
+
+    // grant ALL of Dan's own data — not all data: switching the top level to the
+    // per-agent scope makes the single top-level Project authorization
+    // `AllFromAgent` (a data owner defaults to all of their own data), and the
+    // Task need inherits from it
+    const topPanel = app.locator('#panel-hell > .v-expansion-panel')
+    await topPanel.locator('.v-expansion-panel-title').click()
+    await topPanel
+      .locator('.v-expansion-panel-text .v-btn-toggle')
+      .first()
+      .locator('.mdi-minus-box-outline')
+      .click()
+    // Dan is the only data owner on the screen; his panel now shows the
+    // "all of it" selection
+    const thisAgent = topPanel.locator('.v-expansion-panel-title').filter({ hasText: 'Me' })
+    await expect(thisAgent.locator('.mdi-checkbox-marked')).toBeVisible({
+      timeout: FIRST_LOAD_TIMEOUT,
+    })
+    const authorize = app.getByRole('button', { name: 'Authorize', exact: true })
+    await expect(authorize).toBeEnabled()
+    await authorize.click()
+
+    // the authorization UI answers with the client's callback endpoint
+    // (`hasAuthorizationCallbackEndpoint`, https://test-client)
+    await app.waitForURL((url) => url.origin === appOrigin, { timeout: WORKFLOW_TIMEOUT })
+
+    // ── back in the app BEFORE the grants exist: pull for updates ──
+    // The redirect returns the browser to the app's callback endpoint as soon as
+    // the authorization is recorded; the grant generation and the
+    // application-registration projection (Temporal workflows) land after it.
+    // Authn.vue therefore shows a waiting state and polls
+    // `Application.refreshRegistration()` instead of asking to request the
+    // authorization again; once the registration is granted the app routes to
+    // the agent view with the data the agent just authorized.
+    await expect(app).toHaveURL(/\/agent\?agent=/, { timeout: WORKFLOW_TIMEOUT })
+    const projects = app.locator('.v-list-item a[href*="project="]')
+    // one AllFromAgent authorization covers EVERY Project registration — in
+    // both of Dan's pods
+    await expect(projects).toHaveCount(3, { timeout: WORKFLOW_TIMEOUT })
+    expect((await projects.allInnerTexts()).map((title) => title.trim()).sort()).toEqual([
+      'Hydra',
+      'Nimbus',
+      'Vega',
+    ])
+
+    // the inherited Task grant makes a project's tasks readable
+    await app.getByRole('link', { name: 'Nimbus' }).click()
+    await expect(app).toHaveURL(/\/project\?/, { timeout: FIRST_LOAD_TIMEOUT })
+    const tasks = app.locator('.v-card-title')
+    await expect(tasks).toHaveCount(2, { timeout: WORKFLOW_TIMEOUT })
+    expect((await tasks.allInnerTexts()).map((title) => title.trim()).sort()).toEqual(['D3', 'D5'])
+  } finally {
+    await danActor.close()
   }
 })

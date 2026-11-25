@@ -192,7 +192,11 @@ services:
       # OpenTelemetry dev loop — live to the compose tempo service (worker)
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
   ui:
-    image: node:26-alpine
+    # slim (glibc), like every other service: the dev containers run the HOST
+    # node_modules through the bind mount, and vite 8 (rolldown) ships a native
+    # binding per libc — alpine/musl would need the musl build the host has no
+    # reason to install
+    image: node:26-slim
     container_name: ui
     restart: on-failure
     networks:
@@ -210,7 +214,9 @@ services:
       - traefik.http.routers.ui-sai.tls=true
       - traefik.http.services.ui-sai.loadbalancer.server.port=4200
   vuejectron:
-    image: node:26-alpine
+    # slim (glibc) for the same reason as `ui`: the host node_modules' rolldown
+    # binding is the gnu build
+    image: node:26-slim
     container_name: vuejectron
     restart: on-failure
     networks:

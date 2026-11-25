@@ -58,13 +58,22 @@ export const getApplications = async (ctx: ResolvedContext) => {
  * Returns the application profile of an application that is _not_ registered for the given agent
  */
 export const getUnregisteredApplication = async (agent: AuthorizationAgent, id: IRI) => {
-  const { name, logo, accessNeedGroup } = await loadClientIdDocument(id, agent.fetch).then(
-    (doc) => ({
-      name: doc.clientName,
-      logo: doc.logoUri,
-      accessNeedGroup: doc.hasAccessNeedGroup,
-    })
-  )
+  const { name, logo, callbackEndpoint, accessNeedGroup } = await loadClientIdDocument(
+    id,
+    agent.fetch
+  ).then((doc) => ({
+    name: doc.clientName,
+    logo: doc.logoUri,
+    // the app's `hasAuthorizationCallbackEndpoint` — where it waits for the grant
+    callbackEndpoint: doc.callbackEndpoint,
+    accessNeedGroup: doc.hasAccessNeedGroup,
+  }))
 
-  return UnregisteredApplication.make({ id: IRI.make(id), name, logo, accessNeedGroup })
+  return UnregisteredApplication.make({
+    id: IRI.make(id),
+    name,
+    logo,
+    callbackEndpoint,
+    accessNeedGroup,
+  })
 }

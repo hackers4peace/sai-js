@@ -92,6 +92,39 @@ describe('discovery helpers', () => {
   })
 })
 
+describe('pull for updates after the authorization flow', () => {
+  const mocked = vi.fn(statelessFetch)
+  // the app is NOT authorized yet: the authorization agent's HEAD carries no
+  // registration link
+  const noLinkResponse = { ok: true, headers: { get: (): null => null } } as unknown as Response
+  noLinkResponse.clone = () => Object.assign({}, noLinkResponse)
+  const linkResponse = {
+    ok: true,
+    headers: { get: (name: string): string | null => (name === 'Link' ? linkString : null) },
+  } as unknown as Response
+  linkResponse.clone = () => Object.assign({}, linkResponse)
+
+  test('refreshRegistration discovers the registration once the authorization created it', async () => {
+    mocked.mockResolvedValueOnce(await statelessFetch(webId)).mockResolvedValueOnce(noLinkResponse)
+    const app = await Application.build(webId, applicationId, { fetch: mocked, randomUUID })
+    expect(app.registrationIri).toBeUndefined()
+
+    // the workflows created the registration in the meantime
+    mocked.mockResolvedValueOnce(linkResponse)
+    await app.refreshRegistration()
+    expect(app.registrationIri).toBe(
+      'https://auth.alice.example/bcf22534-0187-4ae4-b88f-fe0f9fa96659'
+    )
+    expect(app.applicationRegistration?.id).toBe(
+      'https://auth.alice.example/bcf22534-0187-4ae4-b88f-fe0f9fa96659'
+    )
+    // the refresh bypasses the cache: a still-ungranted registration must not
+    // be served from an earlier read
+    const refreshInit = mocked.mock.calls.at(-2)?.[1] as RequestInit | undefined
+    expect(refreshInit?.cache).toBe('no-store')
+  })
+})
+
 describe('iriForNew', () => {
   const uuid = '6f1e6c1e-0000-4000-8000-000000000000'
   const scope = 'https://trees.example/Project'

@@ -2,17 +2,25 @@
 import { h } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { getRuntimeConfig } from '@/runtime-config'
 import { useAppStore } from '@/store/app'
 import { useCoreStore } from '@/store/core'
 
 async function handleRedirect() {
   const coreStore = useCoreStore()
+  const appStore = useAppStore()
   try {
     await coreStore.handleRedirect(window.location.href)
   } catch (error) {
     console.error('handleRedirect', error)
     return { name: 'login' }
   }
+  // this may ALSO be the return from the authorization flow. In a unified
+  // deployment the login interaction IS the authorization screen, so the grant
+  // is on its way (`request` → wait for it); otherwise a login carries no grant
+  // (`login` → only followed in the background, the request screen stays
+  // usable)
+  appStore.awaitAuthorization(getRuntimeConfig().authorizationOnLogin ? 'request' : 'login')
 
   const restoreUrl = localStorage.getItem('restorePath')
   localStorage.removeItem('restorePath')

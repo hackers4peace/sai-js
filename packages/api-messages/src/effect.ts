@@ -57,6 +57,8 @@ export const UnregisteredApplication = S.Struct({
   id: IRI,
   name: S.String,
   logo: S.optional(S.String),
+  /** The app's `hasAuthorizationCallbackEndpoint`: where it waits for the grant. */
+  callbackEndpoint: S.optional(S.String),
   accessNeedGroup: S.String, // interop:hasAccessNeedGroup
 })
 

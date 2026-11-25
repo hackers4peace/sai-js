@@ -3407,10 +3407,115 @@ _:n3-194 <http://www.w3.org/ns/solid/acp#anyOf> _:n3-195.
 <https://registry/dan/.acr#fullOwnerAccess> <http://www.w3.org/ns/solid/acp#apply> _:n3-194
 }
 <meta:https://data/dan-east/> {
-<https://data/dan-east/> a <http://www.w3.org/ns/solid/interop#DataRegistry>, <http://www.w3.org/ns/ldp#Resource>, <http://www.w3.org/ns/pim/space#Storage>
+<https://data/dan-east/> a <http://www.w3.org/ns/solid/interop#DataRegistry>, <http://www.w3.org/ns/ldp#Resource>, <http://www.w3.org/ns/pim/space#Storage>;
+    <https://www.w3.org/ns/lws#contains> <https://data/dan-east/p7n2kd>, <https://data/dan-east/t3x9wm>
+}
+<meta:https://data/dan-east/p7n2kd> {
+<https://data/dan-east/p7n2kd> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/>;
+    <https://www.w3.org/ns/lws#contains> <https://data/dan-east/h6y2rb>, <https://data/dan-east/m8v4qs>
+}
+<meta:https://data/dan-east/t3x9wm> {
+<https://data/dan-east/t3x9wm> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/>;
+    <https://www.w3.org/ns/lws#contains> <https://data/dan-east/c2j7fn>, <https://data/dan-east/r3q8lv>, <https://data/dan-east/w5k9zt>, <https://data/dan-east/y9s2hd>
+}
+<meta:https://data/dan-east/h6y2rb> {
+<https://data/dan-east/h6y2rb> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/p7n2kd>
+}
+<https://data/dan-east/h6y2rb> {
+<https://data/dan-east/h6y2rb> a <https://vocab.example/project-management/Project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Hydra";
+    <https://vocab.example/project-management/hasTask> <https://data/dan-east/c2j7fn>, <https://data/dan-east/w5k9zt>
+}
+<meta:https://data/dan-east/m8v4qs> {
+<https://data/dan-east/m8v4qs> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/p7n2kd>
+}
+<https://data/dan-east/m8v4qs> {
+<https://data/dan-east/m8v4qs> a <https://vocab.example/project-management/Project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Nimbus";
+    <https://vocab.example/project-management/hasTask> <https://data/dan-east/r3q8lv>, <https://data/dan-east/y9s2hd>
+}
+<meta:https://data/dan-east/c2j7fn> {
+<https://data/dan-east/c2j7fn> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/t3x9wm>
+}
+<https://data/dan-east/c2j7fn> {
+<https://data/dan-east/c2j7fn> a <https://vocab.example/project-management/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "D1"
+}
+<meta:https://data/dan-east/w5k9zt> {
+<https://data/dan-east/w5k9zt> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/t3x9wm>
+}
+<https://data/dan-east/w5k9zt> {
+<https://data/dan-east/w5k9zt> a <https://vocab.example/project-management/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "D2"
+}
+<meta:https://data/dan-east/r3q8lv> {
+<https://data/dan-east/r3q8lv> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/t3x9wm>
+}
+<https://data/dan-east/r3q8lv> {
+<https://data/dan-east/r3q8lv> a <https://vocab.example/project-management/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "D3"
+}
+<meta:https://data/dan-east/y9s2hd> {
+<https://data/dan-east/y9s2hd> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-east/t3x9wm>
+}
+<https://data/dan-east/y9s2hd> {
+<https://data/dan-east/y9s2hd> a <https://vocab.example/project-management/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "D5"
 }
 <meta:https://data/dan-west/> {
-<https://data/dan-west/> a <http://www.w3.org/ns/solid/interop#DataRegistry>, <http://www.w3.org/ns/ldp#Resource>, <http://www.w3.org/ns/pim/space#Storage>
+<https://data/dan-west/> a <http://www.w3.org/ns/solid/interop#DataRegistry>, <http://www.w3.org/ns/ldp#Resource>, <http://www.w3.org/ns/pim/space#Storage>;
+    <https://www.w3.org/ns/lws#contains> <https://data/dan-west/k6m2vt>, <https://data/dan-west/z8f3xp>
+}
+<meta:https://data/dan-west/k6m2vt> {
+<https://data/dan-west/k6m2vt> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Project>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-west/>;
+    <https://www.w3.org/ns/lws#contains> <https://data/dan-west/b4t7nq>
+}
+<meta:https://data/dan-west/z8f3xp> {
+<https://data/dan-west/z8f3xp> a <http://www.w3.org/ns/solid/interop#DataRegistration>, <http://www.w3.org/ns/ldp#Resource>;
+    <http://www.w3.org/ns/solid/interop#registeredShapeTree> <https://data/shapetrees/trees/Task>;
+    a <http://www.w3.org/ns/ldp#Container>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-west/>;
+    <https://www.w3.org/ns/lws#contains> <https://data/dan-west/g2w9rc>, <https://data/dan-west/u7d5ph>
+}
+<meta:https://data/dan-west/b4t7nq> {
+<https://data/dan-west/b4t7nq> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-west/k6m2vt>
+}
+<https://data/dan-west/b4t7nq> {
+<https://data/dan-west/b4t7nq> a <https://vocab.example/project-management/Project>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "Vega";
+    <https://vocab.example/project-management/hasTask> <https://data/dan-west/g2w9rc>, <https://data/dan-west/u7d5ph>
+}
+<meta:https://data/dan-west/g2w9rc> {
+<https://data/dan-west/g2w9rc> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-west/z8f3xp>
+}
+<https://data/dan-west/g2w9rc> {
+<https://data/dan-west/g2w9rc> a <https://vocab.example/project-management/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "F1"
+}
+<meta:https://data/dan-west/u7d5ph> {
+<https://data/dan-west/u7d5ph> a <http://www.w3.org/ns/ldp#Resource>;
+    <https://www.w3.org/ns/lws#partOf> <https://data/dan-west/z8f3xp>
+}
+<https://data/dan-west/u7d5ph> {
+<https://data/dan-west/u7d5ph> a <https://vocab.example/project-management/Task>;
+    <http://www.w3.org/2004/02/skos/core#prefLabel> "F2"
 }
 <https://id/dan> {
 <https://id/dan> <http://www.w3.org/ns/solid/terms#oidcIssuer> <https://auth/>;

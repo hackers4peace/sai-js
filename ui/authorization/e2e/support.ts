@@ -13,6 +13,7 @@ export const VUEJECTRON_URL = process.env.VUEJECTRON_URL ?? 'https://vuejectron.
 export const AGENT_IDS = {
   alice: process.env.ALICE_ID ?? 'https://alice.id.docker',
   bob: process.env.BOB_ID ?? 'https://bob.id.docker',
+  dan: process.env.DAN_ID ?? 'https://dan.id.docker',
   kim: process.env.KIM_ID ?? 'https://kim.id.docker',
   nobody: process.env.NOBODY_ID ?? 'https://nobody.id.docker',
 } as const

@@ -18,6 +18,14 @@ export interface RuntimeConfig {
   clientId: string
   baseUrl: string
   /**
+   * `true` when this deployment's OIDC interaction screen IS its authorization
+   * screen (unified authN/authZ — the OP's `interactionRoute` points at the
+   * authorization UI). The login interaction then records the grant itself, so
+   * the app has to wait for the registration and its grants after the redirect
+   * instead of offering to request the authorization again.
+   */
+  authorizationOnLogin?: boolean
+  /**
    * Base URL of the shape tree collection the app works with. Defaults to the
    * public workers; set it to the deployment's own copy (for example
    * `https://data/shapetrees` in the Dagger integration stack) so the scopes
