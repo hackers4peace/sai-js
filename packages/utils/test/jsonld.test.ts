@@ -2,10 +2,12 @@ import { describe, expect, test, vi } from 'vitest'
 
 import {
   HttpStatusError,
+  accessClaimTerms,
   containedIrisJsonLd,
   documentValues,
   fetchJsonLd,
   findNodeIdByType,
+  lwsV1Context,
 } from '../src'
 import type { WhatwgFetch } from '../src'
 
@@ -122,5 +124,19 @@ describe('containedIrisJsonLd', () => {
     const fetch = mockFetch({ ok: true, json: async () => doc })
     const iris = await containedIrisJsonLd(container, fetch)
     expect(iris).toEqual([`${container}hierarchical`, `${container}flat`])
+  })
+})
+
+describe('bundled LWS context', () => {
+  const scopedContext = (term: string) =>
+    (
+      lwsV1Context['@context'] as unknown as Record<string, { '@context': Record<string, unknown> }>
+    )[term]['@context']
+
+  test('AccessGrant/AccessRequest scoped contexts keep the composed containers', () => {
+    for (const term of ['AccessGrant', 'AccessRequest']) {
+      expect(scopedContext(term).type).toEqual(accessClaimTerms.type)
+      expect(scopedContext(term).access).toEqual(accessClaimTerms.access)
+    }
   })
 })

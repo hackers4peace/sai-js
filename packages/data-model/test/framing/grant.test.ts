@@ -29,6 +29,16 @@ describe('Grant framing', () => {
     expect(permission.target.owner).toBe('https://id/acme')
     expect(permission.target.storage).toBe('https://data/acme-rnd/')
   })
+
+  test('keeps array containers and multi-valued rdf:type', async () => {
+    // the seed carries admin grants as `lws:AccessGrant, interop:AdminGrant`;
+    // the LWS type-scoped context must not collapse `type`/`access` to scalars
+    const iri = 'https://registry/yoyo/vbg74v'
+    const doc = [{ '@id': iri, '@type': [LWS.AccessGrant, INTEROP.AdminGrant] }]
+    const grant = await Grant.fromJsonLd(doc, iri)
+    expect(grant.type).toEqual([LWS.AccessGrant, INTEROP.AdminGrant])
+    expect(grant.access).toEqual([])
+  })
 })
 
 describe('Grant scopes and access actions (local fixture)', () => {

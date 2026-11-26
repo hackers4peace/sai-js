@@ -102,9 +102,6 @@ export interface GrantPermissionInput extends GrantTargetInput {
 
 const urn = (): string => `urn:uuid:${crypto.randomUUID()}`
 
-const asArray = <T>(value: T | Array<T> | undefined): Array<T> =>
-  value === undefined ? [] : Array.isArray(value) ? value : [value]
-
 const PREFIX_IRI: Record<string, string> = {
   interop: 'http://www.w3.org/ns/solid/interop#',
   st: 'http://www.w3.org/ns/shapetrees#',
@@ -152,12 +149,8 @@ function normalizeTarget(node: Record<string, unknown>): OdrlTarget {
     uid: node.uid as string | undefined,
     owner: resolveIri(node.owner),
     storage: resolveIri(node.storage),
-    type: asArray(node.type as string | Array<string> | undefined).map((value) =>
-      resolveIri(value)!
-    ),
-    source: asArray(node.source as string | Array<string> | undefined).map((value) =>
-      resolveIri(value)!
-    ),
+    type: ((node.type as Array<string> | undefined) ?? []).map((value) => resolveIri(value)!),
+    source: ((node.source as Array<string> | undefined) ?? []).map((value) => resolveIri(value)!),
     ...(node.registeredShapeTree
       ? {
           registeredShapeTree: resolveIri(node.registeredShapeTree),
@@ -177,24 +170,20 @@ function normalizePermission(node: Record<string, unknown>): OdrlPermission {
     uid: node.uid as string | undefined,
     assigner: resolveIri(node.assigner)!,
     assignee: resolveIri(node.assignee)!,
-    action: asArray(node.action as string | Array<string> | undefined).map((value) =>
-      resolveIri(value)!
-    ),
+    action: ((node.action as Array<string> | undefined) ?? []).map((value) => resolveIri(value)!),
     target: normalizeTarget((node.target as Record<string, unknown>) ?? {}),
   }
 }
 
 function normalizePolicy(node: Record<string, unknown>): OdrlPolicy {
-  const permission = asArray(node.permission as Array<Record<string, unknown>> | undefined).map(
+  const permission = ((node.permission as Array<Record<string, unknown>> | undefined) ?? []).map(
     normalizePermission
   )
   const first = permission[0]
   return {
     id: node.id as string | undefined,
     uid: node.uid as string | undefined,
-    type: asArray(node.type as string | Array<string> | undefined).map((value) =>
-      resolveIri(value)!
-    ),
+    type: ((node.type as Array<string> | undefined) ?? []).map((value) => resolveIri(value)!),
     profile: resolveIri(node.profile)!,
     permission,
     scopeOfGrant: resolveIri(node.scopeOfGrant),
@@ -284,19 +273,20 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
   const node = (await frameNode(expanded, accessContext, id, {
     access: { '@embed': '@always' },
   })) as Record<string, unknown>
-  const access = asArray(node.access as Array<Record<string, unknown>> | undefined)
-    .filter(Boolean)
-    .map(normalizePolicy)
+  // every set-container term frames as an array — `accessContext` declares
+  // `@container: '@set'`, including inside the LWS type-scoped contexts — so
+  // no scalar unwrapping here.
+  const access = ((node.access as Array<Record<string, unknown>> | undefined) ?? []).map(
+    normalizePolicy
+  )
   return {
     id,
-    type: asArray(node.type as string | Array<string> | undefined).map((value) =>
-      resolveIri(value)!
-    ),
+    type: ((node.type as Array<string> | undefined) ?? []).map((value) => resolveIri(value)!),
     access,
     scopeOfGrant: resolveIri(node.scopeOfGrant) ?? access[0]?.scopeOfGrant ?? '',
     ...(node.inheritsFromGrant ? { inheritsFromGrant: resolveIri(node.inheritsFromGrant)! } : {}),
     ...(node.hasInheritingGrant
-      ? { hasInheritingGrant: asArray(node.hasInheritingGrant as string | Array<string>) }
+      ? { hasInheritingGrant: node.hasInheritingGrant as Array<string> }
       : {}),
     ...deriveFields(node, access),
   }

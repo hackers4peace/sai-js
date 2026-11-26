@@ -16,6 +16,10 @@
  *   top-level term.
  * - the top-level `@protected` is removed so the LWS, ODRL, and SAI contexts
  *   can be composed in one document; nested scoped contexts stay protected.
+ * - `AccessGrant`/`AccessRequest` scoped contexts declare `@container: '@set'`
+ *   on `type` and `access`: a type-scoped context wins over the composed
+ *   top-level definitions, so without them a grant frames with a scalar
+ *   `type` and an object `access` (docs/data-model.md §1).
  */
 export const lwsV1Context = {
   '@context': {
@@ -197,7 +201,7 @@ export const lwsV1Context = {
       '@context': {
         '@protected': true,
         id: '@id',
-        type: '@type',
+        type: { '@id': '@type', '@container': '@set' },
         storage: {
           '@id': 'https://www.w3.org/ns/lws#storage',
           '@type': '@id',
@@ -206,7 +210,10 @@ export const lwsV1Context = {
           '@id': 'http://www.w3.org/ns/ldp#inbox',
           '@type': '@id',
         },
-        access: 'https://www.w3.org/ns/lws#access',
+        access: {
+          '@id': 'https://www.w3.org/ns/lws#access',
+          '@container': '@set',
+        },
       },
     },
     AccessGrantService: 'https://www.w3.org/ns/lws#AccessGrantService',
@@ -215,7 +222,7 @@ export const lwsV1Context = {
       '@context': {
         '@protected': true,
         id: '@id',
-        type: '@type',
+        type: { '@id': '@type', '@container': '@set' },
         storage: {
           '@id': 'https://www.w3.org/ns/lws#storage',
           '@type': '@id',
@@ -224,7 +231,10 @@ export const lwsV1Context = {
           '@id': 'http://www.w3.org/ns/ldp#inbox',
           '@type': '@id',
         },
-        access: 'https://www.w3.org/ns/lws#access',
+        access: {
+          '@id': 'https://www.w3.org/ns/lws#access',
+          '@container': '@set',
+        },
       },
     },
     AccessRequestService: 'https://www.w3.org/ns/lws#AccessRequestService',
