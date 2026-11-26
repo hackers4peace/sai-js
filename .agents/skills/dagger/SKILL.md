@@ -25,6 +25,30 @@ devbox run -- bash -lc \
 
 `--tempo-endpoint=http://172.16.0.1:4318` sends traces to the compose Tempo service. Use the Docker host gateway address because Dagger containers cannot resolve the compose name `tempo`. The full suite takes about 11 minutes. Search the resulting traces with the Tempo MCP tools.
 
+## Playwright report (`ui/authorization/e2e`)
+
+```bash
+# run the browser suite and export the HTML report + traces
+# (never fails: a red run still exports its report)
+devbox run -- bash -lc \
+  'dagger call --tempo-endpoint=http://172.16.0.1:4318 playwright-report \
+     --grep="vuejectron" export --path=ui/authorization/e2e-out --wipe'
+```
+
+`--wipe` is required for a target directory you reuse. `export` MERGES into an
+existing host directory by default (same-named files are overwritten, everything
+else is kept), so without it `e2e-out/playwright-report/data/` accumulates trace
+zips, videos and screenshots from every earlier run, and
+`e2e-out/test-results/*/error-context.md` keeps the error pages of long-fixed
+failures — easy to mistake for the current run. With `--wipe` the directory ends
+up exactly as produced by this run. Export to a fresh path instead if you want to
+keep an earlier report:
+
+```bash
+dagger call --tempo-endpoint=http://172.16.0.1:4318 playwright-report \
+  export --path=/tmp/e2e-out-$(date +%s)
+```
+
 ## Debugger proxy
 
 Start the proxy:

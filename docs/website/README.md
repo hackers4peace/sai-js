@@ -40,7 +40,10 @@ not served from the Turborepo cache.
 The Pages workflow exports the Dagger Playwright HTML report into `dist/journeys` after the
 Astro build, and the landing page's **Journeys** nav link opens it in a new tab. A plain
 `npm run build` does not create it, so that link only resolves after the workflow export or an
-explicit `dagger playwright-report directory ... export --path=dist/journeys`.
+explicit `dagger playwright-report directory ... export --path=dist/journeys --wipe`.
+Pass `--wipe` whenever the target directory may already exist: Dagger's `export` merges into
+it by default, which would keep an earlier run's report data (traces, videos, failed run
+`error-context.md`) next to the new one.
 
 ## GitHub Pages
 

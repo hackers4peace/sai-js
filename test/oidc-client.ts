@@ -103,7 +103,14 @@ async function completeInteraction(options: InteractionOptions): Promise<string>
         }
         return next.href
       }
-      current = next.href
+      // The OP's interaction route is the authorization UI, a different site
+      // than the OP (`https://ui.auth/authorize` in the Dagger stack). This
+      // suite has no UI service, so drive the OP's own interaction pages
+      // instead: the `_interaction` cookie this 303 sets (path `/.account/`)
+      // indexes them, and their controls are exactly what the UI calls.
+      const interactionIndex = new URL('/.account/', ISSUER).href
+      current = next.origin === new URL(ISSUER).origin ? next.href : interactionIndex
+      hops.push(`interaction entry -> ${current}`)
       continue
     }
 

@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from './fixtures'
 import { AGENT_IDS, attachDiagnostics, newActor, signIn } from './support'
 
 // UI counterpart of the need-based access request in test/access-request.test.ts

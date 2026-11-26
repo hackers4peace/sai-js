@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises'
+import { createInterface } from 'node:readline'
 
 import {
   Postgres,
@@ -90,8 +91,23 @@ export async function prepareTestSeed(): Promise<TestSeed> {
 if (process.argv[1] === import.meta.filename) {
   const testSeed = await prepareTestSeed()
   await testSeed.putClientId()
-  await testSeed.seed()
-  console.log('test fixtures seeded')
+  if (process.argv[2] === '--serve') {
+    // prepare once (Garage buckets/keys and the objectEndpoint records), then
+    // seed the KV + Fuseki on each `seed` line: the Playwright suite does this
+    // before every test, like vitest's setup.ts. Re-preparing between tests
+    // would mint new objectEndpoint records the running services may not see.
+    console.log('test fixtures ready')
+    for await (const line of createInterface({ input: process.stdin })) {
+      if (line.trim() !== 'seed') {
+        continue
+      }
+      await testSeed.seed()
+      console.log('test fixtures seeded')
+    }
+  } else {
+    await testSeed.seed()
+    console.log('test fixtures seeded')
+  }
   // the Postgres client keeps the event loop alive
   process.exit(0)
 }

@@ -5,6 +5,7 @@ import { suppressTracing } from '@opentelemetry/core'
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest'
 
 import { prepareTestSeed } from './seed'
+import { waitForTemporalIdle } from './temporal-idle'
 
 // opt-in OpenTelemetry: a no-op unless an OTLP endpoint (SAI_OTLP_ENDPOINT in
 // the dagger test env) is set. The test runner plays the browser/App role —
@@ -80,5 +81,6 @@ afterAll(async () => {
   }
 })
 beforeEach(async () => {
+  await withoutTracing(() => waitForTemporalIdle())
   await withoutTracing(() => testSeed.seed())
 })

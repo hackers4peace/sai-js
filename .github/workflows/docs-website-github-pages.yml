@@ -66,7 +66,10 @@ jobs:
         uses: dagger/dagger-for-github@v8.2.0
         with:
           version: 0.21.12
-          args: playwright-report directory --path=playwright-report export --path=docs/website/dist/journeys
+          # --wipe: `export` merges by default — without it a reused workspace
+          # keeps the previous run's report data (old traces, screenshots and
+          # test-results) inside dist/journeys
+          args: playwright-report directory --path=playwright-report export --path=docs/website/dist/journeys --wipe
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
 
       - name: Upload Pages artifact

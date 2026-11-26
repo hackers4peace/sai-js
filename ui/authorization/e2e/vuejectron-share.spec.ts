@@ -1,14 +1,16 @@
-import { expect, test } from '@playwright/test'
 import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test'
 
+import { expect, reseedFixtures, test } from './fixtures'
 import type { Account } from './support'
 import {
   ACCOUNT_EMAILS,
+  AUTH_ORIGIN,
   PASSWORD,
   UI_BASE_URL,
   VUEJECTRON_URL,
   attachDiagnostics,
   signIn,
+  watchActivityDone,
 } from './support'
 
 // Share from the demo app (`examples/vuejectron`, the stack's `test-client`
@@ -186,54 +188,83 @@ test('alice shares a project from vuejectron, kim sees it in her session', async
 
 // A NEW agent: Dan has Projects and Tasks in his pods but no application
 // registration for the test client, so vuejectron has to walk the whole
-// authorization flow — sign in, review the needs, authorize — and then wait for
-// the grant generation and the registration projection to reach it.
+// authorization flow — reach the authorization screen, review the needs,
+// authorize — and then wait for the grant generation and the registration
+// projection to reach it. Two variants:
+//
+// - no session: the app's Login reaches the authorization UI, which sends the
+//   browser to /login; the email + password login resumes the OIDC interaction
+//   onto the authorization screen;
+// - a seeded account cookie (the auth UI session): Login lands on the
+//   authorization screen directly.
 //
 // Seed (environments/data/registry.trig): Dan owns two data pods — `dan-east`
 // ("Hydra", "Nimbus") and `dan-west` ("Vega") with two Tasks each — and holds
 // NO `test-client` application registration, exactly like a first-time user.
 // Both of his peers (Bob, YoYo) registered Dan without granting him any of
-// their data, so he is the only data owner on the screen. His browser starts
-// without a session: after the app's Login the authorization UI sends him to
-// its /login screen, and the login response resumes the interaction onto the
-// authorization screen — the same screen a request-only flow shows, because a
-// unified deployment records the grant during the login interaction.
+// their data, so he is the only data owner on the screen.
 //
 // The authorization is `AllFromAgent` (the per-agent scope inside the UI's
 // "Selected data" toggle): one data authorization for Project, inherited by
 // Task, so every project in BOTH pods and their tasks become readable — the
 // grants are generated per data registration after the redirect back.
-test('dan authorizes vuejectron for all his projects and tasks', async ({ browser }, testInfo) => {
-  // sign-in round trips, the authorization workflow and the app's pull for
-  // the registration + grants
-  test.setTimeout(4 * WORKFLOW_TIMEOUT)
+//
+// `e2e/fixtures.ts` re-seeds the KV + Fuseki fixture before every test and
+// waits for the SAI worker queues to drain; each test also waits for the
+// `AuthorizationGranted` done row, so the grant generation and registration
+// projection cannot leak into the next test.
 
-  const danActor = await newVuejectronContext(browser, testInfo, 'dan')
-  const app = danActor.page
+/**
+ * Reach the authorization screen through the app's Login. The fixture's
+ * Temporal barrier covers workflows that started before the seed; one that
+ * starts later (a delayed webhook follow-up) can still leave the app
+ * registered, in which case the UI offers the consent-only Sign In instead of
+ * the needs. Re-create the fixture and start the login over; the account
+ * cookie survives the registry reset, so the retry may skip the /login form.
+ */
+async function reachNeedsScreen(actor: Actor, login: () => Promise<void>): Promise<void> {
+  const app = actor.page
+  const needs = app.getByText('Project').first()
+  const appSignIn = app.getByRole('button', { name: 'Sign In', exact: true })
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await login()
+    const visible = await needs
+      .waitFor({ state: 'visible', timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false)
+    if (visible) {
+      return
+    }
+    if (!(await appSignIn.isVisible().catch(() => false))) {
+      break
+    }
+    await reseedFixtures()
+  }
+  await expect(needs).toBeVisible({ timeout: WORKFLOW_TIMEOUT })
+}
+
+/**
+ * Review Dan's needs on the authorization UI, authorize, and wait for the app
+ * to load the three projects and their tasks. Subscribes to the
+ * `AuthorizationGranted` activity before the click: the data can appear before
+ * the workflow writes its done row.
+ */
+async function authorizeDan(actor: Actor): Promise<void> {
+  const app = actor.page
   const appOrigin = new URL(VUEJECTRON_URL).origin
-  const uiOrigin = new URL(UI_BASE_URL).origin
+  await expect(app).toHaveURL(/\/authorize/, { timeout: FIRST_LOAD_TIMEOUT })
+  await expect(app.getByText('Project').first()).toBeVisible({ timeout: WORKFLOW_TIMEOUT })
 
+  // Keep a page on the auth origin subscribed to the activity stream while the
+  // main page authorizes and navigates back to the app. Use a public
+  // well-known path: a `/.account/` visit would refresh the account cookie.
+  const authPage = await actor.context.newPage()
+  await authPage.goto(`${AUTH_ORIGIN}/.well-known/openid-configuration`)
+  const { done } = await watchActivityDone(authPage, 'AuthorizationGranted')
+  void done.catch(() => undefined)
   try {
-    // ── the app: login, then the authorization UI's sign-in screen ──
-    // The interaction has no account session, so the UI's router guard sends
-    // the browser to /login instead of showing an empty authorization screen.
-    await app.goto(VUEJECTRON_URL)
-    await app.getByRole('button', { name: 'Login' }).click()
-    await app.waitForURL((url) => url.origin === uiOrigin && url.pathname === '/login', {
-      timeout: FIRST_LOAD_TIMEOUT,
-    })
-    await app.getByRole('textbox', { name: 'email' }).fill(ACCOUNT_EMAILS.dan)
-    await app.getByRole('textbox', { name: 'password' }).fill(PASSWORD)
-    await app.getByRole('button', { name: 'Sign In', exact: true }).click()
-
-    // ── the authorization UI: the app's needs from its client-id document ──
-    // The login response carried the interaction's resume URL; following it
-    // brought the browser back here with the account session.
-    await expect(app).toHaveURL(/\/authorize/, { timeout: FIRST_LOAD_TIMEOUT })
-    await expect(app.getByText('Project').first()).toBeVisible({ timeout: WORKFLOW_TIMEOUT })
-
-    // grant ALL of Dan's own data — not all data: switching the top level to the
-    // per-agent scope makes the single top-level Project authorization
+    // grant ALL of Dan's own data — not all data: switching the top level to
+    // the per-agent scope makes the single top-level Project authorization
     // `AllFromAgent` (a data owner defaults to all of their own data), and the
     // Task need inherits from it
     const topPanel = app.locator('#panel-hell > .v-expansion-panel')
@@ -282,6 +313,73 @@ test('dan authorizes vuejectron for all his projects and tasks', async ({ browse
     const tasks = app.locator('.v-card-title')
     await expect(tasks).toHaveCount(2, { timeout: WORKFLOW_TIMEOUT })
     expect((await tasks.allInnerTexts()).map((title) => title.trim()).sort()).toEqual(['D3', 'D5'])
+
+    // The registration is visible before the workflow writes its completion;
+    // wait for it so it cannot write after the next test's seed.
+    await done
+  } finally {
+    await authPage.close()
+  }
+}
+
+test('dan authorizes vuejectron for all his projects and tasks', async ({ browser }, testInfo) => {
+  // sign-in round trips, the authorization workflow and the app's pull for
+  // the registration + grants
+  test.setTimeout(4 * WORKFLOW_TIMEOUT)
+
+  const danActor = await newVuejectronContext(browser, testInfo, 'dan')
+  const app = danActor.page
+  const uiOrigin = new URL(UI_BASE_URL).origin
+
+  try {
+    // ── the app: login, then the authorization UI's sign-in screen ──
+    // The interaction has no account session, so the UI's router guard sends
+    // the browser to /login instead of showing an empty authorization screen.
+    // A retry after a fixture reset may already have the account cookie and
+    // land on /authorize directly.
+    await reachNeedsScreen(danActor, async () => {
+      await app.goto(VUEJECTRON_URL)
+      await app.getByRole('button', { name: 'Login' }).click()
+      await app.waitForURL((url) => url.origin === uiOrigin, { timeout: FIRST_LOAD_TIMEOUT })
+      // the guard may still be redirecting from /authorize to /login
+      const email = app.getByRole('textbox', { name: 'email' })
+      const consent = app.getByRole('button', { name: /^(Authorize|Sign In)$/ })
+      await expect(email.or(consent).first()).toBeVisible({ timeout: FIRST_LOAD_TIMEOUT })
+      if (!(await email.isVisible())) {
+        return
+      }
+      await email.fill(ACCOUNT_EMAILS.dan)
+      await app.getByRole('textbox', { name: 'password' }).fill(PASSWORD)
+      await app.getByRole('button', { name: 'Sign In', exact: true }).click()
+    })
+
+    // the login response resumes the interaction onto the authorization screen
+    await authorizeDan(danActor)
+  } finally {
+    await danActor.close()
+  }
+})
+
+test('dan authorizes vuejectron with an existing auth session', async ({ browser }, testInfo) => {
+  test.setTimeout(4 * WORKFLOW_TIMEOUT)
+
+  const danActor = await newVuejectronContext(browser, testInfo, 'dan')
+  const app = danActor.page
+  const uiOrigin = new URL(UI_BASE_URL).origin
+
+  try {
+    // ── the seeded account cookie is the auth UI session: Login lands on the
+    // authorization screen directly, with no /login step ──
+    await signIn(danActor.context, 'dan')
+    await reachNeedsScreen(danActor, async () => {
+      await app.goto(VUEJECTRON_URL)
+      await app.getByRole('button', { name: 'Login' }).click()
+      await app.waitForURL((url) => url.origin === uiOrigin && url.pathname === '/authorize', {
+        timeout: FIRST_LOAD_TIMEOUT,
+      })
+    })
+
+    await authorizeDan(danActor)
   } finally {
     await danActor.close()
   }

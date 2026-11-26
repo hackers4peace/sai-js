@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test'
-
+import { expect, test } from './fixtures'
 import { attachDiagnostics, signIn } from './support'
 
 // UI counterpart of test/authorizations.test.ts (ListAuthorizations, C0): the

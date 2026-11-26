@@ -87,6 +87,69 @@ export async function signIn(context: BrowserContext, account: Account): Promise
 }
 
 /**
+ * Open the auth service's activity stream on a page that stays on the auth
+ * origin, and resolve on the first matching `done` row. The app's data is not a
+ * workflow completion signal: the registration is visible before the parent
+ * workflow writes the activity completion, so a test that stops at the data can
+ * leave a workflow writing after the next seed.
+ *
+ * The stream does not replay, so this subscribes before the action that writes
+ * the activity and waits for the stream to be open before returning.
+ */
+export async function watchActivityDone(
+  page: Page,
+  type: string
+): Promise<{ done: Promise<void> }> {
+  const done = page.evaluate(
+    async ({ type }): Promise<void> => {
+      const response = await fetch('/.sai/events', { credentials: 'include' })
+      if (!response.body) {
+        throw new Error('the activity stream returned no body')
+      }
+      ;(window as unknown as { saiEventStreamOpen?: boolean }).saiEventStreamOpen = true
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      try {
+        for (;;) {
+          const { value, done } = await reader.read()
+          if (done) {
+            throw new Error('the activity stream ended')
+          }
+          buffer += decoder.decode(value, { stream: true })
+          let newline = buffer.indexOf('\n')
+          while (newline >= 0) {
+            const line = buffer.slice(0, newline)
+            buffer = buffer.slice(newline + 1)
+            if (line) {
+              const message = JSON.parse(line) as {
+                type?: string
+                activity?: { type?: Array<string>; status?: string }
+              }
+              if (
+                message.type === 'activity' &&
+                message.activity?.status === 'done' &&
+                message.activity.type?.includes(type)
+              ) {
+                return
+              }
+            }
+            newline = buffer.indexOf('\n')
+          }
+        }
+      } finally {
+        await reader.cancel().catch(() => undefined)
+      }
+    },
+    { type }
+  )
+  await page.waitForFunction(
+    () => (window as unknown as { saiEventStreamOpen?: boolean }).saiEventStreamOpen === true
+  )
+  return { done }
+}
+
+/**
  * Surface backend failures and browser errors in the report: the trace keeps
  * requests, but not the body of a failed RPC response. `who` prefixes the
  * attachment names when a test drives several browsers.

@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs'
+import { createInterface } from 'node:readline'
 import { fileURLToPath } from 'node:url'
 
 import { Args, Command, Options } from '@effect/cli'
@@ -131,45 +132,64 @@ const generateRegistry = (path: string, env: string): Effect.Effect<string, Erro
     catch: (error) => new Error(`Failed to generate data: ${error}`),
   })
 
-const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
-  Effect.gen(function* () {
-    yield* Console.log(`Seeding data for ${env}`)
+export interface EnvSeed {
+  seed(): Promise<void>
+  close(): Promise<void>
+}
 
-    const connectionString = 'postgres://temporal:temporal@localhost:5432/auth'
-    const fusekiBaseUrl = 'http://localhost:3030'
-    const pg = new Postgres(connectionString, 'key_value')
+/**
+ * Prepare the environment fixture once: map it for `env` and provision the
+ * per-pod Garage buckets/keys and their objectEndpoint records. `seed()` then
+ * writes the KV and the per-pod Fuseki datasets and can be repeated — the
+ * Playwright suite re-seeds before every test, like vitest's setup.ts.
+ * Re-preparing would mint new objectEndpoint records that the running services
+ * may not pick up between tests.
+ */
+export async function prepareEnvSeed(env: string): Promise<EnvSeed> {
+  const connectionString = 'postgres://temporal:temporal@localhost:5432/auth'
+  const fusekiBaseUrl = 'http://localhost:3030'
+  const kv = await Effect.runPromise(generateRegistry(kvSourcePath, env))
+  const dataset = await Effect.runPromise(generateRegistry(datasetSourcePath, env))
 
-    const kv = yield* generateRegistry(kvSourcePath, env)
-    const dataset = yield* generateRegistry(datasetSourcePath, env)
+  // stage 3: one Fuseki dataset per pod; the registry origin is the mapped one
+  // for this environment (map.prefixes['https://registry/'])
+  const kvData = JSON.parse(kv) as Record<string, any>
+  const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf8')) as {
+    prefixes: Record<string, string>
+  }
+  const podDatasets = podDatasetsFromKeyValue(kvData)
+  const datasets = await splitFixtureByPod(dataset, {
+    podDatasets,
+    idOrigin: map.prefixes['https://id/'],
+  })
 
-    // stage 3: one Fuseki dataset per pod; the registry origin is the mapped
-    // one for this environment (map.prefixes['https://registry/'])
-    const kvData = JSON.parse(kv)
-    const map = JSON.parse(readFileSync(mapPaths[env as keyof typeof mapPaths], 'utf8')) as {
-      prefixes: Record<string, string>
-    }
-    const podDatasets = podDatasetsFromKeyValue(kvData)
-    const datasets = yield* Effect.promise(() =>
-      splitFixtureByPod(dataset, { podDatasets, idOrigin: map.prefixes['https://id/'] })
-    )
+  // per-pod buckets/keys through the Garage admin API (published on the host)
+  await seedObjectEndpoints(kvData, {
+    adminBaseUrl: 'http://localhost:3903',
+    adminToken: garageAdminToken(),
+    s3Endpoint: 'http://garage:3900',
+  })
 
-    // per-pod buckets/keys through the Garage admin API (published on the host)
-    yield* Effect.promise(() =>
-      seedObjectEndpoints(kvData, {
-        adminBaseUrl: 'http://localhost:3903',
-        adminToken: garageAdminToken(),
-        s3Endpoint: 'http://garage:3900',
-      })
-    )
-
-    yield* Effect.promise(() => pg.seedKeyValue(kvData))
-    yield* Effect.promise(async () => {
+  const pg = new Postgres(connectionString, 'key_value')
+  return {
+    async seed() {
+      await pg.seedKeyValue(kvData)
       for (const [ds, trig] of datasets) {
         await seedFusekiDataset(`${fusekiBaseUrl}/${ds}`, trig)
       }
-    })
-    yield* Effect.promise(() => pg.sql.end())
+    },
+    async close() {
+      await pg.sql.end()
+    },
+  }
+}
 
+const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
+  Effect.gen(function* () {
+    yield* Console.log(`Seeding data for ${env}`)
+    const seed = yield* Effect.promise(() => prepareEnvSeed(env))
+    yield* Effect.promise(() => seed.seed())
+    yield* Effect.promise(() => seed.close())
     yield* Console.log('Data seeded successfully')
     return 0
   }).pipe(
@@ -182,9 +202,38 @@ const seedEnvCommand = Command.make('seed-env', { env: envOption }, ({ env }) =>
   )
 ).pipe(Command.withDescription('Seed local Postgres, Fuseki and Garage from the mapped fixture'))
 
+const seedServeCommand = Command.make('seed-serve', { env: envOption }, ({ env }) =>
+  Effect.gen(function* () {
+    const seed = yield* Effect.promise(() => prepareEnvSeed(env))
+    yield* Console.log('test fixtures ready')
+    yield* Effect.promise(async () => {
+      for await (const line of createInterface({ input: process.stdin })) {
+        if (line.trim() !== 'seed') {
+          continue
+        }
+        await seed.seed()
+        process.stdout.write('test fixtures seeded\n')
+      }
+      await seed.close()
+    })
+    return 0
+  }).pipe(
+    Effect.catchAll((error: Error) =>
+      Effect.gen(function* () {
+        yield* Console.error(`Error serving seed data: ${error.message}`)
+        return 1
+      })
+    )
+  )
+).pipe(
+  Command.withDescription(
+    'Prepare the mapped fixture once and seed Postgres/Fuseki on each `seed` line (Playwright)'
+  )
+)
+
 const cliCommand = Command.make('interop').pipe(
   Command.withDescription('SAI Interop CLI tool'),
-  Command.withSubcommands([genJwkCommand, seedEnvCommand, addUserCommand])
+  Command.withSubcommands([genJwkCommand, seedEnvCommand, seedServeCommand, addUserCommand])
 )
 
 const cli = Command.run(cliCommand, {

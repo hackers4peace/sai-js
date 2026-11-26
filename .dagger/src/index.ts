@@ -802,19 +802,19 @@ export class SaiJs {
         .withEnvVariable('CSS_GARAGE_ADMIN_TOKEN', CSS_GARAGE_ADMIN_TOKEN)
         .withEnvVariable('SAI_TEMPORAL_READY', TEMPORAL_READY)
         .withWorkdir('/sai/ui/authorization')
-        // ONE exec for the readiness wait, the fixture seed and the browser run:
-        // between execs Dagger stops the now client-less services and restarts
-        // them, which dropped the SAI worker's Temporal pollers (workflows then
-        // stalled for minutes, so "done" activity events never reached the UI)
-        // and could leave the ephemeral stores empty. The readiness script
-        // resolves @temporalio/client from /sai/test; the seed is
-        // environments/data (the account cookies resolve only once kv.json is
-        // in Postgres), as vitest's setup.ts does.
+        // ONE exec for the readiness wait and the browser run: between execs
+        // Dagger stops the now client-less services and restarts them, which
+        // dropped the SAI worker's Temporal pollers (workflows then stalled for
+        // minutes, so "done" activity events never reached the UI) and could
+        // leave the ephemeral stores empty. The readiness script resolves
+        // @temporalio/client from /sai/test. The fixtures themselves are
+        // re-seeded before every test by `ui/authorization/e2e/fixtures.ts`
+        // (`node /sai/test/seed.ts --serve`), like vitest's setup.ts does.
         .withExec(
           [
             'sh',
             '-c',
-            '(cd /sai/test && node --input-type=module -e "$SAI_TEMPORAL_READY") && node /sai/test/seed.ts && exec "$@"',
+            '(cd /sai/test && node --input-type=module -e "$SAI_TEMPORAL_READY") && exec "$@"',
             'sh',
             ...args,
           ],
@@ -841,7 +841,13 @@ export class SaiJs {
   /**
    * Same run as `playwright`, but never fails and returns the Playwright HTML report
    * and traces, for CI artifacts:
-   *   dagger call playwright-report export --path=ui/authorization/e2e-out
+   *   dagger call playwright-report export --path=ui/authorization/e2e-out --wipe
+   *
+   * `--wipe` is not optional for a reused target: `export` MERGES into an existing
+   * host directory by default, so every earlier run's report data (trace zips,
+   * videos, and each failed test's `error-context.md` under `test-results`) would
+   * survive next to this run's report. `--wipe` deletes what the exported directory does not
+   * contain, so the target matches exactly this run.
    */
   @func({ cache: 'never' })
   async playwrightReport(@argument() grep?: string): Promise<Directory> {
