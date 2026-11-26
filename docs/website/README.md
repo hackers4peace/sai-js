@@ -13,7 +13,7 @@ npm run build  # LikeC4 codegen, `astro build`, then the OpenWiki export → `di
 npm run preview
 ```
 
-`codegen:likec4` targets the `docs/` folder (parent of this package) so `architecture.c4` and related files are included. Regenerates `public/likec4-webcomponent.js` before dev/build.
+`codegen:likec4` targets the `docs/` folder (parent of this package) so `architecture.c4` and related files are included. Regenerates `public/likec4-webcomponent.js` before dev/build; that bundle is generated, not committed (gitignored), and CI rebuilds it before publishing the site.
 
 Video list is kept in sync with [this YouTube playlist](https://www.youtube.com/playlist?list=PLXBho_YohPB09B_ecOsABoI8Dc67v1H4O); update `src/data/playlist.ts` when the playlist changes (e.g. list with `yt-dlp --flat-playlist --print "%(id)s|%(title)s" "<url>"`).
 

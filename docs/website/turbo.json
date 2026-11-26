@@ -3,7 +3,11 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/openwiki/**/*.md"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/openwiki/**/*.md",
+        "$TURBO_ROOT$/docs/**/*.c4"
+      ]
     }
   }
 }
