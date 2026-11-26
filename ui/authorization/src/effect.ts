@@ -1,4 +1,4 @@
-import { FetchHttpClient } from '@effect/platform'
+import { FetchHttpClient, HttpClient } from '@effect/platform'
 import { RpcClient, RpcSerialization } from '@effect/rpc'
 import { IRI, rpcGroup } from '@janeirodigital/sai-api-messages'
 import type { Authorization, ShareAuthorization } from '@janeirodigital/sai-api-messages'
@@ -14,11 +14,22 @@ const makeClient = Effect.gen(function* () {
   return yield* RpcClient.make(rpcGroup)
 })
 
-const AuthFetch = FetchHttpClient.layer.pipe(
+// `/.sai/api` answers an unauthenticated request with a non-NDJSON 4xx body,
+// which the NDJSON transport cannot read: without `filterStatusOk` the RPC call
+// never settles and the authorization UI stays blank instead of the router
+// guard sending the browser to `/login`.
+const AuthFetch = Layer.effect(
+  HttpClient.HttpClient,
+  Effect.map(HttpClient.HttpClient, HttpClient.filterStatusOk)
+).pipe(
   Layer.provide(
-    Layer.succeed(FetchHttpClient.RequestInit, {
-      credentials: 'include',
-    })
+    FetchHttpClient.layer.pipe(
+      Layer.provide(
+        Layer.succeed(FetchHttpClient.RequestInit, {
+          credentials: 'include',
+        })
+      )
+    )
   )
 )
 

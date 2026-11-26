@@ -2,7 +2,14 @@ import { expect, test } from '@playwright/test'
 import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test'
 
 import type { Account } from './support'
-import { AGENT_IDS, AUTH_ORIGIN, VUEJECTRON_URL, attachDiagnostics, signIn } from './support'
+import {
+  ACCOUNT_EMAILS,
+  PASSWORD,
+  UI_BASE_URL,
+  VUEJECTRON_URL,
+  attachDiagnostics,
+  signIn,
+} from './support'
 
 // Share from the demo app (`examples/vuejectron`, the stack's `test-client`
 // application), the browser counterpart of test/share.test.ts extended with an
@@ -17,10 +24,12 @@ import { AGENT_IDS, AUTH_ORIGIN, VUEJECTRON_URL, attachDiagnostics, signIn } fro
 // writes is mirrored into kim's registry and projected onto her application
 // registration by the delegated-grants workflow.
 //
-// The auth service serves the OIDC interaction as the CSS `/.account/` JSON API
-// (its HTML views are disabled), so the sign-in helper below drives that API
-// from the auth page the app navigated to — the same steps test/oidc-client.ts
-// runs in Node, but with the browser's seeded account + interaction cookies.
+// The authorization UI is the stack's OIDC interaction route
+// (`CSS_AUTHORIZATION_ENDPOINT`): the app's Login redirects the browser there,
+// and the UI completes the authorization-code interaction — sign in with the
+// seeded account cookie or email + password, pick the WebID, consent. The
+// authorization screen is therefore the login interaction itself; no separate
+// authorization request from the app is involved.
 
 const WORKFLOW_TIMEOUT = 60_000
 const FIRST_LOAD_TIMEOUT = 30_000
@@ -31,100 +40,44 @@ interface Actor {
   close: () => Promise<void>
 }
 
-interface InteractionControls {
-  oidc: { webId: string; consent: string }
-}
-
-interface InteractionResponse {
-  status: number
-  body: { controls?: InteractionControls; location?: string }
-}
-
 /**
- * Complete the authorization-code interaction the app just started: pick the
- * agent's WebID and consent. Returns the client redirect URL to hand back to
- * the app (the app exchanges the code for its session).
+ * Sign the app in with the seeded account cookie. The app's Login lands on the
+ * authorization UI's interaction resolver; with an account session the UI
+ * finds the app's registration and completes the interaction from its Sign In
+ * button.
  */
-async function completeOidcInteraction(page: Page, webId: string): Promise<string> {
-  const redirect = await page.evaluate(
-    async ({ webId }): Promise<string | undefined> => {
-      const call = async (url: string, body?: unknown): Promise<InteractionResponse> => {
-        const response = await fetch(url, {
-          method: body ? 'POST' : 'GET',
-          credentials: 'include',
-          headers: body ? { 'content-type': 'application/json' } : {},
-          body: body ? JSON.stringify(body) : undefined,
-        })
-        return { status: response.status, body: await response.json() }
-      }
-      const index = await call('/.account/')
-      const controls = index.body.controls
-      if (!controls) {
-        throw new Error('the auth service returned no interaction controls')
-      }
-      // The seeded `css-account` cookie already identifies the account; assigning
-      // the WebID is the login half of the interaction, consent the other.
-      const picked = await call(controls.oidc.webId, { webId })
-      if (picked.status !== 200 || !picked.body.location) {
-        throw new Error(`OIDC pick-webid failed: ${picked.status} ${JSON.stringify(picked.body)}`)
-      }
-      // The consent handler needs the interaction updated with the chosen WebID.
-      const resumed = await fetch(picked.body.location, { credentials: 'include' })
-      if (!resumed.ok) {
-        throw new Error(`OIDC interaction resume failed: ${resumed.status}`)
-      }
-      const consented = await call(controls.oidc.consent, { remember: true })
-      if (consented.status !== 200) {
-        throw new Error(
-          `OIDC consent failed: ${consented.status} ${JSON.stringify(consented.body)}`
-        )
-      }
-      return consented.body.location
-    },
-    { webId }
-  )
-  if (!redirect) {
-    throw new Error('the OIDC interaction returned no client redirect')
-  }
-  return redirect
-}
-
-/** Sign the app in through the OP's authorization-code flow. */
-async function signInVuejectron(page: Page, webId: string): Promise<void> {
+async function signInVuejectron(page: Page): Promise<void> {
+  const appOrigin = new URL(VUEJECTRON_URL).origin
+  const uiOrigin = new URL(UI_BASE_URL).origin
   await page.goto(VUEJECTRON_URL)
   await page.getByRole('button', { name: 'Login' }).click()
-  // the OP's interaction entry (CSS's `/.account/` JSON API)
-  await page.waitForURL(
-    (url) => url.origin === new URL(AUTH_ORIGIN).origin && url.pathname.startsWith('/.account'),
-    { timeout: FIRST_LOAD_TIMEOUT }
-  )
-  const redirect = await completeOidcInteraction(page, webId)
-  await page.goto(redirect)
-  await page.waitForURL((url) => !url.pathname.startsWith('/redirect'), {
+  await page.waitForURL((url) => url.origin === uiOrigin && url.pathname === '/authorize', {
     timeout: FIRST_LOAD_TIMEOUT,
   })
+  // a registered app: the UI only needs the consent, not a needs review
+  await page.getByRole('button', { name: 'Sign In', exact: true }).click()
+  // the consent redirects to the app's /redirect; the router replaces it with
+  // the restore path before the load event, so only the origin is observable
+  await page.waitForURL((url) => url.origin === appOrigin, { timeout: FIRST_LOAD_TIMEOUT })
 }
 
 /**
- * A second, isolated browser for one actor. Service workers stay enabled: the
- * app's dashboard awaits `navigator.serviceWorker.ready` for its push
- * subscription, so blocking them would leave the view blank.
+ * A second, isolated browser for one actor, with no session yet. Service
+ * workers stay enabled: the app's dashboard awaits
+ * `navigator.serviceWorker.ready` for its push subscription, so blocking them
+ * would leave the view blank.
  */
-async function newVuejectronActor(
+async function newVuejectronContext(
   browser: Browser,
   testInfo: TestInfo,
-  account: Extract<Account, 'alice' | 'dan' | 'kim'>
+  name: string
 ): Promise<Actor> {
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
-    recordVideo: { dir: testInfo.outputPath(`${account}-video`) },
+    recordVideo: { dir: testInfo.outputPath(`${name}-video`) },
   })
-  // the seeded CSS account cookie and the app's own OIDC session both come from
-  // the same account
-  await signIn(context, account)
   const page = await context.newPage()
-  await attachDiagnostics(page, testInfo, account)
-  await signInVuejectron(page, AGENT_IDS[account])
+  await attachDiagnostics(page, testInfo, name)
   return {
     context,
     page,
@@ -132,10 +85,24 @@ async function newVuejectronActor(
       await context.close()
       const video = await page.video()?.path()
       if (video) {
-        await testInfo.attach(`${account} video`, { path: video, contentType: 'video/webm' })
+        await testInfo.attach(`${name} video`, { path: video, contentType: 'video/webm' })
       }
     },
   }
+}
+
+/** A browser signed in to the app with the seeded account cookie. */
+async function newVuejectronActor(
+  browser: Browser,
+  testInfo: TestInfo,
+  account: Extract<Account, 'alice' | 'dan' | 'kim'>
+): Promise<Actor> {
+  const actor = await newVuejectronContext(browser, testInfo, account)
+  // the seeded CSS account cookie and the app's own OIDC session both come from
+  // the same account
+  await signIn(actor.context, account)
+  await signInVuejectron(actor.page)
+  return actor
 }
 
 test('alice shares a project from vuejectron, kim sees it in her session', async ({
@@ -219,16 +186,18 @@ test('alice shares a project from vuejectron, kim sees it in her session', async
 
 // A NEW agent: Dan has Projects and Tasks in his pods but no application
 // registration for the test client, so vuejectron has to walk the whole
-// authorization flow — request, review the needs, authorize — and then wait for
+// authorization flow — sign in, review the needs, authorize — and then wait for
 // the grant generation and the registration projection to reach it.
 //
 // Seed (environments/data/registry.trig): Dan owns two data pods — `dan-east`
 // ("Hydra", "Nimbus") and `dan-west` ("Vega") with two Tasks each — and holds
 // NO `test-client` application registration, exactly like a first-time user.
 // Both of his peers (Bob, YoYo) registered Dan without granting him any of
-// their data, so he is the only data owner on the screen. His account is seeded
-// with a login cookie (`ACCOUNT_COOKIES.dan`), so the OIDC and authorization UI
-// flows run as Dan.
+// their data, so he is the only data owner on the screen. His browser starts
+// without a session: after the app's Login the authorization UI sends him to
+// its /login screen, and the login response resumes the interaction onto the
+// authorization screen — the same screen a request-only flow shows, because a
+// unified deployment records the grant during the login interaction.
 //
 // The authorization is `AllFromAgent` (the per-agent scope inside the UI's
 // "Selected data" toggle): one data authorization for Project, inherited by
@@ -239,23 +208,28 @@ test('dan authorizes vuejectron for all his projects and tasks', async ({ browse
   // the registration + grants
   test.setTimeout(4 * WORKFLOW_TIMEOUT)
 
-  const danActor = await newVuejectronActor(browser, testInfo, 'dan')
+  const danActor = await newVuejectronContext(browser, testInfo, 'dan')
   const app = danActor.page
   const appOrigin = new URL(VUEJECTRON_URL).origin
+  const uiOrigin = new URL(UI_BASE_URL).origin
 
   try {
-    // ── the app: no registration for the test client yet ──
-    // The request screen is shown right away: this stack's OIDC interaction is
-    // CSS's `/.account/` (not the authorization UI), so a login carries no grant
-    // and the app only watches for one in the background. A unified deployment
-    // sets `authorizationOnLogin` and waits on the login return instead (the
-    // dev stack — see examples/vuejectron/public/config.json).
-    const request = app.getByRole('button', { name: 'Request Authorization' })
-    await expect(request).toBeVisible({ timeout: FIRST_LOAD_TIMEOUT })
-    await request.click()
+    // ── the app: login, then the authorization UI's sign-in screen ──
+    // The interaction has no account session, so the UI's router guard sends
+    // the browser to /login instead of showing an empty authorization screen.
+    await app.goto(VUEJECTRON_URL)
+    await app.getByRole('button', { name: 'Login' }).click()
+    await app.waitForURL((url) => url.origin === uiOrigin && url.pathname === '/login', {
+      timeout: FIRST_LOAD_TIMEOUT,
+    })
+    await app.getByRole('textbox', { name: 'email' }).fill(ACCOUNT_EMAILS.dan)
+    await app.getByRole('textbox', { name: 'password' }).fill(PASSWORD)
+    await app.getByRole('button', { name: 'Sign In', exact: true }).click()
 
     // ── the authorization UI: the app's needs from its client-id document ──
-    await expect(app).toHaveURL(/\/authorize\?/, { timeout: FIRST_LOAD_TIMEOUT })
+    // The login response carried the interaction's resume URL; following it
+    // brought the browser back here with the account session.
+    await expect(app).toHaveURL(/\/authorize/, { timeout: FIRST_LOAD_TIMEOUT })
     await expect(app.getByText('Project').first()).toBeVisible({ timeout: WORKFLOW_TIMEOUT })
 
     // grant ALL of Dan's own data — not all data: switching the top level to the

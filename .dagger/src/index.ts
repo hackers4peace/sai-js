@@ -740,13 +740,15 @@ export class SaiJs {
   }
 
   private vuejectronBuild(): Container {
-    // No `authorizationOnLogin`: this stack's OIDC interaction stays on the
-    // auth service's `/.account/`, so a login never carries a grant — the app
-    // shows the request screen right away and only watches in the background.
+    // `authorizationOnLogin`: the authorization UI is this stack's OIDC
+    // interaction route (environments/css/https/auth.json), so the login
+    // return carries the grant — the app waits for the registration instead of
+    // showing the request screen (the dev stack behaves the same).
     const config = JSON.stringify({
       defaultOidcIssuer: CSS_BASE_URL,
       clientId: 'https://data/test-client/public/id',
       baseUrl: 'https://test-client',
+      authorizationOnLogin: true,
       shapeTreesOrigin: 'https://data/shapetrees',
     })
     return dag

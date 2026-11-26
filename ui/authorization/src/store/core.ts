@@ -37,7 +37,16 @@ export const useCoreStore = defineStore('core', () => {
     { immediate: true }
   )
 
-  async function signIn(email: string, password: string): Promise<boolean> {
+  /**
+   * Signs in. A login that is part of an OIDC interaction answers with the
+   * interaction's resume URL (`location`), which the browser has to follow to
+   * finish the interaction; a login outside an interaction has none.
+   * Returns `undefined` when the email/password combination is rejected.
+   */
+  async function signIn(
+    email: string,
+    password: string
+  ): Promise<{ location?: string } | undefined> {
     const controlsResponse = await fetch(endpoint)
     const { controls } = await controlsResponse.json()
     const loginResponse = await fetch(controls.password.login, {
@@ -46,7 +55,11 @@ export const useCoreStore = defineStore('core', () => {
       credentials: 'include',
       body: JSON.stringify({ email, password, remember: true }),
     })
-    return loginResponse.ok
+    if (!loginResponse.ok) {
+      return undefined
+    }
+    const { location } = (await loginResponse.json()) as { location?: string }
+    return { location }
   }
 
   async function signUp(email: string, password: string): Promise<boolean> {

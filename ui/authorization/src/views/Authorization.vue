@@ -55,8 +55,12 @@ watch(
       return
     }
     if (!cId || Array.isArray(cId)) {
-      clientId.value = await coreStore.getClientInfo()
+      // Advance the interaction (WebID pick) before anything app-specific is
+      // rendered: the resume rotates the interaction cookie to the consent
+      // step, and a consent fetched against the consumed pick step answers
+      // without OIDC controls.
       await coreStore.setWebId()
+      clientId.value = await coreStore.getClientInfo()
       await appStore.listApplications()
       return
     }

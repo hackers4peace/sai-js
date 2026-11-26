@@ -60,6 +60,17 @@ export const ACCOUNT_COOKIES = {
 
 export type Account = keyof typeof ACCOUNT_COOKIES
 
+// Seeded account emails (environments/data/kv.json) for the password login.
+// Every seeded account uses the same password.
+export const ACCOUNT_EMAILS = {
+  alice: 'alice@acme.example',
+  bob: 'bob@yoyodyne.example',
+  dan: 'dan@yoyodyne.example',
+  kim: 'kim@encom.example',
+} as const
+
+export const PASSWORD = 'password'
+
 /** Sign the browser context in as a seeded account. */
 export async function signIn(context: BrowserContext, account: Account): Promise<void> {
   await context.addCookies([

@@ -1,0 +1,21 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^8.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@elfpavlik/sai-components/^1.0.0/components/context.jsonld"
+  ],
+  "import": [],
+  "@graph": [
+    {
+      "comment": "Writes the account cookie as SameSite=None so the authorization UI can reach the auth service when it is served from another site (the Dagger stack: ui.auth vs auth).",
+      "@id": "urn:sai:default:OverrideAccountCookieMetadataWriter",
+      "@type": "Override",
+      "overrideInstance": {
+        "@id": "urn:solid-server:default:MetadataWriter_Cookie"
+      },
+      "overrideParameters": {
+        "@type": "AccountCookieMetadataWriter",
+        "cookieName": { "@id": "urn:solid-server:default:value:accountCookieName" }
+      }
+    }
+  ]
+}

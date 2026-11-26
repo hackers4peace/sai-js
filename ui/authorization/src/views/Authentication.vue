@@ -169,8 +169,16 @@ const errors = computed(() => {
 })
 
 async function signIn() {
-  if (await coreStore.signIn(email.value, password.value)) {
-    coreStore.navigateHome()
+  const signedIn = await coreStore.signIn(email.value, password.value)
+  if (signedIn) {
+    // a login during an OIDC interaction answers with the interaction's resume
+    // URL: following it brings the browser back (here to the authorization
+    // screen) with the account session
+    if (signedIn.location) {
+      window.location.href = signedIn.location
+    } else {
+      coreStore.navigateHome()
+    }
   } else {
     if (await coreStore.signUp(email.value, password.value)) {
       step.value = 'signUp'
