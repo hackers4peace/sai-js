@@ -2,8 +2,8 @@
 
 > **Status:** current behaviour (wire shape, producers, consumers).
 > **Last reviewed:** 2026-11-27.
-> Grouping is the same before and after the data-model read-model refactor
-> (item 11): that refactor changes how a grant is read, not how it is grouped.
+> Grouping is independent of the read-model refactor: that refactor changes how
+> a grant is read (wire-shaped `GrantData`), not how it is grouped.
 
 This note documents the grouping contract and the assumptions it rests on. It
 also corrects three common assumptions about how policies are grouped per
@@ -71,6 +71,38 @@ grant ─lws:access→ policy (odrl:Agreement) ─odrl:permission→ permission 
   ]
 }
 ```
+
+### Context and read model
+
+Grants are read and written with `accessContext` (`= odrlAccessContext`: the
+bundled LWS + ODRL + SAI contexts composed with `accessClaimTerms`). The
+definitions this document depends on:
+
+- `type` and `access` are `@container: '@set'` both at the top level and
+  inside the bundled LWS `AccessGrant`/`AccessRequest` type-scoped contexts —
+  without the scoped containers a grant frames with a scalar `type` and an
+  object `access`;
+- `action`, `profile` and `scopeOfGrant` are `@type: '@vocab'`, so they compact
+  to bare tokens (`read`, `AccessProfile`, `AllFromRegistry`);
+- `assigner`, `assignee`, `uid`, `source`, `owner`, `storage`,
+  `registeredShapeTree`, `hasDataRegistration` are `@type: '@id'`;
+- `access`, `permission`, `source` and `action` are always arrays; `target` is
+  an embedded node (a scoped context there maps `value` to `lws:value`);
+- `uid` maps to `odrl:uid` and is **distinct** from the node `id`.
+
+Reads frame the grant with `GRANT_TERMS` (`@explicit`), embedding the policy
+with `@embed: '@always'` and resolving `hasInheritingGrant` through a
+`@reverse` term. `GrantData` (`packages/data-model/src/grant.ts`) is the wire
+shape — `id`, `type`, `access`, `scopeOfGrant`, `inheritsFromGrant`,
+`hasInheritingGrant`. The target facts (`storage`, `grantedBy`, `dataOwner`,
+`registeredShapeTree`, `hasDataRegistration`, `hasDataInstance`) are not
+fields: they are derived by the `grant*` helpers, so they cannot go stale. The
+write path is the inverse: `toJsonLd` is a per-level `pick` of the wire terms
+plus the two normalizations a builder may not have applied — the `AccessGrant`
+envelope class and `uid ?? id` at policy, permission and target level. It
+cannot be dropped entirely: a claim-derived policy may lack `uid`, and a
+generated grant carries only the document's own classes until the write adds
+the envelope.
 
 ## 2. What we emit
 
@@ -161,12 +193,11 @@ granularities:
 - **set facts** — shape tree, registration, selected instances, actions — from
   **all targets/permissions**.
 
-Both read models implement the same rule: in the item-11 wire-shaped model
-the values are the `grant*` helpers in `packages/data-model/src/grant.ts`
-(`grantStorage`, `grantDataOwner`, `grantAssigner` vs `grantShapeTree`,
-`grantRegistration`, `grantDataInstances`, `grantAccessModes`); in the earlier
-model the framed POJO carries the same values as derived fields. Do not add a
-writer that breaks 1–4 without updating those reads (see §6).
+The values come from the `grant*` helpers in
+`packages/data-model/src/grant.ts` (`grantStorage`, `grantDataOwner`,
+`grantAssigner` vs `grantShapeTree`, `grantRegistration`, `grantDataInstances`,
+`grantAccessModes`). Do not add a writer that breaks 1–4 without updating
+those reads (see §6).
 
 ## 4. Grants are read per policy elsewhere
 
@@ -225,7 +256,10 @@ intersects the assigner sets. Different policies of one claim may therefore be
 backed by different grants (parent and child, or different registrations), as
 long as one assigner covers all of them. `grantCoversClaim` compares scope,
 parties, shape tree, registration, storage, actions and selected instances
-with the same coverage-not-equality rule as the grant chain.
+with the same coverage-not-equality rule as the grant chain. Scopes and access
+modes are normalized before comparison (`asScopeTerm`/`asAccessModeTerm`
+accept either the compact token or the absolute IRI), matching the `@vocab`
+coercion of the access context.
 
 ### 5.2 Verification (`verifyAccessClaim`, `components/src/access-claim.ts`)
 
@@ -299,6 +333,8 @@ changes to the reads above.
   `fromJsonLd`/`toJsonLd`;
 - `packages/data-model/test/framing/grant.test.ts` — the seeded Project and
   Task grants (target facts, selected instances, inheritance links);
+- `packages/data-model/test/framing/schema.test.ts` — the frame is the schema:
+  framed keys are exactly `id`, `type` + `GRANT_TERMS`;
 - `packages/components/test/grant-policy.test.ts` — per-policy coverage;
 - `packages/components/test/delegated-access-claim-validator.test.ts` — edge
   selection, inherited links, registration-level vs asset-only preference;
@@ -312,8 +348,9 @@ changes to the reads above.
 
 ## 8. Related documentation
 
-- `docs/data-model.md` — the grant read model: framing, the POJO, and the
-  write path (`toJsonLd`).
+- `docs/jsonld.md` — the JSON-LD layer behind this document: framing and
+  `@explicit`, context composition (`accessContext`), language maps, the
+  verified `jsonld@9.0.0` constraints and the write path.
 - `docs/odrl.md` — ODRL alignment proposal; §2/§6 mention the one-permission-
   per-instance rule, §7 the target-copy instantiation pattern.
 - `openwiki/architecture/id-jag-access-claims.md` — the ID-JAG chain, ODRL

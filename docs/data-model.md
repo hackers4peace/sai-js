@@ -1,12 +1,13 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** in progress. Items 1–6, 8, 9 and 11 are landed; item 10 is mostly
-> landed (the OpenWiki refresh is still due). The grant read model normalization
-> was removed, the read paths are absolute-IRI-only, and `GrantData` is now the
-> wire shape (the derived fields live in the `grant*` helpers). A review of
-> `packages/data-model` and the JSON-LD helpers in `packages/utils`, with
-> behaviour verified against the installed `jsonld@9.0.0` (framing, compaction
-> and expansion probes).
+> **Status:** done except item 7 (deferred — the corrected plan is in
+> `docs/jsonld.md` §4/§6.7/§8) and item 10's OpenWiki refresh (deferred to a
+> dedicated session). Items 1–6 and 8–11 are landed; the grant read model
+> normalization was removed, the read paths are absolute-IRI-only, and
+> `GrantData` is the wire shape (the derived fields live in the `grant*`
+> helpers). A review of `packages/data-model` and the JSON-LD helpers in
+> `packages/utils`, with behaviour verified against the installed
+> `jsonld@9.0.0` (framing, compaction and expansion probes).
 > **Last reviewed:** 2026-11-27.
 
 ## Current state
@@ -16,18 +17,24 @@ The package is already framing-first:
 - reads are `frameNode`/`frameDoc` (`jsonld.frame`) over fetched
   `application/ld+json`; writes are expanded once and PUT without `@context`
   (`packages/utils/src/jsonld.ts`);
-- `fetchJsonLd` is the **only** place a base IRI enters: it expands against the
-  response's final URL and rejects anything that stays relative;
+- `fetchJsonLd` is the **only** place a base IRI is *derived*: it expands
+  against the response's final URL and rejects anything that stays relative;
 - `@reverse` relationships, `@container: '@set'`, and `@container: '@language'`
   language maps are used deliberately (`packages/data-model/src/context.ts`);
 - quads survive only at the SPARQL boundary and in the not-yet-migrated
   `authorization-agent/src/access-description-set.ts`.
 
-What remains is structural, not incremental:
+What remains:
 
-- `shape-tree.ts` still resolves `descriptionLanguages` with a document-wide
-  `documentValues` lookup (the description sets are separate nodes);
-- the context architecture (item 7) and the OpenWiki refresh (item 10).
+- item 7 (context architecture) — deferred; findings and proposed steps are in
+  `docs/jsonld.md` §4, §6.7 and §8 (the original bullets are corrected below);
+- item 10's OpenWiki refresh — `openwiki/data-model/json-ld-layer.md` still
+  documents `selectNode`; deferred to a dedicated session.
+
+`shape-tree.ts` keeps the document-wide `documentValues` lookup for
+`descriptionLanguages` **by design** (item 4): the language tags live on the
+separate description-set nodes and no single frame selects "description sets
+of this tree".
 
 Landed: the type-scoped container fix, the `CONTEXT` term maps, the typed
 `Framed*` + `projectNode` read paths, the frame defaults, the absolute-IRI
@@ -127,10 +134,13 @@ paths need.
 
 ### Landed — item 2: frame defaults (no `@default`)
 
-- `buildFrame` builds each entry as `{ '@embed': '@never', ...(isForwardSet ?
-  {} : { '@omitDefault': true }), ...overrides[key] }` — overrides **merge**,
-  so `{'@embed': '@always'}` on an absent single-valued term is omitted, not
-  `null`.
+- `frameEntry` (shared by `buildFrame` and `frameFor`) builds each entry as
+  `{ '@embed': '@never', ...(alwaysArrayTerm(def) ? {} : { '@omitDefault':
+  true }), ...override }` — overrides **merge**, so `{'@embed': '@always'}` on
+  an absent single-valued term is omitted, not `null`.
+  `alwaysArrayTerm` is true for a forward `@set` term only: `@reverse` and
+  `@type: '@vocab'` terms never get a container default from the framing
+  algorithm (verified).
 - **No `@default` anywhere.** Verified against the real `dataModelContext` and
   `accessContext`: with `@omitDefault` dropped, `@container: '@set'` alone
   yields `[]` for forward set terms (`contains`, `lwsContains`, `accessMode`,
@@ -158,10 +168,12 @@ paths need.
   (the final URL after redirects — JSON-LD 1.1 §4.1.3, RFC 3986 §5.1), then
   `assertAbsoluteIris`. A response without `url` throws: a test double must
   model the final URL (helpers pass the document's `@id`).
-- No base anywhere else: `frameDoc`/`frameNode`/`frameDataset`,
-  `expandedJsonLd`/`putJsonLd`, `documentValues`, `toStore`, `toNQuads`. Write
-  payloads assert absolute IRIs, so a relative IRI in a POJO fails loudly
-  (`relative IRI #fragment in write payload`).
+- No base option on `frameDoc`/`frameNode`/`frameDataset`, `expandedJsonLd`,
+  `putJsonLd`; write payloads assert absolute IRIs, so a relative IRI in a POJO
+  fails loudly (`relative IRI #fragment in write payload`).
+  `documentValues` (second argument), `findNodeIdByType`, `toStore` and
+  `toNQuads` still take a base for expanding / converting input that is not
+  pre-expanded; they never create relative IRIs.
 - `frameDoc` passes `compactToRelative: false`: with a base, compaction would
   otherwise emit relative IRI references (verified — a base plus default
   options compacts `https://…/grants/1/y` to `"y"`).
@@ -179,7 +191,7 @@ paths need.
   tolerances, each established by a failing document:
   - **`GrantData.scopeOfGrant` is optional.** An `AdminGrant` carries
     `interop:scopeOfAdminGrant`, never a data scope; the same reader
-    (`Grant.fromJsonLd`) serves admin grants from the grant registry.
+    (`fromJsonLd` in `grant.ts`) serves admin grants from the grant registry.
     `scopeCovers` now fails closed on an absent scope instead of comparing
     `undefined === undefined` and calling two scopeless grants cover each other.
   - **`registeredShapeTree` / `hasDataRegistration` stay `''`** when the grant
@@ -211,9 +223,11 @@ fields (`assignee`, `action`, `target`). The first three are now redundant:
 - the access context guarantees the set containers (arrays) and tokens;
 - `FramedTarget`/`FramedPermission`/`FramedPolicy`/`FramedGrant` types make the
   framed node typed with one boundary cast;
-- one mapper, `toOdrlPolicy`, only fills defaults and lifts the first
-  permission to the policy convenience fields. `deriveFields` stays — it
-  derives the flat grant fields that are not on the wire.
+- one mapper, `toOdrlPolicy`, only fills the embedded set-container defaults
+  and requires the values every permission needs. (Superseded by item 11:
+  the policy-level convenience fields and `deriveFields` are gone —
+  `GrantData` is the wire shape and the `grant*` helpers derive the target
+  facts.)
 - Behaviour note: extras framed on policies/permissions/targets are now
   preserved instead of dropped; `toJsonLd` still serializes only known fields.
 
@@ -230,7 +244,8 @@ longer used by `packages/data-model`.
 
 Only the derivation stays:
 
-- grant — `toOdrlPolicy` (convenience fields/defaults) + `deriveFields`;
+- grant — `toOdrlPolicy` (embedded set defaults) + the `grant*` helpers (the
+  wire-shaped `GrantData` has no derived fields);
 - access need — `required`, `children`, `descriptionLanguages`;
 - application registration — `granted`;
 - data registration — `contains`/`partOf`;
@@ -443,8 +458,8 @@ through `CONTEXT_IRI`.
 - `dataModelContext` (`accessMode`, `required`, `type` class terms) stays
   IRI-valued for now — a separate follow-up, not needed to delete
   `resolveIri`.
-- Acceptance: `Grant.fromJsonLd` output is tokens + absolute IRIs only; no
-  `resolveIri`; package and integration tests updated.
+- Acceptance: the `fromJsonLd` output (grant.ts) is tokens + absolute IRIs
+  only; no `resolveIri`; package and integration tests updated.
 
 ### 6. Activity decode: one frame, and preserve `@type`
 
@@ -461,26 +476,37 @@ through `CONTEXT_IRI`.
 - Acceptance: one frame call per activity; `type` contains every non-storage
   type from the document; activity tests unchanged.
 
-### 7. Context architecture (follow-up, larger blast radius)
+### 7. Context architecture — outstanding, deferred
 
-- Per-model **type-scoped contexts** instead of the 65-term union; each model
-  owns its terms and its reverse/container definitions.
-- `@protected: true` on the shared context. The blocker is
-  `data-instance.ts`'s `delete context.label`: introduce a distinct
-  `instanceLabel` term (mapped to the shape tree's `describesInstance`) and
-  drop the mutation.
-- Replace `{...lws, ...odrl, ...sai}` spreads with `@import` over the bundled
-  context documents (works with the local `documentLoader`). This also makes
-  item 1 visible at composition time.
-- Do **not** add a global `@vocab`; scope vocab coercion to enum terms and
-  type-scoped contexts.
-- Acceptance: `duplicate/conflicting term definitions` test passes; data
-  instance framing keeps working without context mutation; no term is defined
-  twice with different definitions.
+> **Status:** outstanding, deferred. The corrected findings, the decision
+> record and the remaining steps are in `docs/jsonld.md` §4, §6.7 and §8.
+
+Superseded assumptions in the original plan:
+
+- the shared context is **82 keys / 78 terms**, not a 65-term union;
+- **no `instanceLabel` term**: `describesInstance` is supplied by the shape
+  tree, so it stays an **IRI key** in the per-instance context; the current
+  `label` remap (`data-instance.ts`) is what must go;
+- `@protected` does not mechanically block that remap — jsonld sees one merged
+  JS object, so no redefinition happens (verified). The remap goes away for
+  semantic reasons: `label` must not mean two different predicates;
+- language-map terms cannot appear in a frame at all, so "per-model frames for
+  every model" needs a container-stripped frame context, not a context split;
+- frames constrain **reads only**: the write-payload audit (`partOf` dropped on
+  a data registration; merged `contains` re-written as `ldp:contains`) is
+  independent of any context split.
+
+Remaining acceptance: the duplicate-definition test, `@protected` on the
+shared contexts, per-model frames for the seven language-map models.
+`scopeOfGrant`/`scopeOfAdminGrant` are dead weight in `dataModelContext`
+(`scopeOfGrant` is read only by the grant family, `scopeOfAdminGrant` has no
+users), so dropping them makes the duplicate test passable without changing
+the published SAI context.
 
 ### 8. Base IRI: absolute IRIs only
 
-> **Status:** landed — the base enters at `fetchJsonLd` and nowhere else.
+> **Status:** landed — the base is derived only at `fetchJsonLd` and no
+> relative IRIs are created anywhere else.
 
 The package never creates relative IRIs. The only source is a retrieved
 document, so `fetchJsonLd` expands the payload against `response.url` (the
@@ -489,8 +515,11 @@ relative — e.g. a document declaring `"@base": null`, which suppresses
 resolution even when a base is supplied (verified).
 
 - No `base` option on `frameDoc`/`frameNode`/`frameDataset`, `expandedJsonLd`,
-  `putJsonLd`, `documentValues`, `toStore`, `toNQuads`; write payloads assert
-  absolute IRIs instead.
+  `putJsonLd`; write payloads assert absolute IRIs instead.
+- `documentValues` (second argument), `findNodeIdByType`, `toStore` and
+  `toNQuads` still take a base for expanding / converting input that is not
+  pre-expanded. They never create relative IRIs; only `fetchJsonLd` derives a
+  base from a response.
 - `frameDoc` always passes `compactToRelative: false` (a base would otherwise
   make compaction emit `"y"` for `https://…/y`).
 - `response.url` is required: no fallback to the requested IRI, so the base is
@@ -518,7 +547,8 @@ resolution even when a base is supplied (verified).
 
 ### 10. Hygiene
 
-> **Status:** mostly landed. `viaPredicate` stays an RDFJS `NamedNode`.
+> **Status:** landed except the OpenWiki refresh (deferred). `viaPredicate`
+> stays an RDFJS `NamedNode`.
 
 - **Landed** — `jsonld` dropped from `packages/data-model` and
   `packages/authorization-agent` (and `@types/jsonld` from data-model): both
@@ -528,10 +558,13 @@ resolution even when a base is supplied (verified).
   `NamedNode`; `n3`/`@rdfjs/types` therefore stay dependencies.
 - **Landed** — the nonexistent `docs/jsonld.md` references were removed from
   code comments, and comments state the constraint inline instead of pointing
-  at a plan document (this file is temporary, so nothing references it).
+  at a plan document (this file is temporary, so nothing references it). The
+  file now exists as the durable JSON-LD reference; code comments still state
+  constraints inline.
 - **Landed** — `selectNode` is removed (unused since `projectNode`). The
   `openwiki/data-model/json-ld-layer.md` page still describes it; OpenWiki has
-  no automatic refresh configured, so the page needs an explicit update run.
+  no automatic refresh configured, and the refresh is deferred to a dedicated
+  session.
 - Note: this document is working material and will be deleted once the plan is
   finished — nothing in the code may reference it.
 
@@ -581,37 +614,12 @@ left to select.
 
 ## Verified `jsonld@9.0.0` constraints
 
-| Feature | Behaviour |
-| --- | --- |
-| `@explicit: true` | output restricted to frame-listed properties; `@type` is kept without listing it |
-| `@explicit` + nested `{'@embed': '@always'}` subframe | the embedded child keeps all its properties — the flag does not restrict embedded nodes |
-| `@requireAll: true` on a selector with several property patterns | does **not** restrict the match: nodes matching any pattern are returned, non-matching properties are `null` |
-| nested reference subframe with property patterns | a dangling reference matches nothing and is dropped silently; a bare `{ '@embed': '@once' }` keeps it as an id-only node |
-| `@explicit` + `@container: '@language'` | throws (`reading '@value'` of undefined) |
-| `@explicit` + absent forward `@set` term | `[]` (same as without `@explicit`) |
-| `@explicit` + absent `@reverse`/`@vocab` set term | omitted — `frameNode` must fill `[]` |
-| `@default: []` | yields `[]` when absent (forward set terms only) |
-| `@default` + `@omitDefault: true` | `@default` ignored, property omitted |
-| set container + no `@omitDefault` | `[]` for forward `@set` terms (`@type: '@id'`, literals) |
-| set container on `@reverse` / `@vocab` term, no `@omitDefault` | property **omitted** — no `[]`, and `@default` cannot rescue it |
-| single-valued term, no `@omitDefault` | `null` (so every non-set term keeps `@omitDefault: true`) |
-| nested subframe property list | acts as a **match requirement** (`@requireAll` default false): a child without the listed term yields `null` for the parent property; nested `@default`/`@omitDefault` do not help |
-| nested frame with no matchable property | the child compacts to a bare IRI **string**, not an object |
-| `@explicit: true` + `@requireAll: false` + full term list | absent set term frames as `[]`, child still matches — the recipe for item 3 |
-| expansion of a node with only `@id` | node dropped (no statements) |
-| `@base: null` + `base` option | relative IRIs survive expansion (no error) → caught by `assertAbsoluteIris` |
-| `frame` with `base`, default options | compacts IRIs to relative references (why `compactToRelative: false` is mandatory) |
-| `@embed: '@once'` | dedupes repeated references |
-| `@embed: '@always'` on a nested node | frames the child with terms; `@reverse` does not resolve inside it |
-| multi-`@id` frame | returns `@graph`, each match top-level, `@reverse` resolves per node |
-| `@graph` in a frame | must be a single object; property patterns do not filter — not a reliable selector |
-| `@type: '@vocab'` | bare tokens (`AccessRequired`) |
-| `@type: '@id'` | IRI/compact-IRI only (`interop:AllFromRegistry`), never a value term |
-| type-scoped context | shadows top-level terms for typed nodes; `@propagate: false` does not prevent node-level shadowing |
-| `@protected` | redefinition throws; identical redefinition allowed |
-| `@import` | works through the bundled `documentLoader` |
-| `jsonld.frame` without `base` | relative `@id`s never match an absolute frame `@id` |
-| `base` + `compactToRelative: false` | absolute ids in framed output |
+Moved to `docs/jsonld.md` §7 — the single place for the measured
+`jsonld@9.0.0` behaviour (framing, value patterns, `@import`, `@protected`,
+language maps), together with the context rules and the open items.
+`docs/jsonld.md` extends the table with the findings from the context review
+(value patterns, `@import` limits, `@protected` scope, IRI-keyed frame entries,
+language selection).
 
 ## Landing order
 
@@ -628,7 +636,9 @@ left to select.
 8. Item 9 (ACR root ids) — independent correctness fix. — **landed**
 9. Item 11 (write paths) — wire-shaped `GrantData`, helper reads,
    `toJsonLd` as a `pick`. — **landed**
-10. Items 7, 10 — cleanup / follow-up, can land independently.
+10. Items 7, 10 — **deferred**: item 7's corrected plan is in
+    `docs/jsonld.md` §4/§6.7/§8; item 10's OpenWiki refresh runs in a dedicated
+    session.
 
 ## Out of scope
 
