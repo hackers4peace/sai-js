@@ -129,7 +129,7 @@ export function buildFrame(
  */
 export function frameFor(
   context: JsonLdContext,
-  iri: string,
+  iri: string | ReadonlyArray<string>,
   terms: ReadonlyArray<string>,
   overrides: Record<string, Record<string, unknown>> = {}
 ): Record<string, unknown> {
@@ -317,13 +317,39 @@ export async function frameMatches(
     subject,
     false
   )
+  return graphNodes(framed).map(withoutContext)
+}
+
+/**
+ * Frame **several subjects** in one call — `@id` accepts a list and the
+ * framing algorithm returns every match top-level under `@graph`, each as a
+ * focus node. Unlike an embedded child, a top-level match resolves its
+ * `@reverse` terms, which is what the activity decode needs for a class whose
+ * objects ride the same document (a `DataAuthorization`'s
+ * `hasInheritingAuthorization`).
+ *
+ * Every node is normalized like `frameNode`: `@context` stripped, `id`
+ * guaranteed, set-container terms of the frame's term list filled with `[]`.
+ */
+export async function frameNodes(
+  doc: unknown,
+  context: JsonLdContext,
+  iris: ReadonlyArray<string>,
+  terms: ReadonlyArray<string>,
+  overrides: Record<string, Record<string, unknown>> = {}
+): Promise<Array<FramedNode>> {
+  const subject = iris.join(' ')
+  const framed = await runFrame(doc, frameFor(context, iris, terms, overrides), subject, false)
+  return graphNodes(framed).map((node) => toFramedNode(node, context, terms, subject))
+}
+
+/** The matched nodes of a framed document: the `@graph` entries or the node itself. */
+function graphNodes(framed: Record<string, unknown>): Array<Record<string, unknown>> {
   const graph = framed['@graph']
-  const nodes: Array<Record<string, unknown>> = Array.isArray(graph)
-    ? (graph as Array<Record<string, unknown>>)
-    : framed.id || framed['@id']
-      ? [framed]
-      : []
-  return nodes.map(withoutContext)
+  if (Array.isArray(graph)) {
+    return graph as Array<Record<string, unknown>>
+  }
+  return framed.id || framed['@id'] ? [framed] : []
 }
 
 /** Run `jsonld.frame` with the shared loader and the framing span. */
@@ -396,17 +422,28 @@ export async function frameNode(
   const frame = options.terms
     ? frameFor(context, iri, options.terms, options.overrides)
     : buildFrame(context, iri, options.overrides)
-  const node = (await runFrame(doc, frame, iri)) as Record<string, unknown> & {
-    '@context'?: unknown
-  }
+  return toFramedNode(await runFrame(doc, frame, iri), context, options.terms, iri)
+}
+
+/**
+ * POJO normalization for one framed node: strip the embedded `@context` (the
+ * node becomes pure data), guarantee `id`, and fill absent set-container terms
+ * of the frame's term list with `[]`.
+ */
+function toFramedNode(
+  node: Record<string, unknown>,
+  context: JsonLdContext,
+  terms: ReadonlyArray<string> | undefined,
+  subject: string
+): FramedNode {
   // the frame embeds its @context in the output — strip it so the node is
   // pure POJO data (term keys, plain-IRI/literal values only)
   const { '@context': _context, ...rest } = node
   const id = (rest.id ?? rest['@id']) as string | undefined
   if (!id) {
-    throw new Error(`framed node ${iri} has no id`)
+    throw new Error(`framed node ${subject} has no id`)
   }
-  return withSetDefaults({ ...rest, id }, context, options.terms)
+  return withSetDefaults({ ...rest, id }, context, terms)
 }
 
 /**

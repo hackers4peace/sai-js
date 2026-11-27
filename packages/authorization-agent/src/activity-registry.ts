@@ -1,7 +1,12 @@
-import { DataAuthorizationFromJsonLd, dataModelContext } from '@janeirodigital/interop-data-model'
+import {
+  DATA_AUTHORIZATION_TERMS,
+  DataAuthorizationFromFramedNode,
+  dataModelContext,
+} from '@janeirodigital/interop-data-model'
 import type {
   ActivityData,
   ActivityRegistryData,
+  FramedDataAuthorization,
   CreateInvitationPojo,
   EmbeddedAccessRequestRef,
   EmbeddedAdminAuthorization,
@@ -15,7 +20,8 @@ import {
   AS,
   INTEROP,
   fetchJsonLd,
-  frameDoc,
+  frameNodes,
+  frameNode,
   createResource,
   mintResource,
   withContext,
@@ -25,6 +31,30 @@ import type { LanguageMap, WhatwgFetch } from '@janeirodigital/interop-utils'
 import { graphDoc, listContained } from './sparql.ts'
 import type { SparqlTransport } from './sparql.ts'
 import type { DataModelDependencies } from './types.ts'
+
+/**
+ * The activity document's own wire terms — the frame's property list. Exactly
+ * the fields the decode reads: the parties, the timestamp, the target and the
+ * class's object.
+ */
+const ACTIVITY_TERMS = [
+  'target',
+  'createdAt',
+  'actor',
+  'object',
+  'satisfiesAccessRequest',
+  'grantee',
+] as const
+
+/**
+ * `AuthorizationGranted` frames the activity and every embedded
+ * DataAuthorization in ONE call, so the frame needs the union of both term
+ * sets (each matched node keeps only the terms it has).
+ */
+const AUTHORIZATION_GRANTED_TERMS: ReadonlyArray<string> = [
+  ...ACTIVITY_TERMS,
+  ...DATA_AUTHORIZATION_TERMS,
+]
 
 /** The activity resources currently in the registry (`lws:contains` listing). */
 export async function getActivityIris(
@@ -79,13 +109,12 @@ const NEED_BASED_CLASSES = [
 ]
 
 /**
- * Frame an activity as a single document (the pinned single-doc read).
- * CLASS-GATED `as:object` handling:
- * - `AuthorizationGranted` — DEFAULT frame (every property
- *   `@embed: '@never'`): the embedded DataAuthorization nodes frame to
- *   plain-IRI string(s); `loadActivity` re-frames the same doc per object id
- *   with `DataAuthorizationFromJsonLd` (two-phase framing — no embedded-node
- *   unwrapping).
+ * Frame an activity as a single document (the pinned single-doc read), with
+ * the model's own wire terms as the `@explicit` frame list.
+ *
+ * CLASS-GATED `as:object` handling (`AuthorizationGranted` is decoded before
+ * this by `authorizationGrantedActivity`, which frames the activity and its
+ * objects together):
  * - need-based classes — the DEEP frame: the request SNAPSHOT embeds with
  *   its COMPLETE group (sparql.md: the activity graph is self-contained;
  *   its needs incl. inherited children ride the graph, or the approval
@@ -96,24 +125,27 @@ const NEED_BASED_CLASSES = [
  *   dereferences absent nodes).
  */
 async function frameActivity(doc: unknown, id: string): Promise<Record<string, unknown>> {
-  if (docHasClass(doc, INTEROP.AuthorizationGranted)) {
-    return frameDoc(doc, dataModelContext, id)
-  }
   if (NEED_BASED_CLASSES.some((cls) => docHasClass(doc, cls))) {
-    return frameDoc(doc, dataModelContext, id, {
-      object: {
-        '@embed': '@always',
-        hasAccessNeedGroup: {
+    return frameNode(doc, dataModelContext, id, {
+      terms: ACTIVITY_TERMS,
+      overrides: {
+        object: {
           '@embed': '@always',
-          hasAccessNeed: {
+          hasAccessNeedGroup: {
             '@embed': '@always',
-            hasInheritingNeed: { '@embed': '@always' },
+            hasAccessNeed: {
+              '@embed': '@always',
+              hasInheritingNeed: { '@embed': '@always' },
+            },
           },
         },
       },
     })
   }
-  return frameDoc(doc, dataModelContext, id, { object: { '@embed': '@always' } })
+  return frameNode(doc, dataModelContext, id, {
+    terms: ACTIVITY_TERMS,
+    overrides: { object: { '@embed': '@always' } },
+  })
 }
 
 function asString(value: unknown): string {
@@ -185,6 +217,28 @@ function isLanguageMap(value: unknown): value is LanguageMap {
 /** The ASV activity types ride the `type` tuple beside the interop class. */
 const ASV_ACTIVITY_TYPES = new Set(['as:Accept', 'as:Create', 'as:Add', 'as:Update'])
 
+/** The activity classes the decode knows — the discriminator is looked up in
+ * this set, so an unknown extra type never shadows the real class. */
+const ACTIVITY_CLASSES = new Set([
+  'InvitationAccepted',
+  'InvitationCreated',
+  'NeedBasedAccessRequestSent',
+  'NeedBasedAccessRequestReceived',
+  'AgentRegistrationAdded',
+  'AdminAuthorizationGranted',
+  'AdminAuthorizationRevoked',
+  'AuthorizationGranted',
+  'AuthorizationDenied',
+  'AccessRequestGranted',
+  'AccessRequestArchived',
+  'AuthorizationRevoked',
+  'RoleCreated',
+  'RoleMembershipChanged',
+  'RoleDeleted',
+  'DelegatedGrantsUpdated',
+  'ActivityCompleted',
+])
+
 /**
  * Storage vocabulary types the plane read picks up from `meta:<iri>` (the CSS
  * LWS metadata graph types the resource `ldp:Resource`; `graphDoc` unions the
@@ -200,14 +254,33 @@ const STORAGE_TYPE_PREFIXES = ['http://www.w3.org/ns/ldp#', 'https://www.w3.org/
  * class is found by set membership, never by position.
  */
 function activityClass(type: Array<string>): string {
+  const known = type.find((t) => ACTIVITY_CLASSES.has(t))
+  if (known) {
+    return known
+  }
+  // an unrecognised activity class: surface it so the decode fails loudly
+  // instead of silently mis-decoding it
   return (
-    type.find(
-      (t) =>
-        t !== 'Activity' &&
-        !ASV_ACTIVITY_TYPES.has(t) &&
-        !STORAGE_TYPE_PREFIXES.some((prefix) => t.startsWith(prefix))
-    ) ?? 'Activity'
+    type.find((t) => t !== 'Activity' && !ASV_ACTIVITY_TYPES.has(t) && !isStorageType(t)) ??
+    'Activity'
   )
+}
+
+/** Storage metadata types are never activity types. */
+function isStorageType(type: string): boolean {
+  return STORAGE_TYPE_PREFIXES.some((prefix) => type.startsWith(prefix))
+}
+
+/**
+ * The activity's `type` tuple, normalized: `Activity` first, then the class,
+ * then every other non-storage type the document carries — ASV types and any
+ * unknown domain class, deduplicated. `rdf:type` is an unordered set (the
+ * SPARQL store may return it in any order) and the storage metadata graph adds
+ * `ldp:Resource`/`lws:*`; nothing else is dropped.
+ */
+function activityType(type: Array<string>): Array<string> {
+  const meaningful = type.filter((candidate) => !isStorageType(candidate))
+  return [...new Set(['Activity', activityClass(meaningful), ...meaningful])]
 }
 
 /** Read an activity resource from the Activity Registry into an ActivityData
@@ -225,11 +298,73 @@ export async function getActivity(transport: SparqlTransport, id: string): Promi
   return frameActivityData(await graphDoc(transport, id), id)
 }
 
+/**
+ * `AuthorizationGranted` — ONE frame per activity.
+ *
+ * The class carries its `DataAuthorization`s embedded at real ids, and a
+ * `DataAuthorization`'s `hasInheritingAuthorization` is a `@reverse` term: an
+ * embedded child does not resolve `@reverse` (Framing §2.3.1), while a
+ * multi-`@id` frame returns every match TOP-LEVEL and does. So the activity and
+ * its objects are framed together and each object is projected with the shared
+ * decoder — no re-framing of the same document per object id.
+ */
+async function authorizationGrantedActivity(doc: unknown, id: string): Promise<ActivityData> {
+  const objectIds = objectIris(doc, id)
+  const framed = await frameNodes(
+    doc,
+    dataModelContext,
+    [id, ...objectIds],
+    AUTHORIZATION_GRANTED_TERMS,
+    {
+      object: { '@embed': '@never' },
+    }
+  )
+  const byId = new Map(framed.map((node) => [node.id, node]))
+  const node = byId.get(id)
+  if (!node) {
+    throw new Error(`activity ${id} not found in framed output`)
+  }
+  const missing = objectIds.filter((objectId) => !byId.has(objectId))
+  if (missing.length > 0) {
+    throw new Error(`activity ${id} references missing object(s): ${missing.join(', ')}`)
+  }
+  return {
+    id,
+    target: asString(node.target),
+    createdAt: asString(node.createdAt),
+    type: activityType(node.type ?? []) as ['Activity', 'AuthorizationGranted'],
+    actor: asString(node.actor),
+    // the owner-span close — optional, direct approvals carry none
+    satisfiesAccessRequest:
+      node.satisfiesAccessRequest === undefined ? undefined : asString(node.satisfiesAccessRequest),
+    // declaration order, not frame order
+    object: objectIds.map((objectId) =>
+      DataAuthorizationFromFramedNode(byId.get(objectId) as unknown as FramedDataAuthorization)
+    ),
+  }
+}
+
+/**
+ * The `as:object` IRIs of the activity node in the RAW document — read before
+ * framing, because the frame's `@id` list needs them. Handles the expanded form
+ * (`{'@id'}` references under the full IRI) and a compacted one (the `object`
+ * term, test fixtures).
+ */
+function objectIris(doc: unknown, id: string): Array<string> {
+  const nodes = (Array.isArray(doc) ? doc : [doc]) as Array<Record<string, unknown>>
+  const node = nodes.find((candidate) => (candidate['@id'] ?? candidate.id) === id) ?? nodes[0]
+  return asStringArray(node?.[AS.object] ?? node?.object).filter((iri) => iri !== '')
+}
+
 async function frameActivityData(doc: unknown, id: string): Promise<ActivityData> {
+  // `AuthorizationGranted` decodes from ONE multi-`@id` frame (activity + its
+  // embedded DataAuthorizations); every other class frames the activity alone
+  if (docHasClass(doc, INTEROP.AuthorizationGranted)) {
+    return authorizationGrantedActivity(doc, id)
+  }
   const node = await frameActivity(doc, id)
-  const type = (node.type as Array<string> | undefined) ?? []
+  const type = activityType((node.type as Array<string> | undefined) ?? [])
   const cls = activityClass(type)
-  const canonicalType = ['Activity', cls, ...type.filter((t) => ASV_ACTIVITY_TYPES.has(t))]
   const base = {
     id,
     target: asString(node.target),
@@ -241,7 +376,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'InvitationAccepted', 'as:Accept'],
+        type: type as ['Activity', 'InvitationAccepted', 'as:Accept'],
         actor,
         // the urn:uuid snapshot — fields normalized (a single rdf:type
         // frames as a scalar string; the embedded POJOs type it as string[])
@@ -260,7 +395,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'InvitationCreated', 'as:Create'],
+        type: type as ['Activity', 'InvitationCreated', 'as:Create'],
         actor,
         object: {
           id: asString((node.object as CreateInvitationPojo)?.id),
@@ -281,7 +416,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'NeedBasedAccessRequestSent'],
+        type: type as ['Activity', 'NeedBasedAccessRequestSent'],
         actor,
         object: {
           id: asString(embedded?.id),
@@ -306,7 +441,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       const group = embedded?.hasAccessNeedGroup
       return {
         ...base,
-        type: canonicalType as ['Activity', 'NeedBasedAccessRequestReceived'],
+        type: type as ['Activity', 'NeedBasedAccessRequestReceived'],
         actor,
         object: {
           id: asString(embedded?.id),
@@ -325,7 +460,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
     case 'AgentRegistrationAdded':
       return {
         ...base,
-        type: canonicalType as ['Activity', 'AgentRegistrationAdded', 'as:Add'],
+        type: type as ['Activity', 'AgentRegistrationAdded', 'as:Add'],
         actor,
         object: {
           id: asString((node.object as EmbeddedSocialAgentRegistration)?.id),
@@ -347,7 +482,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'AdminAuthorizationGranted'],
+        type: type as ['Activity', 'AdminAuthorizationGranted'],
         actor,
         object: {
           id: asString((node.object as EmbeddedAdminAuthorization)?.id),
@@ -366,7 +501,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'AdminAuthorizationRevoked'],
+        type: type as ['Activity', 'AdminAuthorizationRevoked'],
         actor,
         object: {
           id: asString((node.object as EmbeddedAdminAuthorization)?.id),
@@ -378,31 +513,6 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
           ),
         },
       }
-    case 'AuthorizationGranted': {
-      // two-phase framing: phase 1 (default frame) gave the object as
-      // plain-IRI string(s) — a single embedded node frames as a scalar, so
-      // wrap it; phase 2
-      // re-frames the SAME doc per object id via the standard
-      // data-authorization read path → full `DataAuthorizationData` POJOs
-      // (plain-IRI refs, @reverse children resolved), no node unwrapping.
-      // Declines are `AuthorizationDenied` (Step 4): no snapshot form lives
-      // on this class anymore.
-      const objectIds = asStringArray(node.object)
-      return {
-        ...base,
-        type: canonicalType as ['Activity', 'AuthorizationGranted'],
-        actor,
-        // the owner-span close (see the OpenWiki `services/activity-lifecycle.md`) — optional,
-        // direct approvals without a request carry none
-        satisfiesAccessRequest:
-          node.satisfiesAccessRequest === undefined
-            ? undefined
-            : asString(node.satisfiesAccessRequest),
-        object: await Promise.all(
-          objectIds.map((objectId) => DataAuthorizationFromJsonLd(doc, objectId))
-        ),
-      }
-    }
     case 'AuthorizationDenied': {
       // decline — no `target`; the request-structure snapshot (urn:uuid)
       // carrying `grantee` rides the object; cast once per object
@@ -410,7 +520,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'AuthorizationDenied'],
+        type: type as ['Activity', 'AuthorizationDenied'],
         actor,
         // the owner-span close (see the OpenWiki `services/activity-lifecycle.md`) — optional,
         // direct declines without a request carry none
@@ -437,7 +547,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'AccessRequestGranted'],
+        type: type as ['Activity', 'AccessRequestGranted'],
         actor,
         object: {
           id: asString(embedded?.id),
@@ -453,7 +563,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'AccessRequestArchived'],
+        type: type as ['Activity', 'AccessRequestArchived'],
         actor,
         object: {
           id: asString(embedded?.id),
@@ -474,7 +584,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'AuthorizationRevoked'],
+        type: type as ['Activity', 'AuthorizationRevoked'],
         actor,
         object: refs,
         grantee: asString(node.grantee),
@@ -487,7 +597,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'RoleCreated', 'as:Add'],
+        type: type as ['Activity', 'RoleCreated', 'as:Add'],
         actor,
         object: {
           id: asString((node.object as RoleData)?.id),
@@ -504,7 +614,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'RoleMembershipChanged', 'as:Update'],
+        type: type as ['Activity', 'RoleMembershipChanged', 'as:Update'],
         actor,
         object: {
           id: asString((node.object as RoleData)?.id),
@@ -521,7 +631,7 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
       return {
         id,
         createdAt: asString(node.createdAt),
-        type: canonicalType as ['Activity', 'RoleDeleted'],
+        type: type as ['Activity', 'RoleDeleted'],
         actor,
         object: {
           id: asString((node.object as RoleData)?.id),
@@ -535,12 +645,12 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
     case 'DelegatedGrantsUpdated':
       return {
         ...base,
-        type: canonicalType as ['Activity', 'DelegatedGrantsUpdated'],
+        type: type as ['Activity', 'DelegatedGrantsUpdated'],
         actor,
         object: asString(node.object),
       }
     case 'ActivityCompleted':
-      return { ...base, type: canonicalType as ['Activity', 'ActivityCompleted'] }
+      return { ...base, type: type as ['Activity', 'ActivityCompleted'] }
     default:
       throw new Error(`unknown activity class: ${JSON.stringify(type)}`)
   }

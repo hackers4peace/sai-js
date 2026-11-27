@@ -8,7 +8,7 @@ import {
 
 import { dataModelContext } from './context.ts'
 
-type FramedDataAuthorization = {
+export type FramedDataAuthorization = {
   id?: string
   type?: Array<string>
   grantee?: string
@@ -48,7 +48,7 @@ export type DataAuthorizationData = DataAuthorizationId & {
 export type FinalDataAuthorizationData = DataAuthorizationData &
   Required<Pick<DataAuthorizationData, 'id'>>
 
-const DATA_AUTHORIZATION_TERMS = [
+export const DATA_AUTHORIZATION_TERMS = [
   'grantee',
   'grantedBy',
   'registeredShapeTree',
@@ -75,10 +75,13 @@ function requiredTerm(node: Record<string, unknown>, key: string, strict: boolea
   return strict ? required(node, key) : ((node[key] as string | undefined) ?? '')
 }
 
-export async function fromJsonLd(doc: unknown, id: string): Promise<DataAuthorizationData> {
-  const framed = (await frameNode(doc, dataModelContext, id, {
-    terms: DATA_AUTHORIZATION_TERMS,
-  })) as unknown as FramedDataAuthorization
+/**
+ * The POJO projection of an already-framed node — the shared decoder for a
+ * direct read and for a caller that framed the node in a larger frame (the
+ * activity decode frames an activity and its embedded DataAuthorizations in
+ * one multi-`@id` call).
+ */
+export function fromFramedNode(framed: FramedDataAuthorization): DataAuthorizationData {
   const node = projectNode(framed, DATA_AUTHORIZATION_TERMS)
   const strict = node.type.includes(INTEROP.DataAuthorization)
   return {
@@ -88,6 +91,13 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<DataAuthoriz
     registeredShapeTree: requiredTerm(node, 'registeredShapeTree', strict),
     scopeOfAuthorization: requiredTerm(node, 'scopeOfAuthorization', strict),
   }
+}
+
+export async function fromJsonLd(doc: unknown, id: string): Promise<DataAuthorizationData> {
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: DATA_AUTHORIZATION_TERMS,
+  })) as unknown as FramedDataAuthorization
+  return fromFramedNode(framed)
 }
 
 export function toJsonLd(data: FinalDataAuthorizationData): Record<string, unknown> {

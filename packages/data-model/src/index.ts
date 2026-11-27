@@ -47,7 +47,11 @@ export {
   isBlob,
   labelFromNode,
 } from './data-instance.ts'
-export { fromJsonLd as DataAuthorizationFromJsonLd } from './data-authorization.ts'
+export {
+  DATA_AUTHORIZATION_TERMS,
+  fromFramedNode as DataAuthorizationFromFramedNode,
+  fromJsonLd as DataAuthorizationFromJsonLd,
+} from './data-authorization.ts'
 export type { AdminAuthorizationData } from './admin-authorization.ts'
 export * as AdminAuthorization from './admin-authorization.ts'
 export type { ShapeTreeData, ShapeTreeId, ShapeTreeReference } from './shape-tree.ts'
@@ -91,6 +95,7 @@ export type {
   DataAuthorizationData,
   DataAuthorizationId,
   FinalDataAuthorizationData,
+  FramedDataAuthorization,
 } from './data-authorization.ts'
 export * as DataAuthorization from './data-authorization.ts'
 export type { WebIdProfileData, WebIdProfileId } from './web-id-profile.ts'

@@ -523,3 +523,47 @@ describe('ActivityRegistry — registry plane', () => {
     expect(activity.type).toEqual(['Activity', 'InvitationCreated', 'as:Create'])
   })
 })
+
+describe('ActivityRegistry.loadActivity — type tuple', () => {
+  test('keeps every non-storage type and drops the storage metadata types', async () => {
+    const iri = 'https://registry/alice/typed'
+    const doc = {
+      '@context': dataModelContext,
+      '@id': iri,
+      '@type': [
+        'AuthorizationGranted',
+        'Activity',
+        'as:Accept',
+        // an unknown domain class — never dropped
+        'https://example.example/CustomClass',
+        // CSS metadata types the plane read picks up
+        'http://www.w3.org/ns/ldp#Resource',
+        'https://www.w3.org/ns/lws#DataResource',
+      ],
+      actor: 'https://id/alice',
+      target: 'https://registry/alice/authorization/',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      object: [
+        {
+          '@id': 'https://registry/alice/o1',
+          '@type': ['http://www.w3.org/ns/solid/interop#DataAuthorization'],
+          grantee: 'https://id/bob',
+          grantedBy: 'https://id/alice',
+          registeredShapeTree: 'https://data/shapetrees/trees/Project',
+          scopeOfAuthorization: 'http://www.w3.org/ns/solid/interop#AllFromRegistry',
+          accessMode: ['http://www.w3.org/ns/odrl/2/read'],
+        },
+      ],
+    }
+    const activity = await ActivityRegistry.loadActivity(iri, mockFetch(doc))
+
+    expect(activity.type).toEqual([
+      'Activity',
+      'AuthorizationGranted',
+      'as:Accept',
+      'https://example.example/CustomClass',
+    ])
+    // the object decodes in ONE frame together with the activity
+    expect(activity.object).toEqual([expect.objectContaining({ id: 'https://registry/alice/o1' })])
+  })
+})
