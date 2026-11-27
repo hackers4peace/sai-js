@@ -1,11 +1,11 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** in progress. Items 1, 2, 3, 4, 5 and 8 are landed; the grant read
-> model normalization was removed and the read paths are absolute-IRI-only. A
-> review of `packages/data-model` and the JSON-LD helpers in `packages/utils`,
+> **Status:** in progress. Items 1, 2, 3, 4, 5, 6, 8 and 9 are landed; the grant
+> read model normalization was removed and the read paths are absolute-IRI-only.
+> A review of `packages/data-model` and the JSON-LD helpers in `packages/utils`,
 > with behaviour verified against the installed `jsonld@9.0.0` (framing,
 > compaction and expansion probes).
-> **Last reviewed:** 2026-11-26.
+> **Last reviewed:** 2026-11-27.
 
 ## Current state
 
@@ -23,17 +23,16 @@ The package is already framing-first:
 
 What remains is structural, not incremental:
 
-- the authorization-agent activity decode still canonicalizes `type` by hand
-  and re-frames the same document once per embedded object (item 6);
 - `shape-tree.ts` still resolves `descriptionLanguages` with a document-wide
   `documentValues` lookup (the description sets are separate nodes);
 - write paths are projections (`toJsonLd` in grant, `withContext` in the other
   models) rather than a wire-shaped read model (see the open question).
 
 Landed: the type-scoped container fix, the `CONTEXT` term maps, the typed
-`Framed*` + `projectNode` read paths, the frame defaults, and the absolute-IRI
-fetch boundary (see the progress log). `selectNode` is gone — framing plus
-`frameNode`'s set defaults are the only filter the read paths need.
+`Framed*` + `projectNode` read paths, the frame defaults, the absolute-IRI
+fetch boundary, the one-frame activity decode, and the ACR root-id fix (see the
+progress log). `selectNode` is gone — framing plus `frameNode`'s set defaults
+are the only filter the read paths need.
 
 
 ## Progress log
@@ -66,6 +65,38 @@ fetch boundary (see the progress log). `selectNode` is gone — framing plus
   `CONTEXT_IRI`.
 - `dataModelContext` (`accessMode`, `required`, class terms) intentionally
   stays IRI-valued for now — separate follow-up.
+
+### Landed — item 6: one activity frame, `@type` preserved
+
+- `AuthorizationGranted` decodes the activity and every embedded object with
+  **one** `frameNodes` call over `[activityIri, ...objectIris]`; the N+1
+  re-framing (one `jsonld.frame` per object id) is gone.
+- The class comes from set membership (`activityClass`), not from a hand-built
+  `canonicalType` tuple: `activityType` emits `['Activity', <class>, ...]` from
+  the document's own types, dropping only storage metadata types — an unknown
+  domain class survives.
+- `activity-registry.test.ts` pins the single-frame decode and the preserved
+  types.
+
+### Landed — item 9: ACR root ids and template drift
+
+- `agentRegistrationAcrJsonLd` roots at `<registration>.acr#root` (was
+  `#registration`); `accessGrantAcrJsonLd` takes the ACR document IRI as `acr`
+  and roots/controls under `<acr>#…` (was `<acr>#grant` plus
+  `<acr>.acr#fullOwnerAccess` — a doubled `.acr`).
+- `rewriteFullAdminAccess` locates the root by `<acrId>#root` **or** the
+  `acp:AccessControlResource` class, so an ACR written elsewhere (any root node
+  id) is wired instead of gaining a second root; `#root` is created only when
+  neither matches.
+- `registrySetAcrJsonLd` declares the bootstrap ACR (owner-only, `#root`).
+  `templates/RegistrySet.ts` still emits TriG — the bootstrap is posted as one
+  TriG document — and the template test now asserts its `.acr` graph is
+  isomorphic to the builder's quads (`toBeRdfIsomorphic`), so the two
+  serializations cannot drift.
+- Deferred: the typed ACR read model + `toJsonLd`. The rewrite is a graph edit
+  of a document we do not own (it must preserve foreign controls and their
+  policies), so a whole-document typed read model needs the write-frame work in
+  the open question below.
 
 ### Landed — item 2: frame defaults (no `@default`)
 
@@ -390,6 +421,9 @@ through `CONTEXT_IRI`.
 
 ### 6. Activity decode: one frame, and preserve `@type`
 
+> **Status:** landed — one `frameNodes` call per activity, `activityClass`
+> discriminant, every non-storage `@type` preserved (see the progress log).
+
 - `AuthorizationGranted` re-frames the same document once per object id
   (N+1 `jsonld.frame`). A single frame with `@id: [activityIri, ...objectIris]`
   returns `@graph` with every match top-level and resolves `@reverse` per node
@@ -439,6 +473,11 @@ resolution even when a base is supplied (verified).
 
 ### 9. ACR layer: root ids and read/write symmetry
 
+> **Status:** landed — builders and the bootstrap template root at `#root`,
+> `rewriteFullAdminAccess` also finds a root by `acp:AccessControlResource`, and
+> the template ACR is pinned to `registrySetAcrJsonLd` by an isomorphism test.
+> The typed read model + `toJsonLd` is deferred to the open question below.
+
 - `agentRegistrationAcrJsonLd` writes `${acr}#registration`,
   `accessGrantAcrJsonLd` writes `${id}#grant`, while `rewriteFullAdminAccess`
   expects `${acrId}#root` — a rewrite adds a second root node instead of
@@ -471,9 +510,9 @@ resolution even when a base is supplied (verified).
 
 ### 11. Apply the grant simplification to the other models
 
-> **Status:** landed for the data-model readers (typed `Framed*` + `projectNode`)
-> and for `shape-tree.ts` (nested references, framed description lookup).
-> Remaining: the authorization-agent activity decode.
+> **Status:** landed for the data-model readers (typed `Framed*` + `projectNode`),
+> for `shape-tree.ts` (nested references, framed description lookup) and for the
+> authorization-agent activity decode. Remaining: the write paths.
 
 The grant read path is now the template:
 
@@ -485,10 +524,6 @@ The grant read path is now the template:
 
 Remaining targets:
 
-- activities (`authorization-agent/activity-registry.ts`) — typed framed
-  union; keep only the class discriminant/canonical `type` and embedded
-  snapshot normalization; replace the N+1 re-framing with one multi-`@id`
-  frame;
 - write paths: see the open question below (`toJsonLd` projection in grant,
   `withContext` in the other models).
 
@@ -581,8 +616,10 @@ fields is too invasive.
    items 4 and 6. — **landed**
 6. Item 4 (nested framing in `shape-tree.ts`) — deletes the expanded-document
    walks. — **landed**
-7. Item 6 (activity decode) — authorization-agent side; one multi-`@id` frame.
-8. Items 7, 9, 10 — cleanup / follow-up, can land independently.
+7. Item 6 (activity decode) — authorization-agent side; one multi-`@id` frame. —
+   **landed**
+8. Item 9 (ACR root ids) — independent correctness fix. — **landed**
+9. Items 7, 10 — cleanup / follow-up, can land independently.
 
 ## Out of scope
 

@@ -21,8 +21,9 @@ function acrPolicy(
 
 /**
  * Compacted JSON-LD document for an agent-registration ACR: the owner gets
- * full access, the peer read-only. Node IRIs mirror the former Turtle
- * template (`<id>.acr#…`). PUT expanded via `putJsonLd`.
+ * full access, the peer read-only. The ACR document is at `<id>.acr` and its
+ * root node at `<id>.acr#root` — the id `rewriteFullAdminAccess` expects. PUT
+ * expanded via `putJsonLd`.
  */
 export function agentRegistrationAcrJsonLd({
   id,
@@ -38,7 +39,7 @@ export function agentRegistrationAcrJsonLd({
     '@context': acrContext,
     '@graph': [
       {
-        id: `${acr}#registration`,
+        id: `${acr}#root`,
         type: ['AccessControlResource'],
         resource: id,
         accessControl: [`${acr}#fullOwnerAccess`, `${acr}#peerReadAccess`],
@@ -59,19 +60,53 @@ export function agentRegistrationAcrJsonLd({
 }
 
 /**
+ * Compacted JSON-LD document for the bootstrap registry-set ACR: the owner's
+ * full access only — admins are added later by `rewriteFullAdminAccess`.
+ * `templates/RegistrySet.ts` emits the same graph as TriG; the template test
+ * asserts the two are isomorphic.
+ */
+export function registrySetAcrJsonLd({
+  id,
+  owner,
+}: {
+  id: string
+  owner: AgentAndClient
+}): Record<string, unknown> {
+  const acr = `${id}.acr`
+  return {
+    '@context': acrContext,
+    '@graph': [
+      {
+        id: `${acr}#root`,
+        type: ['AccessControlResource'],
+        resource: id,
+        accessControl: [`${acr}#fullOwnerAccess`],
+        memberAccessControl: [`${acr}#fullOwnerAccess`],
+      },
+      {
+        id: `${acr}#fullOwnerAccess`,
+        type: ['AccessControl'],
+        apply: [acrPolicy([ACL.Read, ACL.Write, ACL.Control], owner)],
+      },
+    ],
+  }
+}
+
+/**
  * Compacted JSON-LD document for an access-grant ACR. The owner always gets full
  * access; an optional delegating `grantor` and an optional `peer`/`client`
- * matcher get read-only access. Node IRIs mirror the former Turtle template.
+ * matcher get read-only access. `acr` is the ACR document IRI (the resource's
+ * `acl` link), so the root and the controls live under `<acr>#…`.
  */
 export function accessGrantAcrJsonLd({
-  id,
+  acr,
   resource,
   owner,
   grantor,
   peer,
   client,
 }: {
-  id: string
+  acr: string
   resource: string
   owner: AgentAndClient
   grantor?: AgentAndClient
@@ -90,14 +125,14 @@ export function accessGrantAcrJsonLd({
     '@context': acrContext,
     '@graph': [
       {
-        id: `${id}#grant`,
+        id: `${acr}#root`,
         type: ['AccessControlResource'],
         resource,
-        accessControl: [`${id}.acr#fullOwnerAccess`, `${id}.acr#peerReadAccess`],
-        memberAccessControl: [`${id}.acr#fullOwnerAccess`, `${id}.acr#peerReadAccess`],
+        accessControl: [`${acr}#fullOwnerAccess`, `${acr}#peerReadAccess`],
+        memberAccessControl: [`${acr}#fullOwnerAccess`, `${acr}#peerReadAccess`],
       },
       {
-        id: `${id}.acr#fullOwnerAccess`,
+        id: `${acr}#fullOwnerAccess`,
         type: ['AccessControl'],
         apply: [
           acrPolicy([ACL.Read, ACL.Write, ACL.Control], owner),
@@ -105,7 +140,7 @@ export function accessGrantAcrJsonLd({
         ],
       },
       {
-        id: `${id}.acr#peerReadAccess`,
+        id: `${acr}#peerReadAccess`,
         type: ['AccessControl'],
         apply: [{ type: ['Policy'], allow: [ACL.Read], anyOf: peerMatchers }],
       },
@@ -118,9 +153,14 @@ type ExpandedNode = Record<string, any>
 /**
  * Rewrite the `#fullAdminAccess` access control of an ACR (fetched as expanded
  * JSON-LD) from the given admin matchers. Removes the existing control (its
- * `acp:apply` policies and their `acp:anyOf` matchers) and its `#root`
+ * `acp:apply` policies and their `acp:anyOf` matchers) and its root node's
  * `acp:accessControl`/`acp:memberAccessControl` wiring, then adds a fresh
  * control + wiring. An empty `matchers` list removes the control entirely.
+ *
+ * The root is located by `${acrId}#root` — the id our builders and the
+ * bootstrap template emit — or, for an ACR written elsewhere, by the
+ * `acp:AccessControlResource` class. Only when neither matches is a `#root`
+ * node created.
  *
  * Pure — the input document is cloned, never mutated.
  */
@@ -134,6 +174,13 @@ export function rewriteFullAdminAccess(
 
   const fullAdminAccess = `${acrId}#fullAdminAccess`
   const rootId = `${acrId}#root`
+  // our builders and the bootstrap template name the root node `${acrId}#root`;
+  // an ACR written elsewhere may use any node id, so fall back to the
+  // `acp:AccessControlResource` class (one per document). Without this the
+  // wiring lands on a fresh `#root` node while the real root stays untouched.
+  const isRoot = (node: ExpandedNode): boolean =>
+    node['@id'] === rootId ||
+    (Array.isArray(node['@type']) && node['@type'].includes(ACP.AccessControlResource))
 
   // transitive closure: #fullAdminAccess → acp:apply policies → acp:anyOf matchers
   const toRemove = new Set<string>([fullAdminAccess])
@@ -158,9 +205,9 @@ export function rewriteFullAdminAccess(
 
   const kept = nodes.filter((node) => !toRemove.has(node['@id']))
 
-  // drop the #root wiring to #fullAdminAccess
+  // drop the root wiring to #fullAdminAccess
   for (const node of kept) {
-    if (node['@id'] !== rootId) {
+    if (!isRoot(node)) {
       continue
     }
     for (const predicate of [ACP.accessControl, ACP.memberAccessControl]) {
@@ -195,7 +242,7 @@ export function rewriteFullAdminAccess(
     })),
   }
 
-  const root = kept.find((node) => node['@id'] === rootId)
+  const root = kept.find(isRoot)
   if (root) {
     root[ACP.accessControl] = [...(root[ACP.accessControl] ?? []), { '@id': fullAdminAccess }]
     root[ACP.memberAccessControl] = [

@@ -231,7 +231,7 @@ export async function createAdminGrantAcr(payload: { grant: AdminGrantData }): P
     acrId,
     session.fetch,
     accessGrantAcrJsonLd({
-      id: acrId,
+      acr: acrId,
       resource: payload.grant.id,
       owner: {
         agent: session.webId,

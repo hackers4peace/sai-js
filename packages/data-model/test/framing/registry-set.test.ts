@@ -1,9 +1,9 @@
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
-import { INTEROP, LDP, SPACE, jsonld, loader } from '@janeirodigital/interop-utils'
+import { INTEROP, LDP, SPACE, jsonld, loader, toStore } from '@janeirodigital/interop-utils'
 import { DataFactory, Parser } from 'n3'
 import { describe, test } from 'vitest'
 
-import { RegistrySet, registrySetTemplate } from '../../src'
+import { RegistrySet, registrySetAcrJsonLd, registrySetTemplate } from '../../src'
 const loadRegistrySet = loader(RegistrySet.fromJsonLd)
 
 import { expect } from '../expect'
@@ -47,10 +47,12 @@ describe('RegistrySet framing', () => {
  */
 describe('RegistrySet bootstrap template', () => {
   const id = 'https://auth.alice.example/c0ffee/'
+  const webId = 'https://alice.example/#me'
+  const uas = 'https://auth.alice.example/uas#id'
   const template = registrySetTemplate({
     id,
-    webId: 'https://alice.example/#me',
-    uas: 'https://auth.alice.example/uas#id',
+    webId,
+    uas,
     dataRegistry: 'https://pro.alice.example/1/',
   })
 
@@ -75,6 +77,19 @@ describe('RegistrySet bootstrap template', () => {
     expect(registrySet.hasActivityRegistry?.id).toBe(`${id}activity/`)
     expect(registrySet.hasAccessRequestRegistry?.id).toBe(`${id}access-request/`)
     expect(registrySet.hasDataRegistry).toEqual([{ id: 'https://pro.alice.example/1/' }])
+  })
+
+  // the ACR graph is also emitted by `acr.ts` (registrySetAcrJsonLd) — compare
+  // the two serializations so the TriG template cannot drift from it
+  test('emits the registrySetAcrJsonLd ACR graph', async () => {
+    const acr = `${id}.acr`
+    const acrQuads = new Parser({ format: 'application/trig' })
+      .parse(template)
+      .filter((quad) => quad.graph.value === acr)
+      .map((quad) => DataFactory.quad(quad.subject, quad.predicate, quad.object))
+    const built = await toStore(registrySetAcrJsonLd({ id, owner: { agent: webId, client: uas } }))
+
+    expect(acrQuads).toBeRdfIsomorphic(built)
   })
 
   test('a registry set without the grant or role registry is malformed', async () => {

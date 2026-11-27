@@ -728,7 +728,7 @@ export async function createAcr(
     acrId,
     session.fetch,
     accessGrantAcrJsonLd({
-      id: acrId,
+      acr: acrId,
       resource: payload.id,
       owner: {
         agent: session.webId,
