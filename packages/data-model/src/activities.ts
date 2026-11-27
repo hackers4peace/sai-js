@@ -366,8 +366,9 @@ export type EmbeddedAuthorization = {
  * id(s) — ONE activity carries ALL grantees' DAs (grantee rides every POJO,
  * parents and children alike; the `processAuthorizationGranted` parent
  * groups by grantee and fans out one child workflow per grantee). A single
- * embedded DA frames as an object (jsonld.md gotcha 1 — the decoder wraps
- * it). Sync/decline (no grant) is `AuthorizationDenied` (Step 4). */
+ * embedded DA frames as an object — a single-valued `{'@embed': '@always'}`
+ * frame yields one object, never a one-element array. Sync/decline (no
+ * grant) is `AuthorizationDenied` (Step 4). */
 export type AuthorizationGranted = ActivityBase & {
   type: ['Activity', 'AuthorizationGranted']
   /** as:actor — plain IRI (the registry owner) */

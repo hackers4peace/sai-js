@@ -19,7 +19,7 @@
  * - `AccessGrant`/`AccessRequest` scoped contexts declare `@container: '@set'`
  *   on `type` and `access`: a type-scoped context wins over the composed
  *   top-level definitions, so without them a grant frames with a scalar
- *   `type` and an object `access` (docs/data-model.md §1).
+ *   `type` and an object `access` instead of arrays.
  */
 export const lwsV1Context = {
   '@context': {

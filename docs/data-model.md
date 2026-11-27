@@ -434,14 +434,22 @@ resolution even when a base is supplied (verified).
 
 ### 10. Hygiene
 
-- `packages/data-model` depends on `jsonld` but never imports it (all via
-  `interop-utils`) — drop the dependency.
-- `ShapeTreeReference.viaPredicate` is an RDFJS `NamedNode`; make it a string
-  and drop `n3`/`@rdfjs/types` from the package.
-- Code comments reference `docs/jsonld.md` (TODO 2/4/6), which does not exist.
-  Restore it or point at `openwiki/data-model/json-ld-layer.md`.
-- `selectNode` is removed (unused since `projectNode`); the `openwiki` page
-  describing it refreshes on the next OpenWiki run.
+> **Status:** mostly landed. `viaPredicate` stays an RDFJS `NamedNode`.
+
+- **Landed** — `jsonld` dropped from `packages/data-model` and
+  `packages/authorization-agent` (and `@types/jsonld` from data-model): both
+  packages only ever reached it through `@janeirodigital/interop-utils`, tests
+  included. `packages/utils` is the one package that depends on it.
+- **Kept deliberately** — `ShapeTreeReference.viaPredicate` stays an RDFJS
+  `NamedNode`; `n3`/`@rdfjs/types` therefore stay dependencies.
+- **Landed** — the nonexistent `docs/jsonld.md` references were removed from
+  code comments, and comments state the constraint inline instead of pointing
+  at a plan document (this file is temporary, so nothing references it).
+- **Landed** — `selectNode` is removed (unused since `projectNode`). The
+  `openwiki/data-model/json-ld-layer.md` page still describes it; OpenWiki has
+  no automatic refresh configured, so the page needs an explicit update run.
+- Note: this document is working material and will be deleted once the plan is
+  finished — nothing in the code may reference it.
 
 
 ### 11. Apply the grant simplification to the other models

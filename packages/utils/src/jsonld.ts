@@ -411,7 +411,8 @@ export function pickLanguage(map: LanguageMap | undefined, preferred?: string): 
  * Matching is delegated to the framing algorithm: a frame with only
  * `{'@type': typeIri}` matches the FIRST node of that type as the focus —
  * single match frames as the node itself, multiple matches wrap in
- * `@graph`, none yields `{}` (docs/jsonld.md TODO 4).
+ * `@graph`, none yields `{}`. A `@graph` pattern inside a frame is a single
+ * object and does not filter, so it cannot be used as a selector.
  */
 export async function findNodeIdByType(
   doc: unknown,
@@ -633,7 +634,7 @@ export async function fetchJsonLd(iri: string, fetch: WhatwgFetch): Promise<unkn
 /**
  * Generic fetch+decode loader — the uniform `loadX` wrapper factory that
  * replaces the per-model `loadX = fromJsonLd(await fetchJsonLd(id, fetch), id)`
- * pairs (docs/jsonld.md TODO 6). The generic `T` is instantiated by inference
+ * pairs. The generic `T` is instantiated by inference
  * from `decode`'s return type at each use site; `WhatwgFetch` stays in the
  * factory signature, away from the model files:
  *

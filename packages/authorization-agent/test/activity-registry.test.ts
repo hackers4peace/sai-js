@@ -249,7 +249,7 @@ describe('ActivityRegistry.loadActivity — unordered type set', () => {
     expect(activity.object[0].scopeOfAuthorization).toBe(
       'http://www.w3.org/ns/solid/interop#AllFromRegistry'
     )
-    // two-phase framing (docs/jsonld.md TODO 2): each object re-frames the
+    // two-phase framing: each object re-frames the
     // SAME doc by its own id — @reverse RESOLVES at the top-level matched
     // node, so the parent's children (written as @reverse terms on the wire)
     // come back as plain-IRI strings, and the child's forward

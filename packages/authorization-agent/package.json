@@ -12,7 +12,7 @@
       "email": "maciej.samoraj@gmail.com"
     },
     {
-      "name": "Ángel Araya",
+      "name": "\u00c1ngel Araya",
       "email": "angel.araya@janeirodigital.com"
     }
   ],
@@ -48,7 +48,6 @@
     "@janeirodigital/interop-utils": "^1.0.0-rc.31",
     "@opentelemetry/api": "^1.9.0",
     "fetch-sparql-endpoint": "^7.3.0",
-    "jsonld": "^9.0.0",
     "n3": "^2.13.12"
   },
   "devDependencies": {

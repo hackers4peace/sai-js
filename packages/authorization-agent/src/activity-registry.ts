@@ -80,7 +80,7 @@ const NEED_BASED_CLASSES = [
 
 /**
  * Frame an activity as a single document (the pinned single-doc read).
- * CLASS-GATED `as:object` handling (docs/jsonld.md TODO 2):
+ * CLASS-GATED `as:object` handling:
  * - `AuthorizationGranted` — DEFAULT frame (every property
  *   `@embed: '@never'`): the embedded DataAuthorization nodes frame to
  *   plain-IRI string(s); `loadActivity` re-frames the same doc per object id
@@ -379,9 +379,9 @@ async function frameActivityData(doc: unknown, id: string): Promise<ActivityData
         },
       }
     case 'AuthorizationGranted': {
-      // two-phase framing (docs/jsonld.md TODO 2): phase 1 (default frame)
-      // gave the object as plain-IRI string(s) — a single embedded node
-      // frames as a scalar (jsonld.md gotcha 1), so wrap it; phase 2
+      // two-phase framing: phase 1 (default frame) gave the object as
+      // plain-IRI string(s) — a single embedded node frames as a scalar, so
+      // wrap it; phase 2
       // re-frames the SAME doc per object id via the standard
       // data-authorization read path → full `DataAuthorizationData` POJOs
       // (plain-IRI refs, @reverse children resolved), no node unwrapping.

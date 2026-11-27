@@ -38,7 +38,7 @@ const clientIdDocument = {
   client_name: 'Projectron',
   logo_uri: 'https://projectron.example/logo.png',
   // node references — bare strings would expand as literals and drop under
-  // the `@type: '@id'`-coerced terms (docs/jsonld.md)
+  // the `@type: '@id'`-coerced terms
   'interop:hasAccessNeedGroup': { '@id': 'https://projectron.example/needs' },
   'interop:hasAuthorizationCallbackEndpoint': { '@id': 'https://projectron.example/callback' },
 }
