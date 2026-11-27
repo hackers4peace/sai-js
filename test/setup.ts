@@ -81,6 +81,13 @@ afterAll(async () => {
   }
 })
 beforeEach(async () => {
-  await withoutTracing(() => waitForTemporalIdle())
+  // A test that PATCHes a resource also starts the delegated-grants cascade
+  // (per-peer consumer drains, mirror syncs, grant regeneration and the
+  // webhook deliveries they trigger). The barrier has to let that settle
+  // before the next seed; that routinely takes ~10s and longer on CI, so the
+  // bound lives here, below vitest's hookTimeout (test/vitest.config.ts) —
+  // otherwise the hook is killed first and reports an opaque
+  // HookTimeoutError instead of the still-running workflow ids.
+  await withoutTracing(() => waitForTemporalIdle({ timeoutMs: 60_000 }))
   await withoutTracing(() => testSeed.seed())
 })
