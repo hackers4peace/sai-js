@@ -1,6 +1,6 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** in progress. Items 1, 2, 3, 5 and 8 are landed; the grant read
+> **Status:** in progress. Items 1, 2, 3, 4, 5 and 8 are landed; the grant read
 > model normalization was removed and the read paths are absolute-IRI-only. A
 > review of `packages/data-model` and the JSON-LD helpers in `packages/utils`,
 > with behaviour verified against the installed `jsonld@9.0.0` (framing,
@@ -23,11 +23,10 @@ The package is already framing-first:
 
 What remains is structural, not incremental:
 
-- framing is still used as "return one node", not as a schema — one
-  kitchen-sink context with `@embed: '@never'` everywhere (no `@explicit` yet);
-- `shape-tree.ts` still walks the expanded document for `references` and
-  `descriptionLanguages`, and the authorization-agent activity decode still
-  canonicalizes `type` by hand;
+- the authorization-agent activity decode still canonicalizes `type` by hand
+  and re-frames the same document once per embedded object (item 6);
+- `shape-tree.ts` still resolves `descriptionLanguages` with a document-wide
+  `documentValues` lookup (the description sets are separate nodes);
 - write paths are projections (`toJsonLd` in grant, `withContext` in the other
   models) rather than a wire-shaped read model (see the open question).
 
@@ -308,24 +307,34 @@ algorithm, and each model's `*_TERMS` constant is that list.
 
 ### 4. Nested framing instead of expanded-document walks
 
-`@embed: '@never'` is applied to every term, so child-node shapes fall back to
+> **Status:** landed.
+
+`@embed: '@never'` applied to every term, so child-node shapes fell back to
 `jsonld.expand` walks.
 
-- `shape-tree.ts` `referencePairs`: replace with
-  `references: { '@embed': '@once', hasShapeTree: {'@embed': '@never'},
-  viaPredicate: {'@embed': '@never'} }`; framing returns the reference objects
-  and dedupes repeated ids. Delete `expandedNodes`/`byId`.
-- `shape-tree.ts` `getDescription`: two expanded scans become frames —
-  a type-only frame for the description set, then
-  `{ '@type': Description, describes: { '@id': tree },
-  inDescriptionSet: { '@id': set } }` with `@requireAll: true`.
-- Use `@embed: '@once'` (not `@always`) for deep frames so shared nodes are not
-  duplicated; keep `@never` for pure reference fields.
-- Known limit: `@reverse` does not resolve on **embedded** children even when
-  named in the subframe; a multi-`@id` frame returns each match top-level and
-  does resolve them (see item 6).
-- Acceptance: `shape-tree` read has no `jsonld.expand`; reference and
-  description tests unchanged.
+- `shape-tree.ts` `fromJsonLd` frames the references with
+  `references: { '@embed': '@once' }`; `referenceNodes` pairs
+  `hasShapeTree`/`viaPredicate` from the embedded nodes and dedupes by
+  (shape tree, predicate). `expandedNodes`, `referencePairs` and the `byId` map
+  are gone.
+- `shape-tree.ts` `getDescription` uses two selector frames via the new
+  `frameMatches(doc, context, patterns)`: nodes carrying `descriptionLanguages`
+  (the tree document does not type the sets — `a shapetrees:DescriptionSet`
+  lives in the set's own graph), then the descriptions that `describes` the tree
+  (filtered by `inDescriptionSet`).
+- `descriptionLanguages` in `fromJsonLd` stays a `documentValues` lookup: the
+  language tags sit on separate nodes, and no single frame can select
+  "description sets of this tree" (there is no forward link from the tree).
+- Verified: `@requireAll: true` on a **multi-property selector** does not
+  restrict matches in jsonld@9 — every node matching any pattern is returned
+  (non-matching properties come back `null`), so the exact description is
+  filtered in the mapper.
+- Verified: a nested reference subframe with property patterns
+  (`hasShapeTree`/`viaPredicate`) drops a **dangling** reference silently; a
+  bare `{ '@embed': '@once' }` keeps it as an id-only node, which the mapper
+  rejects.
+- Acceptance met: `shape-tree.ts` has no `jsonld.expand` call; the reference
+  and description tests are unchanged (plus new dedupe/dangling cases).
 
 ### 5. One IRI representation (`resolveIri` removal)
 
@@ -462,9 +471,9 @@ resolution even when a base is supplied (verified).
 
 ### 11. Apply the grant simplification to the other models
 
-> **Status:** landed for the data-model readers (typed `Framed*` + `projectNode`).
-> Remaining: `shape-tree.ts` reference/description extraction and the
-> authorization-agent activity decode.
+> **Status:** landed for the data-model readers (typed `Framed*` + `projectNode`)
+> and for `shape-tree.ts` (nested references, framed description lookup).
+> Remaining: the authorization-agent activity decode.
 
 The grant read path is now the template:
 
@@ -476,8 +485,6 @@ The grant read path is now the template:
 
 Remaining targets:
 
-- `ShapeTree` — nested-frame `references` (`@embed: '@once'`), then
-  `referencePairs`/`expandedNodes` go; `getDescription` scans become frames;
 - activities (`authorization-agent/activity-registry.ts`) — typed framed
   union; keep only the class discriminant/canonical `type` and embedded
   snapshot normalization; replace the N+1 re-framing with one multi-`@id`
@@ -536,6 +543,8 @@ fields is too invasive.
 | --- | --- |
 | `@explicit: true` | output restricted to frame-listed properties; `@type` is kept without listing it |
 | `@explicit` + nested `{'@embed': '@always'}` subframe | the embedded child keeps all its properties — the flag does not restrict embedded nodes |
+| `@requireAll: true` on a selector with several property patterns | does **not** restrict the match: nodes matching any pattern are returned, non-matching properties are `null` |
+| nested reference subframe with property patterns | a dangling reference matches nothing and is dropped silently; a bare `{ '@embed': '@once' }` keeps it as an id-only node |
 | `@explicit` + `@container: '@language'` | throws (`reading '@value'` of undefined) |
 | `@explicit` + absent forward `@set` term | `[]` (same as without `@explicit`) |
 | `@explicit` + absent `@reverse`/`@vocab` set term | omitted — `frameNode` must fill `[]` |
@@ -571,7 +580,7 @@ fields is too invasive.
 5. Item 3 (`@explicit` + `*_TERMS`) — prerequisite for the nested frames in
    items 4 and 6. — **landed**
 6. Item 4 (nested framing in `shape-tree.ts`) — deletes the expanded-document
-   walks.
+   walks. — **landed**
 7. Item 6 (activity decode) — authorization-agent side; one multi-`@id` frame.
 8. Items 7, 9, 10 — cleanup / follow-up, can land independently.
 

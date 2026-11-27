@@ -292,25 +292,57 @@ export async function frameDoc(
   iri: string,
   overrides: Record<string, Record<string, unknown>> = {}
 ): Promise<Record<string, unknown>> {
-  return frameWith(doc, buildFrame(context, iri, overrides), iri)
+  return runFrame(doc, buildFrame(context, iri, overrides), iri)
+}
+
+/**
+ * Frame every node a **selector frame** matches — a frame without `@id` matches
+ * all nodes satisfying its patterns and returns each match top-level under
+ * `@graph` (JSON-LD 1.1 Framing §2.1.5), a single match as the node itself.
+ * Returns `[]` when nothing matches.
+ *
+ * The selector is the frame's property/`@type` patterns; `@explicit` (on unless
+ * the patterns set it) keeps the output to the listed terms, so a selector used
+ * only to locate nodes costs one entry per node.
+ */
+export async function frameMatches(
+  doc: unknown,
+  context: JsonLdContext,
+  patterns: Record<string, unknown>,
+  subject = 'frame selector'
+): Promise<Array<Record<string, unknown>>> {
+  const framed = await runFrame(
+    doc,
+    { '@context': context, '@explicit': true, ...patterns },
+    subject,
+    false
+  )
+  const graph = framed['@graph']
+  const nodes: Array<Record<string, unknown>> = Array.isArray(graph)
+    ? (graph as Array<Record<string, unknown>>)
+    : framed.id || framed['@id']
+      ? [framed]
+      : []
+  return nodes.map(withoutContext)
 }
 
 /** Run `jsonld.frame` with the shared loader and the framing span. */
-async function frameWith(
+async function runFrame(
   doc: unknown,
   frame: Record<string, unknown>,
-  iri: string
+  subject: string,
+  requireMatch = true
 ): Promise<Record<string, unknown>> {
   return withSpan('sai-jsonld', 'frameDoc', async (span) => {
-    span.setAttribute('sai.jsonld.uri', iri)
+    span.setAttribute('sai.jsonld.uri', subject)
     // compactToRelative: false — compaction would otherwise emit relative IRI
     // references (shorter than the absolute form) wherever a base is available
     const framed = await frameJsonLd(doc, frame, {
       documentLoader,
       compactToRelative: false,
     })
-    if (!framed.id && !framed['@id']) {
-      throw new Error(`Node ${iri} not found in framed output`)
+    if (requireMatch && !framed.id && !framed['@id']) {
+      throw new Error(`Node ${subject} not found in framed output`)
     }
     // the framed node — @context stripped for the payload (frameNode does
     // the same for the model POJOs); the span attribute set before end()
@@ -364,7 +396,7 @@ export async function frameNode(
   const frame = options.terms
     ? frameFor(context, iri, options.terms, options.overrides)
     : buildFrame(context, iri, options.overrides)
-  const node = (await frameWith(doc, frame, iri)) as Record<string, unknown> & {
+  const node = (await runFrame(doc, frame, iri)) as Record<string, unknown> & {
     '@context'?: unknown
   }
   // the frame embeds its @context in the output — strip it so the node is

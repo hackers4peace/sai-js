@@ -1,7 +1,7 @@
-import { SHAPETREES } from '@janeirodigital/interop-utils'
+import { SHAPETREES, withContext } from '@janeirodigital/interop-utils'
 import { describe, test } from 'vitest'
 
-import { ShapeTree } from '../../src'
+import { ShapeTree, dataModelContext } from '../../src'
 import { expect } from '../expect'
 import { docFromGraphs, fixtureFetch } from './helpers'
 
@@ -86,5 +86,36 @@ describe('ShapeTree.getDescription (local fixture)', () => {
   test('returns null when no description set exists for the language', async () => {
     const tree = await ShapeTree.fromJsonLd(await docFromGraphs([TREE_GRAPH]), TREE_IRI)
     await expect(ShapeTree.getDescription(tree, 'fr', fixtureFetch)).resolves.toBeNull()
+  })
+})
+
+describe('ShapeTree references (framed child nodes)', () => {
+  const reference = {
+    hasShapeTree: 'https://data/shapetrees/trees/Task',
+    viaPredicate: 'https://vocab.example/project-management/hasTask',
+  }
+
+  test('deduplicates the same (shape tree, predicate) pair', async () => {
+    const doc = withContext(dataModelContext, {
+      id: TREE_IRI,
+      type: [SHAPETREES.ShapeTree],
+      references: [reference, reference],
+    })
+    const tree = await ShapeTree.fromJsonLd(doc, TREE_IRI)
+    expect(tree.references.map((entry) => [entry.shapeTree, entry.viaPredicate.value])).toEqual([
+      [reference.hasShapeTree, reference.viaPredicate],
+    ])
+  })
+
+  test('a reference node without hasShapeTree/viaPredicate is malformed', async () => {
+    // a dangling reference stays a plain IRI string — no reference node
+    const doc = withContext(dataModelContext, {
+      id: TREE_IRI,
+      type: [SHAPETREES.ShapeTree],
+      references: [{ '@id': 'https://data/shapetrees/trees/missing-ref' }],
+    })
+    await expect(ShapeTree.fromJsonLd(doc, TREE_IRI)).rejects.toThrow(
+      `shape tree ${TREE_IRI} has a reference missing hasShapeTree/viaPredicate`
+    )
   })
 })
