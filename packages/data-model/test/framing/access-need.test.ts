@@ -36,6 +36,8 @@ describe('AccessNeed framing', () => {
       ],
       required: true,
       children: [],
+      // a declared set term is always an array
+      hasDataInstance: [],
       descriptionLanguages: ['en', 'es'],
     })
   })
@@ -63,7 +65,7 @@ describe('request-projection fields', () => {
   test('leaves instance/registration fields absent on a shape-tree need', async () => {
     const doc = await docFromGraphs([ACCESS_NEEDS_GRAPH])
     const need = await AccessNeed.fromJsonLd(doc, NEED_IRI)
-    expect(need.hasDataInstance).toBeUndefined()
+    expect(need.hasDataInstance).toEqual([])
     expect(need.hasDataRegistration).toBeUndefined()
   })
 })

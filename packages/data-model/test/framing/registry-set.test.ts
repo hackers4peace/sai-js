@@ -16,7 +16,11 @@ const REGISTRY_SET_IRI = 'https://registry/alice/'
 describe('RegistrySet framing', () => {
   test('frames the registry set graph into RegistrySetData', async () => {
     const doc = await docFromGraphs([`meta:${REGISTRY_SET_IRI}`])
-    const fetch = (async () => ({ ok: true, json: async () => doc })) as unknown as WhatwgFetch
+    const fetch = (async () => ({
+      ok: true,
+      url: REGISTRY_SET_IRI,
+      json: async () => doc,
+    })) as unknown as WhatwgFetch
     const registrySet = await loadRegistrySet(REGISTRY_SET_IRI, fetch)
     expect(registrySet).toEqual({
       id: REGISTRY_SET_IRI,

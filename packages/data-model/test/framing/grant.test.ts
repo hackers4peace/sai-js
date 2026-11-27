@@ -1,4 +1,4 @@
-import { CONTEXT } from '@janeirodigital/interop-utils'
+import { CONTEXT, CONTEXT_IRI } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import { Grant } from '../../src'
@@ -33,11 +33,14 @@ describe('Grant framing', () => {
   test('keeps array containers and multi-valued rdf:type', async () => {
     // the seed carries admin grants as `lws:AccessGrant, interop:AdminGrant`;
     // the LWS type-scoped context must not collapse `type`/`access` to scalars
-    const iri = 'https://registry/yoyo/vbg74v'
-    const doc = [{ '@id': iri, '@type': [CONTEXT.AccessGrant, CONTEXT.AdminGrant] }]
+    const iri = 'https://registry/acme/p9m2vr'
+    const doc = (await docFromGraphs([iri])) as Array<Record<string, unknown>>
+    const node = doc.find((candidate) => candidate['@id'] === iri)!
+    ;(node['@type'] as Array<string>).push(CONTEXT_IRI.AdminGrant)
     const grant = await Grant.fromJsonLd(doc, iri)
     expect(grant.type).toEqual([CONTEXT.AccessGrant, CONTEXT.AdminGrant])
-    expect(grant.access).toEqual([])
+    expect(Array.isArray(grant.access)).toBe(true)
+    expect(grant.access[0].type).toContain(CONTEXT.Agreement)
   })
 })
 

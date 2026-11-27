@@ -21,7 +21,7 @@ type FramedRegistrySet = {
   hasApplicationRegistry?: string
   hasInvitationRegistry?: string
   hasRoleRegistry?: string
-  hasDataRegistry?: Array<string>
+  hasDataRegistry: Array<string>
   hasActivityRegistry?: string
   hasAccessRequestRegistry?: string
 }
@@ -66,6 +66,10 @@ export type AccessRequestRegistryData = {
 export async function fromJsonLd(doc: unknown, id: string): Promise<RegistrySetData> {
   const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedRegistrySet
   const node = projectNode(framed, REGISTRY_SET_TERMS)
+  // Registry presence is NOT guaranteed: a seeded registry set may omit
+  // `hasGrantRegistry`/`hasRoleRegistry` (see the authorization-agent fixtures),
+  // so the wrappers stay tolerant until the model decides between an optional
+  // wrapper and a hard requirement.
   return {
     ...node,
     hasAuthorizationRegistry: { id: node.hasAuthorizationRegistry ?? '' },
@@ -74,7 +78,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<RegistrySetD
     hasApplicationRegistry: { id: node.hasApplicationRegistry ?? '' },
     hasInvitationRegistry: { id: node.hasInvitationRegistry ?? '' },
     hasRoleRegistry: { id: node.hasRoleRegistry ?? '' },
-    hasDataRegistry: (node.hasDataRegistry ?? []).map((dataRegistryId) => ({ id: dataRegistryId })),
+    hasDataRegistry: node.hasDataRegistry.map((dataRegistryId) => ({ id: dataRegistryId })),
     hasActivityRegistry: node.hasActivityRegistry ? { id: node.hasActivityRegistry } : undefined,
     hasAccessRequestRegistry: node.hasAccessRequestRegistry
       ? { id: node.hasAccessRequestRegistry }

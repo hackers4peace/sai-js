@@ -1,4 +1,4 @@
-import { frameNode, projectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode, required } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 /** The embedded access need group of a need-based access request — the
@@ -39,7 +39,7 @@ export interface NeedBasedAccessRequestData {
 type FramedAccessNeedGroup = {
   id: string
   type?: Array<string>
-  hasAccessNeed?: Array<unknown>
+  hasAccessNeed: Array<unknown>
 }
 
 type FramedAccessRequest = {
@@ -48,7 +48,7 @@ type FramedAccessRequest = {
   grantee?: string
   grantedBy?: string
   dataOwner?: string
-  hasAccessNeedGroup?: FramedAccessNeedGroup
+  hasAccessNeedGroup?: FramedAccessNeedGroup | null
 }
 
 const NEED_BASED_ACCESS_REQUEST_TERMS = [
@@ -60,11 +60,22 @@ const NEED_BASED_ACCESS_REQUEST_TERMS = [
 
 const ACCESS_NEED_GROUP_TERMS = ['type', 'hasAccessNeed'] as const
 
-const EMPTY_GROUP: NeedBasedAccessRequestGroup = { id: '', type: [], hasAccessNeed: [] }
-
-function framedGroup(group: FramedAccessNeedGroup): NeedBasedAccessRequestGroup {
-  const node = projectNode(group, ACCESS_NEED_GROUP_TERMS)
-  return { ...node, hasAccessNeed: node.hasAccessNeed ?? [] }
+/**
+ * The embedded group must be a framed node with at least one access need.
+ * A group node without `hasAccessNeed` never matches the nested frame (a
+ * subframe's property list is a match requirement — Framing §4.2), so it
+ * arrives as `null`; a node with no projected properties at all compacts to a
+ * bare IRI string. Both, and an empty need list, are invalid requests.
+ */
+function framedGroup(value: unknown, id: string): NeedBasedAccessRequestGroup {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`access request ${id} has no embedded access need group`)
+  }
+  const node = projectNode(value as FramedAccessNeedGroup, ACCESS_NEED_GROUP_TERMS)
+  if (node.hasAccessNeed.length === 0) {
+    throw new Error(`access request ${id} has an access need group without access needs`)
+  }
+  return node
 }
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<NeedBasedAccessRequestData> {
@@ -80,11 +91,9 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<NeedBasedAcc
   const node = projectNode(framed, NEED_BASED_ACCESS_REQUEST_TERMS)
   return {
     ...node,
-    grantee: node.grantee ?? '',
-    grantedBy: node.grantedBy ?? '',
-    dataOwner: node.dataOwner ?? '',
-    hasAccessNeedGroup: node.hasAccessNeedGroup
-      ? framedGroup(node.hasAccessNeedGroup)
-      : { ...EMPTY_GROUP },
+    grantee: required(node, 'grantee'),
+    grantedBy: required(node, 'grantedBy'),
+    dataOwner: required(node, 'dataOwner'),
+    hasAccessNeedGroup: framedGroup(node.hasAccessNeedGroup, id),
   }
 }

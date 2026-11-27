@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest'
 import { getApplications } from '../src/services/ApplicationRegistry.js'
 import type { ResolvedContext } from '../src/services/Context.js'
 import { getSocialAgentInvitations } from '../src/services/InvitationRegistry.js'
+import { responseUrl } from './response-url.ts'
 
 // ──────────────────────────
 // Fixtures
@@ -47,10 +48,16 @@ const orgProfileDoc = {
   'http://www.w3.org/ns/solid/interop#hasAuthorizationAgent': { '@id': ORG_AA },
 }
 
-function mockResponse(body: unknown, status = 200, contentType = 'application/ld+json'): Response {
+function mockResponse(
+  body: unknown,
+  status = 200,
+  contentType = 'application/ld+json',
+  url = responseUrl(body)
+): Response {
   return {
     ok: status >= 200 && status < 300,
     status,
+    url,
     headers: {
       get: (name: string) => (name.toLowerCase() === 'content-type' ? contentType : null),
     },
@@ -89,7 +96,7 @@ describe('getApplications — org context lists applications via /sparql-admin',
           return mockResponse(orgProfileDoc)
         }
         if (url === APP_WEBID) {
-          return mockResponse(clientIdDocument)
+          return mockResponse(clientIdDocument, 200, 'application/ld+json', APP_WEBID)
         }
         if (url !== sparqlAdminUrl) {
           throw new Error(`unexpected request: ${url}`)

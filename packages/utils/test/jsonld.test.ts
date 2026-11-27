@@ -3,39 +3,93 @@ import { describe, expect, test, vi } from 'vitest'
 import {
   HttpStatusError,
   accessClaimTerms,
+  buildFrame,
   containedIrisJsonLd,
   documentValues,
+  expandedJsonLd,
   fetchJsonLd,
   findNodeIdByType,
+  frameDoc,
   lwsV1Context,
 } from '../src'
 import type { WhatwgFetch } from '../src'
 
-function mockFetch(response: Partial<Response> & { ok: boolean }): WhatwgFetch {
-  return vi.fn(async () => response) as unknown as WhatwgFetch
+/**
+ * Fetch double. `url` models the response's final URL, which `fetchJsonLd`
+ * uses as the base IRI — a double without it is exactly what the no-url guard
+ * rejects.
+ */
+function mockFetch(response: Partial<Response> & { ok: boolean }, url = ''): WhatwgFetch {
+  return vi.fn(async () => ({ url, ...response })) as unknown as WhatwgFetch
 }
 
+const RESOURCE = 'https://example.example/resource'
+const TYPE = 'https://example.example/Thing'
+const NAME = 'https://example.example/name'
+
 describe('fetchJsonLd', () => {
-  test('requests the LWS JSON-LD profile and returns the parsed document', async () => {
-    const doc = { '@id': 'https://example.example/resource' }
-    const fetch = vi.fn(async () => ({ ok: true, json: async () => doc })) as unknown as WhatwgFetch
-    const result = await fetchJsonLd('https://example.example/resource', fetch)
-    expect(result).toEqual(doc)
-    expect(fetch).toHaveBeenCalledWith('https://example.example/resource', {
+  test('requests the LWS JSON-LD profile and returns the expanded document', async () => {
+    const doc = { '@id': RESOURCE, '@type': [TYPE] }
+    const fetch = vi.fn(async () => ({
+      ok: true,
+      url: RESOURCE,
+      json: async () => doc,
+    })) as unknown as WhatwgFetch
+    const result = await fetchJsonLd(RESOURCE, fetch)
+    expect(result).toEqual([{ '@id': RESOURCE, '@type': [TYPE] }])
+    expect(fetch).toHaveBeenCalledWith(RESOURCE, {
       headers: { Accept: 'application/ld+json; profile="https://www.w3.org/ns/lws/v1"' },
     })
   })
 
+  test('resolves document-relative IRIs against the final response url', async () => {
+    const final = 'https://example.example/documents/1'
+    const doc = {
+      '@context': {
+        id: '@id',
+        knows: { '@id': 'https://example.example/vocab#knows', '@type': '@id' },
+      },
+      id: '#me',
+      knows: 'bob',
+    }
+    const fetch = mockFetch({ ok: true, json: async () => doc }, final)
+    const result = await fetchJsonLd('https://example.example/requested', fetch)
+    expect(result).toEqual([
+      {
+        '@id': `${final}#me`,
+        'https://example.example/vocab#knows': [{ '@id': 'https://example.example/documents/bob' }],
+      },
+    ])
+  })
+
+  test('throws when the response carries no url', async () => {
+    const fetch = mockFetch({ ok: true, json: async () => ({ '@id': RESOURCE }) })
+    await expect(fetchJsonLd(RESOURCE, fetch)).rejects.toThrow(
+      `fetch response for ${RESOURCE} has no url`
+    )
+  })
+
+  test('throws when a relative IRI survives expansion', async () => {
+    // `@base: null` suppresses resolution even though fetchJsonLd passes one
+    const doc = {
+      '@context': { '@base': null, id: '@id', name: 'https://example.example/name' },
+      id: '#me',
+      name: 'Alice',
+    }
+    const fetch = mockFetch({ ok: true, json: async () => doc }, RESOURCE)
+    await expect(fetchJsonLd(RESOURCE, fetch)).rejects.toThrow(`relative IRI #me in ${RESOURCE}`)
+  })
+
   test('falls back to plain application/ld+json when the profile is not supported', async () => {
-    const doc = { '@id': 'https://example.example/resource' }
+    const doc = { '@id': RESOURCE, '@type': [TYPE] }
     const fetch = vi.fn(async (_iri: string, init?: RequestInit) =>
       init?.headers && (init.headers as Record<string, string>).Accept.includes('profile')
         ? { ok: false, status: 406 }
-        : { ok: true, json: async () => doc }
+        : { ok: true, url: RESOURCE, json: async () => doc }
     ) as unknown as WhatwgFetch
-    const result = await fetchJsonLd('https://example.example/resource', fetch)
-    expect(result).toEqual(doc)
-    expect(fetch).toHaveBeenLastCalledWith('https://example.example/resource', {
+    const result = await fetchJsonLd(RESOURCE, fetch)
+    expect(result).toEqual([{ '@id': RESOURCE, '@type': [TYPE] }])
+    expect(fetch).toHaveBeenLastCalledWith(RESOURCE, {
       headers: { Accept: 'application/ld+json' },
     })
   })
@@ -121,9 +175,84 @@ describe('containedIrisJsonLd', () => {
   ]
 
   test('unions ldp:contains with lws:contains and drops auxiliary members', async () => {
-    const fetch = mockFetch({ ok: true, json: async () => doc })
+    const fetch = mockFetch({ ok: true, json: async () => doc }, container)
     const iris = await containedIrisJsonLd(container, fetch)
     expect(iris).toEqual([`${container}hierarchical`, `${container}flat`])
+  })
+})
+
+describe('buildFrame', () => {
+  const context = {
+    '@version': 1.1,
+    id: '@id',
+    type: { '@id': '@type', '@container': '@set' },
+    forward: { '@id': 'https://example.example/forward', '@type': '@id', '@container': '@set' },
+    reverse: {
+      '@reverse': 'https://example.example/child',
+      '@type': '@id',
+      '@container': '@set',
+    },
+    vocab: {
+      '@id': 'https://example.example/vocab',
+      '@type': '@vocab',
+      '@container': '@set',
+    },
+    single: { '@id': 'https://example.example/single', '@type': '@id' },
+    label: { '@id': 'https://example.example/label', '@container': '@language' },
+  }
+
+  test('set containers rely on the container, everything else omits the default', () => {
+    const frame = buildFrame(context, 'https://example.example/a')
+    expect(frame.forward).toEqual({ '@embed': '@never' })
+    expect(frame.reverse).toEqual({ '@embed': '@never', '@omitDefault': true })
+    expect(frame.vocab).toEqual({ '@embed': '@never', '@omitDefault': true })
+    expect(frame.single).toEqual({ '@embed': '@never', '@omitDefault': true })
+    // aliases, keywords and language maps carry no frame entry
+    expect(frame).not.toHaveProperty('id')
+    expect(frame).not.toHaveProperty('type')
+    expect(frame).not.toHaveProperty('label')
+    expect(frame).not.toHaveProperty('@version')
+  })
+
+  test('overrides merge over the computed entry', () => {
+    const frame = buildFrame(context, 'https://example.example/a', {
+      single: { '@embed': '@always' },
+      forward: { '@embed': '@always' },
+    })
+    expect(frame.single).toEqual({ '@embed': '@always', '@omitDefault': true })
+    expect(frame.forward).toEqual({ '@embed': '@always' })
+  })
+
+  test('absent set terms frame as [], an overridden single term stays omitted', async () => {
+    const doc = [
+      {
+        '@id': 'https://example.example/a',
+        'https://example.example/forward': [{ '@id': 'https://example.example/b' }],
+      },
+    ]
+    const framed = await frameDoc(doc, context, 'https://example.example/a', {
+      single: { '@embed': '@always' },
+    })
+    expect(framed.forward).toEqual(['https://example.example/b'])
+    // @reverse and @vocab terms get no container default — they stay omitted
+    expect('reverse' in framed).toBe(false)
+    expect('vocab' in framed).toBe(false)
+    expect('single' in framed).toBe(false)
+    expect(Object.values(framed)).not.toContain(null)
+  })
+})
+
+describe('expandedJsonLd', () => {
+  test('throws on a relative IRI in a write payload', async () => {
+    await expect(
+      expandedJsonLd({ '@context': { id: '@id', name: NAME }, id: '#fragment', name: 'Alice' })
+    ).rejects.toThrow('relative IRI #fragment in write payload')
+  })
+
+  test('keeps blank node identifiers', async () => {
+    await expect(
+      expandedJsonLd({ '@context': { id: '@id', name: NAME }, id: '_:a', name: 'Alice' })
+    ).resolves.toEqual([{ '@id': '_:a', [NAME]: [{ '@value': 'Alice' }] }])
   })
 })
 

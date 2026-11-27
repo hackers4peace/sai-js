@@ -58,7 +58,12 @@ function upstreamKey(dataOwner: string, grantee: string | undefined, grant: Gran
  * `Inherited` is a child scope covered by a same-registration `AllFromRegistry`
  * (or a broader scope), but it never covers a non-inherited scope.
  */
-export function scopeCovers(upstream: string, downstream: string): boolean {
+export function scopeCovers(upstream: string | undefined, downstream: string | undefined): boolean {
+  // a grant without a scope (an AdminGrant read through the data-grant model)
+  // carries no data scope — fail closed rather than compare `undefined`s
+  if (!upstream || !downstream) {
+    return false
+  }
   const upTerm = asScopeTerm(upstream) ?? upstream
   const downTerm = asScopeTerm(downstream) ?? downstream
   if (upTerm === downTerm) {
@@ -114,7 +119,7 @@ export function accessModesCover(
  * (`matchGrantedRequests`), which unions several grants for one request.
  */
 export function selectedInstancesCover(
-  scopeOfGrant: string,
+  scopeOfGrant: string | undefined,
   hasDataInstance: ReadonlyArray<string> | undefined,
   requested: ReadonlyArray<string>
 ): boolean {

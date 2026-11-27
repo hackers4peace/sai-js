@@ -1,4 +1,10 @@
-import { frameNode, projectNode, withContext } from '@janeirodigital/interop-utils'
+import {
+  INTEROP,
+  frameNode,
+  projectNode,
+  required,
+  withContext,
+} from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 
@@ -13,7 +19,7 @@ type FramedDataAuthorization = {
   hasDataRegistration?: string
   satisfiesAccessNeed?: string
   inheritsFromAuthorization?: string
-  accessMode?: Array<string>
+  accessMode: Array<string>
   hasDataInstance?: Array<string>
   hasInheritingAuthorization?: Array<string>
 }
@@ -56,16 +62,29 @@ const DATA_AUTHORIZATION_TERMS = [
   'hasInheritingAuthorization',
 ] as const
 
+/**
+ * A required term, validated only when the node IS a data authorization.
+ *
+ * The same decoder doubles as a probe over an authorization registry
+ * container, where `AdminAuthorization` (and other) resources share the
+ * container and are filtered by type at the call site (`getDataAuthorization`
+ * in sparql.ts). Foreign nodes keep the tolerant empty-field POJO; a real
+ * `interop:DataAuthorization` missing a required term throws.
+ */
+function requiredTerm(node: Record<string, unknown>, key: string, strict: boolean): string {
+  return strict ? required(node, key) : ((node[key] as string | undefined) ?? '')
+}
+
 export async function fromJsonLd(doc: unknown, id: string): Promise<DataAuthorizationData> {
   const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedDataAuthorization
   const node = projectNode(framed, DATA_AUTHORIZATION_TERMS)
+  const strict = node.type.includes(INTEROP.DataAuthorization)
   return {
     ...node,
-    grantee: node.grantee ?? '',
-    grantedBy: node.grantedBy ?? '',
-    registeredShapeTree: node.registeredShapeTree ?? '',
-    scopeOfAuthorization: node.scopeOfAuthorization ?? '',
-    accessMode: node.accessMode ?? [],
+    grantee: requiredTerm(node, 'grantee', strict),
+    grantedBy: requiredTerm(node, 'grantedBy', strict),
+    registeredShapeTree: requiredTerm(node, 'registeredShapeTree', strict),
+    scopeOfAuthorization: requiredTerm(node, 'scopeOfAuthorization', strict),
   }
 }
 

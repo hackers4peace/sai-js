@@ -42,10 +42,12 @@ describe('loadDataInstance — flat LWS parent resolution (`up` link)', () => {
   const registration = 'https://data.yoyo.example/k9m4wx'
   const tree = 'https://shapetrees.example/trees/Project'
 
-  const jsonResponse = (body: unknown): Response =>
+  const jsonResponse = (url: string, body: unknown): Response =>
     ({
       ok: true,
       status: 200,
+      // a real response carries its final URL — the base IRI for expansion
+      url,
       headers: new Headers({ 'content-type': 'application/ld+json' }),
       json: async () => body,
     }) as unknown as Response
@@ -75,7 +77,7 @@ describe('loadDataInstance — flat LWS parent resolution (`up` link)', () => {
         } as unknown as Response
       }
       if (docs[url]) {
-        return jsonResponse(docs[url])
+        return jsonResponse(url, docs[url])
       }
       throw new Error(`unexpected request: ${init?.method ?? 'GET'} ${url}`)
     }) as unknown as Parameters<typeof loadDataInstance>[1]

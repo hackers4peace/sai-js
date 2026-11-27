@@ -1,4 +1,4 @@
-import { frameNode, projectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode, required } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import type { AgentRegistrationId } from './agent-registration.ts'
@@ -66,7 +66,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<SocialAgentR
   const node = projectNode(framed, SOCIAL_AGENT_REGISTRATION_TERMS)
   return {
     ...node,
-    registeredAgent: node.registeredAgent ?? '',
+    registeredAgent: required(node, 'registeredAgent'),
     label: node.label ?? {},
   }
 }

@@ -101,6 +101,11 @@ const authzGraph = (
     DataFactory.namedNode(INTEROP.scopeOfAuthorization),
     DataFactory.namedNode(scope)
   ),
+  DataFactory.quad(
+    DataFactory.namedNode(iri),
+    DataFactory.namedNode(INTEROP.registeredShapeTree),
+    DataFactory.namedNode('https://shapetrees.example/trees/Project')
+  ),
 ]
 
 /** A social-agent registration graph for a grantee (typed via the agent plane). */

@@ -106,9 +106,16 @@ function session() {
       if (!doc) {
         return new Response('gone', { status: 404 })
       }
-      return new Response(JSON.stringify(doc), {
-        headers: { 'content-type': 'application/ld+json' },
-      })
+      // a plain response double: `new Response()` has no URL, and
+      // `fetchJsonLd` expands against the final response URL
+      return {
+        ok: true,
+        status: 200,
+        url: iri,
+        headers: { get: () => 'application/ld+json' },
+        json: async () => doc,
+        text: async () => JSON.stringify(doc),
+      } as unknown as Response
     },
   } as unknown as AuthorizationAgent
 }

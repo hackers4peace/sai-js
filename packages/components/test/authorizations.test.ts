@@ -82,10 +82,12 @@ function buildContext(authorizations: Array<unknown>): {
     session: {
       sparqlEndpoint: 'http://example.test/sparql',
       // `loadShapeTree` fetches the document before the mocked `fromJsonLd`
-      // decodes it; any JSON body is enough here
-      fetch: vi.fn(async () => ({
+      // decodes it; any JSON body is enough here — but the response must
+      // carry its URL (`fetchJsonLd` expands against the final URL)
+      fetch: vi.fn(async (url: string) => ({
         ok: true,
         status: 200,
+        url,
         json: async () => ({}),
       })),
     },

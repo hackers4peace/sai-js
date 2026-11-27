@@ -41,11 +41,13 @@ function notificationFetch(options: {
     if (url === storageDescriptionIri) {
       return {
         ok: true,
+        url,
         json: async () => options.storageDescription ?? storageDescription,
       } as unknown as Response
     }
     return {
       ok: true,
+      url,
       json: async () =>
         options.channel ?? {
           id: subscriptionUrl,

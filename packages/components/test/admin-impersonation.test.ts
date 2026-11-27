@@ -12,6 +12,9 @@ import { agentId } from '../src/util/uriTemplates.js'
 import { idJagClaim } from './access-claim-helpers.js'
 
 const ORG = 'https://id/yoyo'
+// identifier templates mint absolute IRIs from CSS_BASE_URL
+process.env.CSS_BASE_URL = 'https://auth/'
+
 const ORG_UAS = agentId(ORG)
 const ADMIN = 'https://id/dan'
 const ADMIN_UAS = 'https://auth/.sai/agents/ZGFu'

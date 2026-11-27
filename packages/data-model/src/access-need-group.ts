@@ -6,7 +6,7 @@ import { dataModelContext } from './context.ts'
 type FramedAccessNeedGroup = {
   id: string
   type?: Array<string>
-  hasAccessNeed?: Array<string>
+  hasAccessNeed: Array<string>
 }
 
 const ACCESS_NEED_GROUP_TERMS = ['hasAccessNeed'] as const
@@ -36,7 +36,6 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedGr
   const node = projectNode(framed, ACCESS_NEED_GROUP_TERMS)
   return {
     ...node,
-    hasAccessNeed: node.hasAccessNeed ?? [],
     accessNeeds: [],
   }
 }

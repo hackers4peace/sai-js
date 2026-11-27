@@ -5,6 +5,7 @@ import {
   documentValues,
   frameNode,
   projectNode,
+  required,
 } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
@@ -14,8 +15,8 @@ type FramedAccessNeed = {
   type?: Array<string>
   registeredShapeTree?: string
   inheritsFromNeed?: string
-  hasInheritingNeed?: Array<string>
-  accessMode?: Array<string>
+  hasInheritingNeed: Array<string>
+  accessMode: Array<string>
   required?: string
   hasDataInstance?: Array<string>
   hasDataRegistration?: string
@@ -82,10 +83,8 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedDa
   const node = projectNode(framed, ACCESS_NEED_TERMS)
   return {
     ...node,
-    registeredShapeTree: node.registeredShapeTree ?? '',
-    hasInheritingNeed: node.hasInheritingNeed ?? [],
-    accessMode: node.accessMode ?? [],
-    required: asAccessNecessityTerm(node.required) === CONTEXT.AccessRequired,
+    registeredShapeTree: required(node, 'registeredShapeTree'),
+    required: asAccessNecessityTerm(required(node, 'required')) === CONTEXT.AccessRequired,
     children: [],
     descriptionLanguages: await documentValues(doc, id, INTEROP.usesLanguage),
   }

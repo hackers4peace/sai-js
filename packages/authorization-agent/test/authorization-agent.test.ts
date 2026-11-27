@@ -4,11 +4,16 @@ import { grantAccess, grantAccessModes, grantGrantee } from '@janeirodigital/int
 import type { GrantData } from '@janeirodigital/interop-data-model'
 import {
   ACCESS_ACTIONS,
+  CONTEXT_IRI,
   INTEROP,
   LWS,
   ODRL,
+  accessModeIri,
+  asAccessModeTerm,
+  asScopeTerm,
   discoverAgentRegistration,
   discoverAuthorizationAgent,
+  scopeIri,
 } from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { describe, expect, test, vi } from 'vitest'
@@ -768,6 +773,23 @@ describe('revokeGrants core (C1)', () => {
   })
   const pathGrant = grantFixture(`${GRANT_REGISTRY}path-shaped`)
 
+  /**
+   * POJO values are context tokens (`read`, `AllFromRegistry`, `Asset`) or
+   * already-absolute IRIs; RDF needs the IRI. `expandedJsonLd` asserts that
+   * every IRI is absolute, so the fixture must resolve tokens here.
+   */
+  const iriOf = (value: string): string => {
+    const scope = asScopeTerm(value)
+    if (scope) {
+      return scopeIri(scope)
+    }
+    const mode = asAccessModeTerm(value)
+    if (mode) {
+      return accessModeIri(mode)
+    }
+    return CONTEXT_IRI[value] ?? value
+  }
+
   const grantQuads = (grant: GrantData) => {
     const node = DataFactory.namedNode(grant.id!)
     const policy = DataFactory.namedNode(`urn:uuid:${grant.id}-policy`)
@@ -794,7 +816,11 @@ describe('revokeGrants core (C1)', () => {
       ]
       for (const type of targetValue.type) {
         quads.push(
-          DataFactory.quad(targetNode, DataFactory.namedNode(RDF_TYPE), DataFactory.namedNode(type))
+          DataFactory.quad(
+            targetNode,
+            DataFactory.namedNode(RDF_TYPE),
+            DataFactory.namedNode(iriOf(type))
+          )
         )
       }
       for (const source of targetValue.source) {
@@ -846,7 +872,7 @@ describe('revokeGrants core (C1)', () => {
     }
     const quads = [
       q(RDF_TYPE, LWS.AccessGrant),
-      q(INTEROP.scopeOfGrant, grant.scopeOfGrant),
+      q(INTEROP.scopeOfGrant, iriOf(grant.scopeOfGrant)),
       DataFactory.quad(node, DataFactory.namedNode(LWS.access), policy),
       DataFactory.quad(
         policy,
@@ -862,7 +888,7 @@ describe('revokeGrants core (C1)', () => {
       DataFactory.quad(
         policy,
         DataFactory.namedNode(INTEROP.scopeOfGrant),
-        DataFactory.namedNode(grant.scopeOfGrant)
+        DataFactory.namedNode(iriOf(grant.scopeOfGrant))
       ),
       DataFactory.quad(policy, DataFactory.namedNode(ODRL.permission), permission),
       DataFactory.quad(permission, DataFactory.namedNode(ODRL.uid), permission),
@@ -880,7 +906,7 @@ describe('revokeGrants core (C1)', () => {
         DataFactory.quad(
           permission,
           DataFactory.namedNode(ODRL.action),
-          DataFactory.namedNode(mode)
+          DataFactory.namedNode(iriOf(mode))
         )
       ),
     ]

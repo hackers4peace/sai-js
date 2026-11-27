@@ -7,7 +7,7 @@ type FramedRole = {
   id: string
   type?: Array<string>
   label?: LanguageMap
-  members?: Array<string>
+  members: Array<string>
 }
 
 const ROLE_TERMS = ['label', 'members'] as const
@@ -29,6 +29,5 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<RoleData> {
   return {
     ...node,
     label: node.label ?? {},
-    members: node.members ?? [],
   }
 }

@@ -138,6 +138,7 @@ describe('CachingIdentifierStrategyResolver', () => {
       }
       return {
         ok: true,
+        url: typeof _input === 'string' ? _input : _input.url,
         headers: {
           get: (name: string) => (name === 'Content-Type' ? 'application/lws+cid' : null),
         },

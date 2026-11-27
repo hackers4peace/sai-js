@@ -95,6 +95,12 @@ Stop the proxy with Ctrl-C or by killing the `dagger call ... proxy-service` pro
 
 ## Pitfalls
 
+- **Services run `packages/components/dist`.** The container mounts the host
+  worktree as-is, and only `packages/components` has a `build` script — the
+  other packages are imported from `src` (Node strips types). After changing
+  `packages/*/src`, rebuild before running the suite, otherwise the auth/worker
+  services keep serving stale code while the test process sees the new source:
+  `npx turbo run build --filter=@elfpavlik/sai-components --force`.
 - Run Dagger through `devbox run`. Otherwise the engine host variable is missing.
 - `--tempo-endpoint` enables header, token, and body capture. Without it, the suite runs without traces.
 - The HTTP capture wrapper clones capturable response bodies. Never treat long-lived stream formats such as `application/x-ndjson` or `text/event-stream` as capturable. The clone waits for the stream to end and blocks the client fetch.

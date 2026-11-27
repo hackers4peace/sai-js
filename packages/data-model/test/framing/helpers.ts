@@ -54,6 +54,8 @@ export const fixtureFetch: WhatwgFetch = (async (url: string) => {
   return {
     ok: true,
     status: 200,
+    // a real response carries its final URL; `fetchJsonLd` uses it as the base
+    url,
     headers: new Headers({ 'content-type': 'application/ld+json' }),
     json: async () => doc,
     text: async () => JSON.stringify(doc),

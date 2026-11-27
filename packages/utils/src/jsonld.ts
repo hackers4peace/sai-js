@@ -63,7 +63,8 @@ const documentLoader = localDocumentLoader as any
 
 export { documentLoader }
 
-/** Build a JSON-LD frame that resolves the node at `iri` with all its
+/**
+ * Build a JSON-LD frame that resolves the node at `iri` with all its
  * properties as plain node references (no embedding of referenced nodes).
  *
  * Each property in the context gets `@embed: "@never"` so that the
@@ -71,10 +72,23 @@ export { documentLoader }
  * instead of embedding full child graphs. This also resolves @reverse
  * relationships automatically.
  *
- * `overrides` replaces the default `@embed: '@never'` entry for selected
- * keys — e.g. `{ object: { '@embed': '@always' } }` for activity reads,
- * where in-document snapshot nodes embed while out-of-document live-link
- * nodes stay plain-IRI strings (no dereference).
+ * **Absent properties** (JSON-LD 1.1 Framing §2.2 "Default content"): a frame
+ * property that the node does not have is emitted with `null` unless the
+ * omit-default flag is set, so every non-array term gets `@omitDefault: true`
+ * and is omitted instead — framed nodes never carry `null` and POJO readers
+ * use `required()` for the terms the model requires.
+ *
+ * **Set terms** get no `@default` — `@container: '@set'` already guarantees the
+ * array (`[]` when absent, verified against jsonld@9), and `@default: []` is
+ * silently ignored for `@reverse` and `@type: '@vocab'` terms, which therefore
+ * keep `@omitDefault: true`. `frameNode` fills those two shapes afterwards, so
+ * the "declared set term is always an array" contract holds for readers.
+ *
+ * `overrides` merges over the computed entry for selected keys — e.g.
+ * `{ object: { '@embed': '@always' } }` for activity reads, where in-document
+ * snapshot nodes embed while out-of-document live-link nodes stay plain-IRI
+ * strings (no dereference). Merging (not replacing) keeps the omit-default
+ * behaviour, so an override on an absent property still yields no key.
  */
 export function buildFrame(
   context: JsonLdContext,
@@ -86,14 +100,38 @@ export function buildFrame(
     '@id': iri,
   }
   for (const [key, val] of Object.entries(context)) {
-    if (key === 'id' || key === 'type' || key === '@version') {
+    if (key === 'id' || key === 'type' || key.startsWith('@')) {
       continue
     }
     if (typeof val === 'object' && val !== null && !isLanguageMapTerm(val)) {
-      frame[key] = overrides[key] ?? { '@embed': '@never', '@omitDefault': true }
+      frame[key] = {
+        '@embed': '@never',
+        ...(alwaysArrayTerm(val as Record<string, unknown>) ? {} : { '@omitDefault': true }),
+        ...overrides[key],
+      }
     }
   }
   return frame
+}
+
+/**
+ * Whether an absent property is guaranteed to frame as `[]` by the set
+ * container alone. Holds for forward `@set` terms; `@reverse` terms and
+ * `@type: '@vocab'` terms never get a container default from the framing
+ * algorithm (verified against jsonld@9 — the property is omitted instead).
+ */
+function alwaysArrayTerm(definition: Record<string, unknown>): boolean {
+  return (
+    isSetContainer(definition) &&
+    definition['@reverse'] === undefined &&
+    definition['@type'] !== '@vocab'
+  )
+}
+
+/** Whether a term definition declares `@container: '@set'`. */
+function isSetContainer(definition: unknown): boolean {
+  const container = (definition as { '@container'?: string | Array<string> } | null)?.['@container']
+  return Array.isArray(container) ? container.includes('@set') : container === '@set'
 }
 
 /**
@@ -111,6 +149,45 @@ function isLanguageMapTerm(definition: unknown): boolean {
 }
 
 /**
+ * IRI scheme prefix (`https:`, `urn:`, `did:`, …) — the shape of every IRI the
+ * package accepts in an IRI position. Blank node identifiers (`_:b0`) are the
+ * one non-IRI value the expanded form may carry.
+ */
+const ABSOLUTE_IRI = /^[A-Za-z][A-Za-z0-9+.-]*:/
+
+/**
+ * Assert that every IRI in an expanded JSON-LD document is absolute.
+ *
+ * Expanded form holds every IRI position as `@id` or `@type` (node references,
+ * node identifiers, datatypes), so one recursive walk covers the document. The
+ * package never creates relative IRIs: reads resolve document-relative
+ * references against the response URL (`fetchJsonLd`), writes carry none — so a
+ * relative IRI here is either a fetched document that suppressed resolution
+ * (`"@base": null`, JSON-LD 1.1 §4.1.3) or a bug in a write payload.
+ */
+export function assertAbsoluteIris(expanded: unknown, source: string): void {
+  const walk = (value: unknown): void => {
+    if (Array.isArray(value)) {
+      value.forEach(walk)
+      return
+    }
+    if (!value || typeof value !== 'object') {
+      return
+    }
+    for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+      if ((key === '@id' || key === '@type') && typeof entry === 'string') {
+        if (entry.startsWith('_:') || ABSOLUTE_IRI.test(entry)) {
+          continue
+        }
+        throw new Error(`relative IRI ${entry} in ${source}`)
+      }
+      walk(entry)
+    }
+  }
+  walk(expanded)
+}
+
+/**
  * Convert a parsed RDF dataset into a framed JSON-LD node.
  *
  * Uses jsonld.fromRDF + jsonld.frame to resolve @reverse relationships
@@ -123,6 +200,7 @@ export async function frameDataset(
   iri: string
 ): Promise<Record<string, unknown>> {
   const expanded = await jsonld.fromRDF(dataset)
+  assertAbsoluteIris(expanded, `dataset ${iri}`)
   return frameDoc(expanded, context, iri)
 }
 
@@ -157,8 +235,11 @@ export async function frameDoc(
 ): Promise<Record<string, unknown>> {
   return withSpan('sai-jsonld', 'frameDoc', async (span) => {
     span.setAttribute('sai.jsonld.uri', iri)
+    // compactToRelative: false — compaction would otherwise emit relative IRI
+    // references (shorter than the absolute form) wherever a base is available
     const framed = await frameJsonLd(doc, buildFrame(context, iri, overrides), {
       documentLoader,
+      compactToRelative: false,
     })
     if (!framed.id && !framed['@id']) {
       throw new Error(`Node ${iri} not found in framed output`)
@@ -210,44 +291,43 @@ export async function frameNode(
   if (!id) {
     throw new Error(`framed node ${iri} has no id`)
   }
-  return { ...rest, id }
+  return withSetDefaults({ ...rest, id }, context)
 }
 
 /**
- * Select a model's fields from a framed node — the per-model whitelist
- * (docs/jsonld.md). Framing emits EVERY property of the focus node
- * (foreign predicates leak as raw-IRI keys), so the POJO is built from
- * exactly `id`/`type` + the model's terms — present values only; absent
- * means omitted (`undefined`), no `''`/`[]` defaults (`@set` containers
- * guarantee arrays when present).
+ * Fill `[]` for every `@container: '@set'` term the framed node does not carry.
+ *
+ * A forward set term already frames as `[]` when absent; `@reverse` and
+ * `@type: '@vocab'` set terms are omitted by the framing algorithm instead
+ * (verified against jsonld@9, no `@default` applies). Filling here makes the
+ * package contract uniform — **every declared set term is an array** — so POJO
+ * readers never default a set field and `Framed*` types can declare them as
+ * required.
  */
-export function selectNode(
-  node: FramedNode,
-  terms: ReadonlyArray<string>
-): Record<string, string | Array<string> | undefined> {
-  const out: Record<string, string | Array<string> | undefined> = {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-  }
-  for (const term of terms) {
-    const value = node[term]
-    if (value !== undefined && value !== null) {
-      out[term] = value as string | Array<string>
+function withSetDefaults(node: FramedNode, context: JsonLdContext): FramedNode {
+  const out: FramedNode = { ...node }
+  for (const [term, definition] of Object.entries(context)) {
+    if (typeof definition !== 'object' || definition === null || !isSetContainer(definition)) {
+      continue
+    }
+    if (out[term] === undefined) {
+      out[term] = []
     }
   }
   return out
 }
 
 /**
- * Typed front for `selectNode`: project a framed node to `id`, `type` and the
- * model's terms, dropping every other framed property. Absent terms are
- * omitted (no `undefined` keys), matching the POJO contract. The model types
- * the framed shape; this helper only narrows the runtime object.
+ * Project a framed node to `id`, `type` and the model's terms, dropping every
+ * other framed property. The model's `Framed*` type states the POJO contract —
+ * set-container terms as required arrays (`frameNode` fills `[]`), single
+ * valued terms optional — so the projection is returned as `T` itself; models
+ * pass their complete term list.
  */
 export function projectNode<T extends object, K extends keyof T & string>(
   node: T,
   terms: ReadonlyArray<K>
-): { id: string; type: Array<string> } & Partial<Pick<T, K>> {
+): { id: string; type: Array<string> } & T {
   const source = node as Record<string, unknown>
   const out: Record<string, unknown> = {
     id: source.id,
@@ -259,12 +339,26 @@ export function projectNode<T extends object, K extends keyof T & string>(
       out[term] = value
     }
   }
-  return out as { id: string; type: Array<string> } & Partial<Pick<T, K>>
+  return out as { id: string; type: Array<string> } & T
 }
 
 /** Optional single value — string when present, `undefined` when absent. */
 export function opt(node: Record<string, unknown>, key: string): string | undefined {
   return framedValue(node[key])
+}
+
+/**
+ * A single value the model requires. Frames omit absent single-valued terms
+ * (see `buildFrame`), so a missing value is a malformed document, not a POJO
+ * default: throw instead of coercing to `''`.
+ */
+export function required(node: Record<string, unknown>, key: string): string {
+  const value = opt(node, key)
+  if (value === undefined) {
+    const id = (node.id ?? node['@id']) as string | undefined
+    throw new Error(`node ${id} is missing required term ${key}`)
+  }
+  return value
 }
 
 /**
@@ -484,8 +578,19 @@ async function fetchContainerRdf(iri: string, fetch: WhatwgFetch): Promise<unkno
 }
 
 /**
- * Raw JSON-LD GET — returns the parsed document (expanded, compacted, or
- * flattened form). Throws `HttpStatusError` when the response is not ok.
+ * Fetch a JSON-LD resource and return it in **expanded** form with every IRI
+ * absolute — the only place a base IRI enters the package.
+ *
+ * Relative IRI references in a retrieved document resolve against the
+ * document base (JSON-LD 1.1 §4.1.3, RFC 3986 §5.1), which is the response's
+ * final URL after redirects — not the IRI that was requested. Expanding here
+ * means every downstream consumer (framing, `documentValues`, `toStore`, the
+ * quad readers) works on absolute IRIs and never needs a base.
+ *
+ * Throws `HttpStatusError` when the response is not ok, when the response
+ * carries no URL (a test double or a custom `fetch` that does not model the
+ * final URL — there is no safe base without it), and when a relative IRI
+ * survives expansion (`"@base": null` in the document suppresses resolution).
  *
  * The request prefers the LWS profile; if the server does not support it
  * (406/415) the request is retried with plain `application/ld+json`. A
@@ -508,14 +613,20 @@ export async function fetchJsonLd(iri: string, fetch: WhatwgFetch): Promise<unkn
     if (!response.ok) {
       throw new HttpStatusError(iri, response.status)
     }
+    const base = response.url
+    if (!base) {
+      throw new Error(`fetch response for ${iri} has no url`)
+    }
     let doc: unknown = await response.json()
     if (isLwsContainerDocument(doc)) {
-      doc = await fetchContainerRdf(iri, fetch)
+      doc = await fetchContainerRdf(base, fetch)
     }
     if (span.isRecording()) {
       span.setAttribute('sai.jsonld.raw', JSON.stringify(doc))
     }
-    return doc
+    const expanded = await expandJsonLd(doc, { base, documentLoader })
+    assertAbsoluteIris(expanded, base)
+    return expanded
   })
 }
 
@@ -540,9 +651,15 @@ export function loader<T>(decode: (doc: unknown, id: string) => Promise<T>) {
  * full-IRI property keys, node references as `{ '@id' }`, literals as
  * `{ '@value' }` — with no `@context` on the result. The write path uses this
  * so PUT bodies carry no context (and are context-version-proof).
+ *
+ * No base is used: the package never creates relative IRIs (minted identifiers
+ * are absolute, reads resolve at `fetchJsonLd`), so a relative IRI in a write
+ * payload is a bug — `assertAbsoluteIris` throws on it.
  */
 export async function expandedJsonLd(doc: Record<string, unknown>): Promise<Array<unknown>> {
-  return jsonld.expand(doc, { documentLoader })
+  const expanded = await jsonld.expand(doc, { documentLoader })
+  assertAbsoluteIris(expanded, 'write payload')
+  return expanded
 }
 
 /**

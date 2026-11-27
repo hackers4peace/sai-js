@@ -57,6 +57,7 @@ export const statelessFetch = async function statelessFetch(
   if (accept === 'application/lws+cid') {
     return {
       ok: true,
+      url: strippedUrl,
       headers: { get: () => 'application/lws+cid' },
       json: async () => ({
         id: strippedUrl,
@@ -68,6 +69,7 @@ export const statelessFetch = async function statelessFetch(
   if (url === STORAGE_DESCRIPTION_IRI) {
     return {
       ok: true,
+      url: strippedUrl,
       headers: { get: () => 'application/ld+json' },
       text: async () => storageDescriptionJsonLd,
       json: async () => JSON.parse(storageDescriptionJsonLd),
@@ -85,6 +87,9 @@ export const statelessFetch = async function statelessFetch(
   }
   const response = {
     ok: true,
+    // a real response never carries the request fragment — the final URL is
+    // the base IRI for expansion
+    url: strippedUrl,
     headers: {
       get(name: string) {
         if (name in headers) {

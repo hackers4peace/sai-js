@@ -52,6 +52,7 @@ function jsonldFetch(docs: Record<string, unknown>) {
     const url = typeof input === 'string' ? input : input.url
     return {
       ok: true,
+      url,
       json: async () => docs[url],
     } as unknown as Response
   })
@@ -91,7 +92,10 @@ const cidDoc = {
 }
 
 function cidFetch(doc: unknown = cidDoc) {
-  return vi.fn(async () => ({ ok: true, json: async () => doc }) as unknown as Response)
+  return vi.fn(async (input: RequestInfo) => {
+    const url = typeof input === 'string' ? input : input.url
+    return { ok: true, url, json: async () => doc } as unknown as Response
+  })
 }
 
 describe('discoverAccessRequestService / discoverAccessGrantService', () => {

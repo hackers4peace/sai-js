@@ -26,6 +26,9 @@ import { createSocialAgentInvitation } from '../src/temporal/activities/invitati
 // Fixtures
 // ──────────────────────────
 
+// the identifier templates mint absolute IRIs from CSS_BASE_URL
+process.env.CSS_BASE_URL = 'https://auth.example/'
+
 const INVITATION_REGISTRY = 'https://auth.example/invitation/'
 const INVITATION_ID = 'https://auth.example/invitation/abc123'
 const OWNER = 'https://alice.example/#id'
@@ -71,10 +74,14 @@ function makeSession(registeredInvitations: Array<string> = []) {
           },
         ]
       : [{ '@id': url }]
-    return new Response(JSON.stringify(body), {
+    return {
+      ok: true,
       status: 200,
-      headers: { 'content-type': 'application/ld+json' },
-    })
+      url,
+      headers: { get: () => 'application/ld+json' },
+      json: async () => body,
+      text: async () => JSON.stringify(body),
+    } as unknown as Response
   })
   return {
     session: {

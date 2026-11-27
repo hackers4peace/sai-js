@@ -4,6 +4,7 @@ import {
   asScopeTerm,
   expandedJsonLd,
   frameNode,
+  required,
   withContext,
 } from '@janeirodigital/interop-utils'
 import type {
@@ -75,7 +76,7 @@ export interface OdrlPolicy {
  */
 export type GrantData = GrantId & {
   access: Array<OdrlPolicy>
-  scopeOfGrant: OpenTerm<ScopeOfGrantTerm> | ''
+  scopeOfGrant?: OpenTerm<ScopeOfGrantTerm>
   inheritsFromGrant?: string
   hasInheritingGrant?: Array<string>
 
@@ -153,11 +154,11 @@ type FramedPolicy = {
 
 type FramedGrant = {
   id: string
-  type?: Array<OpenTerm<GrantClassTerm>>
-  access?: Array<FramedPolicy>
+  type: Array<OpenTerm<GrantClassTerm>>
+  access: Array<FramedPolicy>
   scopeOfGrant?: OpenTerm<ScopeOfGrantTerm>
   inheritsFromGrant?: string
-  hasInheritingGrant?: Array<string>
+  hasInheritingGrant: Array<string>
   storage?: string
   grantedBy?: string
   dataOwner?: string
@@ -168,14 +169,16 @@ type FramedGrant = {
 
 /**
  * The framed policy already has the POJO's property names; this only fills the
- * set-container defaults and lifts the first permission to the policy-level
+ * set-container defaults of the EMBEDDED nodes (policies, permissions and
+ * targets are not focus nodes of the frame, so `frameNode` does not fill their
+ * absent set terms) and lifts the first permission to the policy-level
  * convenience fields (`assignee`, `action`, `target`).
  */
 function toOdrlPolicy(framed: FramedPolicy): OdrlPolicy {
   const permission = (framed.permission ?? []).map((entry) => ({
     ...entry,
-    assigner: entry.assigner ?? '',
-    assignee: entry.assignee ?? '',
+    assigner: required(entry, 'assigner'),
+    assignee: required(entry, 'assignee'),
     action: entry.action ?? [],
     target: {
       ...(entry.target ?? {}),
@@ -187,7 +190,7 @@ function toOdrlPolicy(framed: FramedPolicy): OdrlPolicy {
   return {
     ...framed,
     type: framed.type ?? [],
-    profile: framed.profile ?? '',
+    profile: required(framed, 'profile'),
     permission,
     scopeOfGrant: asScopeTerm(framed.scopeOfGrant) ?? framed.scopeOfGrant,
     ...(first ? { assignee: first.assignee, action: [...first.action], target: first.target } : {}),
@@ -225,6 +228,14 @@ export function registrationOfTarget(target: OdrlTarget | undefined): string {
   return target.hasDataRegistration ?? ''
 }
 
+/** A grant value the model requires; throws instead of coercing to `''`. */
+function must<T extends string>(value: T | undefined | '', what: string, id: string): T {
+  if (value === undefined || value === '') {
+    throw new Error(`grant ${id} is missing ${what}`)
+  }
+  return value
+}
+
 function deriveFields(
   node: FramedGrant,
   access: Array<OdrlPolicy>
@@ -249,11 +260,14 @@ function deriveFields(
       : []
   )
   return {
-    storage: target?.storage ?? node.storage ?? '',
-    grantedBy: first?.assigner ?? node.grantedBy ?? '',
-    dataOwner: first?.target.owner ?? node.dataOwner ?? '',
+    storage: must(target?.storage ?? node.storage, 'storage', node.id),
+    grantedBy: must(first?.assigner ?? node.grantedBy, 'grantedBy', node.id),
+    dataOwner: must(first?.target.owner ?? node.dataOwner, 'dataOwner', node.id),
+    // empty when the grant is not shape-tree-scoped (an AdminGrant targets the
+    // registry set / a data registry, not a shape tree)
     registeredShapeTree:
       permissions.map((permission) => shapeTreeOfTarget(permission.target)).find(Boolean) ?? '',
+    // empty when the grant is not registration-scoped (a shape-tree target)
     hasDataRegistration:
       registrationOfTarget(registrationTarget) ||
       (permissions.map((permission) => registrationOfTarget(permission.target)).find(Boolean) ??
@@ -273,13 +287,14 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
   const node = (await frameNode(expanded, accessContext, id, {
     access: { '@embed': '@always' },
   })) as unknown as FramedGrant
-  const access = (node.access ?? []).map(toOdrlPolicy)
+  const access = node.access.map(toOdrlPolicy)
   return {
     id,
-    type: node.type ?? [],
+    type: node.type,
     access,
-    scopeOfGrant:
-      asScopeTerm(node.scopeOfGrant) ?? node.scopeOfGrant ?? access[0]?.scopeOfGrant ?? '',
+    // OPTIONAL: an AdminGrant carries `scopeOfAdminGrant`, not a data scope —
+    // the same reader is used for both, so an absent scope is not an error.
+    scopeOfGrant: asScopeTerm(node.scopeOfGrant) ?? node.scopeOfGrant ?? access[0]?.scopeOfGrant,
     ...(node.inheritsFromGrant ? { inheritsFromGrant: node.inheritsFromGrant } : {}),
     ...(node.hasInheritingGrant ? { hasInheritingGrant: node.hasInheritingGrant } : {}),
     ...deriveFields(node, access),

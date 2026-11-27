@@ -22,6 +22,7 @@ import {
   sparqlTransportFor,
 } from '../src/services/queries/org.js'
 import { agentsWithAccessMatching, whoHasAccessMatching } from '../src/services/ShareResource.js'
+import { responseUrl } from './response-url.ts'
 
 // ──────────────────────────
 // Fixtures
@@ -55,6 +56,7 @@ function jsonResponse(body: unknown, status = 200, contentType = 'application/ld
   return {
     ok: status >= 200 && status < 300,
     status,
+    url: responseUrl(body),
     headers: {
       get: (name: string) => (name.toLowerCase() === 'content-type' ? contentType : null),
     },
@@ -141,9 +143,16 @@ describe('fetchPeerDocument', () => {
   test('reads the document through the storage fetch, scoped to the grant storage', async () => {
     const { ctx, requests } = fakeCtx({ [PEER_REGISTRATION]: peerRegistrationDoc })
 
-    await expect(fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION)).resolves.toEqual(
-      peerRegistrationDoc
-    )
+    // fetchJsonLd expands at the fetch boundary (every IRI absolute, no context)
+    await expect(fetchPeerDocument(ctx, PEER_STORAGE, PEER_REGISTRATION)).resolves.toEqual([
+      {
+        '@id': PEER_REGISTRATION,
+        'http://www.w3.org/ns/solid/interop#registeredShapeTree': [
+          { '@id': 'https://shapetrees.example/Project' },
+        ],
+        'http://www.w3.org/ns/ldp#contains': [{ '@id': PEER_INSTANCE }],
+      },
+    ])
     // one request, through the storage the context holds credentials for —
     // no document-proxy endpoint, no discovery round trip
     expect(requests).toEqual([{ storage: PEER_STORAGE, url: PEER_REGISTRATION }])
@@ -291,6 +300,7 @@ describe('peerInstanceIris', () => {
     }
     const parentRegistrationDoc = {
       '@id': parentRegistrationIri,
+      'http://www.w3.org/ns/solid/interop#registeredShapeTree': [{ '@id': parentShapeTreeIri }],
       'http://www.w3.org/ns/ldp#contains': [{ '@id': parentInstanceIri }],
     }
     const parentInstanceDoc = {

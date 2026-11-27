@@ -1,9 +1,10 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** in progress. Items 1 and 5 are landed; the grant read model
-> normalization was removed. A review of `packages/data-model` and the JSON-LD
-> helpers in `packages/utils`, with behaviour verified against the installed
-> `jsonld@9.0.0` (framing, compaction and expansion probes).
+> **Status:** in progress. Items 1, 2, 5 and 8 are landed; the grant read model
+> normalization was removed and the read paths are absolute-IRI-only. A review
+> of `packages/data-model` and the JSON-LD helpers in `packages/utils`, with
+> behaviour verified against the installed `jsonld@9.0.0` (framing, compaction
+> and expansion probes).
 > **Last reviewed:** 2026-11-26.
 
 ## Current state
@@ -13,6 +14,8 @@ The package is already framing-first:
 - reads are `frameNode`/`frameDoc` (`jsonld.frame`) over fetched
   `application/ld+json`; writes are expanded once and PUT without `@context`
   (`packages/utils/src/jsonld.ts`);
+- `fetchJsonLd` is the **only** place a base IRI enters: it expands against the
+  response's final URL and rejects anything that stays relative;
 - `@reverse` relationships, `@container: '@set'`, and `@container: '@language'`
   language maps are used deliberately (`packages/data-model/src/context.ts`);
 - quads survive only at the SPARQL boundary and in the not-yet-migrated
@@ -21,17 +24,17 @@ The package is already framing-first:
 What remains is structural, not incremental:
 
 - framing is still used as "return one node", not as a schema — one
-  kitchen-sink context, `@embed: '@never'` everywhere, and `@default` only in
-  `data-registration`;
+  kitchen-sink context with `@embed: '@never'` everywhere (no `@explicit` yet);
 - `shape-tree.ts` still walks the expanded document for `references` and
   `descriptionLanguages`, and the authorization-agent activity decode still
   canonicalizes `type` by hand;
 - write paths are projections (`toJsonLd` in grant, `withContext` in the other
   models) rather than a wire-shaped read model (see the open question).
 
-Landed: the type-scoped container fix, the `CONTEXT` term maps, and the typed
-`Framed*` + `projectNode` read paths (see the progress log). `selectNode` and
-the per-field normalizers are no longer used by `packages/data-model`.
+Landed: the type-scoped container fix, the `CONTEXT` term maps, the typed
+`Framed*` + `projectNode` read paths, the frame defaults, and the absolute-IRI
+fetch boundary (see the progress log). `selectNode` is gone — framing plus
+`frameNode`'s set defaults are the only filter the read paths need.
 
 
 ## Progress log
@@ -64,6 +67,75 @@ the per-field normalizers are no longer used by `packages/data-model`.
   `CONTEXT_IRI`.
 - `dataModelContext` (`accessMode`, `required`, class terms) intentionally
   stays IRI-valued for now — separate follow-up.
+
+### Landed — item 2: frame defaults (no `@default`)
+
+- `buildFrame` builds each entry as `{ '@embed': '@never', ...(isForwardSet ?
+  {} : { '@omitDefault': true }), ...overrides[key] }` — overrides **merge**,
+  so `{'@embed': '@always'}` on an absent single-valued term is omitted, not
+  `null`.
+- **No `@default` anywhere.** Verified against the real `dataModelContext` and
+  `accessContext`: with `@omitDefault` dropped, `@container: '@set'` alone
+  yields `[]` for forward set terms (`contains`, `lwsContains`, `accessMode`,
+  `access`). `@default: []` is silently ignored for `@reverse` and
+  `@type: '@vocab'` terms, so it buys nothing.
+- `frameNode` fills `[]` for **every** declared `@set` term the frame left out,
+  including the `@reverse` (`hasInheritingNeed`) and `@vocab` (`action`) shapes
+  the algorithm omits. Contract: *a declared set term is always an array*.
+  `Framed*` types declare set terms as required arrays and `projectNode`
+  returns `T` (not `Partial<Pick<T>>`), so the mappers no longer default them.
+- Embedded nodes (policies, permissions, targets inside a grant) are not focus
+  nodes and keep their local set defaults in `toOdrlPolicy`.
+- Note for item 3: with `@explicit` the fill must be restricted to the frame's
+  term list, otherwise every set term of the shared context reappears as `[]`.
+- Consequence in `access-request.ts`: a nested subframe
+  (`hasAccessNeedGroup: { '@embed': '@always', hasAccessNeed: … }`) is a match
+  requirement, so a group without needs frames as `null` — the case the old
+  `EMPTY_GROUP` fallback papered over. The fallback is gone: a request without
+  a group, or with a group that has no needs, throws.
+
+### Landed — item 8: absolute IRIs, base only at the fetch boundary
+
+- `fetchJsonLd` returns the document **expanded**, with `base = response.url`
+  (the final URL after redirects — JSON-LD 1.1 §4.1.3, RFC 3986 §5.1), then
+  `assertAbsoluteIris`. A response without `url` throws: a test double must
+  model the final URL (helpers pass the document's `@id`).
+- No base anywhere else: `frameDoc`/`frameNode`/`frameDataset`,
+  `expandedJsonLd`/`putJsonLd`, `documentValues`, `toStore`, `toNQuads`. Write
+  payloads assert absolute IRIs, so a relative IRI in a POJO fails loudly
+  (`relative IRI #fragment in write payload`).
+- `frameDoc` passes `compactToRelative: false`: with a base, compaction would
+  otherwise emit relative IRI references (verified — a base plus default
+  options compacts `https://…/grants/1/y` to `"y"`).
+- Expansion drops a node that carries only `@id` (no statements); that matches
+  the wire form, since PUT bodies are expanded.
+- Identifier minting stays absolute: `${storageRoot}${uuid}`,
+  `new URL(location, step.url)`, and the `CSS_*` templates now throw when
+  `CSS_BASE_URL` is unset instead of minting `undefined.sai/...`.
+- Mapper coercions became errors: `required(node, term)` for the terms the
+  model requires (`registeredShapeTree`, `registeredAgent`,
+  `hasAccessNeedGroup`, `grantee`, `grantedBy`, `dataOwner`,
+  `scopeOfAuthorization`, `assigner`, `profile`), and `must(value, what, id)`
+  for `storage`/`grantedBy`/`dataOwner` on a grant. The unit suite plus the
+  Dagger integration suite confirm all of them on real data. Deliberate
+  tolerances, each established by a failing document:
+  - **`GrantData.scopeOfGrant` is optional.** An `AdminGrant` carries
+    `interop:scopeOfAdminGrant`, never a data scope; the same reader
+    (`Grant.fromJsonLd`) serves admin grants from the grant registry.
+    `scopeCovers` now fails closed on an absent scope instead of comparing
+    `undefined === undefined` and calling two scopeless grants cover each other.
+  - **`registeredShapeTree` / `hasDataRegistration` stay `''`** when the grant
+    is not shape-tree/registration-scoped (registry-set and data-registry admin
+    grants target storage, not a shape tree).
+  - **`DataAuthorization` validates only when the node is typed
+    `interop:DataAuthorization`** — the same decoder doubles as a container
+    probe (`getDataAuthorization` in `authorization-agent/src/sparql.ts`),
+    where foreign nodes frame with empty fields and are filtered by type.
+  - **`RegistrySet` wrappers stay tolerant (`{ id: '' }`)** — a seeded registry
+    set may omit `hasGrantRegistry`/`hasRoleRegistry`; a separate decision.
+  - **`formatAccessNeed` emits `dataInstances` only for a non-empty array** —
+    the set-term contract made `[]` always present, which would have added an
+    empty RPC field to every shape-tree need.
 
 ### Landed — grant read-model normalization removed
 
@@ -171,20 +243,22 @@ patchedLws = {
   remove the now-redundant `asArray` calls in `grant.ts`; add a regression test
   that frames the grant fixture and asserts both containers.
 
-### 2. `buildFrame`: merge overrides, derive `@default` from `@container`
+### 2. `buildFrame`: merge overrides, set-container defaults
 
-Today `buildFrame` sets `frame[key] = overrides[key] ?? { '@embed': '@never',
-'@omitDefault': true }` — an override **replaces** the safe default, so
-`{'@embed': '@always'}` on an absent property yields `null` and every model
-carries a fallback (`access-request.ts` group default).
+> **Status:** landed — no `@default`; overrides merge; `frameNode` fills `[]`
+> for every declared set term.
 
-- Merge instead: `{ ...base, ...overrides[key] }`.
-- Derive `{ '@default': [] }` for terms whose context definition has
-  `@container: '@set'`; keep `{ '@omitDefault': true }` for the rest.
-- `@default` is ignored when `@omitDefault: true` is also present — set exactly
-  one per term.
-- Acceptance: no `?? []` needed for declared set terms; no `null` values in
-  framed nodes.
+An override used to **replace** the safe default, so `{'@embed': '@always'}`
+on an absent property yielded `null`. Now entries are built as
+`{ '@embed': '@never', ...(isForwardSet ? {} : { '@omitDefault': true }),
+...overrides[key] }`, and `@container: '@set'` provides the array.
+
+- `@default` is not used at all: `@container: '@set'` yields `[]` for forward
+  set terms, and `@default: []` is ignored for `@reverse`/`@vocab` terms.
+- `frameNode` fills `[]` for the shapes the algorithm omits (see the progress
+  log), so the invariant "declared set term → array" holds everywhere.
+- Acceptance met: no `?? []` for declared set terms, no `null` in framed nodes
+  (a test asserts `Object.values(framed)` has no `null`).
 
 ### 3. Frame-as-schema: `@explicit` + the existing `*_TERMS`
 
@@ -308,20 +382,25 @@ through `CONTEXT_IRI`.
   instance framing keeps working without context mutation; no term is defined
   twice with different definitions.
 
-### 8. Base IRI: thread `base` through framing and expansion
+### 8. Base IRI: absolute IRIs only
 
-`frameDoc` calls `jsonld.frame` without `base`/`compactToRelative`, so a
-document using document-relative `@id`s never matches the absolute frame `@id`
-(verified). `putJsonLd` expands without a base, so relative IRIs are stored
-relative and re-based by the server.
+> **Status:** landed — the base enters at `fetchJsonLd` and nowhere else.
 
-- `frameDoc(doc, context, iri)` → options `{ documentLoader, base: iri,
-  compactToRelative: false }`.
-- `putJsonLd(iri, …)` → `expandedJsonLd(doc, iri)`.
-- `expandJsonLd`/`expandedJsonLd` gain an optional `base` (like
-  `parseJsonld`/`toNQuads`/`toStore` already have).
-- Acceptance: a document with `@id: '#me'` frames against the resource IRI and
-  yields absolute ids; PUT bodies contain absolute IRIs.
+The package never creates relative IRIs. The only source is a retrieved
+document, so `fetchJsonLd` expands the payload against `response.url` (the
+final URL after redirects) and `assertAbsoluteIris` rejects anything that stays
+relative — e.g. a document declaring `"@base": null`, which suppresses
+resolution even when a base is supplied (verified).
+
+- No `base` option on `frameDoc`/`frameNode`/`frameDataset`, `expandedJsonLd`,
+  `putJsonLd`, `documentValues`, `toStore`, `toNQuads`; write payloads assert
+  absolute IRIs instead.
+- `frameDoc` always passes `compactToRelative: false` (a base would otherwise
+  make compaction emit `"y"` for `https://…/y`).
+- `response.url` is required: no fallback to the requested IRI, so the base is
+  always the resource's final URL. Test doubles report the document's `@id`.
+- Acceptance met: a document with `@id: '#me'` expands to
+  `<final-url>#me`; a surviving relative IRI throws; PUT bodies are absolute.
 
 ### 9. ACR layer: root ids and read/write symmetry
 
@@ -343,6 +422,8 @@ relative and re-based by the server.
   and drop `n3`/`@rdfjs/types` from the package.
 - Code comments reference `docs/jsonld.md` (TODO 2/4/6), which does not exist.
   Restore it or point at `openwiki/data-model/json-ld-layer.md`.
+- `selectNode` is removed (unused since `projectNode`); the `openwiki` page
+  describing it refreshes on the next OpenWiki run.
 
 
 ### 11. Apply the grant simplification to the other models
@@ -421,8 +502,17 @@ fields is too invasive.
 | --- | --- |
 | `@explicit: true` | output restricted to frame-listed properties |
 | `@explicit` + `@container: '@language'` | field dropped; `{}`/`[]` throw; `{'@embed':'@never'}` → `null` under the full IRI |
-| `@default: []` | yields `[]` when absent |
+| `@default: []` | yields `[]` when absent (forward set terms only) |
 | `@default` + `@omitDefault: true` | `@default` ignored, property omitted |
+| set container + no `@omitDefault` | `[]` for forward `@set` terms (`@type: '@id'`, literals) |
+| set container on `@reverse` / `@vocab` term, no `@omitDefault` | property **omitted** — no `[]`, and `@default` cannot rescue it |
+| single-valued term, no `@omitDefault` | `null` (so every non-set term keeps `@omitDefault: true`) |
+| nested subframe property list | acts as a **match requirement** (`@requireAll` default false): a child without the listed term yields `null` for the parent property; nested `@default`/`@omitDefault` do not help |
+| nested frame with no matchable property | the child compacts to a bare IRI **string**, not an object |
+| `@explicit: true` + `@requireAll: false` + full term list | absent set term frames as `[]`, child still matches — the recipe for item 3 |
+| expansion of a node with only `@id` | node dropped (no statements) |
+| `@base: null` + `base` option | relative IRIs survive expansion (no error) → caught by `assertAbsoluteIris` |
+| `frame` with `base`, default options | compacts IRIs to relative references (why `compactToRelative: false` is mandatory) |
 | `@embed: '@once'` | dedupes repeated references |
 | `@embed: '@always'` on a nested node | frames the child with terms; `@reverse` does not resolve inside it |
 | multi-`@id` frame | returns `@graph`, each match top-level, `@reverse` resolves per node |
@@ -438,12 +528,16 @@ fields is too invasive.
 ## Landing order
 
 1. Item 1 (bug) + regression test. — **landed**
-2. Item 2 (frame defaults) — removes fallbacks used by items 3–6.
-3. Item 8 (base) — correctness, independent.
-4. Item 4 (nested framing) — deletes code, no POJO change.
-5. Item 3 (`@explicit` + `*_TERMS`) — deletes `selectNode` where possible.
-6. Item 5 (representation) — POJO contract change. — **landed**
-7. Item 6 (activity decode) — authorization-agent side.
+2. Item 2 (frame defaults) — removes fallbacks used by items 3–6. — **landed**
+3. Item 8 (base) — correctness, independent. — **landed**
+4. Item 5 (representation) — POJO contract change. — **landed**
+5. Item 3 (`@explicit` + `@requireAll: false` + `*_TERMS`) — prerequisite for
+   the nested frames in items 4 and 6: a nested subframe's property list is a
+   match requirement, so nesting only becomes safe once the frame carries the
+   full term list with `@explicit` (verified behaviour, see the table).
+6. Item 4 (nested framing in `shape-tree.ts`) — deletes the expanded-document
+   walks.
+7. Item 6 (activity decode) — authorization-agent side; one multi-`@id` frame.
 8. Items 7, 9, 10 — cleanup / follow-up, can land independently.
 
 ## Out of scope

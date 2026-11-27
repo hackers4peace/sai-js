@@ -15,10 +15,11 @@ import { expect } from './expect'
 // decode, pending filters, the events bus) breaks.
 
 function mockFetch(doc: Record<string, unknown>): (url: string) => Promise<Response> {
-  return async () =>
+  return async (url: string) =>
     ({
       ok: true,
       status: 200,
+      url,
       headers: { get: () => 'application/ld+json' },
       json: async () => doc,
     }) as unknown as Response

@@ -1,4 +1,4 @@
-import { frameNode, projectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode, required } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 
@@ -6,7 +6,7 @@ type FramedApplicationRegistration = {
   id: string
   type?: Array<string>
   registeredAgent?: string
-  hasDataGrant?: Array<string>
+  hasDataGrant: Array<string>
 }
 
 const APPLICATION_REGISTRATION_TERMS = ['registeredAgent', 'hasDataGrant'] as const
@@ -41,11 +41,9 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<ApplicationR
     id
   )) as unknown as FramedApplicationRegistration
   const node = projectNode(framed, APPLICATION_REGISTRATION_TERMS)
-  const hasDataGrant = node.hasDataGrant ?? []
   return {
     ...node,
-    registeredAgent: node.registeredAgent ?? '',
-    hasDataGrant,
-    granted: hasDataGrant.length > 0,
+    registeredAgent: required(node, 'registeredAgent'),
+    granted: node.hasDataGrant.length > 0,
   }
 }

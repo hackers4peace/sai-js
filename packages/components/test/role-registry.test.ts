@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 
 import type { ResolvedContext } from '../src/services/Context.js'
 import { getRoles } from '../src/services/RoleRegistry.js'
+import { responseUrl } from './response-url.ts'
 
 // ──────────────────────────
 // Fixtures
@@ -34,6 +35,7 @@ function mockResponse(body: unknown, status = 200, contentType = 'application/ld
   return {
     ok: status >= 200 && status < 300,
     status,
+    url: responseUrl(body),
     headers: {
       get: (name: string) => (name.toLowerCase() === 'content-type' ? contentType : null),
     },

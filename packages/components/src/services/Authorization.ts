@@ -116,7 +116,9 @@ const formatAccessNeed = async (
       label: await shapeTreeLabelFor(accessNeed.registeredShapeTree),
     },
     parent: accessNeed.inheritsFromNeed ? IRI.make(accessNeed.inheritsFromNeed) : undefined,
-    ...(accessNeed.hasDataInstance
+    // a declared set term is always an array — keep the wire field absent when
+    // the registration-scoped need has no instances
+    ...(accessNeed.hasDataInstance?.length
       ? { dataInstances: accessNeed.hasDataInstance.map((instance) => IRI.make(instance)) }
       : {}),
     ...(accessNeed.hasDataRegistration

@@ -1,4 +1,4 @@
-import { frameNode, projectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode, required } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 
@@ -6,8 +6,8 @@ type FramedDataRegistration = {
   id: string
   type?: Array<string>
   registeredShapeTree?: string
-  contains?: Array<string>
-  lwsContains?: Array<string>
+  contains: Array<string>
+  lwsContains: Array<string>
   lwsPartOf?: string
 }
 
@@ -35,16 +35,7 @@ const DATA_REGISTRATION_TERMS = [
 ] as const
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<DataRegistrationData> {
-  // `@container: '@set'` guarantees an array for values that are present, but
-  // framing omits a property with no values (`buildFrame` sets
-  // `@omitDefault: true` on every term). A registration with no instances has
-  // no `ldp:contains` triples, so the frame supplies `@default: []` for
-  // `contains` — the framed node is always an array, matching the type
-  // (JSON-LD 1.1 Framing: `@default` + `@omitDefault`).
-  const framed = (await frameNode(doc, dataModelContext, id, {
-    contains: { '@embed': '@never', '@default': [] },
-    lwsContains: { '@embed': '@never', '@default': [] },
-  })) as unknown as FramedDataRegistration
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedDataRegistration
   const node = projectNode(framed, DATA_REGISTRATION_TERMS)
   // Flat LWS storage keeps membership as `lws:contains` and the parent as
   // `lws:partOf`; path-based storage uses `ldp:contains` and the URI path.
@@ -52,8 +43,8 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<DataRegistra
   const { lwsContains, lwsPartOf, ...rest } = node
   return {
     ...rest,
-    registeredShapeTree: rest.registeredShapeTree ?? '',
-    contains: [...new Set([...(rest.contains ?? []), ...(lwsContains ?? [])])],
+    registeredShapeTree: required(rest, 'registeredShapeTree'),
+    contains: [...new Set([...rest.contains, ...lwsContains])],
     ...(lwsPartOf ? { partOf: lwsPartOf } : {}),
   }
 }

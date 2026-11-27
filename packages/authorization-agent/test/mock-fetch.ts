@@ -33,6 +33,7 @@ async function common(
   if (accept === 'application/lws+cid') {
     return {
       ok: true,
+      url: strippedUrl,
       headers: { get: () => 'application/lws+cid' },
       json: async () => ({
         id: strippedUrl,
@@ -45,6 +46,7 @@ async function common(
   if (url === STORAGE_DESCRIPTION_IRI) {
     return {
       ok: true,
+      url: strippedUrl,
       clone: () => ({}) as unknown as Response,
       headers: { get: () => 'application/ld+json' },
       text: async () => storageDescriptionJsonLd,
@@ -69,6 +71,9 @@ async function common(
 
   const response = {
     ok: true,
+    // a real response never carries the request fragment — the final URL is
+    // the base IRI for expansion
+    url: strippedUrl,
     headers: {
       get(name: string) {
         if (name in headers) {
