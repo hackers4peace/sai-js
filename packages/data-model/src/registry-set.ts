@@ -64,7 +64,9 @@ export type AccessRequestRegistryData = {
  * flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<RegistrySetData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedRegistrySet
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: REGISTRY_SET_TERMS,
+  })) as unknown as FramedRegistrySet
   const node = projectNode(framed, REGISTRY_SET_TERMS)
   // The six core registries are REQUIRED and created by the account bootstrap
   // (`templates/RegistrySet.ts` — `registrySetTemplate`, used by

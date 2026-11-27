@@ -104,14 +104,73 @@ export function buildFrame(
       continue
     }
     if (typeof val === 'object' && val !== null && !isLanguageMapTerm(val)) {
-      frame[key] = {
-        '@embed': '@never',
-        ...(alwaysArrayTerm(val as Record<string, unknown>) ? {} : { '@omitDefault': true }),
-        ...overrides[key],
-      }
+      frame[key] = frameEntry(val, overrides[key])
     }
   }
   return frame
+}
+
+/**
+ * Build the frame for one model: `@explicit` over the model's own wire terms.
+ *
+ * Framing otherwise emits every property of the focus node, so a foreign
+ * predicate surfaces as a raw-IRI key and the shared context supplies defaults
+ * for terms the model never reads. `@explicit: true` restricts the output to
+ * the frame's property list in the algorithm — the model's `*_TERMS` constant
+ * is that list (JSON-LD 1.1 Framing §2.3.2).
+ *
+ * `@type` is emitted without being listed, and `@explicit` does **not**
+ * propagate into embedded child nodes (a nested `{'@embed': '@always'}`
+ * subframe keeps all of the child's properties — verified against jsonld@9).
+ *
+ * Throws for a term the context does not define (a typo in the list would
+ * otherwise silently drop the property) and for a language-map term, which
+ * `@explicit` cannot express at all (jsonld.js throws while compacting it).
+ */
+export function frameFor(
+  context: JsonLdContext,
+  iri: string,
+  terms: ReadonlyArray<string>,
+  overrides: Record<string, Record<string, unknown>> = {}
+): Record<string, unknown> {
+  const frame: Record<string, unknown> = {
+    '@context': context,
+    '@id': iri,
+    '@explicit': true,
+  }
+  for (const term of terms) {
+    if (term === 'id' || term === 'type' || term.startsWith('@')) {
+      continue
+    }
+    const definition = context[term]
+    if (definition === undefined) {
+      throw new Error(`frame term ${term} is not defined in the context`)
+    }
+    if (isLanguageMapTerm(definition)) {
+      throw new Error(`@explicit cannot frame the language-map term ${term}`)
+    }
+    frame[term] = frameEntry(definition, overrides[term])
+  }
+  return frame
+}
+
+/**
+ * One frame entry: plain node references by default, the omit-default rule for
+ * terms whose absent value would otherwise be `null`, merged with an override.
+ */
+function frameEntry(
+  definition: unknown,
+  override?: Record<string, unknown>
+): Record<string, unknown> {
+  const setArray =
+    typeof definition === 'object' &&
+    definition !== null &&
+    alwaysArrayTerm(definition as Record<string, unknown>)
+  return {
+    '@embed': '@never',
+    ...(setArray ? {} : { '@omitDefault': true }),
+    ...override,
+  }
 }
 
 /**
@@ -233,11 +292,20 @@ export async function frameDoc(
   iri: string,
   overrides: Record<string, Record<string, unknown>> = {}
 ): Promise<Record<string, unknown>> {
+  return frameWith(doc, buildFrame(context, iri, overrides), iri)
+}
+
+/** Run `jsonld.frame` with the shared loader and the framing span. */
+async function frameWith(
+  doc: unknown,
+  frame: Record<string, unknown>,
+  iri: string
+): Promise<Record<string, unknown>> {
   return withSpan('sai-jsonld', 'frameDoc', async (span) => {
     span.setAttribute('sai.jsonld.uri', iri)
     // compactToRelative: false — compaction would otherwise emit relative IRI
     // references (shorter than the absolute form) wherever a base is available
-    const framed = await frameJsonLd(doc, buildFrame(context, iri, overrides), {
+    const framed = await frameJsonLd(doc, frame, {
       documentLoader,
       compactToRelative: false,
     })
@@ -275,13 +343,28 @@ export type FramedNode = {
  * handle per-field reads; `id`/`type` are read directly off the typed
  * `FramedNode`.
  */
+/** How `frameNode` builds its frame. */
+export interface FrameNodeOptions {
+  /**
+   * The model's wire terms — the frame's property list, framed with
+   * `@explicit` (see `frameFor`). Omitted for models with language-map terms,
+   * which keep the context-wide frame and the `projectNode` filter.
+   */
+  terms?: ReadonlyArray<string>
+  /** Merged over the computed entry for a term (e.g. `{'@embed': '@always'}`). */
+  overrides?: Record<string, Record<string, unknown>>
+}
+
 export async function frameNode(
   doc: unknown,
   context: JsonLdContext,
   iri: string,
-  overrides: Record<string, Record<string, unknown>> = {}
+  options: FrameNodeOptions = {}
 ): Promise<FramedNode> {
-  const node = (await frameDoc(doc, context, iri, overrides)) as Record<string, unknown> & {
+  const frame = options.terms
+    ? frameFor(context, iri, options.terms, options.overrides)
+    : buildFrame(context, iri, options.overrides)
+  const node = (await frameWith(doc, frame, iri)) as Record<string, unknown> & {
     '@context'?: unknown
   }
   // the frame embeds its @context in the output — strip it so the node is
@@ -291,7 +374,7 @@ export async function frameNode(
   if (!id) {
     throw new Error(`framed node ${iri} has no id`)
   }
-  return withSetDefaults({ ...rest, id }, context)
+  return withSetDefaults({ ...rest, id }, context, options.terms)
 }
 
 /**
@@ -304,15 +387,17 @@ export async function frameNode(
  * readers never default a set field and `Framed*` types can declare them as
  * required.
  */
-function withSetDefaults(node: FramedNode, context: JsonLdContext): FramedNode {
+function withSetDefaults(
+  node: FramedNode,
+  context: JsonLdContext,
+  terms?: ReadonlyArray<string>
+): FramedNode {
   const out: FramedNode = { ...node }
-  for (const [term, definition] of Object.entries(context)) {
-    if (typeof definition !== 'object' || definition === null || !isSetContainer(definition)) {
+  for (const term of terms ?? Object.keys(context)) {
+    if (out[term] !== undefined || !isSetContainer(context[term])) {
       continue
     }
-    if (out[term] === undefined) {
-      out[term] = []
-    }
+    out[term] = []
   }
   return out
 }

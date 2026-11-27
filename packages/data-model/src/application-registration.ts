@@ -35,11 +35,9 @@ export type ApplicationId = {
  * or flattened form. `granted` is derived from the presence of access grants.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<ApplicationRegistrationData> {
-  const framed = (await frameNode(
-    doc,
-    dataModelContext,
-    id
-  )) as unknown as FramedApplicationRegistration
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: APPLICATION_REGISTRATION_TERMS,
+  })) as unknown as FramedApplicationRegistration
   const node = projectNode(framed, APPLICATION_REGISTRATION_TERMS)
   return {
     ...node,

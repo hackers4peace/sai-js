@@ -21,7 +21,9 @@ export type AdminAuthorizationData = {
 }
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<AdminAuthorizationData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedAdminAuthorization
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: ADMIN_AUTHORIZATION_TERMS,
+  })) as unknown as FramedAdminAuthorization
   const node = projectNode(framed, ADMIN_AUTHORIZATION_TERMS)
   return {
     ...node,

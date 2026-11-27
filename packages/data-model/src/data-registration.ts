@@ -35,7 +35,9 @@ const DATA_REGISTRATION_TERMS = [
 ] as const
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<DataRegistrationData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedDataRegistration
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: DATA_REGISTRATION_TERMS,
+  })) as unknown as FramedDataRegistration
   const node = projectNode(framed, DATA_REGISTRATION_TERMS)
   // Flat LWS storage keeps membership as `lws:contains` and the parent as
   // `lws:partOf`; path-based storage uses `ldp:contains` and the URI path.

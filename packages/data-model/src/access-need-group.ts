@@ -32,7 +32,9 @@ export type AccessNeedGroupData = AccessNeedGroupId & {
  * flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedGroupData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedAccessNeedGroup
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: ACCESS_NEED_GROUP_TERMS,
+  })) as unknown as FramedAccessNeedGroup
   const node = projectNode(framed, ACCESS_NEED_GROUP_TERMS)
   return {
     ...node,

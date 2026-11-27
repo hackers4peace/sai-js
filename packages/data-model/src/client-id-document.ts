@@ -31,6 +31,8 @@ const CLIENT_ID_DOCUMENT_TERMS = [
 ] as const
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<ClientIdDocumentData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedClientIdDocument
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: CLIENT_ID_DOCUMENT_TERMS,
+  })) as unknown as FramedClientIdDocument
   return projectNode(framed, CLIENT_ID_DOCUMENT_TERMS)
 }

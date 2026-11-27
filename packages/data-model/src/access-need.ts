@@ -79,7 +79,9 @@ export type AccessNeedData = AccessNeedId & {
  * boolean (`interop:accessNecessity = interop:AccessRequired`).
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedAccessNeed
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: ACCESS_NEED_TERMS,
+  })) as unknown as FramedAccessNeed
   const node = projectNode(framed, ACCESS_NEED_TERMS)
   return {
     ...node,

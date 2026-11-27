@@ -1,10 +1,10 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** in progress. Items 1, 2, 5 and 8 are landed; the grant read model
-> normalization was removed and the read paths are absolute-IRI-only. A review
-> of `packages/data-model` and the JSON-LD helpers in `packages/utils`, with
-> behaviour verified against the installed `jsonld@9.0.0` (framing, compaction
-> and expansion probes).
+> **Status:** in progress. Items 1, 2, 3, 5 and 8 are landed; the grant read
+> model normalization was removed and the read paths are absolute-IRI-only. A
+> review of `packages/data-model` and the JSON-LD helpers in `packages/utils`,
+> with behaviour verified against the installed `jsonld@9.0.0` (framing,
+> compaction and expansion probes).
 > **Last reviewed:** 2026-11-26.
 
 ## Current state
@@ -86,8 +86,9 @@ fetch boundary (see the progress log). `selectNode` is gone — framing plus
   returns `T` (not `Partial<Pick<T>>`), so the mappers no longer default them.
 - Embedded nodes (policies, permissions, targets inside a grant) are not focus
   nodes and keep their local set defaults in `toOdrlPolicy`.
-- Note for item 3: with `@explicit` the fill must be restricted to the frame's
-  term list, otherwise every set term of the shared context reappears as `[]`.
+- The `[]` fill is restricted to the frame's term list (`frameNode` with
+  `terms`), so a model never receives empty arrays for set terms of the shared
+  context it does not read.
 - Consequence in `access-request.ts`: a nested subframe
   (`hasAccessNeedGroup: { '@embed': '@always', hasAccessNeed: … }`) is a match
   requirement, so a group without needs frames as `null` — the case the old
@@ -267,36 +268,43 @@ on an absent property yielded `null`. Now entries are built as
 
 ### 3. Frame-as-schema: `@explicit` + the existing `*_TERMS`
 
-Framing emits every property of the focus node, so foreign predicates leak as
-raw-IRI keys and the shared 65-term context makes `frameNode` fill `[]` for
-set terms the model never reads. `@explicit: true` restricts the output to the
-frame's own property list in the algorithm. The `*_TERMS` constants
-(`data-authorization.ts`, `admin-authorization.ts`, `client-id-document.ts`,
-`access-request.ts`, `data-registration.ts`, `access-need.ts`, `role.ts`, …)
-are already that list.
+> **Status:** landed.
 
-- Add `frameFor(context, iri, terms, overrides)` to `packages/utils` producing
-  `{ '@context', '@id', '@explicit': true, ...termFrame }` with the same
-  per-term defaults as `buildFrame` (no `@default`; `@omitDefault` for
-  single-valued/reverse/`@vocab` terms).
-- `frameNode` must then take the term list too, so its `[]` fill is restricted
-  to the frame's terms instead of every set term of the shared context.
-- Apply to models **without** language-map terms; `Role`, `WebIdProfile`,
-  `SocialAgentRegistration`, `SocialAgentInvitation`, the two description
-  models and the invitation snapshot decode keep the `projectNode` filter.
-- Verified: `@explicit` keeps `@type` without listing it; absent forward
-  `@set` terms still frame as `[]`; absent `@reverse`/`@vocab` set terms are
-  omitted (so the `[]` fill in `frameNode` stays necessary).
+Framing emitted every property of the focus node, so foreign predicates leaked
+as raw-IRI keys and `frameNode` filled `[]` for set terms the model never reads.
+`@explicit: true` restricts the output to the frame's property list in the
+algorithm, and each model's `*_TERMS` constant is that list.
+
+- `frameFor(context, iri, terms, overrides)` in `packages/utils` builds the
+  frame: `{ '@context', '@id', '@explicit': true }` plus one entry per listed
+  term with the same defaults as `buildFrame` (no `@default`; `@omitDefault`
+  for single-valued/`@reverse`/`@vocab` terms). It throws for a term the
+  context does not define and for a language-map term.
+- `frameNode(doc, context, iri, { terms, overrides })` builds that frame and
+  restricts its `[]` fill (`withSetDefaults`) to the same terms.
+- Applied to `DataRegistration`, `DataAuthorization`, `AdminAuthorization`,
+  `ApplicationRegistration`, `RegistrySet`, `ShapeTree`, `ClientIdDocument`,
+  `AccessNeed`/`AccessNeedGroup`, `NeedBasedAccessRequest` (nested group
+  overrides) and `Grant` (new `GRANT_TERMS`).
+- Language-map models keep the context-wide frame and `projectNode`:
+  `Role`, `WebIdProfile`, `SocialAgentRegistration`, `SocialAgentInvitation`,
+  the two access-need description models and `ShapeTreeDescription`. So does
+  `data-instance.ts`, whose term set is per shape tree.
+- Verified: `@explicit` keeps `@type` without listing it, absent forward
+  `@set` terms still frame as `[]`, absent `@reverse`/`@vocab` set terms are
+  omitted (the `[]` fill covers them), and the flag does **not** restrict
+  embedded child nodes (a nested `{'@embed': '@always'}` subframe keeps all of
+  the child's properties).
 - Verified limitation: `@explicit` combined with a `@container: '@language'`
-  term **throws** in jsonld@9 (`Cannot read properties of undefined (reading
-  '@value')`), not just drops the field.
+  term throws in jsonld@9 (`reading '@value'` of undefined).
 - Verified for nested frames (items 4/6): `@explicit: true` + `@requireAll:
   false` + a full term list yields `[]` for absent set terms, **but** a
   subframe whose listed properties are all absent still fails to match — the
   parent property becomes `null`. A nested child must carry at least one
   listed term, or be framed separately by `@id`.
-- Acceptance: framed keys are exactly `id`, `type` + the term list (except
-  language-map models); a test asserts no `http…` keys in framed output.
+- Acceptance met: `packages/data-model/test/framing/schema.test.ts` asserts
+  framed keys are exactly `id`, `type` + the term list and that no `http…` key
+  survives; `packages/utils/test/jsonld.test.ts` covers `frameFor` itself.
 
 ### 4. Nested framing instead of expanded-document walks
 
@@ -527,6 +535,7 @@ fields is too invasive.
 | Feature | Behaviour |
 | --- | --- |
 | `@explicit: true` | output restricted to frame-listed properties; `@type` is kept without listing it |
+| `@explicit` + nested `{'@embed': '@always'}` subframe | the embedded child keeps all its properties — the flag does not restrict embedded nodes |
 | `@explicit` + `@container: '@language'` | throws (`reading '@value'` of undefined) |
 | `@explicit` + absent forward `@set` term | `[]` (same as without `@explicit`) |
 | `@explicit` + absent `@reverse`/`@vocab` set term | omitted — `frameNode` must fill `[]` |
@@ -559,10 +568,8 @@ fields is too invasive.
 2. Item 2 (frame defaults) — removes fallbacks used by items 3–6. — **landed**
 3. Item 8 (base) — correctness, independent. — **landed**
 4. Item 5 (representation) — POJO contract change. — **landed**
-5. Item 3 (`@explicit` + `@requireAll: false` + `*_TERMS`) — prerequisite for
-   the nested frames in items 4 and 6: a nested subframe's property list is a
-   match requirement, so nesting only becomes safe once the frame carries the
-   full term list with `@explicit` (verified behaviour, see the table).
+5. Item 3 (`@explicit` + `*_TERMS`) — prerequisite for the nested frames in
+   items 4 and 6. — **landed**
 6. Item 4 (nested framing in `shape-tree.ts`) — deletes the expanded-document
    walks.
 7. Item 6 (activity decode) — authorization-agent side; one multi-`@id` frame.

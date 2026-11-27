@@ -168,6 +168,23 @@ type FramedGrant = {
 }
 
 /**
+ * The grant document's own wire terms — the `@explicit` frame list. Only terms
+ * the reader consumes: the embedded policy tree under `access`, the scope, the
+ * inheritance links and the grant-level fallbacks for the derived fields.
+ * (`interop:grantedBy`/`dataOwner` are not in the access context, so they never
+ * frame as compacted terms — both are derived from the permission/target.)
+ */
+const GRANT_TERMS = [
+  'access',
+  'scopeOfGrant',
+  'inheritsFromGrant',
+  'hasInheritingGrant',
+  'storage',
+  'registeredShapeTree',
+  'hasDataRegistration',
+] as const
+
+/**
  * The framed policy already has the POJO's property names; this only fills the
  * set-container defaults of the EMBEDDED nodes (policies, permissions and
  * targets are not focus nodes of the frame, so `frameNode` does not fill their
@@ -285,7 +302,8 @@ function deriveFields(
 export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
   const expanded = await expandedJsonLd(doc as Record<string, unknown>)
   const node = (await frameNode(expanded, accessContext, id, {
-    access: { '@embed': '@always' },
+    terms: GRANT_TERMS,
+    overrides: { access: { '@embed': '@always' } },
   })) as unknown as FramedGrant
   const access = node.access.map(toOdrlPolicy)
   return {

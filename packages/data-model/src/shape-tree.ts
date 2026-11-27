@@ -115,7 +115,9 @@ function referencePairs(expanded: Array<any>, treeId: string): Array<ShapeTreeRe
  * node-centric frame can't capture either shape.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<ShapeTreeData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedShapeTree
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: SHAPE_TREE_TERMS,
+  })) as unknown as FramedShapeTree
   const node = projectNode(framed, SHAPE_TREE_TERMS)
   return {
     ...node,

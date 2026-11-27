@@ -76,7 +76,9 @@ function requiredTerm(node: Record<string, unknown>, key: string, strict: boolea
 }
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<DataAuthorizationData> {
-  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedDataAuthorization
+  const framed = (await frameNode(doc, dataModelContext, id, {
+    terms: DATA_AUTHORIZATION_TERMS,
+  })) as unknown as FramedDataAuthorization
   const node = projectNode(framed, DATA_AUTHORIZATION_TERMS)
   const strict = node.type.includes(INTEROP.DataAuthorization)
   return {

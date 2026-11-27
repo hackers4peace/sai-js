@@ -10,6 +10,8 @@ import {
   fetchJsonLd,
   findNodeIdByType,
   frameDoc,
+  frameFor,
+  frameNode,
   lwsV1Context,
 } from '../src'
 import type { WhatwgFetch } from '../src'
@@ -267,5 +269,89 @@ describe('bundled LWS context', () => {
       expect(scopedContext(term).type).toEqual(accessClaimTerms.type)
       expect(scopedContext(term).access).toEqual(accessClaimTerms.access)
     }
+  })
+})
+
+describe('frameFor / frameNode with a term list', () => {
+  const context = {
+    '@version': 1.1,
+    id: '@id',
+    type: { '@id': '@type', '@container': '@set' },
+    label: { '@id': 'https://example.example/label', '@container': '@language' },
+    name: { '@id': 'https://example.example/name' },
+    forward: { '@id': 'https://example.example/forward', '@type': '@id', '@container': '@set' },
+    reverse: {
+      '@reverse': 'https://example.example/child',
+      '@type': '@id',
+      '@container': '@set',
+    },
+    single: { '@id': 'https://example.example/single', '@type': '@id' },
+    unused: { '@id': 'https://example.example/unused', '@type': '@id', '@container': '@set' },
+  }
+  const iri = 'https://example.example/a'
+  const foreign = 'https://example.example/foreign'
+
+  test('frames only the listed terms, with @explicit', () => {
+    const frame = frameFor(context, iri, ['name', 'forward', 'single', 'type'])
+    expect(frame['@explicit']).toBe(true)
+    expect(Object.keys(frame)).toEqual([
+      '@context',
+      '@id',
+      '@explicit',
+      'name',
+      'forward',
+      'single',
+    ])
+    expect(frame.forward).toEqual({ '@embed': '@never' })
+    expect(frame.single).toEqual({ '@embed': '@never', '@omitDefault': true })
+  })
+
+  test('throws for an undefined term and for a language-map term', () => {
+    expect(() => frameFor(context, iri, ['nope'])).toThrow(
+      'frame term nope is not defined in the context'
+    )
+    expect(() => frameFor(context, iri, ['label'])).toThrow(
+      '@explicit cannot frame the language-map term label'
+    )
+  })
+
+  test('drops foreign and non-listed properties, keeps id/type and the set defaults', async () => {
+    const doc = [
+      {
+        '@id': iri,
+        '@type': ['https://example.example/Thing'],
+        'https://example.example/name': [{ '@value': 'A' }],
+        'https://example.example/forward': [{ '@id': 'https://example.example/b' }],
+        [foreign]: [{ '@value': 'leaks without @explicit' }],
+      },
+    ]
+    const node = await frameNode(doc, context, iri, {
+      terms: ['name', 'forward', 'reverse', 'single'],
+    })
+    expect(node).toEqual({
+      id: iri,
+      type: ['https://example.example/Thing'],
+      name: 'A',
+      forward: ['https://example.example/b'],
+      // absent set terms are still filled — @explicit omits the reverse shape
+      reverse: [],
+    })
+    expect(Object.keys(node).some((key) => key.includes('http'))).toBe(false)
+    expect(node).not.toHaveProperty(foreign)
+    expect(node).not.toHaveProperty('unused')
+  })
+
+  test('an override keeps the omit-default rule for an absent single term', async () => {
+    const node = await frameNode(
+      [{ '@id': iri, '@type': ['https://example.example/Thing'] }],
+      context,
+      iri,
+      {
+        terms: ['single'],
+        overrides: { single: { '@embed': '@always' } },
+      }
+    )
+    expect(node).not.toHaveProperty('single')
+    expect(node).not.toHaveProperty('single', null)
   })
 })

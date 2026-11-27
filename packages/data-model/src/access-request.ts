@@ -80,11 +80,14 @@ function framedGroup(value: unknown, id: string): NeedBasedAccessRequestGroup {
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<NeedBasedAccessRequestData> {
   const framed = (await frameNode(doc, dataModelContext, id, {
-    hasAccessNeedGroup: {
-      '@embed': '@always',
-      hasAccessNeed: {
+    terms: NEED_BASED_ACCESS_REQUEST_TERMS,
+    overrides: {
+      hasAccessNeedGroup: {
         '@embed': '@always',
-        hasInheritingNeed: { '@embed': '@always' },
+        hasAccessNeed: {
+          '@embed': '@always',
+          hasInheritingNeed: { '@embed': '@always' },
+        },
       },
     },
   })) as unknown as FramedAccessRequest
