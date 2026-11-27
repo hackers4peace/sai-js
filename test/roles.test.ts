@@ -7,7 +7,7 @@ import {
   grantGrantee,
 } from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
-import { INTEROP, loader } from '@janeirodigital/interop-utils'
+import { CONTEXT, loader } from '@janeirodigital/interop-utils'
 const loadDataAuthorization = loader(DataAuthorization.fromJsonLd)
 const loadGrant = loader(Grant.fromJsonLd)
 
@@ -107,7 +107,7 @@ async function verifyAccessGrant(
     // role authorizations are expanded to concrete grantees; the materialized
     // grant never carries a role IRI as its assignee
     expect(grantGrantee(accessGrant)).toBe(granteeId)
-    expect(accessGrant.scopeOfGrant).toBe(INTEROP.AllFromRegistry)
+    expect(accessGrant.scopeOfGrant).toBe(CONTEXT.AllFromRegistry)
   } else {
     await waitFor(async () => (await findAccessGrant()) === undefined, { timeout: 30_000 })
   }

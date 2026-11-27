@@ -1,6 +1,7 @@
 import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
 import type { DataAuthorizationData, RegistrySetData } from '@janeirodigital/interop-data-model'
 import {
+  CONTEXT,
   ACCESS_ACTIONS,
   FlatIdentifierStrategy,
   INTEROP,
@@ -414,12 +415,12 @@ describe('delegated-grant generation — mirror only', () => {
       registeredShapeTree: PROJECT_TREE,
       hasDataRegistration: PROJECT_REGISTRATION,
       storage: PROJECT_STORAGE,
-      scopeOfGrant: INTEROP.AllFromRegistry,
+      scopeOfGrant: CONTEXT.AllFromRegistry,
     })
     expect(grantGrantee(grant)).toBe(KIM)
-    expect(grant.type).toEqual([LWS.AccessGrant])
+    expect(grant.type).toEqual([CONTEXT.AccessGrant])
     // the source allows Read+Write, the authorization asks for Read only
-    expect(grantAccessModes(grant)).toEqual([ACCESS_ACTIONS.read])
+    expect(grantAccessModes(grant)).toEqual([CONTEXT.read])
   })
 
   test('matches by shape tree — only the Task grant delegates', async () => {
@@ -509,7 +510,7 @@ describe('delegated-grant generation — mirror only', () => {
     }>
     expect(child).toMatchObject({
       registeredShapeTree: TASK_TREE,
-      scopeOfGrant: INTEROP.Inherited,
+      scopeOfGrant: CONTEXT.Inherited,
       hasDataRegistration: TASK_REGISTRATION,
       dataOwner: ALICE,
       inheritsFromGrant: parent.id,

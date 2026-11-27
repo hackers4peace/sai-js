@@ -1,5 +1,5 @@
 import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpavlik/sai-components'
-import { ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
+import { CONTEXT, ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
 import { Client, Connection } from '@temporalio/client'
 import { describe, expect, test } from 'vitest'
 
@@ -377,7 +377,7 @@ describe('approve a need-based access request', () => {
     // the seeded alice-work grants), so the first Project/Task match may
     // belong to different registries
     for (const taskGrant of taskGrants) {
-      expect(taskGrant.scopeOfGrant).toBe('http://www.w3.org/ns/solid/interop#Inherited')
+      expect(taskGrant.scopeOfGrant).toBe(CONTEXT.Inherited)
       const parent = grantsAfter.find((grant) => grant.id === taskGrant.inheritsFromGrant)
       expect(parent).toBeDefined()
       expect(parent!.registeredShapeTree).toBe('https://data/shapetrees/trees/Project')

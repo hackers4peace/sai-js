@@ -10,7 +10,7 @@ import {
   shapeTreeOfTarget,
 } from '@janeirodigital/interop-data-model'
 import type { FinalGrantData, GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
-import { INTEROP, LWS } from '@janeirodigital/interop-utils'
+import { CONTEXT, asScopeTerm } from '@janeirodigital/interop-utils'
 
 /** The data owner encoded in an ODRL policy target. */
 export function firstDataOwner(policy: OdrlPolicy): string {
@@ -30,15 +30,15 @@ export function grantFromPolicy(
   const target = permission?.target
   const instances = policy.permission
     .map((candidate) => candidate.target)
-    .filter((candidate) => candidate.type.includes('http://www.w3.org/ns/odrl/2/Asset'))
+    .filter((candidate) => candidate.type.includes(CONTEXT.Asset))
     .map((candidate) => candidate.source[0])
     .filter(Boolean)
   const registration = registrationOfTarget(target)
   return {
     id,
-    type: [LWS.AccessGrant],
+    type: [CONTEXT.AccessGrant],
     access: [policy],
-    scopeOfGrant: policy.scopeOfGrant ?? envelopeScope,
+    scopeOfGrant: asScopeTerm(policy.scopeOfGrant) ?? asScopeTerm(envelopeScope) ?? '',
     storage: target?.storage ?? '',
     dataOwner: target?.owner ?? '',
     grantedBy: permission?.assigner ?? '',
@@ -80,7 +80,8 @@ export function grantCoversClaim(
     return false
   }
   const needsRegistration =
-    grant.scopeOfGrant !== INTEROP.AllFromAgent && claim.scopeOfGrant !== INTEROP.AllFromAgent
+    asScopeTerm(grant.scopeOfGrant) !== CONTEXT.AllFromAgent &&
+    asScopeTerm(claim.scopeOfGrant) !== CONTEXT.AllFromAgent
   if (needsRegistration && (!grant.hasDataRegistration || !claim.hasDataRegistration)) {
     return false
   }

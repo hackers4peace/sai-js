@@ -6,7 +6,7 @@ import {
 } from '@janeirodigital/interop-authorization-agent'
 import { grantGrantee } from '@janeirodigital/interop-data-model'
 import type { GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
-import { INTEROP, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
+import { CONTEXT, asScopeTerm, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
 import { verifyAccessClaim } from './access-claim.js'
@@ -52,14 +52,16 @@ export interface AccessClaimLookupInput {
 
 /** Narrower grant scopes win when the user has several grants for one storage. */
 const SCOPE_RANK: Record<string, number> = {
-  [INTEROP.SelectedFromRegistry]: 3,
-  [INTEROP.Inherited]: 2,
-  [INTEROP.AllFromRegistry]: 1,
-  [INTEROP.AllFromAgent]: 0,
+  [CONTEXT.SelectedFromRegistry]: 3,
+  [CONTEXT.Inherited]: 2,
+  [CONTEXT.AllFromRegistry]: 1,
+  [CONTEXT.AllFromAgent]: 0,
 }
 
 function grantEdgeRank(batch: Array<GrantData>): number {
-  return Math.max(...batch.map((grant) => SCOPE_RANK[grant.scopeOfGrant] ?? -1))
+  return Math.max(
+    ...batch.map((grant) => SCOPE_RANK[asScopeTerm(grant.scopeOfGrant) ?? grant.scopeOfGrant] ?? -1)
+  )
 }
 
 /**
@@ -68,7 +70,7 @@ function grantEdgeRank(batch: Array<GrantData>): number {
  * holds it, so it cannot back the storage-scoped read of a registration.
  */
 function isRegistrationLevelEdge(batch: Array<GrantData>): boolean {
-  return batch.some((grant) => grant.scopeOfGrant !== INTEROP.SelectedFromRegistry)
+  return batch.some((grant) => asScopeTerm(grant.scopeOfGrant) !== CONTEXT.SelectedFromRegistry)
 }
 
 /**

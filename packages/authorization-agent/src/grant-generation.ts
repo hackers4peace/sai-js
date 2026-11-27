@@ -17,13 +17,15 @@ import type {
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 
 import {
+  CONTEXT,
   INTEROP,
-  LWS,
+  asAccessModeTerm,
+  asScopeTerm,
   mintResource,
   loader,
   requireLwsStorageRoot,
 } from '@janeirodigital/interop-utils'
-import type { WhatwgFetch } from '@janeirodigital/interop-utils'
+import type { ScopeOfGrantTerm, WhatwgFetch } from '@janeirodigital/interop-utils'
 
 import {
   findInheritingAuthorizations,
@@ -56,21 +58,21 @@ export async function* dataInstanceIrisForGrant(
   transport: SparqlTransport,
   fetch: WhatwgFetch
 ): AsyncIterable<string> {
-  switch (grant.scopeOfGrant) {
-    case INTEROP.AllFromRegistry: {
+  switch (asScopeTerm(grant.scopeOfGrant)) {
+    case CONTEXT.AllFromRegistry: {
       const registration = await getDataRegistration(transport, grant.hasDataRegistration)
       for (const id of registration.contains) {
         yield id
       }
       break
     }
-    case INTEROP.SelectedFromRegistry: {
+    case CONTEXT.SelectedFromRegistry: {
       for (const id of grant.hasDataInstance ?? []) {
         yield id
       }
       break
     }
-    case INTEROP.Inherited: {
+    case CONTEXT.Inherited: {
       const parentGrant = await getAccessGrant(transport, grant.inheritsFromGrant!)
       for await (const parentId of dataInstanceIrisForGrant(parentGrant, transport, fetch)) {
         yield* await getChildInstanceIris(parentGrant, parentId, grant.registeredShapeTree, fetch)
@@ -153,12 +155,12 @@ async function generateChildDelegatedGrantData(
 
     const storage = childSourceGrant.storage
     const hasDataRegistration = childSourceGrant.hasDataRegistration
-    const scopeOfGrant = INTEROP.Inherited
+    const scopeOfGrant = CONTEXT.Inherited
     const sourceActions = grantAccessModes(childSourceGrant)
     const childGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
     const childData: GrantData = {
       id: childGrantIri,
-      type: [LWS.AccessGrant],
+      type: [CONTEXT.AccessGrant],
       storage,
       access: grantAccess({
         scopeOfGrant,
@@ -168,7 +170,9 @@ async function generateChildDelegatedGrantData(
         owner: childSourceGrant.dataOwner,
         assigner: data.grantedBy,
         assignee: grantee,
-        actions: childAuthorization.accessMode.filter((mode) => sourceActions.includes(mode)),
+        actions: childAuthorization.accessMode
+          .map((mode) => asAccessModeTerm(mode) ?? mode)
+          .filter((mode) => sourceActions.includes(mode)),
       }),
       grantedBy: data.grantedBy,
       dataOwner: childSourceGrant.dataOwner,
@@ -334,15 +338,15 @@ async function generateDelegatedAccessGrants(
         deps,
         transport
       )
-      const scope: string =
-        data.scopeOfAuthorization === INTEROP.SelectedFromRegistry ||
-        sourceGrant.scopeOfGrant === INTEROP.SelectedFromRegistry
-          ? INTEROP.SelectedFromRegistry
-          : INTEROP.AllFromRegistry
+      const scope: ScopeOfGrantTerm =
+        asScopeTerm(data.scopeOfAuthorization) === CONTEXT.SelectedFromRegistry ||
+        asScopeTerm(sourceGrant.scopeOfGrant) === CONTEXT.SelectedFromRegistry
+          ? CONTEXT.SelectedFromRegistry
+          : CONTEXT.AllFromRegistry
       const storage = sourceGrant.storage
       const hasDataRegistration = sourceGrant.hasDataRegistration
       const hasDataInstance =
-        scope === INTEROP.SelectedFromRegistry
+        scope === CONTEXT.SelectedFromRegistry
           ? data.hasDataInstance?.length
             ? [...data.hasDataInstance]
             : [...(sourceGrant.hasDataInstance ?? [])]
@@ -350,7 +354,7 @@ async function generateDelegatedAccessGrants(
       const sourceActions = grantAccessModes(sourceGrant)
       const grant: GrantData = {
         id: regularGrantIri,
-        type: [LWS.AccessGrant],
+        type: [CONTEXT.AccessGrant],
         storage,
         access: grantAccess({
           scopeOfGrant: scope,
@@ -361,7 +365,9 @@ async function generateDelegatedAccessGrants(
           owner: sourceGrant.dataOwner,
           assigner: data.grantedBy,
           assignee: grantee,
-          actions: data.accessMode.filter((mode) => sourceActions.includes(mode)),
+          actions: data.accessMode
+            .map((mode) => asAccessModeTerm(mode) ?? mode)
+            .filter((mode) => sourceActions.includes(mode)),
         }),
         grantedBy: data.grantedBy,
         dataOwner: sourceGrant.dataOwner,
@@ -402,11 +408,11 @@ async function generateChildSourceGrantData(
       continue
     }
 
-    const scopeOfGrant = INTEROP.Inherited
+    const scopeOfGrant = CONTEXT.Inherited
     const hasDataRegistration = dataRegistration.id
     const childData: FinalGrantData = {
       id: childGrantIri,
-      type: [LWS.AccessGrant],
+      type: [CONTEXT.AccessGrant],
       storage: dataStorageIri,
       access: grantAccess({
         scopeOfGrant,
@@ -492,15 +498,15 @@ async function generateSourceAccessGrants(
       transport
     )
 
-    let scopeOfGrant: string = INTEROP.AllFromRegistry
-    if (data.scopeOfAuthorization === INTEROP.SelectedFromRegistry) {
-      scopeOfGrant = INTEROP.SelectedFromRegistry
+    let scopeOfGrant: ScopeOfGrantTerm = CONTEXT.AllFromRegistry
+    if (asScopeTerm(data.scopeOfAuthorization) === CONTEXT.SelectedFromRegistry) {
+      scopeOfGrant = CONTEXT.SelectedFromRegistry
     }
     const storage = await requireLwsStorageRoot(podUrl, deps.fetch)
     const hasDataRegistration = matchingRegistration.id
     const grant: FinalGrantData = {
       id: regularGrantIri,
-      type: [LWS.AccessGrant],
+      type: [CONTEXT.AccessGrant],
       storage,
       access: grantAccess({
         scopeOfGrant,

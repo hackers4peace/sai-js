@@ -1,4 +1,4 @@
-import { frameNode, selectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
 /** The embedded access need group of a need-based access request — the
@@ -36,6 +36,21 @@ export interface NeedBasedAccessRequestData {
  * a single `rdf:type` frames as a scalar, so `type` goes through the
  * array-form.
  */
+type FramedAccessNeedGroup = {
+  id: string
+  type?: Array<string>
+  hasAccessNeed?: Array<unknown>
+}
+
+type FramedAccessRequest = {
+  id: string
+  type?: Array<string>
+  grantee?: string
+  grantedBy?: string
+  dataOwner?: string
+  hasAccessNeedGroup?: FramedAccessNeedGroup
+}
+
 const NEED_BASED_ACCESS_REQUEST_TERMS = [
   'grantee',
   'grantedBy',
@@ -43,8 +58,17 @@ const NEED_BASED_ACCESS_REQUEST_TERMS = [
   'hasAccessNeedGroup',
 ] as const
 
+const ACCESS_NEED_GROUP_TERMS = ['type', 'hasAccessNeed'] as const
+
+const EMPTY_GROUP: NeedBasedAccessRequestGroup = { id: '', type: [], hasAccessNeed: [] }
+
+function framedGroup(group: FramedAccessNeedGroup): NeedBasedAccessRequestGroup {
+  const node = projectNode(group, ACCESS_NEED_GROUP_TERMS)
+  return { ...node, hasAccessNeed: node.hasAccessNeed ?? [] }
+}
+
 export async function fromJsonLd(doc: unknown, id: string): Promise<NeedBasedAccessRequestData> {
-  const node = await frameNode(doc, dataModelContext, id, {
+  const framed = (await frameNode(doc, dataModelContext, id, {
     hasAccessNeedGroup: {
       '@embed': '@always',
       hasAccessNeed: {
@@ -52,23 +76,15 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<NeedBasedAcc
         hasInheritingNeed: { '@embed': '@always' },
       },
     },
-  })
-  const selected = selectNode(node, NEED_BASED_ACCESS_REQUEST_TERMS)
-  const group = selected.hasAccessNeedGroup as unknown as Record<string, unknown> | undefined
+  })) as unknown as FramedAccessRequest
+  const node = projectNode(framed, NEED_BASED_ACCESS_REQUEST_TERMS)
   return {
-    id,
-    type: node.type ?? [],
-    grantee: node.grantee as string,
-    grantedBy: node.grantedBy as string,
-    dataOwner: node.dataOwner as string,
-    hasAccessNeedGroup: group
-      ? {
-          id: group.id as string,
-          type: (group.type as Array<string> | undefined) ?? [],
-          // the deep frame EMBEDS the need nodes (children incl. inherited
-          // children ride the graph) — pass them through, not as IRI strings
-          hasAccessNeed: (group.hasAccessNeed as Array<unknown> | undefined) ?? [],
-        }
-      : { id: '', type: [], hasAccessNeed: [] },
+    ...node,
+    grantee: node.grantee ?? '',
+    grantedBy: node.grantedBy ?? '',
+    dataOwner: node.dataOwner ?? '',
+    hasAccessNeedGroup: node.hasAccessNeedGroup
+      ? framedGroup(node.hasAccessNeedGroup)
+      : { ...EMPTY_GROUP },
   }
 }

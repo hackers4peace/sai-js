@@ -32,7 +32,7 @@ const loadShapeTree = loader(ShapeTree.fromJsonLd)
 const loadClientIdDocument = loader(ClientIdDocument.fromJsonLd)
 const loadNeedBasedAccessRequest = loader(AccessRequest.fromJsonLd)
 
-import { INTEROP, loader, pickLanguage } from '@janeirodigital/interop-utils'
+import { CONTEXT, INTEROP, asScopeTerm, loader, pickLanguage } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 import type { AuthorizationList } from '@janeirodigital/sai-api-messages'
 import {
@@ -195,7 +195,7 @@ async function findSocialAgentDataRegistrations(
     for (const accessNeed of accessNeedGroup.accessNeeds) {
       if (
         accessGrant.registeredShapeTree === accessNeed.registeredShapeTree &&
-        accessGrant.scopeOfGrant !== INTEROP.Inherited // TODO clarify case when this could happen
+        asScopeTerm(accessGrant.scopeOfGrant) !== CONTEXT.Inherited // TODO clarify case when this could happen
       ) {
         dataRegistrations.push({
           id: IRI.make(accessGrant.hasDataRegistration),
@@ -207,7 +207,7 @@ async function findSocialAgentDataRegistrations(
           // set on SelectedFromRegistry grants (empty [] otherwise, which is
           // truthy and used to make the AllFromRegistry count silently 0).
           count:
-            accessGrant.scopeOfGrant === INTEROP.SelectedFromRegistry
+            asScopeTerm(accessGrant.scopeOfGrant) === CONTEXT.SelectedFromRegistry
               ? (accessGrant.hasDataInstance?.length ?? 0)
               : (
                   await dataRegistrationContains(

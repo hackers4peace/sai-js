@@ -1,4 +1,11 @@
-import { INTEROP, LWS, ODRL, discoverAuthorizationAgent } from '@janeirodigital/interop-utils'
+import {
+  CONTEXT,
+  INTEROP,
+  LWS,
+  ODRL,
+  asAccessModeTerm,
+  discoverAuthorizationAgent,
+} from '@janeirodigital/interop-utils'
 import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint'
 
 import type { VerifiedAccessClaim } from './access-claim.js'
@@ -163,14 +170,18 @@ export class AdminImpersonationAuthority implements AdminImpersonationRequestAut
 
   /** Keep the claim's target/scope and drop every action but `read`. */
   private async narrowToRead(claim: VerifiedAccessClaim): Promise<VerifiedAccessClaim> {
-    if (!claim.access.every((policy) => claimActions(policy).includes(ODRL.read))) {
+    if (
+      !claim.access.every((policy) =>
+        claimActions(policy).some((action) => asAccessModeTerm(action) === CONTEXT.read)
+      )
+    ) {
       throw new AdminImpersonationDenied(
         `${claim.storage} is not readable with ${claim.assignees.join(', ')}.`
       )
     }
     const narrowed = claim.access.map((policy) => ({
       ...(policy as Record<string, unknown>),
-      action: [ODRL.read],
+      action: [CONTEXT.read],
     }))
     return verifyAccessClaim(narrowed, claim.context, claim.storage)
   }

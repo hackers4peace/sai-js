@@ -10,7 +10,7 @@ const loadGrant = loader(Grant.fromJsonLd)
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
 const loadDataRegistration = loader(DataRegistration.fromJsonLd)
 
-import { INTEROP, loader } from '@janeirodigital/interop-utils'
+import { CONTEXT, asScopeTerm, loader } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
 
 /**
@@ -42,21 +42,21 @@ export async function* getDataInstanceIterator(
   grant: GrantData,
   fetch: WhatwgFetch
 ): AsyncIterable<string> {
-  switch (grant.scopeOfGrant) {
-    case INTEROP.AllFromRegistry: {
+  switch (asScopeTerm(grant.scopeOfGrant)) {
+    case CONTEXT.AllFromRegistry: {
       const registration = await loadDataRegistration(grant.hasDataRegistration, fetch)
       for (const id of registration.contains) {
         yield id
       }
       break
     }
-    case INTEROP.SelectedFromRegistry: {
+    case CONTEXT.SelectedFromRegistry: {
       for (const id of grant.hasDataInstance ?? []) {
         yield id
       }
       break
     }
-    case INTEROP.Inherited: {
+    case CONTEXT.Inherited: {
       const parentGrant = await loadGrant(grant.inheritsFromGrant!, fetch)
       for await (const parentId of getDataInstanceIterator(parentGrant, fetch)) {
         yield* await getChildInstanceIris(parentGrant, parentId, grant.registeredShapeTree, fetch)

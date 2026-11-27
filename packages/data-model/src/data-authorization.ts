@@ -1,6 +1,22 @@
-import { frameNode, selectNode, withContext } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode, withContext } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
+
+type FramedDataAuthorization = {
+  id?: string
+  type?: Array<string>
+  grantee?: string
+  grantedBy?: string
+  registeredShapeTree?: string
+  scopeOfAuthorization?: string
+  dataOwner?: string
+  hasDataRegistration?: string
+  satisfiesAccessNeed?: string
+  inheritsFromAuthorization?: string
+  accessMode?: Array<string>
+  hasDataInstance?: Array<string>
+  hasInheritingAuthorization?: Array<string>
+}
 
 export type DataAuthorizationId = {
   id?: string
@@ -38,13 +54,19 @@ const DATA_AUTHORIZATION_TERMS = [
   'accessMode',
   'hasDataInstance',
   'hasInheritingAuthorization',
-]
+] as const
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<DataAuthorizationData> {
-  return selectNode(
-    await frameNode(doc, dataModelContext, id),
-    DATA_AUTHORIZATION_TERMS
-  ) as unknown as DataAuthorizationData
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedDataAuthorization
+  const node = projectNode(framed, DATA_AUTHORIZATION_TERMS)
+  return {
+    ...node,
+    grantee: node.grantee ?? '',
+    grantedBy: node.grantedBy ?? '',
+    registeredShapeTree: node.registeredShapeTree ?? '',
+    scopeOfAuthorization: node.scopeOfAuthorization ?? '',
+    accessMode: node.accessMode ?? [],
+  }
 }
 
 export function toJsonLd(data: FinalDataAuthorizationData): Record<string, unknown> {

@@ -6,7 +6,7 @@ import {
   frameDataInstanceFromDoc,
 } from '@janeirodigital/interop-data-model'
 import type { GrantData, ShapeTreeData } from '@janeirodigital/interop-data-model'
-import { INTEROP, fetchJsonLd, loader } from '@janeirodigital/interop-utils'
+import { CONTEXT, asScopeTerm, fetchJsonLd, loader } from '@janeirodigital/interop-utils'
 
 import type { ResolvedContext } from './Context.js'
 import { getReciprocalGrants, sparqlTransportFor } from './queries/org.js'
@@ -146,18 +146,18 @@ export async function* peerInstanceIris(
   ctx: ResolvedContext,
   accessGrant: GrantData
 ): AsyncIterable<string> {
-  switch (accessGrant.scopeOfGrant) {
-    case INTEROP.AllFromRegistry:
+  switch (asScopeTerm(accessGrant.scopeOfGrant)) {
+    case CONTEXT.AllFromRegistry:
       yield* await dataRegistrationContains(
         ctx,
         accessGrant.storage,
         accessGrant.hasDataRegistration
       )
       break
-    case INTEROP.SelectedFromRegistry:
+    case CONTEXT.SelectedFromRegistry:
       yield* accessGrant.hasDataInstance ?? []
       break
-    case INTEROP.Inherited: {
+    case CONTEXT.Inherited: {
       // the parent grant lives in the peer's registry — refetched from the
       // grant's storage (SAPI supports one level of inheritance today)
       const parentGrant = await Grant.fromJsonLd(

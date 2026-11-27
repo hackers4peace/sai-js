@@ -1,7 +1,16 @@
-import { frameNode, opt } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
+
+type FramedSocialAgentInvitation = {
+  id: string
+  type?: Array<string>
+  capabilityUrl?: string
+  label?: LanguageMap
+  note?: string
+  registeredAgent?: string
+}
 
 export type SocialAgentInvitationId = {
   id: string
@@ -15,6 +24,8 @@ export type SocialAgentInvitationData = SocialAgentInvitationId & {
   note?: string
   registeredAgent?: string
 }
+
+const SOCIAL_AGENT_INVITATION_TERMS = ['capabilityUrl', 'label', 'note', 'registeredAgent'] as const
 
 // ──────────────────────────
 // Read path: JSON-LD → SocialAgentInvitationData
@@ -31,13 +42,15 @@ export type SocialAgentInvitationData = SocialAgentInvitationId & {
  * to a string array.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<SocialAgentInvitationData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(
+    doc,
+    dataModelContext,
+    id
+  )) as unknown as FramedSocialAgentInvitation
+  const node = projectNode(framed, SOCIAL_AGENT_INVITATION_TERMS)
   return {
-    id,
-    type: node.type ?? [],
-    capabilityUrl: node.capabilityUrl as string,
-    label: (node.label as LanguageMap | undefined) ?? {},
-    note: opt(node, 'note'),
-    registeredAgent: opt(node, 'registeredAgent'),
+    ...node,
+    capabilityUrl: node.capabilityUrl ?? '',
+    label: node.label ?? {},
   }
 }

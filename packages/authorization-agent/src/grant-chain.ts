@@ -1,6 +1,6 @@
 import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
-import { INTEROP } from '@janeirodigital/interop-utils'
+import { CONTEXT, asAccessModeTerm, asScopeTerm } from '@janeirodigital/interop-utils'
 
 /**
  * Grant chain validity — the C1 predicate (revocation workstream).
@@ -35,12 +35,12 @@ import { INTEROP } from '@janeirodigital/interop-utils'
  */
 
 const SCOPE_ORDER: Record<string, number> = {
-  [INTEROP.All]: 4,
-  [INTEROP.AllFromAgent]: 3,
-  [INTEROP.AllFromRole]: 3,
-  [INTEROP.AllFromRegistry]: 2,
-  [INTEROP.SelectedFromRegistry]: 1,
-  [INTEROP.Inherited]: 0,
+  [CONTEXT.All]: 4,
+  [CONTEXT.AllFromAgent]: 3,
+  [CONTEXT.AllFromRole]: 3,
+  [CONTEXT.AllFromRegistry]: 2,
+  [CONTEXT.SelectedFromRegistry]: 1,
+  [CONTEXT.Inherited]: 0,
 }
 
 /**
@@ -59,25 +59,27 @@ function upstreamKey(dataOwner: string, grantee: string | undefined, grant: Gran
  * (or a broader scope), but it never covers a non-inherited scope.
  */
 export function scopeCovers(upstream: string, downstream: string): boolean {
-  if (upstream === downstream) {
+  const upTerm = asScopeTerm(upstream) ?? upstream
+  const downTerm = asScopeTerm(downstream) ?? downstream
+  if (upTerm === downTerm) {
     return true
   }
-  if (upstream === INTEROP.All) {
+  if (upTerm === CONTEXT.All) {
     return true
   }
-  const up = SCOPE_ORDER[upstream]
-  const down = SCOPE_ORDER[downstream]
+  const up = SCOPE_ORDER[upTerm]
+  const down = SCOPE_ORDER[downTerm]
   if (up === undefined || down === undefined) {
     return false
   }
 
-  if (downstream === INTEROP.Inherited) {
+  if (downTerm === CONTEXT.Inherited) {
     // a child grant is a subset of its parent's registration; a same-shape
     // AllFromRegistry source grant covers it, a SelectedFromRegistry set does
     // not (we cannot prove the child instances are in the selection)
-    return up >= SCOPE_ORDER[INTEROP.AllFromRegistry]
+    return up >= SCOPE_ORDER[CONTEXT.AllFromRegistry]
   }
-  if (upstream === INTEROP.Inherited) {
+  if (upTerm === CONTEXT.Inherited) {
     return false
   }
   // AllFromAgent / AllFromRole are broader than a single registration; the
@@ -98,8 +100,8 @@ export function accessModesCover(
   if (required.length === 0) {
     return false
   }
-  const available = new Set(upstream ?? [])
-  return required.every((mode) => available.has(mode))
+  const available = new Set((upstream ?? []).map((mode) => asAccessModeTerm(mode) ?? mode))
+  return required.every((mode) => available.has(asAccessModeTerm(mode) ?? mode))
 }
 
 /**
@@ -119,15 +121,16 @@ export function selectedInstancesCover(
   if (requested.length === 0) {
     return true
   }
+  const scope = asScopeTerm(scopeOfGrant) ?? scopeOfGrant
   if (
-    scopeOfGrant === INTEROP.All ||
-    scopeOfGrant === INTEROP.AllFromAgent ||
-    scopeOfGrant === INTEROP.AllFromRole ||
-    scopeOfGrant === INTEROP.AllFromRegistry
+    scope === CONTEXT.All ||
+    scope === CONTEXT.AllFromAgent ||
+    scope === CONTEXT.AllFromRole ||
+    scope === CONTEXT.AllFromRegistry
   ) {
     return true
   }
-  if (scopeOfGrant !== INTEROP.SelectedFromRegistry) {
+  if (scope !== CONTEXT.SelectedFromRegistry) {
     return false
   }
   const available = new Set(hasDataInstance ?? [])
@@ -136,7 +139,7 @@ export function selectedInstancesCover(
 
 /** For a selected downstream scope, the upstream must include the instances. */
 export function instancesCover(upstream: GrantData, downstream: GrantData): boolean {
-  if (downstream.scopeOfGrant !== INTEROP.SelectedFromRegistry) {
+  if (asScopeTerm(downstream.scopeOfGrant) !== CONTEXT.SelectedFromRegistry) {
     return true
   }
   return selectedInstancesCover(
@@ -156,8 +159,8 @@ export function grantCovers(upstream: GrantData, downstream: GrantData): boolean
     return false
   }
   const needsRegistration =
-    upstream.scopeOfGrant !== INTEROP.AllFromAgent &&
-    downstream.scopeOfGrant !== INTEROP.AllFromAgent
+    asScopeTerm(upstream.scopeOfGrant) !== CONTEXT.AllFromAgent &&
+    asScopeTerm(downstream.scopeOfGrant) !== CONTEXT.AllFromAgent
   if (needsRegistration && (!upstream.hasDataRegistration || !downstream.hasDataRegistration)) {
     return false
   }
@@ -182,7 +185,7 @@ export function grantCovers(upstream: GrantData, downstream: GrantData): boolean
  */
 export function parentCoversChild(parent: GrantData, child: GrantData): boolean {
   return (
-    child.scopeOfGrant === INTEROP.Inherited &&
+    asScopeTerm(child.scopeOfGrant) === CONTEXT.Inherited &&
     parent.dataOwner === child.dataOwner &&
     parent.grantedBy === child.grantedBy &&
     grantGrantee(parent) === grantGrantee(child) &&

@@ -1,6 +1,15 @@
-import { frameNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
+
+type FramedApplicationRegistration = {
+  id: string
+  type?: Array<string>
+  registeredAgent?: string
+  hasDataGrant?: Array<string>
+}
+
+const APPLICATION_REGISTRATION_TERMS = ['registeredAgent', 'hasDataGrant'] as const
 
 export type ApplicationRegistrationId = {
   id: string
@@ -26,12 +35,16 @@ export type ApplicationId = {
  * or flattened form. `granted` is derived from the presence of access grants.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<ApplicationRegistrationData> {
-  const node = await frameNode(doc, dataModelContext, id)
-  const hasDataGrant = (node.hasDataGrant as Array<string> | undefined) ?? []
+  const framed = (await frameNode(
+    doc,
+    dataModelContext,
+    id
+  )) as unknown as FramedApplicationRegistration
+  const node = projectNode(framed, APPLICATION_REGISTRATION_TERMS)
+  const hasDataGrant = node.hasDataGrant ?? []
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    registeredAgent: node.registeredAgent as string,
+    ...node,
+    registeredAgent: node.registeredAgent ?? '',
     hasDataGrant,
     granted: hasDataGrant.length > 0,
   }

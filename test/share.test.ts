@@ -1,7 +1,7 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
 import { Grant, getAccessGrantIris, grantAccessModes } from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
-import { INTEROP, loader } from '@janeirodigital/interop-utils'
+import { CONTEXT, loader } from '@janeirodigital/interop-utils'
 const loadGrant = loader(Grant.fromJsonLd)
 
 import { describe, expect, test } from 'vitest'
@@ -73,8 +73,8 @@ describe('share resource', () => {
         grant.hasDataInstance?.includes(resource)
     )
     expect(sharedGrant).toBeDefined()
-    expect(sharedGrant!.scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
-    expect(grantAccessModes(sharedGrant!)).toEqual([readMode])
+    expect(sharedGrant!.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
+    expect(grantAccessModes(sharedGrant!)).toEqual([CONTEXT.read])
 
     // "who has access" (GetResource) reports the new DIRECT grantee, and keeps
     // the seeded ROLE-granted authorization (the `Test` role, no members)

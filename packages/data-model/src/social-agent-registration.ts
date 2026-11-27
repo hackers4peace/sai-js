@@ -1,8 +1,19 @@
-import { frameNode, opt } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import type { AgentRegistrationId } from './agent-registration.ts'
 import { dataModelContext } from './context.ts'
+
+type FramedSocialAgentRegistration = {
+  id: string
+  type?: Array<string>
+  registeredAgent?: string
+  hasDataGrant?: Array<string>
+  hasAdminGrant?: Array<string>
+  label?: LanguageMap
+  note?: string
+  reciprocalRegistration?: string
+}
 
 export type SocialAgentRegistrationId = AgentRegistrationId
 
@@ -16,6 +27,15 @@ export type SocialAgentRegistrationData = SocialAgentRegistrationId & {
   note?: string
   reciprocalRegistration?: string
 }
+
+const SOCIAL_AGENT_REGISTRATION_TERMS = [
+  'registeredAgent',
+  'hasDataGrant',
+  'hasAdminGrant',
+  'label',
+  'note',
+  'reciprocalRegistration',
+] as const
 
 export type SocialAgentId = {
   id: string
@@ -38,16 +58,16 @@ export type SocialAgentId = {
  * rdf:type (from framing) to a string array.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<SocialAgentRegistrationData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(
+    doc,
+    dataModelContext,
+    id
+  )) as unknown as FramedSocialAgentRegistration
+  const node = projectNode(framed, SOCIAL_AGENT_REGISTRATION_TERMS)
   return {
-    id,
-    type: node.type ?? [],
-    registeredAgent: node.registeredAgent as string,
-    hasDataGrant: node.hasDataGrant as Array<string>,
-    hasAdminGrant: node.hasAdminGrant as Array<string>,
-    label: (node.label as LanguageMap | undefined) ?? {},
-    note: opt(node, 'note'),
-    reciprocalRegistration: opt(node, 'reciprocalRegistration'),
+    ...node,
+    registeredAgent: node.registeredAgent ?? '',
+    label: node.label ?? {},
   }
 }
 

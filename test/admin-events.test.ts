@@ -4,7 +4,7 @@ import { Grant, grantGrantee } from '@janeirodigital/interop-data-model'
 const loadGrant = loader(Grant.fromJsonLd)
 
 import {
-  INTEROP,
+  CONTEXT,
   discoverAccessResource,
   fetchJsonLd,
   loader,
@@ -294,7 +294,7 @@ async function adminGrantIris(webId: string, grantee: string): Promise<Array<str
   const adminGrants: Array<string> = []
   for (const iri of iris) {
     const grant = await loadGrant(iri, session.fetch)
-    if (grant.type.includes(INTEROP.AdminGrant) && grantGrantee(grant) === grantee) {
+    if (grant.type.includes(CONTEXT.AdminGrant) && grantGrantee(grant) === grantee) {
       adminGrants.push(iri)
     }
   }

@@ -5,7 +5,7 @@ import {
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
 import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
-import { INTEROP, getRegistrySetIri } from '@janeirodigital/interop-utils'
+import { CONTEXT, INTEROP, asScopeTerm, getRegistrySetIri } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import {
@@ -401,8 +401,8 @@ describe('org context — sharing the org’s own data (2.4 write path)', () => 
     expect(sharedGrant).toBeDefined()
     expect(sharedGrant!.dataOwner).toBe(yoyoId)
     expect(sharedGrant!.grantedBy).toBe(yoyoId)
-    expect(sharedGrant!.scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
-    expect(grantAccessModes(sharedGrant!)).toEqual([readMode])
+    expect(sharedGrant!.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
+    expect(grantAccessModes(sharedGrant!)).toEqual([CONTEXT.read])
 
     // the read side agrees: the org context reports the peer as a DIRECT
     // grantee (the grantee-facing replication of these grants is covered by
@@ -564,11 +564,11 @@ describe('org context — authorizing an agent over the org’s data (2.4 write 
       (grant) =>
         grantGrantee(grant) === bobId &&
         grant.hasDataRegistration === projectRegistration &&
-        grant.scopeOfGrant === INTEROP.AllFromRegistry
+        asScopeTerm(grant.scopeOfGrant) === CONTEXT.AllFromRegistry
     )
     expect(projectGrant).toBeDefined()
     expect(projectGrant!.dataOwner).toBe(yoyoId)
     expect(projectGrant!.grantedBy).toBe(yoyoId)
-    expect(grantAccessModes(projectGrant!)).toContain(readMode)
+    expect(grantAccessModes(projectGrant!)).toContain(CONTEXT.read)
   })
 })

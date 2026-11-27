@@ -1,4 +1,4 @@
-import { frameNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 
 import type { ActivityRegistryData } from './activity-registry.ts'
 import type {
@@ -11,6 +11,32 @@ import { dataModelContext } from './context.ts'
 import type { DataRegistryData } from './data-registry.ts'
 import type { GrantRegistryData } from './grant-registry.ts'
 import type { RoleRegistryData } from './role-registry.ts'
+
+type FramedRegistrySet = {
+  id: string
+  type?: Array<string>
+  hasAuthorizationRegistry?: string
+  hasGrantRegistry?: string
+  hasSocialAgentRegistry?: string
+  hasApplicationRegistry?: string
+  hasInvitationRegistry?: string
+  hasRoleRegistry?: string
+  hasDataRegistry?: Array<string>
+  hasActivityRegistry?: string
+  hasAccessRequestRegistry?: string
+}
+
+const REGISTRY_SET_TERMS = [
+  'hasAuthorizationRegistry',
+  'hasGrantRegistry',
+  'hasSocialAgentRegistry',
+  'hasApplicationRegistry',
+  'hasInvitationRegistry',
+  'hasRoleRegistry',
+  'hasDataRegistry',
+  'hasActivityRegistry',
+  'hasAccessRequestRegistry',
+] as const
 
 export type RegistrySetData = {
   id: string
@@ -38,24 +64,20 @@ export type AccessRequestRegistryData = {
  * flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<RegistrySetData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedRegistrySet
+  const node = projectNode(framed, REGISTRY_SET_TERMS)
   return {
-    id,
-    type: node.type ?? [],
-    hasAuthorizationRegistry: { id: node.hasAuthorizationRegistry as string },
-    hasGrantRegistry: { id: node.hasGrantRegistry as string },
-    hasSocialAgentRegistry: { id: node.hasSocialAgentRegistry as string },
-    hasApplicationRegistry: { id: node.hasApplicationRegistry as string },
-    hasInvitationRegistry: { id: node.hasInvitationRegistry as string },
-    hasRoleRegistry: { id: node.hasRoleRegistry as string },
-    hasDataRegistry: ((node.hasDataRegistry as Array<string> | undefined) ?? []).map(
-      (dataRegistryId) => ({ id: dataRegistryId })
-    ),
-    hasActivityRegistry: node.hasActivityRegistry
-      ? { id: node.hasActivityRegistry as string }
-      : undefined,
+    ...node,
+    hasAuthorizationRegistry: { id: node.hasAuthorizationRegistry ?? '' },
+    hasGrantRegistry: { id: node.hasGrantRegistry ?? '' },
+    hasSocialAgentRegistry: { id: node.hasSocialAgentRegistry ?? '' },
+    hasApplicationRegistry: { id: node.hasApplicationRegistry ?? '' },
+    hasInvitationRegistry: { id: node.hasInvitationRegistry ?? '' },
+    hasRoleRegistry: { id: node.hasRoleRegistry ?? '' },
+    hasDataRegistry: (node.hasDataRegistry ?? []).map((dataRegistryId) => ({ id: dataRegistryId })),
+    hasActivityRegistry: node.hasActivityRegistry ? { id: node.hasActivityRegistry } : undefined,
     hasAccessRequestRegistry: node.hasAccessRequestRegistry
-      ? { id: node.hasAccessRequestRegistry as string }
+      ? { id: node.hasAccessRequestRegistry }
       : undefined,
   }
 }

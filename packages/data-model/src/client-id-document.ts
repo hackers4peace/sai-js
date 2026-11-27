@@ -1,6 +1,15 @@
-import { frameNode, selectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
+
+type FramedClientIdDocument = {
+  id: string
+  type?: Array<string>
+  callbackEndpoint?: string
+  hasAccessNeedGroup?: string
+  clientName?: string
+  logoUri?: string
+}
 
 export type ClientIdDocumentId = {
   id: string
@@ -22,8 +31,6 @@ const CLIENT_ID_DOCUMENT_TERMS = [
 ] as const
 
 export async function fromJsonLd(doc: unknown, id: string): Promise<ClientIdDocumentData> {
-  return selectNode(
-    await frameNode(doc, dataModelContext, id),
-    CLIENT_ID_DOCUMENT_TERMS
-  ) as unknown as ClientIdDocumentData
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedClientIdDocument
+  return projectNode(framed, CLIENT_ID_DOCUMENT_TERMS)
 }

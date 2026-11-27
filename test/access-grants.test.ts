@@ -6,7 +6,7 @@ import {
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
 import { grantGrantee, grantAssigner } from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
-import { LWS } from '@janeirodigital/interop-utils'
+import { CONTEXT } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 const aliceId = 'https://id/alice'
@@ -48,7 +48,7 @@ describe('access grant view', () => {
     // wire documents stay in the canonical LWS shape; derived POJO fields are
     // not part of the response
     for (const grant of body) {
-      expect(grant.type).toContain(LWS.AccessGrant)
+      expect(grant.type).toContain(CONTEXT.AccessGrant)
       expect(grant.dataOwner).toBeUndefined()
       expect(grant.grantedBy).toBeUndefined()
       expect(grant.access[0].permission[0].assigner).toBe(acmeId)

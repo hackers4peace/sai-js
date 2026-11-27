@@ -1,6 +1,35 @@
-import { INTEROP, documentValues, frameNode } from '@janeirodigital/interop-utils'
+import {
+  CONTEXT,
+  INTEROP,
+  asAccessNecessityTerm,
+  documentValues,
+  frameNode,
+  projectNode,
+} from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
+
+type FramedAccessNeed = {
+  id: string
+  type?: Array<string>
+  registeredShapeTree?: string
+  inheritsFromNeed?: string
+  hasInheritingNeed?: Array<string>
+  accessMode?: Array<string>
+  required?: string
+  hasDataInstance?: Array<string>
+  hasDataRegistration?: string
+}
+
+const ACCESS_NEED_TERMS = [
+  'registeredShapeTree',
+  'inheritsFromNeed',
+  'hasInheritingNeed',
+  'accessMode',
+  'required',
+  'hasDataInstance',
+  'hasDataRegistration',
+] as const
 
 export type AccessNeedId = {
   id: string
@@ -49,20 +78,15 @@ export type AccessNeedData = AccessNeedId & {
  * boolean (`interop:accessNecessity = interop:AccessRequired`).
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedAccessNeed
+  const node = projectNode(framed, ACCESS_NEED_TERMS)
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    registeredShapeTree: node.registeredShapeTree as string,
-    inheritsFromNeed: node.inheritsFromNeed as string | undefined,
-    hasInheritingNeed: (node.hasInheritingNeed as Array<string> | undefined) ?? [],
-    accessMode: (node.accessMode as Array<string> | undefined) ?? [],
-    required: node.required === INTEROP.AccessRequired,
+    ...node,
+    registeredShapeTree: node.registeredShapeTree ?? '',
+    hasInheritingNeed: node.hasInheritingNeed ?? [],
+    accessMode: node.accessMode ?? [],
+    required: asAccessNecessityTerm(node.required) === CONTEXT.AccessRequired,
     children: [],
     descriptionLanguages: await documentValues(doc, id, INTEROP.usesLanguage),
-    ...(node.hasDataInstance ? { hasDataInstance: node.hasDataInstance as Array<string> } : {}),
-    ...(node.hasDataRegistration
-      ? { hasDataRegistration: node.hasDataRegistration as string }
-      : {}),
   }
 }

@@ -2,10 +2,10 @@ import { ApplicationRegistration, grantAccessModes } from '@janeirodigital/inter
 import type { ApplicationRegistrationData, DataOwnerData } from '@janeirodigital/interop-data-model'
 const loadApplicationRegistration = loader(ApplicationRegistration.fromJsonLd)
 
-import { INTEROP } from '@janeirodigital/interop-utils'
 import {
-  ACCESS_ACTIONS,
+  CONTEXT,
   CachingIdentifierStrategyResolver,
+  asScopeTerm,
   discoverAgentRegistration,
   discoverAuthorizationAgent,
   discoverAuthorizationRedirectEndpoint,
@@ -193,7 +193,7 @@ export class Application {
     if (!grant) {
       throw new Error('No grant found')
     }
-    if (grant.scopeOfGrant === INTEROP.Inherited) {
+    if (asScopeTerm(grant.scopeOfGrant) === CONTEXT.Inherited) {
       throw new Error('Cannot list instances from Inherited grants')
     }
     const list: Array<string> = []
@@ -233,7 +233,7 @@ export class Application {
 
   public async canCreate(resourceServer: string, scope: string): Promise<boolean> {
     const grant = await this.findGrant(resourceServer, scope)
-    return grant ? grantAccessModes(grant).includes(ACCESS_ACTIONS.create) : false
+    return grant ? grantAccessModes(grant).includes(CONTEXT.create) : false
   }
 
   public async canCreateChild(parentId: string, scope: string): Promise<boolean> {
@@ -242,19 +242,19 @@ export class Application {
       throw new Error(`no parent info for ${parentId}`)
     }
     const grant = await this.findGrant(parentInfo.resourceServer, scope)
-    return grant ? grantAccessModes(grant).includes(ACCESS_ACTIONS.create) : false
+    return grant ? grantAccessModes(grant).includes(CONTEXT.create) : false
   }
 
   public async canUpdate(id: string): Promise<boolean> {
     const info = this.getInfo(id)
     const grant = await this.findGrant(info.resourceServer, info.scope)
-    return grant ? grantAccessModes(grant).includes(ACCESS_ACTIONS.modify) : false
+    return grant ? grantAccessModes(grant).includes(CONTEXT.modify) : false
   }
 
   public async canDelete(id: string): Promise<boolean> {
     const info = this.getInfo(id)
     const grant = await this.findGrant(info.resourceServer, info.scope)
-    return grant ? grantAccessModes(grant).includes(ACCESS_ACTIONS.delete) : false
+    return grant ? grantAccessModes(grant).includes(CONTEXT.delete) : false
   }
 
   // TODO: rename to idForNew

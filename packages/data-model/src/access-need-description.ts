@@ -1,10 +1,20 @@
-import { frameNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import type { AccessDescriptionData, AccessDescriptionId } from './access-description.ts'
 import { dataModelContext } from './context.ts'
 
 export type AccessNeedDescriptionId = AccessDescriptionId
+
+type FramedAccessNeedDescription = {
+  id: string
+  type?: Array<string>
+  label?: LanguageMap
+  definition?: LanguageMap
+  hasAccessNeed?: Array<string>
+}
+
+const ACCESS_NEED_DESCRIPTION_TERMS = ['label', 'definition', 'hasAccessNeed'] as const
 
 export type AccessNeedDescriptionData = AccessDescriptionData & {
   hasAccessNeed?: string
@@ -20,12 +30,15 @@ export type AccessNeedDescriptionData = AccessDescriptionData & {
  * or flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedDescriptionData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(
+    doc,
+    dataModelContext,
+    id
+  )) as unknown as FramedAccessNeedDescription
+  const node = projectNode(framed, ACCESS_NEED_DESCRIPTION_TERMS)
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    label: node.label as LanguageMap,
-    definition: node.definition as LanguageMap | undefined,
-    hasAccessNeed: (node.hasAccessNeed as Array<string> | undefined)?.[0],
+    ...node,
+    label: node.label ?? {},
+    hasAccessNeed: node.hasAccessNeed?.[0],
   }
 }

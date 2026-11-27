@@ -1,4 +1,4 @@
-import { frameNode, opt } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
@@ -8,6 +8,13 @@ import { dataModelContext } from './context.ts'
 // ──────────────────────────
 
 /** Identity of a WebID profile document. */
+type FramedWebIdProfile = {
+  id: string
+  type?: Array<string>
+  label?: LanguageMap
+  oidcIssuer?: string
+}
+
 export type WebIdProfileId = {
   id: string
   /** rdf:type IRIs — captured from framing on read */
@@ -21,6 +28,8 @@ export type WebIdProfileData = WebIdProfileId & {
   oidcIssuer?: string
 }
 
+const WEB_ID_PROFILE_TERMS = ['label', 'oidcIssuer'] as const
+
 // ──────────────────────────
 // Read path: JSON-LD → WebIdProfileData
 // ──────────────────────────
@@ -31,11 +40,6 @@ export type WebIdProfileData = WebIdProfileId & {
  * flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<WebIdProfileData> {
-  const node = await frameNode(doc, dataModelContext, id)
-  return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    label: node.label as LanguageMap | undefined,
-    oidcIssuer: opt(node, 'oidcIssuer'),
-  }
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedWebIdProfile
+  return projectNode(framed, WEB_ID_PROFILE_TERMS)
 }

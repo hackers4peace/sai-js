@@ -1,10 +1,20 @@
-import { frameNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import type { AccessDescriptionData, AccessDescriptionId } from './access-description.ts'
 import { dataModelContext } from './context.ts'
 
 export type AccessNeedGroupDescriptionId = AccessDescriptionId
+
+type FramedAccessNeedGroupDescription = {
+  id: string
+  type?: Array<string>
+  label?: LanguageMap
+  definition?: LanguageMap
+  hasAccessNeedGroup?: string
+}
+
+const ACCESS_NEED_GROUP_DESCRIPTION_TERMS = ['label', 'definition', 'hasAccessNeedGroup'] as const
 
 export type AccessNeedGroupDescriptionData = AccessDescriptionData & {
   // TODO handle missing value
@@ -24,12 +34,15 @@ export async function fromJsonLd(
   doc: unknown,
   id: string
 ): Promise<AccessNeedGroupDescriptionData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(
+    doc,
+    dataModelContext,
+    id
+  )) as unknown as FramedAccessNeedGroupDescription
+  const node = projectNode(framed, ACCESS_NEED_GROUP_DESCRIPTION_TERMS)
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    label: node.label as LanguageMap,
-    definition: node.definition as LanguageMap | undefined,
-    hasAccessNeedGroup: node.hasAccessNeedGroup as string,
+    ...node,
+    label: node.label ?? {},
+    hasAccessNeedGroup: node.hasAccessNeedGroup ?? '',
   }
 }

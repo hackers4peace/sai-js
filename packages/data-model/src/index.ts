@@ -56,6 +56,8 @@ export type { AccessNeedData, AccessNeedId } from './access-need.ts'
 export * as AccessNeed from './access-need.ts'
 export type { AccessNeedGroupData, AccessNeedGroupId } from './access-need-group.ts'
 export * as AccessNeedGroup from './access-need-group.ts'
+export { CONTEXT, CONTEXT_IRI } from '@janeirodigital/interop-utils'
+export type { ContextTerm } from '@janeirodigital/interop-utils'
 export { acrContext, dataModelContext, grantContext, lwsGrantContext } from './context.ts'
 export type {
   GrantData,

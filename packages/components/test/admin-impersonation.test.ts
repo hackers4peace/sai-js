@@ -1,4 +1,4 @@
-import { ODRL, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
+import { CONTEXT, ODRL, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 import { describe, expect, test, vi } from 'vitest'
 
 import type { VerifiedAccessClaim } from '../src/access-claim.js'
@@ -81,7 +81,7 @@ describe('AdminImpersonationAuthority', () => {
     expect(claim.storage).toBe(PEER_STORAGE)
     expect(claim.assignees).toEqual([ORG])
     const actions = claim.access.map((policy) => (policy as { action: Array<string> }).action)
-    expect(actions).toEqual([[ODRL.read]])
+    expect(actions).toEqual([[CONTEXT.read]])
     // the organization is the claim subject, not the admin
     expect(claimValidator.find).toHaveBeenCalledWith({
       subject: ORG,

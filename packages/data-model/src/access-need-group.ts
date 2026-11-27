@@ -1,7 +1,15 @@
-import { frameNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 
 import type { AccessNeedData } from './access-need.ts'
 import { dataModelContext } from './context.ts'
+
+type FramedAccessNeedGroup = {
+  id: string
+  type?: Array<string>
+  hasAccessNeed?: Array<string>
+}
+
+const ACCESS_NEED_GROUP_TERMS = ['hasAccessNeed'] as const
 
 export type AccessNeedGroupId = {
   id: string
@@ -24,11 +32,11 @@ export type AccessNeedGroupData = AccessNeedGroupId & {
  * flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<AccessNeedGroupData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedAccessNeedGroup
+  const node = projectNode(framed, ACCESS_NEED_GROUP_TERMS)
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    hasAccessNeed: (node.hasAccessNeed as Array<string> | undefined) ?? [],
+    ...node,
+    hasAccessNeed: node.hasAccessNeed ?? [],
     accessNeeds: [],
   }
 }

@@ -1,4 +1,12 @@
-import { ACCESS_ACTIONS, INTEROP, LDP, ODRL, LWS, RDF } from '@janeirodigital/interop-utils'
+import {
+  CONTEXT,
+  ACCESS_ACTIONS,
+  INTEROP,
+  LDP,
+  ODRL,
+  LWS,
+  RDF,
+} from '@janeirodigital/interop-utils'
 import { DataFactory, Store } from 'n3'
 import type { Quad } from 'n3'
 import { describe, expect, test } from 'vitest'
@@ -107,7 +115,7 @@ describe('getReciprocalGrants — batched grantee-side read', () => {
 
     expect(grants.map((grant) => grant.id)).toEqual([G1, G2])
     expect(grants[1].registeredShapeTree).toBe('https://data/shapetrees/trees/Task')
-    expect(grants[0].type).toEqual([LWS.AccessGrant])
+    expect(grants[0].type).toEqual([CONTEXT.AccessGrant])
     expect(grants[0].storage).toBe('https://data/alice/')
     expect(transport.queries).toHaveLength(2)
     expect(transport.queries[0]).toContain(`GRAPH <meta:${RECIPROCAL}>`)

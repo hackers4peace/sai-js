@@ -35,11 +35,12 @@ export const accessClaimTerms = {
   assigner: { '@id': ODRL.assigner, '@type': '@id' },
   assignee: { '@id': ODRL.assignee, '@type': '@id' },
   uid: { '@id': ODRL.uid, '@type': '@id' },
-  profile: { '@id': ODRL.profile, '@type': '@id' },
+  profile: { '@id': ODRL.profile, '@type': '@vocab' },
   owner: { '@id': INTEROP.dataOwner, '@type': '@id' },
   storage: { '@id': LWS.storage, '@type': '@id' },
   registeredShapeTree: { '@id': INTEROP.registeredShapeTree, '@type': '@id' },
   hasDataRegistration: { '@id': INTEROP.hasDataRegistration, '@type': '@id' },
+  scopeOfGrant: { '@id': INTEROP.scopeOfGrant, '@type': '@vocab' },
 } as const
 
 /** Body of the grant/request/access-claim JSON-LD context. */

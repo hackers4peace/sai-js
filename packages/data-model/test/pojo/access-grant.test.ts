@@ -1,4 +1,12 @@
-import { ACCESS_ACTIONS, INTEROP, LWS, ODRL, RDF, toStore } from '@janeirodigital/interop-utils'
+import {
+  CONTEXT,
+  ACCESS_ACTIONS,
+  INTEROP,
+  LWS,
+  ODRL,
+  RDF,
+  toStore,
+} from '@janeirodigital/interop-utils'
 import { DataFactory } from 'n3'
 import { describe, expect, test } from 'vitest'
 
@@ -159,6 +167,6 @@ describe('toJsonLd', () => {
     expect(roundTripped.dataOwner).toBe(DATA_OWNER)
     expect(roundTripped.hasDataRegistration).toBe(REGISTRATION)
     expect(roundTripped.registeredShapeTree).toBe(SHAPE_TREE)
-    expect(roundTripped.access[0].permission[0].action).toEqual([ACCESS_ACTIONS.read])
+    expect(roundTripped.access[0].permission[0].action).toEqual([CONTEXT.read])
   })
 })

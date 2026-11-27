@@ -1,4 +1,4 @@
-import { INTEROP, LWS, ODRL, SAI } from './namespaces.ts'
+import { INTEROP, LWS, ODRL, SAI, SHAPETREES } from './namespaces.ts'
 
 /** URI of the bundled SAI wire context. */
 export const SAI_CONTEXT_URI = 'https://www.w3.org/ns/solid/interop-context/v1'
@@ -57,5 +57,6 @@ export const saiContext = {
     Storage: LWS.Storage,
     DataStorage: SAI.DataStorage,
     RegistryStorage: SAI.RegistryStorage,
+    ShapeTree: SHAPETREES.ShapeTree,
   },
 }

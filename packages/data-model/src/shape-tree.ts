@@ -6,6 +6,7 @@ import {
   expandJsonLd,
   fetchJsonLd,
   frameNode,
+  projectNode,
   withContext,
 } from '@janeirodigital/interop-utils'
 import type { WhatwgFetch } from '@janeirodigital/interop-utils'
@@ -26,6 +27,16 @@ export interface ShapeTreeReference {
 // ──────────────────────────
 
 /** Identity of a shape tree. */
+type FramedShapeTree = {
+  id: string
+  type?: Array<string>
+  shape?: string
+  describesInstance?: string
+  expectsType?: string
+}
+
+const SHAPE_TREE_TERMS = ['shape', 'describesInstance', 'expectsType'] as const
+
 export type ShapeTreeId = {
   id: string
   /** rdf:type IRIs — captured from the document on read (e.g. `[SHAPETREES.ShapeTree]`) */
@@ -104,13 +115,10 @@ function referencePairs(expanded: Array<any>, treeId: string): Array<ShapeTreeRe
  * node-centric frame can't capture either shape.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<ShapeTreeData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedShapeTree
+  const node = projectNode(framed, SHAPE_TREE_TERMS)
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    shape: node.shape as string | undefined,
-    describesInstance: node.describesInstance as string | undefined,
-    expectsType: node.expectsType as string | undefined,
+    ...node,
     descriptionLanguages: await documentValues(doc, id, SHAPETREES.usesLanguage),
     references: referencePairs(await expandedNodes(doc, id), id),
   }

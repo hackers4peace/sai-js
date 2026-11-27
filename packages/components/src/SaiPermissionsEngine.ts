@@ -4,7 +4,11 @@ const loadShapeTree = loader(ShapeTree.fromJsonLd)
 
 import {
   ACCESS_ACTIONS,
+  CONTEXT,
   INTEROP,
+  asAccessModeTerm,
+  asScopeTerm,
+  scopeIri,
   LWS,
   ODRL,
   ODRL_ID_JAG_CONTEXT,
@@ -140,20 +144,21 @@ export class SaiPermissionsEngine implements PolicyEngine {
    * `UnionPermissionReader` and would veto the credential-independent public
    * reader; an absent mode is denied by the LDP authorization by default.
    */
-  private permissionMap(modes: Array<string>): PermissionMap {
+  private permissionMap(rawModes: Array<string>): PermissionMap {
+    const modes = new Set(rawModes.map((mode) => asAccessModeTerm(mode) ?? mode))
     const permissions: PermissionMap = {}
-    if (modes.includes(ACCESS_ACTIONS.create)) {
+    if (modes.has(CONTEXT.create)) {
       permissions[PERMISSIONS.Create] = true
       // LDP POST on a container asks for Append, which is separate from Create.
       permissions[PERMISSIONS.Append] = true
     }
-    if (modes.includes(ACCESS_ACTIONS.read)) {
+    if (modes.has(CONTEXT.read)) {
       permissions[PERMISSIONS.Read] = true
     }
-    if (modes.includes(ACCESS_ACTIONS.modify)) {
+    if (modes.has(CONTEXT.modify)) {
       permissions[PERMISSIONS.Modify] = true
     }
-    if (modes.includes(ACCESS_ACTIONS.delete)) {
+    if (modes.has(CONTEXT.delete)) {
       permissions[PERMISSIONS.Delete] = true
     }
     return permissions
@@ -324,7 +329,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
     identity?: GrantIdentity
   ): Promise<string | undefined> {
     let registrationId = id
-    const selected = scope === INTEROP.SelectedFromRegistry
+    const selected = asScopeTerm(scope) === CONTEXT.SelectedFromRegistry
     if (selected) {
       const resolved = await this.getRegistrationId(id)
       if (!resolved) {
@@ -338,7 +343,7 @@ export class SaiPermissionsEngine implements PolicyEngine {
         ?s
           <${LWS.access}> ?policy .
         ?policy
-          <${INTEROP.scopeOfGrant}> <${scope}> ;
+          <${INTEROP.scopeOfGrant}> <${scopeIri(scope)}> ;
           <${ODRL.permission}> ?permission .
         ?permission <${ODRL.target}> ?target .
         ${

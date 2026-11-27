@@ -1,4 +1,4 @@
-import { frameNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode } from '@janeirodigital/interop-utils'
 import type { LanguageMap } from '@janeirodigital/interop-utils'
 
 import { dataModelContext } from './context.ts'
@@ -8,6 +8,13 @@ import { dataModelContext } from './context.ts'
 // ──────────────────────────
 
 /** Identity of a shape tree description resource. */
+type FramedShapeTreeDescription = {
+  id: string
+  type?: Array<string>
+  label?: LanguageMap
+  definition?: LanguageMap
+}
+
 export type ShapeTreeDescriptionId = {
   id: string
   /** rdf:type IRIs — captured from framing on read */
@@ -23,6 +30,8 @@ export type ShapeTreeDescriptionData = ShapeTreeDescriptionId & {
   definition?: LanguageMap
 }
 
+const SHAPE_TREE_DESCRIPTION_TERMS = ['label', 'definition'] as const
+
 // ──────────────────────────
 // Read path: JSON-LD → ShapeTreeDescriptionData
 // ──────────────────────────
@@ -33,11 +42,14 @@ export type ShapeTreeDescriptionData = ShapeTreeDescriptionId & {
  * or flattened form.
  */
 export async function fromJsonLd(doc: unknown, id: string): Promise<ShapeTreeDescriptionData> {
-  const node = await frameNode(doc, dataModelContext, id)
+  const framed = (await frameNode(
+    doc,
+    dataModelContext,
+    id
+  )) as unknown as FramedShapeTreeDescription
+  const node = projectNode(framed, SHAPE_TREE_DESCRIPTION_TERMS)
   return {
-    id: node.id ?? node['@id'],
-    type: node.type ?? [],
-    label: node.label as LanguageMap,
-    definition: node.definition as LanguageMap | undefined,
+    ...node,
+    label: node.label ?? {},
   }
 }

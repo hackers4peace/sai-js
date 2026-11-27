@@ -9,11 +9,8 @@ import {
   SHAPETREES,
   SKOS,
   SOLID,
-  accessClaimTerms,
   createVocabulary,
-  lwsV1Context,
-  odrlContext,
-  saiContext,
+  odrlAccessContext,
 } from '@janeirodigital/interop-utils'
 import type { JsonLdContext } from '@janeirodigital/interop-utils'
 
@@ -185,10 +182,6 @@ export const dataModelContext: JsonLdContext = {
   fileName: { '@id': NFO.fileName },
 }
 
-const lwsTerms = lwsV1Context['@context']
-const odrlTerms = odrlContext['@context']
-const saiTerms = saiContext['@context']
-
 /**
  * JSON-LD context for access requests and grants (read + write).
  *
@@ -196,12 +189,7 @@ const saiTerms = saiContext['@context']
  * maps `uid` to `odrl:uid`, so every ODRL node can carry both `id` (@id) and
  * `uid` (odrl:uid).
  */
-export const accessContext: JsonLdContext = {
-  ...lwsTerms,
-  ...odrlTerms,
-  ...saiTerms,
-  ...accessClaimTerms,
-}
+export const accessContext = odrlAccessContext
 
 /** Backward-compatible aliases for the old grant context names. */
 export const grantContext = accessContext

@@ -1,8 +1,9 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** proposal, not implemented. A review of `packages/data-model` and
-> the JSON-LD helpers in `packages/utils`, with behaviour verified against the
-> installed `jsonld@9.0.0` (framing, compaction and expansion probes).
+> **Status:** in progress. Items 1 and 5 are landed; the grant read model
+> normalization was removed. A review of `packages/data-model` and the JSON-LD
+> helpers in `packages/utils`, with behaviour verified against the installed
+> `jsonld@9.0.0` (framing, compaction and expansion probes).
 > **Last reviewed:** 2026-11-26.
 
 ## Current state
@@ -19,13 +20,88 @@ The package is already framing-first:
 
 What remains is structural, not incremental:
 
-- context composition is a flat merge that loses to **type-scoped contexts**
-  from the bundled LWS context (a read-shape bug);
-- framing is used as "return one node", not as a schema — one kitchen-sink
-  context, `@embed: '@never'` everywhere, `@default` in one model only, and a
-  large manual normalization layer (`selectNode`, `resolveIri`,
-  `referencePairs`, `documentValues`, `asArray`, `canonicalType`) that
-  re-implements what JSON-LD 1.1 specifies.
+- framing is still used as "return one node", not as a schema — one
+  kitchen-sink context, `@embed: '@never'` everywhere, and `@default` only in
+  `data-registration`;
+- `shape-tree.ts` still walks the expanded document for `references` and
+  `descriptionLanguages`, and the authorization-agent activity decode still
+  canonicalizes `type` by hand;
+- write paths are projections (`toJsonLd` in grant, `withContext` in the other
+  models) rather than a wire-shaped read model (see the open question).
+
+Landed: the type-scoped container fix, the `CONTEXT` term maps, and the typed
+`Framed*` + `projectNode` read paths (see the progress log). `selectNode` and
+the per-field normalizers are no longer used by `packages/data-model`.
+
+
+## Progress log
+
+### Landed — item 1: type-scoped context shadowing
+
+- The bundled LWS `AccessGrant`/`AccessRequest` scoped contexts now declare
+  `@container: '@set'` on `type` and `access`. Without it, the type-scoped
+  context shadowed the composed grant terms and grants framed with a scalar
+  `type` and an object `access`.
+- Regression tests: structural (scoped definitions equal `accessClaimTerms`)
+  and behavioural (the grant fixture frames `type`/`access` as arrays, and an
+  `AdminGrant` typed grant keeps both classes).
+
+### Landed — item 5: one IRI representation
+
+- `packages/utils/src/context-terms.ts` derives term maps from a context:
+  `contextTerms` (token object), `contextIndex` (term→IRI and IRI→term),
+  `pickTerms` (typed subset), `contextTerm`/`contextIri`.
+- `packages/utils/src/terms.ts` builds `CONTEXT` and `CONTEXT_IRI` from
+  `odrlAccessContext`; `ScopeOfGrant`, `AccessMode`, `AccessNecessity`,
+  `AccessProfile`, `GrantClass` are typed subsets of the same object. Code
+  uses `CONTEXT.AllFromRegistry`, `CONTEXT.AccessGrant`, `CONTEXT.read`, …;
+  `CONTEXT_IRI[token]` is the absolute IRI.
+- `accessContext` is now exactly `odrlAccessContext` (one composition, no
+  duplicate spread); there is no separate term→IRI map to maintain.
+- `scopeOfGrant`/`profile` are `@type: '@vocab'`; `resolveIri`/`PREFIX_IRI`
+  were deleted from `grant.ts`. `asScopeTerm`/`asAccessModeTerm`/… normalize a
+  token or an absolute IRI; `scopeIri`/`accessModeIri` resolve through
+  `CONTEXT_IRI`.
+- `dataModelContext` (`accessMode`, `required`, class terms) intentionally
+  stays IRI-valued for now — separate follow-up.
+
+### Landed — grant read-model normalization removed
+
+`normalizeTarget` / `normalizePermission` / `normalizePolicy` in `grant.ts`
+were doing four jobs: typing untyped framed nodes, filling set-container
+defaults, whitelisting fields, and deriving the policy-level convenience
+fields (`assignee`, `action`, `target`). The first three are now redundant:
+
+- `access: { '@embed': '@always' }` embeds policy → permission → target;
+- the access context guarantees the set containers (arrays) and tokens;
+- `FramedTarget`/`FramedPermission`/`FramedPolicy`/`FramedGrant` types make the
+  framed node typed with one boundary cast;
+- one mapper, `toOdrlPolicy`, only fills defaults and lifts the first
+  permission to the policy convenience fields. `deriveFields` stays — it
+  derives the flat grant fields that are not on the wire.
+- Behaviour note: extras framed on policies/permissions/targets are now
+  preserved instead of dropped; `toJsonLd` still serializes only known fields.
+
+The equivalent change for the other models (typed `Framed*` types, spread the
+framed shape, keep only derived fields) is item 11 below.
+
+### Landed — the other data-model read paths
+
+Every data-model reader now declares a `Framed*` type for the framed shape and
+casts the frame once (`frameNode(...) as unknown as Framed*`). `projectNode`
+projects the framed node to `id`, `type` and the model's wire terms, so exact
+POJO shapes are preserved without field-by-field copying; `selectNode` is no
+longer used by `packages/data-model`.
+
+Only the derivation stays:
+
+- grant — `toOdrlPolicy` (convenience fields/defaults) + `deriveFields`;
+- access need — `required`, `children`, `descriptionLanguages`;
+- application registration — `granted`;
+- data registration — `contains`/`partOf`;
+- registry set — the registry wrappers;
+- shape tree — `references`/`descriptionLanguages` (still extracted from the
+  expanded document; nested framing is a later item).
 
 ## Principles
 
@@ -63,7 +139,7 @@ AccessGrant: {
 Any node typed `lws:AccessGrant` activates that context, which **wins over the
 top-level** `type: {'@container':'@set'}` and `access: {'@container':'@set'}`
 from `accessClaimTerms`. Result: `type` is a scalar, `access` is an object, and
-`grant.ts` compensates with `asArray`/`resolveIri`.
+`grant.ts` used to compensate with `asArray`/`resolveIri` (both gone).
 
 Fix in the bundled context (add to its documented "local fixes" list), so both
 `accessContext` and `odrlAccessContext` inherit it:
@@ -100,15 +176,15 @@ patchedLws = {
 Today `buildFrame` sets `frame[key] = overrides[key] ?? { '@embed': '@never',
 '@omitDefault': true }` — an override **replaces** the safe default, so
 `{'@embed': '@always'}` on an absent property yields `null` and every model
-carries a fallback (`access-request.ts` group default, `grant.ts` `asArray`).
+carries a fallback (`access-request.ts` group default).
 
 - Merge instead: `{ ...base, ...overrides[key] }`.
 - Derive `{ '@default': [] }` for terms whose context definition has
   `@container: '@set'`; keep `{ '@omitDefault': true }` for the rest.
 - `@default` is ignored when `@omitDefault: true` is also present — set exactly
   one per term.
-- Acceptance: no `?? []` / `asArray` needed for declared set terms; no `null`
-  values in framed nodes.
+- Acceptance: no `?? []` needed for declared set terms; no `null` values in
+  framed nodes.
 
 ### 3. Frame-as-schema: `@explicit` + the existing `*_TERMS`
 
@@ -153,20 +229,55 @@ property list.
 
 ### 5. One IRI representation (`resolveIri` removal)
 
-`grant.ts` `resolveIri` re-implements prefix/term expansion because the frame
-yields a mix of bare terms (`AccessGrant`), compact IRIs
-(`interop:AllFromRegistry`, from `@type: @id`) and vocab tokens (`read`, from
-`@type: @vocab`).
+> **Status:** landed — `CONTEXT` is generated from the combined access context
+> (`context-terms.ts`), grant POJOs carry tokens, and `resolveIri`/`PREFIX_IRI`
+> are gone.
 
-- Prefer tokens in POJOs: make enum terms vocab-coerced
-  (`required`/`accessNecessity`, `scopeOfGrant`, `scopeOfAuthorization`,
-  `accessMode`) and keep action terms as they are.
-- Then delete `resolveIri` and the `PREFIX_IRI` table; update comparisons
-  (`access-need.ts` `required`, access-mode consumers) and tests.
-- Bare terms such as `AllFromRegistry` are inert for `@type: @id` compaction —
-  IRI compaction only uses `@vocab`/prefix terms.
-- Acceptance: `Grant.fromJsonLd` output uses one representation only; no
-  `resolveIri`; grant/access-claim tests updated.
+`jsonld.frame` compacts vocabulary positions differently: `@type` values to
+class terms (`AccessGrant`), `@type: @id` values to compact IRIs
+(`interop:AllFromRegistry`), `@type: @vocab` values to vocab terms (`read`).
+The grant POJO contract is now **compact tokens for vocabulary positions,
+absolute IRIs for IRI positions** (`storage`, `source`, grant links, …).
+
+**How the tokens work.** `context-terms.ts` turns the combined context into
+term maps: `contextTerms` yields the token object, `contextIndex` resolves the
+term IRIs and the reverse IRI→term lookup. `CONTEXT` is the whole access/grant
+context, `CONTEXT_IRI` its token→IRI table:
+
+```ts
+// packages/utils/src/terms.ts
+const INDEX = contextIndex(odrlAccessContext)
+export const CONTEXT = contextTerms(odrlAccessContext)      // { AllFromRegistry: 'AllFromRegistry', … }
+export const CONTEXT_IRI = INDEX.iriByTerm                  // token → absolute IRI
+
+// typed views select the terms of one position; values still come from CONTEXT
+export const ScopeOfGrant = pickTerms(CONTEXT, [
+  'All', 'AllFromAgent', 'AllFromRegistry', 'AllFromRole',
+  'SelectedFromRegistry', 'Inherited',
+] as const)
+export type ScopeOfGrantTerm = (typeof ScopeOfGrant)[keyof typeof ScopeOfGrant]
+```
+
+So code uses `CONTEXT.AllFromRegistry`, `CONTEXT.AccessGrant`,
+`CONTEXT.read`; `CONTEXT_IRI[CONTEXT.AllFromRegistry]` is the IRI.
+`asScopeTerm` / `asAccessModeTerm` / `asGrantClassTerm` normalize a token or
+an absolute IRI through `contextTerm`; `scopeIri` / `accessModeIri` resolve
+through `CONTEXT_IRI`.
+
+- The context is the only source: no separate term→IRI maps are maintained,
+  and no map is spread back into the context.
+- `scopeOfGrant` and `profile` are `@type: '@vocab'` in the access context,
+  which is what makes those values frame as tokens.
+- `GrantData`/`OdrlPolicy`/`OdrlPermission`/`OdrlTarget` type the vocabulary
+  positions as token unions; `type` stays open so domain classes are accepted.
+- The grant-chain predicates (`scopeCovers`, `accessModesCover`,
+  `selectedInstancesCover`, …) normalize both sides with the `as*Term`
+  helpers.
+- `dataModelContext` (`accessMode`, `required`, `type` class terms) stays
+  IRI-valued for now — a separate follow-up, not needed to delete
+  `resolveIri`.
+- Acceptance: `Grant.fromJsonLd` output is tokens + absolute IRIs only; no
+  `resolveIri`; package and integration tests updated.
 
 ### 6. Activity decode: one frame, and preserve `@type`
 
@@ -233,6 +344,77 @@ relative and re-based by the server.
 - Code comments reference `docs/jsonld.md` (TODO 2/4/6), which does not exist.
   Restore it or point at `openwiki/data-model/json-ld-layer.md`.
 
+
+### 11. Apply the grant simplification to the other models
+
+> **Status:** landed for the data-model readers (typed `Framed*` + `projectNode`).
+> Remaining: `shape-tree.ts` reference/description extraction and the
+> authorization-agent activity decode.
+
+The grant read path is now the template:
+
+- declare the framed shape (`Framed*`) once per model instead of
+  `Record<string, unknown>` + per-field casts;
+- spread the framed object, default only the set-container fields;
+- keep a mapper only for derived values that are not on the wire
+  (`deriveFields`) and for policy/POJO convenience fields (`toOdrlPolicy`).
+
+Remaining targets:
+
+- `ShapeTree` — nested-frame `references` (`@embed: '@once'`), then
+  `referencePairs`/`expandedNodes` go; `getDescription` scans become frames;
+- activities (`authorization-agent/activity-registry.ts`) — typed framed
+  union; keep only the class discriminant/canonical `type` and embedded
+  snapshot normalization; replace the N+1 re-framing with one multi-`@id`
+  frame;
+- write paths: see the open question below (`toJsonLd` projection in grant,
+  `withContext` in the other models).
+
+
+## Open question — the grant write path (`toJsonLd`)
+
+`toJsonLd` is **not** a compaction step; it is a projection from the read model
+to the wire model. It drops values that exist only in the POJO:
+
+- grant-level derived fields (`storage`, `grantedBy`, `dataOwner`,
+  `registeredShapeTree`, `hasDataRegistration`, `hasDataInstance`);
+- policy-level convenience fields (`assignee`, `action`, `target` — the wire
+  representation is the `permission` array);
+- it adds the envelope class (`AccessGrant`), defaults `uid ?? id`, and keeps
+  the optional `inheritsFromGrant`/`hasInheritingGrant` links.
+
+`jsonld.compact` cannot drop properties — it emits everything present in the
+input; omitting a term from the context only turns a key into a full IRI, it
+does not remove it. `jsonld.frame` *can* select properties with
+`@explicit: true`, but that needs a **write frame** (the same schema as the
+read frame), an extra expand→frame pass, and makes `toJsonLd` async. It would
+be the declarative end state, not a drop-in replacement.
+
+Options, in increasing order of change:
+
+1. **Keep the projection, make it structural** (current): explicit
+   `toJsonLd`, typed `FinalGrantData` input. It is the only place that knows
+   which POJO fields are derived; tests pin the wire shape (`toStore`
+   assertions).
+2. **Typed write projection**: define `GrantWire` (the exact serializable
+   shape) and build it with a spread/`pick` of wire terms; `toJsonLd` becomes
+   `withContext(accessContext, pick(grant, WIRE_TERMS))` plus the nested
+   policy/permission/target selection. Same behaviour, less hand-written field
+   copying.
+3. **Wire-shaped read model**: move the derived grant fields out of
+   `GrantData` (`grantStorage`, `grantDataOwner`, … already exist as helpers)
+   so the POJO *is* the wire shape; then `withContext(accessContext, grant)`
+   suffices and `toJsonLd` disappears. This is the cleanest end state but
+   touches every consumer that reads `grant.storage`/`grant.hasDataRegistration`
+   directly.
+4. **Declarative write frame**: a `grantWriteFrame` with `@explicit: true`
+   at every level, reusing the read term lists; `toJsonLd` becomes async.
+   Best if we want one frame/schema for both directions.
+
+Recommendation: keep (1) until item 11 has migrated the other models, then do
+(3) together with the write-path cleanup; fall back to (2) if moving derived
+fields is too invasive.
+
 ## Verified `jsonld@9.0.0` constraints
 
 | Feature | Behaviour |
@@ -255,12 +437,12 @@ relative and re-based by the server.
 
 ## Landing order
 
-1. Item 1 (bug) + regression test.
+1. Item 1 (bug) + regression test. — **landed**
 2. Item 2 (frame defaults) — removes fallbacks used by items 3–6.
 3. Item 8 (base) — correctness, independent.
 4. Item 4 (nested framing) — deletes code, no POJO change.
 5. Item 3 (`@explicit` + `*_TERMS`) — deletes `selectNode` where possible.
-6. Item 5 (representation) — POJO contract change; do together with tests.
+6. Item 5 (representation) — POJO contract change. — **landed**
 7. Item 6 (activity decode) — authorization-agent side.
 8. Items 7, 9, 10 — cleanup / follow-up, can land independently.
 

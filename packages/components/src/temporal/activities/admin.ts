@@ -18,6 +18,7 @@ import {
 } from '@janeirodigital/interop-data-model'
 import type { OdrlPolicy } from '@janeirodigital/interop-data-model'
 import {
+  CONTEXT,
   ACCESS_ACTIONS,
   INTEROP,
   LWS,
@@ -56,7 +57,7 @@ function adminAccess(assignee: string, storage: string, owner: string): Array<Od
       id: policyId,
       uid: policyId,
       type: ['http://www.w3.org/ns/odrl/2/Agreement'],
-      profile: INTEROP.AccessProfile,
+      profile: CONTEXT.AccessProfile,
       permission: [
         {
           id: permissionId,
@@ -270,7 +271,7 @@ export async function findAdminGrants(payload: {
   // the grant registry over the plane (listing + one graph read per grant)
   const grants = await getRegistryGrants(localSparqlTransport(session.sparqlEndpoint), registry.id)
   return grants
-    .filter((grant) => grant.type.includes(INTEROP.AdminGrant))
+    .filter((grant) => grant.type.includes(CONTEXT.AdminGrant))
     .filter((grant) => grantGrantee(grant) === payload.admin.id)
     .map((grant) => ({ id: grant.id, type: grant.type }))
 }

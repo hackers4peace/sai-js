@@ -4,7 +4,13 @@ import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-a
 import { AccessRequest, grantGrantee } from '@janeirodigital/interop-data-model'
 const loadAccessRequest = loader(AccessRequest.fromJsonLd)
 
-import { ACCESS_ACTIONS, INTEROP, loader } from '@janeirodigital/interop-utils'
+import {
+  CONTEXT,
+  ACCESS_ACTIONS,
+  INTEROP,
+  asScopeTerm,
+  loader,
+} from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import {
@@ -183,7 +189,7 @@ describe('specific-instance access request', () => {
     const targeted = grants.find(
       (grant) =>
         grant.registeredShapeTree === projectShapeTree &&
-        grant.scopeOfGrant === INTEROP.SelectedFromRegistry &&
+        asScopeTerm(grant.scopeOfGrant) === CONTEXT.SelectedFromRegistry &&
         grantGrantee(grant) === kimId &&
         grant.hasDataInstance?.length === 2 &&
         grant.hasDataInstance?.includes(instance1) &&
@@ -195,7 +201,7 @@ describe('specific-instance access request', () => {
     const assetSources = targeted!.access
       .flatMap((policy) => policy.permission)
       .map((permission) => permission.target)
-      .filter((target) => target.type.includes('http://www.w3.org/ns/odrl/2/Asset'))
+      .filter((target) => target.type.includes(CONTEXT.Asset))
       .flatMap((target) => target.source)
     expect(new Set(assetSources)).toEqual(new Set([instance1, instance2]))
 

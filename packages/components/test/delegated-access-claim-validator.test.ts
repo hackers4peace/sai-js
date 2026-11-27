@@ -1,5 +1,5 @@
 import { grantAccess } from '@janeirodigital/interop-data-model'
-import { INTEROP, ODRL } from '@janeirodigital/interop-utils'
+import { CONTEXT, INTEROP, ODRL } from '@janeirodigital/interop-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DelegatedAccessClaimValidator } from '../src/DelegatedAccessClaimValidator.js'
@@ -102,7 +102,7 @@ describe('DelegatedAccessClaimValidator edge selection', () => {
 
     const policies = policiesOf(claim)
     expect(policies).toHaveLength(1)
-    expect(policies[0].scopeOfGrant).toBe(INTEROP.AllFromRegistry)
+    expect(policies[0].scopeOfGrant).toBe(CONTEXT.AllFromRegistry)
     expect(policies[0].permission[0].target.source).toEqual([PROJECTS])
   })
 
@@ -126,7 +126,7 @@ describe('DelegatedAccessClaimValidator edge selection', () => {
 
     const policies = policiesOf(claim)
     expect(policies.map((policy) => policy.scopeOfGrant).toSorted()).toEqual(
-      [INTEROP.AllFromRegistry, INTEROP.Inherited].toSorted()
+      [CONTEXT.AllFromRegistry, CONTEXT.Inherited].toSorted()
     )
     expect(
       policies.flatMap((policy) =>
@@ -142,7 +142,7 @@ describe('DelegatedAccessClaimValidator edge selection', () => {
 
     const policies = policiesOf(claim)
     expect(policies).toHaveLength(1)
-    expect(policies[0].scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
+    expect(policies[0].scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
     expect(policies[0].permission[0].target.source).toEqual([PROJECT_X])
   })
 
@@ -161,7 +161,7 @@ describe('DelegatedAccessClaimValidator edge selection', () => {
 
     const policies = policiesOf(claim)
     expect(policies).toHaveLength(1)
-    expect(policies[0].scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
+    expect(policies[0].scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
     expect(policies[0].permission[0].target.source).toEqual([PROJECT_X])
   })
 })

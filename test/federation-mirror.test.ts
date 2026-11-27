@@ -1,6 +1,6 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
 import { grantAccessModes } from '@janeirodigital/interop-data-model'
-import { INTEROP } from '@janeirodigital/interop-utils'
+import { CONTEXT } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
 import {
@@ -104,8 +104,8 @@ describe('reciprocal mirror replication', () => {
         grant.hasDataInstance?.includes(resource)
     )
     expect(sharedGrant).toBeDefined()
-    expect(sharedGrant!.scopeOfGrant).toBe(INTEROP.SelectedFromRegistry)
-    expect(sharedGrant!.type).toContain('https://www.w3.org/ns/lws#AccessGrant')
-    expect(grantAccessModes(sharedGrant!)).toEqual([readMode])
+    expect(sharedGrant!.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
+    expect(sharedGrant!.type).toContain(CONTEXT.AccessGrant)
+    expect(grantAccessModes(sharedGrant!)).toEqual([CONTEXT.read])
   })
 })

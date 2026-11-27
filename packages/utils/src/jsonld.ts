@@ -238,6 +238,30 @@ export function selectNode(
   return out
 }
 
+/**
+ * Typed front for `selectNode`: project a framed node to `id`, `type` and the
+ * model's terms, dropping every other framed property. Absent terms are
+ * omitted (no `undefined` keys), matching the POJO contract. The model types
+ * the framed shape; this helper only narrows the runtime object.
+ */
+export function projectNode<T extends object, K extends keyof T & string>(
+  node: T,
+  terms: ReadonlyArray<K>
+): { id: string; type: Array<string> } & Partial<Pick<T, K>> {
+  const source = node as Record<string, unknown>
+  const out: Record<string, unknown> = {
+    id: source.id,
+    type: source.type ?? [],
+  }
+  for (const term of terms) {
+    const value = source[term]
+    if (value !== undefined && value !== null) {
+      out[term] = value
+    }
+  }
+  return out as { id: string; type: Array<string> } & Partial<Pick<T, K>>
+}
+
 /** Optional single value — string when present, `undefined` when absent. */
 export function opt(node: Record<string, unknown>, key: string): string | undefined {
   return framedValue(node[key])
