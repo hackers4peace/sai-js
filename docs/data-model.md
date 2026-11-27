@@ -131,8 +131,13 @@ fetch boundary (see the progress log). `selectNode` is gone — framing plus
     `interop:DataAuthorization`** — the same decoder doubles as a container
     probe (`getDataAuthorization` in `authorization-agent/src/sparql.ts`),
     where foreign nodes frame with empty fields and are filtered by type.
-  - **`RegistrySet` wrappers stay tolerant (`{ id: '' }`)** — a seeded registry
-    set may omit `hasGrantRegistry`/`hasRoleRegistry`; a separate decision.
+  - **`RegistrySet` registries are required — no `{ id: '' }` sentinel.** The
+    account bootstrap (`templates/RegistrySet.ts` via `postBootstrapTriG`)
+    creates all six core registries, so a registry set without one is
+    malformed and throws (`required`). `hasActivityRegistry` /
+    `hasAccessRequestRegistry` stay optional (seeded with their first member).
+    A framing test round-trips the bootstrap TriG through
+    `RegistrySet.fromJsonLd`, so template and read model cannot drift.
   - **`formatAccessNeed` emits `dataInstances` only for a non-empty array** —
     the set-term contract made `[]` always present, which would have added an
     empty RPC field to every shape-tree need.
@@ -262,21 +267,34 @@ on an absent property yielded `null`. Now entries are built as
 
 ### 3. Frame-as-schema: `@explicit` + the existing `*_TERMS`
 
-Framing emits every property of the focus node; `selectNode` then re-filters.
-`@explicit: true` does that in the algorithm. The `*_TERMS` constants
+Framing emits every property of the focus node, so foreign predicates leak as
+raw-IRI keys and the shared 65-term context makes `frameNode` fill `[]` for
+set terms the model never reads. `@explicit: true` restricts the output to the
+frame's own property list in the algorithm. The `*_TERMS` constants
 (`data-authorization.ts`, `admin-authorization.ts`, `client-id-document.ts`,
-`access-request.ts`, `data-registration.ts`, `role.ts`) are already the frame
-property list.
+`access-request.ts`, `data-registration.ts`, `access-need.ts`, `role.ts`, …)
+are already that list.
 
 - Add `frameFor(context, iri, terms, overrides)` to `packages/utils` producing
-  `{ '@context', '@id', '@explicit': true, ...termFrame }`.
-- Apply to models **without** language-map terms; keep `selectNode` for
-  `Role`, `WebIdProfile`, `SocialAgentRegistration`, `SocialAgentInvitation`,
-  the two description models, and the invitation snapshot decode.
-- Verified limitation: `@explicit` is incompatible with `@container:
-  '@language'` in jsonld@9 (field dropped; `{}`/`[]` throw; `{'@embed':
-  '@never'}` emits `null` under the full IRI). Do not attempt to include
-  language-map terms in an `@explicit` frame.
+  `{ '@context', '@id', '@explicit': true, ...termFrame }` with the same
+  per-term defaults as `buildFrame` (no `@default`; `@omitDefault` for
+  single-valued/reverse/`@vocab` terms).
+- `frameNode` must then take the term list too, so its `[]` fill is restricted
+  to the frame's terms instead of every set term of the shared context.
+- Apply to models **without** language-map terms; `Role`, `WebIdProfile`,
+  `SocialAgentRegistration`, `SocialAgentInvitation`, the two description
+  models and the invitation snapshot decode keep the `projectNode` filter.
+- Verified: `@explicit` keeps `@type` without listing it; absent forward
+  `@set` terms still frame as `[]`; absent `@reverse`/`@vocab` set terms are
+  omitted (so the `[]` fill in `frameNode` stays necessary).
+- Verified limitation: `@explicit` combined with a `@container: '@language'`
+  term **throws** in jsonld@9 (`Cannot read properties of undefined (reading
+  '@value')`), not just drops the field.
+- Verified for nested frames (items 4/6): `@explicit: true` + `@requireAll:
+  false` + a full term list yields `[]` for absent set terms, **but** a
+  subframe whose listed properties are all absent still fails to match — the
+  parent property becomes `null`. A nested child must carry at least one
+  listed term, or be framed separately by `@id`.
 - Acceptance: framed keys are exactly `id`, `type` + the term list (except
   language-map models); a test asserts no `http…` keys in framed output.
 
@@ -500,8 +518,10 @@ fields is too invasive.
 
 | Feature | Behaviour |
 | --- | --- |
-| `@explicit: true` | output restricted to frame-listed properties |
-| `@explicit` + `@container: '@language'` | field dropped; `{}`/`[]` throw; `{'@embed':'@never'}` → `null` under the full IRI |
+| `@explicit: true` | output restricted to frame-listed properties; `@type` is kept without listing it |
+| `@explicit` + `@container: '@language'` | throws (`reading '@value'` of undefined) |
+| `@explicit` + absent forward `@set` term | `[]` (same as without `@explicit`) |
+| `@explicit` + absent `@reverse`/`@vocab` set term | omitted — `frameNode` must fill `[]` |
 | `@default: []` | yields `[]` when absent (forward set terms only) |
 | `@default` + `@omitDefault: true` | `@default` ignored, property omitted |
 | set container + no `@omitDefault` | `[]` for forward `@set` terms (`@type: '@id'`, literals) |

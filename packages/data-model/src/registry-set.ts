@@ -1,4 +1,4 @@
-import { frameNode, projectNode } from '@janeirodigital/interop-utils'
+import { frameNode, projectNode, required } from '@janeirodigital/interop-utils'
 
 import type { ActivityRegistryData } from './activity-registry.ts'
 import type {
@@ -66,19 +66,20 @@ export type AccessRequestRegistryData = {
 export async function fromJsonLd(doc: unknown, id: string): Promise<RegistrySetData> {
   const framed = (await frameNode(doc, dataModelContext, id)) as unknown as FramedRegistrySet
   const node = projectNode(framed, REGISTRY_SET_TERMS)
-  // Registry presence is NOT guaranteed: a seeded registry set may omit
-  // `hasGrantRegistry`/`hasRoleRegistry` (see the authorization-agent fixtures),
-  // so the wrappers stay tolerant until the model decides between an optional
-  // wrapper and a hard requirement.
+  // The six core registries are REQUIRED and created by the account bootstrap
+  // (`templates/RegistrySet.ts` — `registrySetTemplate`, used by
+  // `postBootstrapTriG`). No `{ id: '' }` placeholder: a registry set without
+  // one of them is malformed, not a lesser registry set.
   return {
     ...node,
-    hasAuthorizationRegistry: { id: node.hasAuthorizationRegistry ?? '' },
-    hasGrantRegistry: { id: node.hasGrantRegistry ?? '' },
-    hasSocialAgentRegistry: { id: node.hasSocialAgentRegistry ?? '' },
-    hasApplicationRegistry: { id: node.hasApplicationRegistry ?? '' },
-    hasInvitationRegistry: { id: node.hasInvitationRegistry ?? '' },
-    hasRoleRegistry: { id: node.hasRoleRegistry ?? '' },
+    hasAuthorizationRegistry: { id: required(node, 'hasAuthorizationRegistry') },
+    hasGrantRegistry: { id: required(node, 'hasGrantRegistry') },
+    hasSocialAgentRegistry: { id: required(node, 'hasSocialAgentRegistry') },
+    hasApplicationRegistry: { id: required(node, 'hasApplicationRegistry') },
+    hasInvitationRegistry: { id: required(node, 'hasInvitationRegistry') },
+    hasRoleRegistry: { id: required(node, 'hasRoleRegistry') },
     hasDataRegistry: node.hasDataRegistry.map((dataRegistryId) => ({ id: dataRegistryId })),
+    // optional by design: seeded when their first member is written
     hasActivityRegistry: node.hasActivityRegistry ? { id: node.hasActivityRegistry } : undefined,
     hasAccessRequestRegistry: node.hasAccessRequestRegistry
       ? { id: node.hasAccessRequestRegistry }
