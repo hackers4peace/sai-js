@@ -5,9 +5,12 @@ import {
 } from '@janeirodigital/interop-authorization-agent'
 import {
   grantAccessModes,
+  grantAssigner,
+  grantDataOwner,
   grantGrantee,
-  registrationOfTarget,
-  shapeTreeOfTarget,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
 } from '@janeirodigital/interop-data-model'
 import type { FinalGrantData, GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
 import { CONTEXT, asScopeTerm } from '@janeirodigital/interop-utils'
@@ -18,33 +21,21 @@ export function firstDataOwner(policy: OdrlPolicy): string {
 }
 
 /**
- * Convert one ODRL policy into the flat `FinalGrantData` shape used by the
- * grant registry, delegation endpoint, and delegated-claim validation.
+ * Convert one ODRL policy into the grant read model used by the grant
+ * registry, delegation endpoint, and delegated-claim validation. The read
+ * model is the wire shape, so no target facts are copied onto it — the
+ * `grant*` helpers read them from the policy tree.
  */
 export function grantFromPolicy(
   policy: OdrlPolicy,
   id: string,
   envelopeScope: string
 ): FinalGrantData {
-  const permission = policy.permission[0]
-  const target = permission?.target
-  const instances = policy.permission
-    .map((candidate) => candidate.target)
-    .filter((candidate) => candidate.type.includes(CONTEXT.Asset))
-    .map((candidate) => candidate.source[0])
-    .filter(Boolean)
-  const registration = registrationOfTarget(target)
   return {
     id,
     type: [CONTEXT.AccessGrant],
     access: [policy],
     scopeOfGrant: asScopeTerm(policy.scopeOfGrant) ?? asScopeTerm(envelopeScope) ?? '',
-    storage: target?.storage ?? '',
-    dataOwner: target?.owner ?? '',
-    grantedBy: permission?.assigner ?? '',
-    registeredShapeTree: shapeTreeOfTarget(target),
-    hasDataRegistration: registration,
-    ...(instances.length ? { hasDataInstance: instances } : {}),
   }
 }
 
@@ -71,18 +62,22 @@ export function grantCoversClaim(
   options: GrantClaimCoverageOptions = {}
 ): boolean {
   const claim = grantFromPolicy(policy, 'urn:sai:access-claim', policy.scopeOfGrant ?? '')
-  if (claim.grantedBy && claim.grantedBy !== grant.grantedBy) {
+  if (grantAssigner(claim) && grantAssigner(claim) !== grantAssigner(grant)) {
     return false
   }
   // Every claim carries its shape tree; only AllFromAgent targets are not
   // registration-scoped. A missing field is malformed, never a wildcard.
-  if (!grant.registeredShapeTree || !claim.registeredShapeTree) {
+  const claimShapeTree = grantShapeTree(claim)
+  const grantShapeTreeValue = grantShapeTree(grant)
+  if (!grantShapeTreeValue || !claimShapeTree) {
     return false
   }
+  const claimRegistration = grantRegistration(claim)
+  const grantRegistrationValue = grantRegistration(grant)
   const needsRegistration =
     asScopeTerm(grant.scopeOfGrant) !== CONTEXT.AllFromAgent &&
     asScopeTerm(claim.scopeOfGrant) !== CONTEXT.AllFromAgent
-  if (needsRegistration && (!grant.hasDataRegistration || !claim.hasDataRegistration)) {
+  if (needsRegistration && (!grantRegistrationValue || !claimRegistration)) {
     return false
   }
   const assignees = options.assignees ? new Set(options.assignees) : undefined
@@ -96,11 +91,11 @@ export function grantCoversClaim(
         assignees.has(grantGranteeValue)
       : grantGranteeValue === claimGrantee
   return (
-    grant.dataOwner === claim.dataOwner &&
+    grantDataOwner(grant) === grantDataOwner(claim) &&
     assigneeMatches &&
-    grant.registeredShapeTree === claim.registeredShapeTree &&
-    grant.hasDataRegistration === claim.hasDataRegistration &&
-    grant.storage === claim.storage &&
+    grantShapeTreeValue === claimShapeTree &&
+    grantRegistrationValue === claimRegistration &&
+    grantStorage(grant) === grantStorage(claim) &&
     scopeCovers(grant.scopeOfGrant, claim.scopeOfGrant) &&
     accessModesCover(grantAccessModes(grant), grantAccessModes(claim)) &&
     instancesCover(grant, claim)

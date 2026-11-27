@@ -1,5 +1,13 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
-import { Grant, getAccessGrantIris, grantAccessModes } from '@janeirodigital/interop-data-model'
+import {
+  Grant,
+  getAccessGrantIris,
+  grantAccessModes,
+  grantAssigner,
+  grantDataInstances,
+  grantDataOwner,
+  grantShapeTree,
+} from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
 import { CONTEXT, loader } from '@janeirodigital/interop-utils'
 const loadGrant = loader(Grant.fromJsonLd)
@@ -67,10 +75,10 @@ describe('share resource', () => {
     }
     const sharedGrant = grants.find(
       (grant) =>
-        grant.registeredShapeTree === projectShapeTree &&
-        grant.grantedBy === aliceId &&
-        grant.dataOwner === aliceId &&
-        grant.hasDataInstance?.includes(resource)
+        grantShapeTree(grant) === projectShapeTree &&
+        grantAssigner(grant) === aliceId &&
+        grantDataOwner(grant) === aliceId &&
+        grantDataInstances(grant).includes(resource)
     )
     expect(sharedGrant).toBeDefined()
     expect(sharedGrant!.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)

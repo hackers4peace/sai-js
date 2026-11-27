@@ -1,4 +1,10 @@
 import { ApplicationRegistration, grantAccessModes } from '@janeirodigital/interop-data-model'
+import {
+  grantDataOwner,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
+} from '@janeirodigital/interop-data-model'
 import type { ApplicationRegistrationData, DataOwnerData } from '@janeirodigital/interop-data-model'
 const loadApplicationRegistration = loader(ApplicationRegistration.fromJsonLd)
 
@@ -153,9 +159,10 @@ export class Application {
     }
     const accessGrants = await getAccessGrants(this.applicationRegistration, this.fetch)
     return accessGrants.reduce((acc, grant) => {
-      let owner = acc.find((agent) => agent.id === grant.dataOwner)
+      const dataOwnerId = grantDataOwner(grant)
+      let owner = acc.find((agent) => agent.id === dataOwnerId)
       if (!owner) {
-        owner = { id: grant.dataOwner, issuedGrants: [] }
+        owner = { id: dataOwnerId, issuedGrants: [] }
         acc.push(owner)
       }
       owner.issuedGrants.push(grant)
@@ -174,8 +181,8 @@ export class Application {
     if (!dataOwner) {
       return new Set()
     }
-    const grants = dataOwner.issuedGrants.filter((grant) => grant.registeredShapeTree === scope)
-    return new Set(grants.map((grant) => grant.storage))
+    const grants = dataOwner.issuedGrants.filter((grant) => grantShapeTree(grant) === scope)
+    return new Set(grants.map((grant) => grantStorage(grant)))
   }
 
   private async findGrant(storage: string, scope: string) {
@@ -184,7 +191,7 @@ export class Application {
       .flatMap((owner) => owner.issuedGrants)
       .find(
         (accessGrant) =>
-          accessGrant.storage === storage && accessGrant.registeredShapeTree === scope
+          grantStorage(accessGrant) === storage && grantShapeTree(accessGrant) === scope
       )
   }
 
@@ -263,8 +270,8 @@ export class Application {
     if (!grant) {
       throw new Error('No grant found')
     }
-    const registration = grant.hasDataRegistration
-    const { strategy } = await this.identifierStrategies.resolve(grant.storage)
+    const registration = grantRegistration(grant)
+    const { strategy } = await this.identifierStrategies.resolve(grantStorage(grant))
     const id = strategy.mint({ parent: registration, isContainer: false })
     // The creation plan creates the empty resource and the containment; the
     // caller writes its representation afterwards.

@@ -4,7 +4,7 @@ import {
   getRegistryGrants,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import { grantGrantee } from '@janeirodigital/interop-data-model'
+import { grantAssigner, grantGrantee, grantStorage } from '@janeirodigital/interop-data-model'
 import type { GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
 import { CONTEXT, asScopeTerm, ODRL_ID_JAG_CONTEXT } from '@janeirodigital/interop-utils'
 
@@ -90,11 +90,12 @@ function isRegistrationLevelEdge(batch: Array<GrantData>): boolean {
 function mostSpecificGrantEdge(grants: Array<GrantData>, forStorage: boolean): Array<GrantData> {
   const byAssigner = new Map<string, Array<GrantData>>()
   for (const grant of grants) {
-    const bucket = byAssigner.get(grant.grantedBy)
+    const assigner = grantAssigner(grant)
+    const bucket = byAssigner.get(assigner)
     if (bucket) {
       bucket.push(grant)
     } else {
-      byAssigner.set(grant.grantedBy, [grant])
+      byAssigner.set(assigner, [grant])
     }
   }
   const edges = [...byAssigner.entries()]
@@ -153,7 +154,7 @@ function matchingAssigners(
     const assigners = new Set(
       usable
         .filter((grant) => grantCoversClaim(grant, policy, { assignees }))
-        .map((grant) => grant.grantedBy)
+        .map((grant) => grantAssigner(grant))
     )
     if (assigners.size === 0) {
       return new Set()
@@ -191,7 +192,7 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
   public async find(input: AccessClaimLookupInput): Promise<VerifiedAccessClaim | undefined> {
     const relevant = await this.visibleGrants(input.subject, input.client, input.storage)
     const appSpecific = relevant.filter(
-      (grant) => grant.grantedBy === input.subject && grantGrantee(grant) === input.client
+      (grant) => grantAssigner(grant) === input.subject && grantGrantee(grant) === input.client
     )
     // A user can hold several grants for one storage from several assigners
     // (the owner's grant plus an intermediate delegation). Pick one edge: the
@@ -246,9 +247,9 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
     // > AllFromAgent), as the derivation does.
     const visible = await this.visibleGrants(input.subject, input.client, input.storage)
     const assignees = [input.subject, input.client]
-    const candidates = [...new Set(visible.map((grant) => grant.grantedBy))]
+    const candidates = [...new Set(visible.map((grant) => grantAssigner(grant)))]
       .flatMap((assigner) => {
-        const grants = visible.filter((grant) => grant.grantedBy === assigner)
+        const grants = visible.filter((grant) => grantAssigner(grant) === assigner)
         return matchingAssigners(input.access, grants, assignees).size > 0
           ? [{ assigner, grants }]
           : []
@@ -307,7 +308,7 @@ export class DelegatedAccessClaimValidator implements AccessClaimValidator {
       )
     ).filter((grant): grant is GrantData => grant !== undefined)
 
-    return grants.filter((grant) => grant.storage === storage)
+    return grants.filter((grant) => grantStorage(grant) === storage)
   }
 
   /** Load all grants in one assigner's own grant registry. */

@@ -63,10 +63,15 @@ const TASK_REGISTRATION = 'https://data/acme/registrations/tasks/'
 const STORAGE = 'https://data/acme/'
 
 interface GrantOverrides extends Partial<GrantData> {
-  /** legacy-named fixture fields — derived into the canonical access policy */
+  /** legacy-named fixture fields — encoded in the canonical access policy */
   grantee?: string
   accessMode?: Array<string>
   hasStorage?: string
+  dataOwner?: string
+  grantedBy?: string
+  registeredShapeTree?: string
+  hasDataRegistration?: string
+  hasDataInstance?: Array<string>
 }
 
 const DEFAULT_ACTIONS = [ACCESS_ACTIONS.read]
@@ -78,7 +83,7 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
     hasStorage = STORAGE,
     ...rest
   } = overrides
-  const storage = rest.storage ?? hasStorage
+  const storage = hasStorage
   const hasDataRegistration = rest.hasDataRegistration ?? PROJECT_REGISTRATION
   const scopeOfGrant = rest.scopeOfGrant ?? INTEROP.AllFromRegistry
   const target: GrantTargetInput = {
@@ -91,7 +96,6 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
   }
   return {
     type: [LWS.AccessGrant],
-    storage,
     access:
       rest.access ??
       grantAccess({
@@ -100,12 +104,10 @@ function makeGrant(overrides: GrantOverrides = {}): GrantData {
         assignee: grantee,
         actions: accessMode,
       }),
-    grantedBy: 'https://id/acme',
-    dataOwner: 'https://id/acme',
-    registeredShapeTree: PROJECT_TREE,
-    hasDataRegistration,
     scopeOfGrant,
-    ...rest,
+    ...(rest.inheritsFromGrant ? { inheritsFromGrant: rest.inheritsFromGrant } : {}),
+    ...(rest.hasInheritingGrant ? { hasInheritingGrant: rest.hasInheritingGrant } : {}),
+    ...(rest.id ? { id: rest.id } : {}),
   } as GrantData
 }
 

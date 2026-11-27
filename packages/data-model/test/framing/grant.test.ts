@@ -13,9 +13,9 @@ describe('Grant framing', () => {
     expect(grant.id).toBe(GRANT_IRI)
     expect(grant.type).toContain(CONTEXT.AccessGrant)
     expect(grant.scopeOfGrant).toBe(CONTEXT.AllFromRegistry)
-    expect(grant.storage).toBe('https://data/acme-rnd/')
-    expect(grant.hasDataRegistration).toBe('https://data/acme-rnd/reb39k')
-    expect(grant.registeredShapeTree).toBe('https://data/shapetrees/trees/Project')
+    expect(Grant.grantStorage(grant)).toBe('https://data/acme-rnd/')
+    expect(Grant.grantRegistration(grant)).toBe('https://data/acme-rnd/reb39k')
+    expect(Grant.grantShapeTree(grant)).toBe('https://data/shapetrees/trees/Project')
     expect(grant.hasInheritingGrant).toEqual(['https://registry/acme/hdaymz'])
 
     const policy = grant.access[0]
@@ -68,7 +68,7 @@ describe('Grant scopes and access actions (local fixture)', () => {
       selectedFromRegistryIri
     )
     expect(grant.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
-    expect(grant.hasDataRegistration).toBe('https://data/acme-rnd/reb39k')
+    expect(Grant.grantRegistration(grant)).toBe('https://data/acme-rnd/reb39k')
     expect(Grant.dataRegistryIri(grant)).toBe('https://data/acme-rnd/')
   })
 
@@ -76,7 +76,7 @@ describe('Grant scopes and access actions (local fixture)', () => {
     const grant = await Grant.fromJsonLd(await docFromGraphs([inheritedIri]), inheritedIri)
     expect(grant.scopeOfGrant).toBe(CONTEXT.Inherited)
     expect(grant.inheritsFromGrant).toBe(allFromRegistryIri)
-    expect(grant.hasDataRegistration).toBe('https://data/acme-rnd/x0md9s')
+    expect(Grant.grantRegistration(grant)).toBe('https://data/acme-rnd/x0md9s')
     expect(Grant.dataRegistryIri(grant)).toBe('https://data/acme-rnd/')
   })
 })

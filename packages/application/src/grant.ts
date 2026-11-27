@@ -4,6 +4,9 @@ import {
   ShapeTree,
   childIris,
   frameDataInstance,
+  grantDataInstances,
+  grantRegistration,
+  grantShapeTree,
 } from '@janeirodigital/interop-data-model'
 import type { ApplicationRegistrationData, GrantData } from '@janeirodigital/interop-data-model'
 const loadGrant = loader(Grant.fromJsonLd)
@@ -44,14 +47,14 @@ export async function* getDataInstanceIterator(
 ): AsyncIterable<string> {
   switch (asScopeTerm(grant.scopeOfGrant)) {
     case CONTEXT.AllFromRegistry: {
-      const registration = await loadDataRegistration(grant.hasDataRegistration, fetch)
+      const registration = await loadDataRegistration(grantRegistration(grant), fetch)
       for (const id of registration.contains) {
         yield id
       }
       break
     }
     case CONTEXT.SelectedFromRegistry: {
-      for (const id of grant.hasDataInstance ?? []) {
+      for (const id of grantDataInstances(grant)) {
         yield id
       }
       break
@@ -59,7 +62,7 @@ export async function* getDataInstanceIterator(
     case CONTEXT.Inherited: {
       const parentGrant = await loadGrant(grant.inheritsFromGrant!, fetch)
       for await (const parentId of getDataInstanceIterator(parentGrant, fetch)) {
-        yield* await getChildInstanceIris(parentGrant, parentId, grant.registeredShapeTree, fetch)
+        yield* await getChildInstanceIris(parentGrant, parentId, grantShapeTree(grant), fetch)
       }
       break
     }
@@ -78,7 +81,7 @@ async function getChildInstanceIris(
   childShapeTree: string,
   fetch: WhatwgFetch
 ): Promise<Array<string>> {
-  const parentShapeTree = await loadShapeTree(parentGrant.registeredShapeTree, fetch)
+  const parentShapeTree = await loadShapeTree(grantShapeTree(parentGrant), fetch)
   const node = await frameDataInstance(parentId, fetch, parentShapeTree)
   return childIris(node, parentShapeTree, childShapeTree)
 }

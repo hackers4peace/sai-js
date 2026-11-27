@@ -20,6 +20,8 @@ import {
   accessGrantAcrJsonLd,
   dataModelContext,
   getAccessGrantIris,
+  grantAssigner,
+  grantDataOwner,
   grantGrantee,
   isActivityClass,
   toJsonLd,
@@ -563,11 +565,13 @@ export async function checkEquivalence(payload: CheckEquivalenceInput): Promise<
     grants: payload.existing,
   })
   const existingTrees = grantTrees(existingGrants)
-  const sourceExisting = existingTrees.filter((tree) => tree.grant.dataOwner === payload.webId.id)
+  const sourceExisting = existingTrees.filter(
+    (tree) => grantDataOwner(tree.grant) === payload.webId.id
+  )
   const ownGrantIds = payload.ownGrantIds ? new Set(payload.ownGrantIds) : undefined
   const delegatedExisting = existingTrees.filter(
     (tree) =>
-      tree.grant.dataOwner !== payload.webId.id &&
+      grantDataOwner(tree.grant) !== payload.webId.id &&
       (!ownGrantIds || (tree.grant.id !== undefined && ownGrantIds.has(tree.grant.id)))
   )
 
@@ -653,7 +657,7 @@ export async function storeAccessGrant(
   payload: FinalGrantData & { registryOwner?: string }
 ): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.registryOwner ?? payload.dataOwner)
+  const session = await manager.getSession(payload.registryOwner ?? grantDataOwner(payload))
 
   // The storage identifier strategy creates the member at its pre-minted id.
   // Find-first at the callee (the storing workflow is retried by Temporal) — a
@@ -676,7 +680,7 @@ export async function createAcr(
   payload: FinalGrantData & { registryOwner?: string }
 ): Promise<void> {
   const manager = buildSessionManager()
-  const session = await manager.getSession(payload.registryOwner ?? payload.dataOwner)
+  const session = await manager.getSession(payload.registryOwner ?? grantDataOwner(payload))
   const grantee = grantGrantee(payload) ?? ''
   // TODO: improve error handling
   let uasId
@@ -690,15 +694,15 @@ export async function createAcr(
   let client
   // if grantedBy is a peer also their UAS has write access
   // eg. ACME to Alice, then Alice to Kim
-  if (payload.grantedBy !== payload.dataOwner) {
+  if (grantAssigner(payload) !== grantDataOwner(payload)) {
     grantor = {
-      agent: payload.grantedBy,
-      client: await discoverAuthorizationAgent(payload.grantedBy, fetch),
+      agent: grantAssigner(payload),
+      client: await discoverAuthorizationAgent(grantAssigner(payload), fetch),
     }
   }
   if (uasId) {
     // no self granting at this moment!
-    if (grantee === payload.dataOwner) {
+    if (grantee === grantDataOwner(payload)) {
       throw new Error('no self granting: the grantee is the data owner')
     }
 
@@ -710,7 +714,7 @@ export async function createAcr(
   } else {
     // grantee is an application - used by the grantedBy
     client = {
-      agent: payload.grantedBy,
+      agent: grantAssigner(payload),
       client: grantee,
     }
   }

@@ -1,5 +1,10 @@
 import { buildSessionManager } from '@elfpavlik/sai-components'
-import { grantAccessModes } from '@janeirodigital/interop-data-model'
+import {
+  grantAccessModes,
+  grantAssigner,
+  grantDataInstances,
+  grantShapeTree,
+} from '@janeirodigital/interop-data-model'
 import { CONTEXT } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
@@ -99,9 +104,9 @@ describe('reciprocal mirror replication', () => {
     const grants = await accessGrants(replica, kimSession)
     const sharedGrant = grants.find(
       (grant) =>
-        grant.registeredShapeTree === projectShapeTree &&
-        grant.grantedBy === aliceId &&
-        grant.hasDataInstance?.includes(resource)
+        grantShapeTree(grant) === projectShapeTree &&
+        grantAssigner(grant) === aliceId &&
+        grantDataInstances(grant).includes(resource)
     )
     expect(sharedGrant).toBeDefined()
     expect(sharedGrant!.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)

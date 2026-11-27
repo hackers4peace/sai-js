@@ -42,17 +42,12 @@ function grantData(
   return {
     id: snippetIri,
     type: [LWS.AccessGrant],
-    storage: STORAGE,
     access: grantAccess({
       ...targetInput(scopeOfGrant, targetExtra),
       assigner: DATA_OWNER,
       assignee: GRANTEE,
       actions: [ACCESS_ACTIONS.read],
     }),
-    grantedBy: DATA_OWNER,
-    dataOwner: DATA_OWNER,
-    registeredShapeTree: SHAPE_TREE,
-    hasDataRegistration: REGISTRATION,
     scopeOfGrant,
     ...extra,
   }
@@ -97,6 +92,48 @@ describe('toJsonLd', () => {
       DATA_OWNER
     )
     expect(store.getQuads(target, LWS.terms.storage, null, null)[0].object.value).toBe(STORAGE)
+  })
+
+  test('writes exactly the wire terms at every level', () => {
+    const doc = Grant.toJsonLd(grantData(INTEROP.AllFromRegistry))
+
+    // the read model is the wire shape: no derived grant fields, no policy-level
+    // convenience fields — the two normalizations are the envelope class and uid
+    expect(Object.keys(doc).toSorted()).toEqual([
+      '@context',
+      'access',
+      'id',
+      'scopeOfGrant',
+      'type',
+    ])
+    const [policy] = doc.access as Array<Record<string, unknown>>
+    expect(Object.keys(policy).toSorted()).toEqual([
+      'id',
+      'permission',
+      'profile',
+      'scopeOfGrant',
+      'type',
+      'uid',
+    ])
+    const [permission] = policy.permission as Array<Record<string, unknown>>
+    expect(Object.keys(permission).toSorted()).toEqual([
+      'action',
+      'assignee',
+      'assigner',
+      'id',
+      'target',
+      'uid',
+    ])
+    const target = permission.target as Record<string, unknown>
+    expect(Object.keys(target).toSorted()).toEqual([
+      'id',
+      'owner',
+      'registeredShapeTree',
+      'source',
+      'storage',
+      'type',
+      'uid',
+    ])
   })
 
   test('uses one permission per selected resource', async () => {
@@ -163,10 +200,10 @@ describe('toJsonLd', () => {
   test('frames back through the canonical reader', async () => {
     const grant = grantData(INTEROP.AllFromRegistry)
     const roundTripped = await Grant.fromJsonLd(Grant.toJsonLd(grant), snippetIri)
-    expect(roundTripped.storage).toBe(STORAGE)
-    expect(roundTripped.dataOwner).toBe(DATA_OWNER)
-    expect(roundTripped.hasDataRegistration).toBe(REGISTRATION)
-    expect(roundTripped.registeredShapeTree).toBe(SHAPE_TREE)
+    expect(Grant.grantStorage(roundTripped)).toBe(STORAGE)
+    expect(Grant.grantDataOwner(roundTripped)).toBe(DATA_OWNER)
+    expect(Grant.grantRegistration(roundTripped)).toBe(REGISTRATION)
+    expect(Grant.grantShapeTree(roundTripped)).toBe(SHAPE_TREE)
     expect(roundTripped.access[0].permission[0].action).toEqual([CONTEXT.read])
   })
 })

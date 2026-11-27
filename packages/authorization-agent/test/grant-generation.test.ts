@@ -1,5 +1,17 @@
-import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
-import type { DataAuthorizationData, RegistrySetData } from '@janeirodigital/interop-data-model'
+import {
+  grantAccessModes,
+  grantAssigner,
+  grantDataOwner,
+  grantGrantee,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
+} from '@janeirodigital/interop-data-model'
+import type {
+  DataAuthorizationData,
+  GrantData,
+  RegistrySetData,
+} from '@janeirodigital/interop-data-model'
 import {
   CONTEXT,
   ACCESS_ACTIONS,
@@ -375,12 +387,10 @@ describe('delegated-grant generation — mirror only', () => {
     // one delegated grant per authorization, all derived from the mirrored source
     expect(generated.delegatedGrants).toHaveLength(3)
     for (const delegated of generated.delegatedGrants) {
-      expect(delegated).toMatchObject({
-        dataOwner: ALICE,
-        registeredShapeTree: PROJECT_TREE,
-        hasDataRegistration: PROJECT_REGISTRATION,
-        storage: PROJECT_STORAGE,
-      } as Record<string, unknown>)
+      expect(grantDataOwner(delegated)).toBe(ALICE)
+      expect(grantShapeTree(delegated)).toBe(PROJECT_TREE)
+      expect(grantRegistration(delegated)).toBe(PROJECT_REGISTRATION)
+      expect(grantStorage(delegated)).toBe(PROJECT_STORAGE)
     }
     // …and the peer side was read ONCE, not once per authorization
     expect(transport.queries.filter((query) => query.includes('lws#contains'))).toHaveLength(1)
@@ -409,14 +419,12 @@ describe('delegated-grant generation — mirror only', () => {
 
     expect(generated.delegatedGrants).toHaveLength(1)
     const [grant] = generated.delegatedGrants
-    expect(grant).toMatchObject({
-      grantedBy: ACME,
-      dataOwner: ALICE,
-      registeredShapeTree: PROJECT_TREE,
-      hasDataRegistration: PROJECT_REGISTRATION,
-      storage: PROJECT_STORAGE,
-      scopeOfGrant: CONTEXT.AllFromRegistry,
-    })
+    expect(grant).toMatchObject({ scopeOfGrant: CONTEXT.AllFromRegistry })
+    expect(grantAssigner(grant)).toBe(ACME)
+    expect(grantDataOwner(grant)).toBe(ALICE)
+    expect(grantShapeTree(grant)).toBe(PROJECT_TREE)
+    expect(grantRegistration(grant)).toBe(PROJECT_REGISTRATION)
+    expect(grantStorage(grant)).toBe(PROJECT_STORAGE)
     expect(grantGrantee(grant)).toBe(KIM)
     expect(grant.type).toEqual([CONTEXT.AccessGrant])
     // the source allows Read+Write, the authorization asks for Read only
@@ -436,10 +444,8 @@ describe('delegated-grant generation — mirror only', () => {
     )
 
     expect(generated.delegatedGrants).toHaveLength(1)
-    expect(generated.delegatedGrants[0]).toMatchObject({
-      registeredShapeTree: TASK_TREE,
-      hasDataRegistration: TASK_REGISTRATION,
-    })
+    expect(grantShapeTree(generated.delegatedGrants[0])).toBe(TASK_TREE)
+    expect(grantRegistration(generated.delegatedGrants[0])).toBe(TASK_REGISTRATION)
   })
 
   test('MirrorIncompleteError when the reciprocal registration is not mirrored', async () => {
@@ -495,26 +501,17 @@ describe('delegated-grant generation — mirror only', () => {
 
     expect(generated.delegatedGrants).toHaveLength(1)
     const [parent] = generated.delegatedGrants
-    expect(parent).toMatchObject({
-      dataOwner: ALICE,
-      hasDataRegistration: PROJECT_REGISTRATION,
-    })
+    expect(grantDataOwner(parent)).toBe(ALICE)
+    expect(grantRegistration(parent)).toBe(PROJECT_REGISTRATION)
     expect(parent.id).toBeDefined()
     // the child rides the parent as embedded data; both ids are minted in the
     // assigner's registry and the child stores `inheritsFromGrant` on write
-    const [child] = parent.hasInheritingGrant as unknown as Array<{
-      registeredShapeTree: string
-      scopeOfGrant: string
-      hasDataRegistration: string
-      dataOwner: string
-    }>
-    expect(child).toMatchObject({
-      registeredShapeTree: TASK_TREE,
-      scopeOfGrant: CONTEXT.Inherited,
-      hasDataRegistration: TASK_REGISTRATION,
-      dataOwner: ALICE,
-      inheritsFromGrant: parent.id,
-    })
+    const [child] = parent.hasInheritingGrant as unknown as Array<GrantData>
+    expect(grantShapeTree(child)).toBe(TASK_TREE)
+    expect(child.scopeOfGrant).toBe(CONTEXT.Inherited)
+    expect(grantRegistration(child)).toBe(TASK_REGISTRATION)
+    expect(grantDataOwner(child)).toBe(ALICE)
+    expect(child.inheritsFromGrant).toBe(parent.id)
     expect(child.id).toBeDefined()
     expect(child.id).not.toBe(parent.id)
     expect(fetchStub).not.toHaveBeenCalled()

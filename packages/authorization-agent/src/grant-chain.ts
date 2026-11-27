@@ -1,4 +1,13 @@
-import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
+import {
+  grantAccessModes,
+  grantAssigner,
+  grantDataInstances,
+  grantDataOwner,
+  grantGrantee,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
+} from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
 import { CONTEXT, asAccessModeTerm, asScopeTerm } from '@janeirodigital/interop-utils'
 
@@ -49,7 +58,7 @@ const SCOPE_ORDER: Record<string, number> = {
  * after the lookup.
  */
 function upstreamKey(dataOwner: string, grantee: string | undefined, grant: GrantData): string {
-  return `${dataOwner}\u0000${grantee ?? ''}\u0000${grant.registeredShapeTree}\u0000${grant.hasDataRegistration}\u0000${grant.storage}`
+  return `${dataOwner}\u0000${grantee ?? ''}\u0000${grantShapeTree(grant)}\u0000${grantRegistration(grant)}\u0000${grantStorage(grant)}`
 }
 
 /**
@@ -149,8 +158,8 @@ export function instancesCover(upstream: GrantData, downstream: GrantData): bool
   }
   return selectedInstancesCover(
     upstream.scopeOfGrant,
-    upstream.hasDataInstance,
-    downstream.hasDataInstance ?? []
+    grantDataInstances(upstream),
+    grantDataInstances(downstream)
   )
 }
 
@@ -160,21 +169,25 @@ export function instancesCover(upstream: GrantData, downstream: GrantData): bool
  * storage and coverage). Does NOT check the upstream's own validity.
  */
 export function grantCovers(upstream: GrantData, downstream: GrantData): boolean {
-  if (!upstream.registeredShapeTree || !downstream.registeredShapeTree) {
+  const upstreamShapeTree = grantShapeTree(upstream)
+  const downstreamShapeTree = grantShapeTree(downstream)
+  if (!upstreamShapeTree || !downstreamShapeTree) {
     return false
   }
+  const upstreamRegistration = grantRegistration(upstream)
+  const downstreamRegistration = grantRegistration(downstream)
   const needsRegistration =
     asScopeTerm(upstream.scopeOfGrant) !== CONTEXT.AllFromAgent &&
     asScopeTerm(downstream.scopeOfGrant) !== CONTEXT.AllFromAgent
-  if (needsRegistration && (!upstream.hasDataRegistration || !downstream.hasDataRegistration)) {
+  if (needsRegistration && (!upstreamRegistration || !downstreamRegistration)) {
     return false
   }
   return (
-    upstream.dataOwner === downstream.dataOwner &&
-    grantGrantee(upstream) === downstream.grantedBy &&
-    upstream.registeredShapeTree === downstream.registeredShapeTree &&
-    upstream.hasDataRegistration === downstream.hasDataRegistration &&
-    upstream.storage === downstream.storage &&
+    grantDataOwner(upstream) === grantDataOwner(downstream) &&
+    grantGrantee(upstream) === grantAssigner(downstream) &&
+    upstreamShapeTree === downstreamShapeTree &&
+    upstreamRegistration === downstreamRegistration &&
+    grantStorage(upstream) === grantStorage(downstream) &&
     scopeCovers(upstream.scopeOfGrant, downstream.scopeOfGrant) &&
     accessModesCover(grantAccessModes(upstream), grantAccessModes(downstream)) &&
     instancesCover(upstream, downstream)
@@ -191,10 +204,10 @@ export function grantCovers(upstream: GrantData, downstream: GrantData): boolean
 export function parentCoversChild(parent: GrantData, child: GrantData): boolean {
   return (
     asScopeTerm(child.scopeOfGrant) === CONTEXT.Inherited &&
-    parent.dataOwner === child.dataOwner &&
-    parent.grantedBy === child.grantedBy &&
+    grantDataOwner(parent) === grantDataOwner(child) &&
+    grantAssigner(parent) === grantAssigner(child) &&
     grantGrantee(parent) === grantGrantee(child) &&
-    parent.storage === child.storage
+    grantStorage(parent) === grantStorage(child)
   )
 }
 
@@ -221,7 +234,9 @@ export function grantChainValidity(
     // start invalid and become valid through the fixed point
     valid.set(
       id,
-      !removedSet.has(id) && !grant.inheritsFromGrant && grant.grantedBy === grant.dataOwner
+      !removedSet.has(id) &&
+        !grant.inheritsFromGrant &&
+        grantAssigner(grant) === grantDataOwner(grant)
     )
   }
 
@@ -231,13 +246,13 @@ export function grantChainValidity(
   // registry on every fixed-point iteration.
   const upstreamIndex = new Map<string, Array<GrantData>>()
   for (const grant of byId.values()) {
-    const key = upstreamKey(grant.dataOwner, grantGrantee(grant), grant)
+    const key = upstreamKey(grantDataOwner(grant), grantGrantee(grant), grant)
     const list = upstreamIndex.get(key) ?? []
     list.push(grant)
     upstreamIndex.set(key, list)
   }
   const candidatesFor = (grant: GrantData): Array<GrantData> =>
-    upstreamIndex.get(upstreamKey(grant.dataOwner, grant.grantedBy, grant)) ?? []
+    upstreamIndex.get(upstreamKey(grantDataOwner(grant), grantAssigner(grant), grant)) ?? []
 
   let changed = true
   while (changed) {
@@ -253,7 +268,7 @@ export function grantChainValidity(
         const parentValid =
           !!parent && valid.get(parent.id!) === true && parentCoversChild(parent, grant)
         if (parentValid) {
-          if (grant.grantedBy === grant.dataOwner) {
+          if (grantAssigner(grant) === grantDataOwner(grant)) {
             // a source child is valid while its structural parent is valid;
             // its own shape tree/modes are the owner's grant
             next = true
@@ -274,7 +289,7 @@ export function grantChainValidity(
             }
           }
         }
-      } else if (grant.grantedBy !== grant.dataOwner) {
+      } else if (grantAssigner(grant) !== grantDataOwner(grant)) {
         for (const candidate of candidatesFor(grant)) {
           if (candidate.id === id) {
             continue

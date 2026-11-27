@@ -57,7 +57,6 @@ function grant(id: string, overrides: GrantOverrides = {}): GrantData {
   return {
     id,
     type: [LWS.AccessGrant],
-    storage,
     access: grantAccess({
       scopeOfGrant,
       owner: overrides.dataOwner ?? OWNER,
@@ -69,12 +68,7 @@ function grant(id: string, overrides: GrantOverrides = {}): GrantData {
       actions,
       registeredShapeTree: overrides.registeredShapeTree ?? PROJECT_TREE,
     }),
-    grantedBy: overrides.grantedBy ?? A,
-    dataOwner: overrides.dataOwner ?? OWNER,
-    registeredShapeTree: overrides.registeredShapeTree ?? PROJECT_TREE,
-    hasDataRegistration,
     scopeOfGrant,
-    ...(hasDataInstance ? { hasDataInstance } : {}),
     ...(overrides.inheritsFromGrant ? { inheritsFromGrant: overrides.inheritsFromGrant } : {}),
   }
 }
@@ -84,24 +78,23 @@ function withAssignee(grant: GrantData, assignee: string): GrantData {
     ...grant,
     access: grant.access.map((policy) => ({
       ...policy,
-      assignee,
       permission: policy.permission.map((permission) => ({ ...permission, assignee })),
     })),
   }
 }
 
 /** A source grant D→A (the root of a delegated chain). */
-function source(id: string, overrides: Partial<GrantData> = {}): GrantData {
+function source(id: string, overrides: GrantOverrides = {}): GrantData {
   return grant(id, { grantedBy: OWNER, grantee: A, ...overrides })
 }
 
 /** A→B delegated grant. */
-function aliceToBob(id: string, overrides: Partial<GrantData> = {}): GrantData {
+function aliceToBob(id: string, overrides: GrantOverrides = {}): GrantData {
   return grant(id, { grantedBy: A, grantee: B, ...overrides })
 }
 
 /** B→C delegated grant. */
-function bobToKim(id: string, overrides: Partial<GrantData> = {}): GrantData {
+function bobToKim(id: string, overrides: GrantOverrides = {}): GrantData {
   return grant(id, { grantedBy: B, grantee: C, accessMode: [READ], ...overrides })
 }
 
@@ -183,11 +176,19 @@ describe('grantCovers — match-based upstream', () => {
     const upstream = source('root', { grantee: A })
     const downstream = aliceToBob('ab')
     expect(grantCovers(upstream, downstream)).toBe(true)
-    expect(grantCovers({ ...upstream, dataOwner: 'https://id/other' }, downstream)).toBe(false)
+    expect(
+      grantCovers(source('root', { grantee: A, dataOwner: 'https://id/other' }), downstream)
+    ).toBe(false)
     expect(grantCovers(withAssignee(upstream, C), downstream)).toBe(false)
-    expect(grantCovers({ ...upstream, registeredShapeTree: TASK_TREE }, downstream)).toBe(false)
-    expect(grantCovers({ ...upstream, hasDataRegistration: TASK_REG }, downstream)).toBe(false)
-    expect(grantCovers({ ...upstream, storage: 'https://data/other/' }, downstream)).toBe(false)
+    expect(
+      grantCovers(source('root', { grantee: A, registeredShapeTree: TASK_TREE }), downstream)
+    ).toBe(false)
+    expect(
+      grantCovers(source('root', { grantee: A, hasDataRegistration: TASK_REG }), downstream)
+    ).toBe(false)
+    expect(
+      grantCovers(source('root', { grantee: A, hasStorage: 'https://data/other/' }), downstream)
+    ).toBe(false)
   })
 
   test('requires scope, mode and instance coverage', () => {

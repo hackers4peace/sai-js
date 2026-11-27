@@ -3,6 +3,8 @@ import {
   RegistrySet,
   WebIdProfile,
   dataModelContext,
+  grantAssigner,
+  grantDataOwner,
   grantGrantee,
 } from '@janeirodigital/interop-data-model'
 import type {
@@ -190,8 +192,8 @@ export async function revokeGrantsClosure(
     }
     closure.set(grant.id, {
       iri: grant.id,
-      dataOwner: grant.dataOwner,
-      grantedBy: grant.grantedBy,
+      dataOwner: grantDataOwner(grant),
+      grantedBy: grantAssigner(grant),
       grantee: grantGrantee(grant) ?? '',
     })
   }

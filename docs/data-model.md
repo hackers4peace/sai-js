@@ -1,10 +1,12 @@
 # Data model — JSON-LD / framing plan
 
-> **Status:** in progress. Items 1, 2, 3, 4, 5, 6, 8 and 9 are landed; the grant
-> read model normalization was removed and the read paths are absolute-IRI-only.
-> A review of `packages/data-model` and the JSON-LD helpers in `packages/utils`,
-> with behaviour verified against the installed `jsonld@9.0.0` (framing,
-> compaction and expansion probes).
+> **Status:** in progress. Items 1–6, 8, 9 and 11 are landed; item 10 is mostly
+> landed (the OpenWiki refresh is still due). The grant read model normalization
+> was removed, the read paths are absolute-IRI-only, and `GrantData` is now the
+> wire shape (the derived fields live in the `grant*` helpers). A review of
+> `packages/data-model` and the JSON-LD helpers in `packages/utils`, with
+> behaviour verified against the installed `jsonld@9.0.0` (framing, compaction
+> and expansion probes).
 > **Last reviewed:** 2026-11-27.
 
 ## Current state
@@ -25,14 +27,14 @@ What remains is structural, not incremental:
 
 - `shape-tree.ts` still resolves `descriptionLanguages` with a document-wide
   `documentValues` lookup (the description sets are separate nodes);
-- write paths are projections (`toJsonLd` in grant, `withContext` in the other
-  models) rather than a wire-shaped read model (see the open question).
+- the context architecture (item 7) and the OpenWiki refresh (item 10).
 
 Landed: the type-scoped container fix, the `CONTEXT` term maps, the typed
 `Framed*` + `projectNode` read paths, the frame defaults, the absolute-IRI
-fetch boundary, the one-frame activity decode, and the ACR root-id fix (see the
-progress log). `selectNode` is gone — framing plus `frameNode`'s set defaults
-are the only filter the read paths need.
+fetch boundary, the one-frame activity decode, the ACR root-id fix and the
+wire-shaped grant read/write model (see the progress log). `selectNode` is
+gone — framing plus `frameNode`'s set defaults are the only filter the read
+paths need.
 
 
 ## Progress log
@@ -95,8 +97,33 @@ are the only filter the read paths need.
   serializations cannot drift.
 - Deferred: the typed ACR read model + `toJsonLd`. The rewrite is a graph edit
   of a document we do not own (it must preserve foreign controls and their
-  policies), so a whole-document typed read model needs the write-frame work in
-  the open question below.
+  policies), so it neither fits the grant-style projection nor a whole-document
+  read model; the resolved write-path section below records the same conclusion
+  for the two paths that do read-model the wire.
+
+### Landed — item 11: the grant write path (wire-shaped read model)
+
+- `GrantData` is now the wire shape: `id`, `type`, `access` (the ODRL policy
+  tree), `scopeOfGrant`, `inheritsFromGrant`, `hasInheritingGrant`. The six
+  derived fields (`storage`, `grantedBy`, `dataOwner`, `registeredShapeTree`,
+  `hasDataRegistration`, `hasDataInstance`) and the policy-level convenience
+  fields (`assignee`, `action`, `target`) are gone; `deriveFields` and the
+  convenience lift in `toOdrlPolicy` are deleted.
+- Consumers read the target facts through `grantStorage`, `grantAssigner`,
+  `grantDataOwner`, `grantShapeTree`, `grantRegistration` and
+  `grantDataInstances` (the last three are new), and the grantee/mode/target
+  helpers. `grantFieldsEqual` compares the helper values, not raw POJO keys.
+- The read-boundary contract stays: `fromJsonLd` still throws (`must`) on a
+  grant with no storage, issuer or data owner, so the validation did not move
+  into every consumer.
+- `toJsonLd` is a `pick` of per-level wire term lists plus the two
+  normalizations a builder may not have applied — the `AccessGrant` envelope
+  class and `uid ?? id`. No field-by-field copying remains. It survives because
+  a claim-derived policy can lack `uid` and a built grant can lack the envelope
+  class; everything else is the read shape verbatim.
+- Fixtures across the unit and Dagger suites build grants through
+  `grantAccess` (the permission tree is the only source of target facts)
+  instead of setting flat fields; assertions use the `grant*` helpers.
 
 ### Landed — item 2: frame defaults (no `@default`)
 
@@ -476,7 +503,8 @@ resolution even when a base is supplied (verified).
 > **Status:** landed — builders and the bootstrap template root at `#root`,
 > `rewriteFullAdminAccess` also finds a root by `acp:AccessControlResource`, and
 > the template ACR is pinned to `registrySetAcrJsonLd` by an isomorphism test.
-> The typed read model + `toJsonLd` is deferred to the open question below.
+> The typed read model + `toJsonLd` is deferred: an ACR rewrite must preserve
+> foreign controls, so a whole-document read model is not a projection.
 
 - `agentRegistrationAcrJsonLd` writes `${acr}#registration`,
   `accessGrantAcrJsonLd` writes `${id}#grant`, while `rewriteFullAdminAccess`
@@ -510,67 +538,46 @@ resolution even when a base is supplied (verified).
 
 ### 11. Apply the grant simplification to the other models
 
-> **Status:** landed for the data-model readers (typed `Framed*` + `projectNode`),
-> for `shape-tree.ts` (nested references, framed description lookup) and for the
-> authorization-agent activity decode. Remaining: the write paths.
+> **Status:** landed — the data-model readers (typed `Framed*` + `projectNode`),
+> `shape-tree.ts` (nested references, framed description lookup), the
+> authorization-agent activity decode and the write paths (wire-shaped
+> `GrantData` + `toJsonLd` as a `pick`).
 
 The grant read path is now the template:
 
 - declare the framed shape (`Framed*`) once per model instead of
   `Record<string, unknown>` + per-field casts;
 - spread the framed object, default only the set-container fields;
-- keep a mapper only for derived values that are not on the wire
-  (`deriveFields`) and for policy/POJO convenience fields (`toOdrlPolicy`).
+- keep a mapper only for the required/set-container normalization
+  (`toOdrlPolicy`); derived values are helpers over the wire tree
+  (`grantStorage`, `grantShapeTree`, …), never fields.
 
-Remaining targets:
-
-- write paths: see the open question below (`toJsonLd` projection in grant,
-  `withContext` in the other models).
+Remaining targets: none — the grant simplification now covers the readers, the
+activity decode and the write path (see the progress log).
 
 
-## Open question — the grant write path (`toJsonLd`)
+## Resolved — the grant write path (`toJsonLd`)
 
-`toJsonLd` is **not** a compaction step; it is a projection from the read model
-to the wire model. It drops values that exist only in the POJO:
+The grant read model was a mix of wire fields and derived convenience values, so
+`toJsonLd` had to project the POJO onto the wire shape by hand. Item 11 removed
+the mix (option 3): `GrantData` is the wire shape, the target facts are computed
+from the permission tree by the `grant*` helpers, and the policy-level
+convenience fields are gone.
 
-- grant-level derived fields (`storage`, `grantedBy`, `dataOwner`,
-  `registeredShapeTree`, `hasDataRegistration`, `hasDataInstance`);
-- policy-level convenience fields (`assignee`, `action`, `target` — the wire
-  representation is the `permission` array);
-- it adds the envelope class (`AccessGrant`), defaults `uid ?? id`, and keeps
-  the optional `inheritsFromGrant`/`hasInheritingGrant` links.
+`toJsonLd` remains, but only as a `pick` of the per-level wire term lists plus
+two normalizations a builder may not have applied — the `AccessGrant` envelope
+class and `uid ?? id`. It cannot disappear entirely: a claim-derived policy can
+lack `uid`, and a generated grant carries only the document's own classes until
+the write adds the envelope. `withContext(accessContext, grant)` alone would
+write such a grant without them.
 
-`jsonld.compact` cannot drop properties — it emits everything present in the
-input; omitting a term from the context only turns a key into a full IRI, it
-does not remove it. `jsonld.frame` *can* select properties with
-`@explicit: true`, but that needs a **write frame** (the same schema as the
-read frame), an extra expand→frame pass, and makes `toJsonLd` async. It would
-be the declarative end state, not a drop-in replacement.
+The other models (`withContext` in role, registrations, invitations, …) still
+build their write payloads field by field; they never had derived fields, so
+those write paths were already structural and are not a wire-shape problem.
 
-Options, in increasing order of change:
-
-1. **Keep the projection, make it structural** (current): explicit
-   `toJsonLd`, typed `FinalGrantData` input. It is the only place that knows
-   which POJO fields are derived; tests pin the wire shape (`toStore`
-   assertions).
-2. **Typed write projection**: define `GrantWire` (the exact serializable
-   shape) and build it with a spread/`pick` of wire terms; `toJsonLd` becomes
-   `withContext(accessContext, pick(grant, WIRE_TERMS))` plus the nested
-   policy/permission/target selection. Same behaviour, less hand-written field
-   copying.
-3. **Wire-shaped read model**: move the derived grant fields out of
-   `GrantData` (`grantStorage`, `grantDataOwner`, … already exist as helpers)
-   so the POJO *is* the wire shape; then `withContext(accessContext, grant)`
-   suffices and `toJsonLd` disappears. This is the cleanest end state but
-   touches every consumer that reads `grant.storage`/`grant.hasDataRegistration`
-   directly.
-4. **Declarative write frame**: a `grantWriteFrame` with `@explicit: true`
-   at every level, reusing the read term lists; `toJsonLd` becomes async.
-   Best if we want one frame/schema for both directions.
-
-Recommendation: keep (1) until item 11 has migrated the other models, then do
-(3) together with the write-path cleanup; fall back to (2) if moving derived
-fields is too invasive.
+`jsonld.compact` cannot drop properties and a write frame (`@explicit`) would
+make `toJsonLd` async — the option-4 end state stays unused because nothing is
+left to select.
 
 ## Verified `jsonld@9.0.0` constraints
 
@@ -619,7 +626,9 @@ fields is too invasive.
 7. Item 6 (activity decode) — authorization-agent side; one multi-`@id` frame. —
    **landed**
 8. Item 9 (ACR root ids) — independent correctness fix. — **landed**
-9. Items 7, 10 — cleanup / follow-up, can land independently.
+9. Item 11 (write paths) — wire-shaped `GrantData`, helper reads,
+   `toJsonLd` as a `pick`. — **landed**
+10. Items 7, 10 — cleanup / follow-up, can land independently.
 
 ## Out of scope
 

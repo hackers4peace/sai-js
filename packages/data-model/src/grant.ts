@@ -59,16 +59,15 @@ export interface OdrlPolicy {
   permission: Array<OdrlPermission>
   scopeOfGrant?: OpenTerm<ScopeOfGrantTerm>
   inheritsFromGrant?: string
-  /** Derived from the first permission (compatibility convenience). */
-  assignee?: string
-  action?: Array<OpenTerm<AccessModeTerm>>
-  target?: OdrlTarget
 }
 
 /**
- * The canonical access-grant read model. The wire truth is the ODRL
- * policy/permission/target graph; the flat fields below are derived
- * convenience values for existing consumers and are never serialized.
+ * The canonical access-grant read model — the wire shape of the grant document:
+ * the ODRL policy/permission/target tree plus the grant-level links. Nothing
+ * here is derived: the target facts consumers need (storage, owner, shape tree,
+ * registration, instances) are read from the permission tree through the
+ * `grant*` helpers below, so the POJO can be written back with `toJsonLd`
+ * without dropping or inventing fields.
  *
  * Vocabulary values (classes, scope, profile, actions) are the context's
  * compacted tokens; IRI-valued fields (storage, source, shape tree,
@@ -79,14 +78,6 @@ export type GrantData = GrantId & {
   scopeOfGrant?: OpenTerm<ScopeOfGrantTerm>
   inheritsFromGrant?: string
   hasInheritingGrant?: Array<string>
-
-  // Derived convenience fields (not serialized).
-  storage: string
-  grantedBy: string
-  dataOwner: string
-  registeredShapeTree: string
-  hasDataRegistration: string
-  hasDataInstance?: Array<string>
 }
 
 export type FinalGrantData = GrantData & Required<Pick<GrantData, 'id'>>
@@ -118,9 +109,8 @@ export interface GrantPermissionInput extends GrantTargetInput {
 const urn = (): string => `urn:uuid:${crypto.randomUUID()}`
 
 /**
- * The wire shape of a framed grant. These are the same ODRL properties the
- * POJO exposes; only the policy-level convenience fields (`assignee`, `action`,
- * `target`) are derived, not framed.
+ * The node shapes the framer returns — the same ODRL properties the read model
+ * exposes. Everything is a wire term here; there is no separate projection.
  */
 type FramedTarget = {
   id?: string
@@ -159,37 +149,22 @@ type FramedGrant = {
   scopeOfGrant?: OpenTerm<ScopeOfGrantTerm>
   inheritsFromGrant?: string
   hasInheritingGrant: Array<string>
-  storage?: string
-  grantedBy?: string
-  dataOwner?: string
-  registeredShapeTree?: string
-  hasDataRegistration?: string
-  hasDataInstance?: Array<string>
 }
 
 /**
- * The grant document's own wire terms — the `@explicit` frame list. Only terms
- * the reader consumes: the embedded policy tree under `access`, the scope, the
- * inheritance links and the grant-level fallbacks for the derived fields.
- * (`interop:grantedBy`/`dataOwner` are not in the access context, so they never
- * frame as compacted terms — both are derived from the permission/target.)
+ * The grant document's own wire terms — the `@explicit` frame list: the
+ * embedded policy tree under `access`, the scope and the inheritance links.
+ * The target facts (`storage`, `dataOwner`, shape tree, registration,
+ * instances) live on the permission tree and are reached through the `grant*`
+ * helpers, not framed onto the grant node.
  */
-const GRANT_TERMS = [
-  'access',
-  'scopeOfGrant',
-  'inheritsFromGrant',
-  'hasInheritingGrant',
-  'storage',
-  'registeredShapeTree',
-  'hasDataRegistration',
-] as const
+const GRANT_TERMS = ['access', 'scopeOfGrant', 'inheritsFromGrant', 'hasInheritingGrant'] as const
 
 /**
  * The framed policy already has the POJO's property names; this only fills the
- * set-container defaults of the EMBEDDED nodes (policies, permissions and
- * targets are not focus nodes of the frame, so `frameNode` does not fill their
- * absent set terms) and lifts the first permission to the policy-level
- * convenience fields (`assignee`, `action`, `target`).
+ * set-container defaults of the EMBEDDED nodes (permissions and targets are not
+ * focus nodes of the frame, so `frameNode` does not fill their absent set
+ * terms) and requires the values every permission needs.
  */
 function toOdrlPolicy(framed: FramedPolicy): OdrlPolicy {
   const permission = (framed.permission ?? []).map((entry) => ({
@@ -203,14 +178,12 @@ function toOdrlPolicy(framed: FramedPolicy): OdrlPolicy {
       source: entry.target?.source ?? [],
     },
   }))
-  const first = permission[0]
   return {
     ...framed,
     type: framed.type ?? [],
     profile: required(framed, 'profile'),
     permission,
     scopeOfGrant: asScopeTerm(framed.scopeOfGrant) ?? framed.scopeOfGrant,
-    ...(first ? { assignee: first.assignee, action: [...first.action], target: first.target } : {}),
   }
 }
 
@@ -253,52 +226,6 @@ function must<T extends string>(value: T | undefined | '', what: string, id: str
   return value
 }
 
-function deriveFields(
-  node: FramedGrant,
-  access: Array<OdrlPolicy>
-): Pick<
-  GrantData,
-  | 'storage'
-  | 'grantedBy'
-  | 'dataOwner'
-  | 'registeredShapeTree'
-  | 'hasDataRegistration'
-  | 'hasDataInstance'
-> {
-  const permissions = access.flatMap((policy) => policy.permission)
-  const first = permissions[0]
-  const target = first?.target
-  const registrationTarget = permissions
-    .map((permission) => permission.target)
-    .find((candidate) => candidate.type.includes(CONTEXT.DataRegistration))
-  const assetTargets = permissions.flatMap(({ target: candidate }) =>
-    candidate.type.includes(CONTEXT.Asset) && !candidate.type.includes(CONTEXT.DataRegistration)
-      ? [candidate]
-      : []
-  )
-  return {
-    storage: must(target?.storage ?? node.storage, 'storage', node.id),
-    grantedBy: must(first?.assigner ?? node.grantedBy, 'grantedBy', node.id),
-    dataOwner: must(first?.target.owner ?? node.dataOwner, 'dataOwner', node.id),
-    // empty when the grant is not shape-tree-scoped (an AdminGrant targets the
-    // registry set / a data registry, not a shape tree)
-    registeredShapeTree:
-      permissions.map((permission) => shapeTreeOfTarget(permission.target)).find(Boolean) ?? '',
-    // empty when the grant is not registration-scoped (a shape-tree target)
-    hasDataRegistration:
-      registrationOfTarget(registrationTarget) ||
-      (permissions.map((permission) => registrationOfTarget(permission.target)).find(Boolean) ??
-        ''),
-    ...(assetTargets.length
-      ? {
-          hasDataInstance: assetTargets.flatMap((candidate) =>
-            candidate.source[0] ? [candidate.source[0]] : []
-          ),
-        }
-      : {}),
-  }
-}
-
 export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
   const expanded = await expandedJsonLd(doc as Record<string, unknown>)
   const node = (await frameNode(expanded, accessContext, id, {
@@ -306,7 +233,7 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
     overrides: { access: { '@embed': '@always' } },
   })) as unknown as FramedGrant
   const access = node.access.map(toOdrlPolicy)
-  return {
+  const grant: GrantData = {
     id,
     type: node.type,
     access,
@@ -315,8 +242,14 @@ export async function fromJsonLd(doc: unknown, id: string): Promise<GrantData> {
     scopeOfGrant: asScopeTerm(node.scopeOfGrant) ?? node.scopeOfGrant ?? access[0]?.scopeOfGrant,
     ...(node.inheritsFromGrant ? { inheritsFromGrant: node.inheritsFromGrant } : {}),
     ...(node.hasInheritingGrant ? { hasInheritingGrant: node.hasInheritingGrant } : {}),
-    ...deriveFields(node, access),
   }
+  // the reader's contract is visibility, not coercion: a grant without a
+  // storage, an issuer or a data owner can be matched by nobody, so fail at the
+  // read boundary instead of handing consumers empty strings
+  must(grantStorage(grant), 'storage', id)
+  must(grantAssigner(grant), 'grantedBy', id)
+  must(grantDataOwner(grant), 'dataOwner', id)
+  return grant
 }
 
 /** The concrete grantee of the first permission. */
@@ -340,6 +273,41 @@ export function grantAccessModes(grant: Pick<GrantData, 'access'>): Array<string
 /** Every target across the grant's permissions. */
 export function grantTargets(grant: Pick<GrantData, 'access'>): Array<OdrlTarget> {
   return grant.access.flatMap((policy) => policy.permission.map((permission) => permission.target))
+}
+
+/**
+ * The shape tree the grant is scoped to: the first target that names one. Empty
+ * when the grant is not shape-tree-scoped (registry-set and data-registry admin
+ * grants target storage).
+ */
+export function grantShapeTree(grant: Pick<GrantData, 'access'>): string {
+  return grantTargets(grant).map(shapeTreeOfTarget).find(Boolean) ?? ''
+}
+
+/**
+ * The data registration the grant is scoped to: a `DataRegistration` target's
+ * source, else the first target carrying an explicit registration. Empty when
+ * the grant is not registration-scoped (a shape-tree target).
+ */
+export function grantRegistration(grant: Pick<GrantData, 'access'>): string {
+  const targets = grantTargets(grant)
+  const registrationTarget = targets.find((target) =>
+    target.type.includes(CONTEXT.DataRegistration)
+  )
+  return (
+    registrationOfTarget(registrationTarget) ||
+    (targets.map(registrationOfTarget).find(Boolean) ?? '')
+  )
+}
+
+/** The selected instances the grant targets (asset targets), in permission order. */
+export function grantDataInstances(grant: Pick<GrantData, 'access'>): Array<string> {
+  return grantTargets(grant)
+    .filter(
+      (target) =>
+        target.type.includes(CONTEXT.Asset) && !target.type.includes(CONTEXT.DataRegistration)
+    )
+    .flatMap((target) => (target.source[0] ? [target.source[0]] : []))
 }
 
 /** The grant's data storage (first target). */
@@ -447,54 +415,58 @@ export function grantAccess(input: GrantPermissionInput): Array<OdrlPolicy> {
       profile: CONTEXT.AccessProfile,
       permission: permissions,
       scopeOfGrant: scope,
-      ...(permissions[0]
-        ? {
-            assignee: permissions[0].assignee,
-            action: [...permissions[0].action],
-            target: permissions[0].target,
-          }
-        : {}),
     },
   ]
+}
+
+/**
+ * The serializable terms of each grant node. The read model is the wire shape,
+ * so the write path is a `pick` of these per level plus the two normalizations
+ * a builder may not have applied: the `AccessGrant` envelope class and `uid`
+ * defaulting to `id`.
+ */
+const GRANT_WIRE_TERMS = ['id', 'scopeOfGrant', 'inheritsFromGrant', 'hasInheritingGrant'] as const
+const POLICY_WIRE_TERMS = ['id', 'type', 'profile', 'scopeOfGrant', 'inheritsFromGrant'] as const
+const PERMISSION_WIRE_TERMS = ['id', 'assigner', 'assignee', 'action'] as const
+const TARGET_WIRE_TERMS = [
+  'id',
+  'owner',
+  'storage',
+  'type',
+  'source',
+  'registeredShapeTree',
+  'hasDataRegistration',
+] as const
+
+/** The present wire terms only — an absent field is omitted, never `undefined`. */
+function pick<T extends object, K extends keyof T>(source: T, keys: ReadonlyArray<K>): Pick<T, K> {
+  const picked = {} as Pick<T, K>
+  for (const key of keys) {
+    if (source[key] !== undefined) {
+      picked[key] = source[key]
+    }
+  }
+  return picked
 }
 
 /** Write a grant as the frozen ODRL/LWS/SAI shape. */
 export function toJsonLd(grant: FinalGrantData): Record<string, unknown> {
   return withContext(accessContext, {
-    id: grant.id,
-    type: [...new Set([CONTEXT.AccessGrant, ...(grant.type ?? [])])],
-    scopeOfGrant: grant.scopeOfGrant,
+    ...pick(grant, GRANT_WIRE_TERMS),
+    type: [...new Set([CONTEXT.AccessGrant, ...grant.type])],
     access: grant.access.map((policy) => ({
-      id: policy.id,
+      ...pick(policy, POLICY_WIRE_TERMS),
       uid: policy.uid ?? policy.id,
       type: [...new Set(policy.type)],
-      profile: policy.profile,
-      ...(policy.scopeOfGrant ? { scopeOfGrant: policy.scopeOfGrant } : {}),
       permission: policy.permission.map((permission) => ({
-        id: permission.id,
+        ...pick(permission, PERMISSION_WIRE_TERMS),
         uid: permission.uid ?? permission.id,
-        assigner: permission.assigner,
-        assignee: permission.assignee,
-        action: permission.action,
         target: {
-          id: permission.target.id,
+          ...pick(permission.target, TARGET_WIRE_TERMS),
           uid: permission.target.uid ?? permission.target.id,
-          ...(permission.target.owner ? { owner: permission.target.owner } : {}),
-          ...(permission.target.storage ? { storage: permission.target.storage } : {}),
-          type: permission.target.type,
-          source: permission.target.source,
-          ...(permission.target.registeredShapeTree
-            ? { registeredShapeTree: permission.target.registeredShapeTree }
-            : {}),
-          ...(permission.target.hasDataRegistration
-            ? { hasDataRegistration: permission.target.hasDataRegistration }
-            : {}),
         },
       })),
-      ...(policy.inheritsFromGrant ? { inheritsFromGrant: policy.inheritsFromGrant } : {}),
     })),
-    ...(grant.inheritsFromGrant ? { inheritsFromGrant: grant.inheritsFromGrant } : {}),
-    ...(grant.hasInheritingGrant ? { hasInheritingGrant: grant.hasInheritingGrant } : {}),
   })
 }
 

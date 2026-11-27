@@ -1,7 +1,12 @@
 import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpavlik/sai-components'
 import { ActivityRegistry, localSparqlTransport } from '@janeirodigital/interop-authorization-agent'
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
-import { AccessRequest, grantGrantee } from '@janeirodigital/interop-data-model'
+import {
+  AccessRequest,
+  grantDataInstances,
+  grantGrantee,
+  grantShapeTree,
+} from '@janeirodigital/interop-data-model'
 const loadAccessRequest = loader(AccessRequest.fromJsonLd)
 
 import {
@@ -188,15 +193,15 @@ describe('specific-instance access request', () => {
     const grants = await accessGrants(regAfter!, aliceSession)
     const targeted = grants.find(
       (grant) =>
-        grant.registeredShapeTree === projectShapeTree &&
+        grantShapeTree(grant) === projectShapeTree &&
         asScopeTerm(grant.scopeOfGrant) === CONTEXT.SelectedFromRegistry &&
         grantGrantee(grant) === kimId &&
-        grant.hasDataInstance?.length === 2 &&
-        grant.hasDataInstance?.includes(instance1) &&
-        grant.hasDataInstance?.includes(instance2)
+        grantDataInstances(grant).length === 2 &&
+        grantDataInstances(grant).includes(instance1) &&
+        grantDataInstances(grant).includes(instance2)
     )
     expect(targeted).toBeDefined()
-    expect(targeted!.hasDataInstance).not.toContain(notRequested)
+    expect(grantDataInstances(targeted!)).not.toContain(notRequested)
 
     const assetSources = targeted!.access
       .flatMap((policy) => policy.permission)

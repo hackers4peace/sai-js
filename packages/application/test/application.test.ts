@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
-import { FlatIdentifierStrategy } from '@janeirodigital/interop-utils'
+import { grantAccess, grantDataOwner } from '@janeirodigital/interop-data-model'
+import { FlatIdentifierStrategy, INTEROP } from '@janeirodigital/interop-utils'
 import { describe, expect, test, vi } from 'vitest'
 
 import { Application } from '../src'
@@ -41,7 +42,7 @@ describe('applicatrion registration exists', () => {
       expect(owner.id).toBeTypeOf('string')
       expect(Array.isArray(owner.issuedGrants)).toBe(true)
       for (const grant of owner.issuedGrants) {
-        expect(grant.dataOwner).toBe(owner.id)
+        expect(grantDataOwner(grant)).toBe(owner.id)
       }
     }
   })
@@ -137,9 +138,19 @@ describe('iriForNew', () => {
         id: webId,
         issuedGrants: [
           {
-            storage,
-            hasDataRegistration: dataRegistration,
-            registeredShapeTree: scope,
+            id: 'https://auth.alice.example/grant/1',
+            type: [INTEROP.AccessGrant],
+            access: grantAccess({
+              scopeOfGrant: INTEROP.AllFromRegistry,
+              owner: webId,
+              storage,
+              hasDataRegistration: dataRegistration,
+              registeredShapeTree: scope,
+              assigner: webId,
+              assignee: applicationId,
+              actions: [INTEROP.read],
+            }),
+            scopeOfGrant: INTEROP.AllFromRegistry,
           },
         ],
       },

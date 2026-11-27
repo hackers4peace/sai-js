@@ -206,31 +206,27 @@ describe('dataRegistrationContains', () => {
 // peerInstanceIris
 // ──────────────────────────
 
-const grantData = (scopeOfGrant: string, extra: Partial<GrantData> = {}): GrantData => {
-  const registeredShapeTree = extra.registeredShapeTree ?? 'https://shapetrees.example/Child'
+const grantData = (
+  scopeOfGrant: string,
+  extra: { hasDataInstance?: Array<string>; inheritsFromGrant?: string } = {}
+): GrantData => {
   const hasDataInstance = extra.hasDataInstance ?? []
   return {
     id: 'https://peer.example/grants/1',
     type: [LWS.AccessGrant],
-    storage: PEER_STORAGE,
     access: grantAccess({
       scopeOfGrant,
       storage: PEER_STORAGE,
       hasDataRegistration: PEER_REGISTRATION,
       hasDataInstance,
-      registeredShapeTree,
+      registeredShapeTree: 'https://shapetrees.example/Child',
       owner: 'https://peer.example/profile/card#me',
       assigner: 'https://peer.example/profile/card#me',
       assignee: YOYO_WEBID,
       actions: [ACCESS_ACTIONS.read],
     }),
-    grantedBy: 'https://peer.example/profile/card#me',
-    dataOwner: 'https://peer.example/profile/card#me',
-    registeredShapeTree,
-    hasDataRegistration: PEER_REGISTRATION,
     scopeOfGrant,
-    ...(hasDataInstance.length ? { hasDataInstance } : {}),
-    ...extra,
+    ...(extra.inheritsFromGrant ? { inheritsFromGrant: extra.inheritsFromGrant } : {}),
   }
 }
 

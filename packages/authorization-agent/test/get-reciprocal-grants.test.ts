@@ -1,3 +1,4 @@
+import { grantShapeTree, grantStorage } from '@janeirodigital/interop-data-model'
 import {
   CONTEXT,
   ACCESS_ACTIONS,
@@ -114,9 +115,9 @@ describe('getReciprocalGrants — batched grantee-side read', () => {
     const grants = await getReciprocalGrants(transport, RECIPROCAL)
 
     expect(grants.map((grant) => grant.id)).toEqual([G1, G2])
-    expect(grants[1].registeredShapeTree).toBe('https://data/shapetrees/trees/Task')
+    expect(grantShapeTree(grants[1])).toBe('https://data/shapetrees/trees/Task')
     expect(grants[0].type).toEqual([CONTEXT.AccessGrant])
-    expect(grants[0].storage).toBe('https://data/alice/')
+    expect(grantStorage(grants[0])).toBe('https://data/alice/')
     expect(transport.queries).toHaveLength(2)
     expect(transport.queries[0]).toContain(`GRAPH <meta:${RECIPROCAL}>`)
   })

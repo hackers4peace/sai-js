@@ -1,4 +1,5 @@
 import { accessRequestsUrl, buildOidcSession, buildSessionManager } from '@elfpavlik/sai-components'
+import { grantShapeTree } from '@janeirodigital/interop-data-model'
 import { CONTEXT, ACCESS_ACTIONS, INTEROP } from '@janeirodigital/interop-utils'
 import { Client, Connection } from '@temporalio/client'
 import { describe, expect, test } from 'vitest'
@@ -365,10 +366,10 @@ describe('approve a need-based access request', () => {
     // through: test/ had no shape assertion on runtime-generated grants).
     const grantsAfter = await accessGrants(regAfter!, aliceSession)
     const projectGrants = grantsAfter.filter(
-      (grant) => grant.registeredShapeTree === 'https://data/shapetrees/trees/Project'
+      (grant) => grantShapeTree(grant) === 'https://data/shapetrees/trees/Project'
     )
     const taskGrants = grantsAfter.filter(
-      (grant) => grant.registeredShapeTree === 'https://data/shapetrees/trees/Task'
+      (grant) => grantShapeTree(grant) === 'https://data/shapetrees/trees/Task'
     )
     expect(projectGrants.length).toBeGreaterThan(0)
     expect(taskGrants.length).toBeGreaterThan(0)
@@ -380,7 +381,7 @@ describe('approve a need-based access request', () => {
       expect(taskGrant.scopeOfGrant).toBe(CONTEXT.Inherited)
       const parent = grantsAfter.find((grant) => grant.id === taskGrant.inheritsFromGrant)
       expect(parent).toBeDefined()
-      expect(parent!.registeredShapeTree).toBe('https://data/shapetrees/trees/Project')
+      expect(grantShapeTree(parent!)).toBe('https://data/shapetrees/trees/Project')
       expect(parent!.hasInheritingGrant).toContain(taskGrant.id)
     }
 

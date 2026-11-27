@@ -1,4 +1,9 @@
-import { grantAccess, toJsonLd } from '@janeirodigital/interop-data-model'
+import {
+  grantAccess,
+  grantRegistration,
+  grantShapeTree,
+  toJsonLd,
+} from '@janeirodigital/interop-data-model'
 import { INTEROP, ODRL, ODRL_ID_JAG_CONTEXT, toNQuads } from '@janeirodigital/interop-utils'
 import { Parser } from 'n3'
 import { describe, expect, test, vi } from 'vitest'
@@ -115,8 +120,8 @@ describe('claim coverage', () => {
       actions: [ODRL.read],
     })
     const claim = grantFromPolicy(policy, 'urn:sai:access-claim', INTEROP.AllFromAgent)
-    expect(claim.registeredShapeTree).toBe(SHAPE_TREE)
-    expect(claim.hasDataRegistration).toBe('')
+    expect(grantShapeTree(claim)).toBe(SHAPE_TREE)
+    expect(grantRegistration(claim)).toBe('')
     expect(grantCoversClaim(claim, policy)).toBe(true)
   })
 

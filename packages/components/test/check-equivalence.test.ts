@@ -1,4 +1,4 @@
-import { grantAccess } from '@janeirodigital/interop-data-model'
+import { grantAccess, grantShapeTree } from '@janeirodigital/interop-data-model'
 import type { GrantData, GrantTargetInput, OdrlPolicy } from '@janeirodigital/interop-data-model'
 import { INTEROP, LWS } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
@@ -34,10 +34,15 @@ const ACME = 'https://id/acme'
 const KIM = 'https://id/kim'
 
 interface GrantOverrides extends Partial<GrantData> {
-  /** legacy-named fixture fields — derived into the canonical access policy */
+  /** legacy-named fixture fields — encoded in the canonical access policy */
   grantee?: string
   accessMode?: Array<string>
   hasStorage?: string
+  dataOwner?: string
+  grantedBy?: string
+  registeredShapeTree?: string
+  hasDataRegistration?: string
+  hasDataInstance?: Array<string>
 }
 
 function target(
@@ -54,7 +59,6 @@ function withAssignee(grant: GrantData, assignee: string): GrantData {
     ...grant,
     access: grant.access.map((policy) => ({
       ...policy,
-      assignee,
       permission: policy.permission.map((permission) => ({ ...permission, assignee })),
     })),
   }
@@ -62,28 +66,25 @@ function withAssignee(grant: GrantData, assignee: string): GrantData {
 
 function grant(overrides: GrantOverrides = {}): GrantData {
   const { grantee = KIM, accessMode = [READ], hasStorage = STORAGE, ...rest } = overrides
-  const storage = rest.storage ?? hasStorage
+  const storage = hasStorage
   const hasDataRegistration = rest.hasDataRegistration ?? PROJECT_REGISTRATION
   const scopeOfGrant = rest.scopeOfGrant ?? INTEROP.AllFromRegistry
   return {
-    id: PARENT,
+    id: rest.id ?? PARENT,
     type: [LWS.AccessGrant],
-    storage,
     access:
       rest.access ??
       (grantAccess({
         ...target(scopeOfGrant, hasDataRegistration, rest.hasDataInstance, storage),
-        registeredShapeTree: PROJECT_TREE,
-        assigner: ACME,
+        owner: rest.dataOwner ?? ALICE,
+        registeredShapeTree: rest.registeredShapeTree ?? PROJECT_TREE,
+        assigner: rest.grantedBy ?? ACME,
         assignee: grantee,
         actions: accessMode,
       }) as Array<OdrlPolicy>),
-    grantedBy: ACME,
-    dataOwner: ALICE,
-    registeredShapeTree: PROJECT_TREE,
-    hasDataRegistration,
     scopeOfGrant,
-    ...rest,
+    ...(rest.inheritsFromGrant ? { inheritsFromGrant: rest.inheritsFromGrant } : {}),
+    ...(rest.hasInheritingGrant ? { hasInheritingGrant: rest.hasInheritingGrant } : {}),
   }
 }
 
@@ -137,17 +138,17 @@ describe('grantFieldsEqual', () => {
     expect(grantFieldsEqual(a, b)).toBe(true)
   })
 
-  const scalarChanges: Array<[keyof GrantData, string]> = [
+  const scalarChanges: Array<[string, string]> = [
     ['grantedBy', 'https://id/bob'],
     ['dataOwner', 'https://id/bob'],
     ['registeredShapeTree', 'https://data/shapetrees/trees/Other'],
     ['hasDataRegistration', 'https://data/acme/registrations/other/'],
-    ['storage', 'https://data/acme/hr/'],
+    ['hasStorage', 'https://data/acme/hr/'],
     ['scopeOfGrant', INTEROP.SelectedFromRegistry],
   ]
   for (const [field, value] of scalarChanges) {
     test(`differs on ${field}`, () => {
-      expect(grantFieldsEqual(grant(), grant({ [field]: value } as Partial<GrantData>))).toBe(false)
+      expect(grantFieldsEqual(grant(), grant({ [field]: value } as GrantOverrides))).toBe(false)
     })
   }
 
@@ -160,10 +161,11 @@ describe('grantFieldsEqual', () => {
   })
 
   test('differs on hasDataInstance', () => {
-    expect(grantFieldsEqual(grant(), grant({ hasDataInstance: ['i1'] }))).toBe(false)
-    expect(
-      grantFieldsEqual(grant({ hasDataInstance: ['i1'] }), grant({ hasDataInstance: ['i2'] }))
-    ).toBe(false)
+    const selected = (hasDataInstance: Array<string>) =>
+      grant({ scopeOfGrant: INTEROP.SelectedFromRegistry, hasDataInstance })
+    expect(grantFieldsEqual(selected(['i1']), selected(['i2']))).toBe(false)
+    expect(grantFieldsEqual(selected(['i1']), selected(['i1', 'i2']))).toBe(false)
+    expect(grantFieldsEqual(selected(['i1']), selected(['i1']))).toBe(true)
   })
 })
 
@@ -217,7 +219,7 @@ describe('delegatedGrantTrees', () => {
     })
     const [root] = delegatedGrantTrees([embeddedParent])
     expect(root.children).toHaveLength(1)
-    expect(root.children[0].grant.registeredShapeTree).toBe(TASK_TREE)
+    expect(grantShapeTree(root.children[0].grant)).toBe(TASK_TREE)
   })
 
   test('nests embedded descendants (n-depth ready)', () => {
@@ -235,7 +237,7 @@ describe('delegatedGrantTrees', () => {
     const [root] = delegatedGrantTrees([
       grant({ hasInheritingGrant: [middle] as unknown as Array<string> }),
     ])
-    expect(root.children[0].children[0].grant.registeredShapeTree).toBe(PROJECT_TREE)
+    expect(grantShapeTree(root.children[0].children[0].grant)).toBe(PROJECT_TREE)
   })
 
   test('ignores non-object children (the flat/id shape)', () => {

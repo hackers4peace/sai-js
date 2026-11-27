@@ -1,3 +1,11 @@
+import {
+  grantAssigner,
+  grantDataInstances,
+  grantDataOwner,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
+} from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
 
 /**
@@ -16,16 +24,17 @@ import type { GrantData } from '@janeirodigital/interop-data-model'
  * (fail-closed: an incomplete existing tree simply never matches).
  */
 
-const SCALAR_FIELDS = [
-  'grantedBy',
-  'dataOwner',
-  'registeredShapeTree',
-  'hasDataRegistration',
-  'storage',
-  'scopeOfGrant',
-] as const
-
-const SET_FIELDS = ['hasDataInstance'] as const
+/** The semantic scalar fields, read from the permission tree. */
+function scalarFields(grant: GrantData): Array<string> {
+  return [
+    grantAssigner(grant),
+    grantDataOwner(grant),
+    grantShapeTree(grant),
+    grantRegistration(grant),
+    grantStorage(grant),
+    grant.scopeOfGrant ?? '',
+  ]
+}
 
 /** A grant plus its descendants (one level in generation today, recursive for future n-depth). */
 export interface GrantTree {
@@ -89,17 +98,14 @@ function accessShape(grant: GrantData): Array<string> {
  * set equals an empty one.
  */
 export function grantFieldsEqual(a: GrantData, b: GrantData): boolean {
-  for (const field of SCALAR_FIELDS) {
-    if (a[field] !== b[field]) {
-      return false
-    }
+  const scalarsA = scalarFields(a)
+  const scalarsB = scalarFields(b)
+  if (scalarsA.some((value, index) => value !== scalarsB[index])) {
+    return false
   }
-  for (const field of SET_FIELDS) {
-    if (!sameSet(a[field], b[field])) {
-      return false
-    }
-  }
-  return sameSet(accessShape(a), accessShape(b))
+  return (
+    sameSet(grantDataInstances(a), grantDataInstances(b)) && sameSet(accessShape(a), accessShape(b))
+  )
 }
 
 function declaredChildIds(grant: GrantData): Array<string> {

@@ -46,12 +46,15 @@ export interface AdminImpersonationRequestAuthority {
   authorize(input: AdminImpersonationInput): Promise<VerifiedAccessClaim>
 }
 
-/** The `odrl:action` values of one compact ODRL policy. */
+/** The `odrl:action` values of the permissions of one compact ODRL policy. */
 function claimActions(policy: unknown): Array<string> {
-  const action = (policy as { action?: unknown }).action
-  return (Array.isArray(action) ? action : [action]).filter(
-    (value): value is string => typeof value === 'string'
-  )
+  const permissions = (policy as { permission?: Array<{ action?: unknown }> }).permission ?? []
+  return permissions.flatMap((permission) => {
+    const action = permission.action
+    return (Array.isArray(action) ? action : [action]).filter(
+      (value): value is string => typeof value === 'string'
+    )
+  })
 }
 
 /**
@@ -179,10 +182,16 @@ export class AdminImpersonationAuthority implements AdminImpersonationRequestAut
         `${claim.storage} is not readable with ${claim.assignees.join(', ')}.`
       )
     }
-    const narrowed = claim.access.map((policy) => ({
-      ...(policy as Record<string, unknown>),
-      action: [CONTEXT.read],
-    }))
+    // narrow the permission actions — the graph the policy engine evaluates
+    const narrowed = claim.access.map((policy) => {
+      const { permission = [], ...rest } = policy as {
+        permission?: Array<Record<string, unknown>>
+      }
+      return {
+        ...rest,
+        permission: permission.map((entry) => ({ ...entry, action: [CONTEXT.read] })),
+      }
+    })
     return verifyAccessClaim(narrowed, claim.context, claim.storage)
   }
 

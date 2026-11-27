@@ -4,6 +4,10 @@ import {
   ShapeTree,
   childIris,
   frameDataInstanceFromDoc,
+  grantDataInstances,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
 } from '@janeirodigital/interop-data-model'
 import type { GrantData, ShapeTreeData } from '@janeirodigital/interop-data-model'
 import { CONTEXT, asScopeTerm, fetchJsonLd, loader } from '@janeirodigital/interop-utils'
@@ -91,13 +95,15 @@ export async function peerRegistrationOfInstance(
     }
     const grants = await getReciprocalGrants(transport, registration.reciprocalRegistration)
     for (const grant of grants) {
-      const candidate = grant.hasDataRegistration
+      const candidate = grantRegistration(grant)
       if (!candidate || seen.has(candidate)) {
         continue
       }
       seen.add(candidate)
-      if ((await dataRegistrationContains(ctx, grant.storage, candidate)).includes(instanceIri)) {
-        return { id: candidate, storage: grant.storage }
+      if (
+        (await dataRegistrationContains(ctx, grantStorage(grant), candidate)).includes(instanceIri)
+      ) {
+        return { id: candidate, storage: grantStorage(grant) }
       }
     }
   }
@@ -150,29 +156,26 @@ export async function* peerInstanceIris(
     case CONTEXT.AllFromRegistry:
       yield* await dataRegistrationContains(
         ctx,
-        accessGrant.storage,
-        accessGrant.hasDataRegistration
+        grantStorage(accessGrant),
+        grantRegistration(accessGrant)
       )
       break
     case CONTEXT.SelectedFromRegistry:
-      yield* accessGrant.hasDataInstance ?? []
+      yield* grantDataInstances(accessGrant)
       break
     case CONTEXT.Inherited: {
       // the parent grant lives in the peer's registry — refetched from the
       // grant's storage (SAPI supports one level of inheritance today)
       const parentGrant = await Grant.fromJsonLd(
-        await fetchPeerDocument(ctx, accessGrant.storage, accessGrant.inheritsFromGrant),
+        await fetchPeerDocument(ctx, grantStorage(accessGrant), accessGrant.inheritsFromGrant),
         accessGrant.inheritsFromGrant
       )
       for await (const parentIri of peerInstanceIris(ctx, parentGrant)) {
-        const parentShapeTree = await loadShapeTree(
-          parentGrant.registeredShapeTree,
-          ctx.session.fetch
-        )
+        const parentShapeTree = await loadShapeTree(grantShapeTree(parentGrant), ctx.session.fetch)
         yield* childIris(
-          await peerInstanceNode(ctx, accessGrant.storage, parentIri, parentShapeTree),
+          await peerInstanceNode(ctx, grantStorage(accessGrant), parentIri, parentShapeTree),
           parentShapeTree,
-          accessGrant.registeredShapeTree
+          grantShapeTree(accessGrant)
         )
       }
       break

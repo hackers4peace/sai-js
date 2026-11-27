@@ -15,7 +15,15 @@ import {
   listContained,
   accessNeedGroup as resolveAccessNeedGroup,
 } from '@janeirodigital/interop-authorization-agent'
-import { AccessRequest, ClientIdDocument, ShapeTree } from '@janeirodigital/interop-data-model'
+import {
+  AccessRequest,
+  ClientIdDocument,
+  ShapeTree,
+  grantDataInstances,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
+} from '@janeirodigital/interop-data-model'
 import type {
   AccessNeedData,
   AccessNeedGroupData,
@@ -196,11 +204,11 @@ async function findSocialAgentDataRegistrations(
   for (const accessGrant of accessGrants) {
     for (const accessNeed of accessNeedGroup.accessNeeds) {
       if (
-        accessGrant.registeredShapeTree === accessNeed.registeredShapeTree &&
+        grantShapeTree(accessGrant) === accessNeed.registeredShapeTree &&
         asScopeTerm(accessGrant.scopeOfGrant) !== CONTEXT.Inherited // TODO clarify case when this could happen
       ) {
         dataRegistrations.push({
-          id: IRI.make(accessGrant.hasDataRegistration),
+          id: IRI.make(grantRegistration(accessGrant)),
           // the registration's display label is its shape tree's label (a flat
           // LWS IRI says nothing about what the registration holds)
           label: await shapeTreeLabelFor(accessNeed.registeredShapeTree),
@@ -210,12 +218,12 @@ async function findSocialAgentDataRegistrations(
           // truthy and used to make the AllFromRegistry count silently 0).
           count:
             asScopeTerm(accessGrant.scopeOfGrant) === CONTEXT.SelectedFromRegistry
-              ? (accessGrant.hasDataInstance?.length ?? 0)
+              ? grantDataInstances(accessGrant).length
               : (
                   await dataRegistrationContains(
                     ctx,
-                    accessGrant.storage,
-                    accessGrant.hasDataRegistration
+                    grantStorage(accessGrant),
+                    grantRegistration(accessGrant)
                   )
                 ).length,
         })

@@ -83,8 +83,12 @@ describe('AdminImpersonationAuthority', () => {
 
     expect(claim.storage).toBe(PEER_STORAGE)
     expect(claim.assignees).toEqual([ORG])
-    const actions = claim.access.map((policy) => (policy as { action: Array<string> }).action)
-    expect(actions).toEqual([[CONTEXT.read]])
+    const actions = claim.access.flatMap((policy) =>
+      (policy as { permission: Array<{ action: Array<string> }> }).permission.flatMap(
+        (permission) => permission.action
+      )
+    )
+    expect(actions).toEqual([CONTEXT.read])
     // the organization is the claim subject, not the admin
     expect(claimValidator.find).toHaveBeenCalledWith({
       subject: ORG,

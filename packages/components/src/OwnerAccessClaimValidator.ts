@@ -1,5 +1,5 @@
 import type { GrantData, OdrlPolicy } from '@janeirodigital/interop-data-model'
-import { Grant } from '@janeirodigital/interop-data-model'
+import { Grant, grantAssigner } from '@janeirodigital/interop-data-model'
 import { LWS, jsonld } from '@janeirodigital/interop-utils'
 import type { Quad } from '@rdfjs/types'
 import { DataFactory, Store } from 'n3'
@@ -69,7 +69,7 @@ export class OwnerAccessClaimValidator implements AccessClaimValidator {
         throw new Error('no owner grant covers the access claim')
       }
       for (const grant of covering) {
-        owners.add(grant.grantedBy)
+        owners.add(grantAssigner(grant))
       }
     }
     if (owners.size !== 1) {

@@ -1,6 +1,12 @@
 import { randomUUID } from 'node:crypto'
 
-import { grantAccess, grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
+import {
+  grantAccess,
+  grantAccessModes,
+  grantAssigner,
+  grantDataOwner,
+  grantGrantee,
+} from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
 import {
   ACCESS_ACTIONS,
@@ -722,7 +728,6 @@ describe('revokeGrants core (C1)', () => {
     return {
       id,
       type: [LWS.AccessGrant],
-      storage,
       access: grantAccess({
         scopeOfGrant,
         owner: overrides.dataOwner ?? ALICE,
@@ -734,12 +739,7 @@ describe('revokeGrants core (C1)', () => {
         assignee: grantee,
         actions,
       }),
-      dataOwner: overrides.dataOwner ?? ALICE,
-      grantedBy: overrides.grantedBy ?? ALICE,
-      registeredShapeTree: overrides.registeredShapeTree ?? PROJECT_TREE,
-      hasDataRegistration,
       scopeOfGrant,
-      ...(overrides.hasDataInstance ? { hasDataInstance: overrides.hasDataInstance } : {}),
       ...(overrides.inheritsFromGrant ? { inheritsFromGrant: overrides.inheritsFromGrant } : {}),
     }
   }
@@ -895,7 +895,7 @@ describe('revokeGrants core (C1)', () => {
       DataFactory.quad(
         permission,
         DataFactory.namedNode(ODRL.assigner),
-        DataFactory.namedNode(grant.grantedBy)
+        DataFactory.namedNode(grantAssigner(grant))
       ),
       DataFactory.quad(
         permission,
@@ -943,8 +943,8 @@ describe('revokeGrants core (C1)', () => {
             ? [
                 {
                   grant: { termType: 'NamedNode', value: grant.id },
-                  dataOwner: { termType: 'NamedNode', value: grant.dataOwner },
-                  grantedBy: { termType: 'NamedNode', value: grant.grantedBy },
+                  dataOwner: { termType: 'NamedNode', value: grantDataOwner(grant) },
+                  grantedBy: { termType: 'NamedNode', value: grantAssigner(grant) },
                   grantee: { termType: 'NamedNode', value: grantGrantee(grant) ?? '' },
                 },
               ]
@@ -1112,14 +1112,17 @@ describe('dataInstanceIrisForGrant (Phase 4)', () => {
       {
         id: 'https://auth.alice.example/grant/1',
         type: [LWS.AccessGrant],
-        grantee: 'https://bob.example/#id',
-        grantedBy: webId,
-        dataOwner: webId,
-        registeredShapeTree: 'https://shapetrees.example/Project',
-        hasDataRegistration: REGISTRATION,
-        hasStorage: 'https://storage/',
+        access: grantAccess({
+          scopeOfGrant: INTEROP.AllFromRegistry,
+          owner: webId,
+          storage: 'https://storage/',
+          hasDataRegistration: REGISTRATION,
+          registeredShapeTree: 'https://shapetrees.example/Project',
+          assigner: webId,
+          assignee: 'https://bob.example/#id',
+          actions: [ACCESS_ACTIONS.read],
+        }),
         scopeOfGrant: INTEROP.AllFromRegistry,
-        accessMode: [ACCESS_ACTIONS.read],
       },
       localSparqlTransport('http://example.test/sparql'),
       statelessFetch

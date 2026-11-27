@@ -4,7 +4,15 @@ import {
   listContained,
   localSparqlTransport,
 } from '@janeirodigital/interop-authorization-agent'
-import { grantAccessModes, grantGrantee } from '@janeirodigital/interop-data-model'
+import {
+  grantAccessModes,
+  grantAssigner,
+  grantDataInstances,
+  grantDataOwner,
+  grantGrantee,
+  grantRegistration,
+  grantShapeTree,
+} from '@janeirodigital/interop-data-model'
 import { CONTEXT, INTEROP, asScopeTerm, getRegistrySetIri } from '@janeirodigital/interop-utils'
 import { describe, expect, test } from 'vitest'
 
@@ -394,13 +402,13 @@ describe('org context — sharing the org’s own data (2.4 write path)', () => 
     const grants = await accessGrants(linked, yoyoSession)
     const sharedGrant = grants.find(
       (grant) =>
-        grant.registeredShapeTree === projectShapeTree &&
+        grantShapeTree(grant) === projectShapeTree &&
         grantGrantee(grant) === bobId &&
-        grant.hasDataInstance?.includes(ghost)
+        grantDataInstances(grant).includes(ghost)
     )
     expect(sharedGrant).toBeDefined()
-    expect(sharedGrant!.dataOwner).toBe(yoyoId)
-    expect(sharedGrant!.grantedBy).toBe(yoyoId)
+    expect(grantDataOwner(sharedGrant!)).toBe(yoyoId)
+    expect(grantAssigner(sharedGrant!)).toBe(yoyoId)
     expect(sharedGrant!.scopeOfGrant).toBe(CONTEXT.SelectedFromRegistry)
     expect(grantAccessModes(sharedGrant!)).toEqual([CONTEXT.read])
 
@@ -563,12 +571,12 @@ describe('org context — authorizing an agent over the org’s data (2.4 write 
     const projectGrant = grants.find(
       (grant) =>
         grantGrantee(grant) === bobId &&
-        grant.hasDataRegistration === projectRegistration &&
+        grantRegistration(grant) === projectRegistration &&
         asScopeTerm(grant.scopeOfGrant) === CONTEXT.AllFromRegistry
     )
     expect(projectGrant).toBeDefined()
-    expect(projectGrant!.dataOwner).toBe(yoyoId)
-    expect(projectGrant!.grantedBy).toBe(yoyoId)
+    expect(grantDataOwner(projectGrant!)).toBe(yoyoId)
+    expect(grantAssigner(projectGrant!)).toBe(yoyoId)
     expect(grantAccessModes(projectGrant!)).toContain(CONTEXT.read)
   })
 })

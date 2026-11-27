@@ -4,6 +4,11 @@ import {
   frameDataInstance,
   grantAccess,
   grantAccessModes,
+  grantDataInstances,
+  grantDataOwner,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
 } from '@janeirodigital/interop-data-model'
 import type {
   DataAuthorizationData,
@@ -60,14 +65,14 @@ export async function* dataInstanceIrisForGrant(
 ): AsyncIterable<string> {
   switch (asScopeTerm(grant.scopeOfGrant)) {
     case CONTEXT.AllFromRegistry: {
-      const registration = await getDataRegistration(transport, grant.hasDataRegistration)
+      const registration = await getDataRegistration(transport, grantRegistration(grant))
       for (const id of registration.contains) {
         yield id
       }
       break
     }
     case CONTEXT.SelectedFromRegistry: {
-      for (const id of grant.hasDataInstance ?? []) {
+      for (const id of grantDataInstances(grant)) {
         yield id
       }
       break
@@ -75,7 +80,7 @@ export async function* dataInstanceIrisForGrant(
     case CONTEXT.Inherited: {
       const parentGrant = await getAccessGrant(transport, grant.inheritsFromGrant!)
       for await (const parentId of dataInstanceIrisForGrant(parentGrant, transport, fetch)) {
-        yield* await getChildInstanceIris(parentGrant, parentId, grant.registeredShapeTree, fetch)
+        yield* await getChildInstanceIris(parentGrant, parentId, grantShapeTree(grant), fetch)
       }
       break
     }
@@ -94,7 +99,7 @@ async function getChildInstanceIris(
   childShapeTree: string,
   fetch: WhatwgFetch
 ): Promise<Array<string>> {
-  const parentShapeTree = await loadShapeTree(parentGrant.registeredShapeTree, fetch)
+  const parentShapeTree = await loadShapeTree(grantShapeTree(parentGrant), fetch)
   const node = await frameDataInstance(parentId, fetch, parentShapeTree)
   return childIris(node, parentShapeTree, childShapeTree)
 }
@@ -144,7 +149,7 @@ async function generateChildDelegatedGrantData(
     let childSourceGrant: GrantData | undefined
     for (const childIri of sourceGrant.hasInheritingGrant ?? []) {
       const childGrant = await getAccessGrant(transport, childIri)
-      if (childGrant.registeredShapeTree === childAuthorization.registeredShapeTree) {
+      if (grantShapeTree(childGrant) === childAuthorization.registeredShapeTree) {
         childSourceGrant = childGrant
         break
       }
@@ -153,31 +158,26 @@ async function generateChildDelegatedGrantData(
       continue
     }
 
-    const storage = childSourceGrant.storage
-    const hasDataRegistration = childSourceGrant.hasDataRegistration
+    const storage = grantStorage(childSourceGrant)
+    const hasDataRegistration = grantRegistration(childSourceGrant)
     const scopeOfGrant = CONTEXT.Inherited
     const sourceActions = grantAccessModes(childSourceGrant)
     const childGrantIri = await mintResource(registrySet.hasGrantRegistry.id, deps)
     const childData: GrantData = {
       id: childGrantIri,
       type: [CONTEXT.AccessGrant],
-      storage,
       access: grantAccess({
         scopeOfGrant,
         storage,
         hasDataRegistration,
         registeredShapeTree: childAuthorization.registeredShapeTree,
-        owner: childSourceGrant.dataOwner,
+        owner: grantDataOwner(childSourceGrant),
         assigner: data.grantedBy,
         assignee: grantee,
         actions: childAuthorization.accessMode
           .map((mode) => asAccessModeTerm(mode) ?? mode)
           .filter((mode) => sourceActions.includes(mode)),
       }),
-      grantedBy: data.grantedBy,
-      dataOwner: childSourceGrant.dataOwner,
-      registeredShapeTree: childAuthorization.registeredShapeTree,
-      hasDataRegistration,
       scopeOfGrant,
       inheritsFromGrant: parentGrantIri,
     }
@@ -318,11 +318,11 @@ async function generateDelegatedAccessGrants(
     }
 
     let matchingGrants = peer.grants.filter(
-      (grant) => grant.registeredShapeTree === data.registeredShapeTree
+      (grant) => grantShapeTree(grant) === data.registeredShapeTree
     )
     if (data.hasDataRegistration) {
       matchingGrants = matchingGrants.filter(
-        (grant) => grant.hasDataRegistration === data.hasDataRegistration
+        (grant) => grantRegistration(grant) === data.hasDataRegistration
       )
     }
 
@@ -343,38 +343,32 @@ async function generateDelegatedAccessGrants(
         asScopeTerm(sourceGrant.scopeOfGrant) === CONTEXT.SelectedFromRegistry
           ? CONTEXT.SelectedFromRegistry
           : CONTEXT.AllFromRegistry
-      const storage = sourceGrant.storage
-      const hasDataRegistration = sourceGrant.hasDataRegistration
+      const storage = grantStorage(sourceGrant)
+      const hasDataRegistration = grantRegistration(sourceGrant)
       const hasDataInstance =
         scope === CONTEXT.SelectedFromRegistry
           ? data.hasDataInstance?.length
             ? [...data.hasDataInstance]
-            : [...(sourceGrant.hasDataInstance ?? [])]
+            : grantDataInstances(sourceGrant)
           : undefined
       const sourceActions = grantAccessModes(sourceGrant)
       const grant: GrantData = {
         id: regularGrantIri,
         type: [CONTEXT.AccessGrant],
-        storage,
         access: grantAccess({
           scopeOfGrant: scope,
           storage,
           hasDataRegistration,
           hasDataInstance,
-          registeredShapeTree: sourceGrant.registeredShapeTree,
-          owner: sourceGrant.dataOwner,
+          registeredShapeTree: grantShapeTree(sourceGrant),
+          owner: grantDataOwner(sourceGrant),
           assigner: data.grantedBy,
           assignee: grantee,
           actions: data.accessMode
             .map((mode) => asAccessModeTerm(mode) ?? mode)
             .filter((mode) => sourceActions.includes(mode)),
         }),
-        grantedBy: data.grantedBy,
-        dataOwner: sourceGrant.dataOwner,
-        registeredShapeTree: sourceGrant.registeredShapeTree,
-        hasDataRegistration,
         scopeOfGrant: scope,
-        ...(hasDataInstance ? { hasDataInstance } : {}),
       }
       if (childGrantData.length) {
         // embed full child grant data so reconciliation can flatten the tree
@@ -413,7 +407,6 @@ async function generateChildSourceGrantData(
     const childData: FinalGrantData = {
       id: childGrantIri,
       type: [CONTEXT.AccessGrant],
-      storage: dataStorageIri,
       access: grantAccess({
         scopeOfGrant,
         storage: dataStorageIri,
@@ -424,10 +417,6 @@ async function generateChildSourceGrantData(
         assignee: grantee,
         actions: childAuthorization.accessMode,
       }),
-      grantedBy: childAuthorization.grantedBy,
-      dataOwner: childAuthorization.grantedBy,
-      registeredShapeTree: childAuthorization.registeredShapeTree,
-      hasDataRegistration,
       scopeOfGrant,
       inheritsFromGrant: parentGrantIri,
     }
@@ -507,7 +496,6 @@ async function generateSourceAccessGrants(
     const grant: FinalGrantData = {
       id: regularGrantIri,
       type: [CONTEXT.AccessGrant],
-      storage,
       access: grantAccess({
         scopeOfGrant,
         storage,
@@ -519,12 +507,7 @@ async function generateSourceAccessGrants(
         assignee: grantee,
         actions: data.accessMode,
       }),
-      grantedBy: data.grantedBy,
-      dataOwner: data.grantedBy,
-      registeredShapeTree: data.registeredShapeTree,
-      hasDataRegistration,
       scopeOfGrant,
-      ...(data.hasDataInstance?.length ? { hasDataInstance: data.hasDataInstance } : {}),
     }
     if (childGrantData.length) {
       grant.hasInheritingGrant = childGrantData.flatMap((g) => (g.id ? [g.id] : []))

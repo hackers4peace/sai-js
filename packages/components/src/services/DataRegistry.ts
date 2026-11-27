@@ -5,6 +5,10 @@ import {
   DataRegistration as DataRegistrationModel,
   Grant,
   ShapeTree,
+  grantDataOwner,
+  grantRegistration,
+  grantShapeTree,
+  grantStorage,
   labelFromNode,
 } from '@janeirodigital/interop-data-model'
 const loadShapeTree = loader(ShapeTree.fromJsonLd)
@@ -81,18 +85,20 @@ const buildDataRegistryForGrant = async (
   const seen = new Set<string>()
   const registrations: Array<Schema.Type<typeof DataRegistration>> = []
   for (const accessGrant of accessGrants) {
-    if (seen.has(accessGrant.hasDataRegistration)) {
+    const registration = grantRegistration(accessGrant)
+    if (seen.has(registration)) {
       continue
     }
-    seen.add(accessGrant.hasDataRegistration)
-    const shapeTree = await loadShapeTree(accessGrant.registeredShapeTree, ctx.session.fetch)
+    seen.add(registration)
+    const shapeTreeIri = grantShapeTree(accessGrant)
+    const shapeTree = await loadShapeTree(shapeTreeIri, ctx.session.fetch)
     const shapeTreeDescription = descriptionsLang
       ? await ShapeTree.getDescription(shapeTree, descriptionsLang, ctx.session.fetch)
       : undefined
     registrations.push(
       DataRegistration.make({
-        id: IRI.make(accessGrant.hasDataRegistration),
-        shapeTree: accessGrant.registeredShapeTree,
+        id: IRI.make(registration),
+        shapeTree: shapeTreeIri,
         dataRegistry: registryIri,
         label: pickLanguage(shapeTreeDescription?.label, descriptionsLang),
       })
@@ -163,7 +169,7 @@ async function accessGrantIndexForAgent(
       continue
     }
     const grants = await reciprocalGrants(ctx, registration.reciprocalRegistration)
-    scanned.push(...grants.filter((grant) => grant.dataOwner === agentId))
+    scanned.push(...grants.filter((grant) => grantDataOwner(grant) === agentId))
   }
   return indexFromGrants(scanned)
 }
@@ -254,7 +260,7 @@ export const listDataInstances = async (
     }
     const seenInstances = new Set<string>()
     for (const accessGrant of accessGrants) {
-      if (accessGrant.hasDataRegistration !== registrationId) {
+      if (grantRegistration(accessGrant) !== registrationId) {
         continue
       }
       if (ctx.webId === ctx.userWebId) {
@@ -270,7 +276,7 @@ export const listDataInstances = async (
           const dataInstance = await loadDataInstance(
             instanceId,
             ctx.session.fetch,
-            accessGrant.registeredShapeTree,
+            grantShapeTree(accessGrant),
             descriptionsLang
           )
           dataInstances.push(
@@ -284,13 +290,13 @@ export const listDataInstances = async (
         // org context — the admin's session derefs no peer document (403);
         // the context's storage fetch performs the read-only org impersonation
         // for the grant's storage. Shape trees are public (admin-session fetch).
-        const shapeTree = await loadShapeTree(accessGrant.registeredShapeTree, ctx.session.fetch)
+        const shapeTree = await loadShapeTree(grantShapeTree(accessGrant), ctx.session.fetch)
         for await (const instanceId of peerInstanceIris(ctx, accessGrant)) {
           if (seenInstances.has(instanceId)) {
             continue
           }
           seenInstances.add(instanceId)
-          const node = await peerInstanceNode(ctx, accessGrant.storage, instanceId, shapeTree)
+          const node = await peerInstanceNode(ctx, grantStorage(accessGrant), instanceId, shapeTree)
           dataInstances.push(
             DataInstance.make({
               id: IRI.make(instanceId),

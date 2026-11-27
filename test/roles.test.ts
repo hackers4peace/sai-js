@@ -4,7 +4,10 @@ import {
   DataAuthorization,
   Grant,
   getAccessGrantIris,
+  grantAssigner,
+  grantDataOwner,
   grantGrantee,
+  grantShapeTree,
 } from '@janeirodigital/interop-data-model'
 import type { GrantData } from '@janeirodigital/interop-data-model'
 import { CONTEXT, loader } from '@janeirodigital/interop-utils'
@@ -78,9 +81,9 @@ async function verifyAccessGrant(
     }
     return grants.find(
       (grant) =>
-        grant.registeredShapeTree === shapeTree &&
-        grant.grantedBy === grantedById &&
-        grant.dataOwner === dataOwnerId
+        grantShapeTree(grant) === shapeTree &&
+        grantAssigner(grant) === grantedById &&
+        grantDataOwner(grant) === dataOwnerId
     )
   }
 
