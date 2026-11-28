@@ -141,7 +141,12 @@ async function seedFixtures(): Promise<void> {
  */
 export const test = base.extend<{ seed: void }>({
   seed: [
-    async (_fixtures, use) => {
+    // Playwright injects the fixture dependencies as the first argument and
+    // REQUIRES it to be an object pattern; naming it (`_fixtures`) makes the
+    // loader reject the file and collect 0 tests (all specs then import this
+    // `test`), so the report published to /journeys/ is empty.
+    // oxlint-disable-next-line no-empty-pattern -- the pattern is Playwright's signature, not a bug
+    async ({}, use) => {
       await seedFixtures()
       await use()
     },
