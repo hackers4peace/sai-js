@@ -24,7 +24,9 @@ const assetBase = import.meta.env.BASE_URL
     <meta name="color-scheme" content="light dark" />
     <meta name="generator" content={Astro.generator} />
     <title>SAI-JS — Architecture & media</title>
-    <script src={`${assetBase}likec4-webcomponent.js`}></script>
+    <!-- is:inline is required: without it Astro routes script tags through Vite,
+         which silently drops a dynamic src pointing at public/ (no bundled output). -->
+    <script is:inline defer src={`${assetBase}likec4-webcomponent.js`}></script>
   </head>
   <body id="top">
     <a class="skip-link" href="#content">Skip to content</a>
